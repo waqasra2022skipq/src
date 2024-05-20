@@ -1,0 +1,3 @@
+select Active,Type,ProvID,Name,LName,FName,Email,NoMail from Provider order by LName,FName;
+select dbname,UserID,loginid from UserLogin order by loginid;
+

@@ -1,0 +1,130 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+
+############################################################################
+# setup Meaningful Use Accounting
+#   ./genMU DBNAME=db&BillDate=billdate&ClientID=clientid
+############################################################################
+my $form = DBForm->new();
+my $ClientID = $form->{'ClientID'};
+my $BillDate = $form->{'BillDate'};
+if ( $BillDate eq '' )
+{
+  print qq|\nMISSING BillDate!\n|;
+  $form->complete();
+  exit;
+}
+my $dbh = $form->dbconnect();
+my $dbname = $form->{'DBNAME'};
+print qq|genMU Started: |.localtime().qq|\n|;
+print qq|======================================\n\n|;
+my $with = $ClientID ? qq| and Treatment.ClientID=${ClientID}| : '';
+print qq|BillDate: ${BillDate}, with=${with}\n|;
+my $sNote = $dbh->prepare("
+select Treatment.*
+     , Client.LName, Client.FName, Client.Suffix, Client.SSN
+     , Counselor.FName as ProviderFName, Counselor.LName as ProviderLName, Counselor.ScreenName as ProviderScreenName
+     , Clinic.Name as ClinicName
+ from Treatment 
+  left join Client on Client.ClientID=Treatment.ClientID
+  left join Provider as Counselor on Counselor.ProvID=Treatment.ProvID
+  left join Provider as Clinic on Clinic.ProvID=Treatment.ClinicID
+ where BillDate='${BillDate}' ${with}
+ order by ContLogDate");
+$sNote->execute() || $form->dberror("select Treatment ${BillDate} ${ClientID}");
+while ( my $rNote = $sNote->fetchrow_hashref )
+{ 
+  print qq|Process: ClientID=$rNote->{ClientID}, TrID=$rNote->{TrID}, BilledAmt=$rNote->{BilledAmt}, AmtDue=$rNote->{AmtDue}\n|;
+  print qq|         $rNote->{'FName'} $rNote->{'LName'}\n|;
+  print qq|         $rNote->{'ProviderFName'} $rNote->{'ProviderLName'}\n|;
+  print qq|         $rNote->{'ClinicName'} \n|;
+  ##my $r = ();
+  ##$r->{'TrID'} = $rNote->{'TrID'};
+  ##$r->{'ClientID'} = $rNote->{'ClientID'};
+  ##$r->{'ContDate'} = $rNote->{'ContLogDate'};
+  ##$r->{'BillDate'} = $rNote->{'BillDate'};
+  ##$r->{'SCID'} = $rNote->{'SCID'};
+  ##$r->{'SCNum'} = $rNote->{'SCNum'};
+  ##$r->{'InsCode'} = $InsCode;
+  ##$r->{'BillAmt'} = $rNote->{'BilledAmt'};
+  ##$r->{'Units'}   = $rNote->{'Units'};
+  ##$r->{'Code'} = 'BI';
+  ##$r->{'SRC'} = $SRC;
+#foreach my $f ( sort keys %{$r} ) { warn "r: $f=$r->{$f}\n"; }
+  my $TrID = $rNote->{'TrID'};
+  my $ClientID = $rNote->{'ClientID'};
+  my $ProvID = $rNote->{'ProvID'};
+  my $ClinicID = $rNote->{'ClinicID'};
+  my $ContDate = DBUtil->Date($rNote->{'ContLogDate'},'fmt','MM-DD-YYYY');
+  $e = qq|call `emradv_sp_AMS_AddMeasureInformation` ('${ClientID}','${ProvID}','${ClinicID}','${TrID}',STR_TO_DATE('${ContDate}','%m-%d-%Y'),'visitcreated');|;
+warn qq|$e\n|;
+  my $p= $dbh->prepare($e);
+  $p->execute();
+  $e = qq|call `emradv_sp_AMS_AddMeasureInformation` ('${ClientID}','${ProvID}','${ClinicID}','${TrID}',STR_TO_DATE('${ContDate}','%m-%d-%Y'),'PatientEducationinOffice');|;
+warn qq|$e\n|;
+  my $p= $dbh->prepare($e);
+  $p->execute();
+  $e = qq|call `emradv_sp_AMS_AddMeasureInformation` ('${ClientID}','${ProvID}','${ClinicID}','${TrID}',STR_TO_DATE('${ContDate}','%m-%d-%Y'),'PatientEducationOnPortal');|;
+warn qq|$e\n|;
+  my $p= $dbh->prepare($e);
+  $p->execute();
+  $p->finish();
+}
+$sNote->finish();
+print qq|======================================\n|;
+print qq|genMU Completed: |.localtime().qq|\n\n|;
+$form->complete();
+exit;
+############################################################################
+#-- Patient Electronic Access
+#call `emradv_sp_AMS_AddMeasureInformation` ('EarleLavon', 'Provider 1','TIN A','1',STR_TO_DATE('04-04-2016', '%m-%d-%Y'),'visitcreated');
+#call `emradv_sp_AMS_AddMeasureInformation` ('EarleLavon', 'Provider 1','TIN A','1',STR_TO_DATE('04-04-2016', '%m-%d-%Y'),'datapublishedforAPI');
+#call `emradv_sp_AMS_AddMeasureInformation` ('EarleLavon', 'Provider 1','TIN A','1',STR_TO_DATE('04-04-2016', '%m-%d-%Y'),'datapublishedforPORTAL');
+#
+#
+#-- Patient Education
+#call `emradv_sp_AMS_AddMeasureInformation` ('EarleLavon', 'Provider 1','TIN A','1',STR_TO_DATE('04-04-2016', '%m-%d-%Y'),'visitcreated');
+#call `emradv_sp_AMS_AddMeasureInformation` ('EarleLavon', 'Provider 1','TIN A','1',STR_TO_DATE('04-04-2016', '%m-%d-%Y'),'PatientEducationinOffice');
+#call `emradv_sp_AMS_AddMeasureInformation` ('EarleLavon', 'Provider 1','TIN B','24',STR_TO_DATE('04-09-2016', '%m-%d-%Y'),'PatientEducationOnPortal');
+#
+#
+#-- VDT
+#call `emradv_sp_AMS_AddMeasureInformation` ('EarleLavon', 'Provider 1','TIN A','1',STR_TO_DATE('04-04-2016', '%m-%d-%Y'),'visitcreated');
+#call `emradv_sp_AMS_AddMeasureInformation` ('EarleLavon', 'Provider 1','TIN A','23',STR_TO_DATE('04-08-2016', '%m-%d-%Y'),'VDTAPI');
+#call `emradv_sp_AMS_AddMeasureInformation` ('EarleLavon', 'Provider 1','TIN A','23',STR_TO_DATE('04-08-2016', '%m-%d-%Y'),'VDTPortal');
+#
+#
+#-- Securemessaging
+#call `emradv_sp_AMS_AddMeasureInformation` ('EarleLavon', 'Provider 1','TIN A','1',STR_TO_DATE('04-04-2016', '%m-%d-%Y'),'visitcreated');
+#call `emradv_sp_AMS_AddMeasureInformation` ('EarleLavon', 'Provider 1','TIN A','1',STR_TO_DATE('04-04-2016', '%m-%d-%Y'),'Securemessagereceived');
+#call `emradv_sp_AMS_AddMeasureInformation` ('EarleLavon', 'Provider 1','TIN A','23',STR_TO_DATE('04-08-2016', '%m-%d-%Y'),'Securemessagesent');
+#
+#
+#-- Transition of Care
+#call `emradv_sp_AMS_AddMeasureInformation` ('EarleLavon', 'Provider 1','TIN A','100',STR_TO_DATE('07-04-2016', '%m-%d-%Y'),'referalcreated');
+#call `emradv_sp_AMS_AddMeasureInformation` ('EarleLavon', 'Provider 1','TIN A','MSGID',STR_TO_DATE('04-04-2016', '%m-%d-%Y'),'summaryofcaresent');
+#call `emradv_sp_AMS_AddMeasureInformation` ('EarleLavon', 'Provider 1','TIN A','MSGID',STR_TO_DATE('04-04-2016', '%m-%d-%Y'),'MDNreceived');
+#
+#
+#-- Receive Incorporate
+#call `emradv_sp_AMS_AddMeasureInformation` ('EarleLavon', 'Provider 1','TIN A','TRANSID',STR_TO_DATE('04-04-2016', '%m-%d-%Y'),'Transitioned');
+#call `emradv_sp_AMS_AddMeasureInformation` ('EarleLavon', 'Provider 2','TIN A','TRANSID',STR_TO_DATE('04-05-2016', '%m-%d-%Y'),'SummaryOfCareAvailable');
+#call `emradv_sp_AMS_AddMeasureInformation` ('EarleLavon', 'Provider 2','TIN A','TRANSID',STR_TO_DATE('04-05-2016', '%m-%d-%Y'),'SummaryOfCareReceived');
+#call `emradv_sp_AMS_AddMeasureInformation` ('EarleLavon', 'Provider 2','TIN A','TRANSID',STR_TO_DATE('04-05-2016', '%m-%d-%Y'),'SummaryOfCareIncorporated');
+#
+#
+#-- Reconciliation
+#call `emradv_sp_AMS_AddMeasureInformation` ('EarleLavon', 'Provider 1','TIN A','TRANSID_2',STR_TO_DATE('04-04-2016', '%m-%d-%Y'),'Transitioned');
+#call `emradv_sp_AMS_AddMeasureInformation` ('EarleLavon', 'Provider 1','TIN A','TRANSID_2',STR_TO_DATE('04-04-2016', '%m-%d-%Y'),'Medicationreconciled');
+#call `emradv_sp_AMS_AddMeasureInformation` ('EarleLavon', 'Provider 1','TIN A','TRANSID_2',STR_TO_DATE('04-04-2016', '%m-%d-%Y'),'Allergyreconciled');
+#call `emradv_sp_AMS_AddMeasureInformation` ('EarleLavon', 'Provider 1','TIN A','TRANSID_2',STR_TO_DATE('04-04-2016', '%m-%d-%Y'),'Problemreconciled');
+#
+#
+#--For AMS report call the SP as follows
+#-- providerid, organizationid,from date, to date, activity name (blank string), reporting type which can be stage2, Stage3, ACITransition, ACIonly
+#
+#CALL `amsreport`.`emradv_sp_AMS_CalculateAMSReport`('provider 2', '', STR_TO_DATE('04-04-2016', '%m-%d-%Y'), STR_TO_DATE('04-10-2016', '%m-%d-%Y'), '', 'stage2');
+#
+############################################################################

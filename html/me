@@ -1,0 +1,110 @@
+  <TR > <TD CLASS="strcol" COLSPAN="2" ><HR></TD> </TR>
+  <TR >
+    <TD CLASS="strcol" >
+      Is Patient's Condition Related to:
+    </TD>
+    <TD CLASS="strcol" >
+      Employment (Current or Present) 
+        <INPUT TYPE="radio" NAME="ClientReferrals_Employed_1" VALUE="1" <<ClientReferrals_Employed_1=1>> > yes
+        <INPUT TYPE="radio" NAME="ClientReferrals_Employed_1" VALUE="0" <<ClientReferrals_Employed_1=0>> > no
+      <BR>
+      Auto Accident? 
+        <INPUT TYPE="radio" NAME="ClientReferrals_AutoAccident_1" VALUE="1" <<ClientReferrals_AutoAccident_1=1>> > yes
+        <INPUT TYPE="radio" NAME="ClientReferrals_AutoAccident_1" VALUE="0" <<ClientReferrals_AutoAccident_1=0>> > no
+      <BR>
+      Place (State) OK
+        <SELECT NAME="ClientReferrals_AutoAccidentST_1">
+          [[DBA->selxTable(%form+xState+<<ClientReferrals_AutoAccidentST_1>>+Descr)]]
+        </SELECT>
+      <BR>
+      Other Accident? 
+        <INPUT TYPE="radio" NAME="ClientReferrals_OtherAccident_1" VALUE="1" <<ClientReferrals_OtherAccident_1=1>> > yes
+        <INPUT TYPE="radio" NAME="ClientReferrals_OtherAccident_1" VALUE="0" <<ClientReferrals_OtherAccident_1=0>> > no
+    </TD>
+  </TR>
+  <TR > <TD CLASS="strcol" COLSPAN="2" >Initial Referral Questionnaire</TD> </TR>
+  <TR >
+    <TD CLASS="strcol" >#1. Reason for Referral</TD>
+    <TD CLASS="strcol" >
+       <TEXTAREA NAME="ClientReferrals_RefReason_1" COLS="70" ROWS="3" WRAP="virtual" ><<ClientReferrals_RefReason_1>></TEXTAREA>
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >
+      #2. (Tobacco) Do you Use Tobacco?
+    </TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="radio" NAME="ClientReferrals_UseTobacco_1" VALUE="1" <<ClientReferrals_UseTobacco_1=1>> > yes
+      <INPUT TYPE="radio" NAME="ClientReferrals_UseTobacco_1" VALUE="0" <<ClientReferrals_UseTobacco_1=0>> > no
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol indent" >
+      Are you interested in Tobacco Cessation?
+    </TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="radio" NAME="ClientReferrals_TobaccoCessation_1" VALUE="1" <<ClientReferrals_TobaccoCessation_1=1>> > yes
+      <INPUT TYPE="radio" NAME="ClientReferrals_TobaccoCessation_1" VALUE="0" <<ClientReferrals_TobaccoCessation_1=0>> > no
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >
+      #3. (Risk-Suicide) Do you have thoughts of hurting yourself or others?
+    </TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="radio" NAME="ClientReferrals_RiskSuicide_1" VALUE="1" <<ClientReferrals_RiskSuicide_1=1>> > yes
+      <INPUT TYPE="radio" NAME="ClientReferrals_RiskSuicide_1" VALUE="0" <<ClientReferrals_RiskSuicide_1=0>> > no
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol indent" >
+      Do you have a plan?
+    </TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="radio" NAME="ClientReferrals_SuicidePlan_1" VALUE="1" <<ClientReferrals_SuicidePlan_1=1>> > yes
+      <INPUT TYPE="radio" NAME="ClientReferrals_SuicidePlan_1" VALUE="0" <<ClientReferrals_SuicidePlan_1=0>> > no
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >
+      #4. (Trauma) Have you experienced or witnessed trauma?
+    </TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="radio" NAME="ClientReferrals_WitnessTrauma_1" VALUE="1" <<ClientReferrals_WitnessTrauma_1=1>> > yes
+      <INPUT TYPE="radio" NAME="ClientReferrals_WitnessTrauma_1" VALUE="0" <<ClientReferrals_WitnessTrauma_1=0>> > no
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >
+      #5. (Drugs/Alcohol) Do you currently use Alcohol or Drugs?
+    </TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="radio" NAME="ClientReferrals_UseAlcoholDrugs_1" VALUE="1" <<ClientReferrals_UseAlcoholDrugs_1=1>> > yes
+      <INPUT TYPE="radio" NAME="ClientReferrals_UseAlcoholDrugs_1" VALUE="0" <<ClientReferrals_UseAlcoholDrugs_1=0>> > no
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol indent" >
+      Will you be receiving treatment here for that?
+    </TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="radio" NAME="ClientReferrals_RecieveADT_1" VALUE="1" <<ClientReferrals_RecieveADT_1=1>> > yes
+      <INPUT TYPE="radio" NAME="ClientReferrals_RecieveADT_1" VALUE="0" <<ClientReferrals_RecieveADT_1=0>> > no
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >
+      #6. (Mood) Do you experience excessive Anxiety/Worry?
+    </TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="radio" NAME="ClientReferrals_MoodDisorder_1" VALUE="1" <<ClientReferrals_MoodDisorder_1=1>> > yes
+      <INPUT TYPE="radio" NAME="ClientReferrals_MoodDisorder_1" VALUE="0" <<ClientReferrals_MoodDisorder_1=0>> > no
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol tophdr" COLSPAN="2" >
+      A YES INDICATES A SCREENING NEEDS COMPLETED.
+      Give this to the assigned Case Manager to complete appropriate Screenings before Assessment.
+      Schedule the Assessment Intake.
+    </TD>
+  </TR>

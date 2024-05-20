@@ -1,0 +1,24 @@
+#!/bin/bash
+# kls, daily 11/4/08
+# ------------------------------------
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   print "\nServices not installed!"
+   exit 1
+fi
+# ------------------------------------
+DBS=$(${MISBIN}/dbs LIVE)
+print "DBS=${DBS}"
+  print "\n======================================"
+  print "${CMD} Started: $(date)"
+# ------------------------------------
+# save ALL sql files
+  for DBNAME in $DBS; do
+    print "\nRepair MySQL ${DBNAME} db pwd=$(pwd)..."
+    mysqlcheck -r ${DBNAME}
+  done
+# ------------------------------------
+  print "\n${CMD} Complete: $(date)"
+  print "======================================\n"
+# ------------------------------------

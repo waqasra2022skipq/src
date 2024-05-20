@@ -1,0 +1,11 @@
+select xSC.SCID,xSC.SCNum,xSC.SCName
+      ,xSCType.Descr as PAType
+      ,xSC.ServiceType
+      ,xCredentials.Descr as Cred
+      ,xSCRestrictions.Descr as Res
+ from xSC 
+  left join okmis_config.xSCType on xSCType.ID=xSC.Type
+  left join okmis_config.xCredentials on xCredentials.ID=xSC.CredID
+  left join okmis_config.xSCRestrictions on xSCRestrictions.ID=xSC.Restriction
+ where SCNum like 'T1012 HF%' 
+ order by xSC.SCNum,xSC.SCID,xCredentials.Descr

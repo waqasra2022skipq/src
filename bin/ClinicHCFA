@@ -1,0 +1,129 @@
+#!/usr/bin/perl
+###########################################
+use lib '/home/okmis/mis/src/lib';
+use Cwd;
+use DBI;
+use DBForm;
+use DBA;
+use cBill;
+use SysAccess;
+use Time::Local;
+my $DT=localtime();
+
+############################################################################
+# ClinicHCFA DBNAME=db\&BillDate=date\&ForClinic=id\&ForInsurance=id
+############################################################################
+$form = DBForm->new;
+$dbh = $form->dbconnect;
+#foreach my $f ( sort keys %{$form} ) { warn "ClinicHCFA: form-$f=$form->{$f}\n"; }
+
+my ($BillDate,$NEXTBILLDATE) = cBill->getBillDate();
+$BillDate = $form->{BillDate} if ( $form->{BillDate} );
+my $ForClinic = $form->{ForClinic} ? $form->{ForClinic} : $form->{LOGINPROVID};
+print qq|BillDate: ${BillDate}\n|;
+
+chdir("$form->{DOCROOT}/reports3");
+$pwd=cwd();
+#warn "ClinicHCFA: pwd=$pwd\n";
+##
+# Note selection
+my $qNotes = qq|
+select Treatment.* 
+      ,Client.LName as ClientLName,Client.FName as ClientFName,Client.MName as ClientMName
+      ,ClientLegal.CustAgency as CustodialAgency
+      ,concat(Provider.LName, ', ', Provider.FName, ' (', Provider.ProvID, ')') as ProviderName
+      ,xSC.SCNum as SCNum,xSC.SCName as SCName,xSC.Type as SCType,xSC.InsID as SCInsID
+  from Treatment
+    left join Client on Client.ClientID=Treatment.ClientID
+    left join ClientLegal on ClientLegal.ClientID=Treatment.ClientID
+    left join Provider on Provider.ProvID=Treatment.ProvID
+    left join xSC on xSC.SCID=Treatment.SCID
+  where Treatment.CIPDate='$BillDate' and Treatment.ClinicID=? and xSC.InsID=?
+  order by Provider.LName, Provider.FName, Client.LName, Client.FName, Client.Suffix, Treatment.ContLogDate desc, Treatment.ContLogBegTime desc
+|;
+my $sNotes = $dbh->prepare($qNotes);
+
+##
+# first the Black HCFA
+##
+my $ClinicSelection = DBA->getClinicSelection($form,$ForClinic,'Provider.ProvID','and');
+my $InsuranceSelection = DBA->getInsuranceSelection($form,$form->{ForInsurance},'','xInsurance.ID','and');
+$qClinics = qq|
+  select Contracts.InsID, Provider.ProvID, Provider.Name, xInsurance.Descr
+  from Contracts
+    left join Provider on Provider.ProvID=Contracts.ProvID
+    left join xInsurance on xInsurance.ID=Contracts.InsID
+  where Contracts.BillType = 'BH'
+    and Provider.Active=1
+    ${ClinicSelection}
+    ${InsuranceSelection}
+  order by Provider.Name, xInsurance.Descr
+|;
+#warn "ClinicHCFA: qClinics=\n$qClinics\n";
+$sClinics=$dbh->prepare($qClinics);
+$sClinics->execute();
+while ( my $rClinics = $sClinics->fetchrow_hashref )
+{
+  print qq|Black print HCFA: $rClinics->{Name}, $rClinics->{Descr}\n|;
+  my $Cmd = qq|/home/okmis/mis/src/cgi/bin/printHCFA.pl DBNAME=$form->{DBNAME}\\&InsID=$rClinics->{InsID}\\&HCFAtype=Black\\&TrIDs=|;
+  my $spc = ''; my $cnt = 0;
+#warn qq|sNotes\n$qNotes\n($rClinics->{ProvID},$rClinics->{InsID})|;
+  $sNotes->execute($rClinics->{ProvID},$rClinics->{InsID}) || $form->dberror($qNotes);
+  while ( my $rNotes = $sNotes->fetchrow_hashref )
+  { $Cmd .= $spc . $rNotes->{TrID}; $spc = ' '; $cnt++; }
+  my $file = 'HCFA_Black_' . $rClinics->{ProvID} . '_' . $rClinics->{InsID} . "_${BillDate}_" . ${cnt} . '_' . DBUtil->Date('','stamp') . '_' . DBUtil->genToken() . '.pdf';
+  $Cmd .= qq|\\&file=${file}|;
+#warn "cmd=$Cmd\n";
+  if($cnt > 0) {
+    system("${Cmd}");
+  }
+}
+$sClinics->finish();
+############################################################################
+# Pre-Printed forms...Red.
+##
+$qClinics = qq|
+  select Contracts.InsID, Provider.ProvID, Provider.Name, xInsurance.Descr
+  from Contracts
+    left join Provider on Provider.ProvID=Contracts.ProvID
+    left join xInsurance on xInsurance.ID=Contracts.InsID
+  where Contracts.BillType = 'RH'
+    and Provider.Active=1
+    ${ClinicSelection}
+    ${InsuranceSelection}
+  order by Provider.Name, xInsurance.Descr
+|;
+#warn "ClinicHCFA: qClinics=\n$qClinics\n";
+$sClinics=$dbh->prepare($qClinics);
+$sClinics->execute();
+while ( my $rClinics = $sClinics->fetchrow_hashref )
+{
+  print qq|Red Pre-printed HCFA: $rClinics->{Name}, $rClinics->{Descr}\n|;
+  my $Cmd = qq|/home/okmis/mis/src/cgi/bin/printHCFA.pl DBNAME=$form->{DBNAME}\\&InsID=$rClinics->{InsID}\\&HCFAtype=Red\\&TrIDs=|;
+  my $spc = ''; my $cnt = 0;
+#warn qq|sNotes\n$qNotes\n($rClinics->{ProvID},$rClinics->{InsID})|;
+  $sNotes->execute($rClinics->{ProvID},$rClinics->{InsID}) || $form->dberror($qNotes);
+  while ( my $rNotes = $sNotes->fetchrow_hashref )
+  { $Cmd .= $spc . $rNotes->{TrID}; $spc = ' '; $cnt++; }
+  my $file = 'HCFA_Red_' . $rClinics->{ProvID} . '_' . $rClinics->{InsID} . "_${BillDate}_" . ${cnt} . '_' . DBUtil->Date('','stamp') . '_' . DBUtil->genToken() . '.pdf';
+  $Cmd .= qq|\\&file=${file}|;
+#warn "cmd=$Cmd\n";
+  if($cnt > 0) {
+    system("${Cmd}");
+  }
+}
+$sClinics->finish();
+$sNotes->finish();
+############################################################################
+# Send emails to all requested.
+my $Addrs = SysAccess->getPrivEmail($form,'HCFA2Print');
+my $Subject = qq|Generated HCFAs to print|;
+my $Text = qq|${DT}
+To view these reports select on the menus Administration->Notes->HCFA 1500 Print.
+($form->{DBNAME})
+|;
+DBUtil->email($form,$Addrs,$Subject,$Text,'',1);
+############################################################################
+$form->complete();
+exit;
+############################################################################

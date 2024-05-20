@@ -1,0 +1,1 @@
+select ProvID,Name,LName,FName from Provider where Type=3;

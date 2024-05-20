@@ -1,0 +1,3 @@
+update Treatment set ProvOKDate='', ProvOKTime='16:39:52' where TrID='1220024' and ProvOKDate is null and RecDate is null;
+update Treatment set MgrProvID='90',MgrRevDate='', MgrRevTime='16:39:52' where TrID='1220024' and MgrRevDate is null and RecDate is null;
+update Treatment set BillStatus=0, StatusDate='', CIPDate=NULL, DenDate=NULL, DenCode=NULL where TrID='1220024' and RecDate is null;

@@ -1,0 +1,2341 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBA;
+use myForm;
+use myDBI;
+use DBA;
+use myConfig;
+use MgrTree;
+use DBUtil;
+use Time::Local;
+
+use PDFlib::PDFlib;
+use strict;
+
+############################################################################
+my $form = myForm->new();
+my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $IDs = $form->{'IDs'};
+
+my $sClientASAM = $dbh->prepare("select * from ClientASAM where ID=?");
+my $sClient = $dbh->prepare("select * from Client where ClientID=?");
+my $sProvider = $dbh->prepare("select * from Provider where ProvID=?");
+my $sInsurance = $dbh->prepare("select * from Insurance where Insurance.ClientID=? and Insurance.Priority=? and Insurance.InsNumEffDate<=? and (?<=Insurance.InsNumExpDate or Insurance.InsNumExpDate is NULL) order by Insurance.InsNumEffDate desc");
+my $sCredentials = $dbh->prepare("select * from Credentials left join okmis_config.xCredentials on xCredentials.ID=Credentials.CredID where ProvID=? and InsID=? order by Credentials.Rank");
+
+
+############################################################################
+my $searchpath = "../data";
+
+my $pagewidth = 792;
+my $pageheight = 612;
+my $fontname= "Arial";
+my $boldfontname= "Arial-BoldMT";
+my $fontsizesmall = 8;
+my $fontsize = 9;
+my $fontsizemid = 10;
+my $fontsizelarge = 11;
+my $fontsizemidlarge = 12;
+my $fontsizexlarge = 13;
+my $fontsizemidxlarge = 14;
+my $fontsizexxlarge = 15;
+my $basefontoptions = "fontname=" . $fontname . " fontsize=" . $fontsize . " embedding encoding=unicode charref";
+my $basefontoptions_i = $basefontoptions . " fontstyle=italic";
+my $basefontoptions_u = $basefontoptions . " underline=true underlineposition=-15% underlinewidth=0.3";
+my $baseboldfontoptions = "fontname=" . $boldfontname . " fontsize=" . $fontsize . " embedding encoding=unicode";
+my $baseboldfontoptions_u = $baseboldfontoptions . " underline=true underlineposition=-15% underlinewidth=0.3";
+my $basemidfontoptions = $basefontoptions . " fontsize=" . $fontsizemid;
+my $basemidfontoptions_i = $basemidfontoptions . " fontstyle=italic";
+my $basemidfontoptions_u = $basemidfontoptions . " underline=true underlineposition=-15% underlinewidth=0.3";
+my $baseboldmidfontoptions = $baseboldfontoptions . " fontsize=" . $fontsizemid;
+my $baseboldmidfontoptions_u = $baseboldmidfontoptions . " underline=true underlineposition=-15% underlinewidth=0.3";
+my $baseboldmidfontoptions_i = $baseboldmidfontoptions . " fontstyle=italic";
+my $baselargefontoptions = $basefontoptions . " fontsize=" . $fontsizelarge;
+my $baseboldlargefontoptions = $baseboldfontoptions . " fontsize=" . $fontsizelarge;
+my $baseboldlargefontoptions_u = $baseboldlargefontoptions . " underline=true underlineposition=-15% underlinewidth=0.3";
+my $baseboldlargefontoptions_ui = $baseboldlargefontoptions_u . " fontstyle=italic";
+my $baseboldlargefontoptions_i = $baseboldlargefontoptions . " fontstyle=italic";
+my $basesmallfontoptions = $basefontoptions . " fontsize=" . $fontsizesmall;
+my $basesmallfontoptions_i = $basesmallfontoptions . " fontstyle=italic";
+my $baseboldsmallfontoptions = $baseboldfontoptions . " fontsize=" . $fontsizesmall;
+my $basemidlargefontoptions = $basefontoptions . " fontsize=" . $fontsizemidlarge;
+my $basemidlargefontoptions_i = $basemidlargefontoptions . " fontstyle=italic";
+my $basemidxlargefontoptions = $basefontoptions . " fontsize=" . $fontsizemidxlarge;
+my $baseboldmidxlargefontoptions = $baseboldfontoptions . " fontsize=" . $fontsizemidxlarge;
+my $basemidxlargefontoptions_i = $basemidxlargefontoptions . " fontstyle=italic";
+my $baseboldmidlargefontoptions = $baseboldfontoptions . " fontsize=" . $fontsizemidlarge;
+my $baseboldmidlargefontoptions_u = $baseboldmidlargefontoptions . " underline=true underlineposition=-15% underlinewidth=0.3";
+my $baseboldxlargefontoptions = $baseboldfontoptions . " fontsize=" . $fontsizexlarge;
+my $baseboldxlargefontoptions_i = $baseboldxlargefontoptions . " fontstyle=italic";
+my $basecheckfontoptions = "fontname={DejaVuSans} encoding=unicode fontsize=10 charref";
+
+my $marginleft = 30;
+my $margintop = 35;
+my $marginbottom = 30;
+my $contentwidth = $pagewidth - 2 * $marginleft;
+my $y_top = $pageheight - $margintop;
+my $y_bottom = $marginbottom;
+
+my $indoc;
+my $no_of_input_pages;
+my @pagehandles = ();
+my $pagecount = 0;
+
+my $filename = '/tmp/'.$form->{'LOGINID'}.'_'.DBUtil->genToken().'_'.DBUtil->Date('','stamp').'.pdf';
+my $outfile = $form->{'file'} eq ''                # create and print pdf else just create.
+  ? $form->{'DOCROOT'}.$filename
+  : $form->{'file'};
+#my $outfile = "kls.pdf";
+
+############################################################################
+eval {
+
+	# create a new PDFlib object
+	my $p = new PDFlib::PDFlib;
+
+	$p->set_option("SearchPath={{" . $searchpath . "}}");
+
+	# This mean we don't have to check error return values, but will
+	# get an exception in case of runtime problems.
+
+	$p->set_option("errorpolicy=exception");
+
+	# all strings are expected as utf8
+	$p->set_option("stringformat=utf8");
+
+	$p->begin_document($outfile, "");
+
+	$p->set_info("Creator", "Millennium Information Services");
+	$p->set_info("Author", "Keith Stephenson");
+	$p->set_info("Title", "ASAM");
+
+        foreach my $ID ( split(' ',$IDs) )
+        {
+#warn "PrintClientASI: ID=${ID}\n";
+          $sClientASAM->execute($ID) || myDBI->dberror("select ClientASAM ${ID}");
+          while ( my $rClientASAM = $sClientASAM->fetchrow_hashref )
+          {
+            my $AdultChild = $rClientASAM->{'AdultChild'};      # ie: ADULT|CHILD
+            my $Type = $rClientASAM->{'Type'};                  # ie: DIS|ADM
+            # Level: 1 or 2.1 or .05 etc...
+            (my $Level = $rClientASAM->{'Level'}) =~ s/\.//g;
+            $Level = length($Level) == 2 ? $Level : $Level.'0';
+            my $pdftype = qq|${AdultChild}_${Type}_L${Level}|;
+            my $pdfname = qq|Print${pdftype}.pdf|;
+	    my $FORMDIR = myConfig->cfg('FORMDIR');
+            my $pdfpath = qq|$FORMDIR/${pdfname}|;
+            # Open the Block template which contains PDFlib Blocks
+            $indoc = $p->open_pdi_document($pdfpath, "");
+            if ($indoc == -1) { die("Error: " . $p->get_errmsg()); }
+
+            $no_of_input_pages = $p->pcos_get_number($indoc, "length:pages");
+
+            main->openPdiPages($p);
+            main->printClientASAM($p,$pdftype,$rClientASAM);
+
+            main->closePdiPages($p);
+          }
+        }
+	##print($pagecount);
+	if ($pagecount eq 0) { main->createEmptyPage($p); }
+
+	$p->end_document("");
+
+};
+
+if ($@) {
+	die("$0: PDFlib Exception occurred:\n$@");
+}
+
+$sClientASAM->finish();
+$sClient->finish();
+$sProvider->finish();
+$sInsurance->finish();
+$sCredentials->finish();
+
+myDBI->cleanup();
+
+if ( $form->{'file'} eq '' )                # create and print pdf.
+{ print qq|Location: ${filename}\n\n|; }
+exit;
+
+##########################################################################################################
+sub printClientASAM
+{
+  my ($self, $p, $pdftype, $rClientASAM) = @_;
+
+  $sClient->execute($rClientASAM->{'ClientID'}) || myDBI->dberror("select Client: $rClientASAM->{'ClientID'}");
+  my $rClient = $sClient->fetchrow_hashref;
+  $sInsurance->execute($rClient->{'ClientID'},1,$form->{'TODAY'},$form->{'TODAY'});
+  my $rInsurance = $sInsurance->fetchrow_hashref;
+  $sProvider->execute($rClientASAM->{'Interviewer'});
+  my $rProvider = $sProvider->fetchrow_hashref;
+  $sCredentials->execute($rClientASAM->{'Interviewer'},$rInsurance->{'InsID'});
+  my $rCredentials = $sCredentials->fetchrow_hashref;
+  my $ProvCred = $rCredentials->{'Abbr'};
+  $rClientASAM->{'Client_Name'} = qq|$rClient->{'FName'} $rClient->{'MName'} $rClient->{'LName'}|;
+  $rClientASAM->{'Client_ClientID'} = $rClient->{'ClientID'};
+  $rClientASAM->{'Client_Date'} = DBUtil->Date($rClientASAM->{'TestDate'},'fmt','MM/DD/YY');
+  $rClientASAM->{'Provider_Name'} = qq|$rProvider->{'FName'} $rProvider->{'MName'} $rProvider->{'LName'}|;
+  $rClientASAM->{'Provider_Cred'} = $ProvCred;
+  $rClientASAM->{'Provider_Date'} = DBUtil->Date($rClientASAM->{'TestDate'},'fmt','MM/DD/YY');
+
+  foreach my $f ( sort keys %{$rClientASAM} ) {
+				my $val = $rClientASAM->{$f};
+				$rClientASAM->{${f}} = ${val};
+  }
+
+  main->createPages($p, $pdftype, $rClientASAM, $rClient);
+}
+
+
+sub createEmptyPage {
+	my ($self, $p) = @_;
+
+	$p->begin_page_ext($pagewidth, $pageheight, "topdown");
+	$p->fit_textline("NOT FOUND", $marginleft, 50, $basefontoptions);
+	$p->end_page_ext("");
+}
+
+
+sub createPages {
+	my ($self, $p, $pdftype, $rClientASAM, $rClient) = @_;
+
+	# Header info...
+	my $AgencyID = MgrTree->getAgency($form,$rClient->{'clinicClinicID'});
+	$sProvider->execute($AgencyID) || myDBI->dberror("printClientASAM: select Provider $AgencyID");
+	my $rAgency = $sProvider->fetchrow_hashref;
+	my $AgencyName = $rAgency->{Name};
+	my $AgencyAddr = $rAgency->{Addr1} . ', ';
+	$AgencyAddr .= $rAgency->{Addr2} . ', ' if ( $rAgency->{Addr2} );
+	my $AgencyCSZ = $rAgency->{City} . ', ' . $rAgency->{ST} . ' ' . $rAgency->{Zip};
+	my $AgencyPh = 'Office: ' . $rAgency->{WkPh} . ' Fax: ' . $rAgency->{Fax};
+
+	# set variables for pages...
+  ie: $rClientASAM->{Addr1} = "$rClientASAM->{Addr1} $rClientASAM->{Addr2}";
+##
+	my @PageData = ();
+
+	my $transfer = $rClientASAM->{'Transfer'} ? "Yes" : "No";
+	my $meets = $rClientASAM->{'Meets'};
+	if ($pdftype eq "ADULT_ADM_L05") {
+		@PageData = (
+			{
+				"descr" => "page 1",
+				"data" => [
+					{
+						"type"        => "textline",
+						"ypos"        => 559,
+						"xpos"        => 40,
+						"text"        => $rClientASAM->{'Client_Name'}
+					},  # Client Name
+					{
+						"type"        => "textline",
+						"ypos"        => 559,
+						"xpos"        => 224,
+						"text"        => $rClientASAM->{'Client_ClientID'}
+					},  # Client Identification Number
+					{
+						"type"        => "textline",
+						"ypos"        => 559,
+						"xpos"        => 434,
+						"text"        => $rClientASAM->{'Client_Date'}
+					},  # Today
+					{
+						"type"        => "textline",
+						"ypos"        => 53,
+						"xpos"        => 155,
+						"text"        => $rClientASAM->{'Provider_Name'}
+					},  # Print Counselor Name
+					{
+						"type"        => "textline",
+						"ypos"        => 53,
+						"xpos"        => 495,
+						"text"        => $rClientASAM->{'Provider_Cred'}
+					},  # Credential
+					{
+						"type"        => "textline",
+						"ypos"        => 53,
+						"xpos"        => 686,
+						"text"        => $rClientASAM->{'Provider_Date'}
+					},  # Date
+					{
+						"type"      => "check",
+						"ypos"      => 490.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 740, 692 ],
+						"val"       => $meets
+					},  # Requirements
+					{
+						"type"      => "check",
+						"ypos"      => 452,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 740, 692 ],
+						"val"       => $rClientASAM->{'D1'}
+					},  # D1
+					{
+						"type"      => "check",
+						"ypos"      => 458.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 150.5 ],
+						"val"       => $rClientASAM->{'D1v1'}
+					},  # D1v1
+					{
+						"type"      => "check",
+						"ypos"      => 447.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 150.5 ],
+						"val"       => $rClientASAM->{'D1v2'}
+					},  # D1v2
+					{
+						"type"      => "check",
+						"ypos"      => 407,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 740, 692 ],
+						"val"       => $rClientASAM->{'D2'}
+					},  # D2
+					{
+						"type"      => "check",
+						"ypos"      => 353,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 740, 692 ],
+						"val"       => $rClientASAM->{'D3'}
+					},  # D3
+					{
+						"type"      => "check",
+						"ypos"      => 303.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 740, 692 ],
+						"val"       => $rClientASAM->{'D4'}
+					},  # D4
+					{
+						"type"      => "check",
+						"ypos"      => 254,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 740, 692 ],
+						"val"       => $rClientASAM->{'D5'}
+					},  # D5
+					{
+						"type"      => "check",
+						"ypos"      => 260,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 150.5 ],
+						"val"       => $rClientASAM->{'D5v1'}
+					},  # D5v1
+					{
+						"type"      => "check",
+						"ypos"      => 239,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 150.5 ],
+						"val"       => $rClientASAM->{'D5v2'}
+					},  # D5v2
+					{
+						"type"      => "check",
+						"ypos"      => 174.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 740, 692 ],
+						"val"       => $rClientASAM->{'D6'}
+					},  # D6
+					{
+						"type"      => "check",
+						"ypos"      => 196,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 150.5 ],
+						"val"       => $rClientASAM->{'D6v1'}
+					},  # D6v1
+					{
+						"type"      => "check",
+						"ypos"      => 175,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 150.5 ],
+						"val"       => $rClientASAM->{'D6v2'}
+					},  # D6v2
+					{
+						"type"      => "check",
+						"ypos"      => 154,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 150.5 ],
+						"val"       => $rClientASAM->{'D6v3'}
+					},  # D6v3
+					{
+						"type"      => "check",
+						"ypos"      => 133,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 150.5 ],
+						"val"       => $rClientASAM->{'D6v4'}
+					},  # D6v4
+					{
+						"type"        => "textflow",
+						"ypos"        => 120,
+						"xpos_start"  => 40,
+						"xpos_end"    => 765,
+						"text"        => "$rClientASAM->{'Notes'}"
+					},  # Notes
+				]
+			}
+		);
+	}
+	elsif ($pdftype eq "ADULT_ADM_L10") {
+		@PageData = (
+			{
+				"descr" => "page 1",
+				"data" => [
+					{
+						"type"        => "textline",
+						"ypos"        => 547,
+						"xpos"        => 40,
+						"text"        => $rClientASAM->{'Client_Name'}
+					},  # Client Name
+					{
+						"type"        => "textline",
+						"ypos"        => 547,
+						"xpos"        => 218,
+						"text"        => $rClientASAM->{'Client_ClientID'}
+					},  # Client Identification Number
+					{
+						"type"        => "textline",
+						"ypos"        => 547,
+						"xpos"        => 429,
+						"text"        => $rClientASAM->{'Client_Date'}
+					},  # Today
+					{
+						"type"      => "check",
+						"ypos"      => 491.8,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 738.3, 700.5 ],
+						"val"       => $meets
+					},  # Requirements
+					{
+						"type"      => "check",
+						"ypos"      => 464,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 738.3, 700.5 ],
+						"val"       => $rClientASAM->{'D1'}
+					},  # D1
+					{
+						"type"      => "check",
+						"ypos"      => 469.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 160 ],
+						"val"       => $rClientASAM->{'D1v1'}
+					},  # D1v1
+					{
+						"type"      => "check",
+						"ypos"      => 458.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 160 ],
+						"val"       => $rClientASAM->{'D1v2'}
+					},  # D1v2
+					{
+						"type"      => "check",
+						"ypos"      => 420.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 738.3, 700.5 ],
+						"val"       => $rClientASAM->{'D2'}
+					},  # D2
+					{
+						"type"      => "check",
+						"ypos"      => 275,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 738.3, 700.5 ],
+						"val"       => $rClientASAM->{'D3'}
+					},  # D3
+					{
+						"type"      => "check",
+						"ypos"      => 383.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 160 ],
+						"val"       => $rClientASAM->{'D3v1'}
+					},  # D3v1
+					{
+						"type"      => "check",
+						"ypos"      => 342,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 160 ],
+						"val"       => $rClientASAM->{'D3v2'}
+					},  # D3v2
+					{
+						"type"      => "check",
+						"ypos"      => 320.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 160 ],
+						"val"       => $rClientASAM->{'D3v3'}
+					},  # D3v3
+					{
+						"type"      => "check",
+						"ypos"      => 279,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 160 ],
+						"val"       => $rClientASAM->{'D3v4'}
+					},  # D3v4
+					{
+						"type"      => "check",
+						"ypos"      => 228,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 160 ],
+						"val"       => $rClientASAM->{'D3v5'}
+					},  # D3v5
+					{
+						"type"      => "check",
+						"ypos"      => 207,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 160 ],
+						"val"       => $rClientASAM->{'D3v6'}
+					},  # D3v6
+					{
+						"type"      => "check",
+						"ypos"      => 166,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 160 ],
+						"val"       => $rClientASAM->{'D3v7'}
+					},  # D3v7
+					{
+						"type"      => "check",
+						"ypos"      => 98.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 738.3, 700.5 ],
+						"val"       => $rClientASAM->{'D4'}
+					},  # D4
+					{
+						"type"      => "check",
+						"ypos"      => 135,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 160 ],
+						"val"       => $rClientASAM->{'D4v1'}
+					},  # D4v1
+					{
+						"type"      => "check",
+						"ypos"      => 124,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 160 ],
+						"val"       => $rClientASAM->{'D4v2'}
+					},  # D4v2
+					{
+						"type"      => "check",
+						"ypos"      => 103,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 160 ],
+						"val"       => $rClientASAM->{'D4v3'}
+					},  # D4v3
+					{
+						"type"      => "check",
+						"ypos"      => 82,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 160 ],
+						"val"       => $rClientASAM->{'D4v4'}
+					}  # D4v4
+				]
+			},
+			{
+				"descr" => "page 2",
+				"data" => [
+					{
+						"type"      => "check",
+						"ypos"      => 516.8,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 738.8, 700.7 ],
+						"val"       => $rClientASAM->{'D5'}
+					},  # D5
+					{
+						"type"      => "check",
+						"ypos"      => 335,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 738.8, 700.7 ],
+						"val"       => $rClientASAM->{'D6'}
+					},  # D6
+					{
+						"type"      => "check",
+						"ypos"      => 446,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 160 ],
+						"val"       => $rClientASAM->{'D6v1'}
+					},  # D6v1
+					{
+						"type"      => "check",
+						"ypos"      => 436,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 160 ],
+						"val"       => $rClientASAM->{'D6v2'}
+					},  # D6v2
+					{
+						"type"      => "check",
+						"ypos"      => 404,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 160 ],
+						"val"       => $rClientASAM->{'D6v3'}
+					},  # D6v3
+					{
+						"type"      => "check",
+						"ypos"      => 352.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 160 ],
+						"val"       => $rClientASAM->{'D6v4'}
+					},  # D6v4
+					{
+						"type"      => "check",
+						"ypos"      => 331.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 160 ],
+						"val"       => $rClientASAM->{'D6v5'}
+					},  # D6v5
+					{
+						"type"      => "check",
+						"ypos"      => 310.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 160 ],
+						"val"       => $rClientASAM->{'D6v6'}
+					},  # D6v6
+					{
+						"type"        => "textflow",
+						"ypos"        => 200,
+						"xpos_start"  => 40,
+						"xpos_end"    => 765,
+						"text"        => $rClientASAM->{'Notes'}
+					},  # Notes
+					{
+						"type"        => "textline",
+						"ypos"        => 95.5,
+						"xpos"        => 155,
+						"text"        => $rClientASAM->{'Provider_Name'}
+					},  # Print Counselor Name
+					{
+						"type"        => "textline",
+						"ypos"        => 95.5,
+						"xpos"        => 510,
+						"text"        => $rClientASAM->{'Provider_Cred'}
+					},  # Credential
+					{
+						"type"        => "textline",
+						"ypos"        => 95.5,
+						"xpos"        => 698,
+						"text"        => $rClientASAM->{'Provider_Date'}
+					}  # Date
+				]
+			}
+		);
+	}
+	elsif ($pdftype eq "ADULT_ADM_L21") {
+		@PageData = (
+			{
+				"descr" => "page 1",
+				"data" => [
+					{
+						"type"        => "textline",
+						"ypos"        => 545,
+						"xpos"        => 40,
+						"text"        => $rClientASAM->{'Client_Name'}
+					},  # Client Name
+					{
+						"type"        => "textline",
+						"ypos"        => 545,
+						"xpos"        => 235,
+						"text"        => $rClientASAM->{'Client_ClientID'}
+					},  # Client Identification Number
+					{
+						"type"        => "textline",
+						"ypos"        => 545,
+						"xpos"        => 413,
+						"text"        => $rClientASAM->{'Client_Date'}
+					},  # Today
+					{
+						"type"      => "check",
+						"ypos"      => 448.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 742.8, 699.5 ],
+						"val"       => $meets
+					},  # Requirements
+					{
+						"type"      => "check",
+						"ypos"      => 369.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 742.8, 699.5 ],
+						"val"       => $rClientASAM->{'D1'}
+					},  # D1
+					{
+						"type"      => "check",
+						"ypos"      => 390,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 128 ],
+						"val"       => $rClientASAM->{'D1v1'}
+					},  # D1v1
+					{
+						"type"      => "check",
+						"ypos"      => 379,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 128 ],
+						"val"       => $rClientASAM->{'D1v2'}
+					},  # D1v2
+					{
+						"type"      => "check",
+						"ypos"      => 307.2,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 742.8, 699.5 ],
+						"val"       => $rClientASAM->{'D2'}
+					},  # D2
+					{
+						"type"      => "check",
+						"ypos"      => 182,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 742.8, 699.5 ],
+						"val"       => $rClientASAM->{'D3'}
+					},  # D3
+					{
+						"type"      => "check",
+						"ypos"      => 214.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 128 ],
+						"val"       => $rClientASAM->{'D3v1'}
+					},  # D3v1
+					{
+						"type"      => "check",
+						"ypos"      => 193.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 128 ],
+						"val"       => $rClientASAM->{'D3v2'}
+					},  # D3v2
+					{
+						"type"      => "check",
+						"ypos"      => 152,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 128 ],
+						"val"       => $rClientASAM->{'D3v3'}
+					},  # D3v3
+					{
+						"type"      => "check",
+						"ypos"      => 120.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 128 ],
+						"val"       => $rClientASAM->{'D3v4'}
+					},  # D3v4
+					{
+						"type"      => "check",
+						"ypos"      => 110,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 128 ],
+						"val"       => $rClientASAM->{'D3v5'}
+					}  # D3v5
+				]
+			},
+			{
+				"descr" => "page 2",
+				"data" => [
+					{
+						"type"      => "check",
+						"ypos"      => 485,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 742.8, 699.5 ],
+						"val"       => $rClientASAM->{'D4'}
+					},  # D4
+					{
+						"type"      => "check",
+						"ypos"      => 550.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 128 ],
+						"val"       => $rClientASAM->{'D4v1'}
+					},  # D4v1
+					{
+						"type"      => "check",
+						"ypos"      => 519,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 128 ],
+						"val"       => $rClientASAM->{'D4v2'}
+					},  # D4v2
+					{
+						"type"      => "check",
+						"ypos"      => 457,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 128 ],
+						"val"       => $rClientASAM->{'D4v3'}
+					},  # D4v3
+					{
+						"type"      => "check",
+						"ypos"      => 436.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 128 ],
+						"val"       => $rClientASAM->{'D4v4'}
+					},  # D4v4
+					{
+						"type"      => "check",
+						"ypos"      => 415.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 128 ],
+						"val"       => $rClientASAM->{'D4v5'}
+					},  # D4v5
+					{
+						"type"      => "check",
+						"ypos"      => 340.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 742, 699 ],
+						"val"       => $rClientASAM->{'D5'}
+					},  # D5
+					{
+						"type"      => "check",
+						"ypos"      => 228,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 742, 699 ],
+						"val"       => $rClientASAM->{'D6'}
+					},  # D6
+					{
+						"type"      => "check",
+						"ypos"      => 272,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 128 ],
+						"val"       => $rClientASAM->{'D6v1'}
+					},  # D6v1
+					{
+						"type"      => "check",
+						"ypos"      => 240.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 128 ],
+						"val"       => $rClientASAM->{'D6v2'}
+					},  # D6v2
+					{
+						"type"        => "textflow",
+						"ypos"        => 150,
+						"xpos_start"  => 40,
+						"xpos_end"    => 765,
+						"text"        => $rClientASAM->{'Notes'}
+					},  # Notes
+					{
+						"type"        => "textline",
+						"ypos"        => 58,
+						"xpos"        => 153,
+						"text"        => $rClientASAM->{'Provider_Name'}
+					},  # Print Counselor Name
+					{
+						"type"        => "textline",
+						"ypos"        => 58,
+						"xpos"        => 470,
+						"text"        => $rClientASAM->{'Provider_Cred'}
+					},  # Credential
+					{
+						"type"        => "textline",
+						"ypos"        => 58,
+						"xpos"        => 679,
+						"text"        => $rClientASAM->{'Provider_Date'}
+					}  # Date
+				]
+			}
+		);
+	}
+	elsif ($pdftype eq "ADULT_DIS_L05") {
+		@PageData = (
+			{
+				"descr" => "page 1",
+				"data" => [
+					{
+						"type"        => "textline",
+						"ypos"        => 547,
+						"xpos"        => 40,
+						"text"        => $rClientASAM->{'Client_Name'}
+					},  # Client Name
+					{
+						"type"        => "textline",
+						"ypos"        => 547,
+						"xpos"        => 216,
+						"text"        => $rClientASAM->{'Client_ClientID'}
+					},  # Client Identification Number
+					{
+						"type"        => "textline",
+						"ypos"        => 547,
+						"xpos"        => 429,
+						"text"        => $rClientASAM->{'Client_Date'}
+					},  # Today
+					{
+						"type"        => "textline",
+						"ypos"        => 507,
+						"xpos"        => 334,
+						"text"        => $rClientASAM->{'ToLevel'}
+					},  # Enter Level
+					{
+						"type"        => "textline",
+						"ypos"        => 529,
+						"xpos"        => 334,
+						"text"        => $transfer
+					},  # Transfer
+					{
+						"type"        => "textline",
+						"ypos"        => 46,
+						"xpos"        => 154,
+						"text"        => $rClientASAM->{'Provider_Name'}
+					},  # Print Counselor Name
+					{
+						"type"        => "textline",
+						"ypos"        => 46,
+						"xpos"        => 470,
+						"text"        => $rClientASAM->{'Provider_Cred'}
+					},  # Credential
+					{
+						"type"        => "textline",
+						"ypos"        => 46,
+						"xpos"        => 682,
+						"text"        => $rClientASAM->{'Provider_Date'}
+					},  # Date
+					{
+						"type"      => "check",
+						"ypos"      => 481.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 745.5, 712 ],
+						"val"       => $meets
+					},  # Requirements
+					{
+						"type"      => "check",
+						"ypos"      => 449,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 745.5, 712 ],
+						"val"       => $rClientASAM->{'D1'}
+					},  # D1
+					{
+						"type"      => "check",
+						"ypos"      => 455,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 141.5 ],
+						"val"       => $rClientASAM->{'D1v1'}
+					},  # D1v1
+					{
+						"type"      => "check",
+						"ypos"      => 445,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 141.5 ],
+						"val"       => $rClientASAM->{'D1v2'}
+					},  # D1v2
+					{
+						"type"      => "check",
+						"ypos"      => 406,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 745.5, 712 ],
+						"val"       => $rClientASAM->{'D2'}
+					},  # D2
+					{
+						"type"      => "check",
+						"ypos"      => 411.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 141.5 ],
+						"val"       => $rClientASAM->{'D2v1'}
+					},  # D2v1
+					{
+						"type"      => "check",
+						"ypos"      => 390.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 141.5 ],
+						"val"       => $rClientASAM->{'D2v2'}
+					},  # D2v2
+					{
+						"type"      => "check",
+						"ypos"      => 352.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 745.5, 712 ],
+						"val"       => $rClientASAM->{'D3'}
+					},  # D3
+					{
+						"type"      => "check",
+						"ypos"      => 369,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 141.5 ],
+						"val"       => $rClientASAM->{'D3v1'}
+					},  # D3v1
+					{
+						"type"      => "check",
+						"ypos"      => 348,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 141.5 ],
+						"val"       => $rClientASAM->{'D3v2'}
+					},  # D3v2
+					{
+						"type"      => "check",
+						"ypos"      => 294,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 745.5, 712 ],
+						"val"       => $rClientASAM->{'D4'}
+					},  # D4
+					{
+						"type"      => "check",
+						"ypos"      => 304.8,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 141.5 ],
+						"val"       => $rClientASAM->{'D4v1'}
+					},  # D4v1
+					{
+						"type"      => "check",
+						"ypos"      => 283.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 141.5 ],
+						"val"       => $rClientASAM->{'D4v2'}
+					},  # D4v2
+					{
+						"type"      => "check",
+						"ypos"      => 230.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 745.5, 712 ],
+						"val"       => $rClientASAM->{'D5'}
+					},  # D5
+					{
+						"type"      => "check",
+						"ypos"      => 251.3,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 141.5 ],
+						"val"       => $rClientASAM->{'D5v1'}
+					},  # D5v1
+					{
+						"type"      => "check",
+						"ypos"      => 220.3,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 141.5 ],
+						"val"       => $rClientASAM->{'D5v2'}
+					},  # D5v2
+					{
+						"type"      => "check",
+						"ypos"      => 157,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 745.5, 712 ],
+						"val"       => $rClientASAM->{'D6'}
+					},  # D6
+					{
+						"type"      => "check",
+						"ypos"      => 178,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 141.5 ],
+						"val"       => $rClientASAM->{'D6v1'}
+					},  # D6v1
+					{
+						"type"      => "check",
+						"ypos"      => 146.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 141.5 ],
+						"val"       => $rClientASAM->{'D6v2'}
+					},  # D6v2
+					{
+						"type"        => "textflow",
+						"ypos"        => 115,
+						"xpos_start"  => 40,
+						"xpos_end"    => 765,
+						"text"        => "$rClientASAM->{'Notes'}"
+					}  # Notes
+				]
+			}
+		);
+	}
+	elsif ($pdftype eq "ADULT_DIS_L10") {
+		@PageData = (
+			{
+				"descr" => "page 1",
+				"data" => [
+					{
+						"type"        => "textline",
+						"ypos"        => 537,
+						"xpos"        => 40,
+						"text"        => $rClientASAM->{'Client_Name'}
+					},  # Client Name
+					{
+						"type"        => "textline",
+						"ypos"        => 537,
+						"xpos"        => 217,
+						"text"        => $rClientASAM->{'Client_ClientID'}
+					},  # Client Identification Number
+					{
+						"type"        => "textline",
+						"ypos"        => 537,
+						"xpos"        => 429,
+						"text"        => $rClientASAM->{'Client_Date'}
+					},  # Today
+					{
+						"type"        => "textline",
+						"ypos"        => 517,
+						"xpos"        => 330,
+						"text"        => $transfer
+					},  # Transfer
+					{
+						"type"        => "textline",
+						"ypos"        => 495,
+						"xpos"        => 330,
+						"text"        => $rClientASAM->{'ToLevel'}
+					},  # Enter Level
+					{
+						"type"      => "check",
+						"ypos"      => 467,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 735, 690.5 ],
+						"val"       => $meets
+					},  # Requirements
+					{
+						"type"      => "check",
+						"ypos"      => 429.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 735, 690.5 ],
+						"val"       => $rClientASAM->{'D1'}
+					},  # D1
+					{
+						"type"      => "check",
+						"ypos"      => 440.8,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 155.3 ],
+						"val"       => $rClientASAM->{'D1v1'}
+					},  # D1v1
+					{
+						"type"      => "check",
+						"ypos"      => 430.2,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 155.3 ],
+						"val"       => $rClientASAM->{'D1v2'}
+					},  # D1v2
+					{
+						"type"      => "check",
+						"ypos"      => 359.7,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 735, 690.5 ],
+						"val"       => $rClientASAM->{'D2'}
+					},  # D2
+					{
+						"type"      => "check",
+						"ypos"      => 386.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 155.3 ],
+						"val"       => $rClientASAM->{'D2v1'}
+					},  # D2v1
+					{
+						"type"      => "check",
+						"ypos"      => 345.2,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 155.3 ],
+						"val"       => $rClientASAM->{'D2v2'}
+					},  # D2v2
+					{
+						"type"      => "check",
+						"ypos"      => 269.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 735, 690.5 ],
+						"val"       => $rClientASAM->{'D3'}
+					},  # D3
+					{
+						"type"      => "check",
+						"ypos"      => 300.8,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 155.3 ],
+						"val"       => $rClientASAM->{'D3v1'}
+					},  # D3v1
+					{
+						"type"      => "check",
+						"ypos"      => 249.3,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 155.3 ],
+						"val"       => $rClientASAM->{'D3v2'}
+					},  # D3v2
+					{
+						"type"      => "check",
+						"ypos"      => 155,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 735, 690.5 ],
+						"val"       => $rClientASAM->{'D4'}
+					},  # D4
+					{
+						"type"      => "check",
+						"ypos"      => 206.3,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 155.3 ],
+						"val"       => $rClientASAM->{'D4v1'}
+					},  # D4v1
+					{
+						"type"      => "check",
+						"ypos"      => 124,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 155.3 ],
+						"val"       => $rClientASAM->{'D4v2'}
+					}  # D4v2
+				]
+			},
+			{
+				"descr" => "page 2",
+				"data" => [
+					{
+						"type"      => "check",
+						"ypos"      => 525.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 733, 690.5 ],
+						"val"       => $rClientASAM->{'D5'}
+					},  # D5
+					{
+						"type"      => "check",
+						"ypos"      => 554.8,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 155.3 ],
+						"val"       => $rClientASAM->{'D5v1'}
+					},  # D5v1
+					{
+						"type"      => "check",
+						"ypos"      => 513.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 155.3 ],
+						"val"       => $rClientASAM->{'D5v2'}
+					},  # D5v2
+					{
+						"type"      => "check",
+						"ypos"      => 405.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 733, 690.5 ],
+						"val"       => $rClientASAM->{'D6'}
+					},  # D6
+					{
+						"type"      => "check",
+						"ypos"      => 464,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 155.3 ],
+						"val"       => $rClientASAM->{'D6v1'}
+					},  # D6v1
+					{
+						"type"      => "check",
+						"ypos"      => 412.3,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 155.3 ],
+						"val"       => $rClientASAM->{'D6v2'}
+					},  # D6v2
+					{
+						"type"      => "check",
+						"ypos"      => 371,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 155.3 ],
+						"val"       => $rClientASAM->{'D6v3'}
+					},  # D6v3
+					{
+						"type"        => "textflow",
+						"ypos"        => 325,
+						"xpos_start"  => 40,
+						"xpos_end"    => 765,
+						"text"        => $rClientASAM->{'Notes'}
+					},  # Notes
+					{
+						"type"        => "textline",
+						"ypos"        => 109,
+						"xpos"        => 152,
+						"text"        => $rClientASAM->{'Provider_Name'}
+					},  # Print Counselor Name
+					{
+						"type"        => "textline",
+						"ypos"        => 109,
+						"xpos"        => 498,
+						"text"        => $rClientASAM->{'Provider_Cred'}
+					},  # Credential
+					{
+						"type"        => "textline",
+						"ypos"        => 109,
+						"xpos"        => 683,
+						"text"        => $rClientASAM->{'Provider_Date'}
+					}  # Date
+				]
+			}
+		);
+	}
+	elsif ($pdftype eq "CHILD_ADM_L05") {
+		@PageData = (
+			{
+				"descr" => "page 1",
+				"data" => [
+					{
+						"type"        => "textline",
+						"ypos"        => 550,
+						"xpos"        => 40,
+						"text"        => $rClientASAM->{'Client_Name'}
+					},  # Client Name
+					{
+						"type"        => "textline",
+						"ypos"        => 550,
+						"xpos"        => 224,
+						"text"        => $rClientASAM->{'Client_ClientID'}
+					},  # Client Identification Number
+					{
+						"type"        => "textline",
+						"ypos"        => 550,
+						"xpos"        => 434,
+						"text"        => $rClientASAM->{'Client_Date'}
+					},  # Today
+					{
+						"type"        => "textline",
+						"ypos"        => 50,
+						"xpos"        => 152,
+						"text"        => $rClientASAM->{'Provider_Name'}
+					},  # Print Counselor Name
+					{
+						"type"        => "textline",
+						"ypos"        => 50,
+						"xpos"        => 497,
+						"text"        => $rClientASAM->{'Provider_Cred'}
+					},  # Credential
+					{
+						"type"        => "textline",
+						"ypos"        => 50,
+						"xpos"        => 683,
+						"text"        => $rClientASAM->{'Provider_Date'}
+					},  # Date
+					{
+						"type"      => "check",
+						"ypos"      => 486.3,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 740, 692 ],
+						"val"       => $meets
+					},  # Requirements
+					{
+						"type"      => "check",
+						"ypos"      => 453.8,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 740, 692 ],
+						"val"       => $rClientASAM->{'D1'}
+					},  # D1
+					{
+						"type"      => "check",
+						"ypos"      => 459.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 150.5 ],
+						"val"       => $rClientASAM->{'D1v1'}
+					},  # D1v1
+					{
+						"type"      => "check",
+						"ypos"      => 448.8,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 150.5 ],
+						"val"       => $rClientASAM->{'D1v2'}
+					},  # D1v2
+					{
+						"type"      => "check",
+						"ypos"      => 411.4,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 740, 692 ],
+						"val"       => $rClientASAM->{'D2'}
+					},  # D2
+					{
+						"type"      => "check",
+						"ypos"      => 358.7,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 740, 692 ],
+						"val"       => $rClientASAM->{'D3'}
+					},  # D3
+					{
+						"type"      => "check",
+						"ypos"      => 309.4,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 740, 692 ],
+						"val"       => $rClientASAM->{'D4'}
+					},  # D4
+					{
+						"type"      => "check",
+						"ypos"      => 259.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 740, 692 ],
+						"val"       => $rClientASAM->{'D5'}
+					},  # D5
+					{
+						"type"      => "check",
+						"ypos"      => 266,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 150.5 ],
+						"val"       => $rClientASAM->{'D5v1'}
+					},  # D5v1
+					{
+						"type"      => "check",
+						"ypos"      => 245,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 150.5 ],
+						"val"       => $rClientASAM->{'D5v2'}
+					},  # D5v2
+					{
+						"type"      => "check",
+						"ypos"      => 179.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 740, 692 ],
+						"val"       => $rClientASAM->{'D6'}
+					},  # D6
+					{
+						"type"      => "check",
+						"ypos"      => 200.8,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 150.5 ],
+						"val"       => $rClientASAM->{'D6v1'}
+					},  # D6v1
+					{
+						"type"      => "check",
+						"ypos"      => 179.8,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 150.5 ],
+						"val"       => $rClientASAM->{'D6v2'}
+					},  # D6v2
+					{
+						"type"      => "check",
+						"ypos"      => 158.8,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 150.5 ],
+						"val"       => $rClientASAM->{'D6v3'}
+					},  # D6v3
+					{
+						"type"      => "check",
+						"ypos"      => 137.8,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 150.5 ],
+						"val"       => $rClientASAM->{'D6v4'}
+					},  # D6v4
+					{
+						"type"        => "textflow",
+						"ypos"        => 125,
+						"xpos_start"  => 40,
+						"xpos_end"    => 765,
+						"text"        => "$rClientASAM->{'Notes'}"
+					},  # Notes
+				]
+			}
+		);
+	}
+	elsif ($pdftype eq "CHILD_ADM_L10") {
+		@PageData = (
+			{
+				"descr" => "page 1",
+				"data" => [
+					{
+						"type"        => "textline",
+						"ypos"        => 547,
+						"xpos"        => 40,
+						"text"        => $rClientASAM->{'Client_Name'}
+					},  # Client Name
+					{
+						"type"        => "textline",
+						"ypos"        => 547,
+						"xpos"        => 218,
+						"text"        => $rClientASAM->{'Client_ClientID'}
+					},  # Client Identification Number
+					{
+						"type"        => "textline",
+						"ypos"        => 547,
+						"xpos"        => 429,
+						"text"        => $rClientASAM->{'Client_Date'}
+					},  # Today
+					{
+						"type"      => "check",
+						"ypos"      => 469,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 727, 666.5 ],
+						"val"       => $meets
+					},  # Requirements
+					{
+						"type"      => "check",
+						"ypos"      => 431,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 727, 666.5 ],
+						"val"       => $rClientASAM->{'D1'}
+					},  # D1
+					{
+						"type"      => "check",
+						"ypos"      => 444,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 160 ],
+						"val"       => $rClientASAM->{'D1v1'}
+					},  # D1v1
+					{
+						"type"      => "check",
+						"ypos"      => 433.3,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 160 ],
+						"val"       => $rClientASAM->{'D1v2'}
+					},  # D1v2
+					{
+						"type"      => "check",
+						"ypos"      => 377.2,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 727, 666.5 ],
+						"val"       => $rClientASAM->{'D2'}
+					},  # D2
+					{
+						"type"      => "check",
+						"ypos"      => 217.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 727, 666.5 ],
+						"val"       => $rClientASAM->{'D3'}
+					},  # D3
+					{
+						"type"      => "check",
+						"ypos"      => 336.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 160 ],
+						"val"       => $rClientASAM->{'D3v1'}
+					},  # D3v1
+					{
+						"type"      => "check",
+						"ypos"      => 305.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 160 ],
+						"val"       => $rClientASAM->{'D3v2'}
+					},  # D3v2
+					{
+						"type"      => "check",
+						"ypos"      => 213.1,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 160 ],
+						"val"       => $rClientASAM->{'D3v3'}
+					},  # D3v3
+					{
+						"type"      => "check",
+						"ypos"      => 171.8,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 160 ],
+						"val"       => $rClientASAM->{'D3v4'}
+					},  # D3v4
+					{
+						"type"      => "check",
+						"ypos"      => 130.4,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 160 ],
+						"val"       => $rClientASAM->{'D3v5'}
+					}  # D3v5
+				]
+			},
+			{
+				"descr" => "page 2",
+				"data" => [
+					{
+						"type"      => "check",
+						"ypos"      => 507.7,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 727.5, 666.5 ],
+						"val"       => $rClientASAM->{'D4'}
+					},  # D4
+					{
+						"type"      => "check",
+						"ypos"      => 545.3,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 160 ],
+						"val"       => $rClientASAM->{'D4v1'}
+					},  # D4v1
+					{
+						"type"      => "check",
+						"ypos"      => 524.2,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 160 ],
+						"val"       => $rClientASAM->{'D4v2'}
+					},  # D4v2
+					{
+						"type"      => "check",
+						"ypos"      => 493,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 160 ],
+						"val"       => $rClientASAM->{'D4v3'}
+					},  # D4v3
+					{
+						"type"      => "check",
+						"ypos"      => 472,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 160 ],
+						"val"       => $rClientASAM->{'D4v4'}
+					},  # D4v4
+					{
+						"type"      => "check",
+						"ypos"      => 420,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 727.5, 666.5 ],
+						"val"       => $rClientASAM->{'D5'}
+					},  # D5
+					{
+						"type"      => "check",
+						"ypos"      => 336.8,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 727.5, 666.5 ],
+						"val"       => $rClientASAM->{'D6'}
+					},  # D6
+					{
+						"type"      => "check",
+						"ypos"      => 379.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 160 ],
+						"val"       => $rClientASAM->{'D6v1'}
+					},  # D6v1
+					{
+						"type"      => "check",
+						"ypos"      => 358.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 160 ],
+						"val"       => $rClientASAM->{'D6v2'}
+					},  # D6v2
+					{
+						"type"      => "check",
+						"ypos"      => 327.3,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 160 ],
+						"val"       => $rClientASAM->{'D6v3'}
+					},  # D6v3
+					{
+						"type"        => "textflow",
+						"ypos"        => 272,
+						"xpos_start"  => 40,
+						"xpos_end"    => 765,
+						"text"        => $rClientASAM->{'Notes'}
+					},  # Notes
+					{
+						"type"        => "textline",
+						"ypos"        => 120,
+						"xpos"        => 152,
+						"text"        => $rClientASAM->{'Provider_Name'}
+					},  # Print Counselor Name
+					{
+						"type"        => "textline",
+						"ypos"        => 120,
+						"xpos"        => 510,
+						"text"        => $rClientASAM->{'Provider_Cred'}
+					},  # Credential
+					{
+						"type"        => "textline",
+						"ypos"        => 120,
+						"xpos"        => 696,
+						"text"        => $rClientASAM->{'Provider_Date'}
+					}  # Date
+				]
+			}
+		);
+	}
+	elsif ($pdftype eq "CHILD_ADM_L21") {
+		@PageData = (
+			{
+				"descr" => "page 1",
+				"data" => [
+					{
+						"type"        => "textline",
+						"ypos"        => 544.5,
+						"xpos"        => 40,
+						"text"        => $rClientASAM->{'Client_Name'}
+					},  # Client Name
+					{
+						"type"        => "textline",
+						"ypos"        => 544.5,
+						"xpos"        => 235,
+						"text"        => $rClientASAM->{'Client_ClientID'}
+					},  # Client Identification Number
+					{
+						"type"        => "textline",
+						"ypos"        => 544.5,
+						"xpos"        => 413,
+						"text"        => $rClientASAM->{'Client_Date'}
+					},  # Today
+					{
+						"type"      => "check",
+						"ypos"      => 453,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 743, 699.5 ],
+						"val"       => $meets
+					},  # Requirements
+					{
+						"type"      => "check",
+						"ypos"      => 383,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 743, 699.5 ],
+						"val"       => $rClientASAM->{'D1'}
+					},  # D1
+					{
+						"type"      => "check",
+						"ypos"      => 398.8,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 128 ],
+						"val"       => $rClientASAM->{'D1v1'}
+					},  # D1v1
+					{
+						"type"      => "check",
+						"ypos"      => 388,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 128 ],
+						"val"       => $rClientASAM->{'D1v2'}
+					},  # D1v2
+					{
+						"type"      => "check",
+						"ypos"      => 377.2,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 128 ],
+						"val"       => $rClientASAM->{'D1v3'}
+					},  # D1v3
+					{
+						"type"      => "check",
+						"ypos"      => 306.3,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 743, 699.5 ],
+						"val"       => $rClientASAM->{'D2'}
+					},  # D2
+					{
+						"type"      => "check",
+						"ypos"      => 325,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 128 ],
+						"val"       => $rClientASAM->{'D2v1'}
+					},  # D2v1
+					{
+						"type"      => "check",
+						"ypos"      => 304,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 128 ],
+						"val"       => $rClientASAM->{'D2v2'}
+					},  # D2v2
+					{
+						"type"      => "check",
+						"ypos"      => 160.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 743, 699.5 ],
+						"val"       => $rClientASAM->{'D3'}
+					},  # D3
+					{
+						"type"      => "check",
+						"ypos"      => 245.8,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 128 ],
+						"val"       => $rClientASAM->{'D3v1'}
+					},  # D3v1
+					{
+						"type"      => "check",
+						"ypos"      => 204.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 128 ],
+						"val"       => $rClientASAM->{'D3v2'}
+					},  # D3v2
+					{
+						"type"      => "check",
+						"ypos"      => 173.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 128 ],
+						"val"       => $rClientASAM->{'D3v3'}
+					},  # D3v3
+					{
+						"type"      => "check",
+						"ypos"      => 142.2,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 128 ],
+						"val"       => $rClientASAM->{'D3v4'}
+					},  # D3v4
+					{
+						"type"      => "check",
+						"ypos"      => 90.8,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 128 ],
+						"val"       => $rClientASAM->{'D3v5'}
+					}  # D3v5
+				]
+			},
+			{
+				"descr" => "page 2",
+				"data" => [
+					{
+						"type"      => "check",
+						"ypos"      => 530,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 742.5, 699 ],
+						"val"       => $rClientASAM->{'D4'}
+					},  # D4
+					{
+						"type"      => "check",
+						"ypos"      => 571,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 128 ],
+						"val"       => $rClientASAM->{'D4v1'}
+					},  # D4v1
+					{
+						"type"      => "check",
+						"ypos"      => 509.3,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 128 ],
+						"val"       => $rClientASAM->{'D4v2'}
+					},  # D4v2
+					{
+						"type"      => "check",
+						"ypos"      => 419,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 742.5, 699 ],
+						"val"       => $rClientASAM->{'D5'}
+					},  # D5
+					{
+						"type"      => "check",
+						"ypos"      => 457.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 128 ],
+						"val"       => $rClientASAM->{'D5v1'}
+					},  # D5v1
+					{
+						"type"      => "check",
+						"ypos"      => 416,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 128 ],
+						"val"       => $rClientASAM->{'D5v2'}
+					},  # D5v2
+					{
+						"type"      => "check",
+						"ypos"      => 395,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 128 ],
+						"val"       => $rClientASAM->{'D5v3'}
+					},  # D5v3
+					{
+						"type"      => "check",
+						"ypos"      => 304,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 742.5, 699 ],
+						"val"       => $rClientASAM->{'D6'}
+					},  # D6
+					{
+						"type"      => "check",
+						"ypos"      => 349,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 128 ],
+						"val"       => $rClientASAM->{'D6v1'}
+					},  # D6v1
+					{
+						"type"      => "check",
+						"ypos"      => 318,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 128 ],
+						"val"       => $rClientASAM->{'D6v2'}
+					},  # D6v2
+					{
+						"type"      => "check",
+						"ypos"      => 266.3,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 128 ],
+						"val"       => $rClientASAM->{'D6v3'}
+					},  # D6v3
+					{
+						"type"        => "textflow",
+						"ypos"        => 237,
+						"xpos_start"  => 40,
+						"xpos_end"    => 765,
+						"text"        => $rClientASAM->{'Notes'}
+					},  # Notes
+					{
+						"type"        => "textline",
+						"ypos"        => 85,
+						"xpos"        => 153,
+						"text"        => $rClientASAM->{'Provider_Name'}
+					},  # Print Counselor Name
+					{
+						"type"        => "textline",
+						"ypos"        => 85,
+						"xpos"        => 470,
+						"text"        => $rClientASAM->{'Provider_Cred'}
+					},  # Credential
+					{
+						"type"        => "textline",
+						"ypos"        => 85,
+						"xpos"        => 679,
+						"text"        => $rClientASAM->{'Provider_Date'}
+					}  # Date
+				]
+			}
+		);
+	}
+	elsif ($pdftype eq "CHILD_DIS_L05") {
+		@PageData = (
+			{
+				"descr" => "page 1",
+				"data" => [
+					{
+						"type"        => "textline",
+						"ypos"        => 547,
+						"xpos"        => 40,
+						"text"        => $rClientASAM->{'Client_Name'}
+					},  # Client Name
+					{
+						"type"        => "textline",
+						"ypos"        => 547,
+						"xpos"        => 216,
+						"text"        => $rClientASAM->{'Client_ClientID'}
+					},  # Client Identification Number
+					{
+						"type"        => "textline",
+						"ypos"        => 547,
+						"xpos"        => 429,
+						"text"        => $rClientASAM->{'Client_Date'}
+					},  # Today
+					{
+						"type"        => "textline",
+						"ypos"        => 507,
+						"xpos"        => 334,
+						"text"        => $rClientASAM->{'ToLevel'}
+					},  # Enter Level
+					{
+						"type"        => "textline",
+						"ypos"        => 529,
+						"xpos"        => 334,
+						"text"        => $transfer
+					},  # Transfer
+					{
+						"type"        => "textline",
+						"ypos"        => 46,
+						"xpos"        => 154,
+						"text"        => $rClientASAM->{'Provider_Name'}
+					},  # Print Counselor Name
+					{
+						"type"        => "textline",
+						"ypos"        => 46,
+						"xpos"        => 470,
+						"text"        => $rClientASAM->{'Provider_Cred'}
+					},  # Credential
+					{
+						"type"        => "textline",
+						"ypos"        => 46,
+						"xpos"        => 682,
+						"text"        => $rClientASAM->{'Provider_Date'}
+					},  # Date
+					{
+						"type"      => "check",
+						"ypos"      => 481.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 745.8, 712 ],
+						"val"       => $meets
+					},  # Requirements
+					{
+						"type"      => "check",
+						"ypos"      => 449,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 745.8, 712 ],
+						"val"       => $rClientASAM->{'D1'}
+					},  # D1
+					{
+						"type"      => "check",
+						"ypos"      => 455,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 141.5 ],
+						"val"       => $rClientASAM->{'D1v1'}
+					},  # D1v1
+					{
+						"type"      => "check",
+						"ypos"      => 445,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 141.5 ],
+						"val"       => $rClientASAM->{'D1v2'}
+					},  # D1v2
+					{
+						"type"      => "check",
+						"ypos"      => 406,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 745.8, 712 ],
+						"val"       => $rClientASAM->{'D2'}
+					},  # D2
+					{
+						"type"      => "check",
+						"ypos"      => 411.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 141.5 ],
+						"val"       => $rClientASAM->{'D2v1'}
+					},  # D2v1
+					{
+						"type"      => "check",
+						"ypos"      => 390.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 141.5 ],
+						"val"       => $rClientASAM->{'D2v2'}
+					},  # D2v2
+					{
+						"type"      => "check",
+						"ypos"      => 352.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 745.8, 712 ],
+						"val"       => $rClientASAM->{'D3'}
+					},  # D3
+					{
+						"type"      => "check",
+						"ypos"      => 369,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 141.5 ],
+						"val"       => $rClientASAM->{'D3v1'}
+					},  # D3v1
+					{
+						"type"      => "check",
+						"ypos"      => 348,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 141.5 ],
+						"val"       => $rClientASAM->{'D3v2'}
+					},  # D3v2
+					{
+						"type"      => "check",
+						"ypos"      => 294,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 745.8, 712 ],
+						"val"       => $rClientASAM->{'D4'}
+					},  # D4
+					{
+						"type"      => "check",
+						"ypos"      => 304.8,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 141.5 ],
+						"val"       => $rClientASAM->{'D4v1'}
+					},  # D4v1
+					{
+						"type"      => "check",
+						"ypos"      => 283.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 141.5 ],
+						"val"       => $rClientASAM->{'D4v2'}
+					},  # D4v2
+					{
+						"type"      => "check",
+						"ypos"      => 230.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 745.8, 712 ],
+						"val"       => $rClientASAM->{'D5'}
+					},  # D5
+					{
+						"type"      => "check",
+						"ypos"      => 251.3,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 141.5 ],
+						"val"       => $rClientASAM->{'D5v1'}
+					},  # D5v1
+					{
+						"type"      => "check",
+						"ypos"      => 220.3,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 141.5 ],
+						"val"       => $rClientASAM->{'D5v2'}
+					},  # D5v2
+					{
+						"type"      => "check",
+						"ypos"      => 157,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 745.8, 712 ],
+						"val"       => $rClientASAM->{'D6'}
+					},  # D6
+					{
+						"type"      => "check",
+						"ypos"      => 178,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 141.5 ],
+						"val"       => $rClientASAM->{'D6v1'}
+					},  # D6v1
+					{
+						"type"      => "check",
+						"ypos"      => 146.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 141.5 ],
+						"val"       => $rClientASAM->{'D6v2'}
+					},  # D6v2
+					{
+						"type"        => "textflow",
+						"ypos"        => 115,
+						"xpos_start"  => 40,
+						"xpos_end"    => 765,
+						"text"        => "$rClientASAM->{'Notes'}"
+					}  # Notes
+				]
+			}
+		);
+	}
+	elsif ($pdftype eq "CHILD_DIS_L10") {
+		@PageData = (
+			{
+				"descr" => "page 1",
+				"data" => [
+					{
+						"type"        => "textline",
+						"ypos"        => 537,
+						"xpos"        => 40,
+						"text"        => $rClientASAM->{'Client_Name'}
+					},  # Client Name
+					{
+						"type"        => "textline",
+						"ypos"        => 537,
+						"xpos"        => 217,
+						"text"        => $rClientASAM->{'Client_ClientID'}
+					},  # Client Identification Number
+					{
+						"type"        => "textline",
+						"ypos"        => 537,
+						"xpos"        => 429,
+						"text"        => $rClientASAM->{'Client_Date'}
+					},  # Today
+					{
+						"type"        => "textline",
+						"ypos"        => 517,
+						"xpos"        => 330,
+						"text"        => $transfer
+					},  # Transfer
+					{
+						"type"        => "textline",
+						"ypos"        => 495,
+						"xpos"        => 330,
+						"text"        => $rClientASAM->{'ToLevel'}
+					},  # Enter Level
+					{
+						"type"      => "check",
+						"ypos"      => 467.3,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 735, 690.5 ],
+						"val"       => $meets
+					},  # Requirements
+					{
+						"type"      => "check",
+						"ypos"      => 432.2,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 735, 690.5 ],
+						"val"       => $rClientASAM->{'D1'}
+					},  # D1
+					{
+						"type"      => "check",
+						"ypos"      => 441.1,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 155.3 ],
+						"val"       => $rClientASAM->{'D1v1'}
+					},  # D1v1
+					{
+						"type"      => "check",
+						"ypos"      => 430.6,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 155.3 ],
+						"val"       => $rClientASAM->{'D1v2'}
+					},  # D1v2
+					{
+						"type"      => "check",
+						"ypos"      => 364.3,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 735, 690.5 ],
+						"val"       => $rClientASAM->{'D2'}
+					},  # D2
+					{
+						"type"      => "check",
+						"ypos"      => 391.2,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 155.3 ],
+						"val"       => $rClientASAM->{'D2v1'}
+					},  # D2v1
+					{
+						"type"      => "check",
+						"ypos"      => 350,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 155.3 ],
+						"val"       => $rClientASAM->{'D2v2'}
+					},  # D2v2
+					{
+						"type"      => "check",
+						"ypos"      => 274.2,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 735, 690.5 ],
+						"val"       => $rClientASAM->{'D3'}
+					},  # D3
+					{
+						"type"      => "check",
+						"ypos"      => 305.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 155.3 ],
+						"val"       => $rClientASAM->{'D3v1'}
+					},  # D3v1
+					{
+						"type"      => "check",
+						"ypos"      => 253.8,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 155.3 ],
+						"val"       => $rClientASAM->{'D3v2'}
+					},  # D3v2
+					{
+						"type"      => "check",
+						"ypos"      => 164,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 735, 690.5 ],
+						"val"       => $rClientASAM->{'D4'}
+					},  # D4
+					{
+						"type"      => "check",
+						"ypos"      => 211.2,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 155.3 ],
+						"val"       => $rClientASAM->{'D4v1'}
+					},  # D4v1
+					{
+						"type"      => "check",
+						"ypos"      => 129,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 155.3 ],
+						"val"       => $rClientASAM->{'D4v2'}
+					}  # D4v2
+				]
+			},
+			{
+				"descr" => "page 2",
+				"data" => [
+					{
+						"type"      => "check",
+						"ypos"      => 525.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 733, 690.5 ],
+						"val"       => $rClientASAM->{'D5'}
+					},  # D5
+					{
+						"type"      => "check",
+						"ypos"      => 554.8,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 155.3 ],
+						"val"       => $rClientASAM->{'D5v1'}
+					},  # D5v1
+					{
+						"type"      => "check",
+						"ypos"      => 513.5,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 155.3 ],
+						"val"       => $rClientASAM->{'D5v2'}
+					},  # D5v2
+					{
+						"type"      => "check",
+						"ypos"      => 403.3,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ 733, 690.5 ],
+						"val"       => $rClientASAM->{'D6'}
+					},  # D6
+					{
+						"type"      => "check",
+						"ypos"      => 464,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 155.3 ],
+						"val"       => $rClientASAM->{'D6v1'}
+					},  # D6v1
+					{
+						"type"      => "check",
+						"ypos"      => 412.4,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 155.3 ],
+						"val"       => $rClientASAM->{'D6v2'}
+					},  # D6v2
+					{
+						"type"      => "check",
+						"ypos"      => 371,
+						"optlist"   => "fontsize=15 position={center bottom}",
+						"xposarray" => [ -100, 155.3 ],
+						"val"       => $rClientASAM->{'D6v3'}
+					},  # D6v3
+					{
+						"type"        => "textflow",
+						"ypos"        => 322,
+						"xpos_start"  => 40,
+						"xpos_end"    => 765,
+						"text"        => $rClientASAM->{'Notes'}
+					},  # Notes
+					{
+						"type"        => "textline",
+						"ypos"        => 109,
+						"xpos"        => 152,
+						"text"        => $rClientASAM->{'Provider_Name'}
+					},  # Print Counselor Name
+					{
+						"type"        => "textline",
+						"ypos"        => 109,
+						"xpos"        => 498,
+						"text"        => $rClientASAM->{'Provider_Cred'}
+					},  # Credential
+					{
+						"type"        => "textline",
+						"ypos"        => 109,
+						"xpos"        => 683,
+						"text"        => $rClientASAM->{'Provider_Date'}
+					}  # Date
+				]
+			}
+		);
+	}
+
+#####################
+	for (my $pageno = 1; $pageno <= $no_of_input_pages; $pageno++) {
+		$p->begin_page_ext($pagewidth, $pageheight, "");
+		$p->fit_pdi_page($pagehandles[$pageno], 0, 0, "");
+		foreach (@{$PageData[$pageno-1]->{"data"}}) {
+			main->renderObject($p, $_);
+		}
+		$p->end_page_ext("");
+		$pagecount++;
+	}
+}
+
+############################################################################
+sub renderObject {
+	my ($self, $p, $obj) = @_;
+
+	if ($obj->{"type"} eq "textline") {
+		main->renderTextline($p,$obj->{"text"}, $obj->{"xpos"}, $obj->{"ypos"}, $obj->{"optlist"});
+	}
+
+	if ($obj->{"type"} eq "textflow") {
+		main->renderTextflow($p,$obj->{"text"}, $obj->{"xpos_start"}, $obj->{"xpos_end"}, $obj->{"ypos"},$obj->{"optlist"}, $obj->{"optlist2"});
+	}
+
+	if ($obj->{"type"} eq "table") {
+		main->renderTable($p,$obj->{"fields"}, $obj->{"ypos"}, $obj->{"h_row"}, $obj->{"data"});
+	}
+
+	if ($obj->{"type"} eq "check") {
+		main->renderCheck($p,$obj->{"val"}, $obj->{"xposarray"}, $obj->{"ypos"}, $obj->{"optlist"}, $obj->{"text"});
+	}
+
+	if ($obj->{"type"} eq "checkvert") {
+		main->renderCheckVert($p,$obj->{"val"}, $obj->{"xpos"}, $obj->{"yposarray"}, $obj->{"optlist"}, $obj->{"text"});
+	}
+}
+
+
+sub openPdiPages {
+	my ($self, $p) = @_;
+
+	#warn qq|no_of_input_pages: ${no_of_input_pages}\n|;
+	# Prepare all pages of the input document. We assume a small
+	# number of input pages and a large number of generated output
+	# pages. Therefore it makes sense to keep the input pages
+	# open instead of opening the pages again for each encounter.
+
+	for (my $pageno = 1; $pageno <= $no_of_input_pages; $pageno++){
+
+		# Open the first page and clone the page size
+		$pagehandles[$pageno] = $p->open_pdi_page($indoc, $pageno, "");
+		if ($pagehandles[$pageno] == -1) { die("Error: " . $p->get_errmsg()); }
+	}
+}
+
+
+sub closePdiPages {
+	my ($self, $p) = @_;
+
+	# Close all input pages
+	for (my $pageno = 1; $pageno <= $no_of_input_pages; $pageno++){ $p->close_pdi_page($pagehandles[$pageno]); }
+	$p->close_pdi_document($indoc);
+}
+
+
+sub renderTextline {
+	my ($self, $p, $text, $xpos, $ypos, $optlist) = @_;
+
+	$p->fit_textline($text, $xpos, $ypos, ($optlist ? $optlist : $basesmallfontoptions));
+}
+
+
+sub renderTextflow {
+	my ($self, $p, $text, $xpos_start, $xpos_end, $ypos, $optlist, $optlist2) = @_;
+
+	my $tf;
+	my $result;
+
+	$tf = $p->create_textflow($text, $basefontoptions . " leading=120% " . ($optlist ? $optlist : ""));
+	$p->fit_textflow($tf, $xpos_start, $y_bottom, $xpos_end, $ypos, ($optlist2 ? $optlist2 : ""));
+}
+
+
+sub renderTable {
+	my ($self, $p, $fields, $ypos, $h_row, $data) = @_;
+
+	my $i = 0;
+
+	foreach (@{$data}) {
+		foreach my $field (@{$fields}) {
+			main->renderTextline($p, $_->{$field->{"key"}}, $field->{"xpos"}, $ypos - $h_row * $i);
+		}
+		$i++;
+	}
+
+}
+
+
+sub renderCheck {
+	my ($self, $p, $val, $xposarray, $ypos, $optlist, $text) = @_;
+
+	if ($val ne '') {
+		$p->fit_textline(($text eq '' ? '&#x2713;' : $text), @{$xposarray}[int($val)], $ypos, $basecheckfontoptions . " " . ($optlist ? $optlist : ""));
+	}
+}
+
+
+sub renderCheckVert {
+	my ($self, $p, $val, $xpos, $yposarray, $optlist, $text) = @_;
+
+	if ($val ne '') {
+		$p->fit_textline(($text eq '' ? '&#x2713;' : $text), $xpos, @{$yposarray}[int($val)], $basecheckfontoptions . " " . ($optlist ? $optlist : ""));
+	}
+}

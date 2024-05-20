@@ -1,0 +1,12 @@
+cp /usr/local/j2sdk1.4.2_05/jre/lib/fonts/LucidaTypewriterRegular.ttf .
+cp /usr/local/j2sdk1.4.2_05/jre/lib/fonts/LucidaTypewriterBold.ttf .
+cp /usr/local/j2sdk1.4.2_05/jre/lib/fonts/LucidaBrightRegular.ttf .
+cp /usr/local/j2sdk1.4.2_05/jre/lib/fonts/LucidaBrightDemiBold.ttf .
+cp /usr/local/j2sdk1.4.2_05/jre/lib/fonts/LucidaBrightItalic.ttf .
+cp /usr/local/j2sdk1.4.2_05/jre/lib/fonts/LucidaBrightDemiItalic.ttf .
+cp /usr/local/j2sdk1.4.2_05/jre/lib/fonts/LucidaSansRegular.ttf .
+cp /usr/local/j2sdk1.4.2_05/jre/lib/fonts/LucidaSansDemiBold.ttf .
+cp /usr/local/j2sdk1.4.2_05/jre/lib/fonts/LucidaTypewriterOblique.ttf .
+cp /usr/local/j2sdk1.4.2_05/jre/lib/fonts/LucidaTypewriterBoldOblique.ttf .
+cp /usr/local/j2sdk1.4.2_05/jre/lib/fonts/LucidaSansOblique.ttf .
+cp /usr/local/j2sdk1.4.2_05/jre/lib/fonts/LucidaSansDemiOblique.ttf .

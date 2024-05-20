@@ -1,0 +1,4 @@
+  if ( isEmpty(form.InsID) )
+  { return vEntry("notnull",form.InsID); }
+  else if (typeof form.daterange != "undefined")
+  { return vDates(form); }

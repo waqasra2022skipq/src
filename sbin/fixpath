@@ -1,0 +1,16 @@
+#!/bin/bash
+# kls, daily 2/2/98, 11/26/2001
+# ------------------------------------
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   print "\nServices not installed!"
+   exit 1
+fi
+# ------------------------------------
+find . -type f -name "*.xdp" |
+while read fn; do
+  echo "convert pdf location: ${fn}"
+  sed "s;http://www.okmis.com/forms;http://www.okmis.com/forms/printing;" ${fn} > new
+  mv new ${fn}
+done

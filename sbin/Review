@@ -1,0 +1,2 @@
+select TrID, ClientID, BillStatus, RevStatus from Treatment where RevStatus<3 and ProvID=109;
+select TrID, ClientID, BillDate from Treatment where BillDate is null and ProvID=109;

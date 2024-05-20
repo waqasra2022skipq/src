@@ -1,0 +1,5 @@
+select Name, TrID, ContLogDate, ContLogBegTime, ContLogEndTime, Units, BillStatus
+  from Treatment 
+  left join Provider on Provider.ProvID=Treatment.ClinicID
+  where ContLogBegTime is null or ContLogEndTime is null
+  order by Name

@@ -1,0 +1,25 @@
+select Provider.Name,Provider.Addr1,Provider.Addr2,Provider.City,Provider.ST,Provider.Zip,Provider.WkPh as Phone,Provider.Fax
+      ,Contracts.TaxID,Provider.Email as Contact,'Sandi Doyle' as Trainer
+ from Provider
+  left join Contracts on Contracts.ProvID=Provider.ProvID and Contracts.InsID=100
+ where Active=1
+   and Provider.Type=3
+ order by Provider.Name
+;
+select ' ' from Provider where ProvID=91;
+select Provider.LName as Prescriber,Provider.FName,Provider.MName,Provider.Gend
+      ,Provider.Addr1,Provider.Addr2,Provider.City,Provider.ST,Provider.Zip
+      ,Provider.WkPh as Phone,Provider.MobPh as Cell,Provider.Fax
+      ,DATE_FORMAT(Provider.DOB,'%m/%d/%Y') as DOB
+      ,ProviderControl.NPI
+      ,ProviderLicenses.DEA
+      ,'Y' as Clinician,Provider.Role
+      ,Physician.LName as SupervisingPhysician, Physician.FName
+ from Provider
+  left join Provider as Physician on Physician.ProvID=Provider.SupervisingPhysician
+  left join ProviderControl on ProviderControl.ProvID=Provider.ProvID
+  left join ProviderLicenses on ProviderLicenses.ProvID=Provider.ProvID
+ where Provider.Active=1
+   and Provider.Role IN ('Licensed Prescriber','Midlevel Prescriber','Supervising Doctor')
+ order by Provider.LName,Provider.FName
+;

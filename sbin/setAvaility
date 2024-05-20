@@ -1,0 +1,11 @@
+update xInsurance set SubID='200867860'
+                 ,ISARQ='01'
+                 ,ISASQ='ZZ'
+                 ,InsCode='ZZ'
+                 ,SenderID='AV09311993'
+                 ,SenderCode='AV01101957'
+                 ,ReceiverID='030240928'
+                 ,ReceiverCode='030240928'
+                 ,ClearingHouse='availity'
+                 ,RecID='G00840'
+ where ID=349

@@ -1,0 +1,4 @@
+select Treatment.TrID, Treatment.SCID, NoteTrans.SCID 
+  from NoteTrans 
+  left join Treatment on Treatment.TrID=NoteTrans.TrID 
+  where NoteTrans.SCID != Treatment.SCID

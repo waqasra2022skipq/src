@@ -1,0 +1,30 @@
+#!/bin/bash
+#--------------------
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   echo -e "\nServices not installed!"
+   exit 1
+fi
+LogFile=${LOGDIR}/${CMD}
+#--------------------
+TmpFile=/tmp/$$
+DB=$1
+TrID=$2
+#-------------------------
+Usage()
+{
+   echo $1
+   echo
+   echo "Usage: ${CMD} database statement"
+   echo
+   exit
+}
+#-------------------------
+if [ -z "${TrID}" ]; then Usage "No TrID!"; fi
+if [ ! -d ${DBDIR}/${DB} ]; then Usage "Invalid database!"; fi
+  echo "select Treatment.TrID, Treatment.SCID, xSC.SCNum, Treatment.ContLogDate, Treatment.BillDate, Treatment.RecDate, Treatment.BilledAmt, Treatment.AmtDue, Treatment.BillStatus, Treatment.StatusDate from Treatment left join xSC on xSC.SCID=Treatment.SCID where Treatment.TrID=$TrID order by Treatment.ContLogDate;" > ${TmpFile}.in
+  echo "select Treatment.TrID, Treatment.RevStatus, Treatment.ProvID, Treatment.ProvOKDate, Treatment.ProvOKTime, Treatment.MgrProvID, Treatment.MgrRevDate, Treatment.MgrRevTime from Treatment left join xSC on xSC.SCID=Treatment.SCID where Treatment.TrID=$TrID order by Treatment.ContLogDate;" >> ${TmpFile}.in
+  echo "select ID, TrID, SCNum, ContDate, BillDate, RecDate, PaidAmt, Code, SRC from NoteTrans where TrID=$TrID order by RecDate;" >> ${TmpFile}.in
+  ${DBCMD} ${DB} < ${TmpFile}.in
+  rm ${TmpFile}.in

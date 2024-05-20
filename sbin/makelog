@@ -1,0 +1,19 @@
+#!/bin/sh
+#--------------------
+# makelog will create the logging file/table for each sql table
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   echo -e "\nServices not installed!"
+   exit 1
+fi
+if [ -z "$1" ]; then echo "No Table!"; exit; fi
+TABLE=$1
+mysqldump -d okmis_mms $TABLE > makelog.tmp
+cat makelog.tmp | sed "/ \`${TABLE}\`/d" > makelog.tmp1
+cat makelog.tmp1 | sed "s; \`ID\` int(11) NOT NULL AUTO_INCREMENT;CREATE TABLE \`Log$TABLE\` ( LogID int(11) NOT NULL AUTO_INCREMENT, \`ID\` int(11) NOT NULL;" > makelog.tmp
+cat makelog.tmp | sed "s; AUTO_INCREMENT=[0-9]*;;" > makelog.tmp1
+cat makelog.tmp1 | sed "s;PRIMARY KEY;PRIMARY KEY (LogID), KEY;" > makelog.sql
+#rm -f makelog.tmp makelog.tmp1
+echo "load devoays..."
+#mysql devoays < makelog.sql

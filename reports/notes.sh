@@ -1,0 +1,1 @@
+./NoteRpt DBNAME=okmms_dev\&Type=BilledDate\&hdrline=\&output=ss\&Active=\&CQM=\&ClientIDs=\&ClinicIDs=2359?2298?2612?1204?2304?2287?2370?2195?2372?2552?2374\&CustAgency=\&Days=\&Folder=\&Format=Extended\&InsCode=\&InsID=\&ProvIDs=\&sYearMonth=\&ReportDescr=\&xtable=\&submit=1\&FromDate=\&ToDate=\&daterange=thismonth

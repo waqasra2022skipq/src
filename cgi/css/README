@@ -1,0 +1,57 @@
+site   = white on black
+home   = black on white
+port   = black on silver
+menu   = black on coral
+
+heading  = center, large
+title    = center, medium
+subtitle = center, small
+memo     = center, x-small
+
+streamer = left, large
+label    = left, medium
+sublabel = left, small
+tag      = left, x-small
+
+legend   = right, large
+link     = right, medium
+sublink  = right, small
+flag     = right, x-small
+
+A.homelabel
+A.homelabel.hover
+
+**CHANGES**
+menuheading  = porttitle
+menu         = homelabel
+menulink     = homelabel
+
+guideheading = portsubtitle
+guide        = porttag
+
+maintitle    = sitestreamer
+mainhdr      = sitelabel
+maintxt      = sitesublabel
+mainlink     = sitelink
+mainheading  = siteheading
+main         = sitelabel
+mainlabel    = sitestreamer
+
+reporttitle  = portheading
+reporthdr    = portlabel
+reporttxt    = portsublabel
+reporteven   = reporteven
+reportodd    = reportodd
+
+textheading  = portheading
+text         = homestreamer
+textlist     = homeheading
+
+dataheading  = portlabel
+data         = homesublabel
+
+/textlabel -> guideheading
+/textguide -> guide
+/sheader   -> dataheading
+/sbody     -> data
+

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<rdf:RDF
+ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+ xmlns="http://purl.org/rss/1.0/"
+ xmlns:dc="http://purl.org/dc/elements/1.1/"
+ xmlns:taxo="http://purl.org/rss/1.0/modules/taxonomy/"
+ xmlns:syn="http://purl.org/rss/1.0/modules/syndication/"
+>
+
+<channel rdf:about="http://www.jmac.org/linklog/">
+<title>Link's Log</title>
+<link>http://www.jmac.org/linklog/</link>
+<description>Dr. Lance Link's online research journal</description>
+<dc:language>en-us</dc:language>
+<dc:rights>Copright 2002 by Dr. Lance Link</dc:rights>
+<dc:date>2002-10-27T23:59:15+05:00</dc:date>
+<dc:publisher>llink@jmac.org</dc:publisher>
+<dc:creator>llink@jmac.org</dc:creator>
+<dc:subject>llink</dc:subject>
+<syn:updatePeriod>daily</syn:updatePeriod>
+<syn:updateFrequency>1</syn:updateFrequency>
+<syn:updateBase>2002-03-03T00:00:00+05:00</syn:updateBase>
+<items>
+ <rdf:Seq>
+  <rdf:li rdf:resource="http://www.jmac.org/linklog?2002-10-27#22:56:11" />
+  <rdf:li rdf:resource="http://www.jmac.org/linklog?2002-10-18#19:07:06" />
+ </rdf:Seq>
+</items>
+</channel>
+
+<item rdf:about="http://www.jmac.org/linklog?2002-10-27#22:56:11">
+<title>2002-10-27 22:56:11</title>
+<link>http://www.jmac.org/linklog?2002-10-27#22:56:11</link>
+<description>
+Today I asked lab monkey 45-X how it felt about its recent chess
+victory against Dr. Baker. He responded by biting my kneecap. (The
+monkey did, I mean.) I
+think this could lead to a communications breakthrough. As well as
+painful swelling, which is unfortunate.
+</description>
+</item>
+
+<item rdf:about="http://www.jmac.org/linklog?2002-10-18#19:07:06">
+<title>2002-10-18 19:07:06</title>
+<link>http://www.jmac.org/linklog?2002-10-18#19:07:06</link>
+<description>
+On a tangential note, Dr. Xing's research of purple versus green monkey
+trans-sociopolitical impact seems to be stalled, having gained no
+ground for several weeks. Today she learned that her lab assistant
+never mentioned on his job application that he was colorblind. Oh well.
+</description>
+</item>
+
+</rdf:RDF>

@@ -1,0 +1,13 @@
+select Contracts.InsID,Contracts.PIN,Contracts.TaxID
+      ,Provider.ProvID,Provider.Name as ClinicName
+      ,ProviderControl.NPI
+      ,xInsurance.Name as InsName
+ from Contracts
+  left join Provider on Provider.ProvID=Contracts.ProvID
+  left join ProviderControl on ProviderControl.ProvID=Contracts.ProvID
+  left join xInsurance on xInsurance.ID=Contracts.InsID
+ where xInsurance.RecID=330897513
+   and (replace(ProviderControl.NPI,'-','')=1568632776 or replace(Contracts.TaxID,'-','')=1568632776)
+   and Contracts.PIN is not null
+   and Contracts.TaxID is not null
+   and ProviderControl.NPI is not null

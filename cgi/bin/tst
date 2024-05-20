@@ -1,0 +1,99 @@
+#!/usr/bin/perl
+#############################################################################
+#print qq|ENV=$ENV{HOME}\n|;
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use myForm;
+use myDBI;
+use DBA;
+use SysAccess;
+use DBUtil;
+use utils;
+use graphs;
+use Time::Local;
+
+#############################################################################
+my $form = myForm->new();
+my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $str = $form->{'c'};
+warn qq|str=${str}=\n|;
+$str =~ s/^\s+|\s+$//g;
+warn qq|str=${str}=\n|;
+exit;
+
+my $str = shift;
+print qq|1=${str}\n|;
+#warn qq|YES\n| if ( $sfx =~ /log|txt|out|/ );
+if ( $str =~ /log|txt|out||/ )
+{ print "matches...\n"; }
+else
+{ print "NOT A MATCH!!!\n"; }
+print qq|2=${str}\n|;
+myDBI->cleanup();
+exit;
+
+print qq|1=${str}\n|;
+if ( $str !~ /\b[1-9][AC-HJKMNP-RT-Yac-hjkmnp-rt-y][AC-HJKMNP-RT-Yac-hjkmnp-rt-y0-9][0-9]-?[AC-HJKMNP-RT-Yac-hjkmnp-rt-y][AC-HJKMNP-RT-Yac-hjkmnp-rt-y0-9][0-9]-?[AC-HJKMNP-RT-Yac-hjkmnp-rt-y]{2}\d{2}\b/ )
+{ print "NOT A MATCH!!!\n"; }
+else
+{ print "matches...\n"; }
+print qq|2=${str}\n|;
+myDBI->cleanup();
+exit;
+
+my $str = 19.11;
+#if ($str =~ /\D/)            { print "has nondigits\n" }
+#if ($str =~ /^\d+$/)         { print "is a whole number\n" }
+#if ($str =~ /^-?\d+$/)       { print "is an integer\n" }
+#if ($str =~ /^[+-]?\d+$/)    { print "is a +/- integer\n" }
+#if ($str =~ /^-?\d+\.?\d*$/) { print "is a real number\n" }
+#if ($str =~ /^-?(?:\d+(?:\.\d*)?|\.\d+)$/) { print "is a decimal number\n" }
+#if ($str =~ /^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/) { print "a C float\n" }
+print qq|2=${str}\n|;
+myDBI->cleanup();
+exit;
+
+use Time::HiRes qw( time gettimeofday );
+$t_start = time;
+print "ChartList   curtime: $t_start\n";
+my ($sec,$ms) = gettimeofday;
+print "sec: $sec, ms: $ms\n";
+$DT=localtime();
+print qq|DT=$DT\n|;
+myDBI->cleanup();
+exit;
+
+#############################################################################
+my $doctorName = '    ';
+print qq|doctorName=$doctorName=\n|;
+$doctorName =~ s/^\s+|\s+$//g;
+print qq|doctorName=$doctorName=\n|;
+# Make All Words Title-Cased
+# one way (\L should set to lowercase to end of word [match])
+my $string = 'KEITH PO BOX 16 wilcox';
+(my $capstring = $string) =~ s/(\w+)/\u\L$1/g;
+print qq|capstring=$capstring\n|;
+$capstring =~ s/Po Box /PO Box /g;
+print qq|capstring=$capstring\n|;
+myDBI->cleanup();
+exit;
+
+#############################################################################
+  my %DIFF = ();
+    for my $i ( 1..9 )
+    {
+      my $fld = 'Dom'.$i.'Score';
+$name='kls'.$i;
+    $DIFF{$name}{$fld} = $i;
+print qq|name=$name: fld=$fld: $DIFF{$name}{$fld}\n|;
+    }
+  foreach my $x ( sort keys %DIFF )
+  {
+print qq|x=$x: $DIFF{$x}\n|;
+  foreach my $y ( sort keys %{$DIFF{$x}} )
+  {
+print qq|y=$y: $DIFF{$x}{$y}\n|;
+  }
+  }
+myDBI->cleanup();
+exit;

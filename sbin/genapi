@@ -1,0 +1,8 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBUtil;
+
+############################################################################
+my $APIKEY = DBUtil->genToken(24);
+print $APIKEY."\n";
+exit;

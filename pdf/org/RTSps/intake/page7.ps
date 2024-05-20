@@ -1,0 +1,165 @@
+% First box
+% ---------
+ULOrigin PageWidth LM RM add sub 302 box
+ULOrigin 24 sub moveto RMx CurrentY lineto
+ULOrigin 108 sub moveto RMx CurrentY lineto
+stroke
+
+Header setfont
+
+(PROBLEMS NECESSITATING TREATMENT)
+  ULOriginY 17 sub exch cshow
+
+Body setfont
+
+/Line1 ULOriginY 40  sub def
+/Line2 ULOriginY 63  sub def
+/Line3 ULOriginY 86  sub def
+/Col1  BodyLeftEdge      def
+/Col2  ULOriginX 185 add def
+/Col3  ULOriginX 365 add def
+
+(Chemically Dependent)
+  dup Col1 Line1 moveto reportPos
+  currentpoint rlcb
+(Disturbance of Thought)
+  dup Col2 Line1 moveto reportPos
+  currentpoint rlcb
+(Disturbance of Relationship)
+  dup Col3 Line1 moveto reportPos
+  currentpoint rlcb
+(Presence of Depression)
+  dup Col1 Line2 moveto reportPos
+  currentpoint rlcb
+(Disturbance of Behavior)
+  dup Col2 Line2 moveto reportPos
+  currentpoint rlcb
+(Child Abuse Potential)
+  dup Col3 Line2 moveto reportPos
+  currentpoint rlcb
+(Presence of Anxiety)
+  dup Col1 Line3 moveto reportPos
+  currentpoint rlcb
+(Presence of Mania)
+  dup Col2 Line3 moveto reportPos
+  currentpoint rlcb
+(Other: )
+  dup Col3 Line3 moveto reportPos
+  currentpoint rlcb
+  (OtherText\(Problems\)) 
+    ULOriginX 415 add Line3 moveto reportPos uline-eol
+
+(Please Describe the Situation / Circumstances Necessitating the Provision of Outpatient Services:)
+  BodyLeftEdge ULOriginY 124 sub moveto show
+  (Situation Text)
+    BodyLeftEdge ULOriginY 140 sub moveto reportPos
+
+% Second box
+% ----------
+ULOrigin 319 sub PageWidth RM LM add sub 108 box
+ULOrigin 343 sub moveto RMx CurrentY lineto
+stroke
+
+Header setfont
+
+(DIAGNOSIS)
+  ULOriginY 336 sub exch cshow
+
+Body setfont
+
+/Line1 	     ULOriginY 360 sub def
+/Line2 	     ULOriginY 383 sub def
+/Line3 	     ULOriginY 407 sub def
+/Label1      BodyLeftEdge      def
+/Label2      ULOriginX 276 add def
+/ULine1      ULOriginX 63  add def
+/ULine2      ULOriginX 335 add def
+
+(Axis I \(1\))
+  dup Label1 Line1 moveto show
+  ULine1 Line1 moveto reportPos 200 uline
+(Axis I \(2\))
+  dup Label2 Line1 moveto show
+  ULine2 Line1 moveto reportPos uline-eol
+(Axis II)
+  dup Label1 Line2 moveto show
+  ULine1 Line2 moveto reportPos 200 uline
+(Axis III)
+  dup Label2 Line2 moveto show
+  ULine2 Line2 moveto reportPos uline-eol
+(Axis IV)
+  dup Label1 Line3 moveto show
+  ULine1 Line3 moveto reportPos 200 uline
+(Axis V)
+  dup Label2 Line3 moveto show
+  ULine2 Line3 moveto reportPos uline-eol
+  stroke
+
+% Third Box
+% ---------
+ULOrigin 442 sub PageWidth RM LM add sub 70 box
+ULOrigin 466 sub moveto RMx CurrentY lineto
+ULOrigin 490 sub moveto RMx CurrentY lineto
+ULOriginX 179 add ULOriginY 466 sub moveto CurrentX ULOriginY 512 sub lineto
+ULOriginX 359 add ULOriginY 466 sub moveto CurrentX ULOriginY 512 sub lineto
+stroke
+
+Header setfont
+
+(TREATMENT RECOMMENDED)
+  ULOriginY 459 sub exch cshow
+
+Body setfont
+
+/Line1 ULOriginY 483 sub def
+/Line2 ULOriginY 506 sub def
+% Col1 - Col3 are still valid from aboce
+
+(Individual)
+  dup Col1 Line1 moveto reportPos
+  currentpoint rlcb
+(Group)
+  dup Col2 Line1 moveto reportPos
+  currentpoint rlcb
+(Family)
+  dup Col3 Line1 moveto reportPos
+  currentpoint rlcb
+(Homestead)
+  dup Col1 Line2 moveto reportPos
+  currentpoint rlcb
+(Rehab Treatment Services)
+  dup Col2 Line2 moveto reportPos
+  currentpoint rlcb
+(Other:)
+  dup Col3 Line2 moveto reportPos
+  currentpoint rlcb
+  (OtherText\(Treatment\)) 
+    ULOriginX 415 add Line2 moveto reportPos uline-eol
+    stroke
+
+% Bottom of Page
+% ----------------
+(Comments: )
+  dup ULOrigin 540 sub moveto show reportPos
+  0 -2 rmoveto RMx CurrentY lineto
+  1 1 4 {
+    ULOrigin 540 sub 3 -1 roll 15 mul sub moveto
+    0 -2 rmoveto RMx CurrentY lineto
+  } for
+  stroke
+
+(Signature of Interviewer)
+  dup ULOrigin 650 sub moveto reportPos
+  198 uline
+  ULOrigin 666 sub moveto show
+(Credentialed Capacity)
+  dup ULOriginX 225 add ULOriginY 650 sub moveto reportPos
+  180 uline
+  ULOriginX 225 add ULOriginY 666 sub moveto show
+(Date)
+  dup ULOriginX 432 add ULOriginY 650 sub moveto reportPos
+  0 -2 rmoveto RMx CurrentY lineto stroke
+  ULOriginX 432 add ULOriginY 666 sub moveto show
+
+(4  of  4) dup stringwidth pop PageWidth RM sub exch sub 18 moveto show
+showpage

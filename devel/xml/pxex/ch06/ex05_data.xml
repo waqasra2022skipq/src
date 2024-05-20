@@ -1,0 +1,19 @@
+<ancestry>
+  <ancestor><name>Glook the Magnificent</name>
+    <children>
+      <ancestor><name>Glimshaw the Brave</name></ancestor>
+      <ancestor><name>Gelbar the Strong</name></ancestor>
+      <ancestor><name>Glurko the Healthy</name>
+        <children>
+          <ancestor><name>Glurff the Sturdy</name></ancestor>
+          <ancestor><name>Glug the Strange</name>
+            <children>
+              <ancestor><name>Blug the Insane</name></ancestor>
+              <ancestor><name>Flug the Disturbed</name></ancestor>
+            </children>
+          </ancestor>
+        </children>
+      </ancestor>
+    </children>
+  </ancestor>
+</ancestry>

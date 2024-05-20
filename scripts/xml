@@ -1,0 +1,536 @@
+<?xml version="1.0"?>
+<mysqldump xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<database name="okmis_oays">
+	<table_structure name="Client">
+		<field Field="ClientID" Type="int(11)" Null="NO" Key="PRI" Extra="auto_increment" />
+		<field Field="PDataID" Type="int(11)" Null="NO" Key="" Default="0" Extra="" />
+		<field Field="ProvID" Type="int(11)" Null="NO" Key="MUL" Default="0" Extra="" />
+		<field Field="clinicClinicID" Type="int(11)" Null="YES" Key="MUL" Extra="" />
+		<field Field="GrdnID" Type="int(11)" Null="NO" Key="" Default="0" Extra="" />
+		<field Field="AccntNum" Type="varchar(30)" Null="YES" Key="" Extra="" />
+		<field Field="LName" Type="varchar(50)" Null="YES" Key="" Extra="" />
+		<field Field="FName" Type="varchar(50)" Null="YES" Key="" Extra="" />
+		<field Field="MName" Type="varchar(50)" Null="YES" Key="" Extra="" />
+		<field Field="Pref" Type="varchar(10)" Null="YES" Key="" Extra="" />
+		<field Field="Suff" Type="varchar(10)" Null="YES" Key="" Extra="" />
+		<field Field="NName" Type="varchar(50)" Null="YES" Key="" Extra="" />
+		<field Field="LSal" Type="varchar(80)" Null="YES" Key="" Extra="" />
+		<field Field="Addr1" Type="varchar(50)" Null="YES" Key="" Extra="" />
+		<field Field="Addr2" Type="varchar(50)" Null="YES" Key="" Extra="" />
+		<field Field="City" Type="varchar(50)" Null="YES" Key="" Extra="" />
+		<field Field="County" Type="varchar(50)" Null="YES" Key="" Extra="" />
+		<field Field="ST" Type="char(2)" Null="YES" Key="" Extra="" />
+		<field Field="Zip" Type="varchar(10)" Null="YES" Key="" Extra="" />
+		<field Field="HmPh" Type="varchar(20)" Null="YES" Key="" Extra="" />
+		<field Field="WkPh" Type="varchar(20)" Null="YES" Key="" Extra="" />
+		<field Field="MobPh" Type="varchar(20)" Null="YES" Key="" Extra="" />
+		<field Field="Fax" Type="varchar(20)" Null="YES" Key="" Extra="" />
+		<field Field="Carrier" Type="tinyint(3)" Null="YES" Key="" Extra="" />
+		<field Field="OthPh" Type="varchar(20)" Null="YES" Key="" Extra="" />
+		<field Field="OthPhLbl" Type="varchar(30)" Null="YES" Key="" Extra="" />
+		<field Field="SSN" Type="varchar(16)" Null="YES" Key="" Extra="" />
+		<field Field="DOB" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="Gend" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="Race" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="MarStat" Type="tinyint(3)" Null="YES" Key="" Extra="" />
+		<field Field="ParStat" Type="varchar(4)" Null="YES" Key="" Extra="" />
+		<field Field="ChSum" Type="smallint(6)" Null="YES" Key="" Extra="" />
+		<field Field="Empl" Type="varchar(50)" Null="YES" Key="" Extra="" />
+		<field Field="EPos" Type="varchar(50)" Null="YES" Key="" Extra="" />
+		<field Field="EmCont" Type="varchar(80)" Null="YES" Key="" Extra="" />
+		<field Field="EmContRel" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="EmContPh1" Type="varchar(20)" Null="YES" Key="" Extra="" />
+		<field Field="EmContPh1Lbl" Type="varchar(30)" Null="YES" Key="" Extra="" />
+		<field Field="EmContPh2" Type="varchar(20)" Null="YES" Key="" Extra="" />
+		<field Field="EmContPh2Lbl" Type="varchar(30)" Null="YES" Key="" Extra="" />
+		<field Field="RefSource" Type="varchar(50)" Null="YES" Key="" Extra="" />
+		<field Field="MarkRec" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="Res" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="BDayCd" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="ChristCd" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="HanCd" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="RecType" Type="varchar(4)" Null="YES" Key="" Extra="" />
+		<field Field="ContNotes" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Active" Type="char(1)" Null="YES" Key="MUL" Extra="" />
+		<field Field="RecDOLC" Type="timestamp" Null="NO" Key="" Default="CURRENT_TIMESTAMP" Extra="" />
+		<field Field="FormID" Type="varchar(12)" Null="YES" Key="" Extra="" />
+		<field Field="Height" Type="varchar(10)" Null="YES" Key="" Extra="" />
+		<field Field="Weight" Type="varchar(10)" Null="YES" Key="" Extra="" />
+		<field Field="MarIssuesFlag" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="MarIssuesDesc" Type="varchar(80)" Null="YES" Key="" Extra="" />
+		<field Field="MilFlag" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="MilBranch" Type="varchar(50)" Null="YES" Key="" Extra="" />
+		<field Field="MilYears" Type="int(6)" Null="YES" Key="" Extra="" />
+		<field Field="MilDisFlag" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="Religion" Type="varchar(80)" Null="YES" Key="" Extra="" />
+		<field Field="ReligionDesc" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="ResDesc" Type="varchar(50)" Null="YES" Key="" Extra="" />
+		<field Field="EmplStat" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="School" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="SchoolGrade" Type="char(2)" Null="YES" Key="" Extra="" />
+		<field Field="SchoolStat" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="SchoolIssues" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="AtPhysID" Type="int(4)" Null="YES" Key="" Extra="" />
+		<field Field="MarStatTimes" Type="int(4)" Null="YES" Key="" Extra="" />
+		<field Field="CustAgency" Type="varchar(4)" Null="YES" Key="" Extra="" />
+		<field Field="GHLevel" Type="varchar(10)" Null="YES" Key="" Extra="" />
+		<field Field="ResAdmitDate" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="ResNum" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="CreateProvID" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="CreateDate" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="ChangeProvID" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="RefPhysID" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="MaidenName" Type="varchar(50)" Null="YES" Key="" Extra="" />
+		<field Field="EmplType" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="Eyes" Type="tinyint(3)" Null="YES" Key="" Extra="" />
+		<field Field="Hair" Type="tinyint(3)" Null="YES" Key="" Extra="" />
+		<field Field="RefPhysNPI" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="PhysNPI" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="FacIDNPI" Type="char(12)" Null="YES" Key="" Extra="" />
+		<field Field="DesigHospIDNPI" Type="char(12)" Null="YES" Key="" Extra="" />
+		<field Field="Residence" Type="tinyint(3)" Null="YES" Key="" Extra="" />
+		<field Field="Email" Type="text" Null="YES" Key="" Extra="" />
+		<key Table="Client" Non_unique="0" Key_name="PRIMARY" Seq_in_index="1" Column_name="ClientID" Collation="A" Cardinality="15107" Null="" Index_type="BTREE" Comment="" />
+		<key Table="Client" Non_unique="1" Key_name="ProvID" Seq_in_index="1" Column_name="ProvID" Collation="A" Cardinality="302" Null="" Index_type="BTREE" Comment="" />
+		<key Table="Client" Non_unique="1" Key_name="clinicClinicID" Seq_in_index="1" Column_name="clinicClinicID" Collation="A" Cardinality="16" Null="YES" Index_type="BTREE" Comment="" />
+		<key Table="Client" Non_unique="1" Key_name="Active" Seq_in_index="1" Column_name="Active" Collation="A" Cardinality="2" Null="YES" Index_type="BTREE" Comment="" />
+		<options Name="Client" Engine="MyISAM" Version="10" Row_format="Dynamic" Rows="15107" Avg_row_length="209" Data_length="3171892" Max_data_length="281474976710655" Index_length="717824" Data_free="0" Auto_increment="23469" Create_time="2011-06-26 16:39:37" Update_time="2011-10-10 18:56:27" Check_time="2011-06-26 16:39:37" Collation="latin1_swedish_ci" Create_options="" Comment="" />
+	</table_structure>
+</database>
+</mysqldump>
+<?xml version="1.0"?>
+<mysqldump xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<database name="okmis_oays">
+	<table_structure name="ClientIntake">
+		<field Field="ID" Type="int(11)" Null="NO" Key="PRI" Extra="auto_increment" />
+		<field Field="ClientID" Type="int(11)" Null="YES" Key="MUL" Extra="" />
+		<field Field="RefReason" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Disposition" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="ProblemSum" Type="varchar(50)" Null="YES" Key="" Extra="" />
+		<field Field="Issues" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Comments" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Services" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Staff" Type="varchar(50)" Null="YES" Key="" Extra="" />
+		<field Field="LegalDesc" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Worker" Type="varchar(50)" Null="YES" Key="" Extra="" />
+		<field Field="WorkerAddr" Type="varchar(50)" Null="YES" Key="" Extra="" />
+		<field Field="WorkerCity" Type="varchar(30)" Null="YES" Key="" Extra="" />
+		<field Field="WorkerST" Type="char(2)" Null="YES" Key="" Extra="" />
+		<field Field="WorkerZip" Type="varchar(10)" Null="YES" Key="" Extra="" />
+		<field Field="WorkerPh" Type="varchar(20)" Null="YES" Key="" Extra="" />
+		<field Field="Referrals" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="RecDesc" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="RecText" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="FinDesc" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="FinRefDesc" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="VAbuseFlag" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="VAbuseDesc" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="VAbuseCurrFlag" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="SAFamDesc" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="LivesWith" Type="char(2)" Null="YES" Key="" Extra="" />
+		<field Field="LivesWithDesc" Type="varchar(50)" Null="YES" Key="" Extra="" />
+		<field Field="POB" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="RaisedIn" Type="varchar(10)" Null="YES" Key="" Extra="" />
+		<field Field="PreferLive" Type="varchar(10)" Null="YES" Key="" Extra="" />
+		<field Field="DisciplineBy" Type="char(3)" Null="YES" Key="" Extra="" />
+		<field Field="DisciplineDesc" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="PunishDesc" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="SelfHelp" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="FamilySupport" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="EmplSupport" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="ChurchSupport" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="SupportDesc" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="StressDeath" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="StressDivorce" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="StressSeparation" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="StressDesc" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="RelDestrFlag" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="RelDestrDesc" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="RelPDFlag" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="RelPDDesc" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="RelIntimateFlag" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="RelIntimateDesc" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="RelNeedsFlag" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="RelNeedsDesc" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="RelSocialDesc" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="SchoolGrade" Type="char(2)" Null="YES" Key="" Extra="" />
+		<field Field="SchoolStat" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="SchoolIssues" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="RepeatGrade" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="RepeatGradeDesc" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="CurrentGrade" Type="char(2)" Null="YES" Key="" Extra="" />
+		<field Field="CurrentGradeDesc" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="GPA" Type="varchar(5)" Null="YES" Key="" Extra="" />
+		<field Field="SubjectsLike" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="SubjectsDisLike" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="LearnAbility" Type="varchar(20)" Null="YES" Key="" Extra="" />
+		<field Field="IEP" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="SpecEd" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="SpecEdLength" Type="varchar(4)" Null="YES" Key="" Extra="" />
+		<field Field="SpecEdStart" Type="char(2)" Null="YES" Key="" Extra="" />
+		<field Field="IQ" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="Lang1" Type="tinyint(3)" Null="YES" Key="" Extra="" />
+		<field Field="Lang2" Type="tinyint(3)" Null="YES" Key="" Extra="" />
+		<field Field="LangProbs" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="MilFlag" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="MilBranch" Type="varchar(4)" Null="YES" Key="" Extra="" />
+		<field Field="MilDis" Type="varchar(20)" Null="YES" Key="" Extra="" />
+		<field Field="JobDesc" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="JobLength" Type="varchar(4)" Null="YES" Key="" Extra="" />
+		<field Field="JobDescLast" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="JobLengthLast" Type="varchar(10)" Null="YES" Key="" Extra="" />
+		<field Field="JobSkills" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="JobCareer" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Hobby" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Religion" Type="char(2)" Null="YES" Key="" Extra="" />
+		<field Field="ReligionDesc" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="ReligionExp" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="ReligionMean" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="ReligionChild" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="ReligionAttend" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="ReligionDiff" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Active" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="FormID" Type="varchar(12)" Null="YES" Key="" Extra="" />
+		<field Field="RecDOLC" Type="timestamp" Null="NO" Key="" Default="CURRENT_TIMESTAMP" Extra="" />
+		<field Field="Problem" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Summary" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Type" Type="varchar(4)" Null="YES" Key="" Extra="" />
+		<field Field="RefOnly" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="CreateProvID" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="CreateDate" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="ChangeProvID" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="JOLTS" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="ExpDate" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="CASEID" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="ReligionName" Type="char(2)" Null="YES" Key="" Extra="" />
+		<field Field="IntTime" Type="time" Null="YES" Key="" Extra="" />
+		<field Field="StaffID" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="SchoolCollab" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="IntDate" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="RefDate" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="PhysHist" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="MAR" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="ReferredTo" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Tribe" Type="varchar(20)" Null="YES" Key="" Extra="" />
+		<field Field="Gang" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="ReferredBy1" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="ReferredBy2" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="LegalStatus" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="ServiceFocus" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="Problem1" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="Problem2" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="Problem3" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="HomelessLong" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="HomelessMany" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="IncomeDeps" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="Pregnant" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="SpeakEnglish" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="WriteEnglish" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="ReadEnglish" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="CommitmentCounty" Type="varchar(50)" Null="YES" Key="" Extra="" />
+		<field Field="Arrest1" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="Arrested" Type="tinyint(3)" Null="YES" Key="" Extra="" />
+		<field Field="DV" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="SA" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="LOC" Type="char(2)" Null="YES" Key="" Extra="" />
+		<field Field="FAR" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="TransBy" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="TransPh" Type="varchar(16)" Null="YES" Key="" Extra="" />
+		<field Field="TransAddr" Type="varchar(50)" Null="YES" Key="" Extra="" />
+		<field Field="TransCity" Type="varchar(50)" Null="YES" Key="" Extra="" />
+		<field Field="TransCounty" Type="varchar(50)" Null="YES" Key="" Extra="" />
+		<field Field="TransST" Type="char(2)" Null="YES" Key="" Extra="" />
+		<field Field="TransZip" Type="varchar(10)" Null="YES" Key="" Extra="" />
+		<field Field="WitnessDV" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="RefDate2" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="FamilyID" Type="varchar(10)" Null="YES" Key="" Extra="" />
+		<field Field="ICISID" Type="varchar(9)" Null="YES" Key="" Extra="" />
+		<field Field="ReferredCont1" Type="varchar(30)" Null="YES" Key="" Extra="" />
+		<field Field="ReferredCont2" Type="varchar(30)" Null="YES" Key="" Extra="" />
+		<field Field="ActiveSupport" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="NumSchools" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="ReferredToNPI" Type="char(12)" Null="YES" Key="" Extra="" />
+		<field Field="ReferralsNPI" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="ReferredBy1NPI" Type="char(12)" Null="YES" Key="" Extra="" />
+		<field Field="ReferredBy2NPI" Type="char(12)" Null="YES" Key="" Extra="" />
+		<field Field="PregnantDate" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="Alert" Type="varchar(50)" Null="YES" Key="" Extra="" />
+		<field Field="SelfHelp30" Type="tinyint(3)" Null="YES" Key="" Extra="" />
+		<field Field="AbsentSchool" Type="tinyint(3)" Null="YES" Key="" Extra="" />
+		<field Field="SuspendedSchool" Type="tinyint(3)" Null="YES" Key="" Extra="" />
+		<field Field="AbsentDayCare" Type="tinyint(3)" Null="YES" Key="" Extra="" />
+		<field Field="InJail" Type="tinyint(3)" Null="YES" Key="" Extra="" />
+		<field Field="ReferredBy1Type" Type="tinyint(3)" Null="YES" Key="" Extra="" />
+		<field Field="ReferredBy2Type" Type="tinyint(3)" Null="YES" Key="" Extra="" />
+		<field Field="LastSchoolDist" Type="char(9)" Null="YES" Key="" Extra="" />
+		<field Field="LastSchoolName" Type="char(50)" Null="YES" Key="" Extra="" />
+		<field Field="ReligionViews" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="AbleToPay" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="AbleToCare" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="AbleToMeetNeeds" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="AbleToMeetLegal" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="RecoveryNeeds" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="BasicNeeds" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="MilRel" Type="varchar(4)" Null="YES" Key="" Extra="" />
+		<key Table="ClientIntake" Non_unique="0" Key_name="PRIMARY" Seq_in_index="1" Column_name="ID" Collation="A" Cardinality="15104" Null="" Index_type="BTREE" Comment="" />
+		<key Table="ClientIntake" Non_unique="1" Key_name="ClientID" Seq_in_index="1" Column_name="ClientID" Collation="A" Cardinality="15104" Null="YES" Index_type="BTREE" Comment="" />
+		<options Name="ClientIntake" Engine="MyISAM" Version="10" Row_format="Dynamic" Rows="15104" Avg_row_length="749" Data_length="11317264" Max_data_length="281474976710655" Index_length="387072" Data_free="0" Auto_increment="23472" Create_time="2011-09-28 12:11:56" Update_time="2011-10-10 18:55:24" Check_time="2011-09-28 12:11:58" Collation="latin1_swedish_ci" Create_options="" Comment="" />
+	</table_structure>
+</database>
+</mysqldump>
+<?xml version="1.0"?>
+<mysqldump xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<database name="okmis_oays">
+	<table_structure name="ClientSummary">
+		<field Field="ID" Type="int(11)" Null="NO" Key="PRI" Extra="auto_increment" />
+		<field Field="ClientID" Type="int(11)" Null="NO" Key="MUL" Default="0" Extra="" />
+		<field Field="CreateProvID" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="CreateDate" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="ChangeProvID" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="ChangeDate" Type="timestamp" Null="NO" Key="" Default="CURRENT_TIMESTAMP" Extra="" />
+		<field Field="FormID" Type="varchar(12)" Null="YES" Key="" Extra="" />
+		<field Field="S1" Type="varchar(80)" Null="YES" Key="" Extra="" />
+		<field Field="S2" Type="varchar(80)" Null="YES" Key="" Extra="" />
+		<field Field="S3" Type="varchar(80)" Null="YES" Key="" Extra="" />
+		<field Field="S4" Type="varchar(80)" Null="YES" Key="" Extra="" />
+		<field Field="L1" Type="varchar(80)" Null="YES" Key="" Extra="" />
+		<field Field="L2" Type="varchar(80)" Null="YES" Key="" Extra="" />
+		<field Field="L3" Type="varchar(80)" Null="YES" Key="" Extra="" />
+		<field Field="L4" Type="varchar(80)" Null="YES" Key="" Extra="" />
+		<field Field="Prefs" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Overall" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Stage" Type="tinyint(3)" Null="YES" Key="" Extra="" />
+		<key Table="ClientSummary" Non_unique="0" Key_name="PRIMARY" Seq_in_index="1" Column_name="ID" Collation="A" Cardinality="4286" Null="" Index_type="BTREE" Comment="" />
+		<key Table="ClientSummary" Non_unique="1" Key_name="ClientID" Seq_in_index="1" Column_name="ClientID" Collation="A" Null="" Index_type="BTREE" Comment="" />
+		<options Name="ClientSummary" Engine="MyISAM" Version="10" Row_format="Dynamic" Rows="4286" Avg_row_length="131" Data_length="565468" Max_data_length="281474976710655" Index_length="104448" Data_free="0" Auto_increment="4288" Create_time="2011-08-28 16:51:43" Update_time="2011-10-07 18:09:13" Collation="latin1_swedish_ci" Create_options="" Comment="" />
+	</table_structure>
+</database>
+</mysqldump>
+<?xml version="1.0"?>
+<mysqldump xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<database name="okmis_oays">
+	<table_structure name="PrAuth">
+		<field Field="ID" Type="int(11)" Null="NO" Key="PRI" Extra="auto_increment" />
+		<field Field="ClientID" Type="int(11)" Null="NO" Key="" Default="0" Extra="" />
+		<field Field="Type" Type="char(2)" Null="YES" Key="" Extra="" />
+		<field Field="ReqDate" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="PrAuthNum" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="ReqComments" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="OthComments" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="IReqDate" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="IReqProv" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="ClSigDate" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="PGSigDate" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="PrSigDate" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="PhSigDate" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="QASigDate" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="EffDate" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="ExpDate" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="RecDOLC" Type="timestamp" Null="NO" Key="" Default="CURRENT_TIMESTAMP" Extra="" />
+		<field Field="FormID" Type="varchar(12)" Null="YES" Key="" Extra="" />
+		<field Field="CreateProvID" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="CreateDate" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="ChangeProvID" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="InsuranceID" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="ReqType" Type="char(2)" Null="YES" Key="" Extra="" />
+		<field Field="APSID" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="TL" Type="char(2)" Null="YES" Key="" Extra="" />
+		<field Field="LOS" Type="tinyint(3)" Null="YES" Key="" Extra="" />
+		<field Field="AuthAmt" Type="decimal(10,2)" Null="YES" Key="" Extra="" />
+		<field Field="LevelCode" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="Status" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="ContactCDC" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="TransType" Type="tinyint(3)" Null="YES" Key="" Extra="" />
+		<field Field="TransDate" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="TransTime" Type="time" Null="YES" Key="" Extra="" />
+		<field Field="AuthExpDate" Type="date" Null="YES" Key="" Extra="" />
+		<key Table="PrAuth" Non_unique="0" Key_name="PRIMARY" Seq_in_index="1" Column_name="ID" Collation="A" Cardinality="26404" Null="" Index_type="BTREE" Comment="" />
+		<options Name="PrAuth" Engine="MyISAM" Version="10" Row_format="Dynamic" Rows="26404" Avg_row_length="96" Data_length="3730952" Max_data_length="281474976710655" Index_length="486400" Data_free="1178340" Auto_increment="41663" Create_time="2011-01-03 23:33:04" Update_time="2011-10-10 19:10:15" Collation="latin1_swedish_ci" Create_options="" Comment="" />
+	</table_structure>
+</database>
+</mysqldump>
+<?xml version="1.0"?>
+<mysqldump xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<database name="okmis_oays">
+	<table_structure name="TrPlan">
+		<field Field="TrPlanID" Type="int(11)" Null="NO" Key="PRI" Extra="auto_increment" />
+		<field Field="ClientID" Type="int(11)" Null="NO" Key="MUL" Default="0" Extra="" />
+		<field Field="TrPlanType" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="TrPlanSA1" Type="varchar(80)" Null="YES" Key="" Extra="" />
+		<field Field="TrPlanL1" Type="varchar(80)" Null="YES" Key="" Extra="" />
+		<field Field="TrPlanSA2" Type="varchar(80)" Null="YES" Key="" Extra="" />
+		<field Field="TrPlanL2" Type="varchar(80)" Null="YES" Key="" Extra="" />
+		<field Field="TrPlanSA3" Type="varchar(80)" Null="YES" Key="" Extra="" />
+		<field Field="TrPlanL3" Type="varchar(80)" Null="YES" Key="" Extra="" />
+		<field Field="TrPlanSA4" Type="varchar(80)" Null="YES" Key="" Extra="" />
+		<field Field="TrPlanL4" Type="varchar(80)" Null="YES" Key="" Extra="" />
+		<field Field="TrPlanClResCom" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="DCCrit1" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="DCCrit2" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="DCCrit3" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="DCCrit4" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="DCCrit5" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="DisProg" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="DisPlan" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="TrPlanClAgree" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="TrPlanClSigDate" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="TrPlanPGSigDate" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="TrPlanPrSigDate" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="TrPlanPhSigDate" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="TrPlanQASigDate" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="TrPlanEffDate" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="TrPlanExpDate" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="TrPlanComments" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="RecDOLC" Type="timestamp" Null="NO" Key="" Default="CURRENT_TIMESTAMP" Extra="" />
+		<field Field="FormID" Type="varchar(12)" Null="YES" Key="" Extra="" />
+		<field Field="CreateProvID" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="CreateDate" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="ChangeProvID" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="Summary" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="PrAuthID" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="Theoretical" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="EstDisDate" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="Aftercare" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Current" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="ReceivedBy" Type="char(1)" Null="YES" Key="" Extra="" />
+		<field Field="ClientCopy" Type="tinyint(3)" Null="YES" Key="" Extra="" />
+		<field Field="OthersCopy" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="StaffID" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="DevelopBy" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Referrals" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="ReferralsNPI" Type="text" Null="YES" Key="" Extra="" />
+		<key Table="TrPlan" Non_unique="0" Key_name="PRIMARY" Seq_in_index="1" Column_name="TrPlanID" Collation="A" Cardinality="20519" Null="" Index_type="BTREE" Comment="" />
+		<key Table="TrPlan" Non_unique="1" Key_name="ClientID" Seq_in_index="1" Column_name="ClientID" Collation="A" Cardinality="10259" Null="" Index_type="BTREE" Comment="" />
+		<options Name="TrPlan" Engine="MyISAM" Version="10" Row_format="Dynamic" Rows="20519" Avg_row_length="1080" Data_length="34904060" Max_data_length="281474976710655" Index_length="756736" Data_free="12726012" Auto_increment="32367" Create_time="2011-01-04 02:23:28" Update_time="2011-10-10 19:59:43" Check_time="2011-01-04 02:23:29" Collation="latin1_swedish_ci" Create_options="" Comment="" />
+	</table_structure>
+</database>
+</mysqldump>
+<?xml version="1.0"?>
+<mysqldump xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<database name="okmis_oays">
+	<table_structure name="TrPlanIP">
+		<field Field="ID" Type="int(11)" Null="NO" Key="PRI" Extra="auto_increment" />
+		<field Field="ClientID" Type="int(11)" Null="NO" Key="MUL" Default="0" Extra="" />
+		<field Field="TrPlanID" Type="int(11)" Null="NO" Key="MUL" Default="0" Extra="" />
+		<field Field="ProbNum" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="Prob" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Goal" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Obj1" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Date1" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="Prog1" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Obj2" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Date2" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="Prog2" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Obj3" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Date3" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="Prog3" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Obj4" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Date4" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="Prog4" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Obj5" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Date5" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="Prog5" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Comments" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="CreateProvID" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="CreateDate" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="ChangeProvID" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="FormID" Type="varchar(12)" Null="YES" Key="" Extra="" />
+		<field Field="Help1" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Help2" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Help3" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Help4" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Help5" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Serv1" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Serv2" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Serv3" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Serv4" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Serv5" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Freq1" Type="float(10,2)" Null="YES" Key="" Extra="" />
+		<field Field="Freq2" Type="float(10,2)" Null="YES" Key="" Extra="" />
+		<field Field="Freq3" Type="float(10,2)" Null="YES" Key="" Extra="" />
+		<field Field="Freq4" Type="float(10,2)" Null="YES" Key="" Extra="" />
+		<field Field="Freq5" Type="float(10,2)" Null="YES" Key="" Extra="" />
+		<field Field="Cred1" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Cred2" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Cred3" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Cred4" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Cred5" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Init1" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="Init2" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="Init3" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="Init4" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="Init5" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="Obj6" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Date6" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="Prog6" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Help6" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Serv6" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Freq6" Type="float(10,2)" Null="YES" Key="" Extra="" />
+		<field Field="Cred6" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Init6" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="NeedSkill" Type="smallint(3)" Null="YES" Key="" Extra="" />
+		<field Field="ChangeDate" Type="timestamp" Null="NO" Key="" Default="CURRENT_TIMESTAMP" Extra="" />
+		<field Field="Serv11" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Serv12" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Serv13" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Serv21" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Serv22" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Serv23" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Serv31" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Serv32" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Serv33" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Serv41" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Serv42" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Serv43" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Serv51" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Serv52" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Serv53" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Serv61" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Serv62" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Serv63" Type="text" Null="YES" Key="" Extra="" />
+		<field Field="Prov11" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="Prov12" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="Prov13" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="Prov21" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="Prov22" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="Prov23" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="Prov31" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="Prov32" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="Prov33" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="Prov41" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="Prov42" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="Prov43" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="Prov51" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="Prov52" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="Prov53" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="Prov61" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="Prov62" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="Prov63" Type="int(11)" Null="YES" Key="" Extra="" />
+		<key Table="TrPlanIP" Non_unique="0" Key_name="PRIMARY" Seq_in_index="1" Column_name="ID" Collation="A" Cardinality="47618" Null="" Index_type="BTREE" Comment="" />
+		<key Table="TrPlanIP" Non_unique="1" Key_name="ClientID" Seq_in_index="1" Column_name="ClientID" Collation="A" Cardinality="11904" Null="" Index_type="BTREE" Comment="" />
+		<key Table="TrPlanIP" Non_unique="1" Key_name="TrPlanID" Seq_in_index="1" Column_name="TrPlanID" Collation="A" Cardinality="23809" Null="" Index_type="BTREE" Comment="" />
+		<options Name="TrPlanIP" Engine="MyISAM" Version="10" Row_format="Dynamic" Rows="47618" Avg_row_length="748" Data_length="35663280" Max_data_length="281474976710655" Index_length="1581056" Data_free="0" Auto_increment="76182" Create_time="2011-07-17 20:55:01" Update_time="2011-10-10 20:00:12" Check_time="2011-07-17 20:55:02" Collation="latin1_swedish_ci" Create_options="" Comment="" />
+	</table_structure>
+</database>
+</mysqldump>
+<?xml version="1.0"?>
+<mysqldump xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<database name="okmis_oays">
+	<table_structure name="TrPlanS">
+		<field Field="ID" Type="int(11)" Null="NO" Key="PRI" Extra="auto_increment" />
+		<field Field="ClientID" Type="int(11)" Null="NO" Key="MUL" Default="0" Extra="" />
+		<field Field="TrPlanID" Type="int(11)" Null="NO" Key="MUL" Default="0" Extra="" />
+		<field Field="ProvID" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="SignDate" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="CreateProvID" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="CreateDate" Type="date" Null="YES" Key="" Extra="" />
+		<field Field="ChangeProvID" Type="int(11)" Null="YES" Key="" Extra="" />
+		<field Field="FormID" Type="varchar(12)" Null="YES" Key="" Extra="" />
+		<field Field="SignTime" Type="time" Null="YES" Key="" Extra="" />
+		<key Table="TrPlanS" Non_unique="0" Key_name="PRIMARY" Seq_in_index="1" Column_name="ID" Collation="A" Cardinality="9503" Null="" Index_type="BTREE" Comment="" />
+		<key Table="TrPlanS" Non_unique="1" Key_name="ClientID" Seq_in_index="1" Column_name="ClientID" Collation="A" Cardinality="4751" Null="" Index_type="BTREE" Comment="" />
+		<key Table="TrPlanS" Non_unique="1" Key_name="TrPlanID" Seq_in_index="1" Column_name="TrPlanID" Collation="A" Cardinality="9503" Null="" Index_type="BTREE" Comment="" />
+		<options Name="TrPlanS" Engine="MyISAM" Version="10" Row_format="Dynamic" Rows="9503" Avg_row_length="41" Data_length="391560" Max_data_length="281474976710655" Index_length="357376" Data_free="0" Auto_increment="12134" Create_time="2011-02-23 18:52:22" Update_time="2011-10-10 19:31:44" Check_time="2011-02-23 18:52:22" Collation="latin1_swedish_ci" Create_options="" Comment="" />
+	</table_structure>
+</database>
+</mysqldump>

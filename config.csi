@@ -1,0 +1,67 @@
+# Variables for Consultant Services Inc.
+# General variables
+#
+# Main
+BELL="\007\007\n"
+CMD=${0##*/}
+CMDDIR=$(dirname $(readlink -f $0))
+CURPATH=`pwd`
+WEBMASTER="support@okmis.com"
+#
+# Site
+export HOSTNAME=`/bin/hostname`
+export HOSTSYS=linux
+export CSI=/home/okmis/mis/csi
+export SAVEDIR=/home/backups
+export WWW=/home/okmis/www
+export MOODLE=/home/moodle
+export MAINDIR=/home/okmis/mis
+export BACKDIR=/home/okmis/backups
+# Database
+export DBSYS=SQL
+export DBDIR=/var/lib/mysql
+export DBBIN=/usr/bin
+export DBCMD=/usr/bin/mysql
+
+export KEEPDIR=/home/okmis/mis/upd/keep
+export WORKDIR=/home/okmis/mis/upd/work
+
+export TAPEDIR=/home/okmis/mis/backups
+export DBADIR=/home/okmis/mis/
+export MISBIN=/home/okmis/mis/src/bin
+export MISSBIN=/home/okmis/mis/src/sbin
+export MISLIB=/home/okmis/mis/src/lib
+export BILLDIR=/home/okmis/mis/billing
+
+export ADMINDIR=/home/okmis/www/mms/admin
+export FTPDIR="${ADMINDIR}/downloads"
+export LOGDIR="${ADMINDIR}/logs"
+export REMITDIR="${ADMINDIR}/835"
+export SRC=/home/okmis/mis/src
+export SRCBIN=/home/okmis/mis/src/bin
+export SRCLIB=/home/okmis/mis/src/lib
+export SRCSBIN=/home/okmis/mis/src/sbin
+export SCHEDULER=/home/okmis/mis/src/scheduler
+umask ugo+rw
+#
+# some dates
+# decimal
+export TODAY=`date +%Y-%m-%d`
+export DOM=`date +%d`
+export MOY=`date +%m`
+export MD=`date +%m%d`
+export YM=`date +%Y%m`
+export YMD=`date +%Y%m%d`
+export YMDH=`date +%Y%m%d%H`
+export YMDHM=`date +%Y%m%d%H%M`
+# Alpha
+export DOW=`date +%a`
+export DOWEEK=`date +%A`
+export MON=`date +%b`
+export HM=`date +%H:%M`
+export DATESTAMP=`date +%Y%m%d%H%M%S`
+#
+function print
+{
+   echo -e $*
+}

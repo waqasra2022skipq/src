@@ -1,0 +1,37 @@
+#!/usr/local/bin/perl
+#	
+#	Name	:cookie
+#	Author:Kang SoonLai
+#	Date	:Wed Nov 20 1996, 01:58:23 AM	v1.0
+#	Path	:/users/skang/public_html/cgi-bin/cookie
+#	Email	:skang@tisl.ukans.edu
+#	WWW	:http://www.tisl.ukans.edu/~skang
+#
+#	A very simple script that sets a cookie on browsers that support 
+#	Netscape Persistent Cookies. Distributed through Cookie Central.
+#	http://www.cookiecentral.com.
+#
+###############################################################################
+
+$num = $ENV{HTTP_COOKIE};
+$num =~ /NUM=([^;]*)/;
+$num = $1;
+$num++;
+
+
+$cookie = "Set-Cookie: NUM=$num; ; path=/; domain=tisl.ukans.edu; domain=eecs.ukans.edu";
+
+print <<HEADER;
+Content-type: text/html
+$cookie
+#Location: http://www.tisl.ukans.edu/~skang/temp/cookie.html
+
+
+<!--META HTTP-EQUIV="REFRESH" CONTENT="0; URL=http://www.tisl.ukans.edu/~skang/temp/cookie.html">
+The cookie is <B>$ENV{HTTP_COOKIE}</B><P>
+Next cookie will be : $num
+HEADER
+
+# end of printing header
+
+

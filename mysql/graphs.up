@@ -1,0 +1,3 @@
+#INSERT INTO `user` VALUES ('localhost','graphsok_d3','*565C1DF5FF5ECDF9C8CB8D9D6E830B68549B35D7','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','','','','',0,0,0,0,'',NULL);
+UPDATE mysql.user SET Password=PASSWORD('a1000') WHERE User='graphsok_d3';   ## AND Host='localhost';
+FLUSH PRIVILEGES;

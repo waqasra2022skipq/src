@@ -1,0 +1,11 @@
+and for XML there is:
+ #!/usr/bin/perl
+ # use module
+ use XML::Simple;
+ use Data::Dumper;
+ # create object
+ $xml = new XML::Simple;
+ # read XML file
+ $data = $xml->XMLin("data.xml");
+ # print output
+ print Dumper($data);

@@ -1,0 +1,696 @@
+ENTER->SysAccess: setSiteACL: ProvID=
+setSiteACL: 92, 1, Agency
+ENTER->SysAccess: rebldSiteACL: ProvID=92
+SysAccess-rebldSiteACL: (92 + ), 92
+  SysAccess-rebldSiteACL: BEGIN: 92: for 92,Agency,1,t=2
+  SysAccess-rebldSiteACL: UP: 92
+  SysAccess-rebldSiteACL: DOWN: 92
+  SysAccess-rebldSiteACL: END: 92: for 92,Agency,1,t=2
+SysAccess-rebldSiteACL: DONE: ProvID=92
+setSiteACL: 953, 2, Agency
+ENTER->SysAccess: rebldSiteACL: ProvID=953
+SysAccess-rebldSiteACL: (953 + ), 953
+  SysAccess-rebldSiteACL: BEGIN: 953: for 953,Agency,2,t=2
+  SysAccess-rebldSiteACL: UP: 953
+  SysAccess-rebldSiteACL: DOWN: 953
+  SysAccess-rebldSiteACL: END: 953: for 953,Agency,2,t=2
+SysAccess-rebldSiteACL: DONE: ProvID=953
+setSiteACL: 448, Admin, Staff
+ENTER->SysAccess: rebldSiteACL: ProvID=448
+SysAccess-rebldSiteACL: (448 + 189), 448 189
+  SysAccess-rebldSiteACL: BEGIN: 448: for 448,Staff,Admin,t=4
+  SysAccess-rebldSiteACL: UP: 448
+  SysAccess-rebldSiteACL: DOWN: 448
+  SysAccess-rebldSiteACL: END: 448: for 448,Staff,Admin,t=4
+  SysAccess-rebldSiteACL: BEGIN: 448: for 189,1,Manager,t=4
+  SysAccess-rebldSiteACL: UP: 189
+  SysAccess-rebldSiteACL: DOWN: 189
+  SysAccess-rebldSiteACL: END: 448: for 189,1,Manager,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=448
+setSiteACL: 803, Administrative, Assistant 1
+ENTER->SysAccess: rebldSiteACL: ProvID=803
+SysAccess-rebldSiteACL: (803 + 101), 803 101
+  SysAccess-rebldSiteACL: BEGIN: 803: for 803,Assistant 1,Administrative,t=4
+  SysAccess-rebldSiteACL: UP: 803
+  SysAccess-rebldSiteACL: DOWN: 803
+  SysAccess-rebldSiteACL: END: 803: for 803,Assistant 1,Administrative,t=4
+  SysAccess-rebldSiteACL: BEGIN: 803: for 101,1,Office,t=3
+  SysAccess-rebldSiteACL: UP: 101
+  SysAccess-rebldSiteACL: DOWN: 101
+  SysAccess-rebldSiteACL: END: 803: for 101,1,Office,t=3
+SysAccess-rebldSiteACL: DONE: ProvID=803
+setSiteACL: 932, Administrative, Assistant 2
+ENTER->SysAccess: rebldSiteACL: ProvID=932
+SysAccess-rebldSiteACL: (932 + ), 932
+  SysAccess-rebldSiteACL: BEGIN: 932: for 932,Assistant 2,Administrative,t=4
+  SysAccess-rebldSiteACL: UP: 932
+  SysAccess-rebldSiteACL: DOWN: 932
+  SysAccess-rebldSiteACL: END: 932: for 932,Assistant 2,Administrative,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=932
+setSiteACL: 831, Boaz, Julie
+ENTER->SysAccess: rebldSiteACL: ProvID=831
+SysAccess-rebldSiteACL: (831 + ), 831
+  SysAccess-rebldSiteACL: BEGIN: 831: for 831,Julie,Boaz,t=4
+  SysAccess-rebldSiteACL: UP: 831
+  SysAccess-rebldSiteACL: DOWN: 831
+  SysAccess-rebldSiteACL: END: 831: for 831,Julie,Boaz,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=831
+setSiteACL: 916, Chapel, Christine
+ENTER->SysAccess: rebldSiteACL: ProvID=916
+SysAccess-rebldSiteACL: (916 + ), 916
+  SysAccess-rebldSiteACL: BEGIN: 916: for 916,Christine,Chapel,t=4
+  SysAccess-rebldSiteACL: UP: 916
+  SysAccess-rebldSiteACL: DOWN: 916
+  SysAccess-rebldSiteACL: END: 916: for 916,Christine,Chapel,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=916
+setSiteACL: 817, Clerical, 1
+ENTER->SysAccess: rebldSiteACL: ProvID=817
+SysAccess-rebldSiteACL: (817 + ), 817
+  SysAccess-rebldSiteACL: BEGIN: 817: for 817,1,Clerical,t=4
+  SysAccess-rebldSiteACL: UP: 817
+  SysAccess-rebldSiteACL: DOWN: 817
+  SysAccess-rebldSiteACL: END: 817: for 817,1,Clerical,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=817
+setSiteACL: 818, Clerical, 2
+ENTER->SysAccess: rebldSiteACL: ProvID=818
+SysAccess-rebldSiteACL: (818 + 101), 818 101
+  SysAccess-rebldSiteACL: BEGIN: 818: for 818,2,Clerical,t=4
+  SysAccess-rebldSiteACL: UP: 818
+  SysAccess-rebldSiteACL: DOWN: 818
+  SysAccess-rebldSiteACL: END: 818: for 818,2,Clerical,t=4
+  SysAccess-rebldSiteACL: BEGIN: 818: for 101,1,Office,t=3
+  SysAccess-rebldSiteACL: UP: 101
+  SysAccess-rebldSiteACL: DOWN: 101
+  SysAccess-rebldSiteACL: END: 818: for 101,1,Office,t=3
+SysAccess-rebldSiteACL: DONE: ProvID=818
+setSiteACL: 955, Clinic, MiniCert
+ENTER->SysAccess: rebldSiteACL: ProvID=955
+SysAccess-rebldSiteACL: (955 + ), 955
+  SysAccess-rebldSiteACL: BEGIN: 955: for 955,MiniCert,Clinic,t=3
+  SysAccess-rebldSiteACL: UP: 955
+  SysAccess-rebldSiteACL: DOWN: 955
+  SysAccess-rebldSiteACL: END: 955: for 955,MiniCert,Clinic,t=3
+SysAccess-rebldSiteACL: DONE: ProvID=955
+setSiteACL: 100, Executive, Director
+ENTER->SysAccess: rebldSiteACL: ProvID=100
+SysAccess-rebldSiteACL: (100 + 189ý146ý149ý783), 100 189 146 149 783
+  SysAccess-rebldSiteACL: BEGIN: 100: for 100,Director,Executive,t=4
+  SysAccess-rebldSiteACL: UP: 100
+  SysAccess-rebldSiteACL: DOWN: 100
+  SysAccess-rebldSiteACL: END: 100: for 100,Director,Executive,t=4
+  SysAccess-rebldSiteACL: BEGIN: 100: for 189,1,Manager,t=4
+  SysAccess-rebldSiteACL: UP: 189
+  SysAccess-rebldSiteACL: DOWN: 189
+  SysAccess-rebldSiteACL: END: 100: for 189,1,Manager,t=4
+  SysAccess-rebldSiteACL: BEGIN: 100: for 146,2,Manager,t=4
+  SysAccess-rebldSiteACL: UP: 146
+  SysAccess-rebldSiteACL: DOWN: 146
+  SysAccess-rebldSiteACL: END: 100: for 146,2,Manager,t=4
+  SysAccess-rebldSiteACL: BEGIN: 100: for 149,3,Manager,t=4
+  SysAccess-rebldSiteACL: UP: 149
+  SysAccess-rebldSiteACL: DOWN: 149
+  SysAccess-rebldSiteACL: END: 100: for 149,3,Manager,t=4
+  SysAccess-rebldSiteACL: BEGIN: 100: for 783,4,Manager,t=4
+  SysAccess-rebldSiteACL: UP: 783
+  SysAccess-rebldSiteACL: DOWN: 783
+  SysAccess-rebldSiteACL: END: 100: for 783,4,Manager,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=100
+setSiteACL: 950, FC Office, 2
+ENTER->SysAccess: rebldSiteACL: ProvID=950
+SysAccess-rebldSiteACL: (950 + ), 950
+  SysAccess-rebldSiteACL: BEGIN: 950: for 950,2,FC Office,t=3
+  SysAccess-rebldSiteACL: UP: 950
+  SysAccess-rebldSiteACL: DOWN: 950
+  SysAccess-rebldSiteACL: END: 950: for 950,2,FC Office,t=3
+SysAccess-rebldSiteACL: DONE: ProvID=950
+setSiteACL: 780, Foster, John
+ENTER->SysAccess: rebldSiteACL: ProvID=780
+SysAccess-rebldSiteACL: (780 + ), 780
+  SysAccess-rebldSiteACL: BEGIN: 780: for 780,John,Foster,t=4
+  SysAccess-rebldSiteACL: UP: 780
+  SysAccess-rebldSiteACL: DOWN: 780
+  SysAccess-rebldSiteACL: END: 780: for 780,John,Foster,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=780
+setSiteACL: 954, Gayanich, Julie
+ENTER->SysAccess: rebldSiteACL: ProvID=954
+SysAccess-rebldSiteACL: (954 + 193), 954 193
+  SysAccess-rebldSiteACL: BEGIN: 954: for 954,Julie,Gayanich,t=4
+  SysAccess-rebldSiteACL: UP: 954
+  SysAccess-rebldSiteACL: DOWN: 954
+  SysAccess-rebldSiteACL: END: 954: for 954,Julie,Gayanich,t=4
+  SysAccess-rebldSiteACL: BEGIN: 954: for 193,Richard,Hartman,t=4
+  SysAccess-rebldSiteACL: UP: 193
+  SysAccess-rebldSiteACL: DOWN: 193
+  SysAccess-rebldSiteACL: END: 954: for 193,Richard,Hartman,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=954
+setSiteACL: 891, Hampton, Connie
+ENTER->SysAccess: rebldSiteACL: ProvID=891
+SysAccess-rebldSiteACL: (891 + ), 891
+  SysAccess-rebldSiteACL: BEGIN: 891: for 891,Connie,Hampton,t=4
+  SysAccess-rebldSiteACL: UP: 891
+  SysAccess-rebldSiteACL: DOWN: 891
+  SysAccess-rebldSiteACL: END: 891: for 891,Connie,Hampton,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=891
+setSiteACL: 193, Hartman, Richard
+ENTER->SysAccess: rebldSiteACL: ProvID=193
+SysAccess-rebldSiteACL: (193 + 189), 193 189
+  SysAccess-rebldSiteACL: BEGIN: 193: for 193,Richard,Hartman,t=4
+  SysAccess-rebldSiteACL: UP: 193
+  SysAccess-rebldSiteACL: DOWN: 193
+  SysAccess-rebldSiteACL: END: 193: for 193,Richard,Hartman,t=4
+  SysAccess-rebldSiteACL: BEGIN: 193: for 189,1,Manager,t=4
+  SysAccess-rebldSiteACL: UP: 189
+  SysAccess-rebldSiteACL: DOWN: 189
+  SysAccess-rebldSiteACL: END: 193: for 189,1,Manager,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=193
+setSiteACL: 842, Herrera, Ramon
+ENTER->SysAccess: rebldSiteACL: ProvID=842
+SysAccess-rebldSiteACL: (842 + ), 842
+  SysAccess-rebldSiteACL: BEGIN: 842: for 842,Ramon,Herrera,t=4
+  SysAccess-rebldSiteACL: UP: 842
+  SysAccess-rebldSiteACL: DOWN: 842
+  SysAccess-rebldSiteACL: END: 842: for 842,Ramon,Herrera,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=842
+setSiteACL: 865, Hice, Melanie
+ENTER->SysAccess: rebldSiteACL: ProvID=865
+SysAccess-rebldSiteACL: (865 + ), 865
+  SysAccess-rebldSiteACL: BEGIN: 865: for 865,Melanie,Hice,t=4
+  SysAccess-rebldSiteACL: UP: 865
+  SysAccess-rebldSiteACL: DOWN: 865
+  SysAccess-rebldSiteACL: END: 865: for 865,Melanie,Hice,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=865
+setSiteACL: 869, Hice, Melanie (alt)
+ENTER->SysAccess: rebldSiteACL: ProvID=869
+SysAccess-rebldSiteACL: (869 + ), 869
+  SysAccess-rebldSiteACL: BEGIN: 869: for 869,Melanie (alt),Hice,t=4
+  SysAccess-rebldSiteACL: UP: 869
+  SysAccess-rebldSiteACL: DOWN: 869
+  SysAccess-rebldSiteACL: END: 869: for 869,Melanie (alt),Hice,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=869
+setSiteACL: 159, Human, Resources
+ENTER->SysAccess: rebldSiteACL: ProvID=159
+SysAccess-rebldSiteACL: (159 + 101), 159 101
+  SysAccess-rebldSiteACL: BEGIN: 159: for 159,Resources,Human,t=4
+  SysAccess-rebldSiteACL: UP: 159
+  SysAccess-rebldSiteACL: DOWN: 159
+  SysAccess-rebldSiteACL: END: 159: for 159,Resources,Human,t=4
+  SysAccess-rebldSiteACL: BEGIN: 159: for 101,1,Office,t=3
+  SysAccess-rebldSiteACL: UP: 101
+  SysAccess-rebldSiteACL: DOWN: 101
+  SysAccess-rebldSiteACL: END: 159: for 101,1,Office,t=3
+SysAccess-rebldSiteACL: DONE: ProvID=159
+setSiteACL: 885, James, Kim
+ENTER->SysAccess: rebldSiteACL: ProvID=885
+SysAccess-rebldSiteACL: (885 + ), 885
+  SysAccess-rebldSiteACL: BEGIN: 885: for 885,Kim,James,t=4
+  SysAccess-rebldSiteACL: UP: 885
+  SysAccess-rebldSiteACL: DOWN: 885
+  SysAccess-rebldSiteACL: END: 885: for 885,Kim,James,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=885
+setSiteACL: 830, Jenkins, Sharon
+ENTER->SysAccess: rebldSiteACL: ProvID=830
+SysAccess-rebldSiteACL: (830 + ), 830
+  SysAccess-rebldSiteACL: BEGIN: 830: for 830,Sharon,Jenkins,t=4
+  SysAccess-rebldSiteACL: UP: 830
+  SysAccess-rebldSiteACL: DOWN: 830
+  SysAccess-rebldSiteACL: END: 830: for 830,Sharon,Jenkins,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=830
+setSiteACL: 835, Jenkins, Sharon (alt)
+ENTER->SysAccess: rebldSiteACL: ProvID=835
+SysAccess-rebldSiteACL: (835 + ), 835
+  SysAccess-rebldSiteACL: BEGIN: 835: for 835,Sharon (alt),Jenkins,t=4
+  SysAccess-rebldSiteACL: UP: 835
+  SysAccess-rebldSiteACL: DOWN: 835
+  SysAccess-rebldSiteACL: END: 835: for 835,Sharon (alt),Jenkins,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=835
+setSiteACL: 840, Logue, Brenda
+ENTER->SysAccess: rebldSiteACL: ProvID=840
+SysAccess-rebldSiteACL: (840 + ), 840
+  SysAccess-rebldSiteACL: BEGIN: 840: for 840,Brenda,Logue,t=4
+  SysAccess-rebldSiteACL: UP: 840
+  SysAccess-rebldSiteACL: DOWN: 840
+  SysAccess-rebldSiteACL: END: 840: for 840,Brenda,Logue,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=840
+setSiteACL: 189, Manager, 1
+ENTER->SysAccess: rebldSiteACL: ProvID=189
+SysAccess-rebldSiteACL: (189 + 100), 189 100
+  SysAccess-rebldSiteACL: BEGIN: 189: for 189,1,Manager,t=4
+  SysAccess-rebldSiteACL: UP: 189
+  SysAccess-rebldSiteACL: DOWN: 189
+  SysAccess-rebldSiteACL: END: 189: for 189,1,Manager,t=4
+  SysAccess-rebldSiteACL: BEGIN: 189: for 100,Director,Executive,t=4
+  SysAccess-rebldSiteACL: UP: 100
+  SysAccess-rebldSiteACL: DOWN: 100
+  SysAccess-rebldSiteACL: END: 189: for 100,Director,Executive,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=189
+setSiteACL: 146, Manager, 2
+ENTER->SysAccess: rebldSiteACL: ProvID=146
+SysAccess-rebldSiteACL: (146 + ), 146
+  SysAccess-rebldSiteACL: BEGIN: 146: for 146,2,Manager,t=4
+  SysAccess-rebldSiteACL: UP: 146
+  SysAccess-rebldSiteACL: DOWN: 146
+  SysAccess-rebldSiteACL: END: 146: for 146,2,Manager,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=146
+setSiteACL: 149, Manager, 3
+ENTER->SysAccess: rebldSiteACL: ProvID=149
+SysAccess-rebldSiteACL: (149 + 193), 149 193
+  SysAccess-rebldSiteACL: BEGIN: 149: for 149,3,Manager,t=4
+  SysAccess-rebldSiteACL: UP: 149
+  SysAccess-rebldSiteACL: DOWN: 149
+  SysAccess-rebldSiteACL: END: 149: for 149,3,Manager,t=4
+  SysAccess-rebldSiteACL: BEGIN: 149: for 193,Richard,Hartman,t=4
+  SysAccess-rebldSiteACL: UP: 193
+  SysAccess-rebldSiteACL: DOWN: 193
+  SysAccess-rebldSiteACL: END: 149: for 193,Richard,Hartman,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=149
+setSiteACL: 783, Manager, 4
+ENTER->SysAccess: rebldSiteACL: ProvID=783
+SysAccess-rebldSiteACL: (783 + ), 783
+  SysAccess-rebldSiteACL: BEGIN: 783: for 783,4,Manager,t=4
+  SysAccess-rebldSiteACL: UP: 783
+  SysAccess-rebldSiteACL: DOWN: 783
+  SysAccess-rebldSiteACL: END: 783: for 783,4,Manager,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=783
+setSiteACL: 91, Manager, Group
+ENTER->SysAccess: rebldSiteACL: ProvID=91
+SysAccess-rebldSiteACL: (91 + ), 91
+  SysAccess-rebldSiteACL: BEGIN: 91: for 91,Group,Manager,t=1
+  SysAccess-rebldSiteACL: UP: 91
+  SysAccess-rebldSiteACL: DOWN: 91
+  SysAccess-rebldSiteACL: END: 91: for 91,Group,Manager,t=1
+SysAccess-rebldSiteACL: DONE: ProvID=91
+setSiteACL: 808, Manager, Staff
+ENTER->SysAccess: rebldSiteACL: ProvID=808
+SysAccess-rebldSiteACL: (808 + 189), 808 189
+  SysAccess-rebldSiteACL: BEGIN: 808: for 808,Staff,Manager,t=4
+  SysAccess-rebldSiteACL: UP: 808
+  SysAccess-rebldSiteACL: DOWN: 808
+  SysAccess-rebldSiteACL: END: 808: for 808,Staff,Manager,t=4
+  SysAccess-rebldSiteACL: BEGIN: 808: for 189,1,Manager,t=4
+  SysAccess-rebldSiteACL: UP: 189
+  SysAccess-rebldSiteACL: DOWN: 189
+  SysAccess-rebldSiteACL: END: 808: for 189,1,Manager,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=808
+setSiteACL: 945, Mayer, Kristine
+ENTER->SysAccess: rebldSiteACL: ProvID=945
+SysAccess-rebldSiteACL: (945 + ), 945
+  SysAccess-rebldSiteACL: BEGIN: 945: for 945,Kristine,Mayer,t=4
+  SysAccess-rebldSiteACL: UP: 945
+  SysAccess-rebldSiteACL: DOWN: 945
+  SysAccess-rebldSiteACL: END: 945: for 945,Kristine,Mayer,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=945
+setSiteACL: 951, McCoy, Leonard
+ENTER->SysAccess: rebldSiteACL: ProvID=951
+SysAccess-rebldSiteACL: (951 + 953), 951 953
+  SysAccess-rebldSiteACL: BEGIN: 951: for 951,Leonard,McCoy,t=4
+  SysAccess-rebldSiteACL: UP: 951
+  SysAccess-rebldSiteACL: DOWN: 951
+  SysAccess-rebldSiteACL: END: 951: for 951,Leonard,McCoy,t=4
+  SysAccess-rebldSiteACL: BEGIN: 951: for 953,Agency,2,t=2
+  SysAccess-rebldSiteACL: UP: 953
+  SysAccess-rebldSiteACL: DOWN: 953
+  SysAccess-rebldSiteACL: END: 951: for 953,Agency,2,t=2
+SysAccess-rebldSiteACL: DONE: ProvID=951
+setSiteACL: 814, Network, Administrator
+ENTER->SysAccess: rebldSiteACL: ProvID=814
+SysAccess-rebldSiteACL: (814 + 101), 814 101
+  SysAccess-rebldSiteACL: BEGIN: 814: for 814,Administrator,Network,t=4
+  SysAccess-rebldSiteACL: UP: 814
+  SysAccess-rebldSiteACL: DOWN: 814
+  SysAccess-rebldSiteACL: END: 814: for 814,Administrator,Network,t=4
+  SysAccess-rebldSiteACL: BEGIN: 814: for 101,1,Office,t=3
+  SysAccess-rebldSiteACL: UP: 101
+  SysAccess-rebldSiteACL: DOWN: 101
+  SysAccess-rebldSiteACL: END: 814: for 101,1,Office,t=3
+SysAccess-rebldSiteACL: DONE: ProvID=814
+setSiteACL: 920, Nolen, Fred
+ENTER->SysAccess: rebldSiteACL: ProvID=920
+SysAccess-rebldSiteACL: (920 + ), 920
+  SysAccess-rebldSiteACL: BEGIN: 920: for 920,Fred,Nolen,t=4
+  SysAccess-rebldSiteACL: UP: 920
+  SysAccess-rebldSiteACL: DOWN: 920
+  SysAccess-rebldSiteACL: END: 920: for 920,Fred,Nolen,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=920
+setSiteACL: 452, Nurse, Staff
+ENTER->SysAccess: rebldSiteACL: ProvID=452
+SysAccess-rebldSiteACL: (452 + 189), 452 189
+  SysAccess-rebldSiteACL: BEGIN: 452: for 452,Staff,Nurse,t=4
+  SysAccess-rebldSiteACL: UP: 452
+  SysAccess-rebldSiteACL: DOWN: 452
+  SysAccess-rebldSiteACL: END: 452: for 452,Staff,Nurse,t=4
+  SysAccess-rebldSiteACL: BEGIN: 452: for 189,1,Manager,t=4
+  SysAccess-rebldSiteACL: UP: 189
+  SysAccess-rebldSiteACL: DOWN: 189
+  SysAccess-rebldSiteACL: END: 452: for 189,1,Manager,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=452
+setSiteACL: 101, Office, 1
+ENTER->SysAccess: rebldSiteACL: ProvID=101
+SysAccess-rebldSiteACL: (101 + ), 101
+  SysAccess-rebldSiteACL: BEGIN: 101: for 101,1,Office,t=3
+  SysAccess-rebldSiteACL: UP: 101
+  SysAccess-rebldSiteACL: DOWN: 101
+  SysAccess-rebldSiteACL: END: 101: for 101,1,Office,t=3
+SysAccess-rebldSiteACL: DONE: ProvID=101
+setSiteACL: 201, Office, 1
+ENTER->SysAccess: rebldSiteACL: ProvID=201
+SysAccess-rebldSiteACL: (201 + ), 201
+  SysAccess-rebldSiteACL: BEGIN: 201: for 201,1,Office,t=3
+  SysAccess-rebldSiteACL: UP: 201
+  SysAccess-rebldSiteACL: DOWN: 201
+  SysAccess-rebldSiteACL: END: 201: for 201,1,Office,t=3
+SysAccess-rebldSiteACL: DONE: ProvID=201
+setSiteACL: 952, Office, 1
+ENTER->SysAccess: rebldSiteACL: ProvID=952
+SysAccess-rebldSiteACL: (952 + ), 952
+  SysAccess-rebldSiteACL: BEGIN: 952: for 952,1,Office,t=3
+  SysAccess-rebldSiteACL: UP: 952
+  SysAccess-rebldSiteACL: DOWN: 952
+  SysAccess-rebldSiteACL: END: 952: for 952,1,Office,t=3
+SysAccess-rebldSiteACL: DONE: ProvID=952
+setSiteACL: 807, Provider, 11
+ENTER->SysAccess: rebldSiteACL: ProvID=807
+SysAccess-rebldSiteACL: (807 + ), 807
+  SysAccess-rebldSiteACL: BEGIN: 807: for 807,11,Provider,t=4
+  SysAccess-rebldSiteACL: UP: 807
+  SysAccess-rebldSiteACL: DOWN: 807
+  SysAccess-rebldSiteACL: END: 807: for 807,11,Provider,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=807
+setSiteACL: 942, Provider, 12
+ENTER->SysAccess: rebldSiteACL: ProvID=942
+SysAccess-rebldSiteACL: (942 + ), 942
+  SysAccess-rebldSiteACL: BEGIN: 942: for 942,12,Provider,t=4
+  SysAccess-rebldSiteACL: UP: 942
+  SysAccess-rebldSiteACL: DOWN: 942
+  SysAccess-rebldSiteACL: END: 942: for 942,12,Provider,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=942
+setSiteACL: 825, Provider, 13
+ENTER->SysAccess: rebldSiteACL: ProvID=825
+SysAccess-rebldSiteACL: (825 + ), 825
+  SysAccess-rebldSiteACL: BEGIN: 825: for 825,13,Provider,t=4
+  SysAccess-rebldSiteACL: UP: 825
+  SysAccess-rebldSiteACL: DOWN: 825
+  SysAccess-rebldSiteACL: END: 825: for 825,13,Provider,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=825
+setSiteACL: 796, Provider, 14
+ENTER->SysAccess: rebldSiteACL: ProvID=796
+SysAccess-rebldSiteACL: (796 + ), 796
+  SysAccess-rebldSiteACL: BEGIN: 796: for 796,14,Provider,t=4
+  SysAccess-rebldSiteACL: UP: 796
+  SysAccess-rebldSiteACL: DOWN: 796
+  SysAccess-rebldSiteACL: END: 796: for 796,14,Provider,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=796
+setSiteACL: 934, Provider, 15
+ENTER->SysAccess: rebldSiteACL: ProvID=934
+SysAccess-rebldSiteACL: (934 + ), 934
+  SysAccess-rebldSiteACL: BEGIN: 934: for 934,15,Provider,t=4
+  SysAccess-rebldSiteACL: UP: 934
+  SysAccess-rebldSiteACL: DOWN: 934
+  SysAccess-rebldSiteACL: END: 934: for 934,15,Provider,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=934
+setSiteACL: 823, Provider, 16
+ENTER->SysAccess: rebldSiteACL: ProvID=823
+SysAccess-rebldSiteACL: (823 + ), 823
+  SysAccess-rebldSiteACL: BEGIN: 823: for 823,16,Provider,t=4
+  SysAccess-rebldSiteACL: UP: 823
+  SysAccess-rebldSiteACL: DOWN: 823
+  SysAccess-rebldSiteACL: END: 823: for 823,16,Provider,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=823
+setSiteACL: 896, Provider, 17
+ENTER->SysAccess: rebldSiteACL: ProvID=896
+SysAccess-rebldSiteACL: (896 + ), 896
+  SysAccess-rebldSiteACL: BEGIN: 896: for 896,17,Provider,t=4
+  SysAccess-rebldSiteACL: UP: 896
+  SysAccess-rebldSiteACL: DOWN: 896
+  SysAccess-rebldSiteACL: END: 896: for 896,17,Provider,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=896
+setSiteACL: 897, Provider, 18
+ENTER->SysAccess: rebldSiteACL: ProvID=897
+SysAccess-rebldSiteACL: (897 + ), 897
+  SysAccess-rebldSiteACL: BEGIN: 897: for 897,18,Provider,t=4
+  SysAccess-rebldSiteACL: UP: 897
+  SysAccess-rebldSiteACL: DOWN: 897
+  SysAccess-rebldSiteACL: END: 897: for 897,18,Provider,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=897
+setSiteACL: 460, Provider, 19
+ENTER->SysAccess: rebldSiteACL: ProvID=460
+SysAccess-rebldSiteACL: (460 + ), 460
+  SysAccess-rebldSiteACL: BEGIN: 460: for 460,19,Provider,t=4
+  SysAccess-rebldSiteACL: UP: 460
+  SysAccess-rebldSiteACL: DOWN: 460
+  SysAccess-rebldSiteACL: END: 460: for 460,19,Provider,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=460
+setSiteACL: 768, Provider, 20
+ENTER->SysAccess: rebldSiteACL: ProvID=768
+SysAccess-rebldSiteACL: (768 + ), 768
+  SysAccess-rebldSiteACL: BEGIN: 768: for 768,20,Provider,t=4
+  SysAccess-rebldSiteACL: UP: 768
+  SysAccess-rebldSiteACL: DOWN: 768
+  SysAccess-rebldSiteACL: END: 768: for 768,20,Provider,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=768
+setSiteACL: 781, Provider, 21
+ENTER->SysAccess: rebldSiteACL: ProvID=781
+SysAccess-rebldSiteACL: (781 + ), 781
+  SysAccess-rebldSiteACL: BEGIN: 781: for 781,21,Provider,t=4
+  SysAccess-rebldSiteACL: UP: 781
+  SysAccess-rebldSiteACL: DOWN: 781
+  SysAccess-rebldSiteACL: END: 781: for 781,21,Provider,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=781
+setSiteACL: 947, Provider, 22
+ENTER->SysAccess: rebldSiteACL: ProvID=947
+SysAccess-rebldSiteACL: (947 + ), 947
+  SysAccess-rebldSiteACL: BEGIN: 947: for 947,22,Provider,t=4
+  SysAccess-rebldSiteACL: UP: 947
+  SysAccess-rebldSiteACL: DOWN: 947
+  SysAccess-rebldSiteACL: END: 947: for 947,22,Provider,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=947
+setSiteACL: 877, Provider, 23
+ENTER->SysAccess: rebldSiteACL: ProvID=877
+SysAccess-rebldSiteACL: (877 + ), 877
+  SysAccess-rebldSiteACL: BEGIN: 877: for 877,23,Provider,t=4
+  SysAccess-rebldSiteACL: UP: 877
+  SysAccess-rebldSiteACL: DOWN: 877
+  SysAccess-rebldSiteACL: END: 877: for 877,23,Provider,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=877
+setSiteACL: 878, Provider, 24
+ENTER->SysAccess: rebldSiteACL: ProvID=878
+SysAccess-rebldSiteACL: (878 + ), 878
+  SysAccess-rebldSiteACL: BEGIN: 878: for 878,24,Provider,t=4
+  SysAccess-rebldSiteACL: UP: 878
+  SysAccess-rebldSiteACL: DOWN: 878
+  SysAccess-rebldSiteACL: END: 878: for 878,24,Provider,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=878
+setSiteACL: 802, Provider, 25
+ENTER->SysAccess: rebldSiteACL: ProvID=802
+SysAccess-rebldSiteACL: (802 + ), 802
+  SysAccess-rebldSiteACL: BEGIN: 802: for 802,25,Provider,t=4
+  SysAccess-rebldSiteACL: UP: 802
+  SysAccess-rebldSiteACL: DOWN: 802
+  SysAccess-rebldSiteACL: END: 802: for 802,25,Provider,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=802
+setSiteACL: 821, Provider, 26
+ENTER->SysAccess: rebldSiteACL: ProvID=821
+SysAccess-rebldSiteACL: (821 + ), 821
+  SysAccess-rebldSiteACL: BEGIN: 821: for 821,26,Provider,t=4
+  SysAccess-rebldSiteACL: UP: 821
+  SysAccess-rebldSiteACL: DOWN: 821
+  SysAccess-rebldSiteACL: END: 821: for 821,26,Provider,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=821
+setSiteACL: 904, Provider, 3 (alt)
+ENTER->SysAccess: rebldSiteACL: ProvID=904
+SysAccess-rebldSiteACL: (904 + ), 904
+  SysAccess-rebldSiteACL: BEGIN: 904: for 904,3 (alt),Provider,t=4
+  SysAccess-rebldSiteACL: UP: 904
+  SysAccess-rebldSiteACL: DOWN: 904
+  SysAccess-rebldSiteACL: END: 904: for 904,3 (alt),Provider,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=904
+setSiteACL: 139, Provider, 4
+ENTER->SysAccess: rebldSiteACL: ProvID=139
+SysAccess-rebldSiteACL: (139 + ), 139
+  SysAccess-rebldSiteACL: BEGIN: 139: for 139,4,Provider,t=4
+  SysAccess-rebldSiteACL: UP: 139
+  SysAccess-rebldSiteACL: DOWN: 139
+  SysAccess-rebldSiteACL: END: 139: for 139,4,Provider,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=139
+setSiteACL: 918, Provider, 5
+ENTER->SysAccess: rebldSiteACL: ProvID=918
+SysAccess-rebldSiteACL: (918 + ), 918
+  SysAccess-rebldSiteACL: BEGIN: 918: for 918,5,Provider,t=4
+  SysAccess-rebldSiteACL: UP: 918
+  SysAccess-rebldSiteACL: DOWN: 918
+  SysAccess-rebldSiteACL: END: 918: for 918,5,Provider,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=918
+setSiteACL: 327, Provider, 6
+ENTER->SysAccess: rebldSiteACL: ProvID=327
+SysAccess-rebldSiteACL: (327 + ), 327
+  SysAccess-rebldSiteACL: BEGIN: 327: for 327,6,Provider,t=4
+  SysAccess-rebldSiteACL: UP: 327
+  SysAccess-rebldSiteACL: DOWN: 327
+  SysAccess-rebldSiteACL: END: 327: for 327,6,Provider,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=327
+setSiteACL: 914, Provider, 7
+ENTER->SysAccess: rebldSiteACL: ProvID=914
+SysAccess-rebldSiteACL: (914 + ), 914
+  SysAccess-rebldSiteACL: BEGIN: 914: for 914,7,Provider,t=4
+  SysAccess-rebldSiteACL: UP: 914
+  SysAccess-rebldSiteACL: DOWN: 914
+  SysAccess-rebldSiteACL: END: 914: for 914,7,Provider,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=914
+setSiteACL: 917, Provider, 8
+ENTER->SysAccess: rebldSiteACL: ProvID=917
+SysAccess-rebldSiteACL: (917 + ), 917
+  SysAccess-rebldSiteACL: BEGIN: 917: for 917,8,Provider,t=4
+  SysAccess-rebldSiteACL: UP: 917
+  SysAccess-rebldSiteACL: DOWN: 917
+  SysAccess-rebldSiteACL: END: 917: for 917,8,Provider,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=917
+setSiteACL: 899, Provider, 9
+ENTER->SysAccess: rebldSiteACL: ProvID=899
+SysAccess-rebldSiteACL: (899 + ), 899
+  SysAccess-rebldSiteACL: BEGIN: 899: for 899,9,Provider,t=4
+  SysAccess-rebldSiteACL: UP: 899
+  SysAccess-rebldSiteACL: DOWN: 899
+  SysAccess-rebldSiteACL: END: 899: for 899,9,Provider,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=899
+setSiteACL: 826, Putnam, Claralice
+ENTER->SysAccess: rebldSiteACL: ProvID=826
+SysAccess-rebldSiteACL: (826 + ), 826
+  SysAccess-rebldSiteACL: BEGIN: 826: for 826,Claralice,Putnam,t=4
+  SysAccess-rebldSiteACL: UP: 826
+  SysAccess-rebldSiteACL: DOWN: 826
+  SysAccess-rebldSiteACL: END: 826: for 826,Claralice,Putnam,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=826
+setSiteACL: 853, Putnam, Claralice (alt)
+ENTER->SysAccess: rebldSiteACL: ProvID=853
+SysAccess-rebldSiteACL: (853 + ), 853
+  SysAccess-rebldSiteACL: BEGIN: 853: for 853,Claralice (alt),Putnam,t=4
+  SysAccess-rebldSiteACL: UP: 853
+  SysAccess-rebldSiteACL: DOWN: 853
+  SysAccess-rebldSiteACL: END: 853: for 853,Claralice (alt),Putnam,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=853
+setSiteACL: 941, Rainville, Mark
+ENTER->SysAccess: rebldSiteACL: ProvID=941
+SysAccess-rebldSiteACL: (941 + ), 941
+  SysAccess-rebldSiteACL: BEGIN: 941: for 941,Mark,Rainville,t=4
+  SysAccess-rebldSiteACL: UP: 941
+  SysAccess-rebldSiteACL: DOWN: 941
+  SysAccess-rebldSiteACL: END: 941: for 941,Mark,Rainville,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=941
+setSiteACL: 864, Richardson, Suzanne
+ENTER->SysAccess: rebldSiteACL: ProvID=864
+SysAccess-rebldSiteACL: (864 + ), 864
+  SysAccess-rebldSiteACL: BEGIN: 864: for 864,Suzanne,Richardson,t=4
+  SysAccess-rebldSiteACL: UP: 864
+  SysAccess-rebldSiteACL: DOWN: 864
+  SysAccess-rebldSiteACL: END: 864: for 864,Suzanne,Richardson,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=864
+setSiteACL: 353, Sample, Provider
+ENTER->SysAccess: rebldSiteACL: ProvID=353
+SysAccess-rebldSiteACL: (353 + 952), 353 952
+  SysAccess-rebldSiteACL: BEGIN: 353: for 353,Provider,Sample,t=4
+  SysAccess-rebldSiteACL: UP: 353
+  SysAccess-rebldSiteACL: DOWN: 353
+  SysAccess-rebldSiteACL: END: 353: for 353,Provider,Sample,t=4
+  SysAccess-rebldSiteACL: BEGIN: 353: for 952,1,Office,t=3
+  SysAccess-rebldSiteACL: UP: 952
+  SysAccess-rebldSiteACL: DOWN: 952
+  SysAccess-rebldSiteACL: END: 353: for 952,1,Office,t=3
+SysAccess-rebldSiteACL: DONE: ProvID=353
+setSiteACL: 930, Stephenson, Anna
+ENTER->SysAccess: rebldSiteACL: ProvID=930
+SysAccess-rebldSiteACL: (930 + ), 930
+  SysAccess-rebldSiteACL: BEGIN: 930: for 930,Anna,Stephenson,t=4
+  SysAccess-rebldSiteACL: UP: 930
+  SysAccess-rebldSiteACL: DOWN: 930
+  SysAccess-rebldSiteACL: END: 930: for 930,Anna,Stephenson,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=930
+setSiteACL: 956, Surescripts, Dr.
+ENTER->SysAccess: rebldSiteACL: ProvID=956
+SysAccess-rebldSiteACL: (956 + 953), 956 953
+  SysAccess-rebldSiteACL: BEGIN: 956: for 956,Dr.,Surescripts,t=4
+  SysAccess-rebldSiteACL: UP: 956
+  SysAccess-rebldSiteACL: DOWN: 956
+  SysAccess-rebldSiteACL: END: 956: for 956,Dr.,Surescripts,t=4
+  SysAccess-rebldSiteACL: BEGIN: 956: for 953,Agency,2,t=2
+  SysAccess-rebldSiteACL: UP: 953
+  SysAccess-rebldSiteACL: DOWN: 953
+  SysAccess-rebldSiteACL: END: 956: for 953,Agency,2,t=2
+SysAccess-rebldSiteACL: DONE: ProvID=956
+setSiteACL: 747, Villines, Pam
+ENTER->SysAccess: rebldSiteACL: ProvID=747
+SysAccess-rebldSiteACL: (747 + ), 747
+  SysAccess-rebldSiteACL: BEGIN: 747: for 747,Pam,Villines,t=4
+  SysAccess-rebldSiteACL: UP: 747
+  SysAccess-rebldSiteACL: DOWN: 747
+  SysAccess-rebldSiteACL: END: 747: for 747,Pam,Villines,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=747
+setSiteACL: 957, White, David
+ENTER->SysAccess: rebldSiteACL: ProvID=957
+SysAccess-rebldSiteACL: (957 + 952), 957 952
+  SysAccess-rebldSiteACL: BEGIN: 957: for 957,David,White,t=4
+  SysAccess-rebldSiteACL: UP: 957
+  SysAccess-rebldSiteACL: DOWN: 957
+  SysAccess-rebldSiteACL: END: 957: for 957,David,White,t=4
+  SysAccess-rebldSiteACL: BEGIN: 957: for 952,1,Office,t=3
+  SysAccess-rebldSiteACL: UP: 952
+  SysAccess-rebldSiteACL: DOWN: 952
+  SysAccess-rebldSiteACL: END: 957: for 952,1,Office,t=3
+SysAccess-rebldSiteACL: DONE: ProvID=957
+setSiteACL: 937, White, John
+ENTER->SysAccess: rebldSiteACL: ProvID=937
+SysAccess-rebldSiteACL: (937 + ), 937
+  SysAccess-rebldSiteACL: BEGIN: 937: for 937,John,White,t=4
+  SysAccess-rebldSiteACL: UP: 937
+  SysAccess-rebldSiteACL: DOWN: 937
+  SysAccess-rebldSiteACL: END: 937: for 937,John,White,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=937
+setSiteACL: 943, Who, Alex
+ENTER->SysAccess: rebldSiteACL: ProvID=943
+SysAccess-rebldSiteACL: (943 + ), 943
+  SysAccess-rebldSiteACL: BEGIN: 943: for 943,Alex,Who,t=4
+  SysAccess-rebldSiteACL: UP: 943
+  SysAccess-rebldSiteACL: DOWN: 943
+  SysAccess-rebldSiteACL: END: 943: for 943,Alex,Who,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=943
+setSiteACL: 908, Wigdor, Reubin (alt)
+ENTER->SysAccess: rebldSiteACL: ProvID=908
+SysAccess-rebldSiteACL: (908 + ), 908
+  SysAccess-rebldSiteACL: BEGIN: 908: for 908,Reubin (alt),Wigdor,t=4
+  SysAccess-rebldSiteACL: UP: 908
+  SysAccess-rebldSiteACL: DOWN: 908
+  SysAccess-rebldSiteACL: END: 908: for 908,Reubin (alt),Wigdor,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=908
+setSiteACL: 856, Wilson, Kristin
+ENTER->SysAccess: rebldSiteACL: ProvID=856
+SysAccess-rebldSiteACL: (856 + ), 856
+  SysAccess-rebldSiteACL: BEGIN: 856: for 856,Kristin,Wilson,t=4
+  SysAccess-rebldSiteACL: UP: 856
+  SysAccess-rebldSiteACL: DOWN: 856
+  SysAccess-rebldSiteACL: END: 856: for 856,Kristin,Wilson,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=856
+setSiteACL: 776, Zumalt, Brian
+ENTER->SysAccess: rebldSiteACL: ProvID=776
+SysAccess-rebldSiteACL: (776 + ), 776
+  SysAccess-rebldSiteACL: BEGIN: 776: for 776,Brian,Zumalt,t=4
+  SysAccess-rebldSiteACL: UP: 776
+  SysAccess-rebldSiteACL: DOWN: 776
+  SysAccess-rebldSiteACL: END: 776: for 776,Brian,Zumalt,t=4
+SysAccess-rebldSiteACL: DONE: ProvID=776
+setACL Started: Fri Jan 10 12:07:17 2020
+
+======================================
+
+rebuild=0 ProvID=
+
+--------------------------------------
+begin: okmis_demo    Fri Jan 10 12:07:17 2020
+  setSiteACL:       Fri Jan 10 12:07:17 2020
+  setSiteACL     =75 
+  setClientACL:     Fri Jan 10 12:07:17 2020
+  setClientACL   =14 
+  setManagerTree:   Fri Jan 10 12:07:17 2020
+  setManagerTree =75 
+complete: okmis_demo Fri Jan 10 12:07:17 2020
+
+
+======================================
+setACL Completed: Fri Jan 10 12:07:17 2020

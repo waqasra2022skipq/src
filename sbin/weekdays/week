@@ -1,0 +1,22 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+#use 5.010;
+
+use Time::Piece;
+use Time::Local;
+use POSIX qw(strftime);
+
+my $date = '2014-10-01';
+
+my $dt = Time::Piece->strptime($date, '%Y-%m-%d');
+
+print $dt->strftime('week%W-%Y') . "\n";
+
+
+my ($year,$month,$day) = split( '-',$date);
+my $epoch = timelocal( 0, 0, 0, $day, $month - 1, $year - 1900 );
+my $week  = strftime( "%U", localtime( $epoch ) );
+
+printf "Date: %s ? Week: %s\n", $date, $week;

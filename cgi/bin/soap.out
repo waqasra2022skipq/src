@@ -1,0 +1,295 @@
+url=https://ww4.odmhsas.org/ErrorListWebService/service.asmx
+ SOAP::Transport::new: ()
+ SOAP::Serializer::new: ()
+ SOAP::Deserializer::new: ()
+ SOAP::Parser::new: ()
+ SOAP::Lite::new: ()
+ SOAP::Lite::new: ()
+ SOAP::Transport::HTTP::Client::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Lite::call: ()
+ SOAP::Serializer::envelope: ()
+ SOAP::Serializer::envelope: SOAP::Data=HASH(0x33c9608) SOAP::Data=HASH(0x37da250)
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Data::new: ()
+ SOAP::Transport::HTTP::Client::send_receive: HTTP::Request=HASH(0x37f1da0)
+ SOAP::Transport::HTTP::Client::send_receive: POST https://ww4.odmhsas.org/ErrorListWebService/service.asmx HTTP/1.1
+ Accept: text/xml
+ Accept: multipart/*
+ Accept: application/soap
+ Content-Length: 5423
+ Content-Type: text/xml; charset=utf-8
+ SOAPAction: http://tempuri.org/CDCPAErrors
+ 
+ <?xml version="1.0" encoding="UTF-8"?>
+ <soap:Envelope 
+     soap:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" 
+     xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" 
+     xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" 
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+   <soap:Body>
+     <CDCPAErrors xmlns="http://tempuri.org/">
+       <i>
+         <_userid xsi:type="xsd:string">dmhwebsrv</_userid>
+ 
+         <_password xsi:type="xsd:string">B90wR2k</_password>
+ 
+         <_userid2 xsi:type="xsd:string">KiamichiCoun</_userid2>
+ 
+         <_password2 xsi:type="xsd:string">MIS_!hiCoun123</_password2>
+ 
+         <_mode xsi:type="xsd:string">Add</_mode>
+ 
+         <_provideridloc xsi:type="xsd:string">100732840E</_provideridloc>
+ 
+         <_recipient_id xsi:type="xsd:int">888010299</_recipient_id>
+ 
+         <_birthdate xsi:type="xsd:date">1970-04-26</_birthdate>
+ 
+         <_gender xsi:type="xsd:int">2</_gender>
+ 
+         <_transdate xsi:type="xsd:date">2019-02-26</_transdate>
+ 
+         <_transtime xsi:type="xsd:string">0800</_transtime>
+ 
+         <_transtype xsi:type="xsd:int">23</_transtype>
+ 
+         <_servfocus xsi:type="xsd:string">02</_servfocus>
+ 
+         <_racewhite xsi:type="xsd:int">1</_racewhite>
+ 
+         <_raceblack xsi:type="xsd:int">2</_raceblack>
+ 
+         <_raceindian xsi:type="xsd:int">2</_raceindian>
+ 
+         <_racehawaiian xsi:type="xsd:int">2</_racehawaiian>
+ 
+         <_raceasian xsi:type="xsd:int">2</_raceasian>
+ 
+         <_hispanlatino xsi:type="xsd:int">2</_hispanlatino>
+ 
+         <_mhscreen xsi:type="xsd:int">2</_mhscreen>
+ 
+         <_sascreen xsi:type="xsd:int">3</_sascreen>
+ 
+         <_traumascreen xsi:type="xsd:int">3</_traumascreen>
+ 
+         <_traumascore xsi:type="xsd:int">0</_traumascore>
+ 
+         <_gamblingscreen xsi:type="xsd:int">3</_gamblingscreen>
+ 
+         <_primref xsi:type="xsd:int">68</_primref>
+ 
+         <_secref xsi:type="xsd:string">01</_secref>
+ 
+         <_countyres xsi:type="xsd:int">55</_countyres>
+ 
+         <_zipcode xsi:type="xsd:int">74728</_zipcode>
+ 
+         <_probprim xsi:type="xsd:int">720</_probprim>
+ 
+         <_probsec xsi:type="xsd:int">742</_probsec>
+ 
+         <_lname xsi:type="xsd:string">Cheek</_lname>
+ 
+         <_fname xsi:type="xsd:string">Scotty</_fname>
+ 
+         <_address1 xsi:type="xsd:string">1359 Craig Road</_address1>
+ 
+         <_city xsi:type="xsd:string">Broken Bow</_city>
+ 
+         <_state xsi:type="xsd:string">OK</_state>
+ 
+         <_residcur xsi:type="xsd:string">A</_residcur>
+ 
+         <_custodydoc xsi:type="xsd:int">2</_custodydoc>
+ 
+         <_livsitcur xsi:type="xsd:int">2</_livsitcur>
+ 
+         <_chronichomeless xsi:type="xsd:int">2</_chronichomeless>
+ 
+         <_employcur xsi:type="xsd:int">3</_employcur>
+ 
+         <_emptypecur xsi:type="xsd:int">4</_emptypecur>
+ 
+         <_education xsi:type="xsd:int">13</_education>
+ 
+         <_inschool xsi:type="xsd:int">2</_inschool>
+ 
+         <_marital xsi:type="xsd:int">3</_marital>
+ 
+         <_income xsi:type="xsd:string">000000</_income>
+ 
+         <_numlivho xsi:type="xsd:string">01</_numlivho>
+ 
+         <_benssi xsi:type="xsd:int">2</_benssi>
+ 
+         <_benssdi xsi:type="xsd:int">2</_benssdi>
+ 
+         <_langpref xsi:type="xsd:int">0</_langpref>
+ 
+         <_disability1 xsi:type="xsd:string">01</_disability1>
+ 
+         <_veteran xsi:type="xsd:string">B</_veteran>
+ 
+         <_legalstat xsi:type="xsd:string">01</_legalstat>
+ 
+         <_cde_tobacco xsi:type="xsd:int">10</_cde_tobacco>
+ 
+         <_drugch1 xsi:type="xsd:int">18</_drugch1>
+ 
+         <_drugrte1 xsi:type="xsd:int">2</_drugrte1>
+ 
+         <_drugfreq1 xsi:type="xsd:int">5</_drugfreq1>
+ 
+         <_drugage1 xsi:type="xsd:int">18</_drugage1>
+ 
+         <_sublevcare xsi:type="xsd:string">OO</_sublevcare>
+ 
+         <_carmood xsi:type="xsd:int">45</_carmood>
+ 
+         <_carthink xsi:type="xsd:int">40</_carthink>
+ 
+         <_carsubuse xsi:type="xsd:int">45</_carsubuse>
+ 
+         <_carmed xsi:type="xsd:int">30</_carmed>
+ 
+         <_carfam xsi:type="xsd:int">30</_carfam>
+ 
+         <_carintper xsi:type="xsd:int">40</_carintper>
+ 
+         <_carrole xsi:type="xsd:int">45</_carrole>
+ 
+         <_carsocleg xsi:type="xsd:int">45</_carsocleg>
+ 
+         <_carself xsi:type="xsd:int">30</_carself>
+ 
+         <_asimednew xsi:type="xsd:int">6</_asimednew>
+ 
+         <_asiempnew xsi:type="xsd:int">6</_asiempnew>
+ 
+         <_asialcnew xsi:type="xsd:int">4</_asialcnew>
+ 
+         <_asidrugnew xsi:type="xsd:int">6</_asidrugnew>
+ 
+         <_asilegalnew xsi:type="xsd:int">4</_asilegalnew>
+ 
+         <_asifamilynew xsi:type="xsd:int">0</_asifamilynew>
+ 
+         <_asipsychnew xsi:type="xsd:int">0</_asipsychnew>
+ 
+         <_smi xsi:type="xsd:int">1</_smi>
+ 
+         <_arrested30days xsi:type="xsd:string">00</_arrested30days>
+ 
+         <_arrested12months xsi:type="xsd:string">00</_arrested12months>
+ 
+         <_SHG_30Days xsi:type="xsd:string">00</_SHG_30Days>
+ 
+         <_clinician xsi:type="xsd:int">1932569233</_clinician>
+ 
+         <_updatedby xsi:type="xsd:string">KIAMICHI  COUNCIL</_updatedby>
+ 
+         <_PG_group xsi:type="xsd:string">PG044</_PG_group>
+ 
+         <_PA_begdate xsi:type="xsd:date">2019-02-27</_PA_begdate>
+ 
+         <_PA_Diag1Prim xsi:type="xsd:string">F1520</_PA_Diag1Prim>
+ 
+         <_PA_Diag1Sec xsi:type="xsd:string">F1510</_PA_Diag1Sec>
+ 
+         <_PA_transmissiontype xsi:type="xsd:int">3</_PA_transmissiontype>
+       </i>
+     </CDCPAErrors>
+   </soap:Body>
+ </soap:Envelope>

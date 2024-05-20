@@ -1,0 +1,18 @@
+#!/usr/bin/perl
+# test file contents
+# 88164933 4 1 17 /var/noaaport/nbsp/spool/KMOB/kmob_sdus54-n0rmob.498745
+# 88164933 4 1 17 /var/noaaport/nbsp/spool/KMOB/kmob_sdus54-n0rmob.498745
+# 88164933 4 1 17 /var/noaaport/nbsp/spool/KMOB/kmob_sdus54-n0rmob.498745
+if ( open(FILE, '/var/testfile') ) 
+{
+  while ( $line = <FILE> )
+  { 
+    chop($line);
+    ($seq, $type, $cat, $code, $fpath) = split(/\s+/, $line);
+    ($dirname,$fname) = $fpath =~ m/(.*\/)(.*)$/;
+    print qq|seq=$seq, type=$type, cat=$cat, code=$code, fpath=$fpath\n|;
+    print qq|dirname=$dirname, fname=$fname\n|;
+  }
+  close(FILE);
+}
+exit;

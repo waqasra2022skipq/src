@@ -1,0 +1,24 @@
+ls -l constants.php
+ls -l ../../core6/app/constants.php*
+
+ls -l checked-in.php
+ls -l ../../core6/model/appointment/checked-in.php*
+
+ls -l complete.php
+ls -l ../../core6/model/appointment/complete.php*
+
+ls -l email.php
+ls -l ../../core6/model/user/email.php*
+
+ls -l ntsAppointment.php
+ls -l ../../core6/objects/ntsAppointment.php*
+
+ls -l _keys.php
+ls -l ../../core6/panels/admin/conf/email_templates/_keys.php*
+
+ls -l _action-checked-in.php
+ls -l ../../core6/panels/admin/manage/appointments/update/_action-checked-in.php*
+
+ls -l sms.php
+ls -l ../../core6/plugins/sms/model/user/sms.php*
+

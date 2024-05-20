@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# MarkPaid_94_9qqPuD_20090304104742.sql
+ls -1 Mark* |
+while read File; do
+#  echo "${File}"
+  p1=$(echo $File | awk -F'.' '{print $1}')
+  p2=$(echo $File | awk -F'.' '{print $2}')
+  p3=$(echo $p1 | awk -F'_' '{print $2"_Payroll_MarkedPaid_"$4"_"$3"_"$4}')
+  echo "mv ${File} ../payroll/${p3}.sql"
+done
+
+# 312_Payroll\ 2009-03-27\ Summary_20090327102759_dWJkdZ.xls
+ls -1 *Payroll*Detail* |
+while read File; do
+#  echo "${File}"
+  p1=$(echo $File | awk -F'.' '{print $1}')
+  p2=$(echo $File | awk -F'.' '{print $2}')
+  p3=$(echo $p1 | awk -F'_' '{print $1"_Payroll_Detail_"$3"_"$4"_"$3}')
+  echo "mv '${File}' ../payroll/${p3}.xls"
+done
+ls -1 *Payroll*Summary* |
+while read File; do
+#  echo "${File}"
+  p1=$(echo $File | awk -F'.' '{print $1}')
+  p2=$(echo $File | awk -F'.' '{print $2}')
+  p3=$(echo $p1 | awk -F'_' '{print $1"_Payroll_Summary_"$3"_"$4"_"$3}')
+  echo "mv '${File}' ../payroll/${p3}.xls"
+done

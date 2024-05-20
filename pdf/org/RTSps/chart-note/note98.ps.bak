@@ -1,0 +1,286 @@
+%!PS-Adobe-2.0
+%%Creator: mostly vi :-)
+%%Title: note.ps
+%%Pages: 1
+%%PageOrder: Ascend
+%%BoundingBox: 0 0 612 792
+%%DocumentPaperSizes: Letter
+%%EndComments
+
+% Box coords are X-ll Y-ll X-ur Y-ur (outside dims of box)
+
+% <----- coords to fill in ------->
+% LName 111.691 687
+% FName 362.143 687
+% MI 526.499 687
+% TypeOfService 141.951 666
+% GroupSize 513.674 666
+% DateOfService 143.777 645
+% StartTime 284.528 645
+% EndTime 401.296 645
+% TotMinutes 541.737 645
+% ProbStat1 54.2495 594
+% ProbStat2 54.2495 573
+% ProbStat3 54.2495 552
+% ProbStat4 54.2495 531
+% ProbAddrChk1 64 485
+% ProbAddrChk2 109 485
+% ProbAddrChk3 154 485
+% ProbAddrChk4 199 485
+% ProbAddrChkTP 402 485
+% ProbAddrChkCR 524 485
+% MethodsBox 42 362 570 452
+% ProgChkNone 244 344
+% ProgChkMin 289 344
+% ProgChkAvg 352 344
+% ProgChkSig 411 344
+% ProgressBox 42 288 570 337
+% NewProbChkNo 330 270
+% NewProbChkYes 389 270
+% NewProbBox 42 234 570 263
+% DescCrisisBox 42 142 570 209
+% GAFCurr 349.773 130
+% GAFRecPast 543.27 130
+% CredCap 338 90
+% SvcsCode 101.9905 56
+% TotUnits 202.992 56
+% DateBill 298.489 56
+% By 377.243 56
+% <-------- end coords ----------->
+
+
+
+% <--------- functions ----------->
+
+% llcb - left-labeled check box
+% x,y is coord of checkbox
+/llcb  % stack: string x y => ---
+{ newpath moveto
+  -4 0 rmoveto
+  dup stringwidth pop
+  neg 0 rmoveto
+  show
+  4 0 rmoveto
+  1 setlinewidth
+  0 9 rlineto
+  9 0 rlineto
+  0 -9 rlineto
+  closepath
+  stroke
+} def
+
+% rlcb - right-labeled check box
+% x,y is coord of checkbox
+/rlcb  % stack: string x y => ---
+{ newpath moveto
+  1 setlinewidth
+  0 9 rlineto
+  9 0 rlineto
+  0 -9 rlineto
+  closepath
+  13 0 rmoveto
+  show
+  stroke
+} def
+
+% page centered show
+/cshow  % stack: y string => ---
+{ dup stringwidth pop
+  2 div neg 306 add  % calc x coord
+  3 -1 roll  % move y coord to top
+  moveto
+  show
+} def 
+
+
+
+
+% <-----  Start Document  ------>
+
+% Document Title
+/Times-Roman-Bold findfont 11 scalefont setfont
+729 (INTERGRIS \/ OAYS PROVIDER NETWORK) cshow
+715 (PROGRESS NOTE) cshow
+
+
+% draw Client Info box
+newpath
+  1.5 setlinewidth
+  36 702 moveto
+  540 0 rlineto
+  0 -63 rlineto
+  -540 0 rlineto
+  closepath
+  0 -21 rmoveto
+  540 0 rlineto
+  0 -21 rmoveto
+  -540 0 rlineto
+  248 42 rmoveto
+  0 -42 rlineto
+  216 42 rmoveto
+  0 -21 rlineto
+stroke
+
+% fill in Client Info box
+/Times-Roman findfont 11 scalefont setfont
+42 687 moveto
+(LAST NAME:) show
+290 687 moveto
+(FIRST NAME:) show
+506 687 moveto
+(MI:) show
+42 666 moveto
+(TYPE OF SERVICE:) show
+290 666 moveto
+(GROUP SIZE \(Group Counseling Only - Max 8\):) show
+42 645 moveto
+(DATE OF SERVICE:) show
+213 645 moveto
+(START TIME:) show
+342 645 moveto
+(END TIME:) show
+447 645 moveto
+(TOTAL MINUTES:) show
+
+
+% draw Problem Statements Box
+newpath
+  1.5 setlinewidth
+  36 630 moveto
+  540 0 rlineto
+  0 -105 rlineto
+  -540 0 rlineto
+  closepath
+  0 -21 rmoveto
+  540 0 rlineto
+  -540 -21 rmoveto
+  540 0 rlineto
+  -540 -21 rmoveto
+  540 0 rlineto
+  -540 -21 rmoveto
+  540 0 rlineto
+stroke
+
+% fill in Problem Statements box
+42 615 moveto
+(PROBLEM STATEMENTS   \(From Comprehensive Treatment Plan\):) show
+42 594 moveto
+(1.) show
+42 573 moveto
+(2.) show
+42 552 moveto
+(3.) show
+42 531 moveto
+(4.) show
+
+
+% draw Session Info box
+newpath
+  1.5 setlinewidth
+  36 516 moveto
+  540 0 rlineto
+  0 -392 rlineto
+  -540 0 rlineto
+  closepath
+  0 -43 rmoveto
+  540 0 rlineto
+  -540 -115 rmoveto
+  540 0 rlineto
+  -540 -74 rmoveto
+  540 0 rlineto
+  -540 -54 rmoveto
+  540 0 rlineto
+stroke
+
+% fill in Session Info box
+% Specific Problem Addressed box
+42 498 moveto
+(SPECIFIC PROBLEM\(S\) ADDRESSED  \(As Identified On Comprehensive Treatment Plan\):) show
+(1.) 63 484 llcb
+(2.) 108 484 llcb
+(3.) 153 484 llcb
+(4.) 198 484 llcb
+(Develop \/ Review Treatment Plan) 401 484 llcb
+(Crisis Response) 523 484 llcb
+
+% Methods box
+42 458 moveto
+(METHODS USED TO ADDRESS PROBLEMS  \(What Techniques or Activities Were Used To Work On Problems\):)
+show
+
+% Progress box
+42 343 moveto
+(PROGRESS MADE TOWARD GOALS:) show
+(None) 243 343 rlcb
+(Minimal) 288 343 rlcb
+(Average) 351 343 rlcb
+(Significant) 410 343 rlcb
+486 343 moveto
+(As Evidenced By:) show
+0 -2 rmoveto
+486 341 lineto
+1 setlinewidth
+stroke
+
+% New Probs box
+42 269 moveto
+(NEW PROBLEMS IDENTIFIED DURING SESSION:) show
+(No) 329 269 rlcb
+(Yes) 388 269 rlcb
+447 269 moveto
+(If Yes, Describe Below:) show
+0 -2 rmoveto
+447 267 lineto
+1 setlinewidth
+stroke
+
+% Crisis Description box
+42 215 moveto
+(DESCRIPTION OF CRISIS  \() show
+currentpoint  % store start of underlined text
+(For Crisis Intervention Notes Only) show
+currentpoint  % store end of underlined text
+4 -1 roll 4 -1 roll  % swap pairs of coords
+0 -2 rmoveto
+-2 add lineto
+1 setlinewidth
+stroke
+moveto  % move to end of underlined text
+(\):) show
+50 129 moveto
+(LEVEL OF FUNCTIONING ASSESSMENT  GAF: CURRENT:  ) show
+23 0 rlineto
+(  RECENT PAST \(LAST 30 DAYS\):  ) show
+23 0 rlineto
+1 setlinewidth
+stroke
+
+
+% Signature block
+newpath
+  65 88 moveto
+  212 0 rlineto
+  58 0 rmoveto
+  212 0 rlineto
+  1.5 setlinewidth
+stroke
+338 78 moveto
+(Credentialed Capacity) show
+
+% Service Code line
+/Times-Roman findfont 9 scalefont setfont
+45 54 moveto
+(Service Code: ) show
+51 0 rlineto
+(  Total Units: ) show
+45 0 rlineto
+(  Date Billed: ) show
+59 0 rlineto
+(  By: ) show
+567 54 lineto
+1 setlinewidth
+stroke
+
+% <------  End Document  ------->
+showpage
+%%EOF

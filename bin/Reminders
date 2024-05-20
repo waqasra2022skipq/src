@@ -1,0 +1,64 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+my ($sec, $min, $hrs, $day, $month, $year, $wday, $julian) = localtime();
+$month++; $year +=1900;
+$hrs = length($hrs) == 2 ? $hrs : '0'.$hrs;
+$min = length($min) == 2 ? $min : '0'.$min;
+my $TIME = qq|${hrs}:${min}|;
+my @WEEKDAYS = ('Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday');
+my $dow = $WEEKDAYS[$wday];
+my $DT = localtime();
+############################################################################
+# usage: Reminders DBNAME=db
+############################################################################
+my $form = DBForm->new();
+my $dbh = $form->dbconnect();
+my $qBad=qq|update Reminders set Freq=0,Done=1,Message=? where ID=?|;
+my $sBad=$dbh->prepare($qBad);
+my $qDone=qq|update Reminders set Done=1 where ID=?|;
+my $sDone=$dbh->prepare($qDone);
+###my $qReminders=qq|select Reminders.*,Dayname(Reminders.RDate) as DOW,Provider.Email, Provider.NoMail from Reminders left join Provider on Provider.ProvID=Reminders.ProvID where Reminders.RTime >= '${TIME}:00' and Reminders.RTime <= '${TIME}:59'|;
+my $qReminders="select Reminders.*,Dayname(Reminders.RDate) as DOW,Provider.Email, Provider.NoMail from Reminders left join Provider on Provider.ProvID=Reminders.ProvID where Reminders.RTime >= '${TIME}:00' and Reminders.RTime <= '${TIME}:59' and (Reminders.Freq>0 || (Reminders.Freq=0 && Reminders.Done!=1))";
+## print qq|q=$qReminders\n|;
+
+my $sReminders=$dbh->prepare($qReminders);
+############################################################################
+print qq|Reminders: for $form->{'DBNAME'} ${DT}\n|;
+$sReminders->execute() || $form->dberror($qReminders);
+while ( my $rReminders = $sReminders->fetchrow_hashref )
+{
+print qq|ID=$rReminders->{ID}, ProvID=$rReminders->{ProvID}, Email=$rReminders->{Email}/$rReminders->{NoMail}, RDate=$rReminders->{RDate}, RTime=$rReminders->{RTime}\nMessage=\n$rReminders->{Message}\n|;
+  if ( $rReminders->{'Email'} eq '' || $rReminders->{'NoMail'} )
+  {
+    my $msg = $rReminders->{'NoMail'} ? qq|ERROR: Mail is Turned Off| : qq|ERROR: NO EMAIL ADDRESS|;
+    $msg .= "\n".$rReminders->{'Message'};
+    $sBad->execute($msg,$rReminders->{ID}) || $form->dberror($qDone);
+  }
+  else
+  {
+    my ($YEAR,$MON,$DAY) = split('-',$rReminders->{RDate});
+print qq|YEAR=$YEAR, MON=$MON, DAY=$DAY\n|;
+print qq|Freq=$rReminders->{Freq}, Done=$rReminders->{Done}\n|;
+print qq|DOW=$rReminders->{DOW}, dow=$dow\n|;
+print qq|MON=$MON, month=$month\n|;
+    # Freq: 0 = Once, 1 = everyday, 2 = every day of week, 3 = every day of month.
+    if ( ( $rReminders->{Freq} == 0 && !$rReminders->{Done} && $rReminders->{RDate} eq $form->{TODAY} )
+      || ( $rReminders->{Freq} == 1 )
+      || ( $rReminders->{Freq} == 2 && $rReminders->{DOW} eq $dow )
+      || ( $rReminders->{Freq} == 3 && $MON == $month )
+       )
+    {
+      my $subj = qq|Reminder: ${DT}|;
+      DBUtil->email($form,$rReminders->{Email},$subj,$rReminders->{Message},'',1);
+print qq|email: ProvID=$rReminders->{ProvID}: subj=$subj: \nMessage=\n$rReminders->{Message}\n|;
+      $sDone->execute($rReminders->{ID}) || $form->dberror($qDone);
+    }
+  }
+}
+$sReminders->finish();
+$sDone->finish();
+$form->complete();
+############################################################################
+exit;

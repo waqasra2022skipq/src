@@ -1,0 +1,45 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBForm;
+my $form = DBForm->new();
+foreach my $f ( sort keys %{$form} ) { warn "addClient: form-$f=$form->{$f}\n"; }
+my $dbh = $form->dbconnect();
+my $cdbh = $form->connectdb('okmis_client');
+my @flds = ('ID','loginid','Password','dbname','UserID','loginscreen','type','renew','FormID');
+my $ClientID = $form->{'ClientID'};
+
+my $s = $dbh->prepare("select * from Client where ClientID=?");
+$s->execute($ClientID) || $form->dberror("select: Client ${ClientID}");
+if ( my $r = $s->fetchrow_hashref )
+{
+  my $qInsert = qq|Insert into UserLogin (|;
+  foreach my $f ( @flds )
+  { $qInsert .= qq|${dlm}`${f}`|; $dlm=','; }
+  my $dlm = '';
+  $qInsert .= qq|) VALUES (|;
+  foreach my $f ( @flds )
+  {
+    my $value = $f eq 'ID' 
+              ? $form->{DBNAME}.':'.$r->{ClientID}
+              : $f eq 'loginid' ? $r->{FName}.$r->{LName}
+              : $f eq 'Password' ? 'test123'
+              : $f eq 'dbname' ? $form->{DBNAME}
+              : $f eq 'UserID' ? $r->{ClientID}
+              : $f eq 'loginscreen' ? 'ClientPortal'
+              : $f eq 'type' ? 1
+              : $f eq 'renew' ? 0
+              : $r->{$f};
+    $qInsert .= qq|${dlm}'${value}'|; $dlm=','; 
+  }
+  $qInsert .= qq|)|;
+  print "qInsert: ${qInsert}\n";
+  my $sInsert = $cdbh->prepare($qInsert);
+#  $sInsert->execute() || $form->dberror($qInsert);
+  $sInsert->finish();
+  my $qClient = DBA->genInsert($form,'Client',$r);
+  print qq|qClient: ${qClient}\n|;
+  my $sClient = $cdbh->prepare($qClient);
+#  $sClient->execute() || $form->dberror($qClient);
+}
+$s->finish();
+$form->complete();

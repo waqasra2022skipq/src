@@ -1,0 +1,13 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use DBA;
+use cBill;
+############################################################################
+my $form = DBForm->new();
+my $dbh = $form->dbconnect();
+my $table = $form->{'t'};
+my $id = $form->{'i'};
+DBA->insLog($form,$table,'ID',$id);
+exit;

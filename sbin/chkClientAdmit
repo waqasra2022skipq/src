@@ -1,0 +1,8 @@
+select Client.ClientID,Client.LName,Client.FName
+      ,ClientIntake.IntDate,ClientIntake.IntTime
+      ,ClientAdmit.AdmitDate,ClientAdmit.AdmitTime,ClientAdmit.TrID
+ from Client
+  left join ClientIntake on ClientIntake.ClientID=Client.ClientID
+  left join ClientAdmit on ClientAdmit.ClientID=Client.ClientID
+ where ClientAdmit.AdmitDate is null
+ order by ClientIntake.IntDate

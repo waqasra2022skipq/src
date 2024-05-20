@@ -1,0 +1,34 @@
+echo FILE: constants.php
+diff constants.php ../../core6/app/constants.php
+
+echo FILE: checked-in.php
+diff checked-in.php ../../core6/model/appointment/checked-in.php
+
+echo FILE: complete.php
+diff complete.php ../../core6/model/appointment/complete.php
+
+echo FILE: email.php
+diff email.php ../../core6/model/user/email.php
+
+echo FILE: ntsAppointment.php
+diff ntsAppointment.php ../../core6/objects/ntsAppointment.php
+
+echo FILE: _keys.php
+diff _keys.php ../../core6/panels/admin/conf/email_templates/_keys.php
+
+echo FILE: _action-checked-in.php
+diff _action-checked-in.php ../../core6/panels/admin/manage/appointments/update/_action-checked-in.php
+
+echo FILE: sms.php
+diff sms.php ../../core6/plugins/sms/model/user/sms.php
+
+echo FILE: style.css
+diff ../../core6/assets/css/style.css ../../core6/assets/css/style.css.org
+echo FILE: emails.xml
+diff ../../core6/defaults/language/emails.xml ../../core6/defaults/language/emails.xml.org
+echo FILE: ntsEmailTemplateManager.php
+diff ../../core6/lib/ntsEmailTemplateManager.php ../../core6/lib/ntsEmailTemplateManager.php.org
+echo FILE: _notifier.php
+diff ../../core6/model/appointment/_notifier.php ../../core6/model/appointment/_notifier.php.org
+echo FILE: sms.xml
+diff ../../core6/plugins/sms/defaults/language/sms.xml ../../core6/plugins/sms/defaults/language/sms.xml.org

@@ -1,0 +1,74 @@
+table.chartsort {
+        color:black;
+        background-color:white;
+        border:1px solid black;
+        border-collapse:collapse;
+}
+table.chartsort th, table.chartsort td {
+        border:1px solid #aaaaaa;
+        padding: 1px 10px 1px 10px;
+        text-align:center;
+}
+table.chartsort thead th {
+        background-color:#ccccff;
+}
+table.chartsort tfoot td {
+        background-color:#ffccff;
+}
+table.chartsort tr.tbody_header {
+        font-weight:bold;
+        text-align:center;
+        background-color:#dddddd;
+}
+table.chartsort a.pagelink {
+        padding-left:1px;
+        padding-right:1px;
+        border:1px solid #666666;
+        margin:0px 5px 0px 5px;
+}
+table.chartsort a.currentpage {
+        background-color:yellow;
+}
+/* Striping */
+tr.alternate {
+        background-color:#90EE90;
+}
+tr.alternate2 {
+        background-color:yellow;
+}
+/* Sorting */
+th.table-sortable {
+        cursor:pointer;
+        background-image:url("/images/sortable.gif");
+        background-position:center left;
+        background-repeat:no-repeat;
+        padding-left:1px;
+}
+th.table-sorted-acend {
+        background-image:url("/images/sorted_up.gif");
+        background-position:center left;
+        background-repeat:no-repeat;
+}
+th.table-sorted-dcend {
+        background-image:url("/images/sorted_down.gif");
+        background-position:center left;
+        background-repeat:no-repeat;
+}
+th.table-filtered {
+        background-image:url("/images/filter.gif");
+        background-position:center left;
+        background-repeat:no-repeat;
+}
+select.table-autofilter {
+        font-size:smaller;
+}
+/* Examples which stray from the default */
+table.altstripe tr.alternate2 {
+        background-color:yellow;
+}
+/* Documentation */
+tr.doc_section {
+        font-weight:bold;
+        text-align:center;
+        background-color:#dddddd;
+}

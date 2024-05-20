@@ -1,0 +1,35 @@
+#!/bin/bash
+#--------------------
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   echo -e "\nServices not installed!"
+   exit 1
+fi
+LogFile=${LOGDIR}/${CMD}
+#--------------------
+TmpFile=/tmp/$$
+DB=$1
+TrID=$2
+#-------------------------
+Usage()
+{
+   echo $1
+   echo
+   echo "Usage: ${CMD} database statement"
+   echo
+   exit
+}
+#-------------------------
+if [ -z "${TrID}" ]; then Usage "No TrID!"; fi
+if [ ! -d ${DBDIR}/${DB} ]; then Usage "Invalid database!"; fi
+  echo "select Treatment.TrID,Treatment.ClientID as CID, xSC.SCNum, Treatment.SCID, Treatment.ContLogDate,Treatment.Units, Treatment.BillDate,Treatment.BilledAmt, Treatment.RecDate, Treatment.CIPDate, Treatment.PaidDate from Treatment left join xSC on xSC.SCID=Treatment.SCID where Treatment.TrID=$TrID order by Treatment.ContLogDate;" > ${TmpFile}.in
+# long form of output
+#  echo "select Treatment.ClientID as CID, Treatment.TrID, Treatment.SCID, xSC.SCNum, Treatment.ContLogDate, Treatment.MgrRevDate, Treatment.BillDate,Treatment.BilledAmt, Treatment.CIPDate, Treatment.RecDate, Treatment.COPLDate, Treatment.PaidDate from Treatment left join xSC on xSC.SCID=Treatment.SCID where Treatment.TrID=$TrID order by Treatment.ContLogDate;" > ${TmpFile}.in
+#  echo "select Treatment.ClinicID as Clinic, Treatment.ClientID as CID, Treatment.TrID, Treatment.BilledAmt, Treatment.AmtDue, Treatment.BillStatus, Treatment.StatusDate, Treatment.StatusMsg, Treatment.RevStatus, Treatment.Units, Treatment.ContLogBegTime as BegTime, Treatment.ContLogEndTime as EndTime, Treatment.DenCode, Treatment.DenDate, Treatment.RecDOLC from Treatment left join xSC on xSC.SCID=Treatment.SCID where Treatment.TrID=$TrID order by Treatment.ContLogDate;" >> ${TmpFile}.in
+  echo "select TrID,ID,SCNum,SCID, ContDate, BillDate, Units,BillAmt, RecDate, PaidAmt, PaidDate, DenCode from NoteTrans where TrID=$TrID order by SCID, BillDate, BillAmt desc;" >> ${TmpFile}.in
+# long form of output
+#  echo "select ID, ClientID as CID, TrID, SCID, SCNum, ContDate, BillDate, BillAmt, RecDate, PaidAmt, PaidDate, DenCode from NoteTrans where TrID=$TrID order by SCID, BillDate, BillAmt desc;" >> ${TmpFile}.in
+#  echo "select ID, ClientID as CID, TrID, Units, Duration, RefID, ICN, InsCode, Code, SRC, ChangeDate from NoteTrans where TrID=$TrID order by SCID, BillDate, BillAmt desc;" >> ${TmpFile}.in
+  ${DBCMD} ${DB} < ${TmpFile}.in
+  rm ${TmpFile}.in

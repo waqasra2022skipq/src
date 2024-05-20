@@ -1,0 +1,1489 @@
+
+syncit: Started: Wed Mar 11 11:10:23 2020
+syncit: pwd=/home/okmis/mis/upd/work
+======================================
+
+  delete/clear okmis_config-MISEDocs...
+  rebuild/insert from okmis_mms-ProviderEDocs...
+  copy 321 records...
+: insert: ID=7710: Title=DMH Sample New Provider letter
+: insert: ID=7711: Title=DMH CDC Web link</A> help or <A HREF="mailto:gethelp@odmhsas.org" >gethelp@odmhsas.org</A> or Phone: 405-521-6444 and Toll-free: 855-521-6444 
+: insert: ID=7712: Title=Functional Assessment Systems
+: insert: ID=7713: Title=Gambling Screening Letter to Providers
+: insert: ID=7714: Title=Case Management Services Documentation
+: insert: ID=7715: Title=Case Management Reimbursable Services
+: insert: ID=7719: Title=CDC/PA Forms
+: insert: ID=7720: Title=DMH New Provider Enrollment</A> Kathrine Graham Phone: 405-522-3817 and Toll-free: 855-521-6444 
+: insert: ID=7722: Title=Department of Human Services Centers (County Offices)
+: insert: ID=7723: Title=OHCA Global Messages and Provider notifications
+: insert: ID=7724: Title=OHCA Policies and Rules
+: insert: ID=7725: Title=Prior Authorization and CDC current Manual
+: insert: ID=7726: Title=Outpatient Service Plan Signature Page
+: insert: ID=7727: Title=OHCA Secure Website (check PAs)
+: insert: ID=7728: Title=OHCA Behaviorial Health and Substance Abuse Services</A> 800-522-0114 option 1  or  405-522-6205 option 1
+: insert: ID=7729: Title=Drug Court Contact Information (County Offices)
+: insert: ID=7730: Title=Oklahoma Health Care Authority Website
+: insert: ID=7731: Title=SoonerCare Medical Necessity Criteria for Behavioral Medicine
+: insert: ID=7732: Title=OKLAHOMA MEDICAID FRAUD - Title 56-1004
+: insert: ID=7733: Title=Eligibility Medicaid, How to Apply and Contact Information
+: insert: ID=7734: Title=Dual Eligibles at a glance - Medicaid Coverage of Medicare Beneficiaries
+: insert: ID=7735: Title=OptOut Form English
+: insert: ID=7736: Title=OptIn Form English
+: insert: ID=7737: Title=Patient Information Flyer
+: insert: ID=7738: Title=Archive Documents (has PA groups caps)
+: insert: ID=7739: Title=HIPAA Paragraph Addition Suggestion
+: insert: ID=7740: Title=Front Desk Script
+: insert: ID=7741: Title=PowerPoint from Rehab Changes Webinars
+: insert: ID=7742: Title=Prior Authorization Guidelines for Psychosocial Rehabilitation Services
+: insert: ID=7743: Title=Undocumented Aliens Form
+: insert: ID=7744: Title=OHCA/DMH CDC Training Information
+: insert: ID=7745: Title=Undocumented Alien FAQ
+: insert: ID=7746: Title=DMH LOC/LOT Quick Reference Guide
+: insert: ID=7747: Title=DMH LOC/LOT Training Presentation
+: insert: ID=7748: Title=DMH LOC Example
+: insert: ID=7749: Title=DMH LOT Example
+: insert: ID=7750: Title=(JH) LCD L32766 - Psychiatric Codes (Effective 01/01/2014)
+: insert: ID=7751: Title=MLN Matters Special Edition (SE) article
+: insert: ID=7752: Title=Importance of Documentation
+: insert: ID=7753: Title=Reduce Alcohol Misuse
+: insert: ID=7754: Title=Online Inquiry
+: insert: ID=7756: Title=myTRICARE.com - Provider Certification Forms
+: insert: ID=7757: Title=TRICARE South Region Application
+: insert: ID=7758: Title=Clinical Psychologist Application
+: insert: ID=7759: Title=Clinical Social Worker Application
+: insert: ID=7760: Title=Physician and Dentist Application
+: insert: ID=7799: Title=Marriage, Family and Pastoral Application
+: insert: ID=7800: Title=Mental Health Counselor Application
+: insert: ID=7801: Title=Physician Assistant Application
+: insert: ID=7802: Title=RN, LPN, Nurse Midwife, Nurse Practitioner Application
+: insert: ID=7803: Title=Psychiatric Nurse Specialist Application
+: insert: ID=7804: Title=Tricare Referral and Prior Authorization
+: insert: ID=7805: Title=Tricare Provider Resourses
+: insert: ID=7806: Title=Tricare Member Types
+: insert: ID=7807: Title=Tricare Deductible and Co-Pay
+: insert: ID=7808: Title=Tricare Consultation Report Process
+: insert: ID=7809: Title=Tricare Behavioral Health
+: insert: ID=7811: Title=Consent To Treat - Adult
+: insert: ID=7812: Title=Consent To Treat - Child
+: insert: ID=7813: Title=Attestation Form
+: insert: ID=7814: Title=Health Home Risk Categories
+: insert: ID=7816: Title=List of Health Home Codes and Modifiers
+: insert: ID=7817: Title=Health Home Services Non-Payables
+: insert: ID=7818: Title=Health Home Services (Shadow Billing Codes) 20150206
+: insert: ID=7819: Title=Adult Health Home: Access to Care Diagram
+: insert: ID=7820: Title=Child Health Home: Access to Care Diagram
+: insert: ID=7822: Title=Oklahoma Health Home Flow - Hypothetical Adult Scenario
+: insert: ID=7823: Title=Oklahoma Health Home Flow - Hypothetical Child Scenario
+: insert: ID=7824: Title=Health Risk Assessment Form
+: insert: ID=7825: Title=SoonerCare Adult Health Risk Profile
+: insert: ID=7826: Title=SoonerCare Child and Adolescent Health Risk Profile
+: insert: ID=7828: Title=SoonerCare Adult Health Risk Profile example
+: insert: ID=7829: Title=Strengths and Difficulties Questionnaire
+: insert: ID=7830: Title=SoonerCare Child and Adolescent Health Risk Profile example
+: insert: ID=7831: Title=Practitioner Guides
+: insert: ID=7832: Title=Ohio Scales Screener
+: insert: ID=7833: Title=* Oklahoma Systems Of Care Enrollment Form (Care Coordinator)
+: insert: ID=7834: Title=* Ohio Scales OSOC Assessment Caregiver (Care Coordinator)
+: insert: ID=7835: Title=* Ohio Scales OSOC Assessment Worker (Care Coordinator)
+: insert: ID=7836: Title=* Ohio Scales OSOC Assessment Youth (Care Coordinator)
+: insert: ID=7837: Title=* Oklahoma Systems Of Care Referral Form
+: insert: ID=7838: Title=* Oklahoma Systems Of Care Discharge Form
+: insert: ID=7841: Title=Compliance Audit
+: insert: ID=7842: Title=Achoo Healthcare Online - Internet HealthcareDirectory
+: insert: ID=7843: Title=American Psychological Association - Online journals
+: insert: ID=7844: Title=Availity EDI Clearinghouse Health Plans list
+: insert: ID=7845: Title=CAQH Reattestation
+: insert: ID=7846: Title=Child Behavior Disorders
+: insert: ID=7847: Title=Clinical Medicine Resources
+: insert: ID=7848: Title=Dual Eligible Buy-InDefinitions
+: insert: ID=7849: Title=ICD-10 Version 2010
+: insert: ID=7850: Title=ICD-10 Classification of Mental and Behavioural Disorders
+: insert: ID=7851: Title=The Internet Drug Index
+: insert: ID=7852: Title=The Lesson Planet
+: insert: ID=7853: Title=DRKOOP.COM - The Internets largest medical website
+: insert: ID=7854: Title=HealthSCOUT - Personalized Health News
+: insert: ID=7855: Title=John Hopkins University - Information Network
+: insert: ID=7856: Title=The Mayo Clinic
+: insert: ID=7857: Title=Medscape - The #1 Free Internet Medical Site
+: insert: ID=7858: Title=Mental Health - A Report of the Surgeon General
+: insert: ID=7859: Title=Merck & Co. - Worldwide health products company
+: insert: ID=7860: Title=National Library of Medicine - MEDLINE Search
+: insert: ID=7861: Title=WebMD - Personalized Medical Resource
+: insert: ID=7862: Title=Oklahoma LPC/LMFT/LBP Licensing Board
+: insert: ID=7863: Title=Oklahoma LSW-C Licensing Board
+: insert: ID=7864: Title=Mapquest Maps and Driving Directions
+: insert: ID=7865: Title=US Postal Service Zip Codes
+: insert: ID=7866: Title=Diagnosing Student's Neurological Glitches
+: insert: ID=7867: Title=Oklahoma Schools Attuned
+: insert: ID=7868: Title=Center for Development and Learning
+: insert: ID=7869: Title=DSM-IV-TR Clinical Capsules
+: insert: ID=7870: Title=Equal Employment Opportunity Poster
+: insert: ID=7871: Title=Employee Rights Poster 11x17
+: insert: ID=7872: Title=Employee Polygraph Protection Act
+: insert: ID=7873: Title=Employee Rights and Responsibilities
+: insert: ID=7874: Title=Minimum Wage Poster
+: insert: ID=7875: Title=Earned Income Credit Notice 797
+: insert: ID=7876: Title=Job Safety and Health OSHA 3165-12-06R
+: insert: ID=7877: Title=Change Your Withholding IRS Pub. 4929
+: insert: ID=7878: Title=Right to Work Poster English
+: insert: ID=7879: Title=Synopsis of Bill of Rights
+: insert: ID=7880: Title=Uniformed Services Rights Act
+: insert: ID=7881: Title=Oklahoma City Area Emergency Contact Numbers
+: insert: ID=7882: Title=Tulsa Area Emergency Contact Numbers
+: insert: ID=7883: Title=Information for Workers who are Unemployed OES-44_rev_6-10
+: insert: ID=7890: Title=Medicaid Fraud (English)
+: insert: ID=7891: Title=Medicaid Fraud (Spanish)
+: insert: ID=7893: Title=Emergency Mental Hold Issues Adult and Pediatric
+: insert: ID=7894: Title=Involuntary Mental Health Treatment
+: insert: ID=7895: Title=Power of Attorney for Child
+: insert: ID=7896: Title=Office of Inspector General
+: insert: ID=7897: Title=Health Information Privacy (HIPAA)
+: insert: ID=7898: Title=Center for Children and Families Resources
+: insert: ID=7899: Title=UCLA Center for Mental Health in Schools
+: insert: ID=7900: Title=Anger Management
+: insert: ID=7901: Title=Illness Management and Recovery
+: insert: ID=7902: Title=Medication Management Child - IDBD
+: insert: ID=7903: Title=Partners in Parenting
+: insert: ID=7904: Title=Raising Safe Kids One Stage at a Time (March 2009)
+: insert: ID=7905: Title=Violence Prevention Skills for Secondary Schools
+: insert: ID=7906: Title=Violence Prevention Skills for Elementary Schools
+: insert: ID=7907: Title=Social Skills Training For Children with Behavior Disorders
+: insert: ID=7908: Title=Defiant Teens
+: insert: ID=7909: Title=Defiant Children
+: insert: ID=7910: Title=Based on Tip 53 Addressing Viral Hepatitis in People With Substance Use Disorders
+: insert: ID=7911: Title=TIP 55 A Treatment Improvement Protocol Behavioral Health Services for People Who Are Homeless
+: insert: ID=7912: Title=Tip 57 Trauma-Informed Care in Behavioral Health Services
+: insert: ID=7913: Title=Addressing The Needs Of Women And Girls
+: insert: ID=7914: Title=SAMHSA - A JOURNEY TOWARD HEALTH AND HOPE
+: insert: ID=7915: Title=PHQ Patient Health Questionaire
+: insert: ID=7916: Title=PHQ - Brief Patient Health Questionnaire
+: insert: ID=7917: Title=PHQ - 4 Depression and Anxiety
+: insert: ID=7918: Title=PHQ - 9 Severity of Depression
+: insert: ID=7920: Title=PHQ - 15 Somatoform Disorders
+: insert: ID=7921: Title=GAD - 7 Generalized Anxiety Disorder
+: insert: ID=7922: Title=Mental Health Screening Form-III - Instructions
+: insert: ID=7923: Title=PHQ - SADS Somatic Anxiety and Depressive Symptoms
+: insert: ID=7924: Title=TCU Drug Screen V
+: insert: ID=7925: Title=PTSD CheckList for DSM-5 (PCL-5)
+: insert: ID=7926: Title=Child and Adolescent Trauma Screen (CATS)
+: insert: ID=7927: Title=PTSD Checklist – Civilian version (PCL-C)
+: insert: ID=7928: Title=PHQ - GAD7 Instructions
+: insert: ID=7929: Title=T-ASI Teen Addiction Severity Index
+: insert: ID=7930: Title=South Oaks Gambling Screening
+: insert: ID=7931: Title=BASIS-32 Client Form
+: insert: ID=7932: Title= ASI Addiction Severity Index 5th Edition
+: insert: ID=7933: Title= ASAM Adult 65D-30 Intervention Level 05 (20070711)
+: insert: ID=7934: Title=ASAM Adolescent 65D-30 Intervention Level 05
+: insert: ID=7935: Title=Required Fields for CDC
+: insert: ID=7936: Title=Service Focus Requirements with AutoPA for CDC
+: insert: ID=7937: Title=How to Improve Chances For Auto-Auth
+: insert: ID=7938: Title=PICIS Web Site
+: insert: ID=7939: Title=HCA 15 -  Paid Claim Adjustment Request for Crossover Part B, Dental, CMS 1500
+: insert: ID=7940: Title=EDI/ERA Application for Providers 
+: insert: ID=7943: Title=PECOS Checklist for Individual Practitioners 2011
+: insert: ID=7945: Title=Expanded Risk Rescue Rating Scale_20150126
+: insert: ID=7946: Title=Modified Scale for Suicidal Ideation_20150126
+: insert: ID=7947: Title=SDQ Packet_20110211
+: insert: ID=7948: Title=Strengths and Difficulties Questionnaire_20110211
+: insert: ID=7949: Title=Client Orientation CheckList_2013
+: insert: ID=7950: Title=Medicaid Charting Examples_20100701
+: insert: ID=7952: Title=Sample Notes examples of notes by service_20100701
+: insert: ID=7953: Title=Case Management Health Home Assessment
+: insert: ID=7976: Title=GAIN-SS Short Screener
+: insert: ID=7977: Title=GAIN-SS Administration and Scoring Manual
+: insert: ID=7978: Title=GAIN-SS Instructions for Training Course
+: insert: ID=7979: Title=GAIN-SS Scoring the GAIN Short Screener
+: insert: ID=8206: Title=Mental Health Family Health History Male Version
+: insert: ID=8207: Title=Mental Health Family Health History Female Version
+: insert: ID=8208: Title=Mental Health Health Appraisal Male Version
+: insert: ID=8209: Title=Mental Health Health Appraisal Female Version
+: insert: ID=8210: Title= Oklahoma Health Home Web Site
+: insert: ID=8293: Title=Mentor International Drug Prevention for Parents
+: insert: ID=8417: Title=Wellness Coach Workbook
+: insert: ID=8418: Title=Wellness Coach Training
+: insert: ID=8419: Title=Wellness Coach Training PowerPoint
+: insert: ID=8584: Title=Depression in Mothers Toolkit
+: insert: ID=8585: Title=Case Manager Assessment Form Children
+: insert: ID=8687: Title=OHCA Rule Changes for June 1, 2016
+: insert: ID=8808: Title=Health Appraisal Questionnaire Male Version
+: insert: ID=8809: Title=Health Appraisal Questionnaire Female Version
+: insert: ID=8810: Title=Family Health History - Male Version
+: insert: ID=8811: Title=Family Health History - Female Version
+: insert: ID=8872: Title=Substance Abuse FAQ
+: insert: ID=8873: Title=ProAct User Guide 2015
+: insert: ID=11135: Title=Asthma management
+: insert: ID=11136: Title=Cardiovascular disease
+: insert: ID=11137: Title=Diabetes in children and young people overview
+: insert: ID=11138: Title=Diabetic ketoacidosis in children and young
+people
+: insert: ID=11139: Title=Type 2 diabetes in children and young people
+: insert: ID=11140: Title=Managing familial hypercholesterolaemia
+: insert: ID=11141: Title=Identifying and assessing people who are
+overweight or obese
+: insert: ID=11142: Title=Preventing uptake of smoking in children and
+young people
+: insert: ID=11143: Title=Smoking Overview
+: insert: ID=11144: Title=Stopping Smoking in Everyone
+: insert: ID=11479: Title=Columbia-Suicide Severity Rating Scale (C-SSRS)
+: insert: ID=11480: Title=Columbia-Suicide Follow-Up
+: insert: ID=13221: Title=Health Home National Council webinar recordings
+: insert: ID=13665: Title=Smoking Cessation Clinical Pathway
+: insert: ID=13897: Title=Care Transition Interventions in Mental Health
+: insert: ID=13898: Title=Care for adults with depression
+: insert: ID=13899: Title=Depression in children and young people: recognition, detection, risk profiling and referral
+: insert: ID=13900: Title=Management of moderate to severe (including
+psychotic) depression in children and young
+people  tiers 24
+: insert: ID=13901: Title=HSC Care Pathways
+: insert: ID=13902: Title=Managing Depression: Clinical Pathways in Primary and Behavioral Health Care
+: insert: ID=13903: Title=Methods to Help Tackle Emergency Department Visits
+: insert: ID=14735: Title=Medicaid Charting Guideline requirements by service
+: insert: ID=15011: Title=Educating Clinicians and Office Staff
+: insert: ID=15012: Title=Patient Management Tools
+: insert: ID=15013: Title=Safety Planning Guide
+: insert: ID=15014: Title=Patient Safety Plan Template
+: insert: ID=15015: Title=SAFE-T
+: insert: ID=15755: Title=2019 Testings Codes and Limits
+: insert: ID=15756: Title=2019 CPT Testing changes
+: insert: ID=16246: Title=Face to Face codes for bundle to bill for CC.wellness, FSP
+
+: insert: ID=16288: Title=OKLAHOMA CHAPTER PEDIATRIC OBESITY TOOL KIT
+: insert: ID=16409: Title=LegalAidOk.org Helping low-income individuals solve legal problems
+
+: insert: ID=16454: Title=Adverse Childhood Experience (ACE) Questionnaire
+: insert: ID=16455: Title=Mood and Feelings Parent Questionnaire: Short Version
+: insert: ID=16456: Title=Mood and Feelings Child Questionnaire: Short Version
+: insert: ID=16457: Title=Mood and Feelings Questionnaire Directions
+: insert: ID=16493: Title=Epilepsy Society
+: insert: ID=16565: Title=BCBS Psychological Assessment Prior Authorization - 2019
+: insert: ID=16612: Title=ACE - Adverse Childhood Experiences What's Your ACE Score?
+: insert: ID=16867: Title=Telemedicine - Policy and Rules
+: insert: ID=16868: Title=Telemedicine - Reimbursable Behavioral Health Telemedicine Codes
+: insert: ID=16869: Title=Telemedicine - Provider Letter
+: insert: ID=16870: Title=Behavioral Health Case Management Guide
+: insert: ID=16871: Title=DMH Service Manual FY2019
+: insert: ID=16872: Title=Health Home High Intensity Chacopyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20200222081940_PHQ-2.pdf" "/home/okmis/www/forms/90/Testing:20200222081940_PHQ-2.pdf"
+nge
+: insert: ID=16873: Title=Webinar - Diabetes
+: insert: ID=16874: Title=Webinar - Depression and Suicidality
+: insert: ID=16875: Title=Webinar - Role of Nurse Care Manager
+: insert: ID=16876: Title=Webinar - Obesity Care - Adult and Adolescent BMI
+: insert: ID=16877: Title=Webinar - Cardiovascular Disease
+: insert: ID=16878: Title=Webinar - Hypertension
+: insert: ID=16879: Title=Webinar - Metabolic Syndrome
+: insert: ID=16881: Title=Health Home Care Pathway Smoking Cessation
+: insert: ID=16882: Title=Health Home Care Pathway Care Transitions
+: insert: ID=16884: Title=Telemental Health Evidence-Based Practice - 2009
+: insert: ID=16885: Title=Telemental Health Introduction - 2011
+: insert: ID=16886: Title=Telemental Health Practice Guidelines - 2009
+: insert: ID=16887: Title=CAMS Suicide Outcome Tracking Form
+: insert: ID=16945: Title=CAMS Suicide Status Form - SSF-II
+: insert: ID=17268: Title=ACE Training Webinar
+: insert: ID=17269: Title=ACE Training Handout
+: insert: ID=17270: Title=ACE Questionaire
+: insert: ID=17356: Title=Child and Adolescent Needs and Strengths (CANS-MH) Form
+: insert: ID=17357: Title=Child and Adolescent Needs and Strengths (CANS-MH) Manual
+: insert: ID=17655: Title=* Continued HH MHP Statement 2019 (Care Coordinator)
+: insert: ID=18208: Title=* Wellness Plan (Nurse Wellness Coach [preferred] or Well Coach)
+: insert: ID=18209: Title=* SCND (30 days of admission / annual update)
+: insert: ID=18210: Title=Crisis Plan (Care Coordinator)
+: insert: ID=18211: Title=* Team Meeting / Staffing (Care Coordinator)
+: insert: ID=18212: Title=* Family Team Meeting (Care Coordinator / FSP)
+: insert: ID=18213: Title=* Health Risk Appraisal (Care Coordinator)
+: insert: ID=18229: Title=* Oklahoma Systems Of Care Service Event Form
+: insert: ID=18312: Title=National Provider Identifier (NPI) Application/Update Form
+: insert: ID=18334: Title=2019 Updated Guidance on Billing and Coding of Psychological Testing
+: insert: ID=18335: Title=2019 Psychological and Neuropsychological Testing Billing and Coding Guide
+: insert: ID=18336: Title=2019 Psychological and Neuropsychological Testing
+Billing and Coding Guide - Addendum
+: insert: ID=18346: Title=2020 Health Home Manual
+: insert: ID=18378: Title=Psychiatry Evaluation/Management Codes & Vignettes
+: insert: ID=18405: Title=Oklahoma Uniform Credentialing Application (OUCA) PDF Fill Format
+: insert: ID=18406: Title=Oklahoma Uniform Credentialing Application (OUCA) Word Format
+: insert: ID=18407: Title=OUCA Supplement PDF Fill Format
+: insert: ID=18416: Title=CAQH ProView FAQ
+: insert: ID=18417: Title=CAQH ProView Provider User Guide
+: insert: ID=18418: Title=CAQH ProView Practice Manager User Guide
+: insert: ID=18419: Title=CAQH ProView Bulk Upload Submission Instructions
+: insert: ID=18420: Title=CAQH Provider Bulk Upload Template (Excel)
+: insert: ID=18421: Title=CAQH Professional Liability Insurance Document Submission Instructions
+: insert: ID=18422: Title=Voiding Medicare Claim
+: insert: ID=18509: Title=BCBS Telemedicine Guide
+: insert: ID=18511: Title=BCBS General Eligibility and Benefits Expanded Tip Sheet
+: insert: ID=18513: Title=BCBS Claim Research Tool Tip Sheet
+: insert: ID=18514: Title=BCBS Behavioral Health Eligibility and Benefits Tip Sheet
+: insert: ID=18518: Title=Insure Oklahoma
+: insert: ID=18519: Title=Telemedicine GT Modifier Change - Effective 1/1/2018
+: insert: ID=18521: Title=Medicaid Secondary Claim Submission
+: insert: ID=18522: Title=Submitting Secondary Medicaid Claims for Primary Medicare Copay/Deductibles
+: insert: ID=18574: Title=Market Pricing
+: insert: ID=18578: Title=2019 Federal Poverty Guidelines
+: insert: ID=19159: Title=Critical Incident Report
+: insert: ID=19161: Title=Emergency Detention Third Party Statement
+: insert: ID=19167: Title=New Hire Form OES - 112
+: insert: ID=19168: Title=Oklahoma Worker's Compensation Notice - English
+: insert: ID=19169: Title=Oklahoma Worker's Compensation Notice - Spanish
+: insert: ID=19170: Title=Oklahoma Minimum Wage Act (Plain Language)
+: insert: ID=19171: Title=Oklahoma Minimum Wage Act (Statutory Language)
+: insert: ID=19172: Title=Oklahoma Discrimination In Employment Poster
+: insert: ID=19173: Title=Oklahoma Child Labor Law
+: insert: ID=19174: Title=Child Peddling Safety Awareness
+: insert: ID=19175: Title=BCBS BlueCard Manual
+: insert: ID=19857: Title=PHQ - 9 Teen Version
+: insert: ID=19858: Title=PHQ - 2 Depression Screen
+: insert: ID=19859: Title=Mental Health Screening Form-III - FY15
+: insert: ID=20128: Title=i-9 Paper Version
+: insert: ID=20129: Title=i-9 - Form Fillable
+: insert: ID=20279: Title=MEDICARE FRAUD, WASTE, AND ABUSE
+: insert: ID=20281: Title=Medicare COVID-19 Coverage
+
+setFORMDIR: fromdir=/home/okmis/www/mms, todir=/home/okmis/www/forms
+  copy 228 files...
+Path=/Provider/EDocs/90/20200222081940_PHQ-2.pdf, Tag=Testing
+directory=/Provider/EDocs/90/, filename=20200222081940_PHQ-2.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20200222081940_PHQ-2.pdf
+    to: /home/okmis/www/forms/90/Testing:20200222081940_PHQ-2.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160513132746_Case Manager Assessment Form Children.pdf" "/home/okmis/www/forms/90/Medicaid:20160513132746_Case Manager Assessment Form Children.pdf"
+Path=/Provider/EDocs/90/20160513132746_Case Manager Assessment Form Children.pdf, Tag=Medicaid
+directory=/Provider/EDocs/90/, filename=20160513132746_Case Manager Assessment Form Children.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160513132746_Case Manager Assessment Form Children.pdf
+    to: /home/okmis/www/forms/90/Medicaid:20160513132746_Case Manager Assessment Form Children.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160513132107_depression-in-mothers-toolkit.pdf" "/home/okmis/www/forms/90/Curricula:20160513132107_depression-in-mothers-toolkit.pdf"
+Path=/Provider/EDocs/90/20160513132107_depression-in-mothers-toolkit.pdf, Tag=Curricula
+directory=/Provider/EDocs/90/, filename=20160513132107_depression-in-mothers-toolkit.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160513132107_depression-in-mothers-toolkit.pdf
+    to: /home/okmis/www/forms/90/Curricula:20160513132107_depression-in-mothers-toolkit.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/DMH_Sample_New_Provider_letter.pdf" "/home/okmis/www/forms/90/DMH:DMH_Sample_New_Provider_letter.pdf"
+Path=/Provider/EDocs/90/DMH_Sample_New_Provider_letter.pdf, Tag=DMH
+directory=/Provider/EDocs/90/, filename=DMH_Sample_New_Provider_letter.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/DMH_Sample_New_Provider_letter.pdf
+    to: /home/okmis/www/forms/90/DMH:DMH_Sample_New_Provider_letter.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/FY14 CM SERVICES  DOCUMENTATION.pdf" "/home/okmis/www/forms/90/DMH:FY14 CM SERVICES  DOCUMENTATION.pdf"
+Path=/Provider/EDocs/90/FY14 CM SERVICES  DOCUMENTATION.pdf, Tag=DMH
+directory=/Provider/EDocs/90/, filename=FY14 CM SERVICES  DOCUMENTATION.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/FY14 CM SERVICES  DOCUMENTATION.pdf
+    to: /home/okmis/www/forms/90/DMH:FY14 CM SERVICES  DOCUMENTATION.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/FY14Reimbursable Case Management.pdf" "/home/okmis/www/forms/90/DMH:FY14Reimbursable Case Management.pdf"
+Path=/Provider/EDocs/90/FY14Reimbursable Case Management.pdf, Tag=DMH
+directory=/Provider/EDocs/90/, filename=FY14Reimbursable Case Management.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/FY14Reimbursable Case Management.pdf
+    to: /home/okmis/www/forms/90/DMH:FY14Reimbursable Case Management.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190314181659_Reimbursable Behavioral Health Telemed Services_rev 7.18.18.pdf" "/home/okmis/www/forms/90/OHCA:20190314181659_Reimbursable Behavioral Health Telemed Services_rev 7.18.18.pdf"
+Path=/Provider/EDocs/90/20190314181659_Reimbursable Behavioral Health Telemed Services_rev 7.18.18.pdf, Tag=OHCA
+directory=/Provider/EDocs/90/, filename=20190314181659_Reimbursable Behavioral Health Telemed Services_rev 7.18.18.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190314181659_Reimbursable Behavioral Health Telemed Services_rev 7.18.18.pdf
+    to: /home/okmis/www/forms/90/OHCA:20190314181659_Reimbursable Behavioral Health Telemed Services_rev 7.18.18.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190314181026_Telemedicine Policy and Rules.pdf" "/home/okmis/www/forms/90/OHCA:20190314181026_Telemedicine Policy and Rules.pdf"
+Path=/Provider/EDocs/90/20190314181026_Telemedicine Policy and Rules.pdf, Tag=OHCA
+directory=/Provider/EDocs/90/, filename=20190314181026_Telemedicine Policy and Rules.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190314181026_Telemedicine Policy and Rules.pdf
+    to: /home/okmis/www/forms/90/OHCA:20190314181026_Telemedicine Policy and Rules.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/DMH_New_Provider_Enrollment.pdf" "/home/okmis/www/forms/90/DMH:DMH_New_Provider_Enrollment.pdf"
+Path=/Provider/EDocs/90/DMH_New_Provider_Enrollment.pdf, Tag=DMH
+directory=/Provider/EDocs/90/, filename=DMH_New_Provider_Enrollment.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/DMH_New_Provider_Enrollment.pdf
+    to: /home/okmis/www/forms/90/DMH:DMH_New_Provider_Enrollment.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190314183144_FY2019_PA_Manual.pdf" "/home/okmis/www/forms/90/OHCA:20190314183144_FY2019_PA_Manual.pdf"
+Path=/Provider/EDocs/90/20190314183144_FY2019_PA_Manual.pdf, Tag=OHCA
+directory=/Provider/EDocs/90/, filename=20190314183144_FY2019_PA_Manual.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190314183144_FY2019_PA_Manual.pdf
+    to: /home/okmis/www/forms/90/OHCA:20190314183144_FY2019_PA_Manual.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/medicare_beneficiaries_dual_eligibles_at_a_glance.pdf" "/home/okmis/www/forms/90/Medicaid:medicare_beneficiaries_dual_eligibles_at_a_glance.pdf"
+Path=/Provider/EDocs/90/medicare_beneficiaries_dual_eligibles_at_a_glance.pdf, Tag=Medicaid
+directory=/Provider/EDocs/90/, filename=medicare_beneficiaries_dual_eligibles_at_a_glance.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/medicare_beneficiaries_dual_eligibles_at_a_glance.pdf
+    to: /home/okmis/www/forms/90/Medicaid:medicare_beneficiaries_dual_eligibles_at_a_glance.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160115225208_MyHealthOptOutForm_English.pdf" "/home/okmis/www/forms/90/MyHealth:20160115225208_MyHealthOptOutForm_English.pdf"
+Path=/Provider/EDocs/90/20160115225208_MyHealthOptOutForm_English.pdf, Tag=MyHealth
+directory=/Provider/EDocs/90/, filename=20160115225208_MyHealthOptOutForm_English.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160115225208_MyHealthOptOutForm_English.pdf
+    to: /home/okmis/www/forms/90/MyHealth:20160115225208_MyHealthOptOutForm_English.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160115225120_MyHealth_OptInForm_English.pdf" "/home/okmis/www/forms/90/MyHealth:20160115225120_MyHealth_OptInForm_English.pdf"
+Path=/Provider/EDocs/90/20160115225120_MyHealth_OptInForm_English.pdf, Tag=MyHealth
+directory=/Provider/EDocs/90/, filename=20160115225120_MyHealth_OptInForm_English.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160115225120_MyHealth_OptInForm_English.pdf
+    to: /home/okmis/www/forms/90/MyHealth:20160115225120_MyHealth_OptInForm_English.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160115225248_Patient_Information_Flyer.pdf" "/home/okmis/www/forms/90/MyHealth:20160115225248_Patient_Information_Flyer.pdf"
+Path=/Provider/EDocs/90/20160115225248_Patient_Information_Flyer.pdf, Tag=MyHealth
+directory=/Provider/EDocs/90/, filename=20160115225248_Patient_Information_Flyer.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160115225248_Patient_Information_Flyer.pdf
+    to: /home/okmis/www/forms/90/MyHealth:20160115225248_Patient_Information_Flyer.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160115224832_HIPAA_Paragraph_Addition_Suggestion.pdf" "/home/okmis/www/forms/90/MyHealth:20160115224832_HIPAA_Paragraph_Addition_Suggestion.pdf"
+Path=/Provider/EDocs/90/20160115224832_HIPAA_Paragraph_Addition_Suggestion.pdf, Tag=MyHealth
+directory=/Provider/EDocs/90/, filename=20160115224832_HIPAA_Paragraph_Addition_Suggestion.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160115224832_HIPAA_Paragraph_Addition_Suggestion.pdf
+    to: /home/okmis/www/forms/90/MyHealth:20160115224832_HIPAA_Paragraph_Addition_Suggestion.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160115224542_Front_Desk_Script.pdf" "/home/okmis/www/forms/90/MyHealth:20160115224542_Front_Desk_Script.pdf"
+Path=/Provider/EDocs/90/20160115224542_Front_Desk_Script.pdf, Tag=MyHealth
+directory=/Provider/EDocs/90/, filename=20160115224542_Front_Desk_Script.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160115224542_Front_Desk_Script.pdf
+    to: /home/okmis/www/forms/90/MyHealth:20160115224542_Front_Desk_Script.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/SE1407.pdf" "/home/okmis/www/forms/90/Medicare:SE1407.pdf"
+Path=/Provider/EDocs/90/SE1407.pdf, Tag=Medicare
+directory=/Provider/EDocs/90/, filename=SE1407.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/SE1407.pdf
+    to: /home/okmis/www/forms/90/Medicare:SE1407.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/Reduce-Alcohol-Misuse-ICN907798.pdf" "/home/okmis/www/forms/90/Medicare:Reduce-Alcohol-Misuse-ICN907798.pdf"
+Path=/Provider/EDocs/90/Reduce-Alcohol-Misuse-ICN907798.pdf, Tag=Medicare
+directory=/Provider/EDocs/90/, filename=Reduce-Alcohol-Misuse-ICN907798.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/Reduce-Alcohol-Misuse-ICN907798.pdf
+    to: /home/okmis/www/forms/90/Medicare:Reduce-Alcohol-Misuse-ICN907798.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/TRICARE_South_Region_Application.pdf" "/home/okmis/www/forms/90/Tricare:TRICARE_South_Region_Application.pdf"
+Path=/Provider/EDocs/90/TRICARE_South_Region_Application.pdf, Tag=Tricare
+directory=/Provider/EDocs/90/, filename=TRICARE_South_Region_Application.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/TRICARE_South_Region_Application.pdf
+    to: /home/okmis/www/forms/90/Tricare:TRICARE_South_Region_Application.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/Tricare Referral and Prior Authorization.pdf" "/home/okmis/www/forms/90/Tricare:Tricare Referral and Prior Authorization.pdf"
+Path=/Provider/EDocs/90/Tricare Referral and Prior Authorization.pdf, Tag=Tricare
+directory=/Provider/EDocs/90/, filename=Tricare Referral and Prior Authorization.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/Tricare Referral and Prior Authorization.pdf
+    to: /home/okmis/www/forms/90/Tricare:Tricare Referral and Prior Authorization.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/Tricare Provider Resourses.pdf" "/home/okmis/www/forms/90/Tricare:Tricare Provider Resourses.pdf"
+Path=/Provider/EDocs/90/Tricare Provider Resourses.pdf, Tag=Tricare
+directory=/Provider/EDocs/90/, filename=Tricare Provider Resourses.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/Tricare Provider Resourses.pdf
+    to: /home/okmis/www/forms/90/Tricare:Tricare Provider Resourses.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/Tricare Member Types.pdf" "/home/okmis/www/forms/90/Tricare:Tricare Member Types.pdf"
+Path=/Provider/EDocs/90/Tricare Member Types.pdf, Tag=Tricare
+directory=/Provider/EDocs/90/, filename=Tricare Member Types.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/Tricare Member Types.pdf
+    to: /home/okmis/www/forms/90/Tricare:Tricare Member Types.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/Tricare Deductible and Co-Pay.pdf" "/home/okmis/www/forms/90/Tricare:Tricare Deductible and Co-Pay.pdf"
+Path=/Provider/EDocs/90/Tricare Deductible and Co-Pay.pdf, Tag=Tricare
+directory=/Provider/EDocs/90/, filename=Tricare Deductible and Co-Pay.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/Tricare Deductible and Co-Pay.pdf
+    to: /home/okmis/www/forms/90/Tricare:Tricare Deductible and Co-Pay.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/Tricare Consultation Report Process.pdf" "/home/okmis/www/forms/90/Tricare:Tricare Consultation Report Process.pdf"
+Path=/Provider/EDocs/90/Tricare Consultation Report Process.pdf, Tag=Tricare
+directory=/Provider/EDocs/90/, filename=Tricare Consultation Report Process.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/Tricare Consultation Report Process.pdf
+    to: /home/okmis/www/forms/90/Tricare:Tricare Consultation Report Process.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/Tricare Behavioral Health.pdf" "/home/okmis/www/forms/90/Tricare:Tricare Behavioral Health.pdf"
+Path=/Provider/EDocs/90/Tricare Behavioral Health.pdf, Tag=Tricare
+directory=/Provider/EDocs/90/, filename=Tricare Behavioral Health.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/Tricare Behavioral Health.pdf
+    to: /home/okmis/www/forms/90/Tricare:Tricare Behavioral Health.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/ConsentToTreat-Adult.pdf" "/home/okmis/www/forms/90/HealthHome:ConsentToTreat-Adult.pdf"
+Path=/Provider/EDocs/90/ConsentToTreat-Adult.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=ConsentToTreat-Adult.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/ConsentToTreat-Adult.pdf
+    to: /home/okmis/www/forms/90/HealthHome:ConsentToTreat-Adult.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/ConsentToTreat-Child.pdf" "/home/okmis/www/forms/90/HealthHome:ConsentToTreat-Child.pdf"
+Path=/Provider/EDocs/90/ConsentToTreat-Child.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=ConsentToTreat-Child.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/ConsentToTreat-Child.pdf
+    to: /home/okmis/www/forms/90/HealthHome:ConsentToTreat-Child.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/ATTESTATION.docx" "/home/okmis/www/forms/90/HealthHome:ATTESTATION.docx"
+Path=/Provider/EDocs/90/ATTESTATION.docx, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=ATTESTATION.docx
+  copy: /home/okmis/www/mms/Provider/EDocs/90/ATTESTATION.docx
+    to: /home/okmis/www/forms/90/HealthHome:ATTESTATION.docx
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/HH_Risk_Categories.docx" "/home/okmis/www/forms/90/HealthHome:HH_Risk_Categories.docx"
+Path=/Provider/EDocs/90/HH_Risk_Categories.docx, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=HH_Risk_Categories.docx
+  copy: /home/okmis/www/mms/Provider/EDocs/90/HH_Risk_Categories.docx
+    to: /home/okmis/www/forms/90/HealthHome:HH_Risk_Categories.docx
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190702044540_HHCodes_7-2-2018.xlsx" "/home/okmis/www/forms/90/HealthHome:20190702044540_HHCodes_7-2-2018.xlsx"
+Path=/Provider/EDocs/90/20190702044540_HHCodes_7-2-2018.xlsx, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=20190702044540_HHCodes_7-2-2018.xlsx
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190702044540_HHCodes_7-2-2018.xlsx
+    to: /home/okmis/www/forms/90/HealthHome:20190702044540_HHCodes_7-2-2018.xlsx
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/HH_Services_with_codes.pdf" "/home/okmis/www/forms/90/HealthHome:HH_Services_with_codes.pdf"
+Path=/Provider/EDocs/90/HH_Services_with_codes.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=HH_Services_with_codes.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/HH_Services_with_codes.pdf
+    to: /home/okmis/www/forms/90/HealthHome:HH_Services_with_codes.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/HHBillableCodes_10_2-6-15.docx" "/home/okmis/www/forms/90/HealthHome:HHBillableCodes_10_2-6-15.docx"
+Path=/Provider/EDocs/90/HHBillableCodes_10_2-6-15.docx, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=HHBillableCodes_10_2-6-15.docx
+  copy: /home/okmis/www/mms/Provider/EDocs/90/HHBillableCodes_10_2-6-15.docx
+    to: /home/okmis/www/forms/90/HealthHome:HHBillableCodes_10_2-6-15.docx
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/AdultHealthHomeDiagram.pdf" "/home/okmis/www/forms/90/HealthHome:AdultHealthHomeDiagram.pdf"
+Path=/Provider/EDocs/90/AdultHealthHomeDiagram.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=AdultHealthHomeDiagram.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/AdultHealthHomeDiagram.pdf
+    to: /home/okmis/www/forms/90/HealthHome:AdultHealthHomeDiagram.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/ChildHealthHomeDiagram.pdf" "/home/okmis/www/forms/90/HealthHome:ChildHealthHomeDiagram.pdf"
+Path=/Provider/EDocs/90/ChildHealthHomeDiagram.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=ChildHealthHomeDiagram.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/ChildHealthHomeDiagram.pdf
+    to: /home/okmis/www/forms/90/HealthHome:ChildHealthHomeDiagram.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/OklahomaCMHCHHNarrative.pdf" "/home/okmis/www/forms/90/HealthHome:OklahomaCMHCHHNarrative.pdf"
+Path=/Provider/EDocs/90/OklahomaCMHCHHNarrative.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=OklahomaCMHCHHNarrative.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/OklahomaCMHCHHNarrative.pdf
+    to: /home/okmis/www/forms/90/HealthHome:OklahomaCMHCHHNarrative.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/HealthHomeNarrative-Children2.pdf" "/home/okmis/www/forms/90/HealthHome:HealthHomeNarrative-Children2.pdf"
+Path=/Provider/EDocs/90/HealthHomeNarrative-Children2.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=HealthHomeNarrative-Children2.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/HealthHomeNarrative-Children2.pdf
+    to: /home/okmis/www/forms/90/HealthHome:HealthHomeNarrative-Children2.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/SoonerCare_Health_Risk_Assessment_Form.pdf" "/home/okmis/www/forms/90/HealthHome:SoonerCare_Health_Risk_Assessment_Form.pdf"
+Path=/Provider/EDocs/90/SoonerCare_Health_Risk_Assessment_Form.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=SoonerCare_Health_Risk_Assessment_Form.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/SoonerCare_Health_Risk_Assessment_Form.pdf
+    to: /home/okmis/www/forms/90/HealthHome:SoonerCare_Health_Risk_Assessment_Form.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/SoonerCare_Adult_Health_Risk_Profile.pdf" "/home/okmis/www/forms/90/HealthHome:SoonerCare_Adult_Health_Risk_Profile.pdf"
+Path=/Provider/EDocs/90/SoonerCare_Adult_Health_Risk_Profile.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=SoonerCare_Adult_Health_Risk_Profile.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/SoonerCare_Adult_Health_Risk_Profile.pdf
+    to: /home/okmis/www/forms/90/HealthHome:SoonerCare_Adult_Health_Risk_Profile.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/SoonerCare_Child_and_Adolescent_Health_Risk_Profile.pdf" "/home/okmis/www/forms/90/HealthHome:SoonerCare_Child_and_Adolescent_Health_Risk_Profile.pdf"
+Path=/Provider/EDocs/90/SoonerCare_Child_and_Adolescent_Health_Risk_Profile.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=SoonerCare_Child_and_Adolescent_Health_Risk_Profile.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/SoonerCare_Child_and_Adolescent_Health_Risk_Profile.pdf
+    to: /home/okmis/www/forms/90/HealthHome:SoonerCare_Child_and_Adolescent_Health_Risk_Profile.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190727210118_Wellness Plan.pdf" "/home/okmis/www/forms/90/HealthHome:20190727210118_Wellness Plan.pdf"
+Path=/Provider/EDocs/90/20190727210118_Wellness Plan.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=20190727210118_Wellness Plan.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190727210118_Wellness Plan.pdf
+    to: /home/okmis/www/forms/90/HealthHome:20190727210118_Wellness Plan.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/SoonerCare_Adult_Health_Risk_Profile_1_example.pdf" "/home/okmis/www/forms/90/HealthHome:SoonerCare_Adult_Health_Risk_Profile_1_example.pdf"
+Path=/Provider/EDocs/90/SoonerCare_Adult_Health_Risk_Profile_1_example.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=SoonerCare_Adult_Health_Risk_Profile_1_example.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/SoonerCare_Adult_Health_Risk_Profile_1_example.pdf
+    to: /home/okmis/www/forms/90/HealthHome:SoonerCare_Adult_Health_Risk_Profile_1_example.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/Assessments_StrengthsandDifficulties_Questionnaire_20110211.pdf" "/home/okmis/www/forms/90/HealthHome:Assessments_StrengthsandDifficulties_Questionnaire_20110211.pdf"
+Path=/Provider/EDocs/90/Assessments_StrengthsandDifficulties_Questionnaire_20110211.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=Assessments_StrengthsandDifficulties_Questionnaire_20110211.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/Assessments_StrengthsandDifficulties_Questionnaire_20110211.pdf
+    to: /home/okmis/www/forms/90/HealthHome:Assessments_StrengthsandDifficulties_Questionnaire_20110211.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/SoonerCare_Child_and_Adolescent_Health_Risk_Profile_1_example.pdf" "/home/okmis/www/forms/90/HealthHome:SoonerCare_Child_and_Adolescent_Health_Risk_Profile_1_example.pdf"
+Path=/Provider/EDocs/90/SoonerCare_Child_and_Adolescent_Health_Risk_Profile_1_example.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=SoonerCare_Child_and_Adolescent_Health_Risk_Profile_1_example.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/SoonerCare_Child_and_Adolescent_Health_Risk_Profile_1_example.pdf
+    to: /home/okmis/www/forms/90/HealthHome:SoonerCare_Child_and_Adolescent_Health_Risk_Profile_1_example.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/Practitioner_Guides.pdf" "/home/okmis/www/forms/90/HealthHome:Practitioner_Guides.pdf"
+Path=/Provider/EDocs/90/Practitioner_Guides.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=Practitioner_Guides.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/Practitioner_Guides.pdf
+    to: /home/okmis/www/forms/90/HealthHome:Practitioner_Guides.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/Ohio_Scales_screener.pdf" "/home/okmis/www/forms/90/HealthHome:Ohio_Scales_screener.pdf"
+Path=/Provider/EDocs/90/Ohio_Scales_screener.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=Ohio_Scales_screener.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/Ohio_Scales_screener.pdf
+    to: /home/okmis/www/forms/90/HealthHome:Ohio_Scales_screener.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/OKSOC_Enrollment.pdf" "/home/okmis/www/forms/90/HealthHome:OKSOC_Enrollment.pdf"
+Path=/Provider/EDocs/90/OKSOC_Enrollment.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=OKSOC_Enrollment.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/OKSOC_Enrollment.pdf
+    to: /home/okmis/www/forms/90/HealthHome:OKSOC_Enrollment.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160118201500_Ohio_Assessment_Form-Caregiver_5-1-15.pdf" "/home/okmis/www/forms/90/HealthHome:20160118201500_Ohio_Assessment_Form-Caregiver_5-1-15.pdf"
+Path=/Provider/EDocs/90/20160118201500_Ohio_Assessment_Form-Caregiver_5-1-15.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=20160118201500_Ohio_Assessment_Form-Caregiver_5-1-15.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160118201500_Ohio_Assessment_Form-Caregiver_5-1-15.pdf
+    to: /home/okmis/www/forms/90/HealthHome:20160118201500_Ohio_Assessment_Form-Caregiver_5-1-15.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/OKSOC_Assessment-Worker.pdf" "/home/okmis/www/forms/90/HealthHome:OKSOC_Assessment-Worker.pdf"
+Path=/Provider/EDocs/90/OKSOC_Assessment-Worker.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=OKSOC_Assessment-Worker.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/OKSOC_Assessment-Worker.pdf
+    to: /home/okmis/www/forms/90/HealthHome:OKSOC_Assessment-Worker.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160118201526_Ohio_Assessment_Form-Youth_5-1-15.pdf" "/home/okmis/www/forms/90/HealthHome:20160118201526_Ohio_Assessment_Form-Youth_5-1-15.pdf"
+Path=/Provider/EDocs/90/20160118201526_Ohio_Assessment_Form-Youth_5-1-15.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=20160118201526_Ohio_Assessment_Form-Youth_5-1-15.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160118201526_Ohio_Assessment_Form-Youth_5-1-15.pdf
+    to: /home/okmis/www/forms/90/HealthHome:20160118201526_Ohio_Assessment_Form-Youth_5-1-15.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/OKSOC_Referral.pdf" "/home/okmis/www/forms/90/HealthHome:OKSOC_Referral.pdf"
+Path=/Provider/EDocs/90/OKSOC_Referral.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=OKSOC_Referral.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/OKSOC_Referral.pdf
+    to: /home/okmis/www/forms/90/HealthHome:OKSOC_Referral.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/OKSOC_Discharge.pdf" "/home/okmis/www/forms/90/HealthHome:OKSOC_Discharge.pdf"
+Path=/Provider/EDocs/90/OKSOC_Discharge.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=OKSOC_Discharge.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/OKSOC_Discharge.pdf
+    to: /home/okmis/www/forms/90/HealthHome:OKSOC_Discharge.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/ComplianceAudit.pdf" "/home/okmis/www/forms/90/HealthHome:ComplianceAudit.pdf"
+Path=/Provider/EDocs/90/ComplianceAudit.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=ComplianceAudit.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/ComplianceAudit.pdf
+    to: /home/okmis/www/forms/90/HealthHome:ComplianceAudit.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/CAQH.html" "/home/okmis/www/forms/90/Library:CAQH.html"
+Path=/Provider/EDocs/90/CAQH.html, Tag=Library
+directory=/Provider/EDocs/90/, filename=CAQH.html
+  copy: /home/okmis/www/mms/Provider/EDocs/90/CAQH.html
+    to: /home/okmis/www/forms/90/Library:CAQH.html
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/Dual Eligible Buy-InDefinitions.pdf" "/home/okmis/www/forms/90/Library:Dual Eligible Buy-InDefinitions.pdf"
+Path=/Provider/EDocs/90/Dual Eligible Buy-InDefinitions.pdf, Tag=Library
+directory=/Provider/EDocs/90/, filename=Dual Eligible Buy-InDefinitions.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/Dual Eligible Buy-InDefinitions.pdf
+    to: /home/okmis/www/forms/90/Library:Dual Eligible Buy-InDefinitions.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/eeopost.pdf" "/home/okmis/www/forms/90/Federal:eeopost.pdf"
+Path=/Provider/EDocs/90/eeopost.pdf, Tag=Federal
+directory=/Provider/EDocs/90/, filename=eeopost.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/eeopost.pdf
+    to: /home/okmis/www/forms/90/Federal:eeopost.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/EmployeeRightsPoster11x17_Final.pdf" "/home/okmis/www/forms/90/Federal:EmployeeRightsPoster11x17_Final.pdf"
+Path=/Provider/EDocs/90/EmployeeRightsPoster11x17_Final.pdf, Tag=Federal
+directory=/Provider/EDocs/90/, filename=EmployeeRightsPoster11x17_Final.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/EmployeeRightsPoster11x17_Final.pdf
+    to: /home/okmis/www/forms/90/Federal:EmployeeRightsPoster11x17_Final.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/eppac.pdf" "/home/okmis/www/forms/90/Federal:eppac.pdf"
+Path=/Provider/EDocs/90/eppac.pdf, Tag=Federal
+directory=/Provider/EDocs/90/, filename=eppac.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/eppac.pdf
+    to: /home/okmis/www/forms/90/Federal:eppac.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/fmlaen.pdf" "/home/okmis/www/forms/90/Federal:fmlaen.pdf"
+Path=/Provider/EDocs/90/fmlaen.pdf, Tag=Federal
+directory=/Provider/EDocs/90/, filename=fmlaen.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/fmlaen.pdf
+    to: /home/okmis/www/forms/90/Federal:fmlaen.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/minwagep.pdf" "/home/okmis/www/forms/90/Federal:minwagep.pdf"
+Path=/Provider/EDocs/90/minwagep.pdf, Tag=Federal
+directory=/Provider/EDocs/90/, filename=minwagep.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/minwagep.pdf
+    to: /home/okmis/www/forms/90/Federal:minwagep.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/n797.pdf" "/home/okmis/www/forms/90/Federal:n797.pdf"
+Path=/Provider/EDocs/90/n797.pdf, Tag=Federal
+directory=/Provider/EDocs/90/, filename=n797.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/n797.pdf
+    to: /home/okmis/www/forms/90/Federal:n797.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/osha3165.pdf" "/home/okmis/www/forms/90/Federal:osha3165.pdf"
+Path=/Provider/EDocs/90/osha3165.pdf, Tag=Federal
+directory=/Provider/EDocs/90/, filename=osha3165.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/osha3165.pdf
+    to: /home/okmis/www/forms/90/Federal:osha3165.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/p4929.pdf" "/home/okmis/www/forms/90/Federal:p4929.pdf"
+Path=/Provider/EDocs/90/p4929.pdf, Tag=Federal
+directory=/Provider/EDocs/90/, filename=p4929.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/p4929.pdf
+    to: /home/okmis/www/forms/90/Federal:p4929.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/Right_to_Work_Poster_English.pdf" "/home/okmis/www/forms/90/Federal:Right_to_Work_Poster_English.pdf"
+Path=/Provider/EDocs/90/Right_to_Work_Poster_English.pdf, Tag=Federal
+directory=/Provider/EDocs/90/, filename=Right_to_Work_Poster_English.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/Right_to_Work_Poster_English.pdf
+    to: /home/okmis/www/forms/90/Federal:Right_to_Work_Poster_English.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/Client_Rights.pdf" "/home/okmis/www/forms/90/Federal:Client_Rights.pdf"
+Path=/Provider/EDocs/90/Client_Rights.pdf, Tag=Federal
+directory=/Provider/EDocs/90/, filename=Client_Rights.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/Client_Rights.pdf
+    to: /home/okmis/www/forms/90/Federal:Client_Rights.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/USERRA_Private.pdf" "/home/okmis/www/forms/90/Federal:USERRA_Private.pdf"
+Path=/Provider/EDocs/90/USERRA_Private.pdf, Tag=Federal
+directory=/Provider/EDocs/90/, filename=USERRA_Private.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/USERRA_Private.pdf
+    to: /home/okmis/www/forms/90/Federal:USERRA_Private.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/Oklahoma City Area Emergency Contact Numbers.pdf" "/home/okmis/www/forms/90/State:Oklahoma City Area Emergency Contact Numbers.pdf"
+Path=/Provider/EDocs/90/Oklahoma City Area Emergency Contact Numbers.pdf, Tag=State
+directory=/Provider/EDocs/90/, filename=Oklahoma City Area Emergency Contact Numbers.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/Oklahoma City Area Emergency Contact Numbers.pdf
+    to: /home/okmis/www/forms/90/State:Oklahoma City Area Emergency Contact Numbers.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/Tulsa Area Emergency Contact Numbers.pdf" "/home/okmis/www/forms/90/State:Tulsa Area Emergency Contact Numbers.pdf"
+Path=/Provider/EDocs/90/Tulsa Area Emergency Contact Numbers.pdf, Tag=State
+directory=/Provider/EDocs/90/, filename=Tulsa Area Emergency Contact Numbers.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/Tulsa Area Emergency Contact Numbers.pdf
+    to: /home/okmis/www/forms/90/State:Tulsa Area Emergency Contact Numbers.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/OES-44_rev_6-10.pdf" "/home/okmis/www/forms/90/State:OES-44_rev_6-10.pdf"
+Path=/Provider/EDocs/90/OES-44_rev_6-10.pdf, Tag=State
+directory=/Provider/EDocs/90/, filename=OES-44_rev_6-10.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/OES-44_rev_6-10.pdf
+    to: /home/okmis/www/forms/90/State:OES-44_rev_6-10.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20191216142123_CC-Form-1A - English_12-18-14.pdf" "/home/okmis/www/forms/90/State:20191216142123_CC-Form-1A - English_12-18-14.pdf"
+Path=/Provider/EDocs/90/20191216142123_CC-Form-1A - English_12-18-14.pdf, Tag=State
+directory=/Provider/EDocs/90/, filename=20191216142123_CC-Form-1A - English_12-18-14.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20191216142123_CC-Form-1A - English_12-18-14.pdf
+    to: /home/okmis/www/forms/90/State:20191216142123_CC-Form-1A - English_12-18-14.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20191216142948_OCRE poster; rev 01-25-18 - FINAL.pdf" "/home/okmis/www/forms/90/State:20191216142948_OCRE poster; rev 01-25-18 - FINAL.pdf"
+Path=/Provider/EDocs/90/20191216142948_OCRE poster; rev 01-25-18 - FINAL.pdf, Tag=State
+directory=/Provider/EDocs/90/, filename=20191216142948_OCRE poster; rev 01-25-18 - FINAL.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20191216142948_OCRE poster; rev 01-25-18 - FINAL.pdf
+    to: /home/okmis/www/forms/90/State:20191216142948_OCRE poster; rev 01-25-18 - FINAL.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20191216142605_WHMWPosterPlainLanguage--A.pdf" "/home/okmis/www/forms/90/State:20191216142605_WHMWPosterPlainLanguage--A.pdf"
+Path=/Provider/EDocs/90/20191216142605_WHMWPosterPlainLanguage--A.pdf, Tag=State
+directory=/Provider/EDocs/90/, filename=20191216142605_WHMWPosterPlainLanguage--A.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20191216142605_WHMWPosterPlainLanguage--A.pdf
+    to: /home/okmis/www/forms/90/State:20191216142605_WHMWPosterPlainLanguage--A.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20191216142748_WHMWPosterStatutoryLanguage.pdf" "/home/okmis/www/forms/90/State:20191216142748_WHMWPosterStatutoryLanguage.pdf"
+Path=/Provider/EDocs/90/20191216142748_WHMWPosterStatutoryLanguage.pdf, Tag=State
+directory=/Provider/EDocs/90/, filename=20191216142748_WHMWPosterStatutoryLanguage.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20191216142748_WHMWPosterStatutoryLanguage.pdf
+    to: /home/okmis/www/forms/90/State:20191216142748_WHMWPosterStatutoryLanguage.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20191216143504_ChildLaborDoor2DoorBrochureTriFold.pdf" "/home/okmis/www/forms/90/State:20191216143504_ChildLaborDoor2DoorBrochureTriFold.pdf"
+Path=/Provider/EDocs/90/20191216143504_ChildLaborDoor2DoorBrochureTriFold.pdf, Tag=State
+directory=/Provider/EDocs/90/, filename=20191216143504_ChildLaborDoor2DoorBrochureTriFold.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20191216143504_ChildLaborDoor2DoorBrochureTriFold.pdf
+    to: /home/okmis/www/forms/90/State:20191216143504_ChildLaborDoor2DoorBrochureTriFold.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20191216143301_ChildLaborPoster.pdf" "/home/okmis/www/forms/90/State:20191216143301_ChildLaborPoster.pdf"
+Path=/Provider/EDocs/90/20191216143301_ChildLaborPoster.pdf, Tag=State
+directory=/Provider/EDocs/90/, filename=20191216143301_ChildLaborPoster.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20191216143301_ChildLaborPoster.pdf
+    to: /home/okmis/www/forms/90/State:20191216143301_ChildLaborPoster.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/Fraud_Window_Poster.pdf" "/home/okmis/www/forms/90/State:Fraud_Window_Poster.pdf"
+Path=/Provider/EDocs/90/Fraud_Window_Poster.pdf, Tag=State
+directory=/Provider/EDocs/90/, filename=Fraud_Window_Poster.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/Fraud_Window_Poster.pdf
+    to: /home/okmis/www/forms/90/State:Fraud_Window_Poster.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/Fraud_Window_Poster_Spanish.pdf" "/home/okmis/www/forms/90/State:Fraud_Window_Poster_Spanish.pdf"
+Path=/Provider/EDocs/90/Fraud_Window_Poster_Spanish.pdf, Tag=State
+directory=/Provider/EDocs/90/, filename=Fraud_Window_Poster_Spanish.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/Fraud_Window_Poster_Spanish.pdf
+    to: /home/okmis/www/forms/90/State:Fraud_Window_Poster_Spanish.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/Emergency Mental Hold Issues Adult and Pediatric.pdf" "/home/okmis/www/forms/90/Legal:Emergency Mental Hold Issues Adult and Pediatric.pdf"
+Path=/Provider/EDocs/90/Emergency Mental Hold Issues Adult and Pediatric.pdf, Tag=Legal
+directory=/Provider/EDocs/90/, filename=Emergency Mental Hold Issues Adult and Pediatric.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/Emergency Mental Hold Issues Adult and Pediatric.pdf
+    to: /home/okmis/www/forms/90/Legal:Emergency Mental Hold Issues Adult and Pediatric.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/Involuntary Mental Health Treatment.pdf" "/home/okmis/www/forms/90/Legal:Involuntary Mental Health Treatment.pdf"
+Path=/Provider/EDocs/90/Involuntary Mental Health Treatment.pdf, Tag=Legal
+directory=/Provider/EDocs/90/, filename=Involuntary Mental Health Treatment.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/Involuntary Mental Health Treatment.pdf
+    to: /home/okmis/www/forms/90/Legal:Involuntary Mental Health Treatment.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/Power of Attorney for Child.docx" "/home/okmis/www/forms/90/Legal:Power of Attorney for Child.docx"
+Path=/Provider/EDocs/90/Power of Attorney for Child.docx, Tag=Legal
+directory=/Provider/EDocs/90/, filename=Power of Attorney for Child.docx
+  copy: /home/okmis/www/mms/Provider/EDocs/90/Power of Attorney for Child.docx
+    to: /home/okmis/www/forms/90/Legal:Power of Attorney for Child.docx
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/Anger Management.pdf" "/home/okmis/www/forms/90/Curricula:Anger Management.pdf"
+Path=/Provider/EDocs/90/Anger Management.pdf, Tag=Curricula
+directory=/Provider/EDocs/90/, filename=Anger Management.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/Anger Management.pdf
+    to: /home/okmis/www/forms/90/Curricula:Anger Management.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/Illness Management and Recovery.pdf" "/home/okmis/www/forms/90/Curricula:Illness Management and Recovery.pdf"
+Path=/Provider/EDocs/90/Illness Management and Recovery.pdf, Tag=Curricula
+directory=/Provider/EDocs/90/, filename=Illness Management and Recovery.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/Illness Management and Recovery.pdf
+    to: /home/okmis/www/forms/90/Curricula:Illness Management and Recovery.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/MedicationManagementChild-IDBD.pdf" "/home/okmis/www/forms/90/Curricula:MedicationManagementChild-IDBD.pdf"
+Path=/Provider/EDocs/90/MedicationManagementChild-IDBD.pdf, Tag=Curricula
+directory=/Provider/EDocs/90/, filename=MedicationManagementChild-IDBD.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/MedicationManagementChild-IDBD.pdf
+    to: /home/okmis/www/forms/90/Curricula:MedicationManagementChild-IDBD.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/Partners in Parenting.pdf" "/home/okmis/www/forms/90/Curricula:Partners in Parenting.pdf"
+Path=/Provider/EDocs/90/Partners in Parenting.pdf, Tag=Curricula
+directory=/Provider/EDocs/90/, filename=Partners in Parenting.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/Partners in Parenting.pdf
+    to: /home/okmis/www/forms/90/Curricula:Partners in Parenting.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/Raising Safe Kids One Stage at a Time March 2009.pdf" "/home/okmis/www/forms/90/Curricula:Raising Safe Kids One Stage at a Time March 2009.pdf"
+Path=/Provider/EDocs/90/Raising Safe Kids One Stage at a Time March 2009.pdf, Tag=Curricula
+directory=/Provider/EDocs/90/, filename=Raising Safe Kids One Stage at a Time March 2009.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/Raising Safe Kids One Stage at a Time March 2009.pdf
+    to: /home/okmis/www/forms/90/Curricula:Raising Safe Kids One Stage at a Time March 2009.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/Violence_Prevention_Secondary_Schools.pdf" "/home/okmis/www/forms/90/Curricula:Violence_Prevention_Secondary_Schools.pdf"
+Path=/Provider/EDocs/90/Violence_Prevention_Secondary_Schools.pdf, Tag=Curricula
+directory=/Provider/EDocs/90/, filename=Violence_Prevention_Secondary_Schools.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/Violence_Prevention_Secondary_Schools.pdf
+    to: /home/okmis/www/forms/90/Curricula:Violence_Prevention_Secondary_Schools.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/Violence_Prevention_Elementary_Schools.pdf" "/home/okmis/www/forms/90/Curricula:Violence_Prevention_Elementary_Schools.pdf"
+Path=/Provider/EDocs/90/Violence_Prevention_Elementary_Schools.pdf, Tag=Curricula
+directory=/Provider/EDocs/90/, filename=Violence_Prevention_Elementary_Schools.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/Violence_Prevention_Elementary_Schools.pdf
+    to: /home/okmis/www/forms/90/Curricula:Violence_Prevention_Elementary_Schools.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/Social_Skills_Training.pdf" "/home/okmis/www/forms/90/Curricula:Social_Skills_Training.pdf"
+Path=/Provider/EDocs/90/Social_Skills_Training.pdf, Tag=Curricula
+directory=/Provider/EDocs/90/, filename=Social_Skills_Training.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/Social_Skills_Training.pdf
+    to: /home/okmis/www/forms/90/Curricula:Social_Skills_Training.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/Defiant_Teens.pdf" "/home/okmis/www/forms/90/Curricula:Defiant_Teens.pdf"
+Path=/Provider/EDocs/90/Defiant_Teens.pdf, Tag=Curricula
+directory=/Provider/EDocs/90/, filename=Defiant_Teens.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/Defiant_Teens.pdf
+    to: /home/okmis/www/forms/90/Curricula:Defiant_Teens.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/Defiant_Children.pdf" "/home/okmis/www/forms/90/Curricula:Defiant_Children.pdf"
+Path=/Provider/EDocs/90/Defiant_Children.pdf, Tag=Curricula
+directory=/Provider/EDocs/90/, filename=Defiant_Children.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/Defiant_Children.pdf
+    to: /home/okmis/www/forms/90/Curricula:Defiant_Children.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/Trauma Informed Curriculum.pdf" "/home/okmis/www/forms/90/Curricula:Trauma Informed Curriculum.pdf"
+Path=/Provider/EDocs/90/Trauma Informed Curriculum.pdf, Tag=Curricula
+directory=/Provider/EDocs/90/, filename=Trauma Informed Curriculum.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/Trauma Informed Curriculum.pdf
+    to: /home/okmis/www/forms/90/Curricula:Trauma Informed Curriculum.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/SMA13-4734.pdf" "/home/okmis/www/forms/90/Curricula:SMA13-4734.pdf"
+Path=/Provider/EDocs/90/SMA13-4734.pdf, Tag=Curricula
+directory=/Provider/EDocs/90/, filename=SMA13-4734.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/SMA13-4734.pdf
+    to: /home/okmis/www/forms/90/Curricula:SMA13-4734.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/SMA14-4816.pdf" "/home/okmis/www/forms/90/Curricula:SMA14-4816.pdf"
+Path=/Provider/EDocs/90/SMA14-4816.pdf, Tag=Curricula
+directory=/Provider/EDocs/90/, filename=SMA14-4816.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/SMA14-4816.pdf
+    to: /home/okmis/www/forms/90/Curricula:SMA14-4816.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/SMA11-4657.pdf" "/home/okmis/www/forms/90/Curricula:SMA11-4657.pdf"
+Path=/Provider/EDocs/90/SMA11-4657.pdf, Tag=Curricula
+directory=/Provider/EDocs/90/, filename=SMA11-4657.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/SMA11-4657.pdf
+    to: /home/okmis/www/forms/90/Curricula:SMA11-4657.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/PHQ.pdf" "/home/okmis/www/forms/90/Testing:PHQ.pdf"
+Path=/Provider/EDocs/90/PHQ.pdf, Tag=Testing
+directory=/Provider/EDocs/90/, filename=PHQ.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/PHQ.pdf
+    to: /home/okmis/www/forms/90/Testing:PHQ.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/PHQ-Brief.pdf" "/home/okmis/www/forms/90/Testing:PHQ-Brief.pdf"
+Path=/Provider/EDocs/90/PHQ-Brief.pdf, Tag=Testing
+directory=/Provider/EDocs/90/, filename=PHQ-Brief.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/PHQ-Brief.pdf
+    to: /home/okmis/www/forms/90/Testing:PHQ-Brief.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/PHQ-4.pdf" "/home/okmis/www/forms/90/Testing:PHQ-4.pdf"
+Path=/Provider/EDocs/90/PHQ-4.pdf, Tag=Testing
+directory=/Provider/EDocs/90/, filename=PHQ-4.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/PHQ-4.pdf
+    to: /home/okmis/www/forms/90/Testing:PHQ-4.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/PHQ-9.pdf" "/home/okmis/www/forms/90/Testing:PHQ-9.pdf"
+Path=/Provider/EDocs/90/PHQ-9.pdf, Tag=Testing
+directory=/Provider/EDocs/90/, filename=PHQ-9.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/PHQ-9.pdf
+    to: /home/okmis/www/forms/90/Testing:PHQ-9.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/PHQ-15.pdf" "/home/okmis/www/forms/90/Testing:PHQ-15.pdf"
+Path=/Provider/EDocs/90/PHQ-15.pdf, Tag=Testing
+directory=/Provider/EDocs/90/, filename=PHQ-15.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/PHQ-15.pdf
+    to: /home/okmis/www/forms/90/Testing:PHQ-15.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/GAD-7.pdf" "/home/okmis/www/forms/90/Testing:GAD-7.pdf"
+Path=/Provider/EDocs/90/GAD-7.pdf, Tag=Testing
+directory=/Provider/EDocs/90/, filename=GAD-7.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/GAD-7.pdf
+    to: /home/okmis/www/forms/90/Testing:GAD-7.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/MHSF_III-2.pdf" "/home/okmis/www/forms/90/Testing:MHSF_III-2.pdf"
+Path=/Provider/EDocs/90/MHSF_III-2.pdf, Tag=Testing
+directory=/Provider/EDocs/90/, filename=MHSF_III-2.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/MHSF_III-2.pdf
+    to: /home/okmis/www/forms/90/Testing:MHSF_III-2.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/PHQ-SADS.pdf" "/home/okmis/www/forms/90/Testing:PHQ-SADS.pdf"
+Path=/Provider/EDocs/90/PHQ-SADS.pdf, Tag=Testing
+directory=/Provider/EDocs/90/, filename=PHQ-SADS.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/PHQ-SADS.pdf
+    to: /home/okmis/www/forms/90/Testing:PHQ-SADS.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/TCUDS-V-4-1-15.pdf" "/home/okmis/www/forms/90/Testing:TCUDS-V-4-1-15.pdf"
+Path=/Provider/EDocs/90/TCUDS-V-4-1-15.pdf, Tag=Testing
+directory=/Provider/EDocs/90/, filename=TCUDS-V-4-1-15.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/TCUDS-V-4-1-15.pdf
+    to: /home/okmis/www/forms/90/Testing:TCUDS-V-4-1-15.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/PCL5.pdf" "/home/okmis/www/forms/90/Testing:PCL5.pdf"
+Path=/Provider/EDocs/90/PCL5.pdf, Tag=Testing
+directory=/Provider/EDocs/90/, filename=PCL5.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/PCL5.pdf
+    to: /home/okmis/www/forms/90/Testing:PCL5.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/CATS-Youth_7-17.pdf" "/home/okmis/www/forms/90/Testing:CATS-Youth_7-17.pdf"
+Path=/Provider/EDocs/90/CATS-Youth_7-17.pdf, Tag=Testing
+directory=/Provider/EDocs/90/, filename=CATS-Youth_7-17.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/CATS-Youth_7-17.pdf
+    to: /home/okmis/www/forms/90/Testing:CATS-Youth_7-17.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/Abbreviated_PCL.pdf" "/home/okmis/www/forms/90/Testing:Abbreviated_PCL.pdf"
+Path=/Provider/EDocs/90/Abbreviated_PCL.pdf, Tag=Testing
+directory=/Provider/EDocs/90/, filename=Abbreviated_PCL.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/Abbreviated_PCL.pdf
+    to: /home/okmis/www/forms/90/Testing:Abbreviated_PCL.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/PHQ_GAD7_instructions.pdf" "/home/okmis/www/forms/90/Testing:PHQ_GAD7_instructions.pdf"
+Path=/Provider/EDocs/90/PHQ_GAD7_instructions.pdf, Tag=Testing
+directory=/Provider/EDocs/90/, filename=PHQ_GAD7_instructions.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/PHQ_GAD7_instructions.pdf
+    to: /home/okmis/www/forms/90/Testing:PHQ_GAD7_instructions.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160117223359_PrintTASI.pdf" "/home/okmis/www/forms/90/Testing:20160117223359_PrintTASI.pdf"
+Path=/Provider/EDocs/90/20160117223359_PrintTASI.pdf, Tag=Testing
+directory=/Provider/EDocs/90/, filename=20160117223359_PrintTASI.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160117223359_PrintTASI.pdf
+    to: /home/okmis/www/forms/90/Testing:20160117223359_PrintTASI.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160117224113_PrintSOGS_Rev2.pdf" "/home/okmis/www/forms/90/Testing:20160117224113_PrintSOGS_Rev2.pdf"
+Path=/Provider/EDocs/90/20160117224113_PrintSOGS_Rev2.pdf, Tag=Testing
+directory=/Provider/EDocs/90/, filename=20160117224113_PrintSOGS_Rev2.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160117224113_PrintSOGS_Rev2.pdf
+    to: /home/okmis/www/forms/90/Testing:20160117224113_PrintSOGS_Rev2.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160117230902_BASIS-32ClientForm_20100701.pdf" "/home/okmis/www/forms/90/Testing:20160117230902_BASIS-32ClientForm_20100701.pdf"
+Path=/Provider/EDocs/90/20160117230902_BASIS-32ClientForm_20100701.pdf, Tag=Testing
+directory=/Provider/EDocs/90/, filename=20160117230902_BASIS-32ClientForm_20100701.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160117230902_BASIS-32ClientForm_20100701.pdf
+    to: /home/okmis/www/forms/90/Testing:20160117230902_BASIS-32ClientForm_20100701.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160117232043_PrintASI_Rev2.pdf" "/home/okmis/www/forms/90/Testing:20160117232043_PrintASI_Rev2.pdf"
+Path=/Provider/EDocs/90/20160117232043_PrintASI_Rev2.pdf, Tag=Testing
+directory=/Provider/EDocs/90/, filename=20160117232043_PrintASI_Rev2.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160117232043_PrintASI_Rev2.pdf
+    to: /home/okmis/www/forms/90/Testing:20160117232043_PrintASI_Rev2.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160117232731_ASAM_Adult_65D-30_Intervention_Level_05_20070711.pdf" "/home/okmis/www/forms/90/Testing:20160117232731_ASAM_Adult_65D-30_Intervention_Level_05_20070711.pdf"
+Path=/Provider/EDocs/90/20160117232731_ASAM_Adult_65D-30_Intervention_Level_05_20070711.pdf, Tag=Testing
+directory=/Provider/EDocs/90/, filename=20160117232731_ASAM_Adult_65D-30_Intervention_Level_05_20070711.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160117232731_ASAM_Adult_65D-30_Intervention_Level_05_20070711.pdf
+    to: /home/okmis/www/forms/90/Testing:20160117232731_ASAM_Adult_65D-30_Intervention_Level_05_20070711.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160117233236_ASAM_Adolescent_65D-30_Intervention_Level_05_20070711.pdf" "/home/okmis/www/forms/90/Testing:20160117233236_ASAM_Adolescent_65D-30_Intervention_Level_05_20070711.pdf"
+Path=/Provider/EDocs/90/20160117233236_ASAM_Adolescent_65D-30_Intervention_Level_05_20070711.pdf, Tag=Testing
+directory=/Provider/EDocs/90/, filename=20160117233236_ASAM_Adolescent_65D-30_Intervention_Level_05_20070711.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160117233236_ASAM_Adolescent_65D-30_Intervention_Level_05_20070711.pdf
+    to: /home/okmis/www/forms/90/Testing:20160117233236_ASAM_Adolescent_65D-30_Intervention_Level_05_20070711.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160118104126_ODMHSAS_CDC Required Fields_20100507.pdf" "/home/okmis/www/forms/90/DMH:20160118104126_ODMHSAS_CDC Required Fields_20100507.pdf"
+Path=/Provider/EDocs/90/20160118104126_ODMHSAS_CDC Required Fields_20100507.pdf, Tag=DMH
+directory=/Provider/EDocs/90/, filename=20160118104126_ODMHSAS_CDC Required Fields_20100507.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160118104126_ODMHSAS_CDC Required Fields_20100507.pdf
+    to: /home/okmis/www/forms/90/DMH:20160118104126_ODMHSAS_CDC Required Fields_20100507.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160118104431_ODMHSAS_CDC Service Focus Requirements with AutoPA_20100601.pdf" "/home/okmis/www/forms/90/DMH:20160118104431_ODMHSAS_CDC Service Focus Requirements with AutoPA_20100601.pdf"
+Path=/Provider/EDocs/90/20160118104431_ODMHSAS_CDC Service Focus Requirements with AutoPA_20100601.pdf, Tag=DMH
+directory=/Provider/EDocs/90/, filename=20160118104431_ODMHSAS_CDC Service Focus Requirements with AutoPA_20100601.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160118104431_ODMHSAS_CDC Service Focus Requirements with AutoPA_20100601.pdf
+    to: /home/okmis/www/forms/90/DMH:20160118104431_ODMHSAS_CDC Service Focus Requirements with AutoPA_20100601.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160118105609_HOW_TO_IMPROVE_CHANCES_FOR_AUTOAUTH_20071031.pdf" "/home/okmis/www/forms/90/DMH:20160118105609_HOW_TO_IMPROVE_CHANCES_FOR_AUTOAUTH_20071031.pdf"
+Path=/Provider/EDocs/90/20160118105609_HOW_TO_IMPROVE_CHANCES_FOR_AUTOAUTH_20071031.pdf, Tag=DMH
+directory=/Provider/EDocs/90/, filename=20160118105609_HOW_TO_IMPROVE_CHANCES_FOR_AUTOAUTH_20071031.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160118105609_HOW_TO_IMPROVE_CHANCES_FOR_AUTOAUTH_20071031.pdf
+    to: /home/okmis/www/forms/90/DMH:20160118105609_HOW_TO_IMPROVE_CHANCES_FOR_AUTOAUTH_20071031.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160118115220_Medicaid_EDI-ERA_Application_for_Providers.pdf" "/home/okmis/www/forms/90/Medicaid:20160118115220_Medicaid_EDI-ERA_Application_for_Providers.pdf"
+Path=/Provider/EDocs/90/20160118115220_Medicaid_EDI-ERA_Application_for_Providers.pdf, Tag=Medicaid
+directory=/Provider/EDocs/90/, filename=20160118115220_Medicaid_EDI-ERA_Application_for_Providers.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160118115220_Medicaid_EDI-ERA_Application_for_Providers.pdf
+    to: /home/okmis/www/forms/90/Medicaid:20160118115220_Medicaid_EDI-ERA_Application_for_Providers.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20191216143937_bluecard_manual.pdf" "/home/okmis/www/forms/90/BCBS:20191216143937_bluecard_manual.pdf"
+Path=/Provider/EDocs/90/20191216143937_bluecard_manual.pdf, Tag=BCBS
+directory=/Provider/EDocs/90/, filename=20191216143937_bluecard_manual.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20191216143937_bluecard_manual.pdf
+    to: /home/okmis/www/forms/90/BCBS:20191216143937_bluecard_manual.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160118182116_PECOS_Checklist_for_Individual_Practitioners_2011.pdf" "/home/okmis/www/forms/90/Medicare:20160118182116_PECOS_Checklist_for_Individual_Practitioners_2011.pdf"
+Path=/Provider/EDocs/90/20160118182116_PECOS_Checklist_for_Individual_Practitioners_2011.pdf, Tag=Medicare
+directory=/Provider/EDocs/90/, filename=20160118182116_PECOS_Checklist_for_Individual_Practitioners_2011.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160118182116_PECOS_Checklist_for_Individual_Practitioners_2011.pdf
+    to: /home/okmis/www/forms/90/Medicare:20160118182116_PECOS_Checklist_for_Individual_Practitioners_2011.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160118183826_Expanded_Risk_Rescue_Rating_Scale_20150126.pdf" "/home/okmis/www/forms/90/Charting:20160118183826_Expanded_Risk_Rescue_Rating_Scale_20150126.pdf"
+Path=/Provider/EDocs/90/20160118183826_Expanded_Risk_Rescue_Rating_Scale_20150126.pdf, Tag=Charting
+directory=/Provider/EDocs/90/, filename=20160118183826_Expanded_Risk_Rescue_Rating_Scale_20150126.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160118183826_Expanded_Risk_Rescue_Rating_Scale_20150126.pdf
+    to: /home/okmis/www/forms/90/Charting:20160118183826_Expanded_Risk_Rescue_Rating_Scale_20150126.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160118183859_Modified_Scale_for_Suicidal_Ideation_20150126.pdf" "/home/okmis/www/forms/90/Charting:20160118183859_Modified_Scale_for_Suicidal_Ideation_20150126.pdf"
+Path=/Provider/EDocs/90/20160118183859_Modified_Scale_for_Suicidal_Ideation_20150126.pdf, Tag=Charting
+directory=/Provider/EDocs/90/, filename=20160118183859_Modified_Scale_for_Suicidal_Ideation_20150126.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160118183859_Modified_Scale_for_Suicidal_Ideation_20150126.pdf
+    to: /home/okmis/www/forms/90/Charting:20160118183859_Modified_Scale_for_Suicidal_Ideation_20150126.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160118183941_SDQ_Packet_20110211.pdf" "/home/okmis/www/forms/90/Charting:20160118183941_SDQ_Packet_20110211.pdf"
+Path=/Provider/EDocs/90/20160118183941_SDQ_Packet_20110211.pdf, Tag=Charting
+directory=/Provider/EDocs/90/, filename=20160118183941_SDQ_Packet_20110211.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160118183941_SDQ_Packet_20110211.pdf
+    to: /home/okmis/www/forms/90/Charting:20160118183941_SDQ_Packet_20110211.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160118184014_Strengths_and_Difficulties_Questionnaire_20110211.pdf" "/home/okmis/www/forms/90/Charting:20160118184014_Strengths_and_Difficulties_Questionnaire_20110211.pdf"
+Path=/Provider/EDocs/90/20160118184014_Strengths_and_Difficulties_Questionnaire_20110211.pdf, Tag=Charting
+directory=/Provider/EDocs/90/, filename=20160118184014_Strengths_and_Difficulties_Questionnaire_20110211.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160118184014_Strengths_and_Difficulties_Questionnaire_20110211.pdf
+    to: /home/okmis/www/forms/90/Charting:20160118184014_Strengths_and_Difficulties_Questionnaire_20110211.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160118184102_Client_Orientation_CheckList_2013.pdf" "/home/okmis/www/forms/90/Charting:20160118184102_Client_Orientation_CheckList_2013.pdf"
+Path=/Provider/EDocs/90/20160118184102_Client_Orientation_CheckList_2013.pdf, Tag=Charting
+directory=/Provider/EDocs/90/, filename=20160118184102_Client_Orientation_CheckList_2013.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160118184102_Client_Orientation_CheckList_2013.pdf
+    to: /home/okmis/www/forms/90/Charting:20160118184102_Client_Orientation_CheckList_2013.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160118184136_Medicaid_Charting_Examples_20100701.htm" "/home/okmis/www/forms/90/Charting:20160118184136_Medicaid_Charting_Examples_20100701.htm"
+Path=/Provider/EDocs/90/20160118184136_Medicaid_Charting_Examples_20100701.htm, Tag=Charting
+directory=/Provider/EDocs/90/, filename=20160118184136_Medicaid_Charting_Examples_20100701.htm
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160118184136_Medicaid_Charting_Examples_20100701.htm
+    to: /home/okmis/www/forms/90/Charting:20160118184136_Medicaid_Charting_Examples_20100701.htm
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20181029085802_Medicaid__Charting_Guidelines_requirements_by_service_20181028.html" "/home/okmis/www/forms/90/Charting:20181029085802_Medicaid__Charting_Guidelines_requirements_by_service_20181028.html"
+Path=/Provider/EDocs/90/20181029085802_Medicaid__Charting_Guidelines_requirements_by_service_20181028.html, Tag=Charting
+directory=/Provider/EDocs/90/, filename=20181029085802_Medicaid__Charting_Guidelines_requirements_by_service_20181028.html
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20181029085802_Medicaid__Charting_Guidelines_requirements_by_service_20181028.html
+    to: /home/okmis/www/forms/90/Charting:20181029085802_Medicaid__Charting_Guidelines_requirements_by_service_20181028.html
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160118184247_Sample_Notes_examples_of_notes_by_service_20100701.htm" "/home/okmis/www/forms/90/Charting:20160118184247_Sample_Notes_examples_of_notes_by_service_20100701.htm"
+Path=/Provider/EDocs/90/20160118184247_Sample_Notes_examples_of_notes_by_service_20100701.htm, Tag=Charting
+directory=/Provider/EDocs/90/, filename=20160118184247_Sample_Notes_examples_of_notes_by_service_20100701.htm
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160118184247_Sample_Notes_examples_of_notes_by_service_20100701.htm
+    to: /home/okmis/www/forms/90/Charting:20160118184247_Sample_Notes_examples_of_notes_by_service_20100701.htm
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160118201104_case_management_healthhome_assesment.pdf" "/home/okmis/www/forms/90/HealthHome:20160118201104_case_management_healthhome_assesment.pdf"
+Path=/Provider/EDocs/90/20160118201104_case_management_healthhome_assesment.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=20160118201104_case_management_healthhome_assesment.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160118201104_case_management_healthhome_assesment.pdf
+    to: /home/okmis/www/forms/90/HealthHome:20160118201104_case_management_healthhome_assesment.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190728033212_Health Risk Appraisal.pdf" "/home/okmis/www/forms/90/HealthHome:20190728033212_Health Risk Appraisal.pdf"
+Path=/Provider/EDocs/90/20190728033212_Health Risk Appraisal.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=20190728033212_Health Risk Appraisal.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190728033212_Health Risk Appraisal.pdf
+    to: /home/okmis/www/forms/90/HealthHome:20190728033212_Health Risk Appraisal.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160119124201_GAIN SS 3.0.pdf" "/home/okmis/www/forms/90/Testing:20160119124201_GAIN SS 3.0.pdf"
+Path=/Provider/EDocs/90/20160119124201_GAIN SS 3.0.pdf, Tag=Testing
+directory=/Provider/EDocs/90/, filename=20160119124201_GAIN SS 3.0.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160119124201_GAIN SS 3.0.pdf
+    to: /home/okmis/www/forms/90/Testing:20160119124201_GAIN SS 3.0.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160119124325_GAIN SS Administration and Scoring Manual.pdf" "/home/okmis/www/forms/90/Testing:20160119124325_GAIN SS Administration and Scoring Manual.pdf"
+Path=/Provider/EDocs/90/20160119124325_GAIN SS Administration and Scoring Manual.pdf, Tag=Testing
+directory=/Provider/EDocs/90/, filename=20160119124325_GAIN SS Administration and Scoring Manual.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160119124325_GAIN SS Administration and Scoring Manual.pdf
+    to: /home/okmis/www/forms/90/Testing:20160119124325_GAIN SS Administration and Scoring Manual.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160119124459_Instructions_GAIN Short Screener Training.pdf" "/home/okmis/www/forms/90/Testing:20160119124459_Instructions_GAIN Short Screener Training.pdf"
+Path=/Provider/EDocs/90/20160119124459_Instructions_GAIN Short Screener Training.pdf, Tag=Testing
+directory=/Provider/EDocs/90/, filename=20160119124459_Instructions_GAIN Short Screener Training.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160119124459_Instructions_GAIN Short Screener Training.pdf
+    to: /home/okmis/www/forms/90/Testing:20160119124459_Instructions_GAIN Short Screener Training.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160119124606_Scoring the GAIN SS version 3.0.pdf" "/home/okmis/www/forms/90/Testing:20160119124606_Scoring the GAIN SS version 3.0.pdf"
+Path=/Provider/EDocs/90/20160119124606_Scoring the GAIN SS version 3.0.pdf, Tag=Testing
+directory=/Provider/EDocs/90/, filename=20160119124606_Scoring the GAIN SS version 3.0.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160119124606_Scoring the GAIN SS version 3.0.pdf
+    to: /home/okmis/www/forms/90/Testing:20160119124606_Scoring the GAIN SS version 3.0.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190221140427_pntrf_ok.pdf" "/home/okmis/www/forms/90/BCBS:20190221140427_pntrf_ok.pdf"
+Path=/Provider/EDocs/90/20190221140427_pntrf_ok.pdf, Tag=BCBS
+directory=/Provider/EDocs/90/, filename=20190221140427_pntrf_ok.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190221140427_pntrf_ok.pdf
+    to: /home/okmis/www/forms/90/BCBS:20190221140427_pntrf_ok.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20191214210716_Incident_Report_Form_2020.pdf" "/home/okmis/www/forms/90/Legal:20191214210716_Incident_Report_Form_2020.pdf"
+Path=/Provider/EDocs/90/20191214210716_Incident_Report_Form_2020.pdf, Tag=Legal
+directory=/Provider/EDocs/90/, filename=20191214210716_Incident_Report_Form_2020.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20191214210716_Incident_Report_Form_2020.pdf
+    to: /home/okmis/www/forms/90/Legal:20191214210716_Incident_Report_Form_2020.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160314105457_Wellness Coach Workbook 2-23-16.pdf" "/home/okmis/www/forms/90/HealthHome:20160314105457_Wellness Coach Workbook 2-23-16.pdf"
+Path=/Provider/EDocs/90/20160314105457_Wellness Coach Workbook 2-23-16.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=20160314105457_Wellness Coach Workbook 2-23-16.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160314105457_Wellness Coach Workbook 2-23-16.pdf
+    to: /home/okmis/www/forms/90/HealthHome:20160314105457_Wellness Coach Workbook 2-23-16.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160314105717_Wellness Coach Training 2-23-16.pdf" "/home/okmis/www/forms/90/HealthHome:20160314105717_Wellness Coach Training 2-23-16.pdf"
+Path=/Provider/EDocs/90/20160314105717_Wellness Coach Training 2-23-16.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=20160314105717_Wellness Coach Training 2-23-16.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160314105717_Wellness Coach Training 2-23-16.pdf
+    to: /home/okmis/www/forms/90/HealthHome:20160314105717_Wellness Coach Training 2-23-16.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160314105900_Wellness Coach Training PowerPoint.pdf" "/home/okmis/www/forms/90/HealthHome:20160314105900_Wellness Coach Training PowerPoint.pdf"
+Path=/Provider/EDocs/90/20160314105900_Wellness Coach Training PowerPoint.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=20160314105900_Wellness Coach Training PowerPoint.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160314105900_Wellness Coach Training PowerPoint.pdf
+    to: /home/okmis/www/forms/90/HealthHome:20160314105900_Wellness Coach Training PowerPoint.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160601215816_OHCA_Changes_effective_June1.pdf" "/home/okmis/www/forms/90/OHCA:20160601215816_OHCA_Changes_effective_June1.pdf"
+Path=/Provider/EDocs/90/20160601215816_OHCA_Changes_effective_June1.pdf, Tag=OHCA
+directory=/Provider/EDocs/90/, filename=20160601215816_OHCA_Changes_effective_June1.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160601215816_OHCA_Changes_effective_June1.pdf
+    to: /home/okmis/www/forms/90/OHCA:20160601215816_OHCA_Changes_effective_June1.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160630113810_haqmweb.pdf" "/home/okmis/www/forms/90/HealthHome:20160630113810_haqmweb.pdf"
+Path=/Provider/EDocs/90/20160630113810_haqmweb.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=20160630113810_haqmweb.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160630113810_haqmweb.pdf
+    to: /home/okmis/www/forms/90/HealthHome:20160630113810_haqmweb.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160630113854_haqfweb.pdf" "/home/okmis/www/forms/90/HealthHome:20160630113854_haqfweb.pdf"
+Path=/Provider/EDocs/90/20160630113854_haqfweb.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=20160630113854_haqfweb.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160630113854_haqfweb.pdf
+    to: /home/okmis/www/forms/90/HealthHome:20160630113854_haqfweb.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160630113939_fhhmlorna.pdf" "/home/okmis/www/forms/90/HealthHome:20160630113939_fhhmlorna.pdf"
+Path=/Provider/EDocs/90/20160630113939_fhhmlorna.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=20160630113939_fhhmlorna.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160630113939_fhhmlorna.pdf
+    to: /home/okmis/www/forms/90/HealthHome:20160630113939_fhhmlorna.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160630114017_fhhflorna.pdf" "/home/okmis/www/forms/90/HealthHome:20160630114017_fhhflorna.pdf"
+Path=/Provider/EDocs/90/20160630114017_fhhflorna.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=20160630114017_fhhflorna.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160630114017_fhhflorna.pdf
+    to: /home/okmis/www/forms/90/HealthHome:20160630114017_fhhflorna.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20160715130800_ProAct Users Guide.pdf" "/home/okmis/www/forms/90/HealthHome:20160715130800_ProAct Users Guide.pdf"
+Path=/Provider/EDocs/90/20160715130800_ProAct Users Guide.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=20160715130800_ProAct Users Guide.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20160715130800_ProAct Users Guide.pdf
+    to: /home/okmis/www/forms/90/HealthHome:20160715130800_ProAct Users Guide.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20170912134258_asthma-asthma-management.pdf" "/home/okmis/www/forms/90/Clinical_Pathways:20170912134258_asthma-asthma-management.pdf"
+Path=/Provider/EDocs/90/20170912134258_asthma-asthma-management.pdf, Tag=Clinical_Pathways
+directory=/Provider/EDocs/90/, filename=20170912134258_asthma-asthma-management.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20170912134258_asthma-asthma-management.pdf
+    to: /home/okmis/www/forms/90/Clinical_Pathways:20170912134258_asthma-asthma-management.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20170912134422_cardiovascular-disease.pdf" "/home/okmis/www/forms/90/Clinical_Pathways:20170912134422_cardiovascular-disease.pdf"
+Path=/Provider/EDocs/90/20170912134422_cardiovascular-disease.pdf, Tag=Clinical_Pathways
+directory=/Provider/EDocs/90/, filename=20170912134422_cardiovascular-disease.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20170912134422_cardiovascular-disease.pdf
+    to: /home/okmis/www/forms/90/Clinical_Pathways:20170912134422_cardiovascular-disease.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20170912134906_diabetes-in-children-and-young-people-diabetes-in-children-and-young-people-overview.pdf" "/home/okmis/www/forms/90/Clinical_Pathways:20170912134906_diabetes-in-children-and-young-people-diabetes-in-children-and-young-people-overview.pdf"
+Path=/Provider/EDocs/90/20170912134906_diabetes-in-children-and-young-people-diabetes-in-children-and-young-people-overview.pdf, Tag=Clinical_Pathways
+directory=/Provider/EDocs/90/, filename=20170912134906_diabetes-in-children-and-young-people-diabetes-in-children-and-young-people-overview.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20170912134906_diabetes-in-children-and-young-people-diabetes-in-children-and-young-people-overview.pdf
+    to: /home/okmis/www/forms/90/Clinical_Pathways:20170912134906_diabetes-in-children-and-young-people-diabetes-in-children-and-young-people-overview.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20170912134946_diabetes-in-children-and-young-people-diabetic-ketoacidosis-in-children-and-young-people.pdf" "/home/okmis/www/forms/90/Clinical_Pathways:20170912134946_diabetes-in-children-and-young-people-diabetic-ketoacidosis-in-children-and-young-people.pdf"
+Path=/Provider/EDocs/90/20170912134946_diabetes-in-children-and-young-people-diabetic-ketoacidosis-in-children-and-young-people.pdf, Tag=Clinical_Pathways
+directory=/Provider/EDocs/90/, filename=20170912134946_diabetes-in-children-and-young-people-diabetic-ketoacidosis-in-children-and-young-people.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20170912134946_diabetes-in-children-and-young-people-diabetic-ketoacidosis-in-children-and-young-people.pdf
+    to: /home/okmis/www/forms/90/Clinical_Pathways:20170912134946_diabetes-in-children-and-young-people-diabetic-ketoacidosis-in-children-and-young-people.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20170912135046_diabetes-in-children-and-young-people-type-2-diabetes-in-children-and-young-people.pdf" "/home/okmis/www/forms/90/Clinical_Pathways:20170912135046_diabetes-in-children-and-young-people-type-2-diabetes-in-children-and-young-people.pdf"
+Path=/Provider/EDocs/90/20170912135046_diabetes-in-children-and-young-people-type-2-diabetes-in-children-and-young-people.pdf, Tag=Clinical_Pathways
+directory=/Provider/EDocs/90/, filename=20170912135046_diabetes-in-children-and-young-people-type-2-diabetes-in-children-and-young-people.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20170912135046_diabetes-in-children-and-young-people-type-2-diabetes-in-children-and-young-people.pdf
+    to: /home/okmis/www/forms/90/Clinical_Pathways:20170912135046_diabetes-in-children-and-young-people-type-2-diabetes-in-children-and-young-people.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20170912135120_familial-hypercholesterolaemia-managing-familial-hypercholesterolaemia.pdf" "/home/okmis/www/forms/90/Clinical_Pathways:20170912135120_familial-hypercholesterolaemia-managing-familial-hypercholesterolaemia.pdf"
+Path=/Provider/EDocs/90/20170912135120_familial-hypercholesterolaemia-managing-familial-hypercholesterolaemia.pdf, Tag=Clinical_Pathways
+directory=/Provider/EDocs/90/, filename=20170912135120_familial-hypercholesterolaemia-managing-familial-hypercholesterolaemia.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20170912135120_familial-hypercholesterolaemia-managing-familial-hypercholesterolaemia.pdf
+    to: /home/okmis/www/forms/90/Clinical_Pathways:20170912135120_familial-hypercholesterolaemia-managing-familial-hypercholesterolaemia.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20170912135154_obesity-identifying-and-assessing-people-who-are-overweight-or-obese.pdf" "/home/okmis/www/forms/90/Clinical_Pathways:20170912135154_obesity-identifying-and-assessing-people-who-are-overweight-or-obese.pdf"
+Path=/Provider/EDocs/90/20170912135154_obesity-identifying-and-assessing-people-who-are-overweight-or-obese.pdf, Tag=Clinical_Pathways
+directory=/Provider/EDocs/90/, filename=20170912135154_obesity-identifying-and-assessing-people-who-are-overweight-or-obese.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20170912135154_obesity-identifying-and-assessing-people-who-are-overweight-or-obese.pdf
+    to: /home/okmis/www/forms/90/Clinical_Pathways:20170912135154_obesity-identifying-and-assessing-people-who-are-overweight-or-obese.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20170912135238_smoking-preventing-uptake-of-smoking-in-children-and-young-people.pdf" "/home/okmis/www/forms/90/Clinical_Pathways:20170912135238_smoking-preventing-uptake-of-smoking-in-children-and-young-people.pdf"
+Path=/Provider/EDocs/90/20170912135238_smoking-preventing-uptake-of-smoking-in-children-and-young-people.pdf, Tag=Clinical_Pathways
+directory=/Provider/EDocs/90/, filename=20170912135238_smoking-preventing-uptake-of-smoking-in-children-and-young-people.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20170912135238_smoking-preventing-uptake-of-smoking-in-children-and-young-people.pdf
+    to: /home/okmis/www/forms/90/Clinical_Pathways:20170912135238_smoking-preventing-uptake-of-smoking-in-children-and-young-people.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20170912135328_smoking-smoking-overview.pdf" "/home/okmis/www/forms/90/Clinical_Pathways:20170912135328_smoking-smoking-overview.pdf"
+Path=/Provider/EDocs/90/20170912135328_smoking-smoking-overview.pdf, Tag=Clinical_Pathways
+directory=/Provider/EDocs/90/, filename=20170912135328_smoking-smoking-overview.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20170912135328_smoking-smoking-overview.pdf
+    to: /home/okmis/www/forms/90/Clinical_Pathways:20170912135328_smoking-smoking-overview.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20170912135402_smoking-stopping-smoking-in-everyone.pdf" "/home/okmis/www/forms/90/Clinical_Pathways:20170912135402_smoking-stopping-smoking-in-everyone.pdf"
+Path=/Provider/EDocs/90/20170912135402_smoking-stopping-smoking-in-everyone.pdf, Tag=Clinical_Pathways
+directory=/Provider/EDocs/90/, filename=20170912135402_smoking-stopping-smoking-in-everyone.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20170912135402_smoking-stopping-smoking-in-everyone.pdf
+    to: /home/okmis/www/forms/90/Clinical_Pathways:20170912135402_smoking-stopping-smoking-in-everyone.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20171030111701_C-SSRSRiskAssessment.pdf" "/home/okmis/www/forms/90/Testing:20171030111701_C-SSRSRiskAssessment.pdf"
+Path=/Provider/EDocs/90/20171030111701_C-SSRSRiskAssessment.pdf, Tag=Testing
+directory=/Provider/EDocs/90/, filename=20171030111701_C-SSRSRiskAssessment.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20171030111701_C-SSRSRiskAssessment.pdf
+    to: /home/okmis/www/forms/90/Testing:20171030111701_C-SSRSRiskAssessment.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20171030111801_ScreenerFollowUp.pdf" "/home/okmis/www/forms/90/Testing:20171030111801_ScreenerFollowUp.pdf"
+Path=/Provider/EDocs/90/20171030111801_ScreenerFollowUp.pdf, Tag=Testing
+directory=/Provider/EDocs/90/, filename=20171030111801_ScreenerFollowUp.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20171030111801_ScreenerFollowUp.pdf
+    to: /home/okmis/www/forms/90/Testing:20171030111801_ScreenerFollowUp.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20180620210316_smoking-pathway.pdf" "/home/okmis/www/forms/90/Clinical_Pathways:20180620210316_smoking-pathway.pdf"
+Path=/Provider/EDocs/90/20180620210316_smoking-pathway.pdf, Tag=Clinical_Pathways
+directory=/Provider/EDocs/90/, filename=20180620210316_smoking-pathway.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20180620210316_smoking-pathway.pdf
+    to: /home/okmis/www/forms/90/Clinical_Pathways:20180620210316_smoking-pathway.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20180709211712_Care_transition_interventions_in_mental_health Training.pdf" "/home/okmis/www/forms/90/Clinical_Pathways:20180709211712_Care_transition_interventions_in_mental_health Training.pdf"
+Path=/Provider/EDocs/90/20180709211712_Care_transition_interventions_in_mental_health Training.pdf, Tag=Clinical_Pathways
+directory=/Provider/EDocs/90/, filename=20180709211712_Care_transition_interventions_in_mental_health Training.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20180709211712_Care_transition_interventions_in_mental_health Training.pdf
+    to: /home/okmis/www/forms/90/Clinical_Pathways:20180709211712_Care_transition_interventions_in_mental_health Training.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20180709212117_depression-care-for-adults-with-depression.pdf" "/home/okmis/www/forms/90/Clinical_Pathways:20180709212117_depression-care-for-adults-with-depression.pdf"
+Path=/Provider/EDocs/90/20180709212117_depression-care-for-adults-with-depression.pdf, Tag=Clinical_Pathways
+directory=/Provider/EDocs/90/, filename=20180709212117_depression-care-for-adults-with-depression.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20180709212117_depression-care-for-adults-with-depression.pdf
+    to: /home/okmis/www/forms/90/Clinical_Pathways:20180709212117_depression-care-for-adults-with-depression.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20180709212251_depression-depression-in-children-and-young-people-recognition-detection-risk-profiling-and-referral.pdf" "/home/okmis/www/forms/90/Clinical_Pathways:20180709212251_depression-depression-in-children-and-young-people-recognition-detection-risk-profiling-and-referral.pdf"
+Path=/Provider/EDocs/90/20180709212251_depression-depression-in-children-and-young-people-recognition-detection-risk-profiling-and-referral.pdf, Tag=Clinical_Pathways
+directory=/Provider/EDocs/90/, filename=20180709212251_depression-depression-in-children-and-young-people-recognition-detection-risk-profiling-and-referral.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20180709212251_depression-depression-in-children-and-young-people-recognition-detection-risk-profiling-and-referral.pdf
+    to: /home/okmis/www/forms/90/Clinical_Pathways:20180709212251_depression-depression-in-children-and-young-people-recognition-detection-risk-profiling-and-referral.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20180709212445_depression-management-of-moderate-to-severe-including-psychotic-depression-in-children-and-young-people-tiers-24.pdf" "/home/okmis/www/forms/90/Clinical_Pathways:20180709212445_depression-management-of-moderate-to-severe-including-psychotic-depression-in-children-and-young-people-tiers-24.pdf"
+Path=/Provider/EDocs/90/20180709212445_depression-management-of-moderate-to-severe-including-psychotic-depression-in-children-and-young-people-tiers-24.pdf, Tag=Clinical_Pathways
+directory=/Provider/EDocs/90/, filename=20180709212445_depression-management-of-moderate-to-severe-including-psychotic-depression-in-children-and-young-people-tiers-24.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20180709212445_depression-management-of-moderate-to-severe-including-psychotic-depression-in-children-and-young-people-tiers-24.pdf
+    to: /home/okmis/www/forms/90/Clinical_Pathways:20180709212445_depression-management-of-moderate-to-severe-including-psychotic-depression-in-children-and-young-people-tiers-24.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20180709212721_HSCCarePathways.pdf" "/home/okmis/www/forms/90/Clinical_Pathways:20180709212721_HSCCarePathways.pdf"
+Path=/Provider/EDocs/90/20180709212721_HSCCarePathways.pdf, Tag=Clinical_Pathways
+directory=/Provider/EDocs/90/, filename=20180709212721_HSCCarePathways.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20180709212721_HSCCarePathways.pdf
+    to: /home/okmis/www/forms/90/Clinical_Pathways:20180709212721_HSCCarePathways.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20180709212848_Managing_Depression_Clinical_PathwaySAMSHA.pdf" "/home/okmis/www/forms/90/Clinical_Pathways:20180709212848_Managing_Depression_Clinical_PathwaySAMSHA.pdf"
+Path=/Provider/EDocs/90/20180709212848_Managing_Depression_Clinical_PathwaySAMSHA.pdf, Tag=Clinical_Pathways
+directory=/Provider/EDocs/90/, filename=20180709212848_Managing_Depression_Clinical_PathwaySAMSHA.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20180709212848_Managing_Depression_Clinical_PathwaySAMSHA.pdf
+    to: /home/okmis/www/forms/90/Clinical_Pathways:20180709212848_Managing_Depression_Clinical_PathwaySAMSHA.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20180709213018_PracticeEDToolkitandPathwayforHHHuddles.pdf" "/home/okmis/www/forms/90/Clinical_Pathways:20180709213018_PracticeEDToolkitandPathwayforHHHuddles.pdf"
+Path=/Provider/EDocs/90/20180709213018_PracticeEDToolkitandPathwayforHHHuddles.pdf, Tag=Clinical_Pathways
+directory=/Provider/EDocs/90/, filename=20180709213018_PracticeEDToolkitandPathwayforHHHuddles.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20180709213018_PracticeEDToolkitandPathwayforHHHuddles.pdf
+    to: /home/okmis/www/forms/90/Clinical_Pathways:20180709213018_PracticeEDToolkitandPathwayforHHHuddles.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20181116105520_Section 2 Education Clinicians and  Office Staff.pdf" "/home/okmis/www/forms/90/CARF:20181116105520_Section 2 Education Clinicians and  Office Staff.pdf"
+Path=/Provider/EDocs/90/20181116105520_Section 2 Education Clinicians and  Office Staff.pdf, Tag=CARF
+directory=/Provider/EDocs/90/, filename=20181116105520_Section 2 Education Clinicians and  Office Staff.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20181116105520_Section 2 Education Clinicians and  Office Staff.pdf
+    to: /home/okmis/www/forms/90/CARF:20181116105520_Section 2 Education Clinicians and  Office Staff.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20181116105802_Section 4 Patient Management  Tools.pdf" "/home/okmis/www/forms/90/CARF:20181116105802_Section 4 Patient Management  Tools.pdf"
+Path=/Provider/EDocs/90/20181116105802_Section 4 Patient Management  Tools.pdf, Tag=CARF
+directory=/Provider/EDocs/90/, filename=20181116105802_Section 4 Patient Management  Tools.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20181116105802_Section 4 Patient Management  Tools.pdf
+    to: /home/okmis/www/forms/90/CARF:20181116105802_Section 4 Patient Management  Tools.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20181116105916_SafetyPlanningGuide Quick Guide for  Clinicians.pdf" "/home/okmis/www/forms/90/CARF:20181116105916_SafetyPlanningGuide Quick Guide for  Clinicians.pdf"
+Path=/Provider/EDocs/90/20181116105916_SafetyPlanningGuide Quick Guide for  Clinicians.pdf, Tag=CARF
+directory=/Provider/EDocs/90/, filename=20181116105916_SafetyPlanningGuide Quick Guide for  Clinicians.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20181116105916_SafetyPlanningGuide Quick Guide for  Clinicians.pdf
+    to: /home/okmis/www/forms/90/CARF:20181116105916_SafetyPlanningGuide Quick Guide for  Clinicians.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20181116110130_Brown_StanleySafetyPlanTemplate-1.pdf" "/home/okmis/www/forms/90/CARF:20181116110130_Brown_StanleySafetyPlanTemplate-1.pdf"
+Path=/Provider/EDocs/90/20181116110130_Brown_StanleySafetyPlanTemplate-1.pdf, Tag=CARF
+directory=/Provider/EDocs/90/, filename=20181116110130_Brown_StanleySafetyPlanTemplate-1.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20181116110130_Brown_StanleySafetyPlanTemplate-1.pdf
+    to: /home/okmis/www/forms/90/CARF:20181116110130_Brown_StanleySafetyPlanTemplate-1.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20181116110418_sma09-4432.pdf" "/home/okmis/www/forms/90/CARF:20181116110418_sma09-4432.pdf"
+Path=/Provider/EDocs/90/20181116110418_sma09-4432.pdf, Tag=CARF
+directory=/Provider/EDocs/90/, filename=20181116110418_sma09-4432.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20181116110418_sma09-4432.pdf
+    to: /home/okmis/www/forms/90/CARF:20181116110418_sma09-4432.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190108195553_MedicaidTestingCodesLimits.pdf" "/home/okmis/www/forms/90/Medicaid:20190108195553_MedicaidTestingCodesLimits.pdf"
+Path=/Provider/EDocs/90/20190108195553_MedicaidTestingCodesLimits.pdf, Tag=Medicaid
+directory=/Provider/EDocs/90/, filename=20190108195553_MedicaidTestingCodesLimits.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190108195553_MedicaidTestingCodesLimits.pdf
+    to: /home/okmis/www/forms/90/Medicaid:20190108195553_MedicaidTestingCodesLimits.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190108195724_GillaspyOPApresentation2018.pdf" "/home/okmis/www/forms/90/Testing:20190108195724_GillaspyOPApresentation2018.pdf"
+Path=/Provider/EDocs/90/20190108195724_GillaspyOPApresentation2018.pdf, Tag=Testing
+directory=/Provider/EDocs/90/, filename=20190108195724_GillaspyOPApresentation2018.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190108195724_GillaspyOPApresentation2018.pdf
+    to: /home/okmis/www/forms/90/Testing:20190108195724_GillaspyOPApresentation2018.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190210190746_HH_F2F_Codes_for_CC-FSP-Wellness_for_bundle_to_bill.pdf" "/home/okmis/www/forms/90/HealthHome:20190210190746_HH_F2F_Codes_for_CC-FSP-Wellness_for_bundle_to_bill.pdf"
+Path=/Provider/EDocs/90/20190210190746_HH_F2F_Codes_for_CC-FSP-Wellness_for_bundle_to_bill.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=20190210190746_HH_F2F_Codes_for_CC-FSP-Wellness_for_bundle_to_bill.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190210190746_HH_F2F_Codes_for_CC-FSP-Wellness_for_bundle_to_bill.pdf
+    to: /home/okmis/www/forms/90/HealthHome:20190210190746_HH_F2F_Codes_for_CC-FSP-Wellness_for_bundle_to_bill.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190212095802_OK-AAP-Obesity-Tool-Kit.pdf" "/home/okmis/www/forms/90/HealthHome:20190212095802_OK-AAP-Obesity-Tool-Kit.pdf"
+Path=/Provider/EDocs/90/20190212095802_OK-AAP-Obesity-Tool-Kit.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=20190212095802_OK-AAP-Obesity-Tool-Kit.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190212095802_OK-AAP-Obesity-Tool-Kit.pdf
+    to: /home/okmis/www/forms/90/HealthHome:20190212095802_OK-AAP-Obesity-Tool-Kit.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190215111427_FindingYourACEScore.pdf" "/home/okmis/www/forms/90/Testing:20190215111427_FindingYourACEScore.pdf"
+Path=/Provider/EDocs/90/20190215111427_FindingYourACEScore.pdf, Tag=Testing
+directory=/Provider/EDocs/90/, filename=20190215111427_FindingYourACEScore.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190215111427_FindingYourACEScore.pdf
+    to: /home/okmis/www/forms/90/Testing:20190215111427_FindingYourACEScore.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190215111659_MFQParentReportChildShort.pdf" "/home/okmis/www/forms/90/Testing:20190215111659_MFQParentReportChildShort.pdf"
+Path=/Provider/EDocs/90/20190215111659_MFQParentReportChildShort.pdf, Tag=Testing
+directory=/Provider/EDocs/90/, filename=20190215111659_MFQParentReportChildShort.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190215111659_MFQParentReportChildShort.pdf
+    to: /home/okmis/www/forms/90/Testing:20190215111659_MFQParentReportChildShort.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190215111737_MFQChildSelfReportShort.pdf" "/home/okmis/www/forms/90/Testing:20190215111737_MFQChildSelfReportShort.pdf"
+Path=/Provider/EDocs/90/20190215111737_MFQChildSelfReportShort.pdf, Tag=Testing
+directory=/Provider/EDocs/90/, filename=20190215111737_MFQChildSelfReportShort.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190215111737_MFQChildSelfReportShort.pdf
+    to: /home/okmis/www/forms/90/Testing:20190215111737_MFQChildSelfReportShort.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190215111947_AngoldMFQarticle.pdf" "/home/okmis/www/forms/90/Testing:20190215111947_AngoldMFQarticle.pdf"
+Path=/Provider/EDocs/90/20190215111947_AngoldMFQarticle.pdf, Tag=Testing
+directory=/Provider/EDocs/90/, filename=20190215111947_AngoldMFQarticle.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190215111947_AngoldMFQarticle.pdf
+    to: /home/okmis/www/forms/90/Testing:20190215111947_AngoldMFQarticle.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190218170138_EpilepsySociety.PDF" "/home/okmis/www/forms/90/Clinical_Pathways:20190218170138_EpilepsySociety.PDF"
+Path=/Provider/EDocs/90/20190218170138_EpilepsySociety.PDF, Tag=Clinical_Pathways
+directory=/Provider/EDocs/90/, filename=20190218170138_EpilepsySociety.PDF
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190218170138_EpilepsySociety.PDF
+    to: /home/okmis/www/forms/90/Clinical_Pathways:20190218170138_EpilepsySociety.PDF
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190222131900_ACE-Resiliency.pdf" "/home/okmis/www/forms/90/Testing:20190222131900_ACE-Resiliency.pdf"
+Path=/Provider/EDocs/90/20190222131900_ACE-Resiliency.pdf, Tag=Testing
+directory=/Provider/EDocs/90/, filename=20190222131900_ACE-Resiliency.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190222131900_ACE-Resiliency.pdf
+    to: /home/okmis/www/forms/90/Testing:20190222131900_ACE-Resiliency.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190314181917_2016-07 Virtual Visit Codes.pdf" "/home/okmis/www/forms/90/OHCA:20190314181917_2016-07 Virtual Visit Codes.pdf"
+Path=/Provider/EDocs/90/20190314181917_2016-07 Virtual Visit Codes.pdf, Tag=OHCA
+directory=/Provider/EDocs/90/, filename=20190314181917_2016-07 Virtual Visit Codes.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190314181917_2016-07 Virtual Visit Codes.pdf
+    to: /home/okmis/www/forms/90/OHCA:20190314181917_2016-07 Virtual Visit Codes.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20200222081613_PHQ-9_Teen.pdf" "/home/okmis/www/forms/90/Testing:20200222081613_PHQ-9_Teen.pdf"
+Path=/Provider/EDocs/90/20200222081613_PHQ-9_Teen.pdf, Tag=Testing
+directory=/Provider/EDocs/90/, filename=20200222081613_PHQ-9_Teen.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20200222081613_PHQ-9_Teen.pdf
+    to: /home/okmis/www/forms/90/Testing:20200222081613_PHQ-9_Teen.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190818131943_Health Home Manual FY20.pdf" "/home/okmis/www/forms/90/HealthHome:20190818131943_Health Home Manual FY20.pdf"
+Path=/Provider/EDocs/90/20190818131943_Health Home Manual FY20.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=20190818131943_Health Home Manual FY20.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190818131943_Health Home Manual FY20.pdf
+    to: /home/okmis/www/forms/90/HealthHome:20190818131943_Health Home Manual FY20.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190314183959_FY2015 Behavioral Health Case Management Guide.pdf" "/home/okmis/www/forms/90/Medicaid:20190314183959_FY2015 Behavioral Health Case Management Guide.pdf"
+Path=/Provider/EDocs/90/20190314183959_FY2015 Behavioral Health Case Management Guide.pdf, Tag=Medicaid
+directory=/Provider/EDocs/90/, filename=20190314183959_FY2015 Behavioral Health Case Management Guide.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190314183959_FY2015 Behavioral Health Case Management Guide.pdf
+    to: /home/okmis/www/forms/90/Medicaid:20190314183959_FY2015 Behavioral Health Case Management Guide.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190314184423_FY2019_ODMHSAS_Services_Manual.pdf" "/home/okmis/www/forms/90/DMH:20190314184423_FY2019_ODMHSAS_Services_Manual.pdf"
+Path=/Provider/EDocs/90/20190314184423_FY2019_ODMHSAS_Services_Manual.pdf, Tag=DMH
+directory=/Provider/EDocs/90/, filename=20190314184423_FY2019_ODMHSAS_Services_Manual.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190314184423_FY2019_ODMHSAS_Services_Manual.pdf
+    to: /home/okmis/www/forms/90/DMH:20190314184423_FY2019_ODMHSAS_Services_Manual.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190314184819_HHChange20180202.pdf" "/home/okmis/www/forms/90/HealthHome:20190314184819_HHChange20180202.pdf"
+Path=/Provider/EDocs/90/20190314184819_HHChange20180202.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=20190314184819_HHChange20180202.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190314184819_HHChange20180202.pdf
+    to: /home/okmis/www/forms/90/HealthHome:20190314184819_HHChange20180202.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190315184806_CAMS Suicide Status Form - SSF-II.pdf" "/home/okmis/www/forms/90/Testing:20190315184806_CAMS Suicide Status Form - SSF-II.pdf"
+Path=/Provider/EDocs/90/20190315184806_CAMS Suicide Status Form - SSF-II.pdf, Tag=Testing
+directory=/Provider/EDocs/90/, filename=20190315184806_CAMS Suicide Status Form - SSF-II.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190315184806_CAMS Suicide Status Form - SSF-II.pdf
+    to: /home/okmis/www/forms/90/Testing:20190315184806_CAMS Suicide Status Form - SSF-II.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190314190818_HH Care Pathway Smoking Cessation.pdf" "/home/okmis/www/forms/90/Clinical_Pathways:20190314190818_HH Care Pathway Smoking Cessation.pdf"
+Path=/Provider/EDocs/90/20190314190818_HH Care Pathway Smoking Cessation.pdf, Tag=Clinical_Pathways
+directory=/Provider/EDocs/90/, filename=20190314190818_HH Care Pathway Smoking Cessation.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190314190818_HH Care Pathway Smoking Cessation.pdf
+    to: /home/okmis/www/forms/90/Clinical_Pathways:20190314190818_HH Care Pathway Smoking Cessation.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190314191552_HH Care Pathway Care Transitions.pdf" "/home/okmis/www/forms/90/Clinical_Pathways:20190314191552_HH Care Pathway Care Transitions.pdf"
+Path=/Provider/EDocs/90/20190314191552_HH Care Pathway Care Transitions.pdf, Tag=Clinical_Pathways
+directory=/Provider/EDocs/90/, filename=20190314191552_HH Care Pathway Care Transitions.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190314191552_HH Care Pathway Care Transitions.pdf
+    to: /home/okmis/www/forms/90/Clinical_Pathways:20190314191552_HH Care Pathway Care Transitions.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190315004052_NEW_ATA Evidence Based Practice Telemental Health.pdf" "/home/okmis/www/forms/90/Library:20190315004052_NEW_ATA Evidence Based Practice Telemental Health.pdf"
+Path=/Provider/EDocs/90/20190315004052_NEW_ATA Evidence Based Practice Telemental Health.pdf, Tag=Library
+directory=/Provider/EDocs/90/, filename=20190315004052_NEW_ATA Evidence Based Practice Telemental Health.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190315004052_NEW_ATA Evidence Based Practice Telemental Health.pdf
+    to: /home/okmis/www/forms/90/Library:20190315004052_NEW_ATA Evidence Based Practice Telemental Health.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190315004631_intro_telemental_health_may2011.pdf" "/home/okmis/www/forms/90/Library:20190315004631_intro_telemental_health_may2011.pdf"
+Path=/Provider/EDocs/90/20190315004631_intro_telemental_health_may2011.pdf, Tag=Library
+directory=/Provider/EDocs/90/, filename=20190315004631_intro_telemental_health_may2011.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190315004631_intro_telemental_health_may2011.pdf
+    to: /home/okmis/www/forms/90/Library:20190315004631_intro_telemental_health_may2011.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190315005253_PracticeGuidelinesforVideoconferencing-Based TelementalHealth.pdf" "/home/okmis/www/forms/90/Library:20190315005253_PracticeGuidelinesforVideoconferencing-Based TelementalHealth.pdf"
+Path=/Provider/EDocs/90/20190315005253_PracticeGuidelinesforVideoconferencing-Based TelementalHealth.pdf, Tag=Library
+directory=/Provider/EDocs/90/, filename=20190315005253_PracticeGuidelinesforVideoconferencing-Based TelementalHealth.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190315005253_PracticeGuidelinesforVideoconferencing-Based TelementalHealth.pdf
+    to: /home/okmis/www/forms/90/Library:20190315005253_PracticeGuidelinesforVideoconferencing-Based TelementalHealth.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190315005858_CAMS Suicide Outcome Tracking Form.pdf" "/home/okmis/www/forms/90/Testing:20190315005858_CAMS Suicide Outcome Tracking Form.pdf"
+Path=/Provider/EDocs/90/20190315005858_CAMS Suicide Outcome Tracking Form.pdf, Tag=Testing
+directory=/Provider/EDocs/90/, filename=20190315005858_CAMS Suicide Outcome Tracking Form.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190315005858_CAMS Suicide Outcome Tracking Form.pdf
+    to: /home/okmis/www/forms/90/Testing:20190315005858_CAMS Suicide Outcome Tracking Form.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190418163634_Form CANS-MH.pdf" "/home/okmis/www/forms/90/Testing:20190418163634_Form CANS-MH.pdf"
+Path=/Provider/EDocs/90/20190418163634_Form CANS-MH.pdf, Tag=Testing
+directory=/Provider/EDocs/90/, filename=20190418163634_Form CANS-MH.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190418163634_Form CANS-MH.pdf
+    to: /home/okmis/www/forms/90/Testing:20190418163634_Form CANS-MH.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190418163752_cans-mhmanual.pdf" "/home/okmis/www/forms/90/Testing:20190418163752_cans-mhmanual.pdf"
+Path=/Provider/EDocs/90/20190418163752_cans-mhmanual.pdf, Tag=Testing
+directory=/Provider/EDocs/90/, filename=20190418163752_cans-mhmanual.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190418163752_cans-mhmanual.pdf
+    to: /home/okmis/www/forms/90/Testing:20190418163752_cans-mhmanual.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190523144547_Continued HH MHP Statement 2019.pdf" "/home/okmis/www/forms/90/HealthHome:20190523144547_Continued HH MHP Statement 2019.pdf"
+Path=/Provider/EDocs/90/20190523144547_Continued HH MHP Statement 2019.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=20190523144547_Continued HH MHP Statement 2019.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190523144547_Continued HH MHP Statement 2019.pdf
+    to: /home/okmis/www/forms/90/HealthHome:20190523144547_Continued HH MHP Statement 2019.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190918153141_REFERENCEGUIDE_Yearly-Guidelines-and-Thresholds_2019.pdf" "/home/okmis/www/forms/90/Medicaid:20190918153141_REFERENCEGUIDE_Yearly-Guidelines-and-Thresholds_2019.pdf"
+Path=/Provider/EDocs/90/20190918153141_REFERENCEGUIDE_Yearly-Guidelines-and-Thresholds_2019.pdf, Tag=Medicaid
+directory=/Provider/EDocs/90/, filename=20190918153141_REFERENCEGUIDE_Yearly-Guidelines-and-Thresholds_2019.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190918153141_REFERENCEGUIDE_Yearly-Guidelines-and-Thresholds_2019.pdf
+    to: /home/okmis/www/forms/90/Medicaid:20190918153141_REFERENCEGUIDE_Yearly-Guidelines-and-Thresholds_2019.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190727215229_HH SNCD Template.pdf" "/home/okmis/www/forms/90/HealthHome:20190727215229_HH SNCD Template.pdf"
+Path=/Provider/EDocs/90/20190727215229_HH SNCD Template.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=20190727215229_HH SNCD Template.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190727215229_HH SNCD Template.pdf
+    to: /home/okmis/www/forms/90/HealthHome:20190727215229_HH SNCD Template.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190727212209_HH Functional Assessment, Crisis Plan Combined Template with Safety Plan Components.pdf" "/home/okmis/www/forms/90/HealthHome:20190727212209_HH Functional Assessment, Crisis Plan Combined Template with Safety Plan Components.pdf"
+Path=/Provider/EDocs/90/20190727212209_HH Functional Assessment, Crisis Plan Combined Template with Safety Plan Components.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=20190727212209_HH Functional Assessment, Crisis Plan Combined Template with Safety Plan Components.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190727212209_HH Functional Assessment, Crisis Plan Combined Template with Safety Plan Components.pdf
+    to: /home/okmis/www/forms/90/HealthHome:20190727212209_HH Functional Assessment, Crisis Plan Combined Template with Safety Plan Components.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190727223931_Health Home Team Meetings-Staffings.pdf" "/home/okmis/www/forms/90/HealthHome:20190727223931_Health Home Team Meetings-Staffings.pdf"
+Path=/Provider/EDocs/90/20190727223931_Health Home Team Meetings-Staffings.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=20190727223931_Health Home Team Meetings-Staffings.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190727223931_Health Home Team Meetings-Staffings.pdf
+    to: /home/okmis/www/forms/90/HealthHome:20190727223931_Health Home Team Meetings-Staffings.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190727234033_Initial Child and Family Team Agenda and Addendum.pdf" "/home/okmis/www/forms/90/HealthHome:20190727234033_Initial Child and Family Team Agenda and Addendum.pdf"
+Path=/Provider/EDocs/90/20190727234033_Initial Child and Family Team Agenda and Addendum.pdf, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=20190727234033_Initial Child and Family Team Agenda and Addendum.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190727234033_Initial Child and Family Team Agenda and Addendum.pdf
+    to: /home/okmis/www/forms/90/HealthHome:20190727234033_Initial Child and Family Team Agenda and Addendum.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190731194449_OKSOC Service Event Form.docx" "/home/okmis/www/forms/90/HealthHome:20190731194449_OKSOC Service Event Form.docx"
+Path=/Provider/EDocs/90/20190731194449_OKSOC Service Event Form.docx, Tag=HealthHome
+directory=/Provider/EDocs/90/, filename=20190731194449_OKSOC Service Event Form.docx
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190731194449_OKSOC Service Event Form.docx
+    to: /home/okmis/www/forms/90/HealthHome:20190731194449_OKSOC Service Event Form.docx
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190811153226_CMS10114.pdf" "/home/okmis/www/forms/90/Federal:20190811153226_CMS10114.pdf"
+Path=/Provider/EDocs/90/20190811153226_CMS10114.pdf, Tag=Federal
+directory=/Provider/EDocs/90/, filename=20190811153226_CMS10114.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190811153226_CMS10114.pdf
+    to: /home/okmis/www/forms/90/Federal:20190811153226_CMS10114.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190814145921_billing-coding.pdf" "/home/okmis/www/forms/90/Testing:20190814145921_billing-coding.pdf"
+Path=/Provider/EDocs/90/20190814145921_billing-coding.pdf, Tag=Testing
+directory=/Provider/EDocs/90/, filename=20190814145921_billing-coding.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190814145921_billing-coding.pdf
+    to: /home/okmis/www/forms/90/Testing:20190814145921_billing-coding.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190814150316_billing-coding-addendum.pdf" "/home/okmis/www/forms/90/Testing:20190814150316_billing-coding-addendum.pdf"
+Path=/Provider/EDocs/90/20190814150316_billing-coding-addendum.pdf, Tag=Testing
+directory=/Provider/EDocs/90/, filename=20190814150316_billing-coding-addendum.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190814150316_billing-coding-addendum.pdf
+    to: /home/okmis/www/forms/90/Testing:20190814150316_billing-coding-addendum.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190820185814_Psychiatry Evaluation-Management-Codes-Vignettes.pdf" "/home/okmis/www/forms/90/Charting:20190820185814_Psychiatry Evaluation-Management-Codes-Vignettes.pdf"
+Path=/Provider/EDocs/90/20190820185814_Psychiatry Evaluation-Management-Codes-Vignettes.pdf, Tag=Charting
+directory=/Provider/EDocs/90/, filename=20190820185814_Psychiatry Evaluation-Management-Codes-Vignettes.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190820185814_Psychiatry Evaluation-Management-Codes-Vignettes.pdf
+    to: /home/okmis/www/forms/90/Charting:20190820185814_Psychiatry Evaluation-Management-Codes-Vignettes.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190826150841_UniformCredentialingApp.pdf" "/home/okmis/www/forms/90/Library:20190826150841_UniformCredentialingApp.pdf"
+Path=/Provider/EDocs/90/20190826150841_UniformCredentialingApp.pdf, Tag=Library
+directory=/Provider/EDocs/90/, filename=20190826150841_UniformCredentialingApp.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190826150841_UniformCredentialingApp.pdf
+    to: /home/okmis/www/forms/90/Library:20190826150841_UniformCredentialingApp.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190826151256_UniformCredentialingApp.dotx" "/home/okmis/www/forms/90/Library:20190826151256_UniformCredentialingApp.dotx"
+Path=/Provider/EDocs/90/20190826151256_UniformCredentialingApp.dotx, Tag=Library
+directory=/Provider/EDocs/90/, filename=20190826151256_UniformCredentialingApp.dotx
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190826151256_UniformCredentialingApp.dotx
+    to: /home/okmis/www/forms/90/Library:20190826151256_UniformCredentialingApp.dotx
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190826152555_OUCASupplement.pdf" "/home/okmis/www/forms/90/Library:20190826152555_OUCASupplement.pdf"
+Path=/Provider/EDocs/90/20190826152555_OUCASupplement.pdf, Tag=Library
+directory=/Provider/EDocs/90/, filename=20190826152555_OUCASupplement.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190826152555_OUCASupplement.pdf
+    to: /home/okmis/www/forms/90/Library:20190826152555_OUCASupplement.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190826160717_HCAS-ProView-FAQ.pdf" "/home/okmis/www/forms/90/Library:20190826160717_HCAS-ProView-FAQ.pdf"
+Path=/Provider/EDocs/90/20190826160717_HCAS-ProView-FAQ.pdf, Tag=Library
+directory=/Provider/EDocs/90/, filename=20190826160717_HCAS-ProView-FAQ.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190826160717_HCAS-ProView-FAQ.pdf
+    to: /home/okmis/www/forms/90/Library:20190826160717_HCAS-ProView-FAQ.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190826160826_CAQH ProView Provider User Guide.v19.pdf" "/home/okmis/www/forms/90/Library:20190826160826_CAQH ProView Provider User Guide.v19.pdf"
+Path=/Provider/EDocs/90/20190826160826_CAQH ProView Provider User Guide.v19.pdf, Tag=Library
+directory=/Provider/EDocs/90/, filename=20190826160826_CAQH ProView Provider User Guide.v19.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190826160826_CAQH ProView Provider User Guide.v19.pdf
+    to: /home/okmis/www/forms/90/Library:20190826160826_CAQH ProView Provider User Guide.v19.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190826160926_CAQH ProView Practice Manager User Guide v1.2.pdf" "/home/okmis/www/forms/90/Library:20190826160926_CAQH ProView Practice Manager User Guide v1.2.pdf"
+Path=/Provider/EDocs/90/20190826160926_CAQH ProView Practice Manager User Guide v1.2.pdf, Tag=Library
+directory=/Provider/EDocs/90/, filename=20190826160926_CAQH ProView Practice Manager User Guide v1.2.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190826160926_CAQH ProView Practice Manager User Guide v1.2.pdf
+    to: /home/okmis/www/forms/90/Library:20190826160926_CAQH ProView Practice Manager User Guide v1.2.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190826161020_CAQH ProView Bulk Upload Submission Instructions v1.5.pdf" "/home/okmis/www/forms/90/Library:20190826161020_CAQH ProView Bulk Upload Submission Instructions v1.5.pdf"
+Path=/Provider/EDocs/90/20190826161020_CAQH ProView Bulk Upload Submission Instructions v1.5.pdf, Tag=Library
+directory=/Provider/EDocs/90/, filename=20190826161020_CAQH ProView Bulk Upload Submission Instructions v1.5.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190826161020_CAQH ProView Bulk Upload Submission Instructions v1.5.pdf
+    to: /home/okmis/www/forms/90/Library:20190826161020_CAQH ProView Bulk Upload Submission Instructions v1.5.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190826161143_ProviderBulkUpload_2019_08_15_14_12.txt.xlsx" "/home/okmis/www/forms/90/Library:20190826161143_ProviderBulkUpload_2019_08_15_14_12.txt.xlsx"
+Path=/Provider/EDocs/90/20190826161143_ProviderBulkUpload_2019_08_15_14_12.txt.xlsx, Tag=Library
+directory=/Provider/EDocs/90/, filename=20190826161143_ProviderBulkUpload_2019_08_15_14_12.txt.xlsx
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190826161143_ProviderBulkUpload_2019_08_15_14_12.txt.xlsx
+    to: /home/okmis/www/forms/90/Library:20190826161143_ProviderBulkUpload_2019_08_15_14_12.txt.xlsx
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190826161259_Professional Liability Insurance Document Submission QRG v2.0.pdf" "/home/okmis/www/forms/90/Library:20190826161259_Professional Liability Insurance Document Submission QRG v2.0.pdf"
+Path=/Provider/EDocs/90/20190826161259_Professional Liability Insurance Document Submission QRG v2.0.pdf, Tag=Library
+directory=/Provider/EDocs/90/, filename=20190826161259_Professional Liability Insurance Document Submission QRG v2.0.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190826161259_Professional Liability Insurance Document Submission QRG v2.0.pdf
+    to: /home/okmis/www/forms/90/Library:20190826161259_Professional Liability Insurance Document Submission QRG v2.0.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190905124811_telemedicine.pdf" "/home/okmis/www/forms/90/BCBS:20190905124811_telemedicine.pdf"
+Path=/Provider/EDocs/90/20190905124811_telemedicine.pdf, Tag=BCBS
+directory=/Provider/EDocs/90/, filename=20190905124811_telemedicine.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190905124811_telemedicine.pdf
+    to: /home/okmis/www/forms/90/BCBS:20190905124811_telemedicine.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190905133452_general_e_and_b_expanded_tip_sheet-2.pdf" "/home/okmis/www/forms/90/BCBS:20190905133452_general_e_and_b_expanded_tip_sheet-2.pdf"
+Path=/Provider/EDocs/90/20190905133452_general_e_and_b_expanded_tip_sheet-2.pdf, Tag=BCBS
+directory=/Provider/EDocs/90/, filename=20190905133452_general_e_and_b_expanded_tip_sheet-2.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190905133452_general_e_and_b_expanded_tip_sheet-2.pdf
+    to: /home/okmis/www/forms/90/BCBS:20190905133452_general_e_and_b_expanded_tip_sheet-2.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190905133651_availity_claim_research_tool.pdf" "/home/okmis/www/forms/90/BCBS:20190905133651_availity_claim_research_tool.pdf"
+Path=/Provider/EDocs/90/20190905133651_availity_claim_research_tool.pdf, Tag=BCBS
+directory=/Provider/EDocs/90/, filename=20190905133651_availity_claim_research_tool.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190905133651_availity_claim_research_tool.pdf
+    to: /home/okmis/www/forms/90/BCBS:20190905133651_availity_claim_research_tool.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190905133808_behavioral_health_tip_sheet.pdf" "/home/okmis/www/forms/90/BCBS:20190905133808_behavioral_health_tip_sheet.pdf"
+Path=/Provider/EDocs/90/20190905133808_behavioral_health_tip_sheet.pdf, Tag=BCBS
+directory=/Provider/EDocs/90/, filename=20190905133808_behavioral_health_tip_sheet.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190905133808_behavioral_health_tip_sheet.pdf
+    to: /home/okmis/www/forms/90/BCBS:20190905133808_behavioral_health_tip_sheet.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190905140056_MM10152.pdf" "/home/okmis/www/forms/90/Medicare:20190905140056_MM10152.pdf"
+Path=/Provider/EDocs/90/20190905140056_MM10152.pdf, Tag=Medicare
+directory=/Provider/EDocs/90/, filename=20190905140056_MM10152.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190905140056_MM10152.pdf
+    to: /home/okmis/www/forms/90/Medicare:20190905140056_MM10152.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190905143213_Simplifying Secondary Claims.pdf" "/home/okmis/www/forms/90/Medicaid:20190905143213_Simplifying Secondary Claims.pdf"
+Path=/Provider/EDocs/90/20190905143213_Simplifying Secondary Claims.pdf, Tag=Medicaid
+directory=/Provider/EDocs/90/, filename=20190905143213_Simplifying Secondary Claims.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190905143213_Simplifying Secondary Claims.pdf
+    to: /home/okmis/www/forms/90/Medicaid:20190905143213_Simplifying Secondary Claims.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20190905143359_Simplifying Secondary Claims.pdf" "/home/okmis/www/forms/90/Medicare:20190905143359_Simplifying Secondary Claims.pdf"
+Path=/Provider/EDocs/90/20190905143359_Simplifying Secondary Claims.pdf, Tag=Medicare
+directory=/Provider/EDocs/90/, filename=20190905143359_Simplifying Secondary Claims.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20190905143359_Simplifying Secondary Claims.pdf
+    to: /home/okmis/www/forms/90/Medicare:20190905143359_Simplifying Secondary Claims.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20191214223510_ED Third Party Statement 2020.pdf" "/home/okmis/www/forms/90/Legal:20191214223510_ED Third Party Statement 2020.pdf"
+Path=/Provider/EDocs/90/20191214223510_ED Third Party Statement 2020.pdf, Tag=Legal
+directory=/Provider/EDocs/90/, filename=20191214223510_ED Third Party Statement 2020.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20191214223510_ED Third Party Statement 2020.pdf
+    to: /home/okmis/www/forms/90/Legal:20191214223510_ED Third Party Statement 2020.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20200303120405_i-9-paper.pdf" "/home/okmis/www/forms/90/Federal:20200303120405_i-9-paper.pdf"
+Path=/Provider/EDocs/90/20200303120405_i-9-paper.pdf, Tag=Federal
+directory=/Provider/EDocs/90/, filename=20200303120405_i-9-paper.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20200303120405_i-9-paper.pdf
+    to: /home/okmis/www/forms/90/Federal:20200303120405_i-9-paper.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20200303120451_i-9.pdf" "/home/okmis/www/forms/90/Federal:20200303120451_i-9.pdf"
+Path=/Provider/EDocs/90/20200303120451_i-9.pdf, Tag=Federal
+directory=/Provider/EDocs/90/, filename=20200303120451_i-9.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20200303120451_i-9.pdf
+    to: /home/okmis/www/forms/90/Federal:20200303120451_i-9.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20191216141456_New Hire Form OES - 112.pdf" "/home/okmis/www/forms/90/State:20191216141456_New Hire Form OES - 112.pdf"
+Path=/Provider/EDocs/90/20191216141456_New Hire Form OES - 112.pdf, Tag=State
+directory=/Provider/EDocs/90/, filename=20191216141456_New Hire Form OES - 112.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20191216141456_New Hire Form OES - 112.pdf
+    to: /home/okmis/www/forms/90/State:20191216141456_New Hire Form OES - 112.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20191216142330_CC-Form-1A - SPANISH_12-18-14.pdf" "/home/okmis/www/forms/90/State:20191216142330_CC-Form-1A - SPANISH_12-18-14.pdf"
+Path=/Provider/EDocs/90/20191216142330_CC-Form-1A - SPANISH_12-18-14.pdf, Tag=State
+directory=/Provider/EDocs/90/, filename=20191216142330_CC-Form-1A - SPANISH_12-18-14.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20191216142330_CC-Form-1A - SPANISH_12-18-14.pdf
+    to: /home/okmis/www/forms/90/State:20191216142330_CC-Form-1A - SPANISH_12-18-14.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20200222084240_MHSF-III.pdf" "/home/okmis/www/forms/90/Testing:20200222084240_MHSF-III.pdf"
+Path=/Provider/EDocs/90/20200222084240_MHSF-III.pdf, Tag=Testing
+directory=/Provider/EDocs/90/, filename=20200222084240_MHSF-III.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20200222084240_MHSF-III.pdf
+    to: /home/okmis/www/forms/90/Testing:20200222084240_MHSF-III.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20200311092759_Fraud-Abuse-MLN4649244.pdf" "/home/okmis/www/forms/90/Medicare:20200311092759_Fraud-Abuse-MLN4649244.pdf"
+Path=/Provider/EDocs/90/20200311092759_Fraud-Abuse-MLN4649244.pdf, Tag=Medicare
+directory=/Provider/EDocs/90/, filename=20200311092759_Fraud-Abuse-MLN4649244.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20200311092759_Fraud-Abuse-MLN4649244.pdf
+    to: /home/okmis/www/forms/90/Medicare:20200311092759_Fraud-Abuse-MLN4649244.pdf
+copyfile: cp -p "/home/okmis/www/mms/Provider/EDocs/90/20200311093858_03.05.2020_Medicare_COVID_19_Fact_Sheet.pdf" "/home/okmis/www/forms/90/Medicare:20200311093858_03.05.2020_Medicare_COVID_19_Fact_Sheet.pdf"
+Path=/Provider/EDocs/90/20200311093858_03.05.2020_Medicare_COVID_19_Fact_Sheet.pdf, Tag=Medicare
+directory=/Provider/EDocs/90/, filename=20200311093858_03.05.2020_Medicare_COVID_19_Fact_Sheet.pdf
+  copy: /home/okmis/www/mms/Provider/EDocs/90/20200311093858_03.05.2020_Medicare_COVID_19_Fact_Sheet.pdf
+    to: /home/okmis/www/forms/90/Medicare:20200311093858_03.05.2020_Medicare_COVID_19_Fact_Sheet.pdf
+
+chkNoSQL (Del=): Provider/EDocs/90/* and ProviderEDocs (/home/okmis/public_html/mms)
+File on disk: Provider/EDocs/90/20190727211753_HH SNCD Template.pdf! NOT in SQL:ProviderEDocs!
+
+chkNoFile (Del=): Provider/EDocs/90/* and ProviderEDocs where Path is not null and ProvID='90' (/home/okmis/public_html/mms)
+
+======================================
+
+syncit: Completed: Wed Mar 11 11:10:25 2020

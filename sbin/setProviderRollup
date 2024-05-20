@@ -1,0 +1,53 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use myForm;
+use myDBI;
+use Rollup;
+############################################################################
+# usage: setProviderRollup DBNAME=db&[ProvID=pid]
+############################################################################
+# get the command name...
+my ($pw,$cmd) = $0 =~ m/(.*\/)(.*)$/;
+print qq|#${cmd}: Started |.localtime().qq|\n|;
+my $form = myForm->new();
+my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+# for only 1 Provider??
+my $qProvider = $form->{ProvID} ? qq|select * from Provider where ProvID='$form->{ProvID}' order by ProvID| : qq|select * from Provider order by ProvID|;
+#print qq|qProvider=${qProvider}\n|;
+my $sProvider = $dbh->prepare($qProvider);
+$sProvider->execute() || $form->dberror($qProvider);
+while ( my $rProvider = $sProvider->fetchrow_hashref )
+{
+    my $ProvID=$rProvider->{'ProvID'};
+    print qq|  Process ProvID=${ProvID}...\n|;
+    ##
+    # make sure the directory exists
+    ##
+    my $HomePath = qq|/Provider/EDocs/${ProvID}|;
+    my $RootPath = $form->{DOCROOT} . ${HomePath};
+    system("perl /bin/mkdir -pm 777 ${RootPath}");
+
+
+    Rollup->ProviderEDocs($form, $ProvID, "ProviderEDocs");
+    Rollup->ProviderEDocs($form, $ProvID, "ProviderCreds");
+    
+    if ( $rProvider->{Type} == 3 ) {
+        Rollup->ProviderEDocs($form, $ProvID, "Billing");
+    }
+
+    if ( $rProvider->{Type} == 2 ) {
+        # If Agency
+        Rollup->ProviderEDocs($form, $ProvID, "ProviderPay");
+        Rollup->ProviderEDocs($form, $ProvID, "Treatment");
+
+    }
+
+    my $TrIDs = Rollup->Notes($form,'', $ProvID);
+    my $cnt = split(' ',$TrIDs);
+    #warn qq|Progress: cnt=$cnt\n|;
+}
+myDBI->cleanup();
+print qq|#${cmd}: Complete |.localtime().qq|\n\n|;
+############################################################################
+exit;

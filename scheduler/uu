@@ -1,0 +1,9 @@
+#select * from  ha45_v6_users where username='NULL';
+#select ha45_v6_users.id,username,email,first_name,last_name from ha45_v6_users where (ha45_v6_users.email is null or ha45_v6_users.email='');
+select ha45_v6_users.id,username,email,first_name,last_name,obj_class,obj_id,meta_name,meta_value,meta_data from ha45_v6_users left join ha45_v6_objectmeta on ha45_v6_objectmeta.obj_id=ha45_v6_users.id where ha45_v6_objectmeta.obj_class='user' and meta_name='noEmail' and (ha45_v6_users.email is null or ha45_v6_users.email='');
+
+##update ha45_v6_objectmeta set meta_value='' where meta_name='alternate_contact' and meta_value='NULL';
+##update ha45_v6_objectmeta set meta_value='' where meta_name='phone' and meta_value='NULL';
+##update ha45_v6_users set username='KLS' where username='NULL';
+##update  ha45_v6_users left join ha45_v6_objectmeta on ha45_v6_objectmeta.obj_id=ha45_v6_users.id set ha45_v6_objectmeta.meta_value=1 where ha45_v6_objectmeta.obj_class='user' and meta_name='noEmail' and (ha45_v6_users.email is null or ha45_v6_users.email='');
+##update ha45_v6_users set username=CONCAT(first_name,'.',last_name) where username='KLS';

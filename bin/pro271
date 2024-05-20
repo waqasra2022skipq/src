@@ -1,0 +1,487 @@
+#!/usr/bin/perl
+############################################################################
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use myForm;
+use myDBI;
+use DBA;
+use myConfig;
+use File::Copy;
+use CGI qw(:standard escape);
+
+############################################################################
+#
+# Usage: pro271 DBNAME=db&filepath=filepath&clear=1
+#
+############################################################################
+my $form = myForm->new();
+my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $filepath = $form->{'filepath'};
+my $debug = $form->{'debug'};
+
+# setup the configuration...
+my $BACKDIR = myConfig->cfg('BACKDIR');
+
+my $EligibleDate = $form->{'EDate'} ? $form->{'EDate'} : DBUtil->Date('today',0,11);
+my ($FromDate, $ToDate) = DBUtil->Date($EligibleDate,'monthly',0);
+#warn qq|FromDate=${FromDate}, ToDate=${ToDate}\n| if ( $debug );
+my $cnt = 0;
+open( FILE, "daterange.out" ) or die "Could not open 'daterange.out' ($!)";
+while( $line = <FILE> ) { $cnt++; chomp($line); if ( $cnt == 1 ) { $FromDate = $line; } else { $ToDate = $line; }; }
+close(FILE);
+my $FromDateD = DBUtil->Date($FromDate,'fmt','MM/DD/YYYY');
+my $ToDateD = DBUtil->Date($ToDate,'fmt','MM/DD/YYYY');
+
+warn qq|FromDate=${FromDate}, ToDate=${ToDate}\n| if ( $debug );
+
+############################################################################
+print qq|Process 271: DBNAME: $form->{'DBNAME'}...\n|;
+# Just clear table? ...
+if ( $form->{clear} )
+{
+  print qq|Clear Eligibility table...\n|;
+  print qq| where FromDate-ToDate=${FromDateD}-${ToDateD}\n|;
+#myDBI->cleanup();
+#exit;
+  my $sDelete=$dbh->prepare("delete from Eligible where FromDate >= ? and ToDate <= ?");
+  $sDelete->execute($FromDate,$ToDate) || myDBI->dberror("p271: ERROR>>> delete Eligible");
+}
+# OR process the file? ...
+else
+{
+  print qq|Process 271 file: ${filepath}...\n|;
+#myDBI->cleanup();
+#exit;
+
+  my ($in,$RecType,$rest,$LineCount) = ('','','','',0);
+  my ($CLIENTID,$CLIENTLNAME,$CLIENTFNAME,$CLIENTINSNUM,$CLIENTSSN,$CLIENTDOB) = ('','','','','','');
+  my ($HLERROR) = ('');
+  my ($EBID) = ('');
+  my ($EBBENEFIT,$EBLEVEL,$EBSERVICETYPE,$EBINSURANCETYPE,$EBPLANDESCR) = ('','','','','');
+  my ($REFPOLICYID,$REFPOLICYNAME) = ('','');
+  my ($NM1INSNAME,$NM1CLINICNAME,$NM1CODE,$NM1NAME) = ('','','','');
+  my ($DTPFROMDATE,$DTPTODATE,$RENEWALDATE) = ('','','');
+  my ($PERCOMMID,$PERCOMMNUM) = ('','');
+  my ($REFID) = ('');
+  
+  print qq|Eligibility\tInsCode\tLName\tFName\tClientID\tSSN\tDOB\tInsGrpNum\tReason\n|;
+
+  open FILE, $filepath or die "Couldn't open file ${filepath}: $!\n";
+  while ( $in = <FILE> )
+  { 
+    chomp($in); $LineCnt+=1; 
+warn qq|BEGIN main: in=$in\n| if ( $debug );
+    while ( $in )
+    {
+warn qq|main START: in=$in\n| if ( $debug );
+      ($RecType,$rest) = split('\*',$in,2);
+      if ( $RecType eq 'ISA' )
+      { $in = main->Process_ISA($RecType,$rest); }
+      else { print qq|Main: UNRECOGNIZED! ${in}\n|; $in='';}
+      last if ( $in eq 'ERROR' );
+warn qq|main END: in=$in\n| if ( $debug );
+    }
+    last if ( $in eq 'ERROR' );
+warn qq|END main: in=$in\n| if ( $debug );
+  }
+  close(FILE);
+  my ($directory,$filename) = $filepath =~ m#((?:[^/]*/)*)(.*)#;
+  my $bakfile = "${BACKDIR}/271/${filename}";
+  print qq|  move ${filename} to ${bakfile}...\n|;
+  move($filepath,$bakfile) or print "<<<ERROR>>>: move failed: $!";;
+}
+
+myDBI->cleanup();
+exit;
+################################################################
+# got here with an 'ISA' RecType
+sub Process_ISA
+{
+  my ($self, $Type, $str) = @_;
+  while ( my $isa = <FILE> )
+  { 
+    chomp($isa); $LineCnt+=1; 
+warn qq|BEGIN Process_ISA: isa=$isa\n| if ( $debug );
+    while ( $isa )
+    {
+warn qq|Process_ISA START: isa=$isa\n| if ( $debug );
+      my ($RecType,$rest) = split('\*',$isa,2);
+      if ( $RecType eq 'GS' ) { $isa=''; }
+      elsif ( $RecType eq 'ST' ) { $isa=''; }
+      elsif ( $RecType eq 'BHT' )
+      { $isa = main->Process_BHT($RecType,$rest); }
+      elsif ( $RecType eq 'HL' )
+      { $isa = main->Process_HL($RecType,$rest); }
+      elsif ( $RecType eq 'SE' )
+      { $isa = main->Process_SE($RecType,$rest); }
+      elsif ( $RecType eq 'GE' ) { $isa=''; }
+      elsif ( $RecType eq 'IEA' ) { return(''); }
+      else { print qq|Process_ISA: UNRECOGNIZED! ${isa}\n|; $isa='';}
+      return('ERROR') if ( $isa eq 'ERROR' );
+warn qq|Process_ISA END: isa=$isa\n| if ( $debug );
+    }
+warn qq|END Process_ISA: isa=$isa\n| if ( $debug );
+  }
+  print qq|Process_ISA: ERROR! premature end! ${isa}\n|;
+  return('ERROR');
+}
+################################################################
+# got here with an 'BHT' RecType
+sub Process_BHT
+{
+  my ($self, $Type, $str) = @_;
+warn qq|Process_BHT: str=$str\n| if ( $debug );
+  my ($BHTCode,$BHTPurpose,$BHTRefID,$BHTDate,$BHTTime,$rest) = split('\*',$str,6);
+  my $fBHTDate = substr($BHTDate,0,4) . '-' . substr($BHTDate,4,2) . '-' . substr($BHTDate,6,2);
+  return('');
+}
+################################################################
+##
+# got here with an 'HL' RecType
+sub Process_HL
+{
+  my ($self, $Type, $str) = @_;
+  main->resetHL();
+  main->resetEB();
+  my ($ID,$Parent,$Level,$Child,$rest) = split('\*',$str,5);
+  while ( my $hl = <FILE> )
+  {
+    chomp($hl); $LineCnt+=1; 
+warn qq|BEGIN Process_HL: hl=$hl\n| if ( $debug );
+    while ( $hl )
+    {
+warn qq|Process_HL START: hl=$hl\n| if ( $debug );
+      my ($RecType,$rest) = split('\*',$hl,2);
+      if ( $RecType eq 'TRN' ) 
+      { $hl = main->Process_TRN($RecType,$rest); }
+      elsif ( $RecType eq 'NM1' )
+      { $hl = main->Process_NM1($RecType,$rest); }
+      elsif ( $RecType eq 'PER' )
+      { $hl = main->Process_PER($RecType,$rest); }
+      elsif ( $RecType eq 'DMG' ) 
+      { $hl = main->Process_DMG($RecType,$rest); }
+      elsif ( $RecType eq 'EB' )
+      { $hl = main->Process_EB($RecType,$rest); }
+      elsif ( $RecType eq 'REF' ) 
+      { $hl = main->Process_REF($RecType,$rest); }
+      elsif ( $RecType eq 'AAA' )
+      { $hl = main->Process_AAA($RecType,$rest); }
+      else { return($hl); }
+      return('ERROR') if ( $hl eq 'ERROR' );
+warn qq|Process_HL END: hl=$hl\n| if ( $debug );
+    }
+warn qq|END Process_HL: hl=$hl\n| if ( $debug );
+  }
+  print qq|Process_HL: ERROR! premature end! ${Type} ${str}\n|;
+  return('ERROR');
+}
+################################################################
+# got here with an 'TRN' RecType
+sub Process_TRN
+{
+  my ($self, $Type, $str) = @_;
+warn qq|Process_TRN: str=$str\n| if ( $debug );
+  my ($TraceCode,$TraceID,$Company,$CompanyID,$rest) = split('\*',$str,5);
+  if ( $TraceCode == 1 ) { $TransID = $TraceID; }
+  elsif ( $TraceCode == 2 ) { $CLIENTID = $TraceID; }
+  else { warn qq|Process_TRN: ERROR! UNRECOGNIZED TraceCode! ${str}\n|; return('ERROR'); }
+  return('');
+}
+################################################################
+##
+# got here with an 'DMG' RecType
+sub Process_DMG
+{
+  my ($self, $Type, $str) = @_;
+warn qq|Process_DMG: str=$str\n| if ( $debug );
+  ($DMGFormat,$DMGDOB,$rest) = split('\*',$str,3);
+  $CLIENTDOB = substr($DMGDOB,0,4) . '-' . substr($DMGDOB,4,2) . '-' . substr($DMGDOB,6,2);
+  return('');
+}
+################################################################
+# got here with an 'EB' RecType
+# EBBenefit 1 = Active, 6 = InActive, L = Primary Care Provider, R = Other / Additinal Payor, W = Other Source of Data
+# EBLevel IND = Individual (EBCode=R no EBLevel)
+# EBServiceType 30 = Health Benefit (only one we care about)
+sub Process_EB
+{
+  my ($self,$Type,$str) = @_;
+  main->resetEB();
+  ($Benefit,$Level,$ServiceType,$InsuranceType,$PlanDescr,$Period,$Amt,$Pct,$QtyQL,$Qty,$Auth,$YN,$CMPID,$ServID,$SCID,$Mod1,$Mod2,$Mod3,$Mod4,$rest) = split('\*',$str,20);
+  $EBBENEFIT = $Benefit;
+  $EBLEVEL = $Level;
+  $EBSERVICETYPE = $ServiceType;
+  $EBINSURANCETYPE = $InsuranceType;
+  $EBPLANDESCR = $PlanDescr eq '' && $InsuranceType eq 'MA' ? 'Medicare Part A'
+               : $PlanDescr eq '' && $InsuranceType eq 'MB' ? 'Medicare Part B'
+               : $Benefit eq 'CB' ? 'Renewal Date'
+               : $PlanDescr;
+  while ( my $eb = <FILE> )
+  { 
+    chomp($eb); $LineCnt+=1; 
+warn qq|BEGIN Process_EB: eb=$eb\n| if ( $debug );
+    while ( $eb )
+    {
+warn qq|Process_EB START: eb=$eb\n| if ( $debug );
+      my ($RecType,$rest) = split('\*',$eb,2);
+      if ( $RecType eq 'DTP' )
+      { $eb = main->Process_DTP($RecType,$rest); }
+      elsif ( $RecType eq 'REF' ) 
+      { $eb = main->Process_REF($RecType,$rest); }
+      elsif ( $RecType eq 'LS' ) 
+      { $eb = main->Process_LS($RecType,$rest); }
+      else 
+      { main->writeEB(); return($eb); }
+      return('ERROR') if ( $eb eq 'ERROR' );
+warn qq|Process_EB END: eb=$eb\n| if ( $debug );
+    }
+warn qq|END Process_EB: eb=$eb\n| if ( $debug );
+  }
+  warn qq|Process_EB: ERROR! premature end! ${str}\n|;
+  return('ERROR');
+}
+################################################################
+# got here with an 'AAA' RecType
+sub Process_AAA
+{
+  my ($self, $Type, $str) = @_;
+  my ($Resp,$Qual,$Reason,$Action,$rest) = split('\*',$str,5);
+  if ( $Reason == 15 ) { $HLERROR = 'Required application data missing'; }
+  elsif ( $Reason == 42 ) { $HLERROR = 'Unable to Respond at Current Time'; }
+  elsif ( $Reason == 43 ) { $HLERROR = 'Invalid/Missing Provider Identification'; }
+  elsif ( $Reason == 45 ) { $HLERROR = 'Invalid/Missing Provider Specialty'; }
+  elsif ( $Reason == 47 ) { $HLERROR = 'Invalid/Missing Provider State'; }
+  elsif ( $Reason == 48 ) { $HLERROR = 'Invalid/Missing Referring Provider Identification Number'; }
+  elsif ( $Reason == 49 ) { $HLERROR = 'Provider is Not Primary Care Physician'; }
+  elsif ( $Reason == 51 ) { $HLERROR = 'Provider Not on File'; }
+  elsif ( $Reason == 52 ) { $HLERROR = 'Service Dates Not Within Provider Plan Enrollment'; }
+  elsif ( $Reason == 56 ) { $HLERROR = 'Inappropriate Date'; }
+  elsif ( $Reason == 57 ) { $HLERROR = 'Invalid/Missing Date(s) of Service'; }
+  elsif ( $Reason == 58 ) { $HLERROR = 'Invalid/Missing Date-of-Birth'; }
+  elsif ( $Reason == 60 ) { $HLERROR = 'Date of Birth Follows Date(s) of Service'; }
+  elsif ( $Reason == 61 ) { $HLERROR = 'Date of Death Precedes Date(s) of Service'; }
+  elsif ( $Reason == 62 ) { $HLERROR = 'Date of Service Not Within Allowable Inquiry Period'; }
+  elsif ( $Reason == 63 ) { $HLERROR = 'Date of Service in Future'; }
+  elsif ( $Reason == 64 ) { $HLERROR = 'Invalid/Missing Patient ID'; }
+  elsif ( $Reason == 65 ) { $HLERROR = 'Invalid/Missing Patient Name'; }
+  elsif ( $Reason == 66 ) { $HLERROR = 'Invalid/Missing Patient Gender Code'; }
+  elsif ( $Reason == 67 ) { $HLERROR = 'Patient Not Found'; }
+  elsif ( $Reason == 68 ) { $HLERROR = 'Duplicate Patient ID Number'; }
+  elsif ( $Reason == 71 ) { $HLERROR = 'Patient Birth Date Does Not Match That for the Patient on the Database'; }
+  elsif ( $Reason == 72 ) { $HLERROR = 'Invalid/Missing Subscriber/Insured ID'; }
+  elsif ( $Reason == 73 ) { $HLERROR = 'Invalid/Missing Subscriber/Insured Name'; }
+  elsif ( $Reason == 74 ) { $HLERROR = 'Invalid/Missing Subscriber/Insured Gender Code'; }
+  elsif ( $Reason == 75 ) { $HLERROR = 'Subscriber/Insured Not Found'; }
+  elsif ( $Reason == 76 ) { $HLERROR = 'Duplicate Subscriber/Insured ID Number'; }
+  elsif ( $Reason == 77 ) { $HLERROR = 'Subscriber Found, Patient Not Found'; }
+  elsif ( $Reason == 78 ) { $HLERROR = 'Subscriber/Insured Not in Group/Plan Identified'; }
+  else { $HLERROR = $Reason; }
+
+  if ( $Action eq 'C' ) { $HLERROR .= '; Please Correct and Resubmit'; }
+  elsif ( $Action eq 'N' ) { $HLERROR .= '; Resubmission Not Allowed'; }
+  elsif ( $Action eq 'R' ) { $HLERROR .= '; Resubmission Allowed'; }
+  elsif ( $Action eq 'S' ) { $HLERROR .= '; Do Not Resubmit; Inquiry Initiated to a Third Party'; }
+  elsif ( $Action eq 'W' ) { $HLERROR .= '; Please Wait 30 Days and Resubmit'; }
+  elsif ( $Action eq 'X' ) { $HLERROR .= '; Please Wait 10 Days and Resubmit'; }
+  elsif ( $Action eq 'Y' ) { $HLERROR .= '; Do Not Resubmit; We Will Hold Your Request and Respond Again Shortly'; }
+  else { $HLERROR .= qq|; ${Action} (pg 209)|; }
+  $EBBENEFIT = $Reason;
+  $EBINSURANCETYPE = 'MC';
+  $EBSERVICETYPE = '30';
+  $DTPFROMDATE = $FromDate;
+  $DTPTODATE = $ToDate;
+  main->writeEB();
+  return('');
+}
+################################################################
+# got here with an 'DTP' RecType
+sub Process_DTP
+{
+  my ($self, $Type, $str) = @_;
+warn qq|Process_DTP: str=$str\n| if ( $debug );
+  ($Code,$Format,$Date,$rest) = split('\*',$str,4);
+warn qq|Process_DTP: $Code,$Format,$Date,$rest\n| if ( $debug );
+  ($D1,$D2) = split('-',$Date,2);
+# 290 (Coordination of Benefits)
+# 304 (Latest Visit or Consultation)
+# 307 (Eligibility)
+# 198 (Completion [Redetermination] Date)
+# 357 (Eligibility End)
+  if ( $Format eq 'RD8' )
+  {
+    $DTPFROMDATE = substr($D1,0,4) . '-' . substr($D1,4,2) . '-' . substr($D1,6,2);
+    $DTPTODATE = substr($D2,0,4) . '-' . substr($D2,4,2) . '-' . substr($D2,6,2);
+  }
+  elsif ( $Code eq '357' )
+  {
+    $RENEWALDATE = substr($D1,0,4) . '-' . substr($D1,4,2) . '-' . substr($D1,6,2);
+  }
+warn qq|Process_DTP: $CLIENTID: $D1,$D2,$DTPFROMDATE,$DTPTODATE,$RENEWALDATE\n| if ( $debug );
+  return('');
+}
+################################################################
+# got here with an 'LS' RecType
+sub Process_LS
+{
+  my ($self, $Type, $str) = @_;
+  while ( my $ls = <FILE> )
+  { 
+    chomp($ls); $LineCnt+=1; 
+warn qq|BEGIN Process_LS: ls=$ls\n| if ( $debug );
+    while ( $ls )
+    {
+warn qq|Process_LS START: ls=$ls\n| if ( $debug );
+      my ($RecType,$rest) = split('\*',$ls,2);
+      if ( $RecType eq 'NM1' )
+      { $ls = main->Process_NM1($RecType,$rest); }
+      elsif ( $RecType eq 'PER' )
+      { $ls = main->Process_PER($RecType,$rest); }
+      elsif ( $RecType eq 'LE' ) { $ls=''; }
+      else { return($ls); }
+      return('ERROR') if ( $ls eq 'ERROR' );
+warn qq|Process_LS END: ls=$ls\n| if ( $debug );
+    }
+warn qq|END Process_LS: ls=$ls\n| if ( $debug );
+  }
+  print qq|Process_LS: ERROR! premature end! ${str}\n|;
+  return('ERROR');
+}
+################################################################
+# got here with an 'REF' RecType
+sub Process_REF
+{
+  my ($self, $Type, $str) = @_;
+warn qq|Process_REF: str=$str\n| if ( $debug );
+  my ($REFID,$NUM,$DESCR,$rest) = split('\*',$str,4);
+  if ( $REFID eq 'SY' ) { $CLIENTSSN = $NUM; }
+  elsif ( $REFID eq '1L' ) { $REFPOLICYID = $NUM; $REFPOLICYNAME = $DESCR; }
+warn qq|Process_REF: REFPOLICYID=$REFPOLICYID\n| if ( $debug );
+  return('');
+}
+################################################################
+# got here with an 'NM1' RecType
+sub Process_NM1
+{
+  my ($self, $Type, $str) = @_;
+warn qq|Process_NM1: str=$str\n| if ( $debug );
+  my ($EID,$EQL,$LName,$FName,$MName,$Pfx,$Sfx,$IDCodeQL,$IDCode,$rest) = split('\*',$str,10);
+  if ( $EID eq 'PR' ) { $NM1INSNAME = $LName; }
+  elsif ( $EID eq '1P' ) { $NM1CLINICNAME = $LName; }
+  elsif ( $EID eq 'IL' )
+  { $CLIENTLNAME = $LName; $CLIENTFNAME = $FName; $CLIENTINSNUM = $IDCode; }
+  elsif ( $EID eq 'P3' ) { $NM1NAME = $LName; }
+  elsif ( $EID eq 'PRP' ) { $NM1NAME = $LName; }
+  elsif ( $EID eq '13' ) { $NM1NAME = $LName; }
+
+  $NM1CODE = $EID;
+  return('');
+}
+################################################################
+# got here with an 'PER' RecType
+sub Process_PER
+{
+  my ($self,$Type,$str) = @_;
+warn qq|Process_PER: str=$str\n| if ( $debug );
+  my ($ID,$NAME,$COMMID,$COMMNUM,$rest) = split('\*',$str,5);
+  if ( $ID eq 'IC' ) { $PERCOMID = $COMMID; $PERCOMMNUM = $COMMNUM; }
+  return('');
+}
+################################################################
+# got here with an 'SE' RecType
+sub Process_SE
+{
+  my ($self, $Type, $str) = @_;
+warn qq|Process_SE: str=$str\n| if ( $debug );
+  my ($SECount,$ID,$rest) = split('\*',$str,3);
+  return('');
+}
+################################################################
+sub resetHL
+{
+warn qq|resetHL: CLIENTID=$CLIENTID\n| if ( $debug );
+  ($CLIENTID,$CLIENTLNAME,$CLIENTFNAME,$CLIENTINSNUM,$CLIENTSSN,$CLIENTDOB) = ('','','','','','');
+  ($HLERROR) = ('');
+}
+sub resetEB
+{
+warn qq|resetEB: EBBENEFIT=$EBBENEFIT\n| if ( $debug );
+  ($EBBENEFIT,$EBLEVEL,$EBSERVICETYPE,$EBINSURANCETYPE,$EBPLANDESCR) = ('','','','','');
+  ($REFPOLICYID,$REFPOLICYNAME) = ('','');
+  ($NM1CODE,$NM1NAME,$DTPFROMDATE,$DTPTODATE,$RENEWALDATE) = ('','','','','');
+  ($PERCOMMID,$PERCOMMNUM) = ('','');
+}
+sub writeEB
+{
+warn qq|writeEB: BENEFIT=$EBBENEFIT, LEVEL=$EBLEVEL, SERVICE=$EBSERVICETYPE, INS=$EBINSURANCETYPE, D=$EBPLANDESCR\n| if ( $debug );
+warn qq|writeEB: REFPOLICYID=$REFPOLICYID, REFPOLICYNAME=$REFPOLICYNAME\n| if ( $debug );
+  return() unless ( $EBSERVICETYPE == 30 );       # only 1 we care about
+
+  if ( $EBBENEFIT eq 'CB' )                       # Renewal date for last EB
+  {
+    my $r = ();
+    $r->{RenewDate} = $RENEWALDATE;
+warn qq|writeEB: RENEWALDATE=$RENEWALDATE\n| if ( $debug );
+    my $ID = DBA->doUpdate($form,'Eligible',$r,"ID=${EBID}",'',1); # 1=no insert, update only
+  }
+  else
+  {
+    my $r = ();
+    my $EBBENEFITDESCR = '';
+    if( ($EBPLANDESCR =~ /Title 19/i) || ($EBPLANDESCR =~ /Expansion Healthy Adult Program/i) || ($EBPLANDESCR =~ /SoonerCare Choice/i) ) { $EBINSURANCETYPE='MC'; }
+    elsif( $EBPLANDESCR =~ /Mental Health and Substance Abuse/i ) { $EBINSURANCETYPE='MC'; }
+    elsif( $EBPLANDESCR =~ /soonercare/i ) { $EBINSURANCETYPE='MC'; }
+    if ( $EBBENEFIT == 1 ) { $EBBENEFITDESCR = 'Active'; }
+    elsif ( $EBBENEFIT == 6 ) { $EBBENEFITDESCR = 'Inactive'; }
+    elsif ( $EBBENEFIT eq 'L' ) { $EBBENEFITDESCR = 'Primary Care Provider'; }
+    elsif ( $EBBENEFIT eq 'R' ) { $EBBENEFITDESCR = 'Other or Additional Payor'; }
+    elsif ( $EBBENEFIT eq 'W' ) { $EBBENEFITDESCR = 'Other Source of Data'; }
+    elsif ( $HLERROR ne '' ) { $EBBENEFITDESCR = $HLERROR; }
+    else { $EBBENEFITDESCR = $EBBENEFIT . ' (see pg.219)'; }
+warn qq|writeEB: EBBENEFITDESCR=$EBBENEFITDESCR\n| if ( $debug );
+    $r->{ClientID} = $CLIENTID;
+    $r->{InsCode} = $EBINSURANCETYPE;
+    $r->{RefID} = $filepath;
+    $r->{Benefit} = $EBBENEFIT;
+    $r->{BenefitDescr} = $EBBENEFITDESCR;
+    $r->{Coverage} = $EBLEVEL;
+    $r->{ServiceType} = $EBSERVICETYPE;
+    $r->{PlanDescr} = $EBPLANDESCR;
+    $r->{FromDate} = $DTPFROMDATE;
+    $r->{ToDate} = $DTPTODATE;
+    $r->{CreateDate} = $form->{TODAY};
+    $r->{OtherInsCode} = $NM1CODE;
+    $r->{OtherInsName} = $NM1NAME;
+    $r->{PolicyID} = $REFPOLICYID;
+    $r->{PolicyName} = $REFPOLICYNAME;
+    $r->{Ph} = $PERCOMMNUM;
+    if ( $debug ) { foreach my $f ( sort keys %{$r} ) { warn "write: $f=$r->{$f}\n"; } }
+    $EBID = DBA->doUpdate($form,'Eligible',$r);
+    #print qq|END writeEB: $r->{BenefieDescr}\t$r->{InsCode}\t$CLIENTLNAME\t$CLIENTFNAME\t$CLIENTID\t$CLIENTSSN\t$CLIENTDOB\t$CLIENTINSNUM\n|;
+
+    # If SoonerSelect is PlanDescr and and BenefitDescr = 'Primary Care Provider' 
+
+    if($EBPLANDESCR =~ /SoonerSelect/i && $EBBENEFIT eq 'L') {
+      my $xInsurance = $dbh->prepare("SELECT * FROM xInsurance WHERE Name Like ?");
+      $xInsurance->execute("%$OtherInsName%");
+      my $rInsurance = $xInsurance->fetchrow_hashref;
+      my $InsID = $rInsurance->{ID};
+
+      if($InsID) {
+        # print qq|  Update Current Primary Insurance to Secondary\n|;
+        my $upd_cl_insurance = $dbh->prepare("Update Insurance SET Priority=2 WHERE ClientID=? and Priority=1 and InsID = '100'");
+        $upd_cl_insurance->execute($CLIENTID);
+
+        my $sClInsurance = $dbh->prepare("SELECT * FROM Insurance WHERE InsID=? and ClientID=?");
+        $sClInsurance->execute($InsID, $CLIENTID);
+
+        if(my $rClInsurance = $sClInsurance->fetchrow_hashref) {
+          # print qq|  Set The MCO $OtherInsName as Primary Insurance\n|;
+
+          my $upd_cl_insurance_2 = $dbh->prepare("Update Insurance SET Priority=1 WHERE InsID=? and ClientID=?");
+          $upd_cl_insurance_2->execute($InsID, $CLIENTID);
+        }
+      }
+    }
+  }
+  return(1);
+}

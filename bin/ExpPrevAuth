@@ -1,0 +1,146 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBA;
+use myForm;
+use myDBI;
+use DBUtil;
+use Inv;
+############################################################################
+# usage: ExpPrevAuth DBNAME=db
+#   select PAs and find one before it over lapping it
+#    skip the Testing PAs PG029 and PG030
+############################################################################
+my $form = myForm->new();
+my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $ClientID = $form->{'ClientID'};
+my $PrAuthID = $form->{'PrAuthID'};
+my $debug = $form->{'debug'};
+my $sUpdPA=$dbh->prepare("update ClientPrAuth set ExpDate=? where ID=?");
+my $sUpdCDC=$dbh->prepare("update ClientPrAuthCDC set CDCOK=? where ClientPrAuthID=?");
+my $sCheck=$dbh->prepare("select ClientPrAuth.ID,ClientPrAuth.ClientID,ClientPrAuth.InsuranceID,ClientPrAuth.EffDate,ClientPrAuth.ExpDate,ClientPrAuth.CoPA,ClientPrAuth.PAnumber,ClientPrAuthCDC.TransType,ClientPrAuthCDC.Status,ClientPrAuthCDC.StatusDate,ClientPrAuthCDC.CDCOK from ClientPrAuth left join ClientPrAuthCDC on ClientPrAuthCDC.ClientPrAuthID=ClientPrAuth.ID where ClientPrAuth.ClientID=? and ClientPrAuth.InsuranceID=? and ClientPrAuth.PAnumber is not null and ClientPrAuthCDC.TransType IN (21,23,42) and ClientPrAuth.PAgroup NOT IN ('PG029','PG030') and ClientPrAuth.EffDate<? and ClientPrAuth.ExpDate>=?");
+my $sCheck21=$dbh->prepare("select ClientPrAuth.ID,ClientPrAuth.ClientID,ClientPrAuth.InsuranceID,ClientPrAuth.EffDate,ClientPrAuth.ExpDate,ClientPrAuth.PAnumber,ClientPrAuthCDC.TransType,ClientPrAuthCDC.Status,ClientPrAuthCDC.StatusDate,ClientPrAuthCDC.CDCOK from ClientPrAuth left join ClientPrAuthCDC on ClientPrAuthCDC.ClientPrAuthID=ClientPrAuth.ID where ClientPrAuth.ClientID=? and ClientPrAuthCDC.TransType=21 and ClientPrAuth.InsuranceID=? and ClientPrAuth.PAnumber is not null and ClientPrAuth.EffDate=? and ClientPrAuth.ExpDate>=?");
+my $qClientPrAuth = qq|
+select ClientPrAuth.ID,ClientPrAuth.ClientID,ClientPrAuth.InsuranceID
+      ,ClientPrAuth.EffDate,ClientPrAuth.ExpDate,ClientPrAuth.PAnumber
+      ,ClientPrAuthCDC.TransType,ClientPrAuthCDC.Status,ClientPrAuthCDC.StatusDate,ClientPrAuthCDC.CDCOK
+      ,Insurance.InsID
+ from ClientPrAuth
+  left join Insurance on Insurance.InsNumID=ClientPrAuth.InsuranceID
+  left join ClientPrAuthCDC on ClientPrAuthCDC.ClientPrAuthID=ClientPrAuth.ID
+ where ClientPrAuth.PAnumber is not null and ClientPrAuthCDC.CDCOK=1
+   and ClientPrAuthCDC.TransType IN (23,42)
+   and ClientPrAuth.PAgroup NOT IN ('PG029','PG030')
+   and Insurance.InsID IN (100,314,356)
+|;
+$qClientPrAuth .= $ClientID ? qq|and ClientPrAuth.ClientID='${ClientID}'| : '';
+$qClientPrAuth .= $PrAuthID ? qq|and ClientPrAuth.ID='${PrAuthID}'| : '';
+$qClientPrAuth .= qq| order by ClientPrAuth.ClientID,ClientPrAuth.EffDate|;
+
+warn qq|q=\n$qClientPrAuth\n| if ( $debug );
+# check all the newPAs not yet checked (CDCOK=1)
+#  then find all the prevPAs where EffDate<EffDateofthisPA and ExpDate>=EffDateofthisPA
+#  only get those previous to newPA because EffDateofthisPA is NEVER less than itself
+#  then update those previous PAs so that the ExpDate is day before this new PA
+#    and the CDCOK for the prevPA to 99 showing it was backed up.
+#    set the PALines to show it ended at new ExpDate for prevPA
+#    IF a CoPA then do the same to the HealthHome (HH) PA
+#  next check for any 21PAs that started the same day as this non21 PA
+#    IF found then update this 21PA so that the ExpDate is day before this new PA
+#    and the CDCOK for the 21PA to 99 showing it was backed up.
+#    set the PALines to show it ended at new ExpDate for 21PA
+#  finally set the CDCOK for this newPA to 2 showing it was processed.
+#
+my $sClientPrAuth=$dbh->prepare($qClientPrAuth);
+$sClientPrAuth->execute() || myDBI->dberror($qClientPrAuth);
+while ( my $rClientPrAuth = $sClientPrAuth->fetchrow_hashref )
+{ 
+  my $cnt=0;
+  print qq|check $rClientPrAuth->{'InsID'},$rClientPrAuth->{'TransType'}: $rClientPrAuth->{'ClientID'},$rClientPrAuth->{'ID'},$rClientPrAuth->{PAnumber},$rClientPrAuth->{EffDate},$rClientPrAuth->{ExpDate},$rClientPrAuth->{CDCOK}\n| if ( $debug );
+  my $ClientID=$rClientPrAuth->{'ClientID'};
+  my $IID=$rClientPrAuth->{'InsuranceID'};
+# select PAs where EffDate<EffDateofthisPA and ExpDate>=EffDateofthisPA
+#   only get those previous because EffDateofthisPA is NEVER less than itself
+  my $EffDate=$rClientPrAuth->{'EffDate'};
+  $sCheck->execute($ClientID,$IID,$EffDate,$EffDate)
+            || myDBI->dberror("ExpPrevAuth: Check: $ClientID,$IID,$EffDate");
+  while ( my $rCheck = $sCheck->fetchrow_hashref )
+  { 
+    $cnt++;
+    print qq|found:  $rCheck->{'TransType'}: $rCheck->{'ClientID'},$rCheck->{'ID'},$rCheck->{PAnumber},$rCheck->{'EffDate'},$rCheck->{'ExpDate'}\n|;
+    my $NewDate = DBUtil->Date($EffDate,0,-1);
+    $sUpdPA->execute($NewDate,$rCheck->{'ID'})
+        || myDBI->dberror("update ClientPrAuth: $NewDate,$rCheck->{'ID'}");
+    $sUpdCDC->execute(99,$rCheck->{'ID'})
+        || myDBI->dberror("update CDC: $rCheck->{'ID'}/99");
+    # set the PALines for Approved PAs...
+    Inv->setPALines($form,$rCheck->{'ID'});
+    print qq|  set ${cnt}: $rCheck->{'ID'} ExpDate=${NewDate}\n|;
+    if ( $rCheck->{'CoPA'} )            # update the HH HealthHome PA too...
+    {
+      $sUpdPA->execute($NewDate,$rCheck->{'CoPA'})
+          || myDBI->dberror("update ClientPrAuth: $NewDate,$rCheck->{'CoPA'}");
+      $sUpdCDC->execute(99,$rCheck->{'CoPA'})
+          || myDBI->dberror("update CDC: $rCheck->{'CoPA'}/99");
+      # set the PALines for Approved PAs...
+      Inv->setPALines($form,$rCheck->{'CoPA'});
+      print qq|  set ${cnt} HH: $rCheck->{'CoPA'} ExpDate=${NewDate}\n|;
+    }
+    print qq|  Exp before Eff! \n| if ( $NewDate < $rCheck->{'EffDate'} );
+  }
+  if ( $rClientPrAuth->{'TransType'} != 21 )
+  {
+    $sCheck21->execute($ClientID,$IID,$EffDate,$EffDate)
+              || myDBI->dberror("ExpPrevAuth: Check: $ClientID,$IID,$EffDate");
+    while ( my $rCheck21 = $sCheck21->fetchrow_hashref )
+    { 
+      $cnt++;
+      print qq|found21:  $rCheck21->{'TransType'}: $rCheck21->{'ClientID'},$rCheck21->{'ID'},$rCheck21->{PAnumber},$rCheck21->{EffDate},$rCheck21->{ExpDate}\n|;
+      my $NewDate = $EffDate;
+      $sUpdPA->execute($NewDate,$rCheck21->{'ID'})
+        || myDBI->dberror("update ClientPrAuth: $NewDate,$rCheck21->{'ID'}");
+      $sUpdCDC->execute(99,$rCheck21->{'ID'})
+        || myDBI->dberror("update CDC: $rCheck21->{'ID'}/99");
+      # set the PALines for Approved PAs...
+      Inv->setPALines($form,$rCheck21->{'ID'});
+      print qq|  set21 ${cnt}: $rCheck21->{'ID'} ExpDate=${NewDate}\n|;
+    }
+  }
+  $sUpdCDC->execute(2,$rClientPrAuth->{'ID'})
+      || myDBI->dberror("update CDC: $rClientPrAuth->{'ID'}/2");
+}
+$sClientPrAuth->finish();
+$sCheck->finish();
+$sCheck21->finish();
+$sUpdPA->finish();
+$sUpdCDC->finish();
+############################################################################
+# part 2 Discharges...
+# select the Approved Discharges (not yet done CDCOK=1)
+#   (there is not PAnumber like with Approved PrAuths)
+my $sUpdCDC=$dbh->prepare("update ClientDischargeCDC set CDCOK=? where ClientPrAuthID=?");
+my $qClientDischarge = qq|
+select ClientDischarge.ID,ClientDischarge.ClientID,ClientDischarge.InsuranceID
+      ,ClientDischargeCDC.TransType,ClientDischargeCDC.Status,ClientDischargeCDC.StatusDate,ClientDischargeCDC.CDCOK
+      ,Insurance.InsID
+ from ClientDischarge
+  left join Insurance on Insurance.InsNumID=ClientDischarge.InsuranceID
+  left join ClientDischargeCDC on ClientDischargeCDC.ClientDischargeID=ClientDischarge.ID
+ where ClientDischargeCDC.CDCOK=1 and ClientDischargeCDC.Status='Approved'
+   and Insurance.InsID IN (100,314,356)
+|;
+$qClientDischarge .= $ClientID ? qq|and ClientDischarge.ClientID='${ClientID}'| : '';
+$qClientDischarge .= $DischargeID ? qq|and ClientDischarge.ID='${DischargeID}'| : '';
+$qClientDischarge .= qq| order by ClientDischarge.ClientID,ClientDischargeCDC.StatusDate|;
+warn qq|q=\n$qClientDischarge\n| if ( $debug );
+my $sClientDischarge=$dbh->prepare($qClientDischarge);
+$sClientDischarge->execute() || myDBI->dberror($qClientDischarge);
+while ( my $rClientDischarge = $sClientDischarge->fetchrow_hashref )
+{ 
+  print qq|Discharge: CDCOK=$rClientDischarge->{'CDCOK'}, ID=$rClientDischarge->{'ID'}, ClientID=$rClientDischarge->{'ClientID'}, TransType=$rClientDischarge->{'TransType'}, Status=$rClientDischarge->{'Status'}, StatusDate=$rClientDischarge->{'StatusDate'} \n|;
+}
+$sClientDischarge->finish();
+$sUpdCDC->finish();
+############################################################################
+myDBI->cleanup();
+exit;

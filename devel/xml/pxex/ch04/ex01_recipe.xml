@@ -1,0 +1,15 @@
+<recipe>
+  <name>peanut butter and jelly sandwich</name>
+  <!-- add picture of sandwich here -->
+  <ingredients>
+    <ingredient>Gloppy&trade; brand peanut butter</ingredient>
+    <ingredient>bread</ingredient>
+    <ingredient>jelly</ingredient>
+  </ingredients>
+  <instructions>
+    <step>Spread peanutbutter on one slice of bread.</step>
+    <step>Spread jelly on the other slice of bread.</step>
+    <step>Put bread slices together, with peanut butter and
+  jelly touching.</step>
+  </instructions>
+</recipe>

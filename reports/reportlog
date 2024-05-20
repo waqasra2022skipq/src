@@ -1,0 +1,5 @@
+select wReports.RptName,Provider.LName,Provider.FName,wReports.Access
+  from wReports
+    left join Provider on Provider.ProvID=wReports.ProvID
+  where RptName like '%ligible%'
+  order by wReports.RptName,wReports.Access,Provider.LName,Provider.FName

@@ -1,0 +1,7 @@
+update Treatment set
+     RevStatus=2,
+     MgrProvID=NULL,
+    MgrRevDate=NULL,
+    MgrRevTime=NULL
+ where TrID=1123194 or TrID=1123197
+;

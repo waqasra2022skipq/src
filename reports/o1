@@ -1,0 +1,90 @@
+form-Browser=Telnet
+form-DBNAME=okmis_mms
+form-DOCBIN=/home/okmis/www/mms/cgi/bin
+form-DOCPARENT=/home/okmis/www/
+form-DOCROOT=/home/okmis/www/mms
+form-HTTPSERVER=https://mms.okmis.com
+form-LOGINACLID=
+form-LOGINAGENCY=91
+form-LOGINEMAIL=support@okmis.com
+form-LOGINID=root
+form-LOGINNAME=Millennium Group
+form-LOGINPROVID=91
+form-LOGINSCREEN=ManagerTree.cgi
+form-LOGINTYPE=0
+form-LOGINUSERDB=okmis_mms
+form-LOGINUSERID=91
+form-LOGINUSERNAME=Root User 
+form-LOGINUSERTYPE=1
+form-NOW=12:10:37
+form-TODAY=2020-03-22
+form-Type=130
+form-USERLOGINID=okmis_mms:91
+form-mlt=wW3T4Y7MKaHE
+form-query=DBNAME=okmis_mms&Type=130
+Header: 
+402: 
+ code: G9458
+ code: G9459
+ code: G9460
+128: 
+ code: G8416
+ code: G8417
+ code: G8418
+ code: G8419
+ code: G8420
+ code: G8421
+ code: G8422
+ code: G8938
+431: 
+ code: G9621
+ code: G9622
+ code: G9623
+ code: G9624
+130: 
+ code: G8427
+ code: G8428
+ code: G8430
+283: 
+ code: G9919
+ code: G9920
+ code: G9921
+QID: 130
+ GCode: G8427
+ GCode: G8428
+ GCode: G8430
+numFLDS=1
+qrecord=
+
+select Treatment.TrID,Treatment.ContLogDate,Treatment.ClinicID,xSC.SCNum
+      ,Client.LName,Client.FName,Client.ClientID
+      ,Clinic.Name as ClinicName
+      ,CONCAT(Counselor.LName,', ',Counselor.FName) as PrimaryProvider
+      ,Client.DOB,TIMESTAMPDIFF(YEAR, Client.DOB, CURDATE()) AS Age
+      ,xRaces.Descr as Race
+      ,misICD10.ICD10
+      ,count(*) as pcount
+ from Treatment 
+  left join Client on Client.ClientID=Treatment.ClientID
+  left join Provider as Clinic on Clinic.ProvID=Client.clinicClinicID
+  left join Provider as Counselor on Counselor.ProvID=Client.ProvID
+  left join okmis_config.xRaces on xRaces.ID=SUBSTRING_INDEX(Client.Race,'ý',1)
+  left join xSC on xSC.SCID=Treatment.SCID
+  left join xInsurance on xInsurance.ID=xSC.InsID
+  left join ClientNoteProblems on ClientNoteProblems.TrID=Treatment.TrID
+  left join okmis_config.misICD10 on misICD10.ID=ClientNoteProblems.UUID
+ where Client.ClientID>100
+   and (Treatment.ContLogDate >= '2019-01-01' and Treatment.ContLogDate<='2019-12-31')
+  and (TIMESTAMPDIFF(YEAR, Client.DOB, Treatment.ContLogDate) >= 18)
+   and (xSC.SCNum='G8427'
+        or xSC.SCNum='G8428'
+        or xSC.SCNum='G8430'
+      )
+  
+ order by Client.LName,Client.FName,Client.ClientID
+
+Sun Mar 22 12:10:37 2020
+130 Documentation of Current Medications in the Medical Record - National Quality Strategy Domain: Patient Safety - Meaningful Measure Area: Medication Management from 01/01/2019 thru 12/31/2019 
+ClientID	TrID	pcount	G8427	G8428	G8430	
+36945	1220533	1080	1	0	0	
+1			1	0	0	

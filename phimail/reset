@@ -1,0 +1,21 @@
+#!/bin/bash
+# ------------------------------------
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   print "\nServices not installed!"
+   exit 1
+fi
+# ------------------------------------
+  print "\nreset PhiMail received directory and mysql data\n"
+  print "Save Directory: received.${YMD}\n"
+#  mv received received.${DATESTAMP}
+rm -rf received
+  print "\nMaking received..."
+#  mkdir -p received
+#  chown root:adm received
+#  chmod 755 received
+cp -rp kls received
+  print "Clear MySQL PhiMail: using PhiMail.sqldump file...\n"
+  ${DBCMD} okmis_mms < PhiMail.sqldump
+# ------------------------------------

@@ -1,0 +1,10 @@
+select ClientID as CID,TrID,ContLogDate,BillStatus as B,RecDate,StatusDate,COPLDate,ChartEntryDate,CreateDate,RecDOLC
+ from Treatment 
+  where (ContLogDate='0000-00-00' || ContLogDate is null) and BillStatus=4
+  order by RecDOLC,ClientID,TrID
+;
+select ClientID as CID,TrID,ContLogDate,BillStatus as B,RecDate,StatusDate,COPLDate,ChartEntryDate,CreateDate,RecDOLC
+ from Treatment 
+  where (ContLogDate='0000-00-00' || ContLogDate is null)
+  order by RecDOLC,ClientID,TrID
+;

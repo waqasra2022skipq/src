@@ -1,0 +1,77 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+############################################################################
+my $DBNAME=shift;
+my $table=shift;
+my $id1=shift;
+my $id2=shift;
+print qq|\n-------------------------\n|;
+print "## DBNAME=$DBNAME=, table=$table=, id1=$id1=, id2=$id2=\n";
+$id2 = $id2 ? $id2 : $id1+1;
+print "## DBNAME=$DBNAME, table=$table, id1=$id1, id2=$id2\n";
+my $RecID=shift;
+$RecID = $RecID ? $RecID : 'ID';
+$form = DBForm->new("DBNAME=$DBNAME");
+my $dbh = $form->dbconnect();
+# always put good one first...because of the $b eq '' below...
+print "## select * from ${table} where ${RecID}=${id1} or ${RecID}=${id2}\n";
+my $s = $dbh->prepare("select * from ${table} where ${RecID}=${id1} or ${RecID}=${id2}");
+############################################################################
+my $cnt = 0;
+my $out;
+$s->execute() || $form->dberror("select");
+while ( my $r=$s->fetchrow_hashref )
+{
+  $cnt++;
+  foreach my $f ( sort keys %{$r} )
+  { $out->{$f}->{$cnt} = $r->{$f}; }
+}
+print qq|##\n## NONE SELECTED!\n| if ( $cnt == 0 );
+print qq|##\n## ONLY 1 SELECTED!\n| if ( $cnt == 1 );
+print qq|##\n## pass 1:\n|;
+$str = "update ${table} set ";
+$dlm = '';
+foreach my $f ( sort keys %{$out} )
+{
+  my $a=$out->{$f}->{1};
+  my $b=$out->{$f}->{2};
+  my $val = $dbh->quote($a);
+  print qq|## $f\t1=$a\t2=$b\n| if ( $a ne $b && $a ne '' );
+  next if ( $f eq 'ID' );
+  next if ( $f eq 'TrPlanID' );
+  next if ( $f eq 'PDDiagID' );
+  next if ( $f eq 'PDDomID' );
+  next if ( $f eq 'FormID' );
+  next if ( $f eq 'RecDOLC' );
+  if ( $a ne $b && $a ne '' )
+  { $str .= qq|${dlm} ${f}=${val}|; $dlm = '.'; }
+}
+#print "# update 2 with 1\n${str} where ${RecID}=${id2};\n";
+#print "delete from ${table} where ${RecID}=${id1};\n";
+print qq|##\n## pass 2:\n|;
+$str = "update ${table} set ";
+$dlm = '';
+foreach my $f ( sort keys %{$out} )
+{
+  my $a=$out->{$f}->{1};
+  my $b=$out->{$f}->{2};
+  my $val = $dbh->quote($b);
+  print qq|## $f\t1=$a\t2=$b\n| if ( $a ne $b && $b ne '' );
+  next if ( $f eq 'ID' );
+  next if ( $f eq 'TrPlanID' );
+  next if ( $f eq 'PDDiagID' );
+  next if ( $f eq 'PDDomID' );
+  next if ( $f eq 'FormID' );
+  next if ( $f eq 'RecDOLC' );
+  if ( $a ne $b && $b ne '' )
+  { $str .= qq|${dlm} ${f}=${val}|; $dlm = ','; }
+}
+print "# update 1 with 2\n${str} where ${RecID}=${id1};\n" if ( $dlm );
+print "delete from ${table} where ${RecID}=${id2};\n";
+$s->finish();
+$form->complete();
+print qq|-------------------------\n|;
+exit;
+############################################################################

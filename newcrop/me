@@ -1,0 +1,3 @@
+select TrID,StatusDate,BillStatus,BillDate from Treatment where TrID=700396 or TrID=703657 or TrID=703615 or TrID=700400;
+update Treatment set BillStatus=3,StatusDate='2018-03-02' where TrID=700396 or TrID=703657 or TrID=703615 or TrID=700400;
+select TrID,StatusDate,BillStatus,BillDate from Treatment where TrID=700396 or TrID=703657 or TrID=703615 or TrID=700400;

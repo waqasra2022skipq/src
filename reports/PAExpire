@@ -1,0 +1,67 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use DBA;
+use DBUtil;
+use Time::Local;
+$DT = localtime();
+############################################################################
+# usage:
+#   PAExpire ForProvID=id\\&Days=dd
+#                               dd=15,30,45...
+############################################################################
+$form = DBForm->new();
+$dbh = $form->dbconnect();
+$Days_Remaining = $form->{Days} ? $form->{Days} : 0;
+
+print "${DT}\nPrior Authorization Expire Report\nLess than or equal to ${Days_Remaining} days remaining.\n";
+print "Client\tPrimary Provider\tPrior Auth #\tPA Expires\tInsurance\tInsurance #\tDays Remaining\n";
+
+my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+my $qClient = qq|select Client.* from Client
+    left join ClientACL on ClientACL.ClientID=Client.ClientID
+  where Active=1 and ClientACL.ProvID='${ForProvID}' order by LName, FName|;
+my $sClient = $dbh->prepare($qClient);
+my $sProvider = $dbh->prepare("select LName, FName from Provider where ProvID=?");
+my $sInsurance = $dbh->prepare("
+select xInsurance.Name, Insurance.InsIDNum from Insurance 
+    left join xInsurance on xInsurance.ID=Insurance.InsID
+  where Insurance.ClientID=? 
+    and Insurance.Priority=1 
+    and (curdate()<=Insurance.InsNumExpDate or Insurance.InsNumExpDate is NULL)");
+my $sPrAuth = $dbh->prepare("select ID, PAnumber, ExpDate from ClientPrAuth
+  where ClientID=? and EffDate <= curdate() and (curdate() <= ExpDate or ExpDate is null)
+  order by ID desc");
+
+$sClient->execute();
+while (my $rClient = $sClient->fetchrow_hashref)
+{ 
+  $sProvider->execute($rClient->{ProvID});
+  my ($ProvLName, $ProvFName) = $sProvider->fetchrow_array;
+  $ProvName = qq|$ProvLName, $ProvFName ($rClient->{ProvID})|; 
+
+  $sInsurance->execute($rClient->{ClientID});
+  my ($InsName, $InsGrpNum) = $sInsurance->fetchrow_array;
+
+  $sPrAuth->execute($rClient->{ClientID});
+  my ($PrAuthID, $PAnumber, $PrAuthExpDate) = $sPrAuth->fetchrow_array;
+
+  my $SubtractDays = $dbh->prepare("select to_days(?) - to_days(curdate())");
+  $SubtractDays->execute($PrAuthExpDate);
+  my $Remaining = $SubtractDays->fetchrow_array;
+  $SubtractDays->finish();
+  $Remaining = 0 if ( $Remaining eq '' );
+
+#warn qq|$rClient->{LName}, $rClient->{FName} ($rClient->{ClientID})\t${ProvName}\t${PAnumber}\t${PrAuthExpDate}\t${InsName}\t${InsGrpNum}\t${Remaining}\n| if ( $form->{'LOGINPROVID'} == 121 );
+  print qq|$rClient->{LName}, $rClient->{FName} ($rClient->{ClientID})\t${ProvName}\t${PAnumber}\t${PrAuthExpDate}\t${InsName}\t${InsGrpNum}\t${Remaining}\n| 
+    if ( $Remaining <= ${Days_Remaining} );
+}
+
+$sClient->finish();
+$sPrAuth->finish;
+$sInsurance->finish;
+$sProvider->finish;
+$form->complete();
+exit;
+############################################################################

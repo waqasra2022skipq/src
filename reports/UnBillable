@@ -1,0 +1,59 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use SysAccess;
+use Time::Local;
+$DT = localtime();
+
+############################################################################
+# usage: UnBillable DBNAME={dbname}
+############################################################################
+$form = DBForm->new();
+#if ( ! SysAccess->verify($form,'Privilege=BillingReports') )
+#{ $form->error("Access Denied! / Privilege"); }
+$form = DBUtil->setDates($form);
+my $DateRange = qq|from $form->{FromDateD} thru $form->{ToDateD}|;
+$dbh = $form->dbconnect();
+
+#######################################################
+my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+#my $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Treatment.ClinicID');
+my $addSelection = DBA->getForProvID($form,$ForProvID,'and','Treatment.ClinicID','Treatment.ProvID');
+my $qNotes = qq|
+select Treatment.ClientID,Treatment.TrID,Treatment.ContLogDate
+      ,Treatment.BillStatus,Treatment.RevStatus,Treatment.StatusDate,Treatment.StatusMsg
+      ,Treatment.ProvID as NoteProvID, Client.ProvID as PrimaryProvID
+      ,Provider.Name as ClinicName
+      ,Client.LName, Client.FName
+      ,xSC.InsID, xSC.SCID, xSC.SCNum
+      ,xInsurance.Descr as InsDescr, xInsurance.Name as InsName
+  from Treatment
+    left join Provider on Provider.ProvID=Treatment.ClinicID
+    left join Client on Client.ClientID=Treatment.ClientID
+    left join xSC on xSC.SCID=Treatment.SCID
+    left join xInsurance on xInsurance.ID=xSC.InsID
+  where BillStatus=2
+    ${addSelection}
+  order by Provider.Name, xInsurance.Name, Client.LName, Client.FName, Treatment.ContLogDate
+|;
+#warn "qNotes=$qNotes\n" if ( $form->{LOGINPROVID} == 91 );
+$sNotes = $dbh->prepare($qNotes);
+
+#####################################################################
+my ($NoteCnt,$FatalCnt,$WarnCnt) = (0,0,0);
+print qq|${DT}\nUnBillable Notes\n|;
+print qq|Type\tStatus\tClinic\tInsurance\tClient\tTrID\tContDate\tSCNum\tEntryDate\tCreateDate\tChangeDateTime\n|;
+$sNotes->execute() || $form->dberror($qNotes);
+while ( $rNotes = $sNotes->fetchrow_hashref )
+{
+  $NoteCnt++;
+  my $InsID = $rNotes->{InsID} ? $rNotes->{InsID} : '0';           # 0 = No Insurance, none.
+  my $InsDescr = $rNotes->{InsID} ? $rNotes->{InsDescr} : 'none';  # 0 = No Insurance, none.
+  my $InsName = $rNotes->{InsID} ? $rNotes->{InsName} : 'none';    # 0 = No Insurance, none.
+  print qq|FATAL!\t$rNotes->{StatusMsg}\t$rNotes->{ClinicName}\t$InsName\t$rNotes->{FName} $rNotes->{LName} ($rNotes->{ClientID})\t$rNotes->{TrID}\t$rNotes->{ContLogDate}\t$rNotes->{SCNum}\t$rNotes->{ChartEntryDate}\t$rNotes->{CreateDate}\t$rNotes->{RecDOLC} &nbsp;\n|;
+}
+$sNotes->finish();
+$form->complete();
+exit;
+##############################################################################

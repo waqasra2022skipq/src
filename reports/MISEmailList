@@ -1,0 +1,5 @@
+select Provider.LName,Provider.FName,Provider.Email 
+ from Provider 
+  left join ProviderPrefs on ProviderPrefs.ProvID=Provider.ProvID 
+ where Provider.Active=1 and ProviderPrefs.MISEmails=1 
+ order by Provider.LName,Provider.FName

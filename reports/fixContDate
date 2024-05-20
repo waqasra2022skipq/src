@@ -1,0 +1,4 @@
+update Treatment set ContLogDate=RecDOLC 
+ where (ContLogDate='0000-00-00' || ContLogDate is null) and BillStatus=4;
+update Treatment set BillStatus=2,StatusMsg='Missing Contact Date!',MgrProvID=NULL,MgrRevDate=NULL,RevStatus=2,MgrRevTime=NULL
+ where (ContLogDate='0000-00-00' || ContLogDate is null) and BillStatus=0;

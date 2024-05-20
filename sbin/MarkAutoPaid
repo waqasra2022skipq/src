@@ -1,0 +1,71 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use  DBI;
+use  DBForm;
+use  DBA;
+
+############################################################################
+# This routine marks the PaidDate for AutoPay Clinics
+############################################################################
+my $form = DBForm->new();
+my $dbh = $form->dbconnect();
+
+############################################################################
+# Process ALL Clinics with AutoPay
+my $qClinics = qq|
+  select Contracts.PIN, Contracts.InsID
+        ,xInsurance.Descr, Provider.ProvID, Provider.Name, Provider.Email
+        ,Provider.Addr1, Provider.Addr2, Provider.City, Provider.ST, Provider.Zip
+  from Contracts
+    left join Provider on Provider.ProvID=Contracts.ProvID
+    left join xInsurance on xInsurance.ID=Contracts.InsID
+  where Contracts.AutoPay=1
+#where Contracts.ProvID=101 or Contracts.ProvID=1320 or Contracts.ProvID=1336
+  order by xInsurance.Descr, Provider.Name
+|;
+my $sClinics=$dbh->prepare($qClinics);
+$sClinics->execute() || $form->dberror($qClinics);
+while ( $rClinics = $sClinics->fetchrow_hashref ) 
+{ 
+  print qq|\nPay: $rClinics->{Descr} for $rClinics->{Name} ($rClinics->{ProvID}) PIN=$rClinics->{PIN}\n|;
+  main->ClinicPay($rClinics->{ProvID},$rClinics->{InsID});
+}
+$form->complete();
+exit;
+############################################################################
+sub ClinicPay
+{
+  my ($self,$ClinicID,$InsID) = @_;
+  my $qPaid="update Treatment set PaidDate=? where TrID=? and PaidDate is null";
+  my $sPaid=$dbh->prepare($qPaid);
+  my $qTrans="update NoteTrans set PaidDate=? where TrID=? and PaidDate is null";
+  my $sTrans=$dbh->prepare($qTrans);
+  $qNotes = qq|
+select *
+  from NoteTrans
+    left join Treatment on Treatment.TrID=NoteTrans.TrID
+    left join Client on Client.ClientID=Treatment.ClientID
+    left join xSC on xSC.SCID=NoteTrans.SCID
+  where Treatment.ClinicID=${ClinicID}
+    and xSC.InsID='${InsID}'
+    and NoteTrans.RecDate is not null
+    and NoteTrans.PaidDate is null
+#and Treatment.BillDate < '2009-06-01'
+  order by Treatment.ContLogDate
+|;
+#warn "qNotes=\n$qNotes\n";
+  $sNotes=$dbh->prepare($qNotes);
+  print qq|\n#Message\tTrID\tClient\tBillDate\tRecDate\tUnits\n|;
+  $sNotes->execute() || $form->dberror($qNotes);
+  while ( $rNotes = $sNotes->fetchrow_hashref ) 
+  { 
+    print qq|#Mark Claim:\t$rNotes->{TrID}\t$rNotes->{FName}, $rNotes->{LName} ($rNotes->{ClientID})\t$rNotes->{BillDate}\t$rNotes->{RecDate}\t$rNotes->{Units}\n|;
+    $sPaid->execute($rNotes->{RecDate},$rNotes->{TrID}) || $form->dberror($qPaid);
+    $sPaid->finish();
+    $sTrans->execute($rNotes->{RecDate},$rNotes->{TrID}) || $form->dberror($qTrans);
+    $sTrans->finish();
+  }
+  $sNotes->finish();
+  return(1);
+}
+############################################################################

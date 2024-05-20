@@ -1,0 +1,48 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBForm;
+my $form = DBForm->new();
+foreach my $f ( sort keys %{$form} ) { warn "rebld: form-$f=$form->{$f}\n"; }
+my $dbh = $form->dbconnect();
+my @flds = ('ID','loginid','Password','dbname','UserID','loginscreen','type','renew','FormID');
+my $dbname = $form->{'DBNAME'};
+my $table = 'Passwd';
+warn qq|rebld: table=${table}\n|;
+
+#delete new records because of INSERT...
+my $sDelete = $dbh->prepare("delete from UserLogin");
+$sDelete->execute() || $form->dberror("select: UserLogin");
+$sDelete->finish();
+
+my $s = $dbh->prepare("select * from ${table}");
+$s->execute() || $form->dberror("select: ${table}");
+while ( my $r = $s->fetchrow_hashref )
+{
+  print "\ntable=${table}\n";
+#  foreach my $f ( sort keys %{$r} ) { print "${table}: form-$f=$r->{$f}\n"; }
+  my $dlm = '';
+  my $qInsert = qq|Insert into UserLogin (|;
+  foreach my $f ( @flds )
+  { $qInsert .= qq|${dlm}`${f}`|; $dlm=','; }
+  my $dlm = '';
+  $qInsert .= qq|) VALUES (|;
+  foreach my $f ( @flds )
+  {
+    my $value = $f eq 'ID' 
+              ? $dbname.':'.$r->{ProviderID}
+              : $f eq 'loginid' ? $r->{Name}
+              : $f eq 'UserID' ? $r->{ProviderID}
+              : $f eq 'dbname' ? $dbname
+              : $f eq 'loginscreen' ? 'ManagerTree'
+              : $f eq 'type' ? 0
+              : $r->{$f};
+    $qInsert .= qq|${dlm}'${value}'|; $dlm=','; 
+  }
+  $qInsert .= qq|)|;
+  print "qInsert: ${qInsert}\n";
+  my $sInsert = $dbh->prepare($qInsert);
+  $sInsert->execute() || $form->dberror($qInsert);
+  $sInsert->finish();
+}
+$s->finish();
+$form->complete();

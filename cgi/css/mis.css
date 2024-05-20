@@ -1,0 +1,1059 @@
+/* stylesheet for Millennium Information Services */
+/* a0522d is golden brown */
+/* 5a7d9b is aqua blue */
+/* 336666 is aqua green */
+/* e6e6fa is light silver blue */
+/* ffe4e1 is light pink */
+/* 000080 is royal blue */
+/* 778899 is silver blue */
+/* FBFFE7 is almost pink */
+
+/* USED stuff */
+A:link    { color: blue; text-decoration: none; }
+A:visited { color: blue; text-decoration: none; }
+A:active  { color: blue; text-decoration: underline; }
+A:hover   { color: black;
+            background-color: rgb(187,187,187);
+            text-decoration: none;
+          }
+/* ....heading is set to table WIDTH=100%
+/* == site = white on black ============================ */
+
+.siteheading
+{
+  border: none;
+  color: white;
+  background-color: black;
+  text-align: center;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: large;
+  font-weight: bold;
+}
+table.siteheading { width: 100% }
+p.siteheading { width: 90% }
+div.siteheading { width: 90% }
+
+.sitetitle
+{
+  border: none;
+  color: white;
+  background-color: black;
+  text-align: center;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: medium;
+  font-weight: normal;
+}
+table.sitetitle { width: 90% }
+p.sitetitle { width: 90% }
+div.sitetitle { width: 90% }
+
+.sitesubtitle
+{
+  border: none;
+  color: white;
+  background-color: black;
+  text-align: center;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: small;
+  font-weight: normal;
+}
+table.sitesubtitle { width: 90% }
+p.sitesubtitle { width: 90% }
+div.sitesubtitle { width: 90% }
+
+.sitememo
+{
+  border: none;
+  color: white;
+  background-color: black;
+  text-align: center;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: x-small;
+  font-weight: normal;
+}
+table.sitememo { width: 90% }
+p.sitememo { width: 90% }
+div.sitememo { width: 90% }
+
+.sitestreamer
+{
+  border: none;
+  color: white;
+  background-color: black;
+  text-align: left;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: large;
+  font-weight: normal;
+}
+table.sitestreamer { width: 90% }
+p.sitestreamer { width: 90% }
+div.sitestreamer { width: 90% }
+
+.sitelabel
+{
+  border: none;
+  color: white;
+  background-color: black;
+  text-align: left;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: medium;
+  font-weight: normal;
+}
+table.sitelabel { width: 90% }
+p.sitelabel { width: 90% }
+div.sitelabel { width: 90% }
+
+.sitesublabel
+{
+  border: none;
+  color: white;
+  background-color: black;
+  text-align: left;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: small;
+  font-weight: normal;
+}
+table.sitesublabel { width: 90% }
+p.sitesublabel { width: 90% }
+div.sitesublabel { width: 90% }
+A.sitesublabel:link { color: #FFCC00; border: solid 1px black; background-color: black; }
+A.sitesublabel:visited { color: #FFCC00; border: solid 1px black; background-color: black; }
+A.sitesublabel:hover { color: black; border: solid 1px #FFCC00; background-color: silver; }
+
+.sitetag
+{
+  border: none;
+  color: white;
+  background-color: black;
+  text-align: left;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: x-small;
+  font-weight: normal;
+}
+table.sitetag { width: 90% }
+p.sitetag { width: 90% }
+div.sitetag { width: 90% }
+
+.sitelegend
+{
+  border: none;
+  color: white;
+  background-color: black;
+  text-align: right;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: large;
+  font-weight: normal;
+}
+table.sitelegend { width: 90% }
+p.sitelegend { width: 90% }
+div.sitelegend { width: 90% }
+
+.sitelink
+{
+  border: none;
+  color: white;
+  background-color: black;
+  text-align: right;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: medium;
+  font-weight: normal;
+}
+table.sitelink { width: 90% }
+p.sitelink { width: 90% }
+div.sitelink { width: 90% }
+
+.sitesublink
+{
+  border: none;
+  color: white;
+  background-color: black;
+  text-align: right;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: small;
+  font-weight: normal;
+}
+table.sitesublink { width: 90% }
+p.sitesublink { width: 90% }
+div.sitesublink { width: 90% }
+
+.siteflag
+{
+  border: none;
+  color: white;
+  background-color: black;
+  text-align: right;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: x-small;
+  font-weight: normal;
+}
+table.siteflag { width: 90% }
+p.siteflag { width: 90% }
+div.siteflag { width: 90% }
+
+/* == home = black on white ============================ */
+
+.homeheading
+{
+  border: none;
+  color: black;
+  background-color: white;
+  text-align: center;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: large;
+  font-weight: bold;
+}
+table.homeheading { width: 100%; border: solid 2px silver; }
+p.homeheading { width: 90% }
+div.homeheading { width: 90% }
+
+.hometitle
+{
+  border: none;
+  color: black;
+  background-color: white;
+  text-align: center;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: medium;
+  font-weight: normal;
+}
+table.hometitle { width: 90% }
+p.hometitle { width: 90% }
+div.hometitle { width: 90% }
+
+.homesubtitle
+{
+  border: none;
+  color: black;
+  background-color: white;
+  text-align: center;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: small;
+  font-weight: normal;
+}
+table.homesubtitle { width: 90% }
+p.homesubtitle { width: 90% }
+div.homesubtitle { width: 90% }
+
+.homememo
+{
+  border: none;
+  color: black;
+  background-color: white;
+  text-align: center;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: x-small;
+  font-weight: normal;
+}
+table.homememo { width: 90% }
+p.homememo { width: 90% }
+div.homememo { width: 90% }
+
+.homestreamer
+{
+  border: none;
+  color: black;
+  background-color: white;
+  text-align: left;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: large;
+  font-weight: normal;
+}
+table.homestreamer { width: 90% }
+p.homestreamer { width: 90% }
+div.homestreamer { width: 90% }
+
+.homelabel
+{
+  border: none;
+  color: black;
+  background-color: white;
+  text-align: left;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: medium;
+  font-weight: normal;
+}
+table.homelabel { width: 90% }
+p.homelabel { width: 90% }
+div.homelabel { width: 90% }
+
+.homesublabel
+{
+  border: none;
+  color: black;
+  background-color: white;
+  text-align: left;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: small;
+  font-weight: normal;
+}
+table.homesublabel { width: 90% }
+p.homesublabel { width: 90% }
+div.homesublabel { width: 90% }
+A.homesublabel:link { color: blue; text-decoration: none; }
+A.homesublabel:visited { color: blue; text-decoration: none; }
+A.homesublabel:hover { color: black; border: solid 1px coral; background-color: silver; }
+
+.hometag
+{
+  border: none;
+  color: black;
+  background-color: white;
+  text-align: left;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: x-small;
+  font-weight: normal;
+}
+table.hometag { width: 90% }
+p.hometag { width: 90% }
+div.hometag { width: 90% }
+
+.homelegend
+{
+  border: none;
+  color: black;
+  background-color: white;
+  text-align: right;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: large;
+  font-weight: normal;
+}
+table.homelegend { width: 90% }
+p.homelegend { width: 90% }
+div.homelegend { width: 90% }
+
+.homelink
+{
+  border: none;
+  color: black;
+  background-color: white;
+  text-align: right;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: medium;
+  font-weight: normal;
+}
+table.homelink { width: 90% }
+p.homelink { width: 90% }
+div.homelink { width: 90% }
+
+.homesublink
+{
+  border: none;
+  color: black;
+  background-color: white;
+  text-align: right;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: small;
+  font-weight: normal;
+}
+table.homesublink { width: 90% }
+p.homesublink { width: 90% }
+div.homesublink { width: 90% }
+
+.homeflag
+{
+  border: none;
+  color: black;
+  background-color: white;
+  text-align: right;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: x-small;
+  font-weight: normal;
+}
+table.homeflag { width: 90% }
+p.homeflag { width: 90% }
+div.homeflag { width: 90% }
+
+
+/* == port = black on silver ========================== */
+
+.portheading
+{
+  border: none;
+  color: black;
+  background-color: silver;
+  text-align: center;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: large;
+  font-weight: bold;
+}
+table.portheading { width: 100% }
+p.portheading { width: 90% }
+div.portheading { width: 90% }
+
+.porttitle
+{
+  border: none;
+  color: black;
+  background-color: silver;
+  text-align: center;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: medium;
+  font-weight: normal;
+}
+table.porttitle { width: 90% }
+p.porttitle { width: 90% }
+div.porttitle { width: 90% }
+
+.portsubtitle
+{
+  border: none;
+  color: black;
+  background-color: silver;
+  text-align: center;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: small;
+  font-weight: normal;
+}
+table.portsubtitle { width: 90% }
+p.portsubtitle { width: 90% }
+div.portsubtitle { width: 90% }
+
+.portmemo
+{
+  border: none;
+  color: black;
+  background-color: silver;
+  text-align: center;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: x-small;
+  font-weight: normal;
+}
+table.portmemo { width: 90% }
+p.portmemo { width: 90% }
+div.portmemo { width: 90% }
+
+.portstreamer
+{
+  border: none;
+  color: black;
+  background-color: silver;
+  text-align: left;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: large;
+  font-weight: normal;
+}
+table.portstreamer { width: 90% }
+p.portstreamer { width: 90% }
+div.portstreamer { width: 90% }
+
+.portlabel
+{
+  border: none;
+  color: black;
+  background-color: silver;
+  text-align: left;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: medium;
+  font-weight: normal;
+}
+table.portlabel { width: 90% }
+p.portlabel { width: 90% }
+div.portlabel { width: 90% }
+
+.portsublabel
+{
+  border: none;
+  color: black;
+  background-color: silver;
+  text-align: left;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: small;
+  font-weight: normal;
+}
+table.portsublabel { width: 90% }
+p.portsublabel { width: 90% }
+div.portsublabel { width: 90% }
+
+.porttag
+{
+  border: none;
+  color: black;
+  background-color: silver;
+  text-align: left;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: x-small;
+  font-weight: normal;
+}
+table.porttag { width: 90% }
+p.porttag { width: 90% }
+div.porttag { width: 90% }
+
+.portlegend
+{
+  border: none;
+  color: black;
+  background-color: silver;
+  text-align: right;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: large;
+  font-weight: normal;
+}
+table.portlegend { width: 90% }
+p.portlegend { width: 90% }
+div.portlegend { width: 90% }
+
+.portlink
+{
+  border: none;
+  color: black;
+  background-color: silver;
+  text-align: right;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: medium;
+  font-weight: normal;
+}
+table.portlink { width: 90% }
+p.portlink { width: 90% }
+div.portlink { width: 90% }
+
+.portsublink
+{
+  border: none;
+  color: black;
+  background-color: silver;
+  text-align: right;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: small;
+  font-weight: normal;
+}
+table.portsublink { width: 90% }
+p.portsublink { width: 90% }
+div.portsublink { width: 90% }
+
+.portflag
+{
+  border: none;
+  color: black;
+  background-color: silver;
+  text-align: right;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: x-small;
+  font-weight: normal;
+}
+table.portflag { width: 90% }
+p.portflag { width: 90% }
+div.portflag { width: 90% }
+
+
+/* ===================================================== */
+/* font-weight gets inherited even if added to sub-block */
+/*   ie: in table font-weight bold then td has bold even if overridden */
+/* text-align cannot be overridden with <TD ALIGN=right > */
+/*   that's why these definitions are within the <TR> */
+
+.maintitle
+{
+  border: none;
+  background-color: black;
+  color: white;
+  text-align: left;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: large;
+  font-weight: bold;
+}
+table.maintitle { width: 90% }
+p.maintitle { width: 90% }
+div.maintitle { width: 90% }
+
+.mainhdr
+{
+  border: none;
+  background-color: black;
+  color: white;
+  text-align: left;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: medium;
+}
+table.mainhdr { width: 90% }
+p.mainhdr { width: 90% }
+div.mainhdr { width: 90% }
+
+.maintxt
+{
+  background-color: black;
+  border: none;
+  color: white;
+  text-align: left;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: small;
+}
+table.maintxt { width: 90% }
+p.maintxt { width: 90% }
+div.maintxt { width: 90% }
+
+.mainlink
+{
+  background-color: black;
+  border: none;
+  color: white;
+  text-align: right;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: medium;
+  font-weight: normal;
+}
+table.mainlink { width: 90% }
+p.mainlink { width: 90% }
+div.mainlink { width: 90% }
+
+.reporttitle
+{
+  border: none;
+  background-color: silver;
+  color: black;
+  text-align: center;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: large;
+  font-weight: bold;
+}
+table.reporttitle { width: 90% }
+
+.reporthdr
+{
+  background-color: silver;
+  border: none;
+  color: black;
+  text-align: left;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: medium;
+}
+table.reporthdr { width: 90% }
+
+.reporttxt
+{
+  background-color: silver;
+  border: none;
+  color: black;
+  text-align: left;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: small;
+}
+table.reporttxt { width: 90% }
+
+.reporteven
+{
+  background-color: #90EE90;
+  border: none;
+  color: black;
+  text-align: left;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: small;
+  font-weight: normal;
+}
+
+.reportodd
+{
+  background-color: white;
+  border: none;
+  color: black;
+  text-align: left;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: small;
+  font-weight: normal;
+}
+
+.reportheader
+{
+  background-color: #F5F5DC;
+  border: none;
+  color: black;
+  text-align: left;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: small;
+  font-weight: normal;
+}
+
+.reportextra
+{
+  background-color: yellow;
+  border: none;
+  color: black;
+  text-align: left;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: small;
+  font-weight: normal;
+}
+
+table.input 
+{
+  background-color: white;
+  border: solid 3px black;
+}
+
+tr.input 
+{
+  color: black;
+  background-color: white;
+  text-align: left;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: medium;
+  font-weight: normal;
+}
+
+h1.main
+{
+  border: none;
+  background-color: black;
+  color: white;
+  text-align: center;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: large;
+  font-weight: normal;
+}
+
+.mainheading
+{
+  border: none;
+  background-color: black;
+  color: white;
+  text-align: center;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: large;
+  font-weight: bold;
+}
+
+.main 
+{
+  border: none;
+  background-color: black;
+  color: white;
+  text-align: left;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: medium;
+  font-weight: normal;
+}
+
+.mainlabel
+{
+  border: none;
+  background-color: black;
+  color: white;
+  text-align: left;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: large;
+  font-weight: normal;
+}
+
+table.main 
+{
+  width: 90%;
+  background-color: black;
+  color: white;
+  text-align: left;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: medium;
+}
+
+A.menulink 
+{
+  width: 90%;
+  display: block;
+  text-align: left;
+  text-decoration: none;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: small;
+  font-weight: normal;
+  border: solid 1px white;
+}
+
+A.menulink:hover 
+{
+  border: solid 1px coral;
+  background-color: silver;
+}
+
+.menuheading
+{
+  width: 100%;
+  border: none;
+  background-color: silver;
+  color: black;
+  text-align: center;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: medium;
+  font-weight: bold;
+}
+
+.menu 
+{
+  width: 100%;
+  border: none;
+  background-color: white;
+  color: black;
+  text-align: left;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: medium;
+  font-weight: normal;
+}
+
+table.menu 
+{
+  width: 90%;
+  border: solid 3px silver;
+  background-color: white;
+  color: black;
+  text-align: left;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: medium;
+  font-weight: normal;
+}
+.hbuttons
+{ 
+  background-color: silver; 
+  border: none;
+  border-style: none;
+  color: white; 
+  text-align: right;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: medium; 
+  font-weight: normal;
+  vertical-align: top; 
+}
+.sbuttons
+{ 
+  background-color: black; 
+  border: none;
+  border-style: none;
+  color: white; 
+  text-align: right;
+  vertical-align: top; 
+  font-family: Verdana, Arial, Helvetica;
+  font-size: medium; 
+  font-weight: normal;
+}
+.textheading
+{
+  border: none;
+  color: black;
+  background-color: silver;
+  text-align: center;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: large;
+  font-weight: bold;
+}
+
+.text 
+{
+  background-color: white;
+  border: none;
+  color: black;
+  text-align: left;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: large;
+  font-weight: normal;
+}
+table.text 
+{
+  background-color: white;
+  width: 90%;
+  border: solid 3px silver;
+  color: black;
+  text-align: left;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: large;
+  font-weight: normal;
+}
+
+.textlist
+{
+  border: none;
+  color: black;
+  background-color: white;
+  text-align: center;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: large;
+  font-weight: normal;
+}
+
+.dataheading
+{
+  background-color: silver;
+  border: none;
+  border-style: none;
+  color: black;
+  text-align: left;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: medium;
+  font-weight: bold;
+}
+
+.data 
+{
+  background-color: white;
+  border: none;
+  color: black;
+  text-align: left;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: small;
+  font-weight: normal;
+}
+
+.guideheading
+{
+  background-color: silver;
+  border: none;
+  color: black;
+  text-align: center;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: small;
+  font-weight: normal;
+}
+
+.guide
+{
+  background-color: silver;
+  border: none;
+  color: black;
+  text-align: left;
+  vertical-align: top;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: x-small;
+  font-weight: normal;
+}
+
+/* ===================================================== */
+/* UNUSED stuff */
+/* login and admin */
+.login {
+  font-family: Verdana, Arial, Helvetica;
+}
+body.login {
+  background: #5a7d9b;
+  color: black;
+}
+h1.login {
+  font-size: 18pt;
+  color: orange;
+}
+table.login {
+  background-color: #FBFFE7;
+  padding: 20px;
+}
+td.login {
+  text-align: center;
+}
+th.login {
+  text-align: right;
+}
+
+body.admin {
+  background-color: #FBFFE7;
+  color: black;
+}
+
+.listtop { background-color: black; color: white; }
+.listheading { background-color: #336666; color: white; }
+A.listheading:link, A.listheading:active, A.listheading:visited {
+  color: white;
+  text-decoration: none; }
+.listrow1 { background-color: #e6e6fa; color: black; vertical-align: top; }
+.listrow0 { background-color: #ffe4e1; color: black; vertical-align: top; }
+.listsubtotal { background-color: #5a7d9b; color: white; }
+.listtotal { background-color: black; color: white; }
+
+.submit {
+  font-size: 12pt;
+  font-family: Verdana, Arial, Helvetica;
+  color: #000080;
+}
+.checkbox, .radio {
+  font-family: Verdana, Arial, Helvetica;
+  color: #778899;
+}
+
+.plus0 {    /* font color for negative numbers */
+  color: red;
+}
+
+.plus1 {
+  color: green;
+}
+
+h2.confirm {
+  color: blue;
+  font-size: 14pt;
+}
+
+h2.error {
+  color: red;
+  font-size: 14pt;
+}
+
+
+/* media stuff */
+
+@media screen {
+  .noscreen {   /* items with this class won't display */
+    display: none;
+  }
+}
+
+@media print {
+  .noprint {   /* items with this class won't print */
+    display: none;
+  }
+}
+/* new site/home/port definitions use these from now on */
+/* eg. see legalez cfg/agree where <TABLE ID="home" > */
+table#site { border: solid 3px silver; color: white; background-color: black; width: auto; }
+table#site td { border: none; }
+table#home { border: solid 3px silver; color: black; background-color: white; width: auto; }
+table#home td { border: none; vertical-align: top; text-align: left; }
+table#port { border: solid 3px silver; color: black; background-color: silver; width: auto; }
+table#port td { border: none; }
+table#siteset { border: solid 3px silver; color: white; background-color: black; width: 100%; }
+table#siteset td { border: none; }
+table#homeset { border: solid 3px silver; color: black; background-color: white; width: 100%; }
+table#homeset td { border: none; vertical-align: top; text-align: left; }
+table#homeset a:hover { color: black; background-color: silver; text-decoration: underline; }
+table#homeset a:link { color: blue; text-decoration: underline; }
+table#portset { border: solid 3px silver; color: black; background-color: silver; width: 100%; }
+table#portset td { border: none; }
+.hdrrow   { text-align: center; font-style: italic; text-decoration: underline; }
+.toprow   { text-align: center; font-style: italic; }
+.collink  { text-align: left; font-size: x-small; }
+.colleft  { text-align: left; }
+.colright { text-align: right; }

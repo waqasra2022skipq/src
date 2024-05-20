@@ -1,0 +1,33 @@
+<ul id="menuV2">
+  [[DBUtil->isLTE(<<Provider_Type_1>>+3)<LI><A HREF="javascript:void(0)">Clinic Information</A>]]
+  [[DBUtil->isEQ(<<Provider_Type_1>>+4)<LI><A HREF="javascript:void(0)">Provider Information</A>]]
+    <UL CLASS="sub" >
+      [[DBUtil->isLTE(<<Provider_Type_1>>+3)<LI><A HREF="/cgi/bin/mis.cgi?view=Clinic.cgi&Provider_ProvID=<<Provider_ProvID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Name/Demographic</A></LI>]]
+      [[DBUtil->isEQ(<<Provider_Type_1>>+4)<LI><A HREF="/cgi/bin/mis.cgi?view=Provider.cgi&Provider_ProvID=<<Provider_ProvID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Name/Demographic</A></LI>]]
+      [[DBUtil->isEQ(<<Provider_Type_1>>+4)<LI><A HREF="/cgi/bin/mis.cgi?view=Employee.cgi&Provider_ProvID=<<Provider_ProvID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Employee Information (has NPI)</A></LI> ]]
+      [[SysAccess->verify(%form+Privilege=HRReports)<LI><A HREF="/cgi/bin/mis.cgi?view=ProviderCreds.cgi&Provider_ProvID=<<Provider_ProvID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Provider Credentialing</A></LI> ]]
+      <LI><A HREF="/cgi/bin/mis.cgi?view=Benefit.cgi&Provider_ProvID=<<Provider_ProvID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Benefit Information</A></LI>
+      <LI><A HREF="/cgi/bin/mis.cgi?view=ListEquipment.cgi&Provider_ProvID=<<Provider_ProvID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Equipment List</A></LI>
+      <LI><A HREF="/cgi/bin/mis.cgi?view=ListTraining.cgi&Provider_ProvID=<<Provider_ProvID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Training List</A></LI>
+    </UL>
+  </LI>
+  <LI><A HREF="javascript:void(0)" ONMOUSEOVER="window.status='Administration Menu'; return true;" ONMOUSEOUT="window.status=''" >Administration</A>
+    <UL CLASS="sub" >
+      [[SysAccess->verify(%form+Privilege=ProviderPay)<LI><A HREF="javascript:InputWindow('/cgi/bin/TimeClock.cgi?Provider_ProvID=<<Provider_ProvID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>&NONAVATION=1','TimeClock')" >Timesheet</A></LI> ]]
+      <LI><A HREF="/cgi/bin/getHTML.cgi?view=ProviderHrs&Provider_ProvID=<<Provider_ProvID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>"&access=Payroll>Vacation / Sick Hours</A></LI>
+      [[SysAccess->verify(%form+Privilege=ProviderPay)<LI><A HREF="/cgi/bin/mis.cgi?view=ListProviderPay.cgi&Provider_ProvID=<<Provider_ProvID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Payroll Information</A></LI> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderRpts)<LI><A HREF="/cgi/bin/Reports.cgi?Provider_ProvID=<<Provider_ProvID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Reports</A></LI> ]]
+
+      [[DBA->check90(%form)<LI><A href="/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<Provider_ProvID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>&provType=<<provType>>&rollUpMessage=<<rollUpMessage>>">Electronic Documents</A></LI> ]]
+
+      [[SysAccess->verify(%form+Privilege=ProviderPrivs)<LI><A HREF="javascript:InputWindow('/cgi/bin/setPP.cgi?Provider_ProvID=<<Provider_ProvID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>','Privileges',900,1200)" >Update Privileges</A></LI> ]]
+      <LI><A HREF="/cgi/bin/mis.cgi?view=ProviderPrefs.cgi&Provider_ProvID=<<Provider_ProvID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Update Preferences</A></LI>
+      <LI> <A HREF="/cgi/bin/mis.cgi?Provider_ProvID=<<Provider_ProvID>>&view=ListReminders.cgi&mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='Reminders'; return true;" ONMOUSEOUT="window.status=''" >Set up Reminder</A> </LI>
+      [[SysAccess->verify(%form+Privilege=ProviderACL)<LI><A HREF="javascript:ReportWindow('/cgi/bin/MgrTreeReport.cgi?Provider_ProvID=<<Provider_ProvID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>','Providers Tree')" >Provider Manager Tree</A></LI> ]]
+    </UL>
+  </LI>
+  [[SysAccess->chkProvACL(%form+<<Provider_Type_1>>)<LI><A HREF="/cgi/bin/mis.cgi?view=ProviderACL.cgi&Provider_ProvID=<<Provider_ProvID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Access Control</A></LI> ]]
+  [[DBUtil->isEQ(<<Provider_Type_1>>+2)<LI><A TARGET="_scheduler" HREF="<<SchedulerPath>>/index.php" >Scheduler</A></LI> ]]
+  [[DBUtil->isEQ(<<Provider_Type_1>>+3)<LI><A HREF="/cgi/bin/mis.cgi?view=ClinicControl.cgi&Provider_ProvID=<<Provider_ProvID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Clinic Control (has NPI)</A></LI> ]]
+[[gHTML->RestrictedProviderOptions(%form+Agent)]]
+</UL>

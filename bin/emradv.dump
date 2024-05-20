@@ -1,0 +1,13 @@
+mysqldump okmis_mms emradv_tbl_AMS_CPOELabs;
+mysqldump okmis_mms emradv_tbl_AMS_CPOEMeds;
+mysqldump okmis_mms emradv_tbl_AMS_CPOERads;
+mysqldump okmis_mms emradv_tbl_AMS_EPrescription;
+mysqldump okmis_mms emradv_tbl_AMS_EPrescription_OLD;
+mysqldump okmis_mms emradv_tbl_AMS_MedicationReconciliation;
+mysqldump okmis_mms emradv_tbl_AMS_PatientEducation;
+mysqldump okmis_mms emradv_tbl_AMS_PatientElectronicAccess;
+mysqldump okmis_mms emradv_tbl_AMS_ReceiveIncorporate;
+mysqldump okmis_mms emradv_tbl_AMS_SecureMessaging;
+mysqldump okmis_mms emradv_tbl_AMS_TransitionOfCare;
+mysqldump okmis_mms emradv_tbl_AMS_ViewDownloadTransmit;
+mysqldump okmis_mms emradv_tbl_AMS_Visit;

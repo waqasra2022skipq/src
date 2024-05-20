@@ -1,0 +1,22 @@
+/* see ID="textMsgLayer" for attributes...z-index, etc.*/
+.msgText
+{ 
+    font-family: Verdana, Arial, Helvetica;
+    font-size: small;
+    color: black; 
+    text-align: center
+}
+.msgLeft
+{ 
+    font-family: Verdana, Arial, Helvetica;
+    font-size: x-small;
+    color: black; 
+    text-align: left
+}
+.msgRight
+{ 
+    font-family: Verdana, Arial, Helvetica;
+    font-size: x-small;
+    color: black; 
+    text-align: right
+}

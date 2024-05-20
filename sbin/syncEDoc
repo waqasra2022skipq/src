@@ -1,0 +1,25 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use myConfig;
+use DBI;
+use DBForm;
+use DBA;
+use utils;
+use Cwd;
+############################################################################
+# get the command name...
+my ($pw,$cmd) = $0 =~ m/(.*\/)(.*)$/;
+my $id = shift;
+
+############################################################################
+if ( $id eq '' )
+{
+  print qq|\n|;
+  print qq|Usage: ${cmd}: ID\n|;
+  print qq|       where: ID = ProviderEDocs ID of record to sync.\n|; 
+  print qq|\n|;
+  exit;
+}
+utils->syncMISEDoc($id);
+exit;
+############################################################################

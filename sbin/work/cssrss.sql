@@ -1,0 +1,24 @@
+CREATE TABLE `ClientCSSRSs` (
+  `ID` int(11) NOT NULL,
+  `ClientID` int(11) DEFAULT NULL,
+  `CreateProvID` int(11) DEFAULT NULL,
+  `CreateDate` date DEFAULT NULL,
+  `ChangeProvID` int(11) DEFAULT NULL,
+  `ChangeDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `FormID` varchar(12) DEFAULT NULL,
+  `Locked` char(1) DEFAULT NULL,
+  `TestDate` date DEFAULT NULL,
+  `q1` char(1) DEFAULT NULL,
+  `q2` char(1) DEFAULT NULL,
+  `q3` char(1) DEFAULT NULL,
+  `q4` char(1) DEFAULT NULL,
+  `q5` char(1) DEFAULT NULL,
+  `q6` int(11) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+ALTER TABLE `ClientCSSRSs`
+  ADD PRIMARY KEY (`ID`);
+
+ALTER TABLE `ClientCSSRSs`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+

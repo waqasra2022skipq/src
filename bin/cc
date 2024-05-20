@@ -1,0 +1,24 @@
+  select Contracts.ID, Contracts.InsID, Contracts.TaxID, Contracts.Taxonomy, Contracts.UseSpecialty, Provider.ProvID
+#        ,Contracts.UseReferring, Contracts.UseRendering, Contracts.UseSFacility, Contracts.UseAgency
+#        ,Contracts.ContractCode, Contracts.ServMeasure, Contracts.SourceCode
+        ,xInsurance.Name as InsName, xInsurance.InsCode
+#        ,xInsurance.SubID, xInsurance.SenderID, xInsurance.SenderCode , xInsurance.ISASQ
+#        ,xInsurance.RecName, xInsurance.RecID, xInsurance.ReceiverID, xInsurance.ReceiverCode, xInsurance.ISARQ
+#        ,xInsurance.PayName, xInsurance.PayID
+#        ,xInsurance.Addr1 as InsAddr1, xInsurance.Addr2 as InsAddr2
+#        ,xInsurance.City as InsCity, xInsurance.ST as InsST, xInsurance.Zip as InsZip
+#        ,xInsurance.ISARQ
+#        ,Provider.ProvID, Provider.Name, Provider.FName, Provider.LName, Provider.Email
+#        ,Provider.Addr1, Provider.Addr2, Provider.City, Provider.ST, Provider.Zip
+#        ,Provider.WkPh
+#        ,ProviderControl.NPI
+  from Contracts
+    left join Provider on Provider.ProvID=Contracts.ProvID
+    left join ProviderControl on ProviderControl.ProvID=Contracts.ProvID
+    left join xInsurance on xInsurance.ID=Contracts.InsID
+  where Contracts.BillFlag = '1' and Contracts.BillType = 'EL'
+    and Provider.Active=1
+    and xInsurance.Descr='medicaid'
+    and ( Provider.ProvID=131 or Provider.ProvID=201 or Provider.ProvID=100 or Provider.ProvID=184 or Provider.ProvID=90 or Provider.ProvID=166 or Provider.ProvID=185 or Provider.ProvID=140 or Provider.ProvID=158 or Provider.ProvID=138 or Provider.ProvID=162 or Provider.ProvID=175 or Provider.ProvID=164 or Provider.ProvID=183 or Provider.ProvID=161 or Provider.ProvID=153 or Provider.ProvID=139 or Provider.ProvID=180 or Provider.ProvID=136 or Provider.ProvID=207 or Provider.ProvID=240 or Provider.ProvID=143 or Provider.ProvID=200 or Provider.ProvID=222 or Provider.ProvID=239 or Provider.ProvID=238 or Provider.ProvID=144 or Provider.ProvID=208 or Provider.ProvID=216 or Provider.ProvID=134 or Provider.ProvID=190 or Provider.ProvID=167 or Provider.ProvID=198 or Provider.ProvID=195 or Provider.ProvID=217 or Provider.ProvID=168 or Provider.ProvID=246 or Provider.ProvID=245 or Provider.ProvID=234 or Provider.ProvID=242 or Provider.ProvID=247 or Provider.ProvID=244 or Provider.ProvID=241 or Provider.ProvID=236 or Provider.ProvID=228 or Provider.ProvID=231 or Provider.ProvID=232 or Provider.ProvID=243 or Provider.ProvID=235 or Provider.ProvID=237 or Provider.ProvID=219 or Provider.ProvID=135 or Provider.ProvID=179 or Provider.ProvID=171 or Provider.ProvID=165 or Provider.ProvID=155 or Provider.ProvID=230 or Provider.ProvID=149 or Provider.ProvID=150 or Provider.ProvID=210 or Provider.ProvID=199 or Provider.ProvID=154 or Provider.ProvID=133 or Provider.ProvID=214 or Provider.ProvID=203 or Provider.ProvID=204 or Provider.ProvID=197 or Provider.ProvID=156 or Provider.ProvID=220 or Provider.ProvID=148 or Provider.ProvID=186 or Provider.ProvID=225 or Provider.ProvID=209 or Provider.ProvID=212 or Provider.ProvID=170 or Provider.ProvID=169 or Provider.ProvID=221 or Provider.ProvID=202 or Provider.ProvID=215 or Provider.ProvID=211 or Provider.ProvID=189 or Provider.ProvID=172 or Provider.ProvID=224 or Provider.ProvID=229 or Provider.ProvID=181 or Provider.ProvID=187 or Provider.ProvID=218 or Provider.ProvID=196 or Provider.ProvID=146 or Provider.ProvID=206 or Provider.ProvID=191 or Provider.ProvID=182 or Provider.ProvID=145 or Provider.ProvID=157 or Provider.ProvID=151 or Provider.ProvID=192 or Provider.ProvID=193 or Provider.ProvID=223 or Provider.ProvID=173 or Provider.ProvID=163 or Provider.ProvID=177 or Provider.ProvID=127 or Provider.ProvID=132 or Provider.ProvID=160 or Provider.ProvID=159 or Provider.ProvID=176 or Provider.ProvID=178 or Provider.ProvID=114 or Provider.ProvID=122 or Provider.ProvID=108 or Provider.ProvID=126 or Provider.ProvID=205 or Provider.ProvID=104 or Provider.ProvID=103 or Provider.ProvID=110 or Provider.ProvID=123 or Provider.ProvID=112 or Provider.ProvID=105 or Provider.ProvID=188 or Provider.ProvID=130 or Provider.ProvID=117 or Provider.ProvID=113 or Provider.ProvID=106 or Provider.ProvID=121 or Provider.ProvID=142 or Provider.ProvID=124 or Provider.ProvID=102 or Provider.ProvID=109 or Provider.ProvID=129 or Provider.ProvID=194 or Provider.ProvID=125 or Provider.ProvID=141 or Provider.ProvID=213 or Provider.ProvID=119 or Provider.ProvID=116 or Provider.ProvID=120 or Provider.ProvID=233 or Provider.ProvID=128 or Provider.ProvID=107 or Provider.ProvID=115 or Provider.ProvID=227 or Provider.ProvID=226 or Provider.ProvID=118 or Provider.ProvID=111 or Provider.ProvID=101 or Provider.ProvID=174 or Provider.ProvID=152 or Provider.ProvID=147 or Provider.ProvID=137 )
+  order by xInsurance.Descr, Provider.Name
+\G

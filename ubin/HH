@@ -1,0 +1,7 @@
+./fixPG DBNAME=okmis_mms\&PAgroup=G9002
+./fixPG DBNAME=okmis_mms\&PAgroup=G9002 TN
+./fixPG DBNAME=okmis_mms\&PAgroup=G9005
+./fixPG DBNAME=okmis_mms\&PAgroup=G9009
+./fixPG DBNAME=okmis_mms\&PAgroup=G9009 TN
+./fixPG DBNAME=okmis_mms\&PAgroup=G9010
+./fixPG DBNAME=okmis_mms\&PAgroup=G9010 TN

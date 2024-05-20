@@ -1,0 +1,17 @@
+select xSC.Active, xSC.SCID, xSC.SCNum, xSC.SCName, xSC.ServiceType, xSC.ExInv
+      ,xSCRates.ServiceRate, xSCRates.HrsPerUnit, xSCRates.UnitLbl, xSCRates.RVUPct
+      ,xSCRates.EffDate, xSCRates.ExpDate
+      ,xInsurance.Name
+      ,xCredentials.Abbr as Credential
+      ,xSCRestrictions.Descr as Restriction
+      ,xPOS.Descr as PlaceOfService, xSC.PINReq
+  from xSC
+  left join xSCRates on xSCRates.SCID=xSC.SCID
+  left join xInsurance on xInsurance.ID=xSC.InsID
+  left join okmis_config.xCredentials on xCredentials.ID=xSC.CredID
+  left join okmis_config.xSCRestrictions on xSCRestrictions.ID=xSC.Restriction
+  left join okmis_config.xPOS on xPOS.ID=xSC.POS
+where xSCRates.EffDate='2013-01-01'
+and xSCRates.ExpDate is null
+  order by xInsurance.Name, xSC.SCNum, xSC.SCID, xSCRates.EffDate, xSCRestrictions.Descr
+

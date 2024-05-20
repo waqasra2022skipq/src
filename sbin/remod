@@ -1,0 +1,14 @@
+#!/bin/bash
+Dir=/home
+   find ${Dir} -type d -maxdepth 1 |
+   while read Account; do
+      User=${Account##*/}
+      grep "^${User}:" /etc/passwd > /dev/null
+      if [ $? -eq 0 -a "${User}" != 'mail' ]; then
+         echo "chown -R ${User}:${User} ${User}"
+         chown -R ${User}:${User} ${User}
+      fi
+##      print chmod 2${Amod} ${Account}
+##      chmod 2${Amod} ${Account}
+   done
+

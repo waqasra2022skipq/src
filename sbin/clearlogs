@@ -1,0 +1,14 @@
+#!/bin/bash
+# kls, daily 11/11/2008
+# ------------------------------------
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   echo -e "\nServices not installed!"
+   exit 1
+fi
+cd ${LOGDIR}
+find ${LOGDIR}/* -type f -exec rm -vf {} \;
+touch access_errors
+chmod 666 access_errors
+# ------------------------------------

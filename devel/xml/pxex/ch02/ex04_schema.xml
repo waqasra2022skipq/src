@@ -1,0 +1,45 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema-instance">
+
+  <xs:annotation>
+    <xs:documentation>
+      Census form for the Republic of Oz
+      Department of Paperwork, Emerald City
+    </xs:documentation>
+  </xs:annotation>
+
+  <xs:element name="census" type="CensusType"/>
+
+  <xs:complexType name="CensusType">
+    <xs:element name="censustaker" type="xs:decimal" minoccurs="0"/>
+    <xs:element name="address" type="Address"/>
+    <xs:element name="occupants" type="Occupants"/>
+    <xs:attribute name="date" type="xs:date"/>
+  </xs:complexType>
+
+  <xs:complexType name="Address">
+    <xs:element name="number" type="xs:decimal"/>
+    <xs:element name="street" type="xs:string"/>
+    <xs:element name="city"   type="xs:string"/>
+    <xs:element name="province"  type="xs:string"/>
+    <xs:attribute name="postalcode" type="PCode"/>
+  </xs:complexType>
+
+  <xs:simpleType name="PCode" base="xs:string">
+    <xs:pattern value="[A-Z]-d{3}"/>
+  </xs:simpleType>
+
+  <xs:complexType name="Occupants">
+    <xs:element name="occupant" minOccurs="1" maxOccurs="20">
+     <xs:complexType>
+      <xs:element name="firstname" type="xs:string"/>
+      <xs:element name="surname" type="xs:string"/>
+      <xs:element name="age">
+       <xs:simpleType base="xs:positive-integer">
+        <xs:maxExclusive value="200"/>
+       </xs:simpleType>
+      </xs:element>
+     </xs:complexType>
+    </xs:element>
+   </xs:complexType>
+
+</xs:schema>

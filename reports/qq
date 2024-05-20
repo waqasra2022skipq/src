@@ -1,0 +1,2 @@
+./genQRDAsForTree DBNAME=okmis_mms\&daterange=lastyear\&ForProvID=2536
+#./genQRDAsForTree DBNAME=okmis_mms\&daterange=lastyear\&ForProvID=1205

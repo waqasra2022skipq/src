@@ -1,0 +1,266 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>hGraph - Health Score Graphing</title>
+
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+
+	<meta charset='utf-8'>
+
+	<meta name="keywords" content="health, healthcare, glucose, family, healthy, ldl, hdl, cholesterol, weight, medical, data,  html, css, javascript, d3.js">
+	<meta name="description" content="hGraph">
+	
+	<link href='http://fonts.googleapis.com/css?family=Vollkorn' rel='stylesheet' type='text/css'>	
+	<link rel="shortcut icon" href="imgs/Icon-72.png">
+	<link rel="apple-touch-icon" href="imgs/hgraph_logo-144.png" />
+	<link rel="stylesheet" type="text/css" href="css/main.css">
+	<link rel="stylesheet" type="text/css" href="css/global.css">
+
+	<link rel="stylesheet" type="text/css" href="css/HealthGraph.css">
+	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript"></script>
+	 
+
+	<script type="text/javascript" src="lib/mustache.js"></script>
+	<script type="text/javascript" src="lib/d3.js"></script>
+	<script type="text/javascript" src="lib/hammer.js" ></script>
+	<script type="text/javascript" src="lib/HealthGraph.js" ></script>
+	<script src="js/hGraphMain.js" type="text/javascript"></script>
+	<script src="js/hUsers.js" type="text/javascript"></script>
+</head>
+<body>
+	<section id="main">
+
+			<figure id="viz" class="content_inset healthgraph detailed">
+				<div class="hline"> </div>
+				<div id="user-info" > </div>
+				<div id="user-selection"> </div>
+			</figure>
+		
+	</section>
+
+	<script type="text/html" id="user-info-template">
+		{{#.}}
+
+		<div id="user-timeline">
+			<img src="imgs/hgraph_timeline.png"/>
+		</div>
+
+		<div uid={{id}} class="user">
+			<div class="image">
+				<img src="imgs/user-thumbs/{{image}}"/>
+			</div>
+			<h1 class="name"> {{name}} </h1>
+			<div class="intro"> {{age}}yo {{gender}} </div>
+		</div>
+
+		{{/.}}
+	</script>
+
+	<script type="text/html" id="user-menu-template">
+		{{#.}}
+		<div uid={{id}} class="user">
+			<div class="image">
+				<img src="imgs/user-thumbs/{{image}}" />
+			</div>
+			<div class="name"> {{name}} </div>
+		</div>
+		{{/.}}
+	</script>
+
+	<script>
+		var users = [
+			{
+					id: 1,
+					name: 'Piyush',
+					image: 'piyush.png',
+					gender: 'Male',
+					age: '40',
+					hoverevents: true,
+					factors: [
+							{
+									"label": "Total Cholesterol",
+									"score": 10.546416832846784,
+									"value": "655.91 mg/dl",
+									"actual": 655.9052741044138,
+									"weight": 5.333333333333333,
+									"details": [
+											{
+													"label": "LDL",
+													"score": 62.658145575576796,
+													"value": "131.73 mg/dl",
+													"actual": 131.72688165007958,
+													"weight": 9
+											},
+											{
+													"label": "HDL",
+													"score": -58.28797907519921,
+													"value": "38.73 mg/dl",
+													"actual": 38.73259085874359,
+													"weight": 4
+											},
+											{
+													"label": "Triglycerides",
+													"score": 27.269083998162767,
+													"value": "585.45 mg/dl",
+													"actual": 485.44580159559064,
+													"weight": 3
+											}
+									],
+									"angle": 0,
+									"coords": {
+											"x": "166.8",
+											"y": "0.0"
+									}
+							},
+							{
+									"label": "Sleep",
+									"score": -90.43758915323072,
+									"value": "0.82 hours/night",
+									"weight": 5,
+									"angle": 36,
+									"coords": {
+											"x": "67.3",
+											"y": "48.9"
+									}
+							},
+							{
+									"label": "Exercise",
+									"score": -4.516790894766838,
+									"value": "46.89 hours/week",
+									"weight": 5,
+									"angle": 72,
+									"coords": {
+											"x": "47.7",
+											"y": "146.7"
+									}
+							},
+							{
+									"label": "Happiness",
+									"score": -38.94777981976786,
+									"value": "5.23 happiness scale",
+									"weight": 3,
+									"angle": 108,
+									"coords": {
+											"x": "-38.9",
+											"y": "119.6"
+									}
+							},
+							{
+									"label": "Glucose",
+									"score": 92.2744207101353,
+									"value": "153.38 mg/dl",
+									"weight": 10,
+									"angle": 144,
+									"coords": {
+											"x": "-189.6",
+											"y": "137.8"
+									}
+							},
+							{
+									"label": "Blood Pressure",
+									"score": -29.715890464273595,
+									"value": "52.95/99.09 mm/Hg",
+									"actual": 0,
+									"weight": 5,
+									"details": [
+											{
+													"label": "Systolic",
+													"score": -95.78720275213628,
+													"value": "52.95 mm/Hg",
+													"weight": 5,
+													"actual": 52.9489580735046
+											},
+											{
+													"label": "Diastolic",
+													"score": 36.35542182358909,
+													"value": "99.09 mm/Hg",
+													"weight": 5,
+													"actual": 99.08562831516441
+											}
+									],
+									"angle": 180,
+									"coords": {
+											"x": "-133.4",
+											"y": "0.0"
+									}
+							},
+							{
+									"label": "Alcohol",
+									"score": 41.311716101891584,
+									"value": "6.59 drinks/week",
+									"weight": 5,
+									"angle": 216,
+									"coords": {
+											"x": "-155.5",
+											"y": "-113.0"
+									}
+							},
+							{
+									"label": "Smoking",
+									"score": 88.06555367234984,
+									"value": "8.47 cigarettes/day",
+									"weight": 5,
+									"angle": 252,
+									"coords": {
+											"x": "-71.4",
+											"y": "-219.6"
+									}
+							},
+							{
+									"label": "Waist Circumference",
+									"score": 60.29893798713127,
+									"value": "129.11 inches",
+									"weight": 10,
+									"angle": 288,
+									"coords": {
+											"x": "64.3",
+											"y": "-197.8"
+									}
+							},
+							{
+									"label": "Pain",
+									"score": 68.01235800198178,
+									"value": "7.26 pain scale",
+									"weight": 3,
+									"angle": 324,
+									"coords": {
+											"x": "173.4",
+											"y": "-126.0"
+									}
+							}
+					]
+			}
+		];
+		/*
+		* Main function
+		*/
+		$(document).ready(function (){
+
+			var container = $('#viz');
+				minHeight = parseInt(container.css('min-height')),
+				minWidth = parseInt(container.css('min-width'));
+
+			usermenu = $('#user-selection');
+			userinfo = $('#user-info');
+
+			// initializes data conversion routines and multiuser environment
+			mu.users.initialize({ usermenu : usermenu, userinfo : userinfo, users: users});
+
+			/*
+			* Prevents scrolling on ios
+			*/
+			//document.ontouchmove = function(e){ e.preventDefault(); }
+				
+			/*
+			* Win resize function
+			*/
+			$(window).resize(resize);
+
+		});
+	</script>
+	
+</body>
+</html>

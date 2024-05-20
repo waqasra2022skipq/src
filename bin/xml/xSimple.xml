@@ -1,0 +1,13 @@
+<ns0:OKCCRequest xmlns:ns0="http://apshealthcare.com/OKCCRequest.xsd">
+<HeaderDetails>
+  <TotalRecordNo Value="6" >2</TotalRecordNo> 
+  <TransmittingAgency>Agency_Test</TransmittingAgency> 
+  <TransmissionType>Data</TransmissionType> 
+  <OrganizationId>0000000065</OrganizationId> 
+  <CreateDate>20070515</CreateDate> 
+  <kls>
+    <newone>0000000065</newone> 
+    <new2>20070515</new2> 
+  </kls> 
+</HeaderDetails>
+</ns0:OKCCRequest>

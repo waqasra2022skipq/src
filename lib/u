@@ -1,0 +1,81 @@
+-- MySQL dump 10.13  Distrib 5.7.29, for Linux (x86_64)
+--
+-- Host: localhost    Database: okmis_ccs
+-- ------------------------------------------------------
+-- Server version	5.7.29
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `UserLogin`
+--
+
+DROP TABLE IF EXISTS `UserLogin`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `UserLogin` (
+  `ID` varchar(100) NOT NULL,
+  `loginid` varchar(255) DEFAULT NULL,
+  `Password` varchar(255) DEFAULT NULL,
+  `dbname` varchar(24) DEFAULT NULL,
+  `UserID` int(11) NOT NULL DEFAULT '0',
+  `loginscreen` varchar(24) DEFAULT NULL,
+  `type` tinyint(3) NOT NULL DEFAULT '0',
+  `renew` tinyint(3) NOT NULL DEFAULT '0',
+  `FormID` varchar(12) DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `UserLogin`
+--
+
+LOCK TABLES `UserLogin` WRITE;
+/*!40000 ALTER TABLE `UserLogin` DISABLE KEYS */;
+INSERT INTO `UserLogin` VALUES ('okmis_ccs:91','root','kls5773','okmis_ccs',91,'ManagerTree',0,0,'');
+INSERT INTO `UserLogin` VALUES ('okmis_ccs:90','helpdesk','openUP2!','okmis_ccs',90,'ManagerTree',0,0,'');
+INSERT INTO `UserLogin` VALUES ('okmis_ccs:100','kathleenniblack','Jon2002!','okmis_ccs',100,'ManagerTree',0,0,'kathleennibl');
+INSERT INTO `UserLogin` VALUES ('okmis_ccs:101','patsytrent','EpSjDk1956!','okmis_ccs',101,'ManagerTree',0,0,'patsytrent');
+INSERT INTO `UserLogin` VALUES ('okmis_ccs:123','jonathangibbs','2PXoI7','okmis_ccs',123,'ManagerTree',0,0,'jonathangibb');
+INSERT INTO `UserLogin` VALUES ('okmis_ccs:114','payroll','temp!','okmis_ccs',114,'ManagerTree',0,0,'payroll');
+INSERT INTO `UserLogin` VALUES ('okmis_ccs:105','tammyhoward','Waaktn03!','okmis_ccs',105,'ManagerTree',0,0,'tammyhoward');
+INSERT INTO `UserLogin` VALUES ('okmis_ccs:118','michaelnavarro','JZFciC','okmis_ccs',118,'ManagerTree',0,1,'michaelnavar');
+INSERT INTO `UserLogin` VALUES ('okmis_ccs:107','melissalittleton','eNjUQ9','okmis_ccs',107,'ManagerTree',0,0,'melissa litt');
+INSERT INTO `UserLogin` VALUES ('okmis_ccs:108','jessicaelizarde','Cooper07!','okmis_ccs',108,'ManagerTree',0,0,'jessicaeliza');
+INSERT INTO `UserLogin` VALUES ('okmis_ccs:119','angelajohnson','CMB2Q6','okmis_ccs',119,'ManagerTree',0,0,'angelajohnso');
+INSERT INTO `UserLogin` VALUES ('okmis_ccs:113','errinwillis','4Vi4na','okmis_ccs',113,'ManagerTree',0,0,'errinwillis');
+INSERT INTO `UserLogin` VALUES ('okmis_ccs:122','cescilycurtis','bqudDM','okmis_ccs',122,'ManagerTree',0,0,'cescilycurti');
+INSERT INTO `UserLogin` VALUES ('okmis_ccs:116','cynthiabunch','dWuppI','okmis_ccs',116,'ManagerTree',0,0,'cynthiabunch');
+INSERT INTO `UserLogin` VALUES ('okmis_ccs:120','coreydewberry','MnEKv3','okmis_ccs',120,'ManagerTree',0,0,'coreydewberr');
+INSERT INTO `UserLogin` VALUES ('okmis_ccs:124','josephbrown','TnPxft','okmis_ccs',124,'ManagerTree',0,0,'josephbrown');
+INSERT INTO `UserLogin` VALUES ('okmis_ccs:125','mikellaporte','AuQwhW','okmis_ccs',125,'ManagerTree',0,0,'mikellaporte');
+INSERT INTO `UserLogin` VALUES ('okmis_ccs:126','darlajones','JiMVLh','okmis_ccs',126,'ManagerTree',0,0,'darlajones');
+INSERT INTO `UserLogin` VALUES ('okmis_ccs:127','jillmacon','Century21!','okmis_ccs',127,'ManagerTree',0,0,'jillmacon');
+INSERT INTO `UserLogin` VALUES ('okmis_ccs:128','kimberlyparris','ZKC7o6','okmis_ccs',128,'ManagerTree',0,0,'kimberlyparr');
+INSERT INTO `UserLogin` VALUES ('okmis_ccs:129','shaegilbert','Xq2mkj','okmis_ccs',129,'ManagerTree',0,1,'shaegilbert');
+INSERT INTO `UserLogin` VALUES ('okmis_ccs:130','lorettamartin','Believer77!','okmis_ccs',130,'ManagerTree',0,0,'lorettamarti');
+INSERT INTO `UserLogin` VALUES ('okmis_ccs:131','jamielane','9pPgeQ','okmis_ccs',131,'ManagerTree',0,1,'jamielane');
+INSERT INTO `UserLogin` VALUES ('okmis_ccs:132','michelleray','temp','okmis_ccs',132,'ManagerTree',0,1,'michelleray');
+/*!40000 ALTER TABLE `UserLogin` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2020-03-18 12:27:41

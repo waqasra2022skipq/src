@@ -1,0 +1,29 @@
+2. Draw a fixed line across the chart from the point where the average is on the yAxis:
+
+//margin from chart declaration
+var margin = { top: 30, right: 60, bottom: 60, left: 100 };
+//calculate the yScale
+var yScale = chart.yAxis.scale();
+//call generic function...since you'll want this on potentially multiple types of charts
+drawFixedLineAndText(chartID, 960, margin, <your average value goes here>, yScale, <your average label text goes here>);
+
+function drawFixedLineAndText(chartName, width, margin, yValue, yValueScale, text) {
+var svg = d3.select("#" + chartName + " svg");
+svg.append("line")
+    .style("stroke", "#FF7F0E")
+    .style("stroke-width", "2.5px")
+    .attr("x1", margin.left)
+    .attr("y1", yValueScale(yValue) + margin.top)
+    .attr("x2", width - margin.right)
+  .attr("y2", yValueScale(yValue) + margin.top);
+
+
+//add text to fixed line
+d3.select("#" + chartName + " svg")
+    .append("text")
+    .attr("x", width - margin.right / 2)
+    .attr("y", yValueScale(yValue) + margin.top)
+    .attr("text-anchor", "middle")
+    .text(text);
+//end fixed line
+}

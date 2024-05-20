@@ -1,0 +1,67 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use DBA;
+use DBUtil;
+use Time::Local;
+my $DT = localtime();
+############################################################################
+# usage:
+#   NoValACE ForProvID=id
+############################################################################
+my $form = DBForm->new();
+#foreach my $f ( sort keys %{$form} ) { warn "form-$f=$form->{$f}\n"; }
+my $dbh = $form->dbconnect();
+
+my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+# join xInsurance needed for withSelection
+my $ClinicSelection = DBA->withSelection($form,'and','Client.clinicClinicID','','','');
+my $Header = DBA->withSelectionHeader($form);
+$ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+my $sProvider = $dbh->prepare("select LName, FName from Provider where ProvID=?");
+my $qClient = qq"
+select Client.LName, Client.FName, Client.ClientID, Client.DOB, Client.ProvID, Client.Active
+      ,Client.DOB,TIMESTAMPDIFF(YEAR, Client.DOB, CURDATE()) AS Age
+      ,ClientPrAuth.PAnumber, ClientPrAuth.EffDate, ClientPrAuth.ExpDate, ClientPrAuthCDC.TransType
+      ,ClientACE.TestDate as TestACE
+  from Client 
+    left join ClientACL on ClientACL.ClientID=Client.ClientID
+    left join ClientACE on ClientACE.ClientID=Client.ClientID
+    left join ClientPrAuth on ClientPrAuth.ClientID=Client.ClientID
+    left join ClientPrAuthCDC on ClientPrAuthCDC.ClientPrAuthID=ClientPrAuth.ID
+    left join Insurance on Insurance.InsNumID=ClientPrAuth.InsuranceID
+    left join xInsurance on xInsurance.ID=Insurance.InsID
+  where ClientACL.ProvID='${ForProvID}'
+    and (TIMESTAMPDIFF(YEAR, Client.DOB, CURDATE()) >= 18)
+    and ClientACE.TestDate is null 
+    and (
+          ClientPrAuth.PAnumber is not null
+          and curdate() between ClientPrAuth.EffDate and ClientPrAuth.ExpDate
+        )
+    and (ClientPrAuthCDC.TransType=23 || ClientPrAuthCDC.TransType=42)
+  ${ClinicSelection}
+  group by Client.LName, Client.FName, Client.ClientID";
+#warn qq|qClient=\n${qClient}\n|;
+my $sClient = $dbh->prepare($qClient);
+print qq|${DT}\n${Header}Missing ACE Report.\nClients with missing any ACE Test report\n|;
+print qq|Client Name\tActive\tDOB\tAge\tProvider Name\tMessage\n|;
+$sClient->execute();
+while (my $rClient = $sClient->fetchrow_hashref)
+{ 
+  my $ClientID = $rClient->{'ClientID'};
+  my $ActiveFlag = $rClient->{'Active'} ? 'Yes' : 'No';;
+  my $ClientName = qq|$rClient->{'LName'}, $rClient->{'FName'} ($rClient->{'ClientID'})|;
+  my $Age = DBUtil->Date($rClient->{DOB}, 'age');
+  my $msg = 'NO CLIENT ACE TESTS';
+  $sProvider->execute($rClient->{ProvID});
+  my ($ProvLName, $ProvFName) = $sProvider->fetchrow_array;
+  my $ProvName = qq|$ProvLName, $ProvFName ($rClient->{ProvID})|; 
+  print qq|${ClientName}\t${ActiveFlag}\t$rClient->{'DOB'}\t${Age}\t${ProvName}\t${msg}\n|;
+}
+
+$sProvider->finish();
+$sClient->finish();
+$form->complete();
+exit;
+############################################################################

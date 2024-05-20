@@ -1,0 +1,35 @@
+#!/bin/bash
+# ------------------------------------
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   echo -e "\nServices not installed!"
+   exit 1
+fi
+# ------------------------------------
+##LOGFILE=${LOGDIR}/${CMD}.log
+##(
+  echo -e "\n======================================"
+  echo -e "--------------------------------------\n"
+  echo -e "${CMD} Started: $(date)"
+# Now start the saves...
+  for u in $*; do
+    echo -e "download ${u}..."
+    cd ${MAINDIR}/${u}
+    sh ${MAINDIR}/${u}/bin/download
+  done
+  echo -e "--------------------------------------\n"
+  echo -e "rename 835 files..."
+  ${SRCBIN}/rename
+  echo -e "--------------------------------------\n"
+  echo -e "process FTP files..."
+  ${SRCBIN}/ProFTP DBNAME=okmis_mms\&type=835
+  echo -e "--------------------------------------\n"
+  echo -e "rename or fix files..."
+  ${SRCBIN}/renameDB
+  echo -e "--------------------------------------\n"
+  echo -e "\n${CMD} Complete: $(date)"
+  echo -e "======================================\n"
+##) | tee ${LOGFILE} 2>&1
+#cat ${LOGFILE} | ${MISBIN}/email -a support@okmis.com -s "${CMD} ${YMD}"
+# ------------------------------------

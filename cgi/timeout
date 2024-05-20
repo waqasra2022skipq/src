@@ -1,0 +1,30 @@
+<script language="javascript">
+    
+    
+    
+    
+
+    
+    var sessionTimer = setTimeout(refreshCurrentPage, 1770000);
+
+    
+	function stopSessionTimeout()
+	{
+    
+		clearTimeout(sessionTimer);
+    
+		return true;
+	}
+
+	function refreshCurrentPage() {
+		
+		alert("Your session has expired. Click OK to continue.");
+		window.location = add1099OnlyParam(window.location.href);
+	}
+
+	function add1099OnlyParam(url) {
+		
+				return url;
+		
+	}
+</script>

@@ -1,0 +1,5 @@
+select Provider.Type,ProviderControl.ProvID,ProviderControl.Scheduler,Provider.Name
+ from ProviderControl
+  left join Provider on Provider.ProvID=ProviderControl.ProvID
+ where ProviderControl.Scheduler is not null
+ order by Provider.Type

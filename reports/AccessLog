@@ -1,0 +1,9 @@
+select Provider.LName, Provider.FName, Provider.ProvID
+     , DATE_FORMAT(oaysAccessLog.Date,'%m/%d/%Y') as AccessDate, TIME_FORMAT(oaysAccessLog.Date,'%r') as AccessTime
+     , Script, Action, IP
+  from oaysAccessLog
+    left join Provider on Provider.ProvID=oaysAccessLog.ProvID
+  where ( Provider.ProvID=143 ) 
+    and oaysAccessLog.Date between '2006-06-01' and '2006-06-30'
+  order by Provider.LName, Provider.FName, oaysAccessLog.Date
+;

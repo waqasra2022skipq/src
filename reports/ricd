@@ -1,0 +1,9 @@
+#select ICD10,icdName,sctName from misICD10 
+#where sctName REGEXP ".*[(]finding[)]\$"
+#where sctName REGEXP ".*[(]disorder[)]\$"
+
+# ICD10 and icdName do not have in their description
+select ICD10,icdName,sctName from misICD10 
+#where sctName REGEXP ".*[(]finding[)]\$"
+#where sctName REGEXP ".*[(]situation[)]\$"
+where sctName REGEXP ".*[(]event[)]\$"

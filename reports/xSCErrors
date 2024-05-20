@@ -1,0 +1,11 @@
+select xSC.SCID
+      ,xSC.SCNum, xSC.SCName, xInsurance.Descr
+,xSC.ChangeDate, xSC.ChangeProvID
+,xSCRates.ChangeDate, xSCRates.ChangeProvID
+      ,xSCRates.ServiceRate, xSCRates.HrsPerUnit 
+      ,xSCRates.UnitLbl, xSCRates.EffDate, xSCRates.ExpDate 
+  from xSC
+  left join xSCRates on xSCRates.SCID=xSC.SCID
+  left join xInsurance on xInsurance.ID=xSC.InsID
+where xSCRates.UnitLbl is null
+  order by xSC.InsID, xSC.SCID

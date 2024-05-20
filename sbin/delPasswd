@@ -1,0 +1,22 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use DBUtil;
+use MgrTree;
+############################################################################
+##
+$form = DBForm->new();
+my $dbh = $form->dbconnect;
+$qProvider = qq|select * from Provider order by LName, FName|;
+#warn "q=\n$q\n";
+$sProvider = $dbh->prepare($qProvider);
+$sProvider->execute() || $form->dberror($qProvider);
+while ( my $rProvider = $sProvider->fetchrow_hashref )
+{
+  my $AgencyID = MgrTree->getAgency($form,$rProvider->{ProvID});
+  if ( $AgencyID == $form->{AgencyID} )
+  { print qq|update UserLogin set Password=NULL where UserID=$rProvider->{ProvID};\n|; }
+}
+$sProvider->finish();
+############################################################################

@@ -1,0 +1,53 @@
+gpr cx 6118 for PHQ
++'ClientPHQ'
++'ClientPHQBrief'
++'ClientPHQSADS'
++'ClientPHQ4'
++'ClientPHQ9'
++'ClientPHQ15'
++'ClientGAD7'
++'ClientODAS'     print PHQ+TSLevels+WMScore
++'ClientTPHQ9'
++'ClientPHQ2'
++'ClientTCUDS'
++'ClientSMFQ'
++'ClientACE'
+                                STABLE       => 'ClientCATS',
+                                Bprint       => 'PrintPHQ',
+                                STABLE       => 'ClientMHSF',
+                                Bprint       => 'PrintPHQ',
+                                STABLE       => 'ClientPCL5',
+                                Bprint       => 'PrintPHQ',
+
+                                STABLE       => 'ClientSBIRT',
+                                STITLE       => 'Screening, Brief Intervention, Referral to Treatment (SBIRT)',
+                                Bprint       => 'PrintPHQ',
+                                STABLE       => 'ClientCRAFFT',
+                                STITLE       => 'Substance-Related Risks and Problems in Adolescents (CRAFFT)',
+                                Bprint       => 'PrintPHQ',
+                                STABLE       => 'ClientAUDIT',
+                                STITLE       => 'AUDIT (Alcohol Use Disorders Identification Test)',
+                                Bprint       => 'PrintPHQ',
+                                STABLE       => 'ClientCDCHA',
+                                STITLE       => 'Health Appraisal Questionaire Male / Female Version',
+                                Bprint       => 'PrintPHQ',
+                                STABLE       => 'ClientDCGD',
+                                STITLE       => 'DSM5 Diagnostic Criteria: Gambling Disorder',
+                                Bprint       => 'PrintPHQ',
+                                STABLE       => 'ClientPCLC',
+                                STITLE       => 'Abbreviated PCL-C',
+                                Bprint       => 'PrintPHQ',
+
+                                STABLE       => 'ClientGDS',
+                                STITLE         => 'Client Geriatric Depression Scale',
+                                STABLE       => 'ClientBasis32',
+                                STITLE       => 'Behavior and Symptom Identification Scale (BASIS-32)',
+
+                                STABLE       => 'ClientODAS2017',
+                                Bprint       => 'PrintPHQ',
+                                Bprintsum    => 'PrintPHQ:Scores',
+
+other...print routines
+                                STABLE       => 'ClientASAM',
+                                STITLE       => 'American Society of Addiction Medicine (ASAM)',
+                                Bprint       => 'PrintClientASAM',

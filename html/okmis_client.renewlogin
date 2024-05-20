@@ -1,0 +1,62 @@
+Content-Type: text/html; charset=ISO-8859-1
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+<HTML lang="en" >
+<HEAD> <TITLE>Login</TITLE> </HEAD>
+<STYLE>
+ .{ font-family: Verdana, Arial, Helvetica; }
+ BODY  { background: #5a7d9b; color: black; }
+ H1    { font-size: 18pt; color: orange; }
+ TABLE { background-color: #FBFFE7; padding: 20px; }
+ TD    { text-align: center; }
+ TH    { text-align: right; }
+</STYLE>
+<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" >
+function vLogin(form)
+{ return vEntry("notnull",form.user,form.ssn); }
+</SCRIPT>
+
+<BODY >
+<CENTER>
+<BR>
+<H1>Millennium Information Services</H1>
+<H1>{MSG}</H1>
+<BR>
+<TABLE BORDER="3" CELLPADDING="20" >
+  <TR>
+    <TD >
+    <IMG ALT="logo" BORDER=0 SRC="{LOGO}" >
+    <H2 >{SITENAME}</H2>
+<P>
+<FORM NAME="login" METHOD="post" ACTION="/cgi/bin/mis.cgi" >
+      <TABLE WIDTH="100%" >
+	<TR>
+	  <TD ALIGN="center" >
+	    <TABLE>
+	      <TR>
+		<TH ALIGN="right" >Email</TH>
+		<TD><INPUT TYPE="text" NAME="user" SIZE="30" ></TD>
+	      </TR> 
+	      <TR>
+		<TH ALIGN="right" >SSN (xxx-xx-xxxx)</TH>
+		<TD><INPUT TYPE="text" NAME="ssn" SIZE="30" ></TD>
+	      </TR>
+	    </TABLE>
+	    <BR>
+	    <INPUT TYPE="submit" NAME="RenewLogin" VALUE="reset" ONCLICK="return vLogin(this.form);" >
+	    <INPUT TYPE="submit" NAME="Login" VALUE="cancel" >
+	  </TD>
+	</TR>
+      </TABLE>
+</LOADHIDDEN>
+</FORM>
+    </TD>
+  </TR>
+</TABLE>
+<H1>{MSG}</H1>
+<SCRIPT LANGUAGE="JavaScript" >
+document.login.elements[0].focus();
+</SCRIPT>
+</BODY>
+</HTML>

@@ -1,0 +1,8 @@
+<!ELEMENT memo (to, from, message)>
+<!ATTLIST memo priority (urgent|normal|info) 'normal'>
+<!ENTITY % text-only "(#PCDATA)*">
+<!ELEMENT to %text-only;>
+<!ELEMENT from %text-only;>
+<!ELEMENT message (#PCDATA | emphasis)*>
+<!ELEMENT emphasis %text-only;>
+<!ENTITY myname "Bartholomus Chiggin McNugget

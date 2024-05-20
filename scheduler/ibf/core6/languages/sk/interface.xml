@@ -1,0 +1,3041 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<file>
+<language>Slovak</language>
+<author>xxx</author>
+<lastUpdate>16 July, 2012</lastUpdate>
+<charset>utf-8</charset>
+
+<string>
+	<original>- Any -</original>
+	<translate>- Všetko -</translate>
+</string>
+<string>
+	<original>Access Denied</original>
+	<translate>Prístup odopredný</translate>
+</string>
+<string>
+	<original>Actions</original>
+	<translate>Vykonaj</translate>
+</string>
+<string>
+	<original>Activate</original>
+	<translate>Aktivovať</translate>
+</string>
+<string>
+	<original>Active</original>
+	<translate>Aktívny</translate>
+</string>
+<string>
+	<original>Add</original>
+	<translate>Pridať</translate>
+</string>
+<string>
+	<original>Admin</original>
+	<translate>Admin</translate>
+</string>
+<string>
+	<original>Admin Area</original>
+	<translate>Admin Zóna</translate>
+</string>
+<string>
+	<original>Administrative User</original>
+	<translate>Administrátor</translate>
+</string>
+<string>
+	<original>Administrative Users</original>
+	<translate>Administratívny užívatelia</translate>
+</string>
+<string>
+	<original>Advanced Search</original>
+	<translate>Rozšírené vyhľadávanie</translate>
+</string>
+<string>
+	<original>All</original>
+	<translate>Všetko</translate>
+</string>
+<string>
+	<original>All Days</original>
+	<translate>Všetky dni</translate>
+</string>
+<string>
+	<original>Allow No Email</original>
+	<translate>Povoliť Bez Emailu</translate>
+</string>
+<string>
+	<original>Allow To Set Own Timezone</original>
+	<translate>Povoliť nastavenie vlastnej časovej zóny</translate>
+</string>
+<string>
+	<original>Already Approved</original>
+	<translate>Už schváleny</translate>
+</string>
+<string>
+	<original>Already Confirmed</original>
+	<translate>Už potvrdené</translate>
+</string>
+<string>
+	<original>Already have an account?</original>
+	<translate>Už máte vytvorený účet ?</translate>
+</string>
+<string>
+	<original>Already in use</original>
+	<translate>Už používaný</translate>
+</string>
+<string>
+	<original>Amount</original>
+	<translate>Suma</translate>
+</string>
+<string>
+	<original>Applied On</original>
+	<translate>Aplikovaný na</translate>
+</string>
+<string>
+	<original>Appointment</original>
+	<translate>Rezervácia</translate>
+</string>
+<string>
+	<original>Appointment Details</original>
+	<translate>Detialy rezervácie</translate>
+</string>
+<string>
+	<original>Appointment Flow</original>
+	<translate>Priebeh rezervácie</translate>
+</string>
+<string>
+	<original>Appointment Form</original>
+	<translate>Rezervačný formulár</translate>
+</string>
+<string>
+	<original>Appointment Forms</original>
+	<translate>Rezervačné formuláre</translate>
+</string>
+<string>
+	<original>Appointment Pack</original>
+	<translate>Objednávkový balík</translate>
+</string>
+<string>
+	<original>Appointment Packs</original>
+	<translate>Objednávkové balíky</translate>
+</string>
+<string>
+	<original>Appointment Types</original>
+	<translate>Typy rezervácií</translate>
+</string>
+<string>
+	<original>Appointments</original>
+	<translate>Rezervácie</translate>
+</string>
+<string>
+	<original>Appointments In Total</original>
+	<translate>Rezervácie spolu</translate>
+</string>
+<string>
+	<original>Approval Required</original>
+	<translate>Vyžadovane schválenie</translate>
+</string>
+<string>
+	<original>Approve</original>
+	<translate>Schváliť</translate>
+</string>
+<string>
+	<original>Approved</original>
+	<translate>Potvrdená</translate>
+</string>
+<string>
+	<original>Apr</original>
+	<translate>Apríl</translate>
+</string>
+<string>
+	<original>Are you sure?</original>
+	<translate>Ste si istý?</translate>
+</string>
+<string>
+	<original>Assign</original>
+	<translate>Prideliť</translate>
+</string>
+<string>
+	<original>Attach Ical File To Notification Email</original>
+	<translate>Pripojiť Ical súbor do notifikačného Emailu</translate>
+</string>
+<string>
+	<original>Aug</original>
+	<translate>August</translate>
+</string>
+<string>
+	<original>Author</original>
+	<translate>Autor</translate>
+</string>
+<string>
+	<original>Auto Confirmed</original>
+	<translate>Automaticky potvrdený</translate>
+</string>
+<string>
+	<original>Availability</original>
+	<translate>Dostupnosť</translate>
+</string>
+<string>
+	<original>Available</original>
+	<translate>Dostupné</translate>
+</string>
+<string>
+	<original>Available In Packs Only</original>
+	<translate>Dostupný iba v balíku</translate>
+</string>
+<string>
+	<original>Backup</original>
+	<translate>Záloha systému</translate>
+</string>
+<string>
+	<original>Backup File</original>
+	<translate>Zálohový súbor</translate>
+</string>
+<string>
+	<original>Bookable Resource</original>
+	<translate>Rezervovateľný zdroj</translate>
+</string>
+<string>
+	<original>Bookable Resources</original>
+	<translate>Rezervovateľné zdroje</translate>
+</string>
+<string>
+	<original>Browse</original>
+	<translate>Prezerať</translate>
+</string>
+<string>
+	<original>Bulk Actions</original>
+	<translate>Hromadná akcia</translate>
+</string>
+<string>
+	<original>CSV Field Delimiter</original>
+	<translate>CSV Field Delimiter</translate>
+</string>
+<string>
+	<original>Cancel</original>
+	<translate>Storno</translate>
+</string>
+<string>
+	<original>Cancellation/Reschedule Deadline</original>
+	<translate>Storno/Zmena rezervácie (Max. doba)</translate>
+</string>
+<string>
+	<original>Cancelled</original>
+	<translate>Stornovaný</translate>
+</string>
+<string>
+	<original>Capacity</original>
+	<translate>Kapacita</translate>
+</string>
+<string>
+	<original>Categories</original>
+	<translate>Kategórie</translate>
+</string>
+<string>
+	<original>Category</original>
+	<translate>Kategória</translate>
+</string>
+<string>
+	<original>Change</original>
+	<translate>Zmena</translate>
+</string>
+<string>
+	<original>Change Appointment</original>
+	<translate>Zmeniť rezerváciu</translate>
+</string>
+<string>
+	<original>Change Password</original>
+	<translate>Zmeniť heslo</translate>
+</string>
+<string>
+	<original>Checkbox On</original>
+	<translate>Checkbox zapnúť</translate>
+</string>
+<string>
+	<original>Class/Lesson</original>
+	<translate>Trieda/Lekcia</translate>
+</string>
+<string>
+	<original>Click here to confirm your email</original>
+	<translate>Kliknite sem na potvrdenie Vášho emailu.</translate>
+</string>
+<string>
+	<original>Click to activate</original>
+	<translate>Kliknite pre aktivovanie</translate>
+</string>
+<string>
+	<original>Click to disable</original>
+	<translate>Kliknúť pre zastavenie</translate>
+</string>
+<string>
+	<original>Close</original>
+	<translate>Zavrieť</translate>
+</string>
+<string>
+	<original>Company Confirmation Required</original>
+	<translate>Spoločnosťou vyžadované potvrdenie</translate>
+</string>
+<string>
+	<original>Company Timezone</original>
+	<translate>Firemná časová zóna</translate>
+</string>
+<string>
+	<original>Confirm Appointment</original>
+	<translate>Potvrdiť rezerváciu</translate>
+</string>
+<string>
+	<original>Confirm Password</original>
+	<translate>Potvrdiť heslo</translate>
+</string>
+<string>
+	<original>Confirm Reschedule</original>
+	<translate>Potvrdiť zmenu rezervácie</translate>
+</string>
+<string>
+	<original>Congratulations, your account has been created and activated</original>
+	<translate>Gratulujeme, Váš účet bol úspešne vytvorený a aktivovaný</translate>
+</string>
+<string>
+	<original>Contact Information</original>
+	<translate>Kontaktné údaje</translate>
+</string>
+<string>
+	<original>Continue</original>
+	<translate>Pokračovať >>></translate>
+</string>
+<string>
+	<original>Continue With Recurring Appointments</original>
+	<translate>Pokračovať v opakujúcej sa rezervácii</translate>
+</string>
+<string>
+	<original>Continue With Single Appointment</original>
+	<translate>Pokračovať v jednorazovej rezervácii</translate>
+</string>
+<string>
+	<original>Copy</original>
+	<translate>Kopírovať</translate>
+</string>
+<string>
+	<original>Create</original>
+	<translate>Vytvoriť</translate>
+</string>
+<string>
+	<original>Create Appointment</original>
+	<translate>Vytvoriť rezerváciu</translate>
+</string>
+<string>
+	<original>Created</original>
+	<translate>Vytvorený</translate>
+</string>
+<string>
+	<original>Currency</original>
+	<translate>Mena</translate>
+</string>
+<string>
+	<original>Custom Form</original>
+	<translate>Zákaznícky formulár</translate>
+</string>
+<string>
+	<original>Customer</original>
+	<translate>Zákazník</translate>
+</string>
+<string>
+	<original>Customers</original>
+	<translate>Zákazníci</translate>
+</string>
+<string>
+	<original>Date</original>
+	<translate>Dátum</translate>
+</string>
+<string>
+	<original>Date Format</original>
+	<translate>Formát dátumut</translate>
+</string>
+<string>
+	<original>Date and Time</original>
+	<translate>Dátum a čas</translate>
+</string>
+<string>
+	<original>Dates</original>
+	<translate>Dátumy</translate>
+</string>
+<string>
+	<original>Day</original>
+	<translate>Deň</translate>
+</string>
+<string>
+	<original>Days</original>
+	<translate>Dni</translate>
+</string>
+<string>
+	<original>Days To Show In Calendar For External User</original>
+	<translate>Zobrazené dni v kalendári pre zákazníka</translate>
+</string>
+<string>
+	<original>Days To Show In Calendar For Internal User</original>
+	<translate>Zobrazené dni v kalendári pre administrátora</translate>
+</string>
+<string>
+	<original>Dec</original>
+	<translate>December</translate>
+</string>
+<string>
+	<original>Default Value</original>
+	<translate>Základné hodnoty</translate>
+</string>
+<string>
+	<original>Delete</original>
+	<translate>Vymazať</translate>
+</string>
+<string>
+	<original>Deleted</original>
+	<translate>Vymazané</translate>
+</string>
+<string>
+	<original>Description</original>
+	<translate>Popis</translate>
+</string>
+<string>
+	<original>Desired Username</original>
+	<translate>Požadované užívateľské meno</translate>
+</string>
+<string>
+	<original>Details</original>
+	<translate>Detaily</translate>
+</string>
+<string>
+	<original>Disable</original>
+	<translate>Zakázať</translate>
+</string>
+<string>
+	<original>Discount</original>
+	<translate>Zľava</translate>
+</string>
+<string>
+	<original>Do Not Show The Timezone</original>
+	<translate>Nezobrazovať časovú zónu</translate>
+</string>
+<string>
+	<original>Don't have a particular preference</original>
+	<translate>Don't have a particular preference</translate>
+</string>
+<string>
+	<original>Don't have an account yet?</original>
+	<translate>Nemáte ešte u nás účet?</translate>
+</string>
+<string>
+	<original>Down</original>
+	<translate>Dole</translate>
+</string>
+<string>
+	<original>Download Backup</original>
+	<translate>Stiahnuť Backup</translate>
+</string>
+<string>
+	<original>Drop Down</original>
+	<translate>Stiahnuť</translate>
+</string>
+<string>
+	<original>Due Value</original>
+	<translate>Due Value</translate>
+</string>
+<string>
+	<original>Duplicate</original>
+	<translate>Duplikovať</translate>
+</string>
+<string>
+	<original>Duplicate To</original>
+	<translate>Opakovať v</translate>
+</string>
+<string>
+	<original>Duration</original>
+	<translate>Trvanie</translate>
+</string>
+<string>
+	<original>Each option on new line</original>
+	<translate>Každá možnosť na nový riadok</translate>
+</string>
+<string>
+	<original>Edit</original>
+	<translate>Upraviť</translate>
+</string>
+<string>
+	<original>Email</original>
+	<translate>Email</translate>
+</string>
+<string>
+	<original>Email Confirmation Required</original>
+	<translate>Nutnosť potvrdiť emailom</translate>
+</string>
+<string>
+	<original>Email Not Confirmed</original>
+	<translate>Email nepotvrdený</translate>
+</string>
+<string>
+	<original>Email Notifications Templates</original>
+	<translate>Vzory Emailových notifikácií</translate>
+</string>
+<string>
+	<original>Email Test Mode</original>
+	<translate>Email Test Mode</translate>
+</string>
+<string>
+	<original>Enable Registration</original>
+	<translate>Umožniť registráciu</translate>
+</string>
+<string>
+	<original>Error Message If Validation Fails</original>
+	<translate>Error Message If Validation Fails</translate>
+</string>
+<string>
+	<original>Every</original>
+	<translate>Každých</translate>
+</string>
+<string>
+	<original>Every 3 Weeks</original>
+	<translate>Každé 3 týždne</translate>
+</string>
+<string>
+	<original>Every 6 Weeks</original>
+	<translate>Každých 6 týždňov</translate>
+</string>
+<string>
+	<original>Every Day</original>
+	<translate>Každý deň</translate>
+</string>
+<string>
+	<original>Every Fortnight</original>
+	<translate>Every Fortnight</translate>
+</string>
+<string>
+	<original>Every Month</original>
+	<translate>Každý mesiac</translate>
+</string>
+<string>
+	<original>Every Other Day</original>
+	<translate>Každý ďalší deň</translate>
+</string>
+<string>
+	<original>Every Week</original>
+	<translate>Každý týždeň</translate>
+</string>
+<string>
+	<original>External User Access</original>
+	<translate>Externý užívateľský prístup</translate>
+</string>
+<string>
+	<original>Failed</original>
+	<translate>Neúspešne</translate>
+</string>
+<string>
+	<original>Feb</original>
+	<translate>Február</translate>
+</string>
+<string>
+	<original>Fill in if required by your web hosting. You may need to consult your web hosting administrator or help documentation.</original>
+	<translate>Vyplniť, ak je požadované Vašim web hostingom. Možno budete musieť skonzultovať s Vašim web hosting administrátorom alebo použiť nápovedu.</translate>
+</string>
+<string>
+	<original>Find</original>
+	<translate>Hľadať</translate>
+</string>
+<string>
+	<original>First Name</original>
+	<translate>Meno</translate>
+</string>
+<string>
+	<original>Fixed</original>
+	<translate>Vyriešené</translate>
+</string>
+<string>
+	<original>Footer</original>
+	<translate>Pätička</translate>
+</string>
+<string>
+	<original>Footer For All Emails</original>
+	<translate>Pätička pre všetky emaily</translate>
+</string>
+<string>
+	<original>Forgot Your Password</original>
+	<translate>Zabudli ste heslo</translate>
+</string>
+<string>
+	<original>Form</original>
+	<translate>Formulár</translate>
+</string>
+<string>
+	<original>Form Field</original>
+	<translate>Pole formulára</translate>
+</string>
+<string>
+	<original>Form Fields</original>
+	<translate>Polia formulára</translate>
+</string>
+<string>
+	<original>Forms</original>
+	<translate>Formuláre</translate>
+</string>
+<string>
+	<original>Free</original>
+	<translate>Neuvedená</translate>
+</string>
+<string>
+	<original>Fri</original>
+	<translate>Pia</translate>
+</string>
+<string>
+	<original>Friday</original>
+	<translate>Piatok</translate>
+</string>
+<string>
+	<original>From</original>
+	<translate>Od</translate>
+</string>
+<string>
+	<original>Frontend View</original>
+	<translate>Užívateľské zobrazenie</translate>
+</string>
+<string>
+	<original>Full Name</original>
+	<translate>Priezvisko</translate>
+</string>
+<string>
+	<original>Fully Booked</original>
+	<translate>Úplne rezervované</translate>
+</string>
+<string>
+	<original>Fully Paid</original>
+	<translate>Plne zaplatené</translate>
+</string>
+<string>
+	<original>Gateway</original>
+	<translate>Brána</translate>
+</string>
+<string>
+	<original>Gateway Reference</original>
+	<translate>Referencia brány</translate>
+</string>
+<string>
+	<original>Gateway Response</original>
+	<translate>Odpoveď brány</translate>
+</string>
+<string>
+	<original>Go</original>
+	<translate>Vykonaj</translate>
+</string>
+<string>
+	<original>Go Back</original>
+	<translate>Späť</translate>
+</string>
+<string>
+	<original>Header</original>
+	<translate>Hlavička</translate>
+</string>
+<string>
+	<original>Header For All Emails</original>
+	<translate>Hlavička pre všetky emaily</translate>
+</string>
+<string>
+	<original>Help Text</original>
+	<translate>Pomocný text</translate>
+</string>
+<string>
+	<original>Hidden</original>
+	<translate>Skryté</translate>
+</string>
+<string>
+	<original>Hide</original>
+	<translate>Skryť</translate>
+</string>
+<string>
+	<original>Home</original>
+	<translate>Nová rezervácia</translate>
+</string>
+<string>
+	<original>Host</original>
+	<translate>Host</translate>
+</string>
+<string>
+	<original>Hour</original>
+	<translate>Hodina</translate>
+</string>
+<string>
+	<original>Hours</original>
+	<translate>Hodiny</translate>
+</string>
+<string>
+	<original>If more than one seat available, then all appointments should start at the same time. Otherwise, any overlapping allowed.</original>
+	<translate>Ak je viac ako jedno miesto voľné, tak všetky rezervácie majú začať v rovnakom čase. V opačnom prípade je povolené akékoľvek prekrývanie.</translate>
+</string>
+<string>
+	<original>If set correctly, your company time is now [b]{TIME_STRING}[/b]. If it is wrong, please set your company correct time zone.</original>
+	<translate>Ak je nastavené správne, Váš firemný čas je teraz [b]{TIME_STRING}[/b]. Ak je nesprávny, prosím zvoľne správnu časovú zónu pre Vašu firmu.</translate>
+</string>
+<string>
+	<original>If set to 1, the recurring option will be disabled</original>
+	<translate>Ak je nastavené na 1, možnosť opakovania bude pozastavená.</translate>
+</string>
+<string>
+	<original>If set to Minute for example, it will show 90 Minutes rather than 1 Hour 30 Minutes.</original>
+	<translate>Ak sú nastavené Minúty ako príklad, bude prednostne zobrazovať 90 minúť ako 1 hodinu a 30 minút.</translate>
+</string>
+<string>
+	<original>If set, email messages will be printed on screen rather than sent</original>
+	<translate>Ak je nastavené, emailové správy budú zobrazené na obrazovku ako by mali byť posielané.</translate>
+</string>
+<string>
+	<original>If you proceed, these appointments will be cancelled</original>
+	<translate>Ak budete pokračovať, táto rezervácia bude zrušená.</translate>
+</string>
+<string>
+	<original>Info</original>
+	<translate>Info</translate>
+</string>
+<string>
+	<original>Input Validation</original>
+	<translate>Kontrola vstupných údajov</translate>
+</string>
+<string>
+	<original>Install</original>
+	<translate>Inštalovať</translate>
+</string>
+<string>
+	<original>Installed Version</original>
+	<translate>Nainštalovaná verzia</translate>
+</string>
+<string>
+	<original>Integers Only</original>
+	<translate>Iba celé čísla</translate>
+</string>
+<string>
+	<original>Invoice</original>
+	<translate>Faktúra</translate>
+</string>
+<string>
+	<original>Invoice Value</original>
+	<translate>Hodnoty faktúry</translate>
+</string>
+<string>
+	<original>It seems that you have not made a backup for some time, it's highly recommended to do it now</original>
+	<translate>Vyzerá to tak, že ste neurobili backup počas dlhšej doby, je vysoko odporúčané tak urobiť teraz</translate>
+</string>
+<string>
+	<original>Jan</original>
+	<translate>Január</translate>
+</string>
+<string>
+	<original>Jul</original>
+	<translate>Júl</translate>
+</string>
+<string>
+	<original>Jun</original>
+	<translate>Jún</translate>
+</string>
+<string>
+	<original>Keep Cancelled/Rejected Appointments In Database</original>
+	<translate>Ponechať Zrušené/Zamietnuté rezervácie v databáze</translate>
+</string>
+<string>
+	<original>Label</original>
+	<translate>Štítok</translate>
+</string>
+<string>
+	<original>Language</original>
+	<translate>Jazyk</translate>
+</string>
+<string>
+	<original>Languages</original>
+	<translate>Jazyky</translate>
+</string>
+<string>
+	<original>Last Name</original>
+	<translate>Priezvisko</translate>
+</string>
+<string>
+	<original>Last Update</original>
+	<translate>Posledná aktualizácia</translate>
+</string>
+<string>
+	<original>Lead In</original>
+	<translate>Voviesť</translate>
+</string>
+<string>
+	<original>Lead Out</original>
+	<translate>Vyviesť</translate>
+</string>
+<string>
+	<original>Leave these blank to autogenerate a random password</original>
+	<translate>Ak zostane prázdne systém vygeneruje náhodné heslo</translate>
+</string>
+<string>
+	<original>Leave this empty to return to hitAppoint start page</original>
+	<translate>Nechať toto prázdne, aby sa hitAppoint vrátil na domovskú stránku</translate>
+</string>
+<string>
+	<original>Legend</original>
+	<translate>Legenda</translate>
+</string>
+<string>
+	<original>Let Customer Select</original>
+	<translate>Nechať vybrať zákazníka</translate>
+</string>
+<string>
+	<original>Let Customer Select With Auto Assign Option</original>
+	<translate>Nechať vybrať zákazníka s možnosťou automatického priradenia</translate>
+</string>
+<string>
+	<original>List</original>
+	<translate>Zoznam</translate>
+</string>
+<string>
+	<original>List Appointment Packs Above Regular Services</original>
+	<translate>Zoznam balíčkov rezervácií nad pravidelnými službami</translate>
+</string>
+<string>
+	<original>Loading</original>
+	<translate>Nahrávanie</translate>
+</string>
+<string>
+	<original>Location</original>
+	<translate>Umiestnenie</translate>
+</string>
+<string>
+	<original>Locations</original>
+	<translate>Umiestnenia</translate>
+</string>
+<string>
+	<original>Logged out</original>
+	<translate>Odhlásenie</translate>
+</string>
+<string>
+	<original>Login</original>
+	<translate>Prihlásenie</translate>
+</string>
+<string>
+	<original>Login details</original>
+	<translate>Prihlasovacie údaje</translate>
+</string>
+<string>
+	<original>Logout</original>
+	<translate>Odhlásiť</translate>
+</string>
+<string>
+	<original>Logs</original>
+	<translate>Logy</translate>
+</string>
+<string>
+	<original>Lowercase English Letters, Numbers, Underscores Only</original>
+	<translate>Malé anglické písmená, čísla, iba zdôraznenie</translate>
+</string>
+<string>
+	<original>Manage</original>
+	<translate>Rezervácie</translate>
+</string>
+<string>
+	<original>Mar</original>
+	<translate>Marec</translate>
+</string>
+<string>
+	<original>Marked As No Show</original>
+	<translate>Označená ako pozastavená</translate>
+</string>
+<string>
+	<original>Max Advance Booking</original>
+	<translate>Max čas vytvorenia rezvácie vopred</translate>
+</string>
+<string>
+	<original>Max Number Of Appointments In Pack</original>
+	<translate>Max počet rezervácii v balíku</translate>
+</string>
+<string>
+	<original>Max Number Of Recurring Appointments</original>
+	<translate>Max počet opakovania rezevácií</translate>
+</string>
+<string>
+	<original>Max Time Measure In Duration Display</original>
+	<translate>Max čas trvania</translate>
+</string>
+<string>
+	<original>May</original>
+	<translate>Máj</translate>
+</string>
+<string>
+	<original>Message</original>
+	<translate>Správa</translate>
+</string>
+<string>
+	<original>Min Advance Booking</original>
+	<translate>Min čas vytvorenia rezervácie</translate>
+</string>
+<string>
+	<original>Minute</original>
+	<translate>Minúta</translate>
+</string>
+<string>
+	<original>Minutes</original>
+	<translate>Minúty</translate>
+</string>
+<string>
+	<original>Misc</original>
+	<translate>Misc</translate>
+</string>
+<string>
+	<original>Mon</original>
+	<translate>Pon</translate>
+</string>
+<string>
+	<original>Monday</original>
+	<translate>Pondelok</translate>
+</string>
+<string>
+	<original>Month</original>
+	<translate>Mesiac</translate>
+</string>
+<string>
+	<original>Months To Show In Calendar</original>
+	<translate>Mesiace zobrazené v kalendári</translate>
+</string>
+<string>
+	<original>Moved Down</original>
+	<translate>Posun dolu</translate>
+</string>
+<string>
+	<original>Moved Up</original>
+	<translate>Posun hore</translate>
+</string>
+<string>
+	<original>My Appointments</original>
+	<translate>Moje rezervácie</translate>
+</string>
+<string>
+	<original>My Profile</original>
+	<translate>Môj profil</translate>
+</string>
+<string>
+	<original>My Timezone</original>
+	<translate>Moja časová zóna</translate>
+</string>
+<string>
+	<original>N/A</original>
+	<translate>Nie/Áno</translate>
+</string>
+<string>
+	<original>Name</original>
+	<translate>Meno</translate>
+</string>
+<string>
+	<original>Nearest Availability</original>
+	<translate>Najbližšia dostupnosť</translate>
+</string>
+<string>
+	<original>New</original>
+	<translate>Nový</translate>
+</string>
+<string>
+	<original>New Appointment</original>
+	<translate>Nová rezervácia</translate>
+</string>
+<string>
+	<original>New Version</original>
+	<translate>Nová verzia</translate>
+</string>
+<string>
+	<original>New Version Files Uploaded, Upgrade Procedure Required</original>
+	<translate>Nová verzia súborov na upload, požadovaný upgrade</translate>
+</string>
+<string>
+	<original>New appointment has been created and automatically approved.</original>
+	<translate>Nová rezervácia bola úspešne vytvorená.</translate>
+</string>
+<string>
+	<original>New to our site? Please take a moment to register!</original>
+	<translate>Ste nový na našej stránke? Prosím zageristrujte sa!</translate>
+</string>
+<string>
+	<original>Newly registered users will be asked to confirm their email by following a confirmation link in the email message</original>
+	<translate>Novo registrovaný zákazník bude požiadaný o potvrdenie svojej emailovej adresy klinknutím na link v mailovej sráve</translate>
+</string>
+<string>
+	<original>Newsletter</original>
+	<translate>Novinky</translate>
+</string>
+<string>
+	<original>Next Timeoffs</original>
+	<translate>Ďalšie odstávky</translate>
+</string>
+<string>
+	<original>No</original>
+	<translate>Nie</translate>
+</string>
+<string>
+	<original>No Access</original>
+	<translate>Žiaden prístup</translate>
+</string>
+<string>
+	<original>No Email?</original>
+	<translate>Žiadny email?</translate>
+</string>
+<string>
+	<original>No Selectable Times</original>
+	<translate>Žiadne zvoliteľné časy</translate>
+</string>
+<string>
+	<original>No Show</original>
+	<translate>Pozastavená</translate>
+</string>
+<string>
+	<original>No Upgrade Procedure To Run</original>
+	<translate>Žiadne bežiace upgrade procesy</translate>
+</string>
+<string>
+	<original>No administrative users to manage appointments!</original>
+	<translate>Žiadne admistrátorskí užívatelia pre zadanie rezervácií!</translate>
+</string>
+<string>
+	<original>No administrative users to manage schedules!</original>
+	<translate>Žiadne administrátorskí užívatelia pre zadanie časového rozvrhu rezervácií!</translate>
+</string>
+<string>
+	<original>No more available</original>
+	<translate>Už nedostupné</translate>
+</string>
+<string>
+	<original>No payment gateways configured!</original>
+	<translate>Žiadne nastavené platobné brány!</translate>
+</string>
+<string>
+	<original>No schedules configured!</original>
+	<translate>Žiadny časový rozvrh rezervácií nebol nastavený!</translate>
+</string>
+<string>
+	<original>No users found matching your search</original>
+	<translate>Neboli nájdení žiadni užívatelia zodpovedajúci zadanám parametrom</translate>
+</string>
+<string>
+	<original>Non Registered Users</original>
+	<translate>Žiadni registrovaní zákazníci</translate>
+</string>
+<string>
+	<original>None</original>
+	<translate>Žiadny</translate>
+</string>
+<string>
+	<original>Not Allowed</original>
+	<translate>Nepovolený</translate>
+</string>
+<string>
+	<original>Not Approved</original>
+	<translate>Neschválený</translate>
+</string>
+<string>
+	<original>Not Available Now</original>
+	<translate>Teraz nedostupná</translate>
+</string>
+<string>
+	<original>Not Paid</original>
+	<translate>Neuhradený</translate>
+</string>
+<string>
+	<original>Not Registered</original>
+	<translate>Nezaregistrovaný
+</translate>
+</string>
+<string>
+	<original>Not Shown</original>
+	<translate>Nezobrazená</translate>
+</string>
+<string>
+	<original>Not Shown For Security Reasons</original>
+	<translate>Nezobrazené z bezpečnostných dôvodov</translate>
+</string>
+<string>
+	<original>Not The First Option In Select List</original>
+	<translate>Nie prvá možnosť vo výberovom zozname</translate>
+</string>
+<string>
+	<original>Not in list</original>
+	<translate>Nie je v zozname</translate>
+</string>
+<string>
+	<original>Not you?</original>
+	<translate>Nie ste to Vy?</translate>
+</string>
+<string>
+	<original>Notification</original>
+	<translate>Notifikácia</translate>
+</string>
+<string>
+	<original>Notifications</original>
+	<translate>Notifikácie</translate>
+</string>
+<string>
+	<original>Nov</original>
+	<translate>November</translate>
+</string>
+<string>
+	<original>Numbers only</original>
+	<translate>Iba čísla</translate>
+</string>
+<string>
+	<original>OK</original>
+	<translate>OK</translate>
+</string>
+<string>
+	<original>Oct</original>
+	<translate>Október</translate>
+</string>
+<string>
+	<original>Old Appointment</original>
+	<translate>Stará rezervácia</translate>
+</string>
+<string>
+	<original>Old Appointments</original>
+	<translate>Staré rezervácie</translate>
+</string>
+<string>
+	<original>Old Timeoffs</original>
+	<translate>Staré obmedzenia</translate>
+</string>
+<string>
+	<original>One Appointment Free</original>
+	<translate>Jedna rezervácia zdarma</translate>
+</string>
+<string>
+	<original>One Entry Only</original>
+	<translate>Iba jeden vstup</translate>
+</string>
+<string>
+	<original>Only View The Timezone</original>
+	<translate>Zobraziť iba časovú zónu</translate>
+</string>
+<string>
+	<original>Only lowercase English letters, numbers, and underscores please!</original>
+	<translate>Iba malé anglické písmená, čísla a zdôraznenia prosím!</translate>
+</string>
+<string>
+	<original>Optional</original>
+	<translate>Voliteľný</translate>
+</string>
+<string>
+	<original>Or Recurring Appointments?</original>
+	<translate>Alebo opakovať rezerváciu?</translate>
+</string>
+<string>
+	<original>Or select one below</original>
+	<translate>Alebo vybrať o jednu nižšie</translate>
+</string>
+<string>
+	<original>Other Views &amp; Export</original>
+	<translate>Ďalšie náhľady &amp; Export</translate>
+</string>
+<string>
+	<original>Other end time?</original>
+	<translate>Iný čas ukončenia?</translate>
+</string>
+<string>
+	<original>Pages</original>
+	<translate>Strany</translate>
+</string>
+<string>
+	<original>Paid Through</original>
+	<translate>Uhradiť cez</translate>
+</string>
+<string>
+	<original>Paid Value</original>
+	<translate>Hodnoty platby</translate>
+</string>
+<string>
+	<original>Partially Booked</original>
+	<translate>Čiastočne rezervované</translate>
+</string>
+<string>
+	<original>Partially Paid</original>
+	<translate>Partially Paid</translate>
+</string>
+<string>
+	<original>Password</original>
+	<translate>Heslo</translate>
+</string>
+<string>
+	<original>Password Changed</original>
+	<translate>Heslo zmenené</translate>
+</string>
+<string>
+	<original>Password Reset</original>
+	<translate>Reset hesla</translate>
+</string>
+<string>
+	<original>Passwords don't match!</original>
+	<translate>Heslo nesúhlasí!</translate>
+</string>
+<string>
+	<original>Payment</original>
+	<translate>Platba</translate>
+</string>
+<string>
+	<original>Payment Gateway</original>
+	<translate>Platobná brána</translate>
+</string>
+<string>
+	<original>Payment Gateways</original>
+	<translate>Platobné brány</translate>
+</string>
+<string>
+	<original>Payment Options</original>
+	<translate>Možnosti platby</translate>
+</string>
+<string>
+	<original>Payment Required</original>
+	<translate>Platba požadovaná</translate>
+</string>
+<string>
+	<original>Payments</original>
+	<translate>Platby</translate>
+</string>
+<string>
+	<original>Paypal Email</original>
+	<translate>Paypal Email</translate>
+</string>
+<string>
+	<original>Pending</original>
+	<translate>Nepotvrdená</translate>
+</string>
+<string>
+	<original>Period</original>
+	<translate>Obdobie</translate>
+</string>
+<string>
+	<original>Periodic</original>
+	<translate>Periodický</translate>
+</string>
+<string>
+	<original>Permission Denied</original>
+	<translate>Oprávnenie bolo odopreté</translate>
+</string>
+<string>
+	<original>Permissions</original>
+	<translate>Oprávnenia</translate>
+</string>
+<string>
+	<original>Phone number should have at least {NUM} digits</original>
+	<translate>Telefónne číslo musí mať minimálne {NUM} čísiel</translate>
+</string>
+<string>
+	<original>Please Confirm Your Email</original>
+	<translate>Prosím potvrďte Váš email</translate>
+</string>
+<string>
+	<original>Please choose at least one option</original>
+	<translate>Prosím vyberte aspoň jednu možnosť</translate>
+</string>
+<string>
+	<original>Please choose whom to send your newsletter to</original>
+	<translate>Prosím vyberte komu zaslať vaš newsletter</translate>
+</string>
+<string>
+	<original>Please confirm the password</original>
+	<translate>Prosím potvrďte heslo</translate>
+</string>
+<string>
+	<original>Please login</original>
+	<translate>Prosím, prihláste sa</translate>
+</string>
+<string>
+	<original>Please provide the cancel reason</original>
+	<translate>Prosím uveďte dôvody zrušenia</translate>
+</string>
+<string>
+	<original>Please provide the reject reason</original>
+	<translate>Prosím uveďte dôvody zamietnutia</translate>
+</string>
+<string>
+	<original>Please provide your contact details</original>
+	<translate>Uveďte prosím svoje kontaktné údaje</translate>
+</string>
+<string>
+	<original>Please register</original>
+	<translate>Prosím zaregistrujte sa</translate>
+</string>
+<string>
+	<original>Please try again</original>
+	<translate>Skúste znova prosím</translate>
+</string>
+<string>
+	<original>Plugin</original>
+	<translate>Modul</translate>
+</string>
+<string>
+	<original>Plugins</original>
+	<translate>Moduly</translate>
+</string>
+<string>
+	<original>Price</original>
+	<translate>Cena</translate>
+</string>
+<string>
+	<original>Price Format</original>
+	<translate>Formát ceny</translate>
+</string>
+<string>
+	<original>Pricing</original>
+	<translate>Cenotvorba</translate>
+</string>
+<string>
+	<original>Print</original>
+	<translate>Tlač</translate>
+</string>
+<string>
+	<original>Proceed</original>
+	<translate>Vykonať</translate>
+</string>
+<string>
+	<original>Purge</original>
+	<translate>Očistiť</translate>
+</string>
+<string>
+	<original>Purge Cancelled</original>
+	<translate>Očistiť o zrušené</translate>
+</string>
+<string>
+	<original>Purged</original>
+	<translate>Očistené</translate>
+</string>
+<string>
+	<original>Recurring</original>
+	<translate>Opakujúce sa</translate>
+</string>
+<string>
+	<original>Recurring Options</original>
+	<translate>Možnosti opakovania</translate>
+</string>
+<string>
+	<original>Register</original>
+	<translate>Registrácia</translate>
+</string>
+<string>
+	<original>Registered Users</original>
+	<translate>Registrovaný zákazník</translate>
+</string>
+<string>
+	<original>Reject</original>
+	<translate>Zrušiť</translate>
+</string>
+<string>
+	<original>Release No Show</original>
+	<translate>Uvoľniť pozastavenie</translate>
+</string>
+<string>
+	<original>Remind Me To Backup</original>
+	<translate>Pripomenúť Backup</translate>
+</string>
+<string>
+	<original>Reminder</original>
+	<translate>Pripomienka</translate>
+</string>
+<string>
+	<original>Reminders</original>
+	<translate>Pripomienky</translate>
+</string>
+<string>
+	<original>Request (Automatically Approved)</original>
+	<translate>Požiadavka (Automaticky schválená)</translate>
+</string>
+<string>
+	<original>Request Permissions</original>
+	<translate>Požadavoť povolenie</translate>
+</string>
+<string>
+	<original>Require Clients Give Appointment Cancellation Reason</original>
+	<translate>Požadovať uvedenie dôvodu zrušenia zákazníkom</translate>
+</string>
+<string>
+	<original>Required field</original>
+	<translate>Povinné údaje</translate>
+</string>
+<string>
+	<original>Reschedule</original>
+	<translate>Zmeniť</translate>
+</string>
+<string>
+	<original>Resend Confirmation Code</original>
+	<translate>Preposať potvrdzujúci kód</translate>
+</string>
+<string>
+	<original>Reset To Defaults</original>
+	<translate>Obnovenie pôvodných nastavení</translate>
+</string>
+<string>
+	<original>Response</original>
+	<translate>Odpovedať</translate>
+</string>
+<string>
+	<original>Restore</original>
+	<translate>Obnoviť</translate>
+</string>
+<string>
+	<original>Restore From Backup</original>
+	<translate>Obnoviť z Backupu</translate>
+</string>
+<string>
+	<original>Revise Search?</original>
+	<translate>Kontrolné hľadanie?</translate>
+</string>
+<string>
+	<original>Role</original>
+	<translate>Role</translate>
+</string>
+<string>
+	<original>Run Upgrade Procedure</original>
+	<translate>Spustiť upgrade</translate>
+</string>
+<string>
+	<original>SMS</original>
+	<translate>SMS</translate>
+</string>
+<string>
+	<original>SMS Notifications Templates</original>
+	<translate>Vzory SMS notifikácií</translate>
+</string>
+<string>
+	<original>SMTP Settings</original>
+	<translate>SMTP Nastavenia</translate>
+</string>
+<string>
+	<original>Sat</original>
+	<translate>Sob</translate>
+</string>
+<string>
+	<original>Saturday</original>
+	<translate>Sobota</translate>
+</string>
+<string>
+	<original>Save</original>
+	<translate>Uložiť</translate>
+</string>
+<string>
+	<original>Schedule</original>
+	<translate>Prehľad termínu</translate>
+</string>
+<string>
+	<original>Schedules</original>
+	<translate>Časový rozvrh</translate>
+</string>
+<string>
+	<original>Search</original>
+	<translate>Hľadať</translate>
+</string>
+<string>
+	<original>Seats</original>
+	<translate>Miesta</translate>
+</string>
+<string>
+	<original>Secure</original>
+	<translate>Zabezpečiť</translate>
+</string>
+<string>
+	<original>Select</original>
+	<translate>Vybrať</translate>
+</string>
+<string>
+	<original>Select Options</original>
+	<translate>Vybrať možnosť</translate>
+</string>
+<string>
+	<original>Selectable Times</original>
+	<translate>Voliteľné termíny</translate>
+</string>
+<string>
+	<original>Selecting Now</original>
+	<translate>Práve vyberáte</translate>
+</string>
+<string>
+	<original>Selection Display Style</original>
+	<translate>Štýl zobrazovania výberu</translate>
+</string>
+<string>
+	<original>Send</original>
+	<translate>Poslať</translate>
+</string>
+<string>
+	<original>Send New Password</original>
+	<translate>Poslať nové heslo</translate>
+</string>
+<string>
+	<original>Send Reminder Before</original>
+	<translate>Poslať pripomienku vopred</translate>
+</string>
+<string>
+	<original>Send To</original>
+	<translate>Poslať komu</translate>
+</string>
+<string>
+	<original>Sender Email</original>
+	<translate>Email - odosielateľa</translate>
+</string>
+<string>
+	<original>Sender Name</original>
+	<translate>Meno odosielateľa</translate>
+</string>
+<string>
+	<original>Sent At</original>
+	<translate>Poslať na</translate>
+</string>
+<string>
+	<original>Sep</original>
+	<translate>September</translate>
+</string>
+<string>
+	<original>Service</original>
+	<translate>Služba</translate>
+</string>
+<string>
+	<original>Service selection should come before the date and time selection</original>
+	<translate>Výber služby by mal predchádzať výberu dátumu a času</translate>
+</string>
+<string>
+	<original>Services</original>
+	<translate>Služby</translate>
+</string>
+<string>
+	<original>Settings</original>
+	<translate>Nastavenia</translate>
+</string>
+<string>
+	<original>Show</original>
+	<translate>Ukáž</translate>
+</string>
+<string>
+	<original>Show Session Duration For Clients</original>
+	<translate>Zobraziť čas trvania pre klientov</translate>
+</string>
+<string>
+	<original>Showing {SHOW_FROM} - {SHOW_TO} of {TOTAL_COUNT}</original>
+	<translate>Zobrazené {SHOW_FROM} - {SHOW_TO} of {TOTAL_COUNT}</translate>
+</string>
+<string>
+	<original>Single Or Recurring Appointments?</original>
+	<translate>Jednorázové, alebo opakujúce sa rezervácie?</translate>
+</string>
+<string>
+	<original>Something short and descriptive, like Summer Schedule, etc</original>
+	<translate>Niečo kátke a výstižné, ako "letný rozvrh", atď</translate>
+</string>
+<string>
+	<original>Sort By</original>
+	<translate>Zoradiť podľa</translate>
+</string>
+<string>
+	<original>Split</original>
+	<translate>Rozdeliť</translate>
+</string>
+<string>
+	<original>Status</original>
+	<translate>Status</translate>
+</string>
+<string>
+	<original>String(s) missing</original>
+	<translate>Reťatec chýba</translate>
+</string>
+<string>
+	<original>Subject</original>
+	<translate>Predmet</translate>
+</string>
+<string>
+	<original>Sun</original>
+	<translate>Neď</translate>
+</string>
+<string>
+	<original>Sunday</original>
+	<translate>Nedeľa</translate>
+</string>
+<string>
+	<original>Suspend</original>
+	<translate>Pozastaviť</translate>
+</string>
+<string>
+	<original>Suspended</original>
+	<translate>Pozastavená</translate>
+</string>
+<string>
+	<original>System Access Level</original>
+	<translate>System Access Level</translate>
+</string>
+<string>
+	<original>System Name</original>
+	<translate>Systémový názov</translate>
+</string>
+<string>
+	<original>Tags</original>
+	<translate>Znaky</translate>
+</string>
+<string>
+	<original>Template</original>
+	<translate>Šablóna</translate>
+</string>
+<string>
+	<original>Templates</original>
+	<translate>Šablóny</translate>
+</string>
+<string>
+	<original>Terminology</original>
+	<translate>Terminológia</translate>
+</string>
+<string>
+	<original>Text</original>
+	<translate>Text</translate>
+</string>
+<string>
+	<original>Text Field Size</original>
+	<translate>Veľkosť textového poľa</translate>
+</string>
+<string>
+	<original>Textarea</original>
+	<translate>Textové pole</translate>
+</string>
+<string>
+	<original>Textarea Columns</original>
+	<translate>Stĺpce textového poľa</translate>
+</string>
+<string>
+	<original>Textarea Rows</original>
+	<translate>Riadky textového poľa</translate>
+</string>
+<string>
+	<original>Thank you for registering![br]Now we kindly ask you to confirm your email. Please open your inbox and click the confirmation link in our message.</original>
+	<translate>Ďakujem za Vašu registráciu! Prosím otvorte Vašu doručenú poštu a kliknutím na link v správe potvrďte Váš email.</translate>
+</string>
+<string>
+	<original>The administrator will need to manually approve new user accounts before they can access the system</original>
+	<translate>Je vyžadované manuálne potvrdenie nového účtu zákazníka administárorom, k jeho akdivovaniu</translate>
+</string>
+<string>
+	<original>Theme</original>
+	<translate>Téma</translate>
+</string>
+<string>
+	<original>Themes</original>
+	<translate>Témy</translate>
+</string>
+<string>
+	<original>There are [b]{APPS_COUNT}[/b] appointment(s)</original>
+	<translate>Evidujeme [b]{APPS_COUNT}[/b] rezvácií</translate>
+</string>
+<string>
+	<original>There has been a problem with your payment</original>
+	<translate>Evidujeme problém s Vašou platbou</translate>
+</string>
+<string>
+	<original>There is a problem with your account</original>
+	<translate>Evidujeme problém s Vašim účtom</translate>
+</string>
+<string>
+	<original>These upgrade scripts have been executed</original>
+	<translate>Tento upgrade script bol vykonaný</translate>
+</string>
+<string>
+	<original>This email is not registered</original>
+	<translate>Tento email nie je registrovaný</translate>
+</string>
+<string>
+	<original>This may depend on your Excel regional settings</original>
+	<translate>Toto môže závisieť od Vašich národných nastavení Excelu</translate>
+</string>
+<string>
+	<original>This should not be smaller than the min advance booking</original>
+	<translate>Toto nesmie byť menšie ako minimálny čas rezervovania</translate>
+</string>
+<string>
+	<original>Thu</original>
+	<translate>Štv</translate>
+</string>
+<string>
+	<original>Thursday</original>
+	<translate>Štvrtok</translate>
+</string>
+<string>
+	<original>Time</original>
+	<translate>Čas</translate>
+</string>
+<string>
+	<original>Time Format</original>
+	<translate>Formát času</translate>
+</string>
+<string>
+	<original>Time Slot</original>
+	<translate>Časový úsek</translate>
+</string>
+<string>
+	<original>Time Slots</original>
+	<translate>Časové úseky</translate>
+</string>
+<string>
+	<original>Time Unit, min</original>
+	<translate>Časová jednotka, min</translate>
+</string>
+<string>
+	<original>Timeoff</original>
+	<translate>Obmedzenia prevádzky</translate>
+</string>
+<string>
+	<original>Times shown in [b]{TIME_ZONE}[/b] time zone</original>
+	<translate>Čas zobrazený v [b]{TIME_ZONE}[/b] časovej zóne</translate>
+</string>
+<string>
+	<original>Timezone</original>
+	<translate>Časová zóna</translate>
+</string>
+<string>
+	<original>Title</original>
+	<translate>Názov</translate>
+</string>
+<string>
+	<original>To</original>
+	<translate>Do</translate>
+</string>
+<string>
+	<original>Together</original>
+	<translate>Spolu</translate>
+</string>
+<string>
+	<original>Total</original>
+	<translate>Spolu</translate>
+</string>
+<string>
+	<original>Total Amount</original>
+	<translate>Suma spolu</translate>
+</string>
+<string>
+	<original>Total Duration</original>
+	<translate>Celkové trvanie</translate>
+</string>
+<string>
+	<original>Total Price</original>
+	<translate>Celková cena</translate>
+</string>
+<string>
+	<original>Tue</original>
+	<translate>Uto</translate>
+</string>
+<string>
+	<original>Tuesday</original>
+	<translate>Utorok</translate>
+</string>
+<string>
+	<original>Type</original>
+	<translate>Typ</translate>
+</string>
+<string>
+	<original>URL To Return After Appointment Request</original>
+	<translate>URL pre návrat po zadaní rezervácie</translate>
+</string>
+<string>
+	<original>Uncategorized</original>
+	<translate>Nezoradené</translate>
+</string>
+<string>
+	<original>Uninstall</original>
+	<translate>Odinštalovať</translate>
+</string>
+<string>
+	<original>Unique Email</original>
+	<translate>Unikátny Email</translate>
+</string>
+<string>
+	<original>Unique Username</original>
+	<translate>Unikátne užívateľské meno</translate>
+</string>
+<string>
+	<original>Until Closed</original>
+	<translate>Do uzatvorenia</translate>
+</string>
+<string>
+	<original>Up</original>
+	<translate>Hore</translate>
+</string>
+<string>
+	<original>Upcoming Appointments</original>
+	<translate>Nadchádzajúce rezervácie</translate>
+</string>
+<string>
+	<original>Update</original>
+	<translate>Aktualizovať</translate>
+</string>
+<string>
+	<original>Upgrade</original>
+	<translate>Upgrade</translate>
+</string>
+<string>
+	<original>Uploaded Version</original>
+	<translate>Verzia Uploadu</translate>
+</string>
+<string>
+	<original>Use Email As Username</original>
+	<translate>Použiť email ako užívateľské meno</translate>
+</string>
+<string>
+	<original>User</original>
+	<translate>Zákazník</translate>
+</string>
+<string>
+	<original>User Login Required?</original>
+	<translate>Užívateľský login požadovaný?</translate>
+</string>
+<string>
+	<original>User Registration</original>
+	<translate>Registrácia zákazníka</translate>
+</string>
+<string>
+	<original>User Status</original>
+	<translate>Status</translate>
+</string>
+<string>
+	<original>Username</original>
+	<translate>Užívateľské meno</translate>
+</string>
+<string>
+	<original>Users</original>
+	<translate>Užívatelia</translate>
+</string>
+<string>
+	<original>Valid</original>
+	<translate>Platné</translate>
+</string>
+<string>
+	<original>Valid From Date</original>
+	<translate>Platná od dátumu</translate>
+</string>
+<string>
+	<original>Valid To Date</original>
+	<translate>Platná do dátumu</translate>
+</string>
+<string>
+	<original>Valid URL Syntax</original>
+	<translate>Platná URL Syntax</translate>
+</string>
+<string>
+	<original>Validation</original>
+	<translate>Kontrola</translate>
+</string>
+<string>
+	<original>View</original>
+	<translate>Prezerať</translate>
+</string>
+<string>
+	<original>View Only</original>
+	<translate>Iba prezerať</translate>
+</string>
+<string>
+	<original>View and Update</original>
+	<translate>Prezerať a upravaovať</translate>
+</string>
+<string>
+	<original>Waiting For Approval</original>
+	<translate>Čakanie na schválenie</translate>
+</string>
+<string>
+	<original>Warning: your current data will be deleted by restoring from backup file</original>
+	<translate>Upozornenie: Vaše súcasné údaje budú prepísané údajmi z backup súboru</translate>
+</string>
+<string>
+	<original>Web Page Title</original>
+	<translate>Názov webstránky</translate>
+</string>
+<string>
+	<original>Wed</original>
+	<translate>Str</translate>
+</string>
+<string>
+	<original>Wednesday</original>
+	<translate>Streda</translate>
+</string>
+<string>
+	<original>Week</original>
+	<translate>Týždeň</translate>
+</string>
+<string>
+	<original>Week Starts On</original>
+	<translate>Týždeň začína</translate>
+</string>
+<string>
+	<original>Weekday</original>
+	<translate>Deň v týždni</translate>
+</string>
+<string>
+	<original>Weeks</original>
+	<translate>Týždne</translate>
+</string>
+<string>
+	<original>Welcome</original>
+	<translate>Vitajte</translate>
+</string>
+<string>
+	<original>When</original>
+	<translate>Kedy</translate>
+</string>
+<string>
+	<original>When enabling this, be sure you remember your own email address</original>
+	<translate>Pri aktivácii tohto, bude nutné si zapamätať svoju vlastnú e-mailovú adresu</translate>
+</string>
+<string>
+	<original>Working Time</original>
+	<translate>Pracovný čas</translate>
+</string>
+<string>
+	<original>Wrong Confirmation Link</original>
+	<translate>Chybný potvrdzujúci link</translate>
+</string>
+<string>
+	<original>Wrong username or password</original>
+	<translate>Nesprávne užívateľské meno, alebo heslo</translate>
+</string>
+<string>
+	<original>Yes</original>
+	<translate>Áno</translate>
+</string>
+<string>
+	<original>Yes/No</original>
+	<translate>Ano/Nie</translate>
+</string>
+<string>
+	<original>You can use the * wildcard to match any set of characters</original>
+	<translate>Môžete použiť * k náhrade akéhokoľvek znaku</translate>
+</string>
+<string>
+	<original>You cannot cancel or reschedule this appointment now</original>
+	<translate>Teraz nemôžete zrušiť alebo zmeniť termín rezervácie</translate>
+</string>
+<string>
+	<original>You have nothing to manage</original>
+	<translate>Nemáte žiadne rezevácie</translate>
+</string>
+<string>
+	<original>Your Name</original>
+	<translate>Vaše meno</translate>
+</string>
+<string>
+	<original>Your account is temporarily suspended</original>
+	<translate>Váš účet je dočasne pozastavený</translate>
+</string>
+<string>
+	<original>Your email is not confirmed yet. Please open your inbox and click the confirmation link in our message.</original>
+	<translate>Váš e-mail ešte nie je potvrdený. Prosím, otvorte doručenú poštu a kliknite na potvrdzovací odkaz v našej správe.</translate>
+</string>
+<string>
+	<original>Your new password has been sent to your email</original>
+	<translate>Vaše nové heslo bolo zaslané na Váš email</translate>
+</string>
+<string>
+	<original>hitAppoint Path</original>
+	<translate>hitAppoint cesta</translate>
+</string>
+<string>
+	<original>iCal Subscription</original>
+	<translate>iCal Pripomienka</translate>
+</string>
+<string>
+<original>Add a star sign (*) before the default value</original>
+<translate>Umiestnite (*) pred predvolenú hodnotu</translate>
+</string>
+<string>
+<original>Allow Duplicate Emails</original>
+<translate>Povoliť duplicitu emailových adries</translate>
+</string>
+<string>
+<original>Automatically Select Any Available</original>
+<translate>Automaticky vybrať všetky možnosti</translate>
+</string>
+<string>
+<original>Notify Customer On Account Creation</original>
+<translate>Informovať zákazníka o vytvorení účtu</translate>
+</string>
+<string>
+<original>Add Another Appointment</original>
+<translate>Pridať ďalšiu rezerváciu</translate>
+</string>
+<string>
+<original>Add Filter</original>
+<translate>Pridať filter</translate>
+</string>
+<string>
+<original>Add Timeslot</original>
+<translate>Pridať časové rozpätie</translate>
+</string>
+<string>
+<original>Agenda</original>
+<translate>Prehľad</translate>
+</string>
+<string>
+<original>Appointment Cart</original>
+<translate>Košík rezervácií</translate>
+</string>
+<string>
+<original>Appointment Notes</original>
+<translate>Poznámky k rezervácii</translate>
+</string>
+<string>
+<original>Backup Reminder</original>
+<translate>Backup pripomienku</translate>
+</string>
+<string>
+<original>Calendar</original>
+<translate>Kalendár</translate>
+</string>
+<string>
+<original>Class</original>
+<translate>Trieda</translate>
+</string>
+<string>
+<original>Click on a date in calendar to add</original>
+<translate>Pre pridanie kliktnite na dátum v kalendári </translate>
+</string>
+<string>
+<original>Click on a selected date to remove</original>
+<translate>Pre odstránenie kliknite na dátum</translate>
+</string>
+<string>
+<original>Company</original>
+<translate>Firma</translate>
+</string>
+<string>
+<original>Confirm Appointments</original>
+<translate>Potvrdiť rezervácie</translate>
+</string>
+<string>
+<original>Current Version</original>
+<translate>Súčasná verzia</translate>
+</string>
+<string>
+<original>Custom Dates</original>
+<translate>Úžívateľské dátumy</translate>
+</string>
+<string>
+<original>Customer Balance</original>
+<translate>Užívateľský zostatok</translate>
+</string>
+<string>
+<original>Customer Notes</original>
+<translate>Užívateľské poznámky</translate>
+</string>
+<string>
+<original>Days To Show</original>
+<translate>Zobrazené dni</translate>
+</string>
+<string>
+<original>Due</original>
+<translate>Spôsobený</translate>
+</string>
+<string>
+<original>Due Amount</original>
+<translate>Omeškaná suma</translate>
+</string>
+<string>
+<original>First Time Visitors Splash Screen</original>
+<translate>Zobrazená stránka pri prvom prihlásení zákazníka</translate>
+</string>
+<string>
+<original>Fixed Time</original>
+<translate>Pevný čas</translate>
+</string>
+<string>
+<original>Gateway Response </original>
+<translate>Odpoveď brány </translate>
+</string>
+<string>
+<original>Get Notified</original>
+<translate>Byť upozornený</translate>
+</string>
+<string>
+<original>Installation Path</original>
+<translate>Inštalačná cesta</translate>
+</string>
+<string>
+<original>Interval</original>
+<translate>Vnútorný</translate>
+</string>
+<string>
+<original>Invoices</original>
+<translate>Faktúry</translate>
+</string>
+<string>
+<original>Keep Cancelled Appointments In Database</original>
+<translate>Uchovať zrušené rezervácie v databáze</translate>
+</string>
+<string>
+<original>License Code</original>
+<translate>Licenčný kód</translate>
+</string>
+<string>
+<original>Manual</original>
+<translate>Príručka</translate>
+</string>
+<string>
+<original>Max Measure For Duration Display</original>
+<translate>Zobrazenie max meraného trvania</translate>
+</string>
+<string>
+<original>Months To Show</original>
+<translate>Zobraziť mesiace</translate>
+</string>
+<string>
+<original>Move Down</original>
+<translate>Posun dole</translate>
+</string>
+<string>
+<original>Move Up</original>
+<translate>Posun hore</translate>
+</string>
+<string>
+<original>New Appointment Custom Form</original>
+<translate>Užívateľský formulár novej rezervácie</translate>
+</string>
+<string>
+<original>No Appointment</original>
+<translate>Bez rezervácie</translate>
+</string>
+<string>
+<original>No Seats Left</original>
+<translate>Obsadené</translate>
+</string>
+<string>
+<original>No more options available</original>
+<translate>Žiadne ďalšie možnosti nie sú k dispozícii</translate>
+</string>
+<string>
+<original>Not Available</original>
+<translate>Nedostupné</translate>
+</string>
+<string>
+<original>Not found</original>
+<translate>Nenájdené</translate>
+</string>
+<string>
+<original>Note</original>
+<translate>Poznáka</translate>
+</string>
+<string>
+<original>Notes</original>
+<translate>Poznámky</translate>
+</string>
+<string>
+<original>Office</original>
+<translate>Kancelária</translate>
+</string>
+<string>
+<original>Old</original>
+<translate>Starý</translate>
+</string>
+<string>
+<original>Or please register</original>
+<translate>alebo sa prosím zaregistrujte</translate>
+</string>
+<string>
+<original>Overview</original>
+<translate>Prehľad</translate>
+</string>
+<string>
+<original>Paid</original>
+<translate>Uhradené</translate>
+</string>
+<string>
+<original>Please Enter Your License Code</original>
+<translate>Prosim zadajte svoj licenčný kód</translate>
+</string>
+<string>
+<original>Please Upgrade</original>
+<translate>Prosím upgredovať</translate>
+</string>
+<string>
+<original>Please select the end date in calendar</original>
+<translate>Prosím zvoľte koncový dátum v kalendári</translate>
+</string>
+<string>
+<original>Please select the start date in calendar</original>
+<translate>Prosím zvoľte počiatočný dátum v kalendári</translate>
+</string>
+<string>
+<original>Preferred Time</original>
+<translate>Prefrerovaný čas</translate>
+</string>
+<string>
+<original>Preferred time not available</original>
+<translate>Preferovaný čas nie je k dispozícii</translate>
+</string>
+<string>
+<original>Promotion</original>
+<translate>Reklama</translate>
+</string>
+<string>
+<original>Reassign From</original>
+<translate>Preradiť z</translate>
+</string>
+<string>
+<original>Reassign To</original>
+<translate>Preradiť do</translate>
+</string>
+<string>
+<original>Recurring Appointments</original>
+<translate>Opakujúce sa rezervácie</translate>
+</string>
+<string>
+<original>Refno</original>
+<translate>Refernčné číslo</translate>
+</string>
+<string>
+<original>Required Field</original>
+<translate>Požadované pole</translate>
+</string>
+<string>
+<original>Resource</original>
+<translate>Prostriedky</translate>
+</string>
+<string>
+<original>Seats Left</original>
+<translate>Voľné miesta</translate>
+</string>
+<string>
+<original>Show Up</original>
+<translate>Zobraziť hore</translate>
+</string>
+<string>
+<original>Single Appointment</original>
+<translate>Jednorázová rezervácia</translate>
+</string>
+<string>
+<original>Slot Type</original>
+<translate>Typ obmedzenia</translate>
+</string>
+<string>
+<original>Synchronization</original>
+<translate>Synchrnizovať</translate>
+</string>
+<string>
+<original>This Date Only</original>
+<translate>Iba tento dátum</translate>
+</string>
+<string>
+<original>Time Range</original>
+<translate>Časové rozpätie</translate>
+</string>
+<string>
+<original>Time Unit</original>
+<translate>Časová jednotka</translate>
+</string>
+<string>
+<original>Total Value</original>
+<translate>Celková hodnota</translate>
+</string>
+<string>
+<original>Travel Time</original>
+<translate>Doba cesty</translate>
+</string>
+<string>
+<original>Valid Email Syntax</original>
+<translate>Platný formát emailu</translate>
+</string>
+<string>
+<original>Valid Phone Number (10 digits)</original>
+<translate>Platné formát telefónneho čísla (10 čísel)</translate>
+</string>
+<string>
+<original>Weekdays</original>
+<translate>Dni v týždni</translate>
+</string>
+<string>
+<original>Working Time End</original>
+<translate>Koniec pracovnej doby</translate>
+</string>
+<string>
+<original>Working Time Start</original>
+<translate>Začiatok pracovnej doby</translate>
+</string>
+<string>
+<original>After Payment</original>
+<translate>Doplatok</translate>
+</string>
+<string>
+<original>All Upcoming Appointments</original>
+<translate>Všetky nadchádzajúce rezervácie</translate>
+</string>
+<string>
+<original>Automatic Actions</original>
+<translate>Automatické činnosti</translate>
+</string>
+<string>
+<original>Automatic Reject</original>
+<translate>Automatické odmietnutie</translate>
+</string>
+<string>
+<original>Booked Seats Less Than</original>
+<translate>Zarezevovaných miest viac ako</translate>
+</string>
+<string>
+<original>Confirm Package</original>
+<translate>Potvrdiť balíček</translate>
+</string>
+<string>
+<original>Cron Job Last Run</original>
+<translate>Posledné spustenie Cron Jobu</translate>
+</string>
+<string>
+<original>Enable</original>
+<translate>Aktivovať</translate>
+</string>
+<string>
+<original>Enter Code Shown</original>
+<translate>Vložte zobrazený kód</translate>
+</string>
+<string>
+<original>Excel</original>
+<translate>Excel</translate>
+</string>
+<string>
+<original>Fields</original>
+<translate>Polia</translate>
+</string>
+<string>
+<original>Login Details</original>
+<translate>Prihlasovacie údaje - detail</translate>
+</string>
+<string>
+<original>My Prepaid Appointments</original>
+<translate>Moje predplatené rezervácie</translate>
+</string>
+<string>
+<original>No Appointments</original>
+<translate>Žiadne rezervácie</translate>
+</string>
+<string>
+<original>Not Found</original>
+<translate>Nenájdené</translate>
+</string>
+<string>
+<original>Number of appointments</original>
+<translate>Počet rezervácií</translate>
+</string>
+<string>
+<original>Off</original>
+<translate>Vypnúť</translate>
+</string>
+<string>
+<original>On</original>
+<translate>Zapnúť</translate>
+</string>
+<string>
+<original>Package</original>
+<translate>Balíček</translate>
+</string>
+<string>
+<original>Packages</original>
+<translate>Balíčky</translate>
+</string>
+<string>
+<original>Packages Avaiable</original>
+<translate>Dostupné balíčky</translate>
+</string>
+<string>
+<original>Pending Approval</original>
+<translate>Čaká na schválenie</translate>
+</string>
+<string>
+<original>Please configure automatic actions first</original>
+<translate>Prosím potvrďte najskôr automatické činnosti</translate>
+</string>
+<string>
+<original>Prepaid Appointments</original>
+<translate>Predplatené rezervácie</translate>
+</string>
+<string>
+<original>Price per one</original>
+<translate>Cena za jednu</translate>
+</string>
+<string>
+<original>Print View</original>
+<translate>Tlačiť prehľad</translate>
+</string>
+<string>
+<original>Regular price</original>
+<translate>Bežná cena</translate>
+</string>
+<string>
+<original>Reject Before</original>
+<translate>Odmietnúť pred</translate>
+</string>
+<string>
+<original>Require Strong Passwords</original>
+<translate>Požaduje silné heslá</translate>
+</string>
+<string>
+<original>Returning</original>
+<translate>Vrátenie</translate>
+</string>
+<string>
+<original>Same As Above</original>
+<translate>Rovnaké ako nižšie</translate>
+</string>
+<string>
+<original>Schedule Appointment</original>
+<translate>Harmonogram rezervácií</translate>
+</string>
+<string>
+<original>Send Email</original>
+<translate>Poslať Email</translate>
+</string>
+<string>
+<original>Show Appointment End Time For Clients</original>
+<translate>Zobraziť koncový čas rezervácie pre klienta</translate>
+</string>
+<string>
+<original>Transactions</original>
+<translate>Tranzakcie</translate>
+</string>
+<string>
+<original>Use Captcha For Non-Registered Users</original>
+<translate>Použiť OBRÁZKOVÝ KÓD pre neregistrovaných zákazníkov</translate>
+</string>
+<string>
+<original>Use at least 8 characters</original>
+<translate>Použiť minimálne 8 písmen</translate>
+</string>
+<string>
+<original>Use both letters and numbers</original>
+<translate>Použiť obe aj písmená aj čísla</translate>
+</string>
+<string>
+<original>Wrong Code</original>
+<translate>Nesprávny kód</translate>
+</string>
+<string>
+<original>Yes, I've configured the cron job</original>
+<translate>Áno, nastavil som CRON JOB</translate>
+</string>
+<string>
+<original>Add Appointment</original>
+<translate>Pridať rezerváciu</translate>
+</string>
+<string>
+<original>Add Package</original>
+<translate>Pridať balíček</translate>
+</string>
+<string>
+<original>Add Payment</original>
+<translate>Pridať platbu</translate>
+</string>
+<string>
+<original>Add To Customer</original>
+<translate>Pridať zákazníkovi</translate>
+</string>
+<string>
+<original>Add online payment options to enable this</original>
+<translate>Pridať možnosť online platby k tomu aby</translate>
+</string>
+<string>
+<original>All Upcoming</original>
+<translate>Všetky nadchádzajúce</translate>
+</string>
+<string>
+<original>Already Completed</original>
+<translate>Už vybavená</translate>
+</string>
+<string>
+<original>Any</original>
+<translate>Každý</translate>
+</string>
+<string>
+<original>Any Service</original>
+<translate>Každá služba</translate>
+</string>
+<string>
+<original>Apointment packages available</original>
+<translate>Balíčky rezervácií k dispozícii</translate>
+</string>
+<string>
+<original>Available In Package Only</original>
+<translate>K dispozícii iba v balíčku</translate>
+</string>
+<string>
+<original>Bandle</original>
+<translate>Balík</translate>
+</string>
+<string>
+<original>Bundle</original>
+<translate>Balík</translate>
+</string>
+<string>
+<original>Bundles</original>
+<translate>Balíky</translate>
+</string>
+<string>
+<original>Buy Now</original>
+<translate>Kúpiť teraz</translate>
+</string>
+<string>
+<original>Completed</original>
+<translate>Vybavená</translate>
+</string>
+<string>
+<original>Confirm</original>
+<translate>Potvrdiť</translate>
+</string>
+<string>
+<original>Create Invoice</original>
+<translate>Vytvoriť faktúru</translate>
+</string>
+<string>
+<original>Create a package first</original>
+<translate>Najskôr vytvoriť balíček</translate>
+</string>
+<string>
+<original>Customer Limits</original>
+<translate>Zákazníke obmedzenia</translate>
+</string>
+<string>
+<original>Due Date</original>
+<translate>Termín splatnosti</translate>
+</string>
+<string>
+<original>Due Now</original>
+<translate>Aktuálna suma</translate>
+</string>
+<string>
+<original>Expired</original>
+<translate>Vypršaný</translate>
+</string>
+<string>
+<original>Expires</original>
+<translate>Vyprší</translate>
+</string>
+<string>
+<original>Expires In</original>
+<translate>Vyprší do</translate>
+</string>
+<string>
+<original>Expires in</original>
+<translate>Vyprší do</translate>
+</string>
+<string>
+<original>Export To Freshbooks</original>
+<translate>Export do Freshbooks</translate>
+</string>
+<string>
+<original>Freshbooks</original>
+<translate>Freshbooks</translate>
+</string>
+<string>
+<original>Full</original>
+<translate>Plné</translate>
+</string>
+<string>
+<original>Instant Approval</original>
+<translate>Okamžité schválenie</translate>
+</string>
+<string>
+<original>Is Active</original>
+<translate>Aktívne</translate>
+</string>
+<string>
+<original>Items</original>
+<translate>Položky</translate>
+</string>
+<string>
+<original>Leave this empty to return to the default start page</original>
+<translate>Nechať toto prázdne a vrátiť sa na úvodnú stránku</translate>
+</string>
+<string>
+<original>Max Appointments In Cart</original>
+<translate>Maximálny počet rezervácii v objednávke</translate>
+</string>
+<string>
+<original>Max Gap</original>
+<translate>Maximálny rozdiel</translate>
+</string>
+<string>
+<original>Max gap between appointments</original>
+<translate>Maximálna rozdiel medzi rezerváciami</translate>
+</string>
+<string>
+<original>Months</original>
+<translate>Mesiace</translate>
+</string>
+<string>
+<original>My Packages</original>
+<translate>Moje balíky</translate>
+</string>
+<string>
+<original>My Payments</original>
+<translate>Moje platby</translate>
+</string>
+<string>
+<original>Never Expires</original>
+<translate>Nikdy nevyprší</translate>
+</string>
+<string>
+<original>No Email</original>
+<translate>Bez emailu</translate>
+</string>
+<string>
+<original>No Packages Available</original>
+<translate>Žiadny balík nie je dostupný</translate>
+</string>
+<string>
+<original>No Payment</original>
+<translate>Žiadna platba</translate>
+</string>
+<string>
+<original>Not Changed</original>
+<translate>Bez zmeny</translate>
+</string>
+<string>
+<original>Not For Sale</original>
+<translate>Nie je na predaj</translate>
+</string>
+<string>
+<original>Not Scheduled</original>
+<translate>Nerezervované</translate>
+</string>
+<string>
+<original>Not Used</original>
+<translate>Nepoužité</translate>
+</string>
+<string>
+<original>Not Used Yet</original>
+<translate>Ešte nepoužité</translate>
+</string>
+<string>
+<original>Occupies Entire Location</original>
+<translate>Lokácia úplne obsadená</translate>
+</string>
+<string>
+<original>Order</original>
+<translate>Objednať</translate>
+</string>
+<string>
+<original>Package Details</original>
+<translate>Detail balíka</translate>
+</string>
+<string>
+<original>Package Only</original>
+<translate>Iba balík</translate>
+</string>
+<string>
+<original>Package Order</original>
+<translate>Objednávka balíka</translate>
+</string>
+<string>
+<original>Package Orders</original>
+<translate>Objednávky balíka</translate>
+</string>
+<string>
+<original>Package Type</original>
+<translate>Typ balíka</translate>
+</string>
+<string>
+<original>Paid Amount</original>
+<translate>Uhradená suma</translate>
+</string>
+<string>
+<original>Pay Now</original>
+<translate>Uhradiť teraz</translate>
+</string>
+<string>
+<original>Please choose at least 2 options</original>
+<translate>Prosím zvoľte najmenej 2 možnosti</translate>
+</string>
+<string>
+<original>Please give a reason</original>
+<translate>Prosím uveďte dôvod</translate>
+</string>
+<string>
+<original>Prepayment</original>
+<translate>Platba</translate>
+</string>
+<string>
+<original>Purchase</original>
+<translate>Kúpa</translate>
+</string>
+<string>
+<original>Quantity</original>
+<translate>Množstvo</translate>
+</string>
+<string>
+<original>Remain</original>
+<translate>Zvyšok</translate>
+</string>
+<string>
+<original>Require Deposit</original>
+<translate>Požadovať zálohu</translate>
+</string>
+<string>
+<original>Schedule Now</original>
+<translate>Objednajte sa teraz</translate>
+</string>
+<string>
+<original>Sell</original>
+<translate>Predať</translate>
+</string>
+<string>
+<original>Selling Price</original>
+<translate>Predajná cena</translate>
+</string>
+<string>
+<original>Single Services</original>
+<translate>Samostatné služby</translate>
+</string>
+<string>
+<original>Total Paid</original>
+<translate>Uhradené celkom</translate>
+</string>
+<string>
+<original>Unit Price</original>
+<translate>Jednotková cena</translate>
+</string>
+<string>
+<original>Unlimited</original>
+<translate>Neobmedzene</translate>
+</string>
+<string>
+<original>Usage</original>
+<translate>Použitie</translate>
+</string>
+<string>
+<original>Use Customer Packages</original>
+<translate>Použiť užívateľský balík</translate>
+</string>
+<string>
+<original>Used</original>
+<translate>Použité</translate>
+</string>
+<string>
+<original>Valid Till</original>
+<translate>Valid Till</translate>
+</string>
+<string>
+<original>Value</original>
+<translate>Hodnota</translate>
+</string>
+<string>
+<original>Years</original>
+<translate>Roky</translate>
+</string>
+<string>
+<original>You can not select this service now</original>
+<translate>Teraz nemôžete vybrať túto službu</translate>
+</string>
+<string>
+<original>Acknowledge</original>
+<translate>Potvrdiť</translate>
+</string>
+<string>
+<original>Acknowledge Completion</original>
+<translate>Potvrdiť ukončenie</translate>
+</string>
+<string>
+<original>Acknowledged</original>
+<translate>Potvrdené</translate>
+</string>
+<string>
+<original>Add Invoice</original>
+<translate>Pridať faktúru</translate>
+</string>
+<string>
+<original>Always</original>
+<translate>Vždy</translate>
+</string>
+<string>
+<original>Any From List</original>
+<translate>Každý zo zoznamu</translate>
+</string>
+<string>
+<original>Apply</original>
+<translate>Použiť</translate>
+</string>
+<string>
+<original>Appointment packages available</original>
+<translate>Balíčka rezervácií k dispozícii</translate>
+</string>
+<string>
+<original>Auto Complete Appointments After</original>
+<translate>Automatické ukončenie rezervácie po</translate>
+</string>
+<string>
+<original>Auto Reject Appointments If Not Approved Within</original>
+<translate>Automatické odmietnutie rezervácie nie je schválená s</translate>
+</string>
+<string>
+<original>Automatically Activate Packages Even Without Payment</original>
+<translate>Automaticky aktivuj balíček aj bez úhrady</translate>
+</string>
+<string>
+<original>Automatically Open Calendar</original>
+<translate>Automaticky otvoriť kalendár</translate>
+</string>
+<string>
+<original>Base Price</original>
+<translate>Základná cena</translate>
+</string>
+<string>
+<original>CC</original>
+<translate>CC</translate>
+</string>
+<string>
+<original>CSV Export</original>
+<translate>CSV Export</translate>
+</string>
+<string>
+<original>CSV File</original>
+<translate>CSV Súbor</translate>
+</string>
+<string>
+<original>Cash</original>
+<translate>Hotovosť</translate>
+</string>
+<string>
+<original>Check</original>
+<translate>Šek</translate>
+</string>
+<string>
+<original>Coupon Code</original>
+<translate>Kód kupónu</translate>
+</string>
+<string>
+<original>Coupon Code Required</original>
+<translate>Kód kupónu je požadovaný</translate>
+</string>
+<string>
+<original>Coupon Codes</original>
+<translate>Kódy kupónov</translate>
+</string>
+<string>
+<original>Coupons</original>
+<translate>Kupóny</translate>
+</string>
+<string>
+<original>Credit Card</original>
+<translate>Kreditná karta</translate>
+</string>
+<string>
+<original>Custom Price</original>
+<translate>Zákaznícka cena</translate>
+</string>
+<string>
+<original>Customers Can Cancel Appointments</original>
+<translate>Zákazník môže zrušiť rezervácií</translate>
+</string>
+<string>
+<original>Customers Can Reschedule Appointments</original>
+<translate>Zákazník môže zmeniť termín rezervácií</translate>
+</string>
+<string>
+<original>Customers Need To Acknowledge Completed Appointments</original>
+<translate>Zákazníci, musia potvrdiť dokončenie rezervácie</translate>
+</string>
+<string>
+<original>Date Range</original>
+<translate>Rozpätie dátumu</translate>
+</string>
+<string>
+<original>Default Appointments View</original>
+<translate>Základný prehľad rezervácií</translate>
+</string>
+<string>
+<original>Edit Invoice</original>
+<translate>Upraviť faktúru</translate>
+</string>
+<string>
+<original>Enter 0 for no limit</original>
+<translate>Zadať 0 ako "Bez obmedzenia"</translate>
+</string>
+<string>
+<original>Fields Not Recognized</original>
+<translate>Polia neboli rozpoznané</translate>
+</string>
+<string>
+<original>Finance</original>
+<translate>Financie</translate>
+</string>
+<string>
+<original>Fixed Dates</original>
+<translate>Pevné dátumy</translate>
+</string>
+<string>
+<original>Fixed Services</original>
+<translate>Pevné služby</translate>
+</string>
+<string>
+<original>Import</original>
+<translate>Import</translate>
+</string>
+<string>
+<original>Info In Appointment Slot</original>
+<translate>Informácie v časti rezervácie</translate>
+</string>
+<string>
+<original>Internal</original>
+<translate>Interné</translate>
+</string>
+<string>
+<original>Invoice Footer</original>
+<translate>Pätička faktúry</translate>
+</string>
+<string>
+<original>Invoice Header</original>
+<translate>Hlavička faktúry</translate>
+</string>
+<string>
+<original>Mandatory Fields Missing</original>
+<translate>Chýbajú povinné polia</translate>
+</string>
+<string>
+<original>Not Acknowledged By Customer</original>
+<translate>Nie je potvrdené zákazníkom</translate>
+</string>
+<string>
+<original>Not Limited</original>
+<translate>Neobmedzené</translate>
+</string>
+<string>
+<original>Not Valid</original>
+<translate>Neplatné</translate>
+</string>
+<string>
+<original>One option per line</original>
+<translate>Jedna možnosť na riadok</translate>
+</string>
+<string>
+<original>Packs</original>
+<translate>Balíky</translate>
+</string>
+<string>
+<original>Please choose at least 1 option</original>
+<translate>Prosím vyberte aspoň 1 možnosť</translate>
+</string>
+<string>
+<original>Preview</original>
+<translate>Náhľad</translate>
+</string>
+<string>
+<original>Promotions and Coupons</original>
+<translate>Akcie a kupóny</translate>
+</string>
+<string>
+<original>Restrictions</original>
+<translate>Obmedzenia</translate>
+</string>
+<string>
+<original>Send CC For Appointment</original>
+<translate>Poslať CC pre rezerváciu</translate>
+</string>
+<string>
+<original>Send Invoice</original>
+<translate>Poslať faktúru</translate>
+</string>
+<string>
+<original>Services In Package</original>
+<translate>Služby v balíku</translate>
+</string>
+<string>
+<original>Set Completed</original>
+<translate>Nastaviť dokončené</translate>
+</string>
+<string>
+<original>Set For All Services</original>
+<translate>Nastaviť pre všetky služby</translate>
+</string>
+<string>
+<original>Set this if not available for booking by customers</original>
+<translate>Nastaviť túto hodnotu pokiaľ nie je k dispozícii na rezervovanie zákazníkom</translate>
+</string>
+<string>
+<original>Set to 0 to disable</original>
+<translate>Nastaviť 0 ako "Deaktivovať"</translate>
+</string>
+<string>
+<original>Setting this to 0 keeps the location available as long as there are resources available</original>
+<translate>Nastaviť toto na 0 zabezpečí dostupné umiestnenie na tak dlho ako budú dostupné zdroje</translate>
+</string>
+<string>
+<original>Show All Time</original>
+<translate>Zobraziť všetky časy</translate>
+</string>
+<string>
+<original>Show Completed Appointments In Admin Calendar</original>
+<translate>Zobraziť ukončené rezervácie v Admin kalendári</translate>
+</string>
+<string>
+<original>Show Fields</original>
+<translate>Zobraziť polia</translate>
+</string>
+<string>
+<original>Subtotal</original>
+<translate>Medzisúčet</translate>
+</string>
+<string>
+<original>Subtotal Due Now</original>
+<translate>Aktulány medzisúčet</translate>
+</string>
+<string>
+<original>Tax Rate</original>
+<translate>% dane</translate>
+</string>
+<string>
+<original>Tax Title</original>
+<translate>Názov dane</translate>
+</string>
+<string>
+<original>The appointment will be completely deleted including all related payments. No notifications will be sent.</original>
+<translate>Rezervácia bude úplne odstránená vrátane všetkých prislúchajúcich platieb. Žiadne notifikácia nebude zaslaná.</translate>
+</string>
+<string>
+<original>The end time should be after the start</original>
+<translate>Čas ukončenia by mal byť neskôr ako čas začiatku</translate>
+</string>
+<string>
+<original>Total Due</original>
+<translate>Celková suma</translate>
+</string>
+<string>
+<original>Total Due Now</original>
+<translate>Aktuálna celková suma</translate>
+</string>
+<string>
+<original>Total Seats</original>
+<translate>Celkový počet miest</translate>
+</string>
+<string>
+<original>URL For Customer</original>
+<translate>URL pre zákazníka</translate>
+</string>
+<string>
+<original>Unmark Completed</original>
+<translate>Odznačiť ukončené</translate>
+</string>
+<string>
+<original>Unmark No Show</original>
+<translate>Odznačiť nezobrazené</translate>
+</string>
+<string>
+<original>Usage Count</original>
+<translate>Počet použití</translate>
+</string>
+<string>
+<original>Usage Limit</original>
+<translate>Limit použití</translate>
+</string>
+<string>
+<original>Valid Phone Number (11 digits)</original>
+<translate>Platné telefónne číslo (11 číslic)</translate>
+</string>
+<string>
+<original>Valid email required</original>
+<translate>Platný email je požadovaný</translate>
+</string>
+<string>
+<original>We can recognize the following fields in your CSV file</original>
+<translate>Vieme rozpoznať nasledujúce polia v Vašom CSV súbore</translate>
+</string>
+<string>
+<original>You have not yet added hitAppoint [hitappoint] shortcode to any of your posts or pages, some features may not work properly!</original>
+<translate>Ešte ste nepridali hitAppoint [hitappoint] kód každej Vašej pošty alebo stránky, niektoré súčasti nemusia fungovať správne!</translate>
+</string>
+<string>
+<original>Your invoice #{REFNO} is ready, to review please click {SEND_LINK}</original>
+<translate>Vaša faktúra #{REFNO} je pripravená, pre náhľad prosím klik {SEND_LINK}</translate>
+</string>
+</file>

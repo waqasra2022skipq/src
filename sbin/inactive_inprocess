@@ -1,0 +1,8 @@
+select Treatment.ClinicID, Provider.LName as Provider, Provider.FName as PFName ,Client.LName as Client, Client.FName ,Treatment.TrID, Treatment.BillStatus, Treatment.StatusDate ,DATE_FORMAT(Treatment.ContLogDate,'%m/%d/%Y') as ContactDate ,DATE_FORMAT(Treatment.CreateDate,'%m/%d/%Y') as DateEntered ,TO_DAYS(Treatment.CreateDate) - TO_DAYS(Treatment.ContLogDate) as Days
+  from Treatment
+    left join Client on Client.ClientID=Treatment.ClientID
+    left join Provider on Provider.ProvID=Treatment.ProvID
+  where Treatment.BillStatus=3
+    and Provider.Active=0
+#    and (Treatment.ClinicID=692 or Treatment.ClinicID=692)
+  order by Treatment.ClinicID, Provider.LName, Provider.FName, Treatment.ContLogDate

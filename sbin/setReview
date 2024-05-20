@@ -1,0 +1,44 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBForm;
+############################################################################
+my $form = DBForm->new();
+my $dbh = $form->dbconnect();
+my $sclearUnreviewed = $dbh->prepare('delete from Unreviewed'); 
+$sclearUnreviewed->execute();
+$sclearUnreviewed->finish();
+
+my $sUnRev = $dbh->prepare('select count(*) from Treatment where RevStatus<3 and ProvID=?');
+my $sUnBilled = $dbh->prepare('select count(*) from Treatment where BillDate is null and ProvID=?');
+my $sInsert = $dbh->prepare('insert into Unreviewed (ProvID,Count,Unbilled) values (?,?,?)');
+my $sUnRevProv = $dbh->prepare('select * from Treatment where RevStatus<3 and ProvID=?');
+my $sUnBilledProv = $dbh->prepare('select * from Treatment where BillDate is null and ProvID=?');
+
+my $sProvider = $dbh->prepare('select ProvID,LName,FName from Provider order by LName, FName');
+$sProvider->execute();
+while ( my ($ProvID,$LName,$FName) = $sProvider->fetchrow_array )
+{
+  $sUnRev->execute($ProvID);
+  my ($Count) = $sUnRev->fetchrow_array;
+  $sUnBilled->execute($ProvID);
+  my ($UnBilled) = $sUnBilled->fetchrow_array;
+  $sInsert->execute($ProvID,$Count,$UnBilled);
+  print qq|$LName, $FName ($ProvID): $Count, $UnBilled\n|;
+  if ( $form->{'show'} )
+  {
+    $sUnRevProv->execute($ProvID);
+    while ( my $r1 = $sUnRevProv->fetchrow_hashref )
+    { print qq|  UnRev: TrID=$r1->{TrID}, ContDate=$r1->{ContLogDate}, BillDate=$r1->{BillDate}, BillStatus=$r1->{BillStatus}, RevStatus=$r1->{RevStatus}\n|; }
+    $sUnBilledProv->execute($ProvID);
+    while ( my $r2 = $sUnBilledProv->fetchrow_hashref )
+    { print qq|  UnBilled: TrID=$r2->{TrID}, ContDate=$r2->{ContLogDate}, BillDate=$r2->{BillDate}, BillStatus=$r1->{BillStatus}, RevStatus=$r1->{RevStatus}\n|; }
+  }
+}
+$sProvider->finish();
+$sUnRev->finish();
+$sUnBilled->finish();
+$sInsert->finish();
+$sUnRevProv->finish();
+$sUnBilledProv->finish();
+############################################################################
+exit;

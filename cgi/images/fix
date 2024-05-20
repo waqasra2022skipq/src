@@ -1,0 +1,2 @@
+chmod 775 *
+chown root:adm *

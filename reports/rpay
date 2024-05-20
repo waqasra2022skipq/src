@@ -1,0 +1,7 @@
+select Treatment.TrID, Treatment.ContLogDate, NoteTrans.ID, NoteTrans.PaidAmt,
+       Treatment.PaidDate, NoteTrans.PaidDate
+ from Treatment
+  left join Client on Client.ClientID=Treatment.ClientID
+  left join NoteTrans on NoteTrans.TrID=Treatment.TrID
+ where Treatment.RecDate is not null and NoteTrans.RecDate is not null and NoteTrans.PaidDate is null
+   and ( Treatment.ClinicID=2209 or Treatment.ClinicID=2324 or Treatment.ClinicID=2211 or Treatment.ClinicID=2208 or Treatment.ClinicID=2256 or Treatment.ClinicID=101 or Treatment.ClinicID=2210 or Treatment.ClinicID=2279 or Treatment.ClinicID=2374 or Treatment.ClinicID=2372 or Treatment.ClinicID=2195 or Treatment.ClinicID=2370 or Treatment.ClinicID=2287 or Treatment.ClinicID=2304 or Treatment.ClinicID=1204 or Treatment.ClinicID=2207 or Treatment.ClinicID=2371 or Treatment.ClinicID=2298 or Treatment.ClinicID=2206 or Treatment.ClinicID=2359 or Treatment.ClinicID=2212 or Treatment.ClinicID=2154 )

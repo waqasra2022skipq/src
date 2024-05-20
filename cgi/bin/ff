@@ -1,0 +1,10 @@
+
+use myForm;
+use myDBI;
+
+my $form = myForm->new();
+my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+# mod any error
+# check for any my $dbh or dbh
+
+myDBI->cleanup();

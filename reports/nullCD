@@ -1,0 +1,6 @@
+select Treatment.ClientID,Treatment.TrID,Treatment.BillStatus,Treatment.ContLogDate
+      ,Provider.LName as Provider,Provider.FName,Treatment.CreateDate
+#      ,Treatment.MgrProvID,Treatment.CreateProvID,Treatment.MgrRevDate,Treatment.MgrRevTime 
+ from Treatment
+  left join Provider on Provider.ProvID=Treatment.CreateProvID
+ where Treatment.ContLogDate is null order by Treatment.CreateDate

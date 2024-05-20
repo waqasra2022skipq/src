@@ -1,0 +1,15 @@
+#!/bin/bash
+# ------------------------------------
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   print "\nServices not installed!"
+   exit 1
+fi
+# ------------------------------------
+  print "\n======================================"
+  print "${CMD} Started: $(date)"
+  print "${LOGFILE}"
+  print "\n${CMD} Complete: $(date)"
+  print "======================================\n"
+# ------------------------------------

@@ -1,0 +1,121 @@
+
+<HTML>
+<HEAD>
+  <TITLE>Calculator</TITLE>
+<SCRIPT LANGUAGE="JavaScript">
+<!-- Cloak
+var NumVal = '';
+var TotVal = 0;
+var Operator = 0;
+function vNum(form,NumStr) 
+{
+  if ( NumStr == "" ) { return true; }
+  var Num = parseInt(NumStr.value);
+  NumVal += Num;
+  form["Display"].value = NumVal;
+  return true;
+}
+function Setit(form, type) 
+{
+  if ( Operator == 1 )
+  { TotVal += parseInt(NumVal); }
+  else if ( Operator == 2 )
+  { TotVal -= parseInt(NumVal); }
+  else if ( Operator == 3 )
+  { TotVal *= parseInt(NumVal); }
+  else if ( Operator == 4 )
+  { TotVal /= parseInt(NumVal); }
+  else if ( NumVal != "" )
+  { TotVal = parseInt(NumVal); }
+
+  NumVal = '';
+  Operator = type;
+  form["Display"].value = TotVal;
+  return true;
+}
+function Clearit(form) 
+{
+  NumVal = '';
+  TotVal = 0;
+  form["Display"].value = '';
+  return true;
+}
+//  DeCloak -->
+</SCRIPT>
+</HEAD>
+
+<BODY BGCOLOR=blue >
+<FORM >
+<TABLE WIDTH=14% BGCOLOR=white CELLSPACING=0 BORDER=0 >
+  <TR ALIGN=center ><TD COLSPAN=4 ><B>Calculator</B></TD></TR>
+  <TR >
+    <TD ALIGN=right COLSPAN=4 >
+      <INPUT TYPE=text NAME="Display" onFocus="this.blur()">
+    </TD>
+  </TR>
+  <TR ALIGN=center >
+    <TD ALIGN=center >
+      <INPUT TYPE=button VALUE=" 1 " onClick="vNum(this.form,this)">
+    </TD>
+    <TD ALIGN=center >
+      <INPUT TYPE=button VALUE=" 2 " onClick="vNum(this.form,this)" >
+    </TD>
+    <TD ALIGN=center >
+      <INPUT TYPE=button VALUE=" 3 " onClick="vNum(this.form,this)" >
+    </TD>
+    <TD ALIGN=center >
+      <INPUT TYPE=button VALUE=" +  " onClick="Setit(this.form,1)" >
+    </TD>
+  </TR>
+  <TR >
+    <TD ALIGN=center >
+      <INPUT TYPE=button VALUE=" 4 " onClick="vNum(this.form,this)">
+    </TD>
+    <TD ALIGN=center >
+      <INPUT TYPE=button VALUE=" 5 " onClick="vNum(this.form,this)" >
+    </TD>
+    <TD ALIGN=center >
+      <INPUT TYPE=button VALUE=" 6 " onClick="vNum(this.form,this)" >
+    </TD>
+    <TD ALIGN=center >
+      <INPUT TYPE=button VALUE="  -  " onClick="Setit(this.form,2)" >
+    </TD>
+  </TR>
+  <TR >
+    <TD ALIGN=center >
+      <INPUT TYPE=button VALUE=" 7 " onClick="vNum(this.form,this)">
+    </TD>
+    <TD ALIGN=center >
+      <INPUT TYPE=button VALUE=" 8 " onClick="vNum(this.form,this)" >
+    </TD>
+    <TD ALIGN=center >
+      <INPUT TYPE=button VALUE=" 9 " onClick="vNum(this.form,this)" >
+    </TD>
+    <TD ALIGN=center >
+      <INPUT TYPE=button VALUE="  *  " onClick="Setit(this.form,3)" >
+    </TD>
+  </TR>
+  <TR >
+    <TD ALIGN=center > &nbsp; </TD>
+    <TD ALIGN=center >
+      <INPUT TYPE=button VALUE=" 0 " onClick="vNum(this.form,this)" >
+    </TD>
+    <TD ALIGN=center > &nbsp; </TD>
+    <TD ALIGN=center >
+      <INPUT TYPE=button VALUE="  /  " onClick="Setit(this.form,4)" >
+    </TD>
+  </TR>
+  <TR >
+    <TD ALIGN=center COLSPAN=3 >
+      <INPUT TYPE=button VALUE="    Clear    " onClick="Clearit(this.form)" >
+    </TD>
+    <TD ALIGN=center >
+      <INPUT TYPE=button VALUE="  =  " onClick="Setit(this.form,0)" >
+    </TD>
+  </TR>
+</TABLE>
+</LOADHIDDEN>
+</FORM>
+</BODY>
+</HTML>
+

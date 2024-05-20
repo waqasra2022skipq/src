@@ -1,0 +1,111 @@
+BODY
+	{
+	BACKGROUND-IMAGE: url(images/bgdfade.JPG);
+	BACKGROUND-repeat: repeat-y;
+	BACKGROUND-attachment: scroll;
+   	BACKGROUND-COLOR: #792279;
+   	COLOR: #742f75;
+	FONT-FAMILY: arial, sans-serif;
+   	FONT-SIZE: 10pt;
+	FONT-weight:normal;
+	}
+A 		
+	{COLOR: #0000FF;}
+A:visited 	
+	{COLOR: #0000FF;}
+A:hover 
+	{COLOR: red;}
+LI	
+	{list-style-type:disc;
+	list-style-position:inside;}
+INPUT.DEFAULT
+	{
+	font-family:Arial, sans-serif;
+	font-size:10pt;
+	font-weight:normal;
+	color:white;
+	background:#742F75;
+	border-left: #FFFFFF 1px solid;
+	border-right: #FFFFFF 1px solid;
+	border-top: #FFFFFF 1px solid;
+	border-bottom: #FFFFFF 1px solid;
+	cursor:hand;
+	}
+P.TITLE
+	{
+	TEXT-ALIGN:center;
+	FONT-SIZE: 16pt;
+	FONT-weight:bold;
+	}
+P.HEADING{FONT-weight:bold;}
+IMG
+	{
+    BORDER-BOTTOM: 0px;
+   	BORDER-LEFT: 0px;
+   	BORDER-RIGHT: 0px;
+   	BORDER-TOP: 0px;
+	}
+IMG.ARTICLE
+	{
+    BORDER-BOTTOM: 0px;
+   	BORDER-LEFT: 0px;
+   	BORDER-RIGHT: 0px;
+   	BORDER-TOP: 0px;
+	MARGIN: 1em;
+	}
+TABLE.WHITETEXT
+	{COLOR: #FFFFFF;
+	FONT-SIZE: 10pt;}
+
+TABLE.ARTICLE
+	{
+    	COLOR: #742f75;
+	FONT-FAMILY: arial, sans-serif;
+    	FONT-SIZE: 10pt;
+	FONT-weight:normal;
+	}
+TABLE.ISSUE
+	{
+	COLOR: #FFFFFF;
+    	FONT-SIZE: 12pt;
+	FONT-weight:bold;
+	BACKGROUND-color: #792279;
+	}
+.QUESTIONS
+	{
+	COLOR=blue;
+	FONT-SIZE:10pt;
+	cursor:hand;
+	FONT-STYLE:italic;
+	}
+.ANSWERS
+	{
+	FONT-SIZE:10pt;
+	display:none;
+	MARGIN-left:2em;
+	MARGIN-top:5em;
+	}
+TABLE.EDITORIAL
+	{FONT-SIZE: 10pt;}
+TABLE.MENU
+	{
+	FONT-SIZE: 10pt;}
+	}
+
+.SMALL	{FONT-SIZE: 8pt;}
+.BLURB 	
+	{
+	FONT-SIZE: 10pt;
+	FONT-style: italic;
+	}
+.FLOATLEFT
+	{
+	background-color: #FFCCFF;
+	FLOAT: left;
+	font-weight: normal;
+	font-size: 9pt;
+	width:200px;
+	padding:1em;
+	}
+.LEFTCOL
+	{float:left;}

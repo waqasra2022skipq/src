@@ -1,0 +1,144 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use DBA;
+use uCalc;
+use DBUtil;
+use Time::Local;
+my $DT = localtime();
+############################################################################
+# usage:
+#   HighRisk ForProvID=id
+############################################################################
+my $form = DBForm->new();
+#foreach my $f ( sort keys %{$form} ) { warn "form-$f=$form->{$f}\n"; }
+my $dbh = $form->dbconnect();
+
+my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+my $sProvider = $dbh->prepare("select LName, FName from Provider where ProvID=?");
+my $sClientMHSF = $dbh->prepare("select * from ClientMHSF where ClientID=? order by TestDate desc");
+my $sClientPHQ9 = $dbh->prepare("select * from ClientPHQ9 where ClientID=? order by TestDate desc");
+my $sClientTPHQ9 = $dbh->prepare("select * from ClientTPHQ9 where ClientID=? order by TestDate desc");
+my $sClientTCUDS = $dbh->prepare("select * from ClientTCUDS where ClientID=? order by TestDate desc");
+my $sClientCARS = $dbh->prepare("select * from PDDom left join ClientPrAuth on ClientPrAuth.ID=PDDom.PrAuthID where ClientPrAuth.ClientID=? order by ClientPrAuth.EffDate desc");
+my $sClientFamily = $dbh->prepare("select * from ClientFamily where ClientID=? and EmerContact=1 order by Age desc");
+my $sClientEmergency = $dbh->prepare("select * from ClientEmergency where ClientID=?");
+
+# join xInsurance needed for withSelection
+my $ClinicSelection = DBA->withSelection($form,'and','Client.clinicClinicID','','','');
+my $Header = DBA->withSelectionHeader($form);
+$ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+#$form->{ClientID}=57441;
+#$form->{ClientID}=45630;
+$ClinicSelection .= qq| and Client.ClientID='$form->{'ClientID'}'| if ( $form->{'ClientID'} );
+my $qClient = qq"
+select Client.*
+      ,MedHx.AttSuicides,DATE_FORMAT(MedHx.AttSuicideDate,'%m/%d/%Y') as SuicideDate,MedHx.FamilySuicideHx
+      ,IF(MedHx.FamilySuicideHx=1,'Yes','No') as FamilySuicideHx
+      ,IF(MedHx.Firearms=1,'Yes','No') as Firearms
+  from Client 
+    left join ClientACL on ClientACL.ClientID=Client.ClientID
+    left join MedHx on MedHx.ClientID=Client.ClientID
+  where ClientACL.ProvID='${ForProvID}'
+  ${ClinicSelection}
+  order by Client.LName, Client.FName, Client.ClientID";
+#print qq|qClient=\n${qClient}\n|;
+##    and truncate((to_days(curdate()) - to_days(Client.DOB)) / 365,0) >= 18
+my $cnt = 0;
+my $sClient = $dbh->prepare($qClient);
+print qq|${DT}\n${Header}High Risk Report.\nClients with High Risk Assessment report.\n|;
+print qq|Client Name\tProvider\tActive\tDOB\tAge\tMHSF q6a\tMHSF q6b\tMHSF q9\tPHQ9 Total\tPHQ9 q9\tTPHQ9 q12\tSuicide Attempts\tLast Attempt\tFamily Hx\tFirearms\tTCUD Stress\tTCUD Drug\tCARS Total\tCARS DOM1\tCARS DOM2\tCARS DOM3\tCARS DOM4\tEmergency Contact\tPrimary Physician\tHospital\tAdvanced Directive\n|;
+$sClient->execute();
+while (my $rClient = $sClient->fetchrow_hashref)
+{ 
+#warn qq|Client: $rClient->{'ClientID'}\n|;
+  my $ClientID = $rClient->{'ClientID'};
+  my $ActiveFlag = $rClient->{'Active'} ? 'Yes' : 'No';;
+  my $ClientName = qq|$rClient->{'LName'}, $rClient->{'FName'} ($rClient->{'ClientID'})|;
+  my $Age = DBUtil->Date($rClient->{DOB}, 'age');
+  $sProvider->execute($rClient->{ProvID});
+  my ($ProvLName, $ProvFName) = $sProvider->fetchrow_array;
+  my $ProvName = qq|$ProvLName, $ProvFName ($rClient->{ProvID})|; 
+
+  $sClientMHSF->execute($ClientID);
+  my $rClientMHSF = $sClientMHSF->fetchrow_hashref;
+
+  my $PHQ9Total, $PHQ9q9, $PHQ9q12;
+  if ( $Age < 18 )
+  {
+    $sClientTPHQ9->execute($ClientID);
+    my $rClientTPHQ9 = $sClientTPHQ9->fetchrow_hashref;
+    $PHQ9Total = uCalc->calcTotal($form,$rClientTPHQ9,'q',1,13);
+    $PHQ9q9 = uCalc->mtValue($form,$rClientTPHQ9,'ClientTPHQ9','q9');
+    $PHQ9q12 = uCalc->mtValue($form,$rClientTPHQ9,'ClientTPHQ9','q9');
+  }
+  else
+  {
+    $sClientPHQ9->execute($ClientID);
+    my $rClientPHQ9 = $sClientPHQ9->fetchrow_hashref;
+    $PHQ9Total = uCalc->calcTotal($form,$rClientPHQ9,'q',1,9);
+    $PHQ9q9 = uCalc->mtValue($form,$rClientPHQ9,'ClientPHQ9','q9');
+    $PHQ9q12 = '';
+  }
+
+  $sClientTCUDS->execute($ClientID);
+  my $rClientTCUDS = $sClientTCUDS->fetchrow_hashref;
+  my $Stress = uCalc->calcTotal($form,$rClientTCUDS,'q',1,9);
+  my $DrugUse = uCalc->calcTotal($form,$rClientTCUDS,'q13','a','s');
+
+  $sClientCARS->execute($ClientID);
+  my $rClientCARS = $sClientCARS->fetchrow_hashref;
+
+  my $EmergencyContact='';
+  $sClientFamily->execute($ClientID);
+  if ( my $rClientFamily = $sClientFamily->fetchrow_hashref )
+  {
+    my $EmerAddress = $rClientFamily->{'Addr1'};
+    $EmerAddress .= ', '.$rClientFamily->{'Addr2'} if ( $rClientFamily->{'Addr2'} ne '' );
+    $EmergencyContact = qq|$rClientFamily->{'FName'} $rClientFamily->{'LName'} |.$EmerAddress.' '.$rClientFamily->{'City'}.', '.$rClientFamily->{'ST'}.'  '.$rClientFamily->{'Zip'}.' '.$rClientFamily->{'WkPh'};
+  }
+  my $Physician='', $Hospital='', $AdvDir='';
+  $sClientEmergency->execute($ClientID);
+  if ( my $rClientEmergency = $sClientEmergency->fetchrow_hashref )
+  {
+    my $rP = DBA->selxref($form,'xNPI','NPI',$rClientEmergency->{'PhysNPI'});
+    my $PhysAddress = $rP->{'Addr1'};
+    $PhysAddress .= ', '.$rP->{'Addr2'} if ( $rP->{'Addr2'} ne '' );
+    $Physician = qq|$rP->{'ProvFirstName'} $rP->{'ProvLastName'} |.$PhysAddress.' '.$rP->{'City'}.', '.$rP->{'ST'}.'  '.$rP->{'Zip'}.' '.$rP->{'WkPh'};
+    my $rH = DBA->selxref($form,'xNPI','NPI',$rClientEmergency->{'PhysNPI'});
+    my $HospAddress = $rH->{'Addr1'};
+    $HospAddress .= ', '.$rH->{'Addr2'} if ( $rH->{'Addr2'} ne '' );
+    $Hospital = $rH->{'ProvOrgName'}.' '.$HospAddress.' '.$rH->{'City'}.', '.$rH->{'ST'}.'  '.$rH->{'Zip'}.' '.$rH->{'WkPh'};
+    $AdvDir = $rClientEmergency->{'AD'} ? 'Yes' : 'No';
+  }
+
+  next unless ( 
+                $rClientMHSF->{'q6a'} == 1 
+             || $rClientMHSF->{'q6a'} == 1 
+             || $rClientMHSF->{'q9'} == 1 
+             || $rClientCARS->{'Dom1Score'} > 39 
+             || $rClientCARS->{'Dom2Score'} > 39 
+             || $rClientCARS->{'Dom3Score'} > 39 
+             || $rClientCARS->{'Dom4Score'} > 39 
+             || $rClient->{'AttSuicides'} > 0
+             || $PHQ9q9 > 1 
+             || $PHQ9q12 > 1 
+              );
+  print qq|${ClientName}\t${ProvName}\t${ActiveFlag}\t$rClient->{'DOB'}\t${Age}\t$rClientMHSF->{'q6a'}\t$rClientMHSF->{'q6b'}\t$rClientMHSF->{'q9'}\t${PHQ9Total}\t${PHQ9q9}\t${TPHQ9q12}\t$rClient->{'AttSuicides'}\t$rClient->{'SuicideDate'}\t$rClient->{'FamilySuicideHx'}\t$rClient->{'Firearms'}\t${Stress}\t${DrugUse}\t$rClientCARS->{'Total'}\t$rClientCARS->{'Dom1Score'}\t$rClientCARS->{'Dom2Score'}\t$rClientCARS->{'Dom3Score'}\t$rClientCARS->{'Dom4Score'}\t${EmergencyContact}\t${Physician}\t${Hospital}\t${AdvDir}\n|;
+  $cnt++;
+}
+print qq|Count=${cnt}\n|;
+
+$sClientEmergency->finish();
+$sClientFamily->finish();
+$sClientCARS->finish();
+$sClientTCUDS->finish();
+$sClientTPHQ9->finish();
+$sClientPHQ9->finish();
+$sClientMHSF->finish();
+$sProvider->finish();
+$sClient->finish();
+$form->complete();
+exit;
+############################################################################

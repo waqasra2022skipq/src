@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<report>
+  <title>Fish and Bicycles: A Connection?</title>
+  <para>I have found a surprising relationship
+  of fish to bicycles, expressed by the equation 
+  <equation>f = kb+n</equation>. The graph below illustrates
+  the data curve of my experiment:</para>
+  <graph:chart xmlns:graph="http://mathstuff.com/dtds/chartml/">
+    <graph:dimension>
+      <graph:axis>fish</graph:axis>
+      <graph:start>80</graph:start>
+      <graph:end>99</graph:end>
+      <graph:interval>1</graph:interval>
+    </graph:dimension>
+    <graph:dimension>
+      <graph:axis>bicycle</graph:axis>
+      <graph:start>0</graph:start>
+      <graph:end>1000</graph:end>
+      <graph:interval>50</graph:interval>
+    </graph:dimension>
+    <graph:equation>fish=0.01*bicycle+81.4</graph:equation>
+  </graph:chart>
+</report>

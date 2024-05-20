@@ -1,0 +1,206 @@
+ .  final  
+        SELECT AVG(subq.Progress) as MyY, subq.months as MyX
+          FROM (
+              SELECT @row_index:=@row_index + 1 AS row_index,  Progress, DATE_FORMAT(Treatment.ContLogDate,'%Y-%m') as months
+              FROM ProgNotes
+                left join Treatment on Treatment.TrID=ProgNotes.NoteID
+                left join Client on Client.ClientID=ProgNotes.ClientID
+                left join ClientACL on ClientACL.ClientID=Client.ClientID
+                left join Provider as Clinic on Clinic.ProvID=Treatment.ClinicID
+                left join xSC on xSC.SCID=Treatment.SCID
+                left join xInsurance on xInsurance.ID=xSC.InsID
+                where Treatment.ContLogDate>="2022-1-01" and Treatment.ContLogDate<="2022-2-01"
+                and  ClientACL.ProvID='100' 
+                 ORDER BY Progress
+            ) AS subq
+            WHERE subq.row_index 
+            IN (FLOOR(@row_index / 2) , CEIL(@row_index / 2)) -------   .  final  
+        SELECT AVG(subq.Progress) as MyY, subq.months as MyX
+          FROM (
+              SELECT @row_index:=@row_index + 1 AS row_index,  Progress, DATE_FORMAT(Treatment.ContLogDate,'%Y-%m') as months
+              FROM ProgNotes
+                left join Treatment on Treatment.TrID=ProgNotes.NoteID
+                left join Client on Client.ClientID=ProgNotes.ClientID
+                left join ClientACL on ClientACL.ClientID=Client.ClientID
+                left join Provider as Clinic on Clinic.ProvID=Treatment.ClinicID
+                left join xSC on xSC.SCID=Treatment.SCID
+                left join xInsurance on xInsurance.ID=xSC.InsID
+                where Treatment.ContLogDate>="2022-2-01" and Treatment.ContLogDate<="2022-3-01"
+                and  ClientACL.ProvID='100' 
+                 ORDER BY Progress
+            ) AS subq
+            WHERE subq.row_index 
+            IN (FLOOR(@row_index / 2) , CEIL(@row_index / 2)) -------   .  final  
+        SELECT AVG(subq.Progress) as MyY, subq.months as MyX
+          FROM (
+              SELECT @row_index:=@row_index + 1 AS row_index,  Progress, DATE_FORMAT(Treatment.ContLogDate,'%Y-%m') as months
+              FROM ProgNotes
+                left join Treatment on Treatment.TrID=ProgNotes.NoteID
+                left join Client on Client.ClientID=ProgNotes.ClientID
+                left join ClientACL on ClientACL.ClientID=Client.ClientID
+                left join Provider as Clinic on Clinic.ProvID=Treatment.ClinicID
+                left join xSC on xSC.SCID=Treatment.SCID
+                left join xInsurance on xInsurance.ID=xSC.InsID
+                where Treatment.ContLogDate>="2022-3-01" and Treatment.ContLogDate<="2022-4-01"
+                and  ClientACL.ProvID='100' 
+                 ORDER BY Progress
+            ) AS subq
+            WHERE subq.row_index 
+            IN (FLOOR(@row_index / 2) , CEIL(@row_index / 2)) -------   .  final  
+        SELECT AVG(subq.Progress) as MyY, subq.months as MyX
+          FROM (
+              SELECT @row_index:=@row_index + 1 AS row_index,  Progress, DATE_FORMAT(Treatment.ContLogDate,'%Y-%m') as months
+              FROM ProgNotes
+                left join Treatment on Treatment.TrID=ProgNotes.NoteID
+                left join Client on Client.ClientID=ProgNotes.ClientID
+                left join ClientACL on ClientACL.ClientID=Client.ClientID
+                left join Provider as Clinic on Clinic.ProvID=Treatment.ClinicID
+                left join xSC on xSC.SCID=Treatment.SCID
+                left join xInsurance on xInsurance.ID=xSC.InsID
+                where Treatment.ContLogDate>="2022-4-01" and Treatment.ContLogDate<="2022-5-01"
+                and  ClientACL.ProvID='100' 
+                 ORDER BY Progress
+            ) AS subq
+            WHERE subq.row_index 
+            IN (FLOOR(@row_index / 2) , CEIL(@row_index / 2)) -------   .  final  
+        SELECT AVG(subq.Progress) as MyY, subq.months as MyX
+          FROM (
+              SELECT @row_index:=@row_index + 1 AS row_index,  Progress, DATE_FORMAT(Treatment.ContLogDate,'%Y-%m') as months
+              FROM ProgNotes
+                left join Treatment on Treatment.TrID=ProgNotes.NoteID
+                left join Client on Client.ClientID=ProgNotes.ClientID
+                left join ClientACL on ClientACL.ClientID=Client.ClientID
+                left join Provider as Clinic on Clinic.ProvID=Treatment.ClinicID
+                left join xSC on xSC.SCID=Treatment.SCID
+                left join xInsurance on xInsurance.ID=xSC.InsID
+                where Treatment.ContLogDate>="2022-5-01" and Treatment.ContLogDate<="2022-6-01"
+                and  ClientACL.ProvID='100' 
+                 ORDER BY Progress
+            ) AS subq
+            WHERE subq.row_index 
+            IN (FLOOR(@row_index / 2) , CEIL(@row_index / 2)) -------   .  final  
+        SELECT AVG(subq.Progress) as MyY, subq.months as MyX
+          FROM (
+              SELECT @row_index:=@row_index + 1 AS row_index,  Progress, DATE_FORMAT(Treatment.ContLogDate,'%Y-%m') as months
+              FROM ProgNotes
+                left join Treatment on Treatment.TrID=ProgNotes.NoteID
+                left join Client on Client.ClientID=ProgNotes.ClientID
+                left join ClientACL on ClientACL.ClientID=Client.ClientID
+                left join Provider as Clinic on Clinic.ProvID=Treatment.ClinicID
+                left join xSC on xSC.SCID=Treatment.SCID
+                left join xInsurance on xInsurance.ID=xSC.InsID
+                where Treatment.ContLogDate>="2022-6-01" and Treatment.ContLogDate<="2022-7-01"
+                and  ClientACL.ProvID='100' 
+                 ORDER BY Progress
+            ) AS subq
+            WHERE subq.row_index 
+            IN (FLOOR(@row_index / 2) , CEIL(@row_index / 2)) -------   .  final  
+        SELECT AVG(subq.Progress) as MyY, subq.months as MyX
+          FROM (
+              SELECT @row_index:=@row_index + 1 AS row_index,  Progress, DATE_FORMAT(Treatment.ContLogDate,'%Y-%m') as months
+              FROM ProgNotes
+                left join Treatment on Treatment.TrID=ProgNotes.NoteID
+                left join Client on Client.ClientID=ProgNotes.ClientID
+                left join ClientACL on ClientACL.ClientID=Client.ClientID
+                left join Provider as Clinic on Clinic.ProvID=Treatment.ClinicID
+                left join xSC on xSC.SCID=Treatment.SCID
+                left join xInsurance on xInsurance.ID=xSC.InsID
+                where Treatment.ContLogDate>="2022-7-01" and Treatment.ContLogDate<="2022-8-01"
+                and  ClientACL.ProvID='100' 
+                 ORDER BY Progress
+            ) AS subq
+            WHERE subq.row_index 
+            IN (FLOOR(@row_index / 2) , CEIL(@row_index / 2)) -------   .  final  
+        SELECT AVG(subq.Progress) as MyY, subq.months as MyX
+          FROM (
+              SELECT @row_index:=@row_index + 1 AS row_index,  Progress, DATE_FORMAT(Treatment.ContLogDate,'%Y-%m') as months
+              FROM ProgNotes
+                left join Treatment on Treatment.TrID=ProgNotes.NoteID
+                left join Client on Client.ClientID=ProgNotes.ClientID
+                left join ClientACL on ClientACL.ClientID=Client.ClientID
+                left join Provider as Clinic on Clinic.ProvID=Treatment.ClinicID
+                left join xSC on xSC.SCID=Treatment.SCID
+                left join xInsurance on xInsurance.ID=xSC.InsID
+                where Treatment.ContLogDate>="2022-8-01" and Treatment.ContLogDate<="2022-9-01"
+                and  ClientACL.ProvID='100' 
+                 ORDER BY Progress
+            ) AS subq
+            WHERE subq.row_index 
+            IN (FLOOR(@row_index / 2) , CEIL(@row_index / 2)) -------   .  final  
+        SELECT AVG(subq.Progress) as MyY, subq.months as MyX
+          FROM (
+              SELECT @row_index:=@row_index + 1 AS row_index,  Progress, DATE_FORMAT(Treatment.ContLogDate,'%Y-%m') as months
+              FROM ProgNotes
+                left join Treatment on Treatment.TrID=ProgNotes.NoteID
+                left join Client on Client.ClientID=ProgNotes.ClientID
+                left join ClientACL on ClientACL.ClientID=Client.ClientID
+                left join Provider as Clinic on Clinic.ProvID=Treatment.ClinicID
+                left join xSC on xSC.SCID=Treatment.SCID
+                left join xInsurance on xInsurance.ID=xSC.InsID
+                where Treatment.ContLogDate>="2022-9-01" and Treatment.ContLogDate<="2022-10-01"
+                and  ClientACL.ProvID='100' 
+                 ORDER BY Progress
+            ) AS subq
+            WHERE subq.row_index 
+            IN (FLOOR(@row_index / 2) , CEIL(@row_index / 2)) -------   .  final  
+        SELECT AVG(subq.Progress) as MyY, subq.months as MyX
+          FROM (
+              SELECT @row_index:=@row_index + 1 AS row_index,  Progress, DATE_FORMAT(Treatment.ContLogDate,'%Y-%m') as months
+              FROM ProgNotes
+                left join Treatment on Treatment.TrID=ProgNotes.NoteID
+                left join Client on Client.ClientID=ProgNotes.ClientID
+                left join ClientACL on ClientACL.ClientID=Client.ClientID
+                left join Provider as Clinic on Clinic.ProvID=Treatment.ClinicID
+                left join xSC on xSC.SCID=Treatment.SCID
+                left join xInsurance on xInsurance.ID=xSC.InsID
+                where Treatment.ContLogDate>="2022-10-01" and Treatment.ContLogDate<="2022-11-01"
+                and  ClientACL.ProvID='100' 
+                 ORDER BY Progress
+            ) AS subq
+            WHERE subq.row_index 
+            IN (FLOOR(@row_index / 2) , CEIL(@row_index / 2)) -------   .  final  
+        SELECT AVG(subq.Progress) as MyY, subq.months as MyX
+          FROM (
+              SELECT @row_index:=@row_index + 1 AS row_index,  Progress, DATE_FORMAT(Treatment.ContLogDate,'%Y-%m') as months
+              FROM ProgNotes
+                left join Treatment on Treatment.TrID=ProgNotes.NoteID
+                left join Client on Client.ClientID=ProgNotes.ClientID
+                left join ClientACL on ClientACL.ClientID=Client.ClientID
+                left join Provider as Clinic on Clinic.ProvID=Treatment.ClinicID
+                left join xSC on xSC.SCID=Treatment.SCID
+                left join xInsurance on xInsurance.ID=xSC.InsID
+                where Treatment.ContLogDate>="2022-11-01" and Treatment.ContLogDate<="2022-12-01"
+                and  ClientACL.ProvID='100' 
+                 ORDER BY Progress
+            ) AS subq
+            WHERE subq.row_index 
+            IN (FLOOR(@row_index / 2) , CEIL(@row_index / 2)) -------   .  final  
+        SELECT AVG(subq.Progress) as MyY, subq.months as MyX
+          FROM (
+              SELECT @row_index:=@row_index + 1 AS row_index,  Progress, DATE_FORMAT(Treatment.ContLogDate,'%Y-%m') as months
+              FROM ProgNotes
+                left join Treatment on Treatment.TrID=ProgNotes.NoteID
+                left join Client on Client.ClientID=ProgNotes.ClientID
+                left join ClientACL on ClientACL.ClientID=Client.ClientID
+                left join Provider as Clinic on Clinic.ProvID=Treatment.ClinicID
+                left join xSC on xSC.SCID=Treatment.SCID
+                left join xInsurance on xInsurance.ID=xSC.InsID
+                where Treatment.ContLogDate>="2022-12-01" and Treatment.ContLogDate<="2023-1-01"
+                and  ClientACL.ProvID='100' 
+                 ORDER BY Progress
+            ) AS subq
+            WHERE subq.row_index 
+            IN (FLOOR(@row_index / 2) , CEIL(@row_index / 2)) -------  
+      select DATE_FORMAT(Treatment.ContLogDate,'%Y-%m') as MyX, 
+      ROUND(AVG(ProgNotes.Progress), 2)as MyY, 
+      Treatment.ClientID
+    from ProgNotes
+      left join Treatment on Treatment.TrID=ProgNotes.NoteID
+      left join Client on Client.ClientID=ProgNotes.ClientID
+      left join ClientACL on ClientACL.ClientID=Client.ClientID
+      left join Provider as Clinic on Clinic.ProvID=Treatment.ClinicID
+      left join xSC on xSC.SCID=Treatment.SCID
+      left join xInsurance on xInsurance.ID=xSC.InsID
+    where Treatment.ContLogDate>="2022-01-01" and Treatment.ContLogDate<="2022-12-31"
+      and  ClientACL.ProvID='100' 
+    GROUP by MyX

@@ -1,0 +1,58 @@
+#!/bin/bash
+# kls, daily 11/4/08
+# ------------------------------------
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   print "\nServices not installed!"
+   exit 1
+fi
+# ------------------------------------
+usage()
+{
+  echo ""
+  echo "Usage: $0 account  (ie: mms)"
+  echo ""
+  exit
+}
+if [ $# -eq 0 ]; then usage; fi
+# ------------------------------------
+ACCT=$1; shift;
+ACCTDIR=${MISWWW}/okmis_${ACCT}
+SCHRES=/home/okmis/mis/src/addons/schedorg_3.14.4
+SCHDIR=sched_${ACCT}
+# ------------------------------------
+  print "\n======================================"
+  print "${CMD} Started: $(date)"
+# ------------------------------------
+if [ ! -d ${ACCTDIR}/addon ]; then
+   print "\nDB directory '${ACCTDIR}/addon' not found!\n"
+   exit 1
+fi
+
+cd ${ACCTDIR}/addon
+
+if [ ! -d ${SCHRES} ]; then
+   print "\nScheduler directory '${SCHRES}' not found!\n"
+   exit 1
+fi
+
+print "copy ${SCHRES} ${SCHDIR}...\n"
+cp -rp ${SCHRES} ${SCHDIR}
+
+cd ${SCHDIR}
+pwd
+
+print "create SQL db: scheduler_${ACCT}...\n"
+${DBCMD}admin create scheduler_${ACCT}
+
+print "load SQL db: scheduler_${ACCT} with newdb...\n"
+${DBCMD} scheduler_${ACCT} < newdb
+
+print "configure inc/db.inc.php...\n"
+cat db.inc.php | sed "s;scheduler_xxx;scheduler_${ACCT};" > inc/db.inc.php
+
+# ------------------------------------
+  print "\n${CMD} Complete: $(date)"
+  print "======================================\n"
+# ------------------------------------

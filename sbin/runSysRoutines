@@ -1,0 +1,120 @@
+#!/bin/bash
+# ------------------------------------
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   print "\nServices not installed!"
+   exit 1
+fi
+# ------------------------------------
+# sub routines must be loaded first
+usage()
+{
+   print
+   print $*
+   return
+}
+Space_Names()
+{
+  if [ $# -eq 0 ]; then usage "Space_Names: No Arguments found! skipping..."; return; fi
+  for dbname in $*; do
+    echo
+    echo "${dbname}: Space in Names ------------------------------------------------"
+    echo "select Client.FName, Client.LName, Client.ClientID, Client.CreateDate, Client.RecDOLC from Client where Client.FName like ' %' or Client.LName like ' %' order by Client.LName, Client.FName" | ${DBBIN}/mysql ${dbname}
+    echo
+    echo "${dbname}: No Name -------------------------------------------------------"
+    echo "select Client.FName, Client.LName, Client.ClientID, Provider.FName, Provider.LName, Client.CreateDate, Client.RecDOLC from Client left join Provider on Provider.ProvID=Client.ProvID where Client.FName is null or Client.LName is null order by Provider.LName, Provider.FName" | ${DBBIN}/mysql ${dbname}
+  done
+  return
+}
+Missing_ContDate()
+{
+  if [ $# -eq 0 ]; then usage "Missing_ContDate: No Arguments found! skipping..."; return; fi
+  for dbname in $*; do
+    echo
+    echo "${dbname}: Missing ContDate  -----------------------------------------"
+    echo "select ClientID as CID,TrID,ContLogDate,BillStatus as B,RecDate,StatusDate,ChartEntryDate,CreateDate,RecDOLC from Treatment where ContLogDate='0000-00-00'" or ContLogDate is null | ${DBBIN}/mysql ${dbname}
+  done
+  return
+}
+Missing_DOB()
+{
+  if [ $# -eq 0 ]; then usage "Missing_DOB: No Arguments found! skipping..."; return; fi
+  for dbname in $*; do
+    echo
+    echo "${dbname}: Missing DateOfBirth  -----------------------------------------"
+    echo "select LName,FName,ClientID as CID,DOB,CreateDate,RecDOLC from Client where DOB='0000-00-00'" | ${DBBIN}/mysql ${dbname}
+  done
+  return
+}
+Missing_Mgr()
+{
+  if [ $# -eq 0 ]; then usage "Missing_Mgr: No Arguments found! skipping..."; return; fi
+  for dbname in $*; do
+    echo
+    echo "${dbname}: Missing Managers -----------------------------------------"
+    echo "select ProviderID, ManagerID, ProvID, LName, FName, Email, City, ChangeProvID from Provider left join Manager on ProviderID=ProvID where ProviderID!=91 and (ProviderID is null or ManagerID is null)" | ${DBBIN}/mysql ${dbname}
+  done
+  return
+}
+Bad_Methods()
+{
+  if [ $# -eq 0 ]; then usage "Bad_Methods: No Arguments found! skipping..."; return; fi
+  for dbname in $*; do
+    echo
+    echo "${dbname}: Bad Methods -----------------------------------------"
+    echo "select Treatment.ClientID, Treatment.TrID, Treatment.ContLogDate, ProgNotes.Methods, Provider.FName, Provider.LName from ProgNotes left join Treatment on Treatment.TrID=ProgNotes.NoteID left join Provider on Provider.ProvID=Treatment.ProvID where Methods like '%99M%'" | ${DBBIN}/mysql ${dbname}
+  done
+  return
+}
+Null_Times()
+{
+  if [ $# -eq 0 ]; then usage "Null_Times: No Arguments found! skipping..."; return; fi
+  for dbname in $*; do
+    echo
+    echo "${dbname}: Null Times -----------------------------------------"
+    echo "select Name, TrID, ContLogDate, ContLogBegTime, ContLogEndTime, Units, BillStatus from Treatment left join Provider on Provider.ProvID=Treatment.ClinicID where ContLogBegTime is null or ContLogEndTime is null order by Name" | ${DBBIN}/mysql ${dbname}
+  done
+  return
+}
+Trans_Check()
+{
+  if [ $# -eq 0 ]; then usage "Trans_Check: No Arguments found! skipping..."; return; fi
+  for dbname in $*; do
+    echo
+    echo "${dbname}: Hung ProgNotes -(deleted ProgNotes no Treatment.TrID) --------------"
+    echo "select ProgNotes.ID,ProgNotes.NoteID,ProgNotes.ClientID,ProgNotes.RecDOLC,ProgNotes.Methods,ProgNotes.Progress,ProgNotes.ProgEvidence,Treatment.TrID from ProgNotes left join Treatment on Treatment.TrID=ProgNotes.NoteID where Treatment.TrID is null" | ${DBBIN}/mysql ${dbname}
+    echo "${dbname}: Trans Check -(not Billed Status and null NoteTrans.RecDate) --------------"
+    echo "select NoteTrans.ID, NoteTrans.BillDate, NoteTrans.RecDate, NoteTrans.PaidAmt, NoteTrans.Code, NoteTrans.SRC, NoteTrans.TrID, Treatment.BillDate as TBD, Treatment.BillStatus, Treatment.RecDate as TRD, Treatment.BilledAmt, Treatment.AmtDue from NoteTrans left join Treatment on Treatment.TrID=NoteTrans.TrID where Treatment.BillStatus!=3 and NoteTrans.RecDate is null order by Treatment.BillStatus, Treatment.RecDate, Treatment.TrID" | ${DBBIN}/mysql ${dbname}
+#    echo "${dbname}: Trans Check -(null NoteTrans.BillDate) --------------"
+#    echo "select NoteTrans.ID, NoteTrans.BillDate, NoteTrans.RecDate, NoteTrans.PaidAmt, NoteTrans.Code, NoteTrans.SRC, NoteTrans.TrID, Treatment.BillDate as TBD, Treatment.BillStatus, Treatment.RecDate as TRD, Treatment.BilledAmt, Treatment.AmtDue from NoteTrans left join Treatment on Treatment.TrID=NoteTrans.TrID where NoteTrans.BillDate is null order by Treatment.BillStatus, Treatment.RecDate, Treatment.TrID" | ${DBBIN}/mysql ${dbname}
+  done
+  return
+}
+Inactive_Inprocess()
+{
+  if [ $# -eq 0 ]; then usage "Inactive_Inprocess: No Arguments found! skipping..."; return; fi
+  for dbname in $*; do
+    echo
+    echo "${dbname}: Inactive Provider and Inprocess notes -----------------------------------------"
+    echo "select Treatment.ClinicID, Provider.LName as Provider, Provider.FName as PFName ,Client.LName as Client, Client.FName ,Treatment.TrID, Treatment.BillStatus, Treatment.StatusDate ,DATE_FORMAT(Treatment.ContLogDate,'%m/%d/%Y') as ContactDate ,DATE_FORMAT(Treatment.CreateDate,'%m/%d/%Y') as DateEntered ,TO_DAYS(Treatment.CreateDate) - TO_DAYS(Treatment.ContLogDate) as Days from Treatment left join Client on Client.ClientID=Treatment.ClientID left join Provider on Provider.ProvID=Treatment.ProvID where Treatment.BillStatus=3 and Provider.Active=0 order by Treatment.ClinicID, Provider.LName, Provider.FName, Treatment.ContLogDate" | ${DBBIN}/mysql ${dbname}
+  done
+  return
+}
+# ------------------------------------
+DBS=$(${MISBIN}/dbs LIVE)
+print "DBS=${DBS}"
+  echo -e "\n======================================"
+  echo -e "${CMD} Started: $(date)"
+  echo -e "pwd=$(pwd)"
+  Space_Names ${DBS}
+  Null_Times ${DBS}
+  Missing_ContDate ${DBS}
+  Missing_DOB ${DBS}
+  Bad_Methods ${DBS}
+  Trans_Check ${DBS}
+  Missing_Mgr ${DBS}
+  Inactive_Inprocess ${DBS}
+  echo -e "\n======================================"
+  echo -e "${CMD} Complete: $(date)"
+# ------------------------------------

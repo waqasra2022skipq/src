@@ -1,0 +1,102 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use Cwd;
+use DBI;
+use DBForm;
+use DBA;
+use DBUtil;
+use cBill;
+use Time::Local;
+my $DT=localtime();
+my ($sec, $min, $hrs, $day, $month, $year, $wday, $julian) = localtime();
+
+############################################################################
+# chk837 DBNAME=ddd\&InsDescr=tricare\&ForProvID=ppp
+############################################################################
+$form = DBForm->new;
+$dbh = $form->dbconnect;
+my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+my ($BillDate,$NEXTBILLDATE) = cBill->getBillDate();
+$BillDate = $form->{BillDate} if ( $form->{BillDate} );
+
+my $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID');
+my $qNotes = qq|
+  select Treatment.*, Client.*
+       , Treatment.ProvID as ProvID, Client.ProvID as PrimaryProvID
+       , Provider.Name as ClinicName
+       , xInsurance.Name as InsName
+  from Treatment
+    left join Client on Client.ClientID=Treatment.ClientID
+    left join Provider on Provider.ProvID=Client.clinicClinicID
+    left join xSC on xSC.SCID=Treatment.SCID
+    left join xInsurance on xInsurance.ID=xSC.InsID
+  where Treatment.MgrRevDate is not null
+    and Treatment.CIPDate is null
+    and Treatment.COPLDate is null
+    and Treatment.RecDate is null
+    and xInsurance.Descr='$form->{InsDescr}'
+    ${ClinicSelection}
+  order by Client.clinicClinicID, Treatment.ProvID, Treatment.ClientID, Treatment.ContLogDate
+|;
+#warn "qNotes=$qNotes\n";
+print qq|Check notes waiting to process...not necessarialy passed checks\n|;
+$sNotes = $dbh->prepare($qNotes);
+$sNotes->execute() || $form->dberror($qNotes);
+while ( $rNotes = $sNotes->fetchrow_hashref )
+{
+  print qq|$rNotes->{TrID}, $rNotes->{ContLogDate}, $rNotes->{BillDate}, $rNotes->{FName} $rNotes->{LName}, $rNotes->{InsName}, $rNotes->{ClinicName}\n|;
+}
+
+my $Sel = DBA->getClinicProviderSelection($form,$ForProvID,'Provider.ProvID');
+my $qContracts = qq|
+  select Contracts.InsID, Contracts.TaxID, Contracts.Taxonomy
+        ,Contracts.ContractType, Contracts.ContractCode, Contracts.ServMeasure, Contracts.SourceCode
+        ,xInsurance.Name as InsName
+        ,Provider.ProvID, Provider.Name, Provider.FName, Provider.LName, Provider.Email
+        ,Provider.Addr1, Provider.Addr2, Provider.City, Provider.ST, Provider.Zip
+  from Contracts
+    left join Provider on Provider.ProvID=Contracts.ProvID
+    left join xInsurance on xInsurance.ID=Contracts.InsID
+  where Contracts.BillType = 'EL'
+    and xInsurance.Descr='$form->{InsDescr}'
+    ${Sel}
+  order by xInsurance.Descr, Provider.Name
+|;
+#warn "qContracts=$qContracts\n";
+print qq|\nCheck for notes ready for 837...\n|;
+$sContracts = $dbh->prepare($qContracts);
+$sContracts->execute;
+while ( $rContracts = $sContracts->fetchrow_hashref )
+{
+  my $who = qq|Client.clinicClinicID=$rContracts->{ProvID}|;
+  $who = qq|Treatment.ProvID=$rContracts->{ProvID}| if ( $form->{ByProvider} );
+print qq|$rContracts->{InsName}: who=$who, $rContracts->{Name}, $rContracts->{FName} $rContracts->{LName}\n|;
+  my $q = qq|
+select NoteTrans.*, Client.*, xSC.*
+      ,Treatment.ContLogDate, Treatment.ContLogBegTime, Treatment.ContLogEndTime
+      ,NoteTrans.ProvID as ProvID
+      ,Client.ProvID as PrimaryProvID
+  from NoteTrans
+    left join Treatment on Treatment.TrID=NoteTrans.TrID
+    left join Client on Client.ClientID=NoteTrans.ClientID
+    left join xSC on xSC.SCID=NoteTrans.SCID
+    left join xInsurance on xInsurance.ID=xSC.InsID
+  where ${who}
+    and xInsurance.ID=$rContracts->{InsID}
+    and NoteTrans.BillDate='${BillDate}'
+    and NoteTrans.RecDate is null
+    order by NoteTrans.ProvID, NoteTrans.ClientID, NoteTrans.ContDate
+|;
+#warn "sNotes=$q\n";
+  $sNotes = $dbh->prepare($q);
+  $sNotes->execute();
+  while ( $rNotes = $sNotes->fetchrow_hashref )
+  {
+    print qq|$rNotes->{TrID}\t$rNotes->{ProvID}\t$rNotes->{clinicClinicID}\n|;
+  }
+  $sNotes->finish();
+}
+$sContracts->finish();
+$form->complete();
+exit;
+#############################################################################

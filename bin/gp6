@@ -1,0 +1,123 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use DBUtil;
+use NewCrop;
+use MIME::Base64;
+#use SOAP::Lite ( +trace => all, maptype => {} );
+use SOAP::Lite ( maptype => {} );
+use SOAP::DateTime;
+###################################################################################
+# takes 2 arguments: DBNAME and ClientID
+# then calls NewCrop Webservice to get the Clients Medications
+# then calls parseNewCrop with returned xml to update the MIS database 
+#   with Clients Medications
+###################################################################################
+my $form = DBForm->new();
+my $dbh = $form->dbconnect();
+my $UseProduction = $form->{'DBNAME'} eq 'okmis_demo' || $form->{'DBNAME'} eq 'okmis_dev'
+                 || $form->{'LOGINPROVID'} == 2501 || $form->{'LOGINPROVID'} == 2502 || $form->{'LOGINPROVID'} == 2503
+                  ? 0 : 1;
+my $proxy = $UseProduction 
+          ? 'https://secure.newcropaccounts.com/v7/WebServices/Update1.asmx'
+          : 'http://preproduction.newcropaccounts.com/v7/WebServices/Update1.asmx';
+#print qq|gp6: UseProduction=${UseProduction}\ndemo=${demo}\nproxy=${proxy}\n|;
+
+my $soap = SOAP::Lite
+        ->readable(1)
+        ->proxy($proxy)
+        ->on_action( sub { return 'https://secure.newcropaccounts.com/V7/webservices/GetPatientFullMedicationHistory6' });
+
+my $method = SOAP::Data->name('GetPatientFullMedicationHistory6')
+        ->attr({xmlns => 'https://secure.newcropaccounts.com/V7/webservices'});
+
+  my $sClient = $dbh->prepare("select * from Client where ClientID=?");
+  $sClient->execute($form->{ClientID}) || $form->dberror("select Client $form->{ClientID}");
+  my $rClient = $sClient->fetchrow_hashref;
+#
+# Since it is just a query, set the UserRole to the PrimaryProvider...
+  my $msg = NewCrop->new($form,'','',$form->{'ClientID'});
+  $sClient->finish();
+  if ( $msg ne '' ) { $form->dberror($msg); }   # only 'Client missing!'
+  my $sClientMeds = $dbh->prepare("update ClientMeds set Active=0 where ClientID=?");
+  $sClientMeds->execute($form->{ClientID}) || $form->dberror("update ClientMeds $form->{ClientID}");
+  $sClientMeds->finish();
+
+my $name = $UseProduction ? NewCrop->name() : 'demo';
+my $password = $UseProduction ? NewCrop->password() : 'demo';
+my $partnerName = NewCrop->partnerName();
+my $siteID = NewCrop->siteID();
+my $AccountID = NewCrop->AccountID();
+my $PatientID = $form->{'DBNAME'}.'-'.$form->{'ClientID'};
+warn qq|siteID=${siteID}, AccountID=${AccountID}, PatientID=${PatientID}\n|;
+# XXX default UserType is not Role?
+my $UserType = NewCrop->provider('code');
+my $UserId = NewCrop->provider('UserRoleID');
+warn qq|UserType=$UserType, UserId=$UserId\n|;
+my $EndDate = DBUtil->Date('today',0,1);
+my $EndHistory = DBUtil->Date($EndDate,'fmt','MM/DD/YYYY').' 12:00:00 AM';
+#warn qq|EndDate=${EndDate}, EndHistory=${EndHistory}\n|;
+#my $text = qq|\nDBNAME:$form->{DBNAME}\nPROVID:$form->{LOGINPROVID}\nproxy:${proxy}\nname:${name}\np:${password}\npartnerName:${partnerName}\nsiteID:${siteID}\nAccountID:${AccountID}\nPatientID:${PatientID}\n|;
+#DBUtil->email($form,"support\@okmis.com","gp6: $form->{'LOGINUSERNAME'}",$text);
+my @params = (
+        SOAP::Data->name('credentials')->value(
+                \SOAP::Data->value(
+                        SOAP::Data->name('PartnerName')->value($partnerName),
+                        SOAP::Data->name('Name')->value($name),
+                        SOAP::Data->name('Password')->value($password),
+                )
+        ),
+        SOAP::Data->name('accountRequest')->value(
+                \SOAP::Data->value(
+                        SOAP::Data->name('AccountId')->value($AccountID),
+                        SOAP::Data->name('SiteId')->value($siteID),
+                )
+        ),
+        SOAP::Data->name('patientRequest')->value(
+                \SOAP::Data->value(
+                        SOAP::Data->name('PatientId')->value($PatientID),
+                )
+        ),
+        SOAP::Data->name('prescriptionHistoryRequest')->value(
+                \SOAP::Data->value(
+                        SOAP::Data->name('StartHistory')->value(ConvertDate('1/1/2014 12:00:00 AM')),
+                        SOAP::Data->name('EndHistory')->value(ConvertDate($EndHistory)),
+                        SOAP::Data->name('PrescriptionStatus')->value('C'),
+                        SOAP::Data->name('PrescriptionSubStatus')->value('S'),
+                        SOAP::Data->name('PrescriptionArchiveStatus')->value('N'),
+                )
+        ),
+        SOAP::Data->name('patientInformationRequester')->value(
+                \SOAP::Data->value(
+                        SOAP::Data->name('UserType')->value($UserType),
+                        SOAP::Data->name('UserId')->value($UserId),
+                )
+        ),
+        #SOAP::Data->name('patientIdType')->value(''),
+        SOAP::Data->name('includeSchema')->value('N'),
+);
+
+my $res = $soap->call($method => @params)->result;
+#foreach my $f ( sort keys %{ $res } ) { print qq|res-$f=$res->{$f}\n|; foreach my $a ( sort keys %{ $res->{$f} } ) { print qq|res: $f-$a=$res->{$f}->{$a}\n|; } }
+if ( $res->{'Status'} eq 'OK' )
+{
+  my $xml = $res->{'XmlResponse'};
+  $decoded = decode_base64($xml);
+  my $xmlfile = DBUtil->genToken() . '_' . DBUtil->Date('','stamp') . '.gp6';
+  open(OUT, ">$xmlfile"); 
+  print OUT $decoded; 
+  close OUT;
+  my $cmd = qq|/home/okmis/mis/src/bin/parseNewCrop DBNAME=$form->{DBNAME}\\&mlt=$form->{mlt}\\&file=$xmlfile|;
+#print qq|\ncmd: $cmd\n|;
+  my $outfile = DBUtil->ExecCmd($cmd);
+  print qq|\nStatus: OK\n$outfile\n|;
+#  print qq|\nStatus: OK\n$decoded\n|;
+}
+else
+{
+  print qq|ERROR: $res->{'Status'}\n|;
+foreach my $f ( sort keys %{ $res } ) { print qq|  error-$f=$res->{$f}\n|; }
+}
+$form->complete();
+exit;

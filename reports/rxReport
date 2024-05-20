@@ -1,0 +1,6 @@
+./Report DBNAME=okmis_oays\&Type=logwreports
+./Report DBNAME=okmis_mms\&Type=logwreports
+./Report DBNAME=okmis_4un\&Type=logwreports
+./Report DBNAME=okmis_anv\&Type=logwreports
+./Report DBNAME=okmis_elf\&Type=logwreports
+./Report DBNAME=okmis_eti\&Type=logwreports

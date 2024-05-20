@@ -1,0 +1,39 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use gXML;
+use XML::LibXML;
+
+############################################################################
+my $file = 'received/20170707103854_NT_Bad_AllergyConcernElements_r11_v2.xml';
+my $file = 'me';
+
+my $parser = XML::LibXML->new();
+
+my $tree = $parser->parse_file($file);
+my $xpc = XML::LibXML::XPathContext->new($tree);
+$xpc->registerNs('xsi', 'http://www.w3.org/2001/XMLSchema-instance');
+my $root = $tree->getDocumentElement;
+foreach my $camelid ($root->findnodes('*')) {
+
+print qq|camelid=$camelid\n|;
+print $camelid->nodeName."\n";
+print $camelid->to_literal."\n";
+    #my $latin_name = $camelid->findvalue('title');
+
+    #my $common_name = $camelid->findvalue('recordTarget/@title');
+
+    #my $status =  $camelid->findvalue('birthTime/@value');
+
+    print "$common_name ($latin_name) $status \n";
+
+}
+
+#    my $Gender = gXML->getVALUE($xmltree,'/ClinicalDocument/recordTarget/patientRole/patient/administrativeGenderCode');
+#    my $xmltree = '';
+##   load_xml: initializes the parser and parse_file()
+#    eval { $xmltree = XML::LibXML->load_xml(location => $XMLfile); };
+#    return('parse_error') if ( $@ );
+#    my ($FName,$LName,@rest) = gXML->getNODES($xmltree,'/result/demo/name');
+#    my $Gender = gXML->getVALUE($xmltree,'/result/demo/gender');
+#    my $DOB = gXML->getVALUE($xmltree,'/result/demo/birthdate');
+exit;

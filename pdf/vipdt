@@ -1,0 +1,5 @@
+vi TrPlan.pdt
+cp -f TrPlan.pdt t
+vi t
+wc t > tt
+vi TrPlan.pdt

@@ -1,0 +1,12 @@
+grep "foreach my \$f ( sort keys" PrintBasis32.cgi
+grep "foreach my \$f ( sort keys" PrintCDCLog.cgi
+grep "foreach my \$f ( sort keys" PrintClientASAM.cgi
+grep "foreach my \$f ( sort keys" PrintClientCARSReview.cgi
+grep "foreach my \$f ( sort keys" PrintClientSATobacco.cgi
+grep "foreach my \$f ( sort keys" PrintClientTASI.cgi
+grep "foreach my \$f ( sort keys" PrintHTML.cgi
+grep "foreach my \$f ( sort keys" PrintPALines.cgi
+grep "foreach my \$f ( sort keys" PrintPharmacyEnroll.cgi
+grep "foreach my \$f ( sort keys" PrintPHQ.cgi
+grep "foreach my \$f ( sort keys" PrintSOGS.cgi
+grep "foreach my \$f ( sort keys" PrintSOGSGSI.cgi

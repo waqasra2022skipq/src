@@ -1,0 +1,36 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use Accounts;
+############################################################################
+# usage: dbx programname@args dbname dbname ...
+# example:
+#   dbx "GenProvReport@ProviderBilling" oays mms
+############################################################################
+my $Program = shift;
+if ( $Program eq '' ) 
+{ print qq|\nusage: dbx "program_name\@arg1 arg2" dbname dbname ...\n\n|; exit; }
+my ($ProgramName,$ProgramArgs) = split('@',$Program);
+my $CMD = $ProgramName.' '.$ProgramArgs;
+#print qq|${Program}\n|;
+#print qq|${CMD}\n|;
+#print qq|ARGS: @ARGV\n|;
+############################################################################
+# the accounts to work with
+my @DBS = $ARGV[0] eq 'test' ? Accounts->dbs('test')
+        : $ARGV[0] eq 'live' ? Accounts->dbs('live')
+        : scalar(@ARGV) ? @ARGV : Accounts->dbs('active'); 
+##@DBS='okmisorg_devoays';
+print qq|Started: |.localtime().qq|\n|;
+print qq|======================================\n\n|;
+foreach my $dbname ( @DBS )
+{
+  print qq|  database: ${dbname}: ${ProgramName}: Started   |.localtime().qq|\n|;
+  (my $cmd = $CMD) =~ s/DBNAME/DBNAME=$dbname/;
+warn qq|cmd=$cmd\n|;
+  system($cmd);
+  print qq|  database: ${dbname}: ${ProgramName}: Completed |.localtime().qq|\n\n|;
+}
+print qq|======================================\n|;
+print qq|Completed: |.localtime().qq|\n\n|;
+############################################################################
+exit;

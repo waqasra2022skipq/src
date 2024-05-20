@@ -1,0 +1,21 @@
+select xCredentials.Descr,xSC.SCNum
+      ,xSC.CredID
+      ,xSC.CreateDate,xSC.SCID
+ from xSC 
+  left join okmis_config.xCredentials on xCredentials.ID=xSC.CredID
+ where (SCNum LIKE 'H0032%'
+     or SCNum LIKE 'H0034%'
+     or SCNum LIKE 'H0036%'
+     or SCNum LIKE 'S0215%'
+     or SCNum LIKE 'S5185%'
+     or SCNum LIKE 'S9482%'
+     or SCNum LIKE 'T1001%'
+     or SCNum LIKE 'T1012%'
+     or SCNum LIKE 'T1017%'
+     or SCNum LIKE 'T1027%'
+     or SCNum LIKE 'T1502%'
+     or SCNum LIKE 'T2022%')
+   and InsID=100
+   and xSC.CredID IN (11,49,50,51,53,60,61,62,63,64)
+ order by CredID
+;

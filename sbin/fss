@@ -1,0 +1,4 @@
+#!/bin/bash
+find . -type f -newer /home/okmis/copied | grep -v debug
+##find . -type f -exec grep -Hn '[^[:print:]]' {} \;    # find non-print chars
+##find . -type f -exec grep -Hn '[[:cntrl:]]' {} \;     # find control chars

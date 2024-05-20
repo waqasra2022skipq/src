@@ -1,0 +1,86 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use myForm;
+use myDBI;
+use myConfig;
+my $MAINDB = myConfig->cfg('MAINDB');
+my $form = myForm->new("DBNAME=${MAINDB}");
+my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $sUpdate = $dbh->prepare("update xSCRates set ExpDate=? where SCID=? and ExpDate is null");
+#foreach my $f ( sort keys %{$form} ) { print "form-$f=$form->{$f}\n"; }
+############################################################################
+foreach my $file ( @ARGV )
+{
+  if ( $file =~ /^okmis_/ )
+  {
+    $MAINDB=$file;
+    print qq|YES SWITCH: MAINDB=${MAINDB}\n|;
+    $form = myForm->new("DBNAME=${MAINDB}");
+  }
+  $dbh = myDBI->dbconnect($form->{'DBNAME'});      # reconnnect if changed.
+  $sUpdate = $dbh->prepare("update xSCRates set ExpDate=? where SCID=? and ExpDate is null");
+
+  print qq|\nPARSE file: $file\n|;
+  if ( open(FILE,$file) ) 
+  {
+    print qq|Process file: ${file}\n|;
+    my $linecount = 0;
+    while ( $in = <FILE> )
+    {
+      $linecount++;
+      my $err = '';
+      chomp($in);
+      $in =~ s/\r//g;               # carriage return
+      $in =~ s// /g;              # new line
+      $in =~ s/\n/ /g;              # new line
+      if ( $linecount == 1 )        # check the header...
+      { $err = main->testhdr($in); }
+      else
+      { $err = main->processline($in); }
+
+      if ( $err ne '' ) { print qq|\n${err}\n\n|; last; }
+
+      #if ( $in =~ /^BILLING PROVIDER  :/ )
+      #{ $npi = substr($in,20,10); chomp($npi); }
+    }
+    close(FILE);
+  } else { print qq|>>>ERROR: open ${file} $!\n|; }
+}
+$sUpdate->finish();
+myDBI->cleanup();
+exit;
+################################################################
+sub testhdr
+{
+  my ($self,$line) = @_;
+  my $hdr = "SCID	2020 Rate	HrsPerUnit	UnitLbl	Type	RVUPct	EffDate	ExpDate	Credential	PlaceOfService";
+  if ( $line ne $hdr ) { return('>>>ERROR header MISMATCH!'); }
+  return();
+}
+sub processline
+{
+  my ($self,$line) = @_;
+  my $err = '';
+  my ($SCID,$Rate,$HrsPerUnit,$UnitLbl,$Type,$RVUPct,$EffDate,$ExpDate,$Cred,$POS) = split(/\t/,$line);
+  my $SetDate = DBUtil->Date($EffDate,0,-1);
+#  print qq|  SetDate: ${SetDate}\n|;
+  $sUpdate->execute($SetDate,$SCID) || myDBI->dberror("updSC: update xSCRates: ${SetDate} ${SCID}");
+
+  my $rxSCRates = ();
+  $rxSCRates->{'SCID'} = $SCID;
+  $rxSCRates->{'ServiceRate'} = $Rate;
+  $rxSCRates->{'HrsPerUnit'} = $HrsPerUnit;
+  $rxSCRates->{'UnitLbl'} = $UnitLbl;
+  $rxSCRates->{'RVUPct'} = $RVUPct;
+  $rxSCRates->{'EffDate'} = $EffDate;
+  $rxSCRates->{'ExpDate'} = $ExpDate;
+  $rxSCRates->{'ChangeProvID'} = $form->{'LOGINPROVID'};
+#foreach my $f ( sort keys %{$rxSCRates} ) { print "rxSCRates-$f=$rxSCRates->{$f}\n"; }
+  my $qinsert = DBA->genInsert($form,'xSCRates',$rxSCRates);
+#  print qq|  q: ${qinsert}\n|;
+  my $s = $dbh->prepare($qinsert);
+  $s->execute() || myDBI->dberror("updSC: xSCRates: ${qinsert}");
+  $s->finish();
+  return($err);        # end of file
+}
+################################################################

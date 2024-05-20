@@ -1,0 +1,62 @@
+select * from Provider where ProvID=256 \G;
+*************************** 1. row ***************************
+              ProvID: 256
+               LName: Morris
+               FName: Jessica
+               MName: NULL
+              Prefix: NULL
+                LSal: NULL
+               Addr1: 805 S. Mustang Rd
+               Addr2: NULL
+                City: Yukon
+              County: NULL
+                  ST: OK
+                 Zip: 73099
+                HmPh: NULL
+                WkPh: 405-824-4413
+               MobPh: 580-656-5977
+                 Fax: 405-265-5950
+             Carrier: NULL
+               OthPh: NULL
+            OthPhLbl: NULL
+                 SSN: 446-96-1811
+                 DOB: 1986-06-20
+                Gend: F
+                Race: 2106-3
+             MarStat: NULL
+               SName: NULL
+               ChSum: NULL
+              EmCont: NULL
+           EmContRel: NULL
+                EmPh: NULL
+             EmPhLbl: NULL
+          ChangeDate: 2019-12-12 16:32:12
+              Active: 1
+             EffDate: 2019-12-12
+             ExpDate: NULL
+               Email: support@okmis.com
+              FormID: 813010_1
+                Name: NULL
+                Type: 4
+               ACLID: NULL
+               TaxID: NULL
+            Taxonomy: NULL
+            JobTitle: NULL
+        CreateProvID: 90
+          CreateDate: 2019-12-12
+        ChangeProvID: 90
+              NoMail: 0
+              Header: NULL
+              Footer: NULL
+              Server: NULL
+          ScreenName: NULL
+                Role: NULL
+SupervisingPhysician: NULL
+              Suffix: NULL
+              APIKEY: NULL
+select * from Manager where ProviderID=256 \G;
+*************************** 1. row ***************************
+ProviderID: 256
+ ManagerID: 257
+    ClinID: NULL
+    FormID: NULL

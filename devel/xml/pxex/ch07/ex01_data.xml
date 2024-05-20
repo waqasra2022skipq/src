@@ -1,0 +1,24 @@
+<html>
+<body xmlns:eq="http://www.w3.org/1998/Math/MathML">
+<h1>Billybob's Theory</h1>
+<p>
+It is well-known that cats cannot be herded easily. That is, they do
+not tend to run in a straight line for any length of time unless they
+really want to. A cat forced to run in a straight line against its
+will has an increasing probability, with distance, of deviating from
+the line just to spite you, given by this formula:</p>
+<p>
+  <!-- P = 1 - 1/(x^2) -->
+  <eq:math>
+    <eq:mi>P</eq:mi><eq:mo>=</eq:mo><eq:mn>1</eq:mn><eq:mo>-</eq:mo>
+    <eq:mfrac>
+      <eq:mn>1</eq:mn>
+      <eq:msup>
+        <eq:mi>x</eq:mi>
+        <eq:mn>2</eq:mn>
+      </eq:msup>
+    </eq:mfrac>
+  </eq:math>
+</p>
+</body>
+</html>

@@ -1,0 +1,5 @@
+ update PrAuth
+  left join CDCPA on CDCPA.PrAuthID=PrAuth.ID
+  set LinesAuth=6
+ where LinesAuth is null and TransType=23
+;

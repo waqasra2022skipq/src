@@ -1,0 +1,61 @@
+#!/bin/bash
+# kls, daily 11/4/08
+# ------------------------------------
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   print "\nServices not installed!"
+   exit 1
+fi
+# ------------------------------------
+  print "\n======================================"
+  print "${CMD} Started: $(date)"
+# ------------------------------------
+# do daily save.
+  dDir=${BACKDIR}/daily/${DOW}
+  if [ ! -d ${dDir} ]; then
+    print "\nMaking ${dDir}..."
+    mkdir -p ${dDir}
+  fi
+  cd ${dDir}
+  print "\nSave SQL: pwd=$(pwd)"
+  print "\nsave mysql db and user tables..."
+  ${DBBIN}/mysqldump mysql db > mysql_db.dump
+  ${DBBIN}/mysqldump mysql user > mysql_user.dump
+# ------------------------------------
+# create sql files of db
+  DBS=$(${MISBIN}/dbs LIVE)
+  print "DBS=${DBS}"
+  for DBNAME in $DBS; do
+    print "\nSave SQL ${DBNAME} db pwd=$(pwd)..."
+    ${DBBIN}/mysqldump ${DBNAME} > ${DBNAME}.sqldump
+    /usr/bin/gzip -vf ${DBNAME}.sqldump
+  done
+# ------------------------------------
+# our client database...
+  print "\nSave SQL okmis_client db pwd=$(pwd)..."
+  ${DBBIN}/mysqldump okmis_client > okmis_client.sqldump
+  /usr/bin/gzip -vf okmis_client.sqldump
+# ------------------------------------
+# our config database...
+  print "\nSave SQL okmis_config db pwd=$(pwd)..."
+  ${DBBIN}/mysqldump okmis_config > okmis_config.sqldump
+  /usr/bin/gzip -vf okmis_config.sqldump
+# ------------------------------------
+# create sql files of scheduler
+  for DBNAME in $(/bin/ls -1 /var/lib/mysql | grep scheduler); do
+    print "\nSave SQL ${DBNAME} db pwd=$(pwd)..."
+    ${DBBIN}/mysqldump ${DBNAME} > ${DBNAME}.sqldump
+    /usr/bin/gzip -vf ${DBNAME}.sqldump
+  done
+# ------------------------------------
+# create sql files of shiftexec
+  for DBNAME in $(/bin/ls -1 /var/lib/mysql | grep shiftexec); do
+    print "\nSave SQL ${DBNAME} db pwd=$(pwd)..."
+    ${DBBIN}/mysqldump ${DBNAME} > ${DBNAME}.sqldump
+    /usr/bin/gzip -vf ${DBNAME}.sqldump
+  done
+# ------------------------------------
+  print "\n${CMD} Complete: $(date)"
+  print "======================================\n"
+# ------------------------------------

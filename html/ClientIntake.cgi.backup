@@ -1,0 +1,552 @@
+[[myHTML->newPage(%form+Client Intake)]]
+
+<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/NoEnter.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vClientIntake.js?v=20171110"> </SCRIPT>
+<SCRIPT type="text/javascript" src="/cgi/js/ajaxrequest.js"></SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vDate.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vTime.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vPhone.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vNum.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vZip.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" >
+var PopupWindowObj="";
+function uspsWindow(newName,h,w)
+{
+  if (h==undefined) { h = '700'; }
+  if (w==undefined) { w = '1000'; }
+  var ws = "HEIGHT=" + h + ",WIDTH=" + w + ",SCROLLBARS=yes";
+  newURL="/cgi/bin/usps.pl?mlt=<<mlt>>&Tag=Address&Addr1="+document.Intake.Client_Addr1_1.value+"&Addr2="+document.Intake.Client_Addr2_1.value+"&City="+document.Intake.Client_City_1.value+"&State="+document.Intake.Client_ST_1.value+"&Zip="+document.Intake.Client_Zip_1.value;
+  PopupWindowObj = window.open(newURL,newName,ws);
+  PopupWindowObj.focus();
+}
+</SCRIPT>
+
+<FORM NAME="Intake" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<TABLE CLASS="main fullsize" >
+  <TR >
+    <TD CLASS="strcol" >
+      <<<Client_FName_1>>> <<<Client_MName_1>>> <<<Client_LName_1>>> (<<<Client_ClientID_1>>>) <<<Client_SSN_1>>>
+      <BR>
+      Intake Assessment
+    </TD>
+    <TD CLASS="numcol" >[[gHTML->setLINKS(%form+back)]]</TD>
+  </TR>
+</TABLE>
+<TABLE CLASS="home fullsize" >
+  <TR ><TD CLASS="port hdrtxt" COLSPAN="2" >REFERRAL SOURCE / REASON</TD></TR>
+  <TR >
+    <TD CLASS="strcol" >&nbsp;</TD>
+    <TD CLASS="strcol" >ie: or you may enter partial zipcode</TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >Primary Referral</TD>
+    <TD CLASS="strcol" >
+      Search: <INPUT TYPE="text" ID="SearchRefBy1" NAME="SearchRefBy1" VALUE="" ONFOCUS="select()" ONCHANGE="callAjax('Agency','<<ClientReferrals_ReferredBy1NPI_1>>','selRefBy1','&name=ClientReferrals_ReferredBy1NPI_1&pattern='+this.value,'popup.pl');" SIZE="60" >
+<BR><SPAN ID="selRefBy1"></SPAN>
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >Referral Type</TD>
+    <TD CLASS="strcol" >
+      <SELECT NAME="ClientReferrals_ReferredBy1Type_1" >
+        [[DBA->selxTable(%form+xReferralTypes+<<ClientReferrals_ReferredBy1Type_1>>+CDC Descr)]]
+      </SELECT>
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >Alternate Contact Person</TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="text" NAME="ClientReferrals_ReferredCont1_1" VALUE="<<ClientReferrals_ReferredCont1_1>>" ONFOCUS="select()" SIZE="30" MAXLENGTH="30" >
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >Referral Date</TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE=text NAME="ClientReferrals_RefDate_1" VALUE="<<ClientReferrals_RefDate_1>>" ONFOCUS="select()" ONCHANGE="return vDate(this)" MAXLENGTH="10" SIZE="10" >
+      Expire Date
+      <INPUT TYPE=text NAME="ClientReferrals_ExpDate_1" VALUE="<<ClientReferrals_ExpDate_1>>" ONFOCUS="select()" ONCHANGE="return vDate(this)" MAXLENGTH="10" SIZE="10" >
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >Secondary Referral</TD>
+    <TD CLASS="strcol" >
+      Search: <INPUT TYPE="text" ID="SearchRefBy2" NAME="SearchRefBy2" VALUE="" ONFOCUS="select()" ONCHANGE="callAjax('Agency','<<ClientReferrals_ReferredBy2NPI_1>>','selRefBy2','&name=ClientReferrals_ReferredBy2NPI_1&pattern='+this.value,'popup.pl');" SIZE="60" >
+<BR><SPAN ID="selRefBy2"></SPAN>
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >Referral Type</TD>
+    <TD CLASS="strcol" >
+      <SELECT NAME="ClientReferrals_ReferredBy2Type_1" >
+        [[DBA->selxTable(%form+xReferralTypes+<<ClientReferrals_ReferredBy2Type_1>>+CDC Descr)]]
+      </SELECT>
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >Alternate Contact Person</TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="text" NAME="ClientReferrals_ReferredCont2_1" VALUE="<<ClientReferrals_ReferredCont2_1>>" ONFOCUS="select()" SIZE="30" MAXLENGTH="30" >
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >Referral Date</TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE=text NAME="ClientReferrals_RefDate2_1" VALUE="<<ClientReferrals_RefDate2_1>>" ONFOCUS="select()" ONCHANGE="return vDate(this)" MAXLENGTH="10" SIZE="10" >
+    </TD>
+  </TR>
+  <TR > <TD CLASS="strcol" COLSPAN="2" ><HR></TD> </TR>
+  <TR >
+    <TD CLASS="strcol" >Reason for Hospitalization (Procedure)</TD>
+    <TD CLASS="strcol" >
+      <SELECT NAME="ClientReferrals_InPatientProcCode_1" >
+        [[DBA->selxTable(%form+xInPatientProcedures+<<ClientReferrals_InPatientProcCode_1>>+ConceptName ConceptCode)]]
+      </SELECT>
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >Hospitalization Discharge Status</TD>
+    <TD CLASS="strcol" >
+      <SELECT NAME="ClientReferrals_InPatientDisStatus_1" >
+        [[DBA->selxTable(%form+xDischargeStatus+<<ClientReferrals_InPatientDisStatus_1>>+ConceptName ConceptCode)]]
+      </SELECT>
+    </TD>
+  </TR>
+  <TR > <TD CLASS="strcol" COLSPAN="2" ><HR></TD> </TR>
+  <TR >
+    <TD CLASS="strcol" >Referring Physician</TD>
+    <TD CLASS="strcol" >
+      Search: <INPUT TYPE="text" ID="SearchPhysNPI" NAME="SearchPhysNPI" VALUE="" ONFOCUS="select()" ONCHANGE="callAjax('Physicians','<<ClientReferrals_RefPhysNPI_1>>','selPhysNPI','&name=ClientReferrals_RefPhysNPI_1&pattern='+this.value,'popup.pl');" SIZE="60" >
+<BR><SPAN ID="selPhysNPI"></SPAN>
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >Referral Date</TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE=text NAME="ClientReferrals_RefPhysDate_1" VALUE="<<ClientReferrals_RefPhysDate_1>>" ONFOCUS="select()" ONCHANGE="return vDate(this)" MAXLENGTH="10" SIZE="10" >
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >Transported by</TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="text" NAME="ClientReferrals_TransBy_1" VALUE="<<ClientReferrals_TransBy_1>>" ONFOCUS="select()" SIZE="80" >
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >Address</TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="text" NAME="ClientReferrals_TransAddr_1" VALUE="<<ClientReferrals_TransAddr_1>>" ONFOCUS="select()" SIZE="30" >
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >City</TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="text" NAME="ClientReferrals_TransCity_1" VALUE="<<ClientReferrals_TransCity_1>>" ONFOCUS="select()" SIZE="20" >
+      County
+      <SELECT NAME="ClientReferrals_TransCounty_1" >
+        [[DBA->selxTable(%form+xCountyOK+<<ClientReferrals_TransCounty_1>>+Descr)]]
+      </SELECT>
+      State
+      <SELECT NAME="ClientReferrals_TransST_1">
+        [[DBA->selxTable(%form+xState+<<ClientReferrals_TransST_1>>+Descr)]]
+      </SELECT>
+      Zip
+      <INPUT TYPE="text" NAME="ClientReferrals_TransZip_1" VALUE="<<ClientReferrals_TransZip_1>>" ONFOCUS="select()" MAXLENGTH="10" SIZE="10" ONCHANGE="return vZip(this)" >
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >Phone</TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="TEL" NAME="ClientReferrals_TransPh_1" VALUE="<<ClientReferrals_TransPh_1>>" ONFOCUS="select()" ONCHANGE="return vPhone(this)" SIZE="20" >
+    </TD>
+  </TR>
+  <TR > <TD CLASS="strcol" COLSPAN="2" ><HR></TD> </TR>
+  <TR >
+    <TD CLASS="strcol" >
+      Is Patient's Condition Related to:
+    </TD>
+    <TD CLASS="strcol" >
+      Employment (Current or Present) 
+        <INPUT TYPE="radio" NAME="ClientReferrals_Employed_1" VALUE="1" <<ClientReferrals_Employed_1=1>> > yes
+        <INPUT TYPE="radio" NAME="ClientReferrals_Employed_1" VALUE="0" <<ClientReferrals_Employed_1=0>> > no
+      <BR>
+      Auto Accident? 
+        <INPUT TYPE="radio" NAME="ClientReferrals_AutoAccident_1" VALUE="1" <<ClientReferrals_AutoAccident_1=1>> > yes
+        <INPUT TYPE="radio" NAME="ClientReferrals_AutoAccident_1" VALUE="0" <<ClientReferrals_AutoAccident_1=0>> > no
+      <BR>
+      Place (State) OK
+        <SELECT NAME="ClientReferrals_AutoAccidentST_1">
+          [[DBA->selxTable(%form+xState+<<ClientReferrals_AutoAccidentST_1>>+Descr)]]
+        </SELECT>
+      <BR>
+      Other Accident? 
+        <INPUT TYPE="radio" NAME="ClientReferrals_OtherAccident_1" VALUE="1" <<ClientReferrals_OtherAccident_1=1>> > yes
+        <INPUT TYPE="radio" NAME="ClientReferrals_OtherAccident_1" VALUE="0" <<ClientReferrals_OtherAccident_1=0>> > no
+    </TD>
+  </TR>
+  <TR > <TD CLASS="strcol" COLSPAN="2" >Initial Referral Questionnaire</TD> </TR>
+  <TR >
+    <TD CLASS="strcol" >#1. Reason for Referral</TD>
+    <TD CLASS="strcol" >
+       <TEXTAREA NAME="ClientReferrals_RefReason_1" COLS="70" ROWS="3" WRAP="virtual" ><<ClientReferrals_RefReason_1>></TEXTAREA>
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >
+      #2. (Tobacco) Do you Use Tobacco?
+    </TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="radio" NAME="ClientReferrals_UseTobacco_1" VALUE="1" <<ClientReferrals_UseTobacco_1=1>> > yes
+      <INPUT TYPE="radio" NAME="ClientReferrals_UseTobacco_1" VALUE="0" <<ClientReferrals_UseTobacco_1=0>> > no
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol indent" >
+      Are you interested in Tobacco Cessation?
+    </TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="radio" NAME="ClientReferrals_TobaccoCessation_1" VALUE="1" <<ClientReferrals_TobaccoCessation_1=1>> > yes
+      <INPUT TYPE="radio" NAME="ClientReferrals_TobaccoCessation_1" VALUE="0" <<ClientReferrals_TobaccoCessation_1=0>> > no
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >
+      #3. (Risk-Suicide) Do you have thoughts of hurting yourself or others?
+    </TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="radio" NAME="ClientReferrals_RiskSuicide_1" VALUE="1" <<ClientReferrals_RiskSuicide_1=1>> > yes
+      <INPUT TYPE="radio" NAME="ClientReferrals_RiskSuicide_1" VALUE="0" <<ClientReferrals_RiskSuicide_1=0>> > no
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol indent" >
+      Do you have a plan?
+    </TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="radio" NAME="ClientReferrals_SuicidePlan_1" VALUE="1" <<ClientReferrals_SuicidePlan_1=1>> > yes
+      <INPUT TYPE="radio" NAME="ClientReferrals_SuicidePlan_1" VALUE="0" <<ClientReferrals_SuicidePlan_1=0>> > no
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >
+      #4. (Trauma) Have you experienced or witnessed trauma?
+    </TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="radio" NAME="ClientReferrals_WitnessTrauma_1" VALUE="1" <<ClientReferrals_WitnessTrauma_1=1>> > yes
+      <INPUT TYPE="radio" NAME="ClientReferrals_WitnessTrauma_1" VALUE="0" <<ClientReferrals_WitnessTrauma_1=0>> > no
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >
+      #5. (Drugs/Alcohol) Do you currently use Alcohol or Drugs?
+    </TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="radio" NAME="ClientReferrals_UseAlcoholDrugs_1" VALUE="1" <<ClientReferrals_UseAlcoholDrugs_1=1>> > yes
+      <INPUT TYPE="radio" NAME="ClientReferrals_UseAlcoholDrugs_1" VALUE="0" <<ClientReferrals_UseAlcoholDrugs_1=0>> > no
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol indent" >
+      Will you be receiving treatment here for that?
+    </TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="radio" NAME="ClientReferrals_RecieveADT_1" VALUE="1" <<ClientReferrals_RecieveADT_1=1>> > yes
+      <INPUT TYPE="radio" NAME="ClientReferrals_RecieveADT_1" VALUE="0" <<ClientReferrals_RecieveADT_1=0>> > no
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >
+      #6. (Mood) Do you experience excessive Anxiety/Worry?
+    </TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="radio" NAME="ClientReferrals_MoodDisorder_1" VALUE="1" <<ClientReferrals_MoodDisorder_1=1>> > yes
+      <INPUT TYPE="radio" NAME="ClientReferrals_MoodDisorder_1" VALUE="0" <<ClientReferrals_MoodDisorder_1=0>> > no
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol tophdr" COLSPAN="2" >
+      A YES INDICATES A SCREENING NEEDS COMPLETED.
+      Give this to the assigned Case Manager to complete appropriate Screenings before Assessment.
+      Schedule the Assessment Intake.
+    </TD>
+  </TR>
+</TABLE>
+<TABLE CLASS="home fullsize" >
+  <TR ><TD CLASS="port hdrtxt" COLSPAN="2" >I. Initial Intake Information</TD></TR>
+  <TR >
+    <TD CLASS="strcol" >Return to referral source?</TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="radio" NAME="ClientReferrals_ReturnToRef_1" VALUE=0 <<ClientReferrals_ReturnToRef_1=0>> > No
+      <INPUT TYPE="radio" NAME="ClientReferrals_ReturnToRef_1" VALUE=1 <<ClientReferrals_ReturnToRef_1=1>> > Yes
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >Inappropriate/Ineligible for services, Referred to</TD>
+    <TD CLASS="strcol" >
+      Search: <INPUT TYPE="text" ID="SearchRefTo" NAME="SearchRefTo" VALUE="" ONFOCUS="select()" ONCHANGE="callAjax('Agency','<<ClientReferrals_ReferredToNPI_1>>','selRefTo','&name=ClientReferrals_ReferredToNPI_1&pattern='+this.value,'popup.pl');" SIZE="60" >
+<BR><SPAN ID="selRefTo"></SPAN>
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >Intake Date/Time/Provider<BR>(entered by eg. H0031 or 90801 note)</TD>
+    <TD CLASS="strcol" >
+<SPAN ID="ListClientAdmits" >
+[[myHTML->ListSel(%form+ListClientAdmits+<<<Client_ClientID>>>+<<<LINKID>>>+<<<Client_Locked_1>>>)]]
+</SPAN>
+    </TD>
+  </TR>
+</TABLE>
+<TABLE CLASS="home fullsize" >
+  <TR ><TD CLASS="port hdrtxt" COLSPAN="2" >IDENTIFING INFORMATION</TD></TR>
+  <TR ><TD CLASS="port hdrtxt" >Name and Address</TD><TD>&nbsp;</TD></TR>
+  <TR >
+    <TD CLASS="strcol" >First Name</TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="text" NAME="Client_FName_1" VALUE="<<Client_FName_1>>" ONCHANGE="return stringFilter(this,' !@#$%^&*()',1,0,1);" ONFOCUS="select()" SIZE="20" >
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >Last Name</TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="text" NAME="Client_LName_1" VALUE="<<Client_LName_1>>" ONCHANGE="return stringFilter(this,'!@#$%^&*()',1,0,1);" ONFOCUS="select()" SIZE="20" >
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >Maiden Name</TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="text" NAME="Client_MaidenName_1" VALUE="<<Client_MaidenName_1>>" ONCHANGE="return stringFilter(this,'!@#$%^&*()',1,0,1);" ONFOCUS="select()" SIZE="20" >
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >Middle Name</TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="text" NAME="Client_MName_1" VALUE="<<Client_MName_1>>" ONCHANGE="return stringFilter(this,' !@#$%^&*()',1,0,1);" ONFOCUS="select()" SIZE="10" >
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >Suffix</TD>
+    <TD CLASS="strcol" >
+      <SELECT NAME="Client_Suffix_1">
+        [[DBA->selxTable(%form+xSuffix+<<Client_Suffix_1>>+Descr)]]
+      </SELECT>
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >Address 1</TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="text" NAME="Client_Addr1_1" VALUE="<<Client_Addr1_1>>" ONCHANGE="return stringFilter(this,':!@#$%^&*()',0,1,1);" ONFOCUS="select()" SIZE="30" >
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >Address 2</TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="text" NAME="Client_Addr2_1" VALUE="<<Client_Addr2_1>>" ONCHANGE="return stringFilter(this,':!@#$%^&*()',0,1,1);" ONFOCUS="select()" SIZE="30" >
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >City</TD>
+    <TD CLASS="strcol" >
+      <SELECT NAME="Client_City_1">
+        [[DBA->selxTable(%form+xOKCities+<<Client_City_1>>+ID)]]
+      </SELECT> 
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >County</TD>
+    <TD CLASS="strcol" >
+      <SELECT NAME="Client_County_1" >
+        [[DBA->selxTable(%form+xCountyOK+<<Client_County_1>>+CDC Descr)]]
+      </SELECT>
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >State</TD>
+    <TD CLASS="strcol" >
+      <SELECT NAME="Client_ST_1">
+        [[DBA->selxTable(%form+xState+<<Client_ST_1>>+Descr)]]
+      </SELECT>
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >Zip</TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="text" NAME="Client_Zip_1" VALUE="<<Client_Zip_1>>" ONFOCUS="select()" MAXLENGTH="10" SIZE="10" ONCHANGE="return vZip(this)" >
+      <A HREF="javascript:uspsWindow('Address Check',300,300)" ONMOUSEOVER="window.status='Address Check'; return true;" ONMOUSEOUT="window.status=''">(check address)</A>
+    </TD>
+  </TR>
+  <TR ><TD CLASS="port hdrtxt" >Phone Numbers</TD><TD>&nbsp;</TD></TR>
+  <TR >
+    <TD CLASS="strcol" >Home Phone</TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="TEL" NAME="Client_HmPh_1" VALUE="<<Client_HmPh_1>>" ONFOCUS="select()" ONCHANGE="return vPhone(this)" SIZE="20">
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >Work Phone</TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="TEL" NAME="Client_WkPh_1" VALUE="<<Client_WkPh_1>>" ONFOCUS="select()" ONCHANGE="return vPhone(this)" SIZE="20">
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >Cell Phone / Carrier</TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="TEL" NAME="Client_MobPh_1" VALUE="<<Client_MobPh_1>>" ONFOCUS="select()" ONCHANGE="return vPhone(this)" SIZE="20" >
+      <SELECT NAME="Client_Carrier_1">
+        [[DBA->selxTable(%form+xCarrier+<<Client_Carrier_1>>+Descr Access)]]
+      </SELECT>
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >Email</TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="EMAIL" NAME="Client_Email_1" VALUE="<<Client_Email_1>>" ONFOCUS="select()" SIZE="30" >
+    </TD>
+  </TR>
+  <TR ><TD CLASS="port hdrtxt" >Demographic Information</TD><TD>&nbsp;</TD></TR>
+  <TR >
+    <TD CLASS="strcol" >SSN</TD>
+    <TD CLASS="strcol" ><<<Client_SSN_1>>></TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >Date of Birth</TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="date" NAME="Client_DOB_1" VALUE="<<Client_DOB_1>>" ONFOCUS="select()" ONCHANGE="return vDate(this,0,this.form,'Client_Age')" SIZE="10" >
+      Age:
+      <INPUT TYPE="text" NAME="Client_Age" VALUE="<<Client_Age>>" ONFOCUS="form.ClientIntake_POB_1.focus();" SIZE="4" >
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >Place of Birth</TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="text" NAME="ClientIntake_POB_1" VALUE="<<ClientIntake_POB_1>>" ONFOCUS="select()" SIZE="35" >
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >Order of Birth</TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="text" NAME="ClientIntake_BirthOrder_1" VALUE="<<ClientIntake_BirthOrder_1>>" ONFOCUS="select()" ONCHANGE="vNum(this,1,20);" SIZE="12" >
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >Marital Status</TD>
+    <TD CLASS="strcol" >
+      <SELECT NAME="ClientRelations_MarStat_1">
+        [[DBA->selxTable(%form+xMarStat+<<ClientRelations_MarStat_1>>+Descr Text)]]
+      </SELECT>
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >Eyes</TD>
+    <TD CLASS="strcol" >
+      <SELECT NAME="Client_Eyes_1">
+        [[DBA->selxTable(%form+xEyes+<<Client_Eyes_1>>+Descr)]]
+      </SELECT>
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >Hair</TD>
+    <TD CLASS="strcol" >
+      <SELECT NAME="Client_Hair_1">
+        [[DBA->selxTable(%form+xHair+<<Client_Hair_1>>+Descr)]]
+      </SELECT>
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >Birth Gender</TD>
+    <TD CLASS="strcol" >
+      <SELECT NAME="Client_Gend_1">
+        [[DBA->selxTable(%form+xGend+<<Client_Gend_1>>+Descr)]]
+      </SELECT> 
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >
+      [[myHTML->setxTable(%form+xRaces+<<Client_Race_1>>+Client_Race_1+checkbox+0)]]
+    </TD>
+    <TD CLASS="strcol" >
+      <SPAN ID="Client_Race_1_display" ></SPAN>
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >
+      [[myHTML->setxTable(%form+xEthnicity+<<Client_Ethnicity_1>>+Client_Ethnicity_1+checkbox+0)]]
+    </TD>
+    <TD CLASS="strcol" >
+      <SPAN ID="Client_Ethnicity_1_display" ></SPAN>
+    </TD>
+  </TR>
+</TABLE>
+<TABLE CLASS="home fullsize" >
+  <TR ><TD CLASS="port hdrtxt" COLSPAN="2" >Assigned Clinic</TD></TR>
+  <TR >
+    <TD CLASS="strcol" >Clinic Name</TD>
+    <TD CLASS="strcol" >
+      <SELECT NAME="Client_clinicClinicID_1" >[[DBA->selClinics(%form++<<Client_clinicClinicID_1>>++1)]]</SELECT>
+    </TD>
+  </TR>
+</TABLE>
+<TABLE CLASS="home fullsize" >
+  <TR ><TD CLASS="port hdrtxt" COLSPAN="2" >Primary Insurance Information</TD></TR>
+  <TR >
+    <TD CLASS="strcol" >Insurance</TD>
+    <TD CLASS="strcol" >
+      <SELECT NAME="Insurance_InsID_1" >
+        [[DBA->selInsurance(%form+<<Insurance_InsID_1>>)]]
+      </SELECT> 
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >Insurance ID</TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="text" NAME="Insurance_InsIDNum_1" VALUE="<<Insurance_InsIDNum_1>>" ONFOCUS="select()" MAXLENGTH="30" SIZE="30" >
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >Effective</TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="text" NAME="Insurance_InsNumEffDate_1" VALUE="<<Insurance_InsNumEffDate_1>>" ONFOCUS="select()" ONCHANGE="return vDate(this);" SIZE="10" >
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >Expires</TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="text" NAME="Insurance_InsNumExpDate_1" VALUE="<<Insurance_InsNumExpDate_1>>" ONFOCUS="select()" ONCHANGE="return vDate(this);" SIZE="10" >
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >Deductible</TD>
+    <TD CLASS="strcol" >$
+      <INPUT TYPE="text" NAME="Insurance_Deductible_1" VALUE="<<Insurance_Deductible_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,3000);" SIZE="12" >
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >Copay</TD>
+    <TD CLASS="strcol" >$
+      <INPUT TYPE="text" NAME="Insurance_Copay_1" VALUE="<<Insurance_Copay_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,200);" SIZE="12" >
+    </TD>
+  </TR>
+</TABLE>
+<TABLE CLASS="main fullsize" >
+  <TR>
+    <TD CLASS="numcol" >
+      <INPUT TYPE="submit" ONCLICK="return validate(this.form);" NAME="UpdateTables=all&[[myForm->genLink(ClientEmergency+ClientEmergency.cgi)]]" VALUE="Add/Update -> Client Emergency">
+      <INPUT TYPE="submit" ONCLICK="return validate(this.form);" NAME="UpdateTables=all&misPOP=1" VALUE="Add/Update">
+    </TD>
+  </TR>
+</TABLE>
+
+<INPUT TYPE="hidden" NAME="ProviderID" VALUE="<<ProviderID>>" >
+<INPUT TYPE="hidden" NAME="post_update" VALUE="PostUpd->updPA(%form+<<<Client_ClientID_1>>>)" >
+</LOADHIDDEN>
+</FORM>
+<SCRIPT LANGUAGE="JavaScript">
+document.Intake.elements[0].focus();
+callAjax('Agency','<<ClientReferrals_ReferredBy1NPI_1>>','selRefBy1','&name=ClientReferrals_ReferredBy1NPI_1','popup.pl');
+callAjax('Agency','<<ClientReferrals_ReferredBy2NPI_1>>','selRefBy2','&name=ClientReferrals_ReferredBy2NPI_1','popup.pl');
+callAjax('Physicians','<<ClientReferrals_RefPhysNPI_1>>','selPhysNPI','&name=ClientReferrals_RefPhysNPI_1','popup.pl');
+callAjax('Agency','<<ClientReferrals_ReferredToNPI_1>>','selRefTo','&name=ClientReferrals_ReferredToNPI_1','popup.pl');
+doShow('Client_Race_1','Client_Race_1_display');
+doDisableCheck('2186-5','Client_Ethnicity_1','Client_Ethnicity_1_display');
+vDate(document.Intake.Client_DOB_1,1,document.Intake,'Client_Age');
+</SCRIPT>
+
+[[myHTML->rightpane(%form+search)]]

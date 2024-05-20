@@ -1,0 +1,9 @@
+db okmis_oays update xInsurance set ISASQ=\'ZZ\' where ID=$1 and ISASQ is null;
+db okmis_oays update xInsurance set SenderID=\'AV09311993\' where ID=$1 and SenderID is null;
+db okmis_oays update xInsurance set SenderCode=\'AV01101957\' where ID=$1 and SenderCode is null;
+db okmis_oays update xInsurance set ISARQ=\'01\' where ID=$1 and ISARQ is null;
+db okmis_oays update xInsurance set ReceiverID=\'030240928\' where ID=$1 and ReceiverID is null;
+db okmis_oays update xInsurance set ReceiverCode=\'030240928\' where ID=$1 and ReceiverCode is null;
+db okmis_oays update xInsurance set SubID=\'200867860\' where ID=$1 and SubID is null;
+db okmis_oays update xInsurance set InsCode=\'ZZ\' where ID=$1 and InsCode is null;
+

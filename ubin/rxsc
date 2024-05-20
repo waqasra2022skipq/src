@@ -1,0 +1,11 @@
+select * 
+ from xSC 
+  left join xSCRates on xSCRates.SCID=xSC.SCID 
+ where xSC.InsID=100 and xSC.Active=1 and xSC.PAReq=1
+   and xSCRates.EffDate >= '2009-04-01' and xSCRates.ExpDate is null
+   and xSCRates.UnitLbl != 'NonBill'
+   and ((xSC.SCNum NOT LIKE 'H0031%' or xSC.SCNum NOT LIKE 'H0032%')
+   and xSC.SCName NOT LIKE '%moderate%') 
+   and xSC.SCName NOT LIKE '%testing%'
+   and (xSC.CredID!='43' and xSC.CredID!='45' and xSC.CredID!='46')
+ order by xSC.SCNum

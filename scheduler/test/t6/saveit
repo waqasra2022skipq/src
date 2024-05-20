@@ -1,0 +1,6 @@
+cp -p ../../core6/app/constants.php ../../core6/app/constants.php.org
+cp -p ../../core6/model/appointment/complete.php ../../core6/model/appointment/complete.php.org
+cp -p ../../core6/model/user/email.php ../../core6/model/user/email.php.sav1
+cp -p ../../core6/objects/ntsAppointment.php ../../core6/objects/ntsAppointment.php.org
+cp -p ../../core6/panels/admin/conf/email_templates/_keys.php ../../core6/panels/admin/conf/email_templates/_keys.php.org
+cp -p ../../core6/plugins/sms/model/user/sms.php ../../core6/plugins/sms/model/user/sms.php.sav1

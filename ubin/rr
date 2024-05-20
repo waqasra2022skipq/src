@@ -1,0 +1,4 @@
+select Provider.ProvID,Provider.LName,Credentials.CredID
+ from Credentials
+  left join Provider on Provider.ProvID=Credentials.ProvID
+ where Credentials.CredID > 49 and Credentials.CredID < 54

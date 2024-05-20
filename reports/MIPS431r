@@ -1,0 +1,178 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use myForm;
+use myDBI;
+use DBA;
+use DBUtil;
+use Time::Local;
+my $DT = localtime();
+############################################################################
+# usage:
+#   MIPS431
+############################################################################
+my $form = myForm->new();
+my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $debug = $form->{'LOGINPROVID'} == 91 ? 0 : 0;
+if ( $debug ) { foreach my $f ( sort keys %{$form} ) { print "form-$f=$form->{$f}\n"; } }
+$form->{'FromDate'} = '2019-01-01';
+$form->{'ToDate'} = '2019-12-31';
+$form = DBUtil->setDates($form);
+my $DateRange = qq|from $form->{FromDateD} thru $form->{ToDateD}|;
+
+my $multidel = chr(253);
+my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+# join xInsurance needed for withSelection
+my $withSelection = DBA->withSelection($form,'and','Client.clinicClinicID','Treatment.ProvID','Treatment.ClientID','Treatment.TrID');
+my $Header = DBA->withSelectionHeader($form);
+print qq|Header: ${Header}\n| if ( $debug );
+$withSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+  $QID = qq|QID431|;
+  $TITLE = qq|Preventive Care and Screening: Unhealthy Alcohol Use: Screening & Brief Counseling - National Quality Strategy Domain: Community/Population Health - Meaningful Measure Area: Prevention and Treatment of Opioid and Substance Use Disorders|;
+  $CTYPE = qq|MIPS CLINICAL QUALITY MEASURES (CQMS)|;
+  $MTYPE = qq|Process|;
+  $DESC = qq|Percentage of patients aged 18 years and older who were screened for unhealthy alcohol use using a systematic screening method at least once within the last 24 months AND who received brief counseling if identified as an unhealthy alcohol user|;
+  $INST = qq|This measure is to be submitted once per performance period for patients seen during the performance period. This measure is intended to reflect the quality of services provided for preventive screening for unhealthy alcohol use. There is no diagnosis associated with this measure. This measure may be submitted by Merit-based Incentive Payment System (MIPS) eligible clinicians who perform the quality actions described in the measure based on the services provided and the measure-specific denominator coding. For the purposes of the measure, the most recent denominator eligible encounter should be used to determine|;
+  my @FLDS = ('ClinicName:ClinicName','LName:LastName','FName:FirstName','ClientID:ClientID','DOB:DateOfBirth','Age:Age','Race:Race','pcount:ProbAddr','PrimaryProvider:PrimaryProvider');
+  my $numFLDS = scalar(@FLDS)-3;
+print qq|numFLDS=${numFLDS}\n| if ( $debug );
+  my $qrecord = qq|
+select Treatment.TrID,Treatment.ContLogDate,xSC.SCNum
+      ,Client.LName,Client.FName,Client.ClientID
+      ,Clinic.Name as ClinicName
+      ,CONCAT(Counselor.LName,', ',Counselor.FName) as PrimaryProvider
+      ,Client.DOB,TIMESTAMPDIFF(YEAR, Client.DOB, CURDATE()) AS Age
+      ,xRaces.Descr as Race
+      ,misICD10.ICD10
+      ,count(*) as pcount
+ from Treatment 
+  left join Client on Client.ClientID=Treatment.ClientID
+  left join Provider as Clinic on Clinic.ProvID=Client.clinicClinicID
+  left join Provider as Counselor on Counselor.ProvID=Client.ProvID
+  left join okmis_config.xRaces on xRaces.ID=SUBSTRING_INDEX(Client.Race,'${multidel}',1)
+  left join xSC on xSC.SCID=Treatment.SCID
+  left join xInsurance on xInsurance.ID=xSC.InsID
+  left join ClientNoteProblems on ClientNoteProblems.TrID=Treatment.TrID
+  left join okmis_config.misICD10 on misICD10.ID=ClientNoteProblems.UUID
+ where (Treatment.ContLogDate >= '$form->{FromDate}' and Treatment.ContLogDate<='$form->{ToDate}')
+   and (TIMESTAMPDIFF(YEAR, Client.DOB, Treatment.ContLogDate) > 18)
+   and (xSC.SCNum='90791'
+        or xSC.SCNum='90792'
+        or xSC.SCNum='90832'
+        or xSC.SCNum='90834'
+        or xSC.SCNum='90837'
+        or xSC.SCNum='90845'
+        or xSC.SCNum='96150'
+        or xSC.SCNum='96151'
+        or xSC.SCNum='96152'
+        or xSC.SCNum='97165'
+        or xSC.SCNum='97166'
+        or xSC.SCNum='97167'
+        or xSC.SCNum='97168'
+        or xSC.SCNum='97802'
+        or xSC.SCNum='97803'
+        or xSC.SCNum='97804'
+        or xSC.SCNum='99201'
+        or xSC.SCNum='99202'
+        or xSC.SCNum='99203'
+        or xSC.SCNum='99204'
+        or xSC.SCNum='99205'
+        or xSC.SCNum='99212'
+        or xSC.SCNum='99213'
+        or xSC.SCNum='99214'
+        or xSC.SCNum='99215'
+        or xSC.SCNum='G0270'
+        or xSC.SCNum='G0271'
+
+        or xSC.SCNum='96160'
+        or xSC.SCNum='96161'
+        or xSC.SCNum LIKE '99385%'
+        or xSC.SCNum LIKE '99386%'
+        or xSC.SCNum LIKE '99387%'
+        or xSC.SCNum LIKE '99395%'
+        or xSC.SCNum LIKE '99396%'
+        or xSC.SCNum LIKE '99397%'
+        or xSC.SCNum LIKE '99401%'
+        or xSC.SCNum LIKE '99402%'
+        or xSC.SCNum LIKE '99403%'
+        or xSC.SCNum LIKE '99404%'
+        or xSC.SCNum LIKE '99411%'
+        or xSC.SCNum LIKE '99412%'
+        or xSC.SCNum LIKE '99429%'
+        or xSC.SCNum='G0438'
+        or xSC.SCNum='G0439'
+       )
+  ${withSelection}
+ group by Client.LName,Client.FName,Client.ClientID
+|;
+print qq|qrecord=\n${qrecord}\n| if ( $debug );
+my $sGCode = $dbh->prepare("select TrID 
+ from Treatment left join xSC on xSC.SCID=Treatment.SCID 
+ where Treatment.ClientID=? 
+   and (Treatment.ContLogDate >= '$form->{FromDate}' and Treatment.ContLogDate<='$form->{ToDate}')
+   and xSC.SCNum IN ('G9621','G9622','G9623','G9624')");
+my $sGCode1 = $dbh->prepare("
+select Treatment.TrID,count(*) as count 
+ from Treatment 
+  left join xSC on xSC.SCID=Treatment.SCID 
+ where Treatment.ClientID=? 
+   and xSC.SCNum IN ('90791','90792','90832','90834','90837','90845','96150','96151','96152','97165','97166','97167','97168','97802','97803','97804','99201','99202','99203','99204','99205','99212','99213','99214','99215','G0270','G0271')
+ group by Treatment.TrID");
+my $sGCode2 = $dbh->prepare("
+select Treatment.TrID,count(*) as count 
+ from Treatment 
+  left join xSC on xSC.SCID=Treatment.SCID 
+ where Treatment.ClientID=? 
+   and (xSC.SCNum='96160'
+        or xSC.SCNum='96161'
+        or xSC.SCNum LIKE '99385%'
+        or xSC.SCNum LIKE '99386%'
+        or xSC.SCNum LIKE '99387%'
+        or xSC.SCNum LIKE '99395%'
+        or xSC.SCNum LIKE '99396%'
+        or xSC.SCNum LIKE '99397%'
+        or xSC.SCNum LIKE '99401%'
+        or xSC.SCNum LIKE '99402%'
+        or xSC.SCNum LIKE '99403%'
+        or xSC.SCNum LIKE '99404%'
+        or xSC.SCNum LIKE '99411%'
+        or xSC.SCNum LIKE '99412%'
+        or xSC.SCNum LIKE '99429%'
+        or xSC.SCNum='G0438'
+        or xSC.SCNum='G0439'
+       )
+ group by Treatment.TrID");
+my ($Numerator,$Denominator,$total) = (0,0,0);
+print qq|${DT}\n${QID} ${TITLE} ${DateRange} ${Header}\n|;
+foreach my $f ( @FLDS ) { my ($fld,$hdr) = split(':',$f); print qq|${hdr}\t|; }
+print qq|\n|;
+my $srecord = $dbh->prepare($qrecord);
+$srecord->execute();
+while (my $rrecord = $srecord->fetchrow_hashref)
+{ 
+  $sGCode1->execute($rrecord->{'ClientID'});
+  my $rGCode1 = $sGCode1->fetchrow_hashref;
+  $sGCode2->execute($rrecord->{'ClientID'});
+  my $rGCode2 = $sGCode2->fetchrow_hashref;
+#print qq|\nFOUND: $rrecord->{'ClientID'}, count=$rGCode1->{'count'}/$rGCode2->{'count'}\n|;
+  next unless ( $rGCode1->{'count'} > 1 || $rGCode2->{'count'} > 0 );       # must have at least 2and1 encounters.
+#print qq|PASSED: $rrecord->{'ClientID'}, count=$rGCode1->{'count'}/$rGCode2->{'count'}\n|;
+
+  $Denominator++;
+  $sGCode->execute($rrecord->{'ClientID'});
+  if (my $rGCode = $sGCode->fetchrow_hashref)
+  { $Numerator++; }
+  foreach my $f ( @FLDS ) { my ($fld,$hdr) = split(':',$f); print qq|$rrecord->{$fld}\t|; }
+  print qq|\n|;
+  $total += $rrecord->{'pcount'};
+}
+print qq|Numerator\t${Numerator}|."\t" x $numFLDS.qq|${total}\n|;
+print qq|Denominator\t${Denominator}\n|;
+$srecord->finish();
+$sGCode->finish();
+$sGCode1->finish();
+$sGCode2->finish();
+
+myDBI->cleanup();
+exit;
+############################################################################

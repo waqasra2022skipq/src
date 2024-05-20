@@ -1,0 +1,42 @@
+Content-type: text/html
+Pragma: no-cache
+
+
+<HTML>
+<HEAD> <TITLE>Bill Date</TITLE> </HEAD>
+<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vDate.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript">
+function validate(form) 
+{ 
+  if ( vDate(form.BillDate) )
+  { return vEntry("notnull",form.BillDate); }
+  else { return false; }
+}
+</SCRIPT>
+
+<BODY BGCOLOR=silver >
+<FORM NAME="action" ONSUBMIT="return validate(this);" ACTION="/cgi/bin/<<action>>" METHOD="POST" >
+<DIV ALIGN=center>
+<FONT FACE="Verdana, Arial, Helvetica, sans-serif" SIZE=5> <B><<Type>></B> </FONT>
+<BR>
+<FONT FACE="Verdana, Arial, Helvetica, sans-serif" SIZE=5> <B><<InsDescr>></B> </FONT>
+<BR>
+<FONT FACE="Verdana, Arial, Helvetica, sans-serif" SIZE=5> <B>Bill Date</B> </FONT>
+<INPUT TYPE=text NAME="BillDate" VALUE="enter date" ONFOCUS="select()" ONCHANGE="return vDate(this);" SIZE="12" >
+<BR>
+<INPUT TYPE=submit VALUE="submit">
+</DIV>
+<INPUT TYPE=hidden NAME="Type" VALUE="<<Type>>" >
+<INPUT TYPE=hidden NAME="InsDescr" VALUE="<<InsDescr>>" >
+<INPUT TYPE=hidden NAME="REBILL" VALUE="<<REBILL>>" >
+<INPUT TYPE=hidden NAME="State" VALUE="<<State>>" >
+</LOADHIDDEN>
+</FORM>
+<SCRIPT LANGUAGE="JavaScript">
+window.focus();
+document.action.elements[0].focus();
+</SCRIPT>
+
+</BODY>
+</HTML>

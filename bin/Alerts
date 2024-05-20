@@ -1,0 +1,25 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use DBA;
+############################################################################
+my $form = DBForm->new();
+my $dbh = $form->dbconnect();
+if ( $form->{'type'} =~ /renewals/ )
+{
+  my $sClientRenewals = $dbh->prepare("select Provider.FName,Provider.LName,ClientRenewals.ProvID,count(*) as num from ClientRenewals left join Provider on Provider.ProvID=ClientRenewals.ProvID where ClientRenewals.Active=1 group by ClientRenewals.ProvID");
+  ############################################################################
+  $sClientRenewals->execute() || $form->dberror("alert: select ClientRenewals");
+  if ( my $rClientRenewals = $sClientRenewals->fetchrow_hashref )
+  {
+    my $text = qq|You have $rClientRenewals->{num} pharmacy renewals.\\nsee main menu: Reports\\n User Reports->Management->Physician Client Renewals|;
+    print qq|Alerts: $rClientRenewals->{num} renewals for $rClientRenewals->{FName} $rClientRenewals->{LName} ($rClientRenewals->{ProvID})\n|;
+    DBA->setAlert($form,$text,$rClientRenewals->{ProvID});
+  }
+  $sClientRenewals->finish();
+}
+else
+{ print qq|\n\ntype '$form->{'type'}' INVALID (not found)!\n\n|; }
+exit;
+###########################################################################################

@@ -1,0 +1,18 @@
+#!/usr/bin/perl
+############################################################################
+my $s;
+my $file = shift;
+open( FILE, ${file} ) or return "Could not open $file ($!) (ReadFile ${pwd})";
+while( $line = <FILE> ) { $s .= $line; }
+close(FILE);
+print qq|s=$s\n|;
+my $ll = length($s);
+for ($i=0; $i<$ll; $i++)
+{ 
+  my $c=substr($s,$i,1);
+  my $n = ord($c);
+#print qq|c=$c, n=$n\n|;
+  my $str=substr($s,$i-30,62);
+  if ( $n > 127 ) { print qq|str=$str\nc=$c, n=$n\n|; }
+} 
+exit;

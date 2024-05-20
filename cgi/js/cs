@@ -1,0 +1,24 @@
+function getStyle(elem,prop){
+if (elem.currentStyle) {
+var res= elem.currentStyle.margin;
+} else if (window.getComputedStyle) {
+if (window.getComputedStyle.getPropertyValue){
+var res= window.getComputedStyle(elem, null).getPropertyValue(prop)}
+else{var res =window.getComputedStyle(elem)[prop] };
+}
+return res;
+}
+
+
+
+function getStyle(el, cssprop){
+ if (el.currentStyle) //IE
+  return el.currentStyle[cssprop]
+ else if (document.defaultView && document.defaultView.getComputedStyle) //Firefox
+  return document.defaultView.getComputedStyle(el, "")[cssprop]
+ else //try and get inline style
+  return el.style[cssprop]
+}
+
+var mydiv=document.getElementById("test")
+alert(getStyle(mydiv, 'width')) //alerts 100px

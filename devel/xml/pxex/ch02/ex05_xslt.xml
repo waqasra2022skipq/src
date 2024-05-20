@@ -1,0 +1,54 @@
+<xsl:stylesheet 
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  version="1.0">
+
+<xsl:output method="html"/>
+
+<!-- RULE FOR BOOK ELEMENT -->
+<xsl:template match="book">
+  <html>
+    <head>
+      <title><xsl:value-of select="title"/></title>
+    </head>
+    <body>
+      <h1><xsl:value-of select="title"/></h1>
+      <h3>Table of Contents</h3>
+      <xsl:call-template name="toc"/>
+      <xsl:apply-templates select="chapter"/>
+    </body>
+  </html>
+</xsl:template>
+
+<!-- RULE FOR CHAPTER -->
+<xsl:template match="chapter">
+  <xsl:apply-templates/>
+</xsl:template>
+
+<!-- RULE FOR CHAPTER TITLE -->
+<xsl:template match="chapter/title">
+  <h2>
+    <xsl:text>Chapter </xsl:text>
+    <xsl:number count="chapter" level="any" format="1"/>
+  </h2>
+  <xsl:apply-templates/>
+</xsl:template>
+  
+<!-- RULE FOR PARA -->
+<xsl:template match="para">
+  <p><xsl:apply-templates/></p>
+</xsl:template>
+
+<!-- NAMED RULE: TOC -->
+<xsl:template name="toc">
+  <xsl:if test="count(chapter)>0">
+    <xsl:for-each select="chapter">
+      <xsl:text>Chapter </xsl:text>
+      <xsl:value-of select="position()"/>
+      <xsl:text>: </xsl:text>
+      <i><xsl:value-of select="title"/></i>
+      <br/>
+    </xsl:for-each>
+  </xsl:if>
+</xsl:template>
+
+</xsl:stylesheet>

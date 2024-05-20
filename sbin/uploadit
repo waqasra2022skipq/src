@@ -1,0 +1,25 @@
+#!/bin/bash
+# ------------------------------------
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   print "\nServices not installed!"
+   exit 1
+fi
+# ------------------------------------
+LogFile=${LOGDIR}/${CMD}
+(
+  print "\n======================================"
+  print "${CMD} Started: $(date)"
+# Now start the saves...
+  for u in $*; do
+    echo "upload ${u}..."
+    cd ${MAINDIR}/${u}
+    sh ${MAINDIR}/${u}/bin/upload
+  done
+  print "\n${CMD} Complete: $(date)"
+  print "======================================\n"
+) | tee ${LogFile} 2>&1
+#cat ${LogFile} | ${MISBIN}/email -a support@okmis.com -s "${CMD} ${YMD}"
+# ------------------------------------
+

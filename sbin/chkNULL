@@ -1,0 +1,8 @@
+select TrPlanIP.ClientID,TrPlanIP.ID,TrPlanIP.TrPlanID,TrPlan.TrPlanID 
+ from TrPlanIP 
+  left join TrPlan on TrPlan.TrPlanID=TrPlanIP.TrPlanID
+ where TrPlan.TrPlanID is null;
+select TrPlanS.ClientID,TrPlanS.ID,TrPlanS.TrPlanID,TrPlan.TrPlanID 
+ from TrPlanS 
+  left join TrPlan on TrPlan.TrPlanID=TrPlanS.TrPlanID
+ where TrPlan.TrPlanID is null;

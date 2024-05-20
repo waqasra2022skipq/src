@@ -1,0 +1,27 @@
+Content-type: text/html
+Pragma: no-cache
+
+
+<HTML>
+<HEAD> <TITLE>Months</TITLE> </HEAD>
+
+<BODY BGCOLOR=silver >
+<FORM NAME="Months" ACTION="/cgi/bin/<<action>>" METHOD="POST" >
+<DIV ALIGN=center>
+<FONT FACE="Verdana, Arial, Helvetica, sans-serif" SIZE=5> <B><<Title>></B> </FONT>
+<BR>
+<FONT FACE="Verdana, Arial, Helvetica, sans-serif" SIZE=5> <B>Month/Year</B> </FONT>
+<BR>
+<SELECT NAME="YYYYMM" >[[PopUp->selYearMonth(%form)]]</SELECT>
+<BR>
+<INPUT TYPE=submit VALUE="submit">
+</DIV>
+<INPUT TYPE=hidden NAME="Client_ClientID" VALUE="<<Client_ClientID>>" >
+</LOADHIDDEN>
+</FORM>
+<SCRIPT LANGUAGE="JavaScript">
+document.Months.elements[0].focus();
+</SCRIPT>
+
+</BODY>
+</HTML>

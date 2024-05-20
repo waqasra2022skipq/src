@@ -1,0 +1,4 @@
+select Provider.LName,Provider.FName,Provider.Active,ProviderPrivs.Type
+ from ProviderPrivs 
+  left join Provider on Provider.ProvID=ProviderPrivs.ProvID
+ where ProviderPrivs.Type='SiteAdmin';

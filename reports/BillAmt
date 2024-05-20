@@ -1,0 +1,324 @@
+#!/usr/bin/perl
+###########################################
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use MgrTree;
+use DBA;
+use PDF;
+use Time::Local;
+$DT=localtime();
+
+###########################################
+$form = DBForm->new();
+if ( ! SysAccess->verify($form,'Privilege=BillingReports') )
+{ $form->error("Access Denied! / Privilege"); }
+$form = DBUtil->setDates($form);
+my $DateRange = qq|From $form->{FromDateD} thru $form->{ToDateD}|;
+(my $fdate = $form->{FromDate}) =~ s/-//g;
+(my $tdate = $form->{ToDate}) =~ s/-//g;
+
+############################################################################
+$dbh = $form->dbconnect();
+my $qProvider = qq|select Provider.*, ProviderControl.FinMgrID as FinMgrProvID from Provider left join ProviderControl on ProviderControl.ProvID=Provider.ProvID where Provider.ProvID=?|;
+my $sProvider = $dbh->prepare($qProvider);
+my $qBillAmt = qq|
+select BillAmt.*, xInsurance.Name as InsName
+  from BillAmt 
+    left join xInsurance on xInsurance.ID=BillAmt.Insurance
+  where BillAmt.BillDate>='$fdate' and BillAmt.BillDate<='$tdate' and BillAmt.Clinic=?
+| . main->addInssel($form) . qq|
+  order by BillAmt.BillDate, xInsurance.Name
+|;
+my $sBillAmt = $dbh->prepare($qBillAmt);
+
+############################################################################
+my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+my $addSelection = DBA->getForProvID($form,$ForProvID,'and','BillAmt.Clinic');
+my $qClinics = qq|
+select BillAmt.Clinic, Provider.Name from BillAmt
+    left join Provider on Provider.ProvID=BillAmt.Clinic
+  where BillAmt.BillDate>='$fdate' and BillAmt.BillDate<='$tdate'
+| . $addSelection . main->addInssel($form) . qq|
+  group by Provider.Name
+|;
+#warn qq|q=$qClinics\n|;
+my $sClinics = $dbh->prepare($qClinics);
+$sClinics->execute() || $form->dberror($qClinics);
+my $Cnt = $sClinics->rows;
+if ( $form->{output} eq 'pdf' )
+{
+  $pdf = PDF->start("/home/okmis/mis/src/pdf/BillAmt.pdt");
+  while ( my $rClinics = $sClinics->fetchrow_hashref ) { main->genPDFBR($rClinics); }
+  if ( ${Cnt} == 0 )
+  { $pdf->add('',"/R5 14 Tf\n1 0 0 1 40 740 Tm (No Billing for selection.) Tj\n"); }
+  $pdf->finish();
+  print $pdf->{outText};
+}
+else
+{
+  print qq|${DT}\nBilled by Week Report\nNote:\tTotalBilled=Billed+Rebilled\t\tPayments=Reconciled-Scholarshipped\n|;
+  print qq|ClinicName\tBillDate\tInsurance\tNotes\tBilled\tTotalBilled\tAmountDue\tReconciled\tScholarship\tPayments\n|;
+  while ( my $rClinics = $sClinics->fetchrow_hashref ) { main->genReport($rClinics->{Clinic}); }
+  if ( ${Cnt} == 0 ) { print qq|No Billing for selection.\n|; }
+}
+
+$sProvider->finish();
+$sBillAmt->finish();
+$sClinics->finish();
+$form->complete();
+exit;
+############################################################################
+sub genPDFBR
+{
+  my ($self,$rClinics) = @_;
+
+  my $PageNo = 0;
+  my $AgencyID = MgrTree->getAgency($form,$rClinics->{Clinic});
+  $sProvider->execute($AgencyID) || $form->dberror($qProvider);
+  my $rAgency = $sProvider->fetchrow_hashref;
+  $sProvider->execute($rClinics->{Clinic}) || $form->dberror($qProvider);
+  my $rClinic = $sProvider->fetchrow_hashref;
+  $PageNo = main->genPDFHDR($rAgency,$rClinic,$PageNo);
+  $PageNo = main->genPDFLines($rAgency,$rClinic,$PageNo);
+  $PageNo = main->genPDFFTR($rAgency,$rClinic,$PageNo);
+  $pdf->add('','');     # finish up, deflate.
+
+  return(1);
+}
+sub genPDFHDR
+{
+  my ($self,$rAgency,$rClinic,$PageNo) = @_;
+##
+# Agency Name and address.
+##
+  $pdf->addElement(140,740,$rAgency->{Name},'/R5',14);
+  $pdf->addElement(140,729,$rAgency->{Addr1},'/R10',12);
+  $pdf->addElement(140,718,"$rAgency->{City}, $rAgency->{ST}   $rAgency->{Zip}",'/R10',12);
+  $pdf->addElement(140,707,"Office: $rAgency->{WkPh}",'/R10',12);
+  $pdf->addElement(140,696,"Fax: $rAgency->{Fax}",'/R10',12);
+
+  $pdf->addElement(140,674,"Billing / Remittance Report for:",'/R5',14);
+##
+# Clinic Name and address.
+##
+  $pdf->addElement(140,652,$rClinic->{Name},'/R5',14);
+  $pdf->addElement(140,641,$rClinic->{Addr1},'/R10',12);
+  $pdf->addElement(140,630,"$rClinic->{City}, $rClinic->{ST}   $rClinic->{Zip}",'/R10',12);
+  $pdf->addElement(140,619,"Office: $rClinic->{WkPh}",'/R10',12);
+  $pdf->addElement(140,608,"Fax: $rClinic->{Fax}",'/R10',12);
+
+  $pdf->addElement(31,575,"$DateRange (normal billing is on Monday of each week)",'/R5',10);
+  return($PageNo);
+}
+sub genPDFFTR
+{
+  my ($self,$rAgency,$rClinic,$PageNo) = @_;
+
+  $pdf->addElement(31,235,"* next to date means 'not a Monday'.",'/R10',10);
+
+# bottom of Billing: Please Send Payment to:
+  $pdf->addElement(50,156,$rAgency->{Name},'/R10',12);
+  $pdf->addElement(50,145,$rAgency->{Addr1},'/R10',12);
+  $pdf->addElement(50,134,"$rAgency->{City}, $rAgency->{ST}   $rAgency->{Zip}",'/R10',12);
+
+#                    For Questions regarding your billing contact:
+  $sProvider->execute($rAgency->{FinMgrProvID}) || $form->dberror($qProvider);
+  if ( my $rProvider = $sProvider->fetchrow_hashref )
+  {
+    $pdf->addElement(300,156,"$rProvider->{FName} $rProvider->{LName}",'/R10',12);
+    $pdf->addElement(300,145,$rProvider->{JobTitle},'/R10',12);
+    $pdf->addElement(300,134,$rAgency->{Name},'/R10',12);
+    $pdf->addElement(300,123,$rProvider->{WkPh},'/R10',12);
+  }
+  else
+  {
+    $pdf->addElement(300,156,"No finance coordinator assigned",'/R10',12);
+    $pdf->addElement(300,145,"please select coordinator under Agency",'/R10',12);
+    $pdf->addElement(300,134,$rAgency->{Name},'/R10',12);
+    $pdf->addElement(300,123,"No finance coordinator assigned",'/R10',12);
+  }
+
+  $PageNo++;
+  $pdf->addElement(300,25,"Page $PageNo",'/R10',12);
+  return($PageNo);
+}
+############################################################################
+sub genPDFLines
+{
+  my ($self,$rAgency,$rClinic,$PageNo) = @_;
+  my ($TotalNotes,$TotalBilled,$TotalLessReBilled,$TotalAmtDue,$TotalScholarship,$TotalReconciled,$TotalIncome) 
+   = (0,0,0,0,0,0,0);
+  my $ystart = 535;   # to start y @ 535;
+  my ($LineCnt,$yOffset,$yJump) = (0,0,0);
+  $sBillAmt->execute($rClinic->{ProvID}) || $form->dberror($qBillAmt);
+  while ( my $rBillAmt = $sBillAmt->fetchrow_hashref )
+  { 
+    if ( $LineCnt >=25 )
+    {
+      main->prtPDFTotals($TotalNotes,$TotalLessReBilled,$TotalBilled,
+                         $TotalAmtDue,$TotalScholarship,$TotalReconciled,$TotalIncome);
+      $PageNo = main->genPDFFTR($rAgency,$rClinic,$PageNo);
+      $pdf->add('','');     # finish up, deflate.
+      main->genPDFHDR($rAgency,$rClinic);
+      ($LineCnt,$yOffset,$yJump) = (0,0,0);
+      $LineCnt++;
+      my $y = ($ystart - ($yOffset * 11) - $yJump);
+    { $pdf->addElement(92,$y,"continued from page $PageNo",'/R5',10); }
+      $yOffset++;
+    }
+    $LineCnt++;
+    my $y = ($ystart - ($yOffset * 11) - $yJump);
+    $yOffset++;
+
+    my $BillDate = substr($rBillAmt->{BillDate},0,4) . '-'
+                 . substr($rBillAmt->{BillDate},4,2) . '-'
+                 . substr($rBillAmt->{BillDate},6,2);
+    my $dow = DBUtil->Date($BillDate,'dow');
+    my $BillDate = DBUtil->Date($BillDate,'fmt','MM/DD/YYYY');
+    $BillDate .= ' *' unless ( $dow == 1 );    # is Monday.
+    $pdf->addElement(31,$y,$BillDate,'/R5',10);
+#$rBillAmt->{InsName} .= ' and more than 20 chars';
+    if ( length($rBillAmt->{InsName}) > 20 )
+    { 
+      my $i = 20;          # find a space
+      until ( $i == 0 || substr($rBillAmt->{InsName},$i,1) eq ' ' ) { $i--; }
+      $pdf->addElement(92,$y,substr($rBillAmt->{InsName},0,$i),'/R5',10);
+      $pdf->addElement(92,$y-11,substr($rBillAmt->{InsName},$i,20),'/R5',10);
+      $yJump += 11;
+      $LineCnt++;
+    }
+    else
+    { $pdf->addElement(92,$y,$rBillAmt->{InsName},'/R5',10); }
+
+    my $pfx = '*' x (7-length($rBillAmt->{Notes}));
+    $pdf->addElement(195,$y,"${pfx}$rBillAmt->{Notes}",'/R5',10);
+    $TotalNotes += $rBillAmt->{Notes};
+
+    $LessReBilled = sprintf("%.2f",($rBillAmt->{Billed} - $rBillAmt->{ReBilled}));
+    $pfx = '*' x (10-length($LessReBilled));
+    $pdf->addElement(240,$y,"${pfx}${LessReBilled}",'/R5',10);
+    $TotalLessReBilled += $LessReBilled;
+
+    $Billed = sprintf("%.2f",$rBillAmt->{Billed});
+    $pfx = '*' x (10-length($Billed));
+    $pdf->addElement(298,$y,"${pfx}${Billed}",'/R5',10);
+    $TotalBilled += $Billed;
+
+    $AmtDue = sprintf("%.2f",$rBillAmt->{AmtDue});
+    $pfx = '*' x (10-length($AmtDue));
+    $pdf->addElement(356,$y,"${pfx}${AmtDue}",'/R5',10);
+    $TotalAmtDue += $AmtDue;
+
+    $Reconciled = sprintf("%.2f",$rBillAmt->{Reconciled});
+    $pfx = '*' x (10-length($Reconciled));
+    $pdf->addElement(414,$y,"${pfx}${Reconciled}",'/R5',10);
+    $TotalReconciled += $Reconciled;
+
+    $Scholarship = sprintf("%.2f",$rBillAmt->{Scholarship});
+    $pfx = '*' x (10-length($Scholarship));
+    $pdf->addElement(472,$y,"${pfx}${Scholarship}",'/R5',10);
+    $TotalScholarship += $Scholarship;
+
+    $Income = sprintf("%.2f",$rBillAmt->{Income});
+    $pfx = '*' x (10-length($Income));
+    $pdf->addElement(530,$y,"${pfx}${Income}",'/R5',10);
+    $TotalIncome += $Income;
+
+  }
+  main->prtPDFTotals($TotalNotes,$TotalLessReBilled,$TotalBilled,
+                     $TotalAmtDue,$TotalScholarship,$TotalReconciled,$TotalIncome);
+  return($PageNo);
+}
+sub prtPDFTotals
+{
+  my ($self,$tn,$tlrb,$tb,$td,$ts,$tr,$ti) = @_;
+# 240,298,356,414,472,530
+  $pfx = '*' x (7-length($tn));
+  $pdf->addElement(195,212,"${pfx}${tn}",'/R5',10);
+  my $TotalLessReBilled = sprintf("%.2f",$tlrb);
+  $pfx = '*' x (10-length($TotalLessReBilled));
+  $pdf->addElement(240,212,"${pfx}${TotalLessReBilled}",'/R5',10);
+  my $TotalBilled = sprintf("%.2f",$tb);
+  $pfx = '*' x (10-length($TotalBilled));
+  $pdf->addElement(298,212,"${pfx}${TotalBilled}",'/R5',10);
+  my $TotalAmtDue = sprintf("%.2f",$td);
+  $pfx = '*' x (10-length($TotalAmtDue));
+  $pdf->addElement(356,212,"${pfx}${TotalAmtDue}",'/R5',10);
+  my $TotalReconciled = sprintf("%.2f",$tr);
+  $pfx = '*' x (10-length($TotalReconciled));
+  $pdf->addElement(414,212,"${pfx}${TotalReconciled}",'/R5',10);
+  my $TotalScholarship = sprintf("%.2f",$ts);
+  $pfx = '*' x (10-length($TotalScholarship));
+  $pdf->addElement(472,212,"${pfx}${TotalScholarship}",'/R5',10);
+  my $TotalIncome = sprintf("%.2f",$ti);
+  $pfx = '*' x (10-length($TotalIncome));
+  $pdf->addElement(530,212,"${pfx}${TotalIncome}",'/R5',10);
+  return(1);
+}
+############################################################################
+sub genReport
+{
+  my ($self,$ClinicID) = @_;
+  my ($TotalNotes,$TotalBilled,$TotalLessReBilled,$TotalAmtDue,$TotalScholarship,$TotalReconciled,$TotalIncome) 
+   = (0,0,0,0,0,0,0);
+  my $AgencyID = MgrTree->getAgency($form,$ClinicID);
+  $sProvider->execute($AgencyID) || $form->dberror($qProvider);
+  my $rAgency = $sProvider->fetchrow_hashref;
+  $sProvider->execute($ClinicID) || $form->dberror($qProvider);
+  my $rClinic = $sProvider->fetchrow_hashref;
+  $sBillAmt->execute($rClinic->{ProvID}) || $form->dberror($qBillAmt);
+  my $cnt = $sBillAmt->rows;
+  while ( my $rBillAmt = $sBillAmt->fetchrow_hashref )
+  { 
+    $LineCnt++;
+    my $BillDate = substr($rBillAmt->{BillDate},0,4) . '-'
+                 . substr($rBillAmt->{BillDate},4,2) . '-'
+                 . substr($rBillAmt->{BillDate},6,2);
+    my $dow = DBUtil->Date($BillDate,'dow');
+    my $BillDate = DBUtil->Date($BillDate,'fmt','MM/DD/YYYY');
+    $BillDate .= ' *' unless ( $dow == 1 );    # is Monday.
+    $TotalNotes += $rBillAmt->{Notes};
+    $LessReBilled = sprintf("%.2f",($rBillAmt->{Billed} - $rBillAmt->{ReBilled}));
+    $TotalLessReBilled += $LessReBilled;
+    $Billed = sprintf("%.2f",$rBillAmt->{Billed});
+    $TotalBilled += $Billed;
+    $AmtDue = sprintf("%.2f",$rBillAmt->{AmtDue});
+    $TotalAmtDue += $AmtDue;
+    $Reconciled = sprintf("%.2f",$rBillAmt->{Reconciled});
+    $TotalReconciled += $Reconciled;
+    $Scholarship = sprintf("%.2f",$rBillAmt->{Scholarship});
+    $TotalScholarship += $Scholarship;
+    $Income = sprintf("%.2f",$rBillAmt->{Income});
+    $TotalIncome += $Income;
+    print qq|$rClinic->{Name}\t$BillDate\t$rBillAmt->{InsName}\t$rBillAmt->{Notes}\t${LessReBilled}\t${Billed}\t${AmtDue}\t${Reconciled}\t${Scholarship}\t${Income}\n|;
+  }
+  my $trb = sprintf("%.2f",$TotalLessReBilled);
+  my $tb = sprintf("%.2f",$TotalBilled);
+  my $td = sprintf("%.2f",$TotalAmtDue);
+  my $tr = sprintf("%.2f",$TotalReconciled);
+  my $ts = sprintf("%.2f",$TotalScholarship);
+  my $ti = sprintf("%.2f",$TotalIncome);
+  print qq|$rClinic->{Name}\tTotals\t\t${TotalNotes}\t${trb}\t${tb}\t${td}\t${tr}\t${ts}\t${ti}\n|;
+  return(1);
+}
+############################################################################
+sub addInssel
+{
+  my ($self,$form) = @_;
+  my $out = '';
+  if ( $form->{InsID} )
+  {
+    $out .= qq|and (|;
+    $conj = '';
+    foreach my $InsID ( split(chr(253),$form->{InsID}) )
+    { 
+      $out .= qq|${conj}BillAmt.Insurance=${InsID}|; 
+      $conj = ' or ';
+    }
+    $q .= qq|) |;
+    $out .= qq|) |;
+  }
+  return($out);
+}
+############################################################################

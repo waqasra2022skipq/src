@@ -1,0 +1,64 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+
+use XML::LibXML;
+
+my $file = 'me2';
+
+my $parser = '';
+#   load_xml: initializes the parser and parse_file()
+eval { $parser = XML::LibXML->load_xml(location => $file); };
+#my $parser = XML::LibXML->new->parse_file($file);
+my $xml    = XML::LibXML::XPathContext->new;                # No argument here!
+$xml->registerNs('x', 'urn:hl7-org:v3');
+my $dateofbirth = $xml->findvalue('//x:patient/x:birthTime/@value', $parser);
+print "0\t$dateofbirth\n";
+my $gender = $xml->findvalue('//x:patient/x:administrativeGenderCode/@code', $parser);
+print "0\t$gender\n";
+my $fname = $xml->findvalue('//x:patient/x:name/x:given', $parser);
+print "0\t$fname\n";
+my $lname = $xml->findvalue('//x:patient/x:name/x:family', $parser);
+print "0\t$lname\n";
+
+for my $key ($xml->findnodes('//x:patient/x:administrativeGenderCode', $parser)) {         # Provide the $parser here.
+    my $string = $key->findvalue('@code');             # No $parser needed, since attributes are namespaceless.
+    print "1\t$string\n";
+}
+for my $key ($xml->findnodes('//x:patient/x:birthTime', $parser)) {         # Provide the $parser here.
+    my $string = $key->findvalue('@value');             # No $parser needed, since attributes are namespaceless.
+    print "2\t$string\n";
+}
+
+  my ($longname,$othername) = ('','');
+  for my $node ( $xml->findnodes('//x:patient/x:name', $parser) )
+  {
+    my $type = $xml->findvalue('@use', $node);            # Context specified as argument.
+print qq|type=${type}\n|;
+    for my $given ( $xml->findnodes('x:given', $node) )
+    {
+print qq|val=|.$given->to_literal.qq|\n|;
+      if ( $type eq 'L' )
+      {
+        $longname .= $given->to_literal.' ';
+      }
+      else
+      {
+        $othername .= $given->to_literal.' ';
+      }
+    }
+print qq|longname=${longname}\n|;
+print qq|othername=${othername}\n|;
+  }
+print qq|longname=${longname}\n|;
+print qq|othername=${othername}\n|;
+my @X;
+for my $node ($xml->findnodes('//x:patient/x:name', $parser)) { # Again, $parser as argument.
+    my $type = $xml->findvalue('@use', $node);            # Context specified as argument.
+    push @X, $type;
+    my $time = $xml->findvalue('x:given', $node);            # Context specified as argument.
+    push @X, $time;
+    $time = $xml->findvalue('x:family', $node);            # Context specified as argument.
+    push @X, $time;
+}
+print "@X\n";

@@ -1,0 +1,11 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+############################################################################
+# Require Necessary Routines for this script to run.
+##
+$form = DBForm->parse;
+$c = crypt($form->{p},'junk');
+print qq|$form->{p}, $c\n|;
+exit;

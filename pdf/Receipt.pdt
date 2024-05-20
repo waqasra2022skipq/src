@@ -1,0 +1,40 @@
+%PDF-1.2
+1 0 obj
+<</Type/Font/Name/R10/Subtype/Type1/BaseFont/Times-Roman>>
+endobj
+2 0 obj
+<</Type/Font/Name/R5/Subtype/Type1/BaseFont/Times-Bold>>
+endobj
+3 0 obj
+<</Length 742 >>
+stream
+0.1 0 0 0.1 0 0 cm q q 10 0 0 10 0 0 cm 
+BT
+/R5 16 Tf
+1 0 0 1 240 666 Tm (Payment Receipt)Tj
+/R10 12 Tf
+1 0 0 1 38 644 Tm (Receipt Number:)Tj
+1 0 0 1 338 644 Tm (Receipt Date:)Tj
+1 0 0 1 38 622 Tm (Received From:)Tj
+1 0 0 1 38 600 Tm (Amount Paid:)Tj
+1 0 0 1 319 600 Tm (Amount Applied:)Tj
+1 0 0 1 38 578 Tm (For Payment Of:)Tj
+1 0 0 1 38 556 Tm (Type of Payment:)Tj
+1 0 0 1 38 534 Tm (Check Number:)Tj
+1 0 0 1 38 512 Tm (Received By:)Tj
+ET
+Q 10 w 300 6900 m 5800 6900 l S q 10 0 0 10 0 0 cm
+Q 1 i 10 w
+1500 6430 m 2800 6430 l
+4200 6430 m 5500 6430 l
+1500 6210 m 5100 6210 l
+1500 5990 m 2800 5990 l
+4200 5990 m 5500 5990 l
+1500 5770 m 2800 5770 l
+1500 5550 m 2800 5550 l
+1500 5330 m 2800 5330 l
+1500 5110 m 5100 5110 l
+S q 10 0 0 10 0 0 cm
+Q
+endstream
+endobj

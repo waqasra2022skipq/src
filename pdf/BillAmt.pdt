@@ -1,0 +1,75 @@
+%PDF-1.2
+1 0 obj
+<</Type/Font/Name/R10/Subtype/Type1/BaseFont/Times-Roman>>
+endobj
+2 0 obj
+<</Type/Font/Name/R5/Subtype/Type1/BaseFont/Times-Bold>>
+endobj
+3 0 obj
+<</Length 2112 >>
+stream
+0.1 0 0 0.1 0 0 cm q q 10 0 0 10 0 0 cm 
+BT
+/R10 11 Tf
+1 0 0 1 38 559 Tm (Date)Tj
+1 0 0 1 100 559 Tm (Insurance)Tj
+1 0 0 1 202 559 Tm (Notes)Tj
+1 0 0 1 250 559 Tm (Billed)Tj
+1 0 0 1 295 559 Tm (TotalBilled)Tj
+1 0 0 1 351 559 Tm (AmountDue)Tj
+1 0 0 1 412 559 Tm (Reconciled)Tj
+1 0 0 1 469 559 Tm (Scholarship)Tj
+1 0 0 1 532 559 Tm (Payments)Tj
+1 0 0 1 50 167 Tm (Billing and Remitances for:)Tj
+1 0 0 1 300 167 Tm (For questions regarding billing contact:)Tj
+1 0 0 1 202 235 Tm (Notes)Tj
+1 0 0 1 250 235 Tm (Billed)Tj
+1 0 0 1 295 235 Tm (TotalBilled)Tj
+1 0 0 1 351 235 Tm (AmountDue)Tj
+1 0 0 1 412 235 Tm (Reconciled)Tj
+1 0 0 1 469 235 Tm (Scholarship)Tj
+1 0 0 1 532 235 Tm (Payments)Tj
+1 0 0 1 90 212 Tm (CURRENT TOTALS:)Tj
+1 0 0 1 234 212 Tm ($)Tj
+1 0 0 1 292 212 Tm ($)Tj
+1 0 0 1 350 212 Tm ($)Tj
+1 0 0 1 408 212 Tm ($)Tj
+1 0 0 1 466 212 Tm ($)Tj
+1 0 0 1 524 212 Tm ($)Tj
+/R10 10 Tf
+1 0 0 1 31 112 Tm (Note:)Tj
+1 0 0 1 36 101 Tm (Notes count includes non-billable and scholarshipped.)Tj
+1 0 0 1 36 90 Tm (All columns and totals relate to when the note was billed each week.)Tj
+1 0 0 1 36 79 Tm (Naturally Reconciles and Scholarships occur a later date.)Tj
+1 0 0 1 36 68 Tm (Payments \(Checks and Wires\) also occur at a later date and are usually made 10-14 days after BillDate.)Tj
+1 0 0 1 36 57 Tm (AmountDue is NOT TotalBilled-Reconciled but from notes; )Tj
+1 0 0 1 46 46 Tm (because if Billed/Denied and rebilled to another Insurance and paid, nothing is due.)Tj
+/R10 8 Tf
+1 0 0 1 295 552 Tm (Billed+Rebilled)Tj
+1 0 0 1 362 552 Tm (from notes)Tj
+1 0 0 1 526 552 Tm (Reconciled-Sch)Tj
+ET
+Q 1 i 10 w
+300 5700 m 5800 5700 l 5800 2500 l 300 2500 l h
+300 5500 m 5800 5500 l
+900 5700 m 900 2500 l
+1940 5700 m 1940 2500 l
+2340 5700 m 2340 2500 l
+2920 5700 m 2920 2500 l
+3500 5700 m 3500 2500 l
+4080 5700 m 4080 2500 l
+4660 5700 m 4660 2500 l
+5240 5700 m 5240 2500 l
+S q 10 0 0 10 0 0 cm
+Q 1 i 10 w
+1940 2300 m 5800 2300 l 5800 2000 l 1940 2000 l h
+2340 2300 m 2340 2000 l
+2920 2300 m 2920 2000 l
+3500 2300 m 3500 2000 l
+4080 2300 m 4080 2000 l
+4660 2300 m 4660 2000 l
+5240 2300 m 5240 2000 l
+S q 10 0 0 10 0 0 cm
+Q
+endstream
+endobj

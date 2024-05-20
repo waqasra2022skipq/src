@@ -1,0 +1,15 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use DBA;
+use CDC;
+
+############################################################################
+$form = DBForm->new();
+foreach my $PrAuthID ( split(' ',$form->{PrAuthIDs}) )
+{
+  my $out = CDC->setPA($form,$PrAuthID,1);
+warn qq|done: PrAuthID=$PrAuthID, out=$out\n|;
+}
+############################################################################

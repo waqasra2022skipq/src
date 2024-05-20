@@ -1,0 +1,117 @@
+cmd=/home/okmis/mis/src/sbin/work/GetCountyIssue DBNAME=okmis_adv\&fix=yes
+Started: Wed Jun  3 14:11:42 2020
+======================================
+
+  database: okmis_adv: /home/okmis/mis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:42 2020
+DBNAME=okmis_adv
+cmd=/home/okmis/mis/src/sbin/work/GetCountyIssue DBNAME=okmis_anv\&fix=yes
+  database: okmis_adv: /home/okmis/mis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:42 2020
+
+  database: okmis_anv: /home/okmis/mis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:42 2020
+DBNAME=okmis_anv
+cmd=/home/okmis/mis/src/sbin/work/GetCountyIssue DBNAME=okmis_ccc\&fix=yes
+  database: okmis_anv: /home/okmis/mis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:42 2020
+
+  database: okmis_ccc: /home/okmis/mis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:42 2020
+DBNAME=okmis_ccc
+cmd=/home/okmis/mis/src/sbin/work/GetCountyIssue DBNAME=okmis_ccs\&fix=yes
+  database: okmis_ccc: /home/okmis/mis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:43 2020
+
+  database: okmis_ccs: /home/okmis/mis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:43 2020
+DBNAME=okmis_ccs
+cmd=/home/okmis/mis/src/sbin/work/GetCountyIssue DBNAME=okmis_csl\&fix=yes
+  database: okmis_ccs: /home/okmis/mis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:43 2020
+
+  database: okmis_csl: /home/okmis/mis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:43 2020
+DBNAME=okmis_csl
+cmd=/home/okmis/mis/src/sbin/work/GetCountyIssue DBNAME=okmis_cti\&fix=yes
+  database: okmis_csl: /home/okmis/mis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:43 2020
+
+  database: okmis_cti: /home/okmis/mis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:43 2020
+DBNAME=okmis_cti
+cmd=/home/okmis/mis/src/sbin/work/GetCountyIssue DBNAME=okmis_elf\&fix=yes
+  database: okmis_cti: /home/okmis/mis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:43 2020
+
+  database: okmis_elf: /home/okmis/mis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:43 2020
+DBNAME=okmis_elf
+cmd=/home/okmis/mis/src/sbin/work/GetCountyIssue DBNAME=okmis_fho\&fix=yes
+  database: okmis_elf: /home/okmis/mis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:43 2020
+
+  database: okmis_fho: /home/okmis/mis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:43 2020
+DBNAME=okmis_fho
+cmd=/home/okmis/mis/src/sbin/work/GetCountyIssue DBNAME=okmis_foh\&fix=yes
+  database: okmis_fho: /home/okmis/mis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:44 2020
+
+  database: okmis_foh: /home/okmis/mis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:44 2020
+DBNAME=okmis_foh
+cmd=/home/okmis/mis/src/sbin/work/GetCountyIssue DBNAME=okmis_gcs\&fix=yes
+  database: okmis_foh: /home/okmis/mis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:44 2020
+
+  database: okmis_gcs: /home/okmis/mis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:44 2020
+DBNAME=okmis_gcs
+cmd=/home/okmis/mis/src/sbin/work/GetCountyIssue DBNAME=okmis_gpr\&fix=yes
+  database: okmis_gcs: /home/okmis/mis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:44 2020
+
+  database: okmis_gpr: /home/okmis/mis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:44 2020
+DBNAME=okmis_gpr
+cmd=/home/okmis/mis/src/sbin/work/GetCountyIssue DBNAME=okmis_ibf\&fix=yes
+  database: okmis_gpr: /home/okmis/mis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:44 2020
+
+  database: okmis_ibf: /home/okmis/mis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:44 2020
+DBNAME=okmis_ibf
+cmd=/home/okmis/mis/src/sbin/work/GetCountyIssue DBNAME=okmis_ipi\&fix=yes
+  database: okmis_ibf: /home/okmis/mis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:44 2020
+
+  database: okmis_ipi: /home/okmis/mis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:44 2020
+DBNAME=okmis_ipi
+cmd=/home/okmis/mis/src/sbin/work/GetCountyIssue DBNAME=okmis_lbhp\&fix=yes
+  database: okmis_ipi: /home/okmis/mis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:45 2020
+
+  database: okmis_lbhp: /home/okmis/mis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:45 2020
+DBNAME=okmis_lbhp
+cmd=/home/okmis/mis/src/sbin/work/GetCountyIssue DBNAME=okmis_lkt\&fix=yes
+  database: okmis_lbhp: /home/okmis/mis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:45 2020
+
+  database: okmis_lkt: /home/okmis/mis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:45 2020
+DBNAME=okmis_lkt
+cmd=/home/okmis/mis/src/sbin/work/GetCountyIssue DBNAME=okmis_mms\&fix=yes
+  database: okmis_lkt: /home/okmis/mis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:45 2020
+
+  database: okmis_mms: /home/okmis/mis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:45 2020
+DBNAME=okmis_mms
+--63967,Sarah,Everett,Stephens County
+cmd=/home/okmis/mis/src/sbin/work/GetCountyIssue DBNAME=okmis_oays\&fix=yes
+  database: okmis_mms: /home/okmis/mis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:45 2020
+
+  database: okmis_oays: /home/okmis/mis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:45 2020
+DBNAME=okmis_oays
+cmd=/home/okmis/mis/src/sbin/work/GetCountyIssue DBNAME=okmis_opa\&fix=yes
+  database: okmis_oays: /home/okmis/mis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:46 2020
+
+  database: okmis_opa: /home/okmis/mis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:46 2020
+DBNAME=okmis_opa
+cmd=/home/okmis/mis/src/sbin/work/GetCountyIssue DBNAME=okmis_pcd\&fix=yes
+  database: okmis_opa: /home/okmis/mis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:46 2020
+
+  database: okmis_pcd: /home/okmis/mis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:46 2020
+DBNAME=okmis_pcd
+cmd=/home/okmis/mis/src/sbin/work/GetCountyIssue DBNAME=okmis_scs\&fix=yes
+  database: okmis_pcd: /home/okmis/mis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:46 2020
+
+  database: okmis_scs: /home/okmis/mis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:46 2020
+DBNAME=okmis_scs
+cmd=/home/okmis/mis/src/sbin/work/GetCountyIssue DBNAME=okmis_tccp\&fix=yes
+  database: okmis_scs: /home/okmis/mis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:46 2020
+
+  database: okmis_tccp: /home/okmis/mis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:46 2020
+DBNAME=okmis_tccp
+cmd=/home/okmis/mis/src/sbin/work/GetCountyIssue DBNAME=okmis_tsi\&fix=yes
+  database: okmis_tccp: /home/okmis/mis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:46 2020
+
+  database: okmis_tsi: /home/okmis/mis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:46 2020
+DBNAME=okmis_tsi
+  database: okmis_tsi: /home/okmis/mis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:47 2020
+
+======================================
+Completed: Wed Jun  3 14:11:47 2020
+

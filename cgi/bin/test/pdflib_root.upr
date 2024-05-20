@@ -1,0 +1,165 @@
+SearchPath
+/usr/local/PDFlib
+/usr/local/PDFlib/PDFlib
+/usr/local/PDFlib/PDFlib/9.2
+/usr/local/PDFlib/PDFlib/9.2/resource/cmap
+/usr/local/PDFlib/PDFlib/9.2/resource/codelist
+/usr/local/PDFlib/PDFlib/9.2/resource/fonts
+/usr/local/PDFlib/PDFlib/9.2/resource/glyphlst
+/usr/local/PDFlib/PDFlib/9.2/resource/icc
+/root/PDFlib
+/root/PDFlib/PDFlib
+/root/PDFlib/PDFlib/9.2
+/root/PDFlib/PDFlib/9.2/resource/cmap
+/root/PDFlib/PDFlib/9.2/resource/codelist
+/root/PDFlib/PDFlib/9.2/resource/fonts
+/root/PDFlib/PDFlib/9.2/resource/glyphlst
+/root/PDFlib/PDFlib/9.2/resource/icc
+/tmp/test/data
+/usr/share/fonts/msttcore
+.
+
+FontOutline
+Andale Mono=/usr/share/fonts/msttcore/andalemo.ttf
+Arial=/usr/share/fonts/msttcore/arial.ttf
+Arial Black=/usr/share/fonts/msttcore/ariblk.ttf
+Arial,Bold=/usr/share/fonts/msttcore/arialbd.ttf
+Arial,Bold,Italic=/usr/share/fonts/msttcore/arialbi.ttf
+Arial,Italic=/usr/share/fonts/msttcore/ariali.ttf
+Calibri=/usr/share/fonts/msttcore/calibri.ttf
+Calibri,Bold=/usr/share/fonts/msttcore/calibrib.ttf
+Calibri,Bold,Italic=/usr/share/fonts/msttcore/calibriz.ttf
+Calibri,Italic=/usr/share/fonts/msttcore/calibrii.ttf
+Cambria,Bold=/usr/share/fonts/msttcore/cambriab.ttf
+Cambria,Bold,Italic=/usr/share/fonts/msttcore/cambriaz.ttf
+Cambria,Italic=/usr/share/fonts/msttcore/cambriai.ttf
+Candara=/usr/share/fonts/msttcore/candara.ttf
+Candara,Bold=/usr/share/fonts/msttcore/candarab.ttf
+Candara,Bold,Italic=/usr/share/fonts/msttcore/candaraz.ttf
+Candara,Italic=/usr/share/fonts/msttcore/candarai.ttf
+Comic Sans MS=/usr/share/fonts/msttcore/comic.ttf
+Comic Sans MS,Bold=/usr/share/fonts/msttcore/comicbd.ttf
+Consolas=/usr/share/fonts/msttcore/consola.ttf
+Consolas,Bold=/usr/share/fonts/msttcore/consolab.ttf
+Consolas,Bold,Italic=/usr/share/fonts/msttcore/consolaz.ttf
+Consolas,Italic=/usr/share/fonts/msttcore/consolai.ttf
+Constantia=/usr/share/fonts/msttcore/constan.ttf
+Constantia,Bold=/usr/share/fonts/msttcore/constanb.ttf
+Constantia,Bold,Italic=/usr/share/fonts/msttcore/constanz.ttf
+Constantia,Italic=/usr/share/fonts/msttcore/constani.ttf
+Corbel=/usr/share/fonts/msttcore/corbel.ttf
+Corbel,Bold=/usr/share/fonts/msttcore/corbelb.ttf
+Corbel,Bold,Italic=/usr/share/fonts/msttcore/corbelz.ttf
+Corbel,Italic=/usr/share/fonts/msttcore/corbeli.ttf
+Courier New=/usr/share/fonts/msttcore/cour.ttf
+Courier New,Bold=/usr/share/fonts/msttcore/courbd.ttf
+Courier New,Bold,Italic=/usr/share/fonts/msttcore/courbi.ttf
+Courier New,Italic=/usr/share/fonts/msttcore/couri.ttf
+Georgia=/usr/share/fonts/msttcore/georgia.ttf
+Georgia,Bold=/usr/share/fonts/msttcore/georgiab.ttf
+Georgia,Bold,Italic=/usr/share/fonts/msttcore/georgiaz.ttf
+Georgia,Italic=/usr/share/fonts/msttcore/georgiai.ttf
+Impact=/usr/share/fonts/msttcore/impact.ttf
+Noto Serif=/tmp/test/data/NotoSerif-Regular.ttf
+Tahoma=/usr/share/fonts/msttcore/tahoma.ttf
+Times New Roman=/usr/share/fonts/msttcore/times.ttf
+Times New Roman,Bold=/usr/share/fonts/msttcore/timesbd.ttf
+Times New Roman,Bold,Italic=/usr/share/fonts/msttcore/timesbi.ttf
+Times New Roman,Italic=/usr/share/fonts/msttcore/timesi.ttf
+Trebuchet MS=/usr/share/fonts/msttcore/trebuc.ttf
+Trebuchet MS,Bold=/usr/share/fonts/msttcore/trebucbd.ttf
+Trebuchet MS,Bold,Italic=/usr/share/fonts/msttcore/trebucbi.ttf
+Trebuchet MS,Italic=/usr/share/fonts/msttcore/trebucit.ttf
+Verdana=/usr/share/fonts/msttcore/verdana.ttf
+Verdana,Bold=/usr/share/fonts/msttcore/verdanab.ttf
+Verdana,Bold,Italic=/usr/share/fonts/msttcore/verdanaz.ttf
+Verdana,Italic=/usr/share/fonts/msttcore/verdanai.ttf
+Webdings=/usr/share/fonts/msttcore/webdings.ttf
+.
+
+FontnameAlias
+AndaleMono=Andale Mono
+Arial Bold=Arial,Bold
+Arial Bold Italic=Arial,Bold,Italic
+Arial Italic=Arial,Italic
+Arial-Black=Arial Black
+Arial-BoldItalicMT=Arial,Bold,Italic
+Arial-BoldMT=Arial,Bold
+Arial-ItalicMT=Arial,Italic
+ArialMT=Arial
+Calibri Bold=Calibri,Bold
+Calibri Bold Italic=Calibri,Bold,Italic
+Calibri Italic=Calibri,Italic
+Calibri-Bold=Calibri,Bold
+Calibri-BoldItalic=Calibri,Bold,Italic
+Calibri-Italic=Calibri,Italic
+Cambria Bold=Cambria,Bold
+Cambria Bold Italic=Cambria,Bold,Italic
+Cambria Italic=Cambria,Italic
+Cambria-Bold=Cambria,Bold
+Cambria-BoldItalic=Cambria,Bold,Italic
+Cambria-Italic=Cambria,Italic
+Candara Bold=Candara,Bold
+Candara Bold Italic=Candara,Bold,Italic
+Candara Italic=Candara,Italic
+Candara-Bold=Candara,Bold
+Candara-BoldItalic=Candara,Bold,Italic
+Candara-Italic=Candara,Italic
+Comic Sans MS Bold=Comic Sans MS,Bold
+ComicSansMS=Comic Sans MS
+ComicSansMS-Bold=Comic Sans MS,Bold
+Consolas Bold=Consolas,Bold
+Consolas Bold Italic=Consolas,Bold,Italic
+Consolas Italic=Consolas,Italic
+Consolas-Bold=Consolas,Bold
+Consolas-BoldItalic=Consolas,Bold,Italic
+Consolas-Italic=Consolas,Italic
+Constantia Bold=Constantia,Bold
+Constantia Bold Italic=Constantia,Bold,Italic
+Constantia Italic=Constantia,Italic
+Constantia-Bold=Constantia,Bold
+Constantia-BoldItalic=Constantia,Bold,Italic
+Constantia-Italic=Constantia,Italic
+Corbel Bold=Corbel,Bold
+Corbel Bold Italic=Corbel,Bold,Italic
+Corbel Italic=Corbel,Italic
+Corbel-Bold=Corbel,Bold
+Corbel-BoldItalic=Corbel,Bold,Italic
+Corbel-Italic=Corbel,Italic
+Courier New Bold=Courier New,Bold
+Courier New Bold Italic=Courier New,Bold,Italic
+Courier New Italic=Courier New,Italic
+CourierNewPS-BoldItalicMT=Courier New,Bold,Italic
+CourierNewPS-BoldMT=Courier New,Bold
+CourierNewPS-ItalicMT=Courier New,Italic
+CourierNewPSMT=Courier New
+Georgia Bold=Georgia,Bold
+Georgia Bold Italic=Georgia,Bold,Italic
+Georgia Italic=Georgia,Italic
+Georgia-Bold=Georgia,Bold
+Georgia-BoldItalic=Georgia,Bold,Italic
+Georgia-Italic=Georgia,Italic
+Noto Serif Regular=Noto Serif
+NotoSerif-Regular=Noto Serif
+Times New Roman Bold=Times New Roman,Bold
+Times New Roman Bold Italic=Times New Roman,Bold,Italic
+Times New Roman Italic=Times New Roman,Italic
+TimesNewRomanPS-BoldItalicMT=Times New Roman,Bold,Italic
+TimesNewRomanPS-BoldMT=Times New Roman,Bold
+TimesNewRomanPS-ItalicMT=Times New Roman,Italic
+TimesNewRomanPSMT=Times New Roman
+Trebuchet MS Bold=Trebuchet MS,Bold
+Trebuchet MS Bold Italic=Trebuchet MS,Bold,Italic
+Trebuchet MS Italic=Trebuchet MS,Italic
+Trebuchet-BoldItalic=Trebuchet MS,Bold,Italic
+TrebuchetMS=Trebuchet MS
+TrebuchetMS-Bold=Trebuchet MS,Bold
+TrebuchetMS-Italic=Trebuchet MS,Italic
+Verdana Bold=Verdana,Bold
+Verdana Bold Italic=Verdana,Bold,Italic
+Verdana Italic=Verdana,Italic
+Verdana-Bold=Verdana,Bold
+Verdana-BoldItalic=Verdana,Bold,Italic
+Verdana-Italic=Verdana,Italic
+.
+

@@ -1,0 +1,28 @@
+#!/bin/bash
+#--------------------
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   echo -e "\nServices not installed!"
+   exit 1
+fi
+LogFile=${LOGDIR}/${CMD}
+#--------------------
+TmpFile=/tmp/$$
+DB=$1
+ProvID=$2
+#-------------------------
+Usage()
+{
+   echo $1
+   echo
+   echo "Usage: ${CMD} database statement"
+   echo
+   exit
+}
+#-------------------------
+if [ -z "${ProvID}" ]; then Usage "No ProvID!"; fi
+if [ ! -d ${DBDIR}/${DB} ]; then Usage "Invalid database!"; fi
+  echo "select Provider.ProvID, Provider.LName, Provider.FName, Provider.Name, Provider.Type, Provider.SSN, Provider.Email, Provider.WkPh, Provider.MobPh, Provider.Active, Provider.CreateDate, Provider.CreateProvID, Provider.ChangeDate, Provider.ChangeProvID from Provider where ProvID=$ProvID order by LName;" > ${TmpFile}.in
+  ${DBCMD} ${DB} < ${TmpFile}.in
+  rm ${TmpFile}.in

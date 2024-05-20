@@ -1,0 +1,29 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use myForm;
+use myDBI;
+############################################################################
+# TEST THIS FIRST
+my $form = myForm->new('DBNAME=okmis_dev');
+my $table = 'ClientGDSL';    # cannot input from cmd line with DBNAME call
+
+my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $cdbh = myDBI->dbconnect('okmis_config');
+#foreach my $f ( sort keys %{$form} ) { warn "form-$f=$form->{$f}\n"; }
+##
+my $seq = 0;
+#my $s=$cdbh->prepare("select * from misTables where theTable='ClientODAS' order by Seq");
+my $uxTables=$cdbh->prepare("update xTableFields set theSeq=? where ID=?");
+my $sxTables = $cdbh->prepare("select xTables.theTable,xTableFields.* from xTables left join xTableFields on xTableFields.TableID=xTables.ID where xTables.theTable=? order by theSeq");
+$sxTables->execute($table);
+while ( my $rxTables = $sxTables->fetchrow_hashref )
+{
+  print qq|$rxTables->{'ID'}\t${seq}\t$rxTables->{theField}\n|;
+###  print qq| update: ${seq}:$rxTables->{theField}: $rxTables->{ID}:$rxTables->{theTable}\n|;
+  $uxTables->execute($seq,$rxTables->{ID}) || $form->dberror("FAILED: $rxTables->{ID}: update");
+  $seq++;
+}
+$uxTables->finish();
+$sxTables->finish();
+############################################################################
+exit;

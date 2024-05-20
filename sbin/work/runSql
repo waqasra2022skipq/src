@@ -1,0 +1,18 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use Accounts;
+use myConfig;
+use Cwd;
+use DBI;
+use DBForm;
+
+my $sqlfile = "/home/okmis/mis/src/sbin/work/AlterTableDL.sql";
+
+my @DBS = scalar(@ARGV) ? @ARGV : Accounts->dbs('live'); 
+
+foreach my $dbname ( @DBS )
+{
+print qq|  set: ${dbname}: |.localtime().qq|\n| if ( $dbname ne 'okmis_mms' );
+
+system("mysql ${dbname} < ${sqlfile}") if ( $dbname ne 'okmis_mms' );
+}

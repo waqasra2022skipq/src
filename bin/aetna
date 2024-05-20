@@ -1,0 +1,9 @@
+set ssl-force yes
+set ssl-protect-data yes
+set ssl-protect-list yes
+open aetnaedi.com
+user 200867860 smitty!00
+ls
+put okpsych_demo.aetna.1.20100415090618.837
+ls
+

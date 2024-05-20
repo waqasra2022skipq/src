@@ -1,0 +1,988 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<?xfa generator="XFA2_0" APIVersion="2.2.4333.0" ?>
+<xdp:xdp xmlns:xdp="http://ns.adobe.com/xdp/" >
+<xfa:datasets xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/" >
+<xfa:data>
+<TopmostSubform>
+
+  <fident>Keysha GomezVelazquez (54178)</fident> 
+  <fstamp>Sat Dec 14 12:40:54 2019</fstamp> 
+  <recordid>23912</recordid> 
+  <companyname>Millennium Community Services, LLC</companyname> 
+  <companyaddr>448 36th Ave NW, Suite 101, </companyaddr> 
+  <companycsz>Norman, OK  73072-4743</companycsz> 
+  <companyphone>Office: 405-627-0276  Fax: 405-573-0404</companyphone> 
+  <companyfax></companyfax> 
+  <assessmenttype></assessmenttype> 
+  <readmission>0</readmission>
+  <IneligibleForSevices></IneligibleForSevices>
+  <primaryReferral_name>Parent</primaryReferral_name>
+  <primaryReferral_date> 04/26/2017</primaryReferral_date>
+  <primaryReferral_contact>N/A</primaryReferral_contact>
+  <primaryReferral_phn></primaryReferral_phn>
+
+  <referringPhysician_name>None</referringPhysician_name>
+  <referringPhysician_type></referringPhysician_type>
+  <referringPhysician_date></referringPhysician_date>
+  <transportedby_name>N/A</transportedby_name>
+  <transportedby_phone></transportedby_phone>
+  <transportedby_address></transportedby_address>
+  <transportedby_city></transportedby_city>
+  <transportedby_county></transportedby_county>
+  <transportedby_state></transportedby_state>
+  <transportedby_zip></transportedby_zip>
+  <referredto_ineligible>0</referredto_ineligible>
+  <referredto_name>None</referredto_name>
+  <referredto_type></referredto_type>
+  <referral_source></referral_source>
+  <referredto_return></referredto_return>
+  <intake_date>05/08/2017</intake_date>
+  <intake_time>17:00</intake_time>
+  <intake_staff>Kyrie Crippen</intake_staff>
+  <client_firstName>Keysha</client_firstName>
+  <client_lastName>GomezVelazquez</client_lastName>
+  <client_mi></client_mi>
+  <client_maiden>N/A</client_maiden>
+  <client_suffix></client_suffix>
+  <client_address>217 S 13th</client_address>
+  <client_city>Enid</client_city>
+  <client_county>Garfield</client_county>
+  <client_state>OK</client_state>
+  <client_zip>73701-1641</client_zip>
+  <client_homephn>580-278-4308</client_homephn>
+  <client_workphn></client_workphn>
+  <client_cellphn>580-278-4308</client_cellphn>
+  <client_carrier>Sprint PCS</client_carrier>
+  <client_email></client_email>
+  <client_ssn>100-69-0422</client_ssn>
+  <client_dob>2013-02-15</client_dob>
+  <client_pob></client_pob>
+  <client_order></client_order>
+  <client_maritalStatus></client_maritalStatus>
+  <client_height_ft>4</client_height_ft>
+  <client_height_in>0.0</client_height_in>
+  <client_weight>76.2</client_weight>
+  <client_eyes></client_eyes>
+  <client_hair></client_hair>
+  <clientGender_male>Female</clientGender_male>
+  <clientGender_female>Female</clientGender_female>
+  <clientGender_unknown>Female</clientGender_unknown>
+  <app_mail>0</app_mail>
+  <app_text>0</app_text>
+  <app_voiceMail>0</app_voiceMail>
+  <app_none>0</app_none>
+  <guardian1_lastName>Gomez</guardian1_lastName>
+  <guardian1_firstName>Iris</guardian1_firstName>
+  <guardian1_mi></guardian1_mi>
+  <guardian1_address></guardian1_address>
+  <guardian1_city></guardian1_city>
+  <guardian1_county></guardian1_county>
+  <guardian1_state></guardian1_state>
+  <guardian1_zip></guardian1_zip>
+  <guardian1_homePhn></guardian1_homePhn>
+  <guardian1_workPhn></guardian1_workPhn>
+  <guardian1_cellPhn>580-278-4308</guardian1_cellPhn>
+  <guardian1_carrier>Sprint PCS</guardian1_carrier>
+  <guardian1_relationship>mother</guardian1_relationship>
+  <guardian1_email></guardian1_email>
+  <guardian1_legal>1</guardian1_legal>
+  <guardian1_contact>1</guardian1_contact>
+  <guardian1_specialinstructions></guardian1_specialinstructions>
+
+  <hci_name>O&#x27;QUIN, MICHAEL</hci_name> 
+  <hci_address>3201 N VAN BUREN ST, SUITE 300, ENID, OK, 73703-1812</hci_address> 
+  <hci_phone>580-234-7070</hci_phone>
+  <hci_type>Primary Care Physician</hci_type>
+  <hci_name>ST. MARY&#x27;S REGIONAL MEDICAL CENTER</hci_name> 
+  <hci_address>305 S 5TH ST, ENID, OK, 73701-5832</hci_address> 
+  <hci_phone>580-249-3622</hci_phone>
+  <hci_type>Designated Hospital</hci_type>
+  <hci_name>WALGREEN CO</hci_name> 
+  <hci_address>929 W OWEN K GARRIOTT RD, ENID, OK, 73701-5439</hci_address> 
+  <hci_phone>580-237-3151</hci_phone>
+  <hci_type>Designated Pharmacy</hci_type>
+  <hci_name>None</hci_name>
+  <hci_type>Designated Dentist</hci_type>
+  <hci_name>None</hci_name>
+  <hci_type>Designated Vision</hci_type>
+  <hci_name>None</hci_name>
+  <hci_type>Designated Hearing</hci_type>
+  <hci_vaultEmail></hci_vaultEmail>
+  <primaryInsurance_name>Medicaid</primaryInsurance_name>
+  <primaryInsurance_copay>0.00</primaryInsurance_copay>
+  <primaryInsurance_deductible>0.00</primaryInsurance_deductible>
+  <primaryInsurance_pholder></primaryInsurance_pholder>
+  <primaryInsurance_pnumber>B19326839</primaryInsurance_pnumber>
+  <primaryInsurance_paphn></primaryInsurance_paphn>  <secondaryInsurance_name>Health Home</secondaryInsurance_name>
+  <secondaryInsurance_copay>0.00</secondaryInsurance_copay>
+  <secondaryInsurance_deductible>0.00</secondaryInsurance_deductible>
+  <secondaryInsurance_pholder></secondaryInsurance_pholder>
+  <secondaryInsurance_pnumber>B19326839</secondaryInsurance_pnumber>
+  <secondaryInsurance_paphn></secondaryInsurance_paphn>
+  <pp_Problem1>Emotional Maladjustment/Disturbance Anxiety/Panic</pp_Problem1>
+  <pp_Problem2>Behavioral Disturbance Attention Deficit/Hyperactivity Disorder</pp_Problem2>
+  <pp_Problem3></pp_Problem3>
+  <overAllHealthStatus>General health good</overAllHealthStatus>
+
+  <presentingProblem>Client is a 4-year-old Hispanic female who presents with anxiety and hyperactivity. Mother is bringing her in because clt is not listening, back talking, doesn&#x27;t get along with peers, and struggles to get along with her older brother. Client was in OP services for approximately 2 months in the summer of 2016. Clt does not have a history of IP and suicidal ideation is denied. </presentingProblem>
+  <attemptedSolution>Psychological Therapy; Family Therapy June-August 2016 Associated Therapeutic Services</attemptedSolution>
+
+  <hospNum>0</hospNum>
+  <hospReason>none reported</hospReason>
+  <cha_dateCompleted>05/08/2017</cha_dateCompleted>
+  <chaR2_sneez>Yes</chaR2_sneez>
+  <chaR2_bronchitis>No</chaR2_bronchitis>
+  <chaR3_allergy>No</chaR3_allergy>
+  <chaR3_cough>No</chaR3_cough>
+  <chaR4_asthma>No</chaR4_asthma>
+  <chaR4_breath>No</chaR4_breath>
+  <chaR6_cough>No</chaR6_cough>
+  <chaR6_TB>No</chaR6_TB>
+  <chaR7_TB>No</chaR7_TB>
+  <chaR7_lungCancer>No</chaR7_lungCancer>
+  <chaR8_smoker>No</chaR8_smoker>
+  <chaR8_tobacco>No</chaR8_tobacco>
+  <chaR9_smoker></chaR9_smoker>
+
+  <chaR11_hiBlood>No</chaR11_hiBlood>
+  <chaR11_coronary>No</chaR11_coronary>
+  <chaR12_bloodPressure>No</chaR12_bloodPressure>
+  <chaR12_cholesterol>No</chaR12_cholesterol>
+  <chaR14_pain>No</chaR14_pain>
+  <chaR14_nocturnal>No</chaR14_nocturnal>
+  <chaR15_nitroglycerin>No</chaR15_nitroglycerin>
+  <charR15_legPains>No</charR15_legPains>
+  <chaR16_episodes>No</chaR16_episodes>
+  <chaR16_varicose>No</chaR16_varicose>
+  <chaR17_other>No</chaR17_other>
+  <chaR17_skin>No</chaR17_skin>
+  <chaR19_abdominal>No</chaR19_abdominal>
+  <chaR19_constipation>No</chaR19_constipation>
+  <chaR20_indigestion>No</chaR20_indigestion>
+  <chaR20_diarrhea>Yes</chaR20_diarrhea>
+  <chaR22_bowel>No</chaR22_bowel>
+  <chaR22_vegetarian>No</chaR22_vegetarian>
+  <chaR24_ulcer>No</chaR24_ulcer>
+  <chaR24_gallstone>No</chaR24_gallstone>
+  <chaR25_vomitted>No</chaR25_vomitted>
+  <chaR25_yellow>No</chaR25_yellow>
+  <chaR26_blackTarLike>No</chaR26_blackTarLike>
+  <charR26_changeWt>No</charR26_changeWt>
+  <chaR28_headaches>Yes</chaR28_headaches>
+  <chaR28_dizzines>No</chaR28_dizzines>
+  <chaR30_seizure>No</chaR30_seizure>
+  <charR30_stroke>No</charR30_stroke>
+  <chaR31_fainted>No</chaR31_fainted>
+  <chaR31_speak>No</chaR31_speak>
+  <chaR32_paralysis>No</chaR32_paralysis>
+  <chaR34_backPain>No</chaR34_backPain>
+  <chaR34_pain>No</chaR34_pain>
+  <chaR36_brokenBones>No</chaR36_brokenBones>
+  <chaR36_beingIll>No</chaR36_beingIll>
+  <chaR37_troubled>No</chaR37_troubled>
+  <chaR37_panicked>No</chaR37_panicked>
+  <chaR38_troubled>No</chaR38_troubled>
+  <chaR40_urinaryTract>No</chaR40_urinaryTract>
+  <chaR40_urineBlood>No</chaR40_urineBlood>
+  <chaR41_urineControl>No</chaR41_urineControl>
+  <chaR41_urineFlow>No</chaR41_urineFlow>
+  <chaR42_burningUrine>No</chaR42_burningUrine>
+  <chaR42_nightUrine>No</chaR42_nightUrine>
+  <chaR45_bleeding>No</chaR45_bleeding>
+  <chaR45_breastExam>No</chaR45_breastExam>
+  <chaR46_menopouse>No</chaR46_menopouse>
+  <chaR46_mammogram>UNKNOWN</chaR46_mammogram>
+  <chaR47_lumpBreast>No</chaR47_lumpBreast>
+  <chaR43_discharge>No</chaR43_discharge>
+  <chaR49_vd>No</chaR49_vd>
+  <chaR49_thyroid>No</chaR49_thyroid>
+  <chaR50_diabetes>No</chaR50_diabetes>
+  <chaR50_cancer>No</chaR50_cancer>
+  <chaR51_medDiabetes>No</chaR51_medDiabetes>
+  <chaR53_radiation>No</chaR53_radiation>
+  <chaR53_tiredness>No</chaR53_tiredness>
+  <chaR54_refusing>No</chaR54_refusing>
+  <chaR54_crying>No</chaR54_crying>
+  <chaR55_asleep>Yes</chaR55_asleep>
+  <chaR55_depression>No</chaR55_depression>
+  <chaR56_hallucinations>No</chaR56_hallucinations>
+  <chaR56_nervous>No</chaR56_nervous>
+  <chaR58_drink>No</chaR58_drink>
+  <chaR58_drugs>No</chaR58_drugs>
+  <chaR60_raped>No</chaR60_raped>
+  <chaR62_sexuallyActive>No</chaR62_sexuallyActive>
+  <chaR62_aids>No</chaR62_aids>
+  <chaR63_sexLife>No</chaR63_sexLife>
+  <chaR65_visitDoc></chaR65_visitDoc>
+
+  <chaR65_married>No</chaR65_married>
+  <chaR65_marriedNum>0</chaR65_marriedNum>
+
+  <chaR66_school>0</chaR66_school>
+
+  <chaR68_marriage>No</chaR68_marriage>
+  <chaR68_family>No</chaR68_family>
+  <chaR69_drugUsage>No</chaR69_drugUsage>
+  <chaR69_job>No</chaR69_job>
+  <chaR70_finMatters>No</chaR70_finMatters>
+  <chaR71_coronary>No</chaR71_coronary>
+  <chaR71_approxYear>UNKNOWN</chaR71_approxYear>
+  <chaR72_transfusion>No</chaR72_transfusion>
+  <chaR73_immunizations>No</chaR73_immunizations>
+  <chaR74_retired>No</chaR74_retired>
+  <chaR75_died>No</chaR75_died>
+  <chaR76_disease>No</chaR76_disease>
+  <chaR77_illness>No</chaR77_illness>
+  <chaR78_parent>No</chaR78_parent>
+  <chaR79_twin>No</chaR79_twin>
+  <chaR80_healthState>Yes</chaR80_healthState>
+  <chaR81_seatBelt>No</chaR81_seatBelt>
+  <chaR82_stressLevel></chaR82_stressLevel>
+  <chaR83_painScale>unknown</chaR83_painScale>
+
+  <pR1_pregnant>0</pR1_pregnant>
+  <pR1_estDOB></pR1_estDOB>
+  <pR1_prenatal>No</pR1_prenatal>
+  <pR2_decCondition></pR2_decCondition>
+  <shR1_refuse>0</shR1_refuse>
+  <shR2_ageDating>not yet</shR2_ageDating>
+  <shR2_notDating>1</shR2_notDating>
+  <shR2_sexActivity>not yet</shR2_sexActivity>
+  <shR3_sexOrientation>Straight or heterosexual</shR3_sexOrientation>
+
+  <shR4_genderID>Female</shR4_genderID>
+
+  <shR5_sexActive>No</shR5_sexActive>
+  <shR6_std>No</shR6_std>
+  <shR7_stdYes></shR7_stdYes>
+
+  <shR8_sexProblem>No</shR8_sexProblem>
+  <shR9_sexProbDesc></shR9_sexProbDesc>
+  <shR10_chemical>No</shR10_chemical>
+  <shR11_tradedSex>No</shR11_tradedSex>
+  <shR12_guilty>No</shR12_guilty>
+  <allergiesAlert>No Known Allergies</allergiesAlert>
+
+  <aae_allergen>None</aae_allergen>
+
+  <immunization_current>No</immunization_current>
+  <immunization_lacking></immunization_lacking>
+  <hearing_screenDate>Unknown date</hearing_screenDate>
+  <hearing_result>UNKNOWN</hearing_result>
+  <vision_screenDate>Unknown date</vision_screenDate>
+  <vision_result>UNKNOWN</vision_result>
+  <cm_physician>None</cm_physician>
+
+    <developmental_factor>UNKNOWN</developmental_factor>
+  <developmental_prenatal>Normal</developmental_prenatal>
+
+  <developmental_perinatal>Normal / Full term; Epidural Anesthesia; Breast Fed</developmental_perinatal>
+
+  <developmental_postnatal>Known; Alert; Extremely Active; Often Sleeps with Parent; Difficult to Comfort; Sociable; Wants to be Held Freq.; Happy; Playful; Poor Appetite; Wanders from Table; Dislikes Certain Food Textures; Ear Infections</developmental_postnatal>
+
+  <toilet_problem>Bowel</toilet_problem>
+  <toilet_severity></toilet_severity>
+  <toilet_ageAchive>daytime: 3 </toilet_ageAchive>
+    <emergencyRoom>Yes</emergencyRoom>
+  <er_reason></er_reason>
+  <mm_unknown>No</mm_unknown>
+  <mm_sitAlone>Yes</mm_sitAlone>
+  <mm_crawl>Yes</mm_crawl>
+  <mm_walkWell>Yes</mm_walkWell>
+  <mm_goDown>Yes</mm_goDown>
+  <mm_rideTricycle>Yes</mm_rideTricycle>
+  <mm_rideBicycle>No</mm_rideBicycle>
+  <gfm_ridingToy>No</gfm_ridingToy>
+  <gfm_pumpingSelf>Yes</gfm_pumpingSelf>
+  <gfm_learning>No</gfm_learning>
+  <gfm_coloring>No</gfm_coloring>
+  <gfm_puzzles>No</gfm_puzzles>
+  <gfm_playing>No</gfm_playing>
+  <gfm_scissors>No</gfm_scissors>
+  <gfm_weaker>No</gfm_weaker>
+  <gfm_stiff>No</gfm_stiff>
+  <gfm_motorTask>No</gfm_motorTask>
+  <gfm_catching>No</gfm_catching>
+  <gfm_kicking>No</gfm_kicking>
+  <gfm_swim>No</gfm_swim>
+  <shs_useSpoon>No</shs_useSpoon>
+  <shs_cuttingKnife>No</shs_cuttingKnife>
+  <shs_dressingSelf>No</shs_dressingSelf>
+  <shs_clothFastener>No</shs_clothFastener>
+  <shs_tyingShoes>Yes</shs_tyingShoes>
+  <shs_brushTeeth>Sometimes</shs_brushTeeth>
+  <shs_simpleSandwich>Yes</shs_simpleSandwich>
+  <shs_chores>No</shs_chores>
+  <shs_makingBed>Sometimes</shs_makingBed>
+  <shs_bath>No</shs_bath>
+  <shs_washHair>Sometimes</shs_washHair>
+  <mb_carSick>No</mb_carSick>
+  <mb_nausea>No</mb_nausea>
+  <mb_warnNausea>No</mb_warnNausea>
+  <mb_twirling>No</mb_twirling>
+  <mb_seeksQty></mb_seeksQty>
+  <mb_climbPlay></mb_climbPlay>
+  <mb_learnClimb></mb_learnClimb>
+  <mb_dislikeLift></mb_dislikeLift>
+  <placedStomach></placedStomach>
+  <mb_rockSelf></mb_rockSelf>
+  <mb_crawling></mb_crawling>
+  <mb_walkOnToes></mb_walkOnToes>
+  <mb_goMoving></mb_goMoving>
+  <mb_tripsFall></mb_tripsFall>
+  <tch_unaware></tch_unaware>
+  <tch_hurtPain></tch_hurtPain>
+  <tch_sensitive></tch_sensitive>
+  <tch_ticklish></tch_ticklish>
+  <tch_dislikeCloth></tch_dislikeCloth>
+  <tch_resistsWearing></tch_resistsWearing>
+  <tch_transition></tch_transition>
+  <tch_examObject></tch_examObject>
+  <tch_dislikeCuddle></tch_dislikeCuddle>
+  <tch_avoidMessy></tch_avoidMessy>
+  <tch_unawareMessy></tch_unawareMessy>
+  <tch_dislikeCutting></tch_dislikeCutting>
+  <tch_dislikeBath></tch_dislikeBath>
+  <tch_sensitiveWater></tch_sensitiveWater>
+  <tch_dislikeToe></tch_dislikeToe>
+  <tch_pinches></tch_pinches>
+  <tch_bangsHead></tch_bangsHead>
+  <tch_crawlFisted></tch_crawlFisted>
+  <tch_slightBumps></tch_slightBumps>
+  <tch_touchThing></tch_touchThing>
+  <tch_pushBites></tch_pushBites>
+  <al_earInfection></al_earInfection>
+  <al_distracted></al_distracted>
+  <tch_oftenFails></tch_oftenFails>
+  <tch_overSensitive></tch_overSensitive>
+  <tch_freqCover></tch_freqCover>
+  <tch_afraidNoise></tch_afraidNoise>
+  <tch_enjoysEcho></tch_enjoysEcho>
+  <tch_delayedSpeech></tch_delayedSpeech>
+  <tch_understand></tch_understand>
+  <tch_stammers></tch_stammers>
+  <tch_speaksInc></tch_speaksInc>
+  <tch_confusedLoc></tch_confusedLoc>
+  <tch_attnProximity></tch_attnProximity>
+  <tch_notUnderstand></tch_notUnderstand>
+  <tch_talks></tch_talks>
+  <tch_hearingLoss></tch_hearingLoss>
+  <emt_notAccept></emt_notAccept>
+  <emt_easilyFrustrate></emt_easilyFrustrate>
+  <emt_aptImpulsive></emt_aptImpulsive>
+  <emt_moodVar></emt_moodVar>
+  <emt_withdrawGrps></emt_withdrawGrps>
+  <emt_hardWay></emt_hardWay>
+  <emt_changeAct></emt_changeAct>
+  <emt_freqBreakToys></emt_freqBreakToys>
+  <emt_impatient></emt_impatient>
+  <emt_cantTolerate></emt_cantTolerate>
+  <emt_hums></emt_hums>
+  <emt_doesntFinish></emt_doesntFinish>
+  <emt_settleDown></emt_settleDown>
+  <emt_insistToys></emt_insistToys>
+  <emt_disorganized></emt_disorganized>
+  <emt_unableOrder></emt_unableOrder>
+  <emt_boardGame></emt_boardGame>
+  <emt_notThinking></emt_notThinking>
+  <emt_cantPlay></emt_cantPlay>
+  <emt_alwaysGo></emt_alwaysGo>
+  <emt_runs></emt_runs>
+  <emt_fidgets></emt_fidgets>
+  <emt_cantKeep></emt_cantKeep>
+  <emt_diffVisit></emt_diffVisit>
+  <emt_risistsChange></emt_risistsChange>
+  <emt_diffBabysit></emt_diffBabysit>
+  <emt_cautious></emt_cautious>
+  <emt_cries></emt_cries>
+  <emt_forgetSocial></emt_forgetSocial>
+  <emt_cantTolerate></emt_cantTolerate>
+  <emt_needCalm></emt_needCalm>
+  <emt_sloppy></emt_sloppy>
+  <emt_ignoreSocial></emt_ignoreSocial>
+  <emt_noGuilt></emt_noGuilt>
+  <emt_ruleApply></emt_ruleApply>
+  <emt_doesntLearn></emt_doesntLearn>
+  <emt_cantTell></emt_cantTell>
+  <emt_excuse></emt_excuse>
+  <emt_complain></emt_complain>
+  <emt_poorImage></emt_poorImage>
+  <emt_overConcern></emt_overConcern>
+  <emt_irritable></emt_irritable>
+  <emt_shortFuse></emt_shortFuse>
+  <emt_hasHurt></emt_hasHurt>
+  <emt_insensitive></emt_insensitive>
+  <emt_resistAuth></emt_resistAuth>
+  <emt_defiant></emt_defiant>
+  <emt_doesOpp></emt_doesOpp>
+  <emt_untruths></emt_untruths>
+  <emt_picksSmall></emt_picksSmall>
+  <emt_cantTrust></emt_cantTrust>
+  <emt_wantFriend></emt_wantFriend>
+  <emt_fewFriends></emt_fewFriends>
+  <emt_noFriend></emt_noFriend>
+  <emt_playOlder></emt_playOlder>
+  <emt_playAdult></emt_playAdult>
+  <emt_playYounger></emt_playYounger>
+  <emt_physRough></emt_physRough>
+  <emt_excessBossy></emt_excessBossy>
+  <emt_getFight></emt_getFight>
+  <emt_submissive></emt_submissive>
+  <emt_leader></emt_leader>
+  <emt_resistShare></emt_resistShare>
+  <emt_assumeRole></emt_assumeRole>
+  <emt_depress></emt_depress>
+  <aa_scissors></aa_scissors>
+  <aa_handWork></aa_handWork>
+  <emt_recLetter></emt_recLetter>
+  <emt_recNum></emt_recNum>
+  <emt_drawing></emt_drawing>
+  <emt_write></emt_write>
+  <emt_learnCnt></emt_learnCnt>
+  <emt_regClock></emt_regClock>
+  <handicap1>1) NONE</handicap1>
+  <handicap2>2) NONE</handicap2>
+  <handicap3>3) NONE</handicap3>
+  <handicap4>4) NONE</handicap4>
+  <clientAdjustment>Client has no disabilities or disorders</clientAdjustment>
+  <mhh_dateCompleted></mhh_dateCompleted>
+  <mhh_yn1></mhh_yn1>
+  <mhh_yn2></mhh_yn2>
+  <mhh_yn3></mhh_yn3>
+  <mhh_yn4></mhh_yn4>
+  <mhh_yn5></mhh_yn5>
+  <mhh_yn6a></mhh_yn6a>
+  <mhh_yn6b></mhh_yn6b>
+  <mhh_yn7></mhh_yn7>
+  <mhh_yn8></mhh_yn8>
+  <mhh_yn9></mhh_yn9>
+  <mhh_yn10></mhh_yn10>
+  <mhh_yn11></mhh_yn11>
+  <mhh_yn12></mhh_yn12>
+  <mhh_yn13></mhh_yn13>
+  <mhh_yn14></mhh_yn14>
+  <mhh_yn15></mhh_yn15>
+  <mhh_yn16></mhh_yn16>
+  <mhh_yn17></mhh_yn17>
+  <mhh_comments></mhh_comments>
+  <psychoTreatment_rcvd>Yes</psychoTreatment_rcvd>
+  <psychoTreatment_total>2</psychoTreatment_total>
+  <psychoTreatment_detox>0</psychoTreatment_detox>  <psychoTreatment_inPatient>1</psychoTreatment_inPatient>
+  <psychoTreatment_outPatient>0</psychoTreatment_outPatient>
+  <psychoTreatment_where></psychoTreatment_where>
+  <psychoTreatment_type>MH / In Patient</psychoTreatment_type>
+  <psychoTreatment_when>00/00/????</psychoTreatment_when>
+  <psychoTreatment_duration>LT1M</psychoTreatment_duration>
+  <psychoTreatment_reason>aggressive behaviors to self and others</psychoTreatment_reason>  <psychoTreatment_where>INTEGRIS BASS BAPTIST HEALTH CENTER</psychoTreatment_where>
+  <psychoTreatment_type>MH / In Patient</psychoTreatment_type>
+  <psychoTreatment_when>00/00/2019</psychoTreatment_when>
+  <psychoTreatment_duration>LT1M</psychoTreatment_duration>
+  <psychoTreatment_reason>suicidal thoughts</psychoTreatment_reason>
+  <suicidal_attempts>0</suicidal_attempts>
+  <suicidal_last></suicidal_last>
+  <suicidal_firearms>No</suicidal_firearms>
+  <suicidal_history>No</suicidal_history>
+  <suicidal_incident>0</suicidal_incident>
+
+  <useTobacco>No</useTobacco>
+  <ut_ageUse></ut_ageUse>
+  <ut_nicotineFrequency>0</ut_nicotineFrequency>
+  <ut_cigaretteFrequency></ut_cigaretteFrequency>
+  <ut_smokingStatus></ut_smokingStatus>
+
+  <ut_usePerDay>0</ut_usePerDay>
+
+  <afua_usedAlcohol></afua_usedAlcohol>
+  <afua_alcoholIntox>No</afua_alcoholIntox>
+  <ac_alcUsedIn30D>No</ac_alcUsedIn30D>
+  <ac_alcIntoxIn30D>No</ac_alcIntoxIn30D>
+  <ac_alcDT></ac_alcDT>
+  <audit_dateCompleted></audit_dateCompleted>
+  <audit_score1></audit_score1>
+  <audit_score2></audit_score2>
+  <audit_score3></audit_score3>
+  <audit_score4></audit_score4>
+  <audit_score5></audit_score5>
+  <audit_score6></audit_score6>
+  <audit_score7></audit_score7>
+  <audit_score8></audit_score8>
+  <audit_score9></audit_score9>
+  <audit_score10></audit_score10>
+  <audit_scoreTotal>0</audit_scoreTotal>
+  <audit_result>Negative</audit_result>
+  <crafft_dateCompleted></crafft_dateCompleted>
+  <crafft_q1></crafft_q1>
+  <crafft_q2></crafft_q2>
+  <crafft_q3></crafft_q3>
+  <crafft_q4></crafft_q4>
+  <crafft_q5></crafft_q5>
+  <crafft_q6></crafft_q6>
+  <crafft_score>Negative 0</crafft_score>
+  <useDrug>No</useDrug>
+  <da_drug>None</da_drug>
+
+  <drug_history>No</drug_history>
+  <drug_overdosed>0</drug_overdosed>
+
+  <treatmentAlcohol_rcvd>No</treatmentAlcohol_rcvd>
+  <treatmentAlcohol_total>0</treatmentAlcohol_total>
+  <treatmentAlcohol_detox>0</treatmentAlcohol_detox>
+
+  <treatmentDrug_rcvd>No</treatmentDrug_rcvd>
+  <treatmentDrug_total>0</treatmentDrug_total>
+  <treatmentDrug_detox>0</treatmentDrug_detox>
+
+  <fhad_prenatal>No</fhad_prenatal>
+  <fhad_name>Gomez, Gerardo </fhad_name>
+  <fhad_relation>father</fhad_relation>
+  <fhad_type>Alcohol</fhad_type>
+
+  <oc_desc>Mother drinks on social occasions; father drinks most days to the point of extreme intoxication, in which clt has had limited contact with him over the past year</oc_desc>
+  <gamblingHistory>No</gamblingHistory>
+  <bbgs_yn1>No</bbgs_yn1>
+  <bbgs_yn2>No</bbgs_yn2>
+  <bbgs_yn3>No</bbgs_yn3>
+  <bbgs_pn>Negative</bbgs_pn>
+  <bbgs_yn4>No</bbgs_yn4>
+  <bbgs_yn4Desc>n/a</bbgs_yn4Desc>
+  <bbgs_yn5>Fair</bbgs_yn5>
+  <bbgs_yn5Desc>Clt&#x27;s mother works approximately 25 hours a week at Wal-Mart and is a single parent of 2 children</bbgs_yn5Desc>
+  <bbgs_yn6>No</bbgs_yn6>
+  <bbgs_yn7>No</bbgs_yn7>
+  <bbgs_yn8>No</bbgs_yn8>
+  <bbgs_yn9>No</bbgs_yn9>
+  <bbgs_yn10>No</bbgs_yn10>
+  <bbgs_yn11>No</bbgs_yn11>
+  <bbgs_yn12>No</bbgs_yn12>
+  <bbgs_yn13>No</bbgs_yn13>
+  <bbgs_yn14>No</bbgs_yn14>
+  <bbgs_yn15>No</bbgs_yn15>
+  <bbgs_yn16>No</bbgs_yn16>
+  <bbgs_yn17>No</bbgs_yn17>
+  <bbgs_yn18>No</bbgs_yn18>
+  <bbgs_yn19>No</bbgs_yn19>
+  <bbgs_yn20>No</bbgs_yn20>
+  <bbgs_yn21>No</bbgs_yn21>
+  <bbgs_yn22>No</bbgs_yn22>
+  <bbgs_yn23>No</bbgs_yn23>
+  <bbgs_yn24>No</bbgs_yn24>
+  <bbgs_yn25>No</bbgs_yn25>
+  <oba_history>No</oba_history>
+  <oba_apply></oba_apply>
+
+  <oba_desc>none reported</oba_desc>
+  <treatmentGambling_rcvd>No</treatmentGambling_rcvd>
+  <treatmentGambling_total>0</treatmentGambling_total>
+  <treatmentGambling_detox>0</treatmentGambling_detox>
+
+  <personAbused_name>Gomez, Gerardo </personAbused_name>
+  <personAbused_relation>father</personAbused_relation>
+  <personAbused_emotional>perpetrator</personAbused_emotional>
+  <personAbused_physical>perpetrator</personAbused_physical>
+  <personAbused_sexual>none</personAbused_sexual>
+  <personAbused_you>Yes</personAbused_you>
+  <personAbused_other>No</personAbused_other>
+
+  <rav_battered>No</rav_battered>
+  <rav_witness>Yes</rav_witness>
+  <violenceHistory>No</violenceHistory>
+  <tcre_yn1></tcre_yn1>
+     <tcre_cnt1></tcre_cnt1>
+     <tcre_age1></tcre_age1>
+  <tcre_yn2></tcre_yn2>
+     <tcre_cnt2></tcre_cnt2>
+     <tcre_age2></tcre_age2>
+  <tcre_yn3></tcre_yn3>
+     <tcre_cnt3></tcre_cnt3>
+     <tcre_age3></tcre_age3>
+  <tcre_yn4></tcre_yn4>
+     <tcre_cnt4></tcre_cnt4>
+     <tcre_age4></tcre_age4>
+  <tdet_yn1></tdet_yn1>
+     <tdet_cnt1></tdet_cnt1>
+     <tdet_age1></tdet_age1>
+    <tdet_yn1Desc></tdet_yn1Desc>
+  <tdet_yn2></tdet_yn2>
+     <tdet_cnt2></tdet_cnt2>
+     <tdet_age2></tdet_age2>
+    <tdet_yn2Desc></tdet_yn2Desc>
+  <tdet_yn3></tdet_yn3>
+     <tdet_cnt3></tdet_cnt3>
+     <tdet_age3></tdet_age3>
+    <tdet_yn3Desc></tdet_yn3Desc>
+  <tdet_yn4></tdet_yn4>
+     <tdet_cnt4></tdet_cnt4>
+     <tdet_age4></tdet_age4>
+  <tdet_yn5></tdet_yn5>
+     <tdet_cnt5></tdet_cnt5>
+     <tdet_age5></tdet_age5>
+    <tdet_yn5Desc></tdet_yn5Desc>
+  <tdet_yn6></tdet_yn6>
+     <tdet_cnt6></tdet_cnt6>
+     <tdet_age6></tdet_age6>
+    <tdet_yn6Desc></tdet_yn6Desc>
+  <tdet_yn7></tdet_yn7>
+     <tdet_cnt7></tdet_cnt7>
+     <tdet_age7></tdet_age7>
+    <tdet_yn7Desc></tdet_yn7Desc>
+  <tdet_yn8></tdet_yn8>
+     <tdet_cnt8></tdet_cnt8>
+     <tdet_age8></tdet_age8>
+    <tdet_yn8Desc></tdet_yn8Desc>
+  <tdet_yn9></tdet_yn9>
+     <tdet_cnt9></tdet_cnt9>
+     <tdet_age9></tdet_age9>
+    <tdet_yn9Desc></tdet_yn9Desc>
+  <tdet_yn10></tdet_yn10>
+     <tdet_cnt10></tdet_cnt10>
+     <tdet_age10></tdet_age10>
+    <tdet_yn10Desc></tdet_yn10Desc>
+  <tdet_yn11></tdet_yn11>
+     <tdet_cnt11></tdet_cnt11>
+     <tdet_age11></tdet_age11>
+    <tdet_yn11Desc></tdet_yn11Desc>
+  <tdet_yn12></tdet_yn12>
+     <tdet_cnt12></tdet_cnt12>
+     <tdet_age12></tdet_age12>
+    <tdet_yn12Desc></tdet_yn12Desc>
+  <tdet_yn13></tdet_yn13>
+     <tdet_cnt13></tdet_cnt13>
+     <tdet_age13></tdet_age13>
+    <tdet_yn13Desc></tdet_yn13Desc>
+  <tpse_yn1></tpse_yn1>
+     <tpse_cnt1></tpse_cnt1>
+     <tpse_age1></tpse_age1>
+    <tpse_yn1Desc></tpse_yn1Desc>
+  <tpse_yn2></tpse_yn2>
+     <tpse_cnt2></tpse_cnt2>
+     <tpse_age2></tpse_age2>
+    <tpse_yn2Desc></tpse_yn2Desc>
+  <tpse_yn3></tpse_yn3>
+     <tpse_cnt3></tpse_cnt3>
+     <tpse_age3></tpse_age3>
+  <tpse_yn4></tpse_yn4>
+     <tpse_cnt4></tpse_cnt4>
+     <tpse_age4></tpse_age4>
+  <tpse_yn5></tpse_yn5>
+     <tpse_cnt5></tpse_cnt5>
+     <tpse_age5></tpse_age5>
+  <tpse_yn6></tpse_yn6>
+     <tpse_cnt6></tpse_cnt6>
+     <tpse_age6></tpse_age6>
+  <tpse_yn7></tpse_yn7>
+     <tpse_cnt7></tpse_cnt7>
+     <tpse_age7></tpse_age7>
+    <tpse_yn7Desc></tpse_yn7Desc>
+
+  <treatmentViolence_rcvd>No</treatmentViolence_rcvd>
+  <treatmentViolence_total>0</treatmentViolence_total>
+  <treatmentViolence_detox>0</treatmentViolence_detox>
+
+
+  <ms_years>4</ms_years>
+  <ms_months></ms_months>
+  <ms_num>0</ms_num>
+  <fh_relHistory>Clt is close to her mother and brother. Clt has not had much of a relationship with her father since the divorce a year ago. &#34;He&#x27;s mean to my mommy.&#34; Clt does not get along well with her brother most times, but wants to be with him most times.</fh_relHistory>
+  <fh_othersName>None</fh_othersName>
+  <fr_structure>Biological Family </fr_structure>
+  <fr_parentsStatus>Both Parents Living - Divorced</fr_parentsStatus>
+  <fr_growingUp>No</fr_growingUp>
+  <fr_growingUpCare></fr_growingUpCare>
+  <fr_careDuration>4 years</fr_careDuration>
+  <fr_dscpRel>mother</fr_dscpRel>
+  <fr_dscFair>No</fr_dscFair>
+  <fr_dscpReason>yes</fr_dscpReason>
+  <fr_punished></fr_punished>
+  <relationships_name>Dereck Rodriguez</relationships_name>
+  <relationships_relation>brother</relationships_relation>
+  <relationships_age>8</relationships_age>
+  <relationships_inhome>Yes</relationships_inhome>
+  <relationships_rating>7</relationships_rating>
+  <relationships_reason>&#34;they fight a lot&#34;- mother</relationships_reason>
+  <relationships_name>Iris Gomez</relationships_name>
+  <relationships_relation>mother</relationships_relation>
+  <relationships_age>33</relationships_age>
+  <relationships_inhome>Yes</relationships_inhome>
+  <relationships_rating>7</relationships_rating>
+  <relationships_reason>&#34;she drives me nuts sometimes&#34;- mother</relationships_reason>
+  <relationships_name>Gerardo Gomez</relationships_name>
+  <relationships_relation>father</relationships_relation>
+  <relationships_age>33</relationships_age>
+  <relationships_inhome>No</relationships_inhome>
+  <relationships_rating>5</relationships_rating>
+  <relationships_reason>&#34;he&#x27;s not a part of her life the last year&#34; - mother</relationships_reason>
+  <fr_cls>Permanent Housing</fr_cls>
+  <fr_clsAdmitDate></fr_clsAdmitDate>
+  <fr_clsGHLevel></fr_clsGHLevel>
+  <fr_clsArrangement></fr_clsArrangement>
+  <fr_correctional>None</fr_correctional>
+  <fr_homeless>No</fr_homeless>
+  <fr_childPlacement>Not in out-of-home treatment</fr_childPlacement>
+  <fr_restrictive>0</fr_restrictive>
+  <hp_placementNum>0</hp_placementNum>
+  <ohp_name>None</ohp_name>
+  <ohp_type>Service Facility</ohp_type>
+  <fr_livingArrangement>parents</fr_livingArrangement>
+  <fr_arrangement>Yes</fr_arrangement>
+  <income_source>None Reported</income_source>
+  <income_totallast>0.00</income_totallast>
+  <income_totalyearly>0.00</income_totalyearly>
+  <income_number>3</income_number>
+  <income_able>Yes</income_able>
+  <basicNeeds_yn1>No</basicNeeds_yn1>
+  <basicNeeds_yn2>Yes</basicNeeds_yn2>
+  <basicNeeds_yn3>No</basicNeeds_yn3>
+  <basicNeeds_yn4>Yes</basicNeeds_yn4>
+  <basicNeeds_yn5>Yes</basicNeeds_yn5>
+  <basicNeeds_yn6>Yes</basicNeeds_yn6>
+  <basicNeeds_yn7>No</basicNeeds_yn7>
+  <basicNeeds_limitation>Clt is a 4-year-old child. Mother works approximately 25 hours a week and is the single parent of 2 children. </basicNeeds_limitation>
+  <supportSystem_yn1>Yes</supportSystem_yn1>
+  <supportSystem_yn2></supportSystem_yn2>
+  <supportSystem_active>Yes</supportSystem_active>
+  <supportSystem_yn3>Yes</supportSystem_yn3>
+  <supportSystem_yn4>No</supportSystem_yn4>
+  <supportSystem_yn5>No</supportSystem_yn5>
+  <supportSystem_yn6>No</supportSystem_yn6>
+  <supportSystem_days>0</supportSystem_days>
+  <supportSystem_comments></supportSystem_comments>
+   <legal_papers>None</legal_papers>
+  <legal_status>INFORMAL ADMISSION</legal_status>
+  <legal_county></legal_county>
+  <legal_custodyAgency> No Custodial Agency</legal_custodyAgency>
+  <legal_childOnly>JOLTS: N/A</legal_childOnly>
+  <legal_adultOnly>CASEID: N/A</legal_adultOnly>
+  <legal_probation>No</legal_probation>
+  <legal_arrest>0</legal_arrest>
+  <legal_last30days>0</legal_last30days>
+  <legalPPO_name>N/A</legalPPO_name>
+  <legalPPO_address></legalPPO_address>
+  <legalPPO_phone></legalPPO_phone>
+  <legalPPO_contact></legalPPO_contact>
+  <sco_clientRace>WHITE</sco_clientRace>
+
+  <sco_clientEthnicity>HISPANIC OR LATINO</sco_clientEthnicity>
+
+  <sco_tribal></sco_tribal>
+  <sco_traditional>n/a</sco_traditional>
+  <sco_gang>None</sco_gang>
+  <sco_gangvalues>n/a</sco_gangvalues>
+  <sco_other>None</sco_other>
+  <sco_othervalues>n/a</sco_othervalues>
+  <sco_unique>&#34;very intelligent for her age&#34;- mother</sco_unique>
+  <sco_important>&#34;family&#34;</sco_important>
+  <language_primary>Spanish; Castilian</language_primary>
+  <language_secondary>English</language_secondary>
+  <language_reads>Yes</language_reads>
+  <language_writes>Yes</language_writes>
+  <language_speaks>Yes</language_speaks>
+  <language_detailed></language_detailed>
+  <language_readingLevel></language_readingLevel>
+  <language_writingLevel></language_writingLevel>
+  <orientation_raised>City</orientation_raised>
+  <orientation_live>City</orientation_live>
+  <orientation_clientsees>No</orientation_clientsees>
+  <orientation_clientfeels>Yes</orientation_clientfeels>
+  <orientation_howclientfeel>none reported</orientation_howclientfeel>
+  <orientation_meaninggod>&#34;We believe.&#34; -mother</orientation_meaninggod>
+  <orientation_churchchild>No</orientation_churchchild>
+  <orientation_childreligion></orientation_childreligion>
+  <orientation_churchnow>No</orientation_churchnow>
+  <orientation_religionnow></orientation_religionnow>
+  <orientation_clientbehav>No</orientation_clientbehav>
+  <orientation_clientexp>No</orientation_clientexp>
+  <orientation_howclientexp></orientation_howclientexp>
+  <leisure_freetime>Family</leisure_freetime>
+  <leisure_satisfied>Yes</leisure_satisfied>
+  <leisure_closefriends>0</leisure_closefriends>
+  <leisure_interests>Yes</leisure_interests>
+  <leisure_interestsDesc>&#34;YouTube&#34; -mother</leisure_interestsDesc>
+  <leisure_fun>&#34;coloring, playing and watching YouTube&#34; -mother</leisure_fun>
+  <stressor1_recentDeath>0</stressor1_recentDeath>
+  <stressor1_divorced>1</stressor1_divorced>
+  <stressor1_separation>0</stressor1_separation>
+  <stressor1_comment>mother and father divorced a year ago and clt has limited contact with dad since</stressor1_comment>
+  <stressor2>0</stressor2>
+  <stressor2_comment>n/a</stressor2_comment>
+  <stressor3>0</stressor3>
+  <stressor3_comment>n/a</stressor3_comment>
+  <stressor4>0</stressor4>
+  <stressor4_comment>n/a</stressor4_comment>
+  <stressor5>0</stressor5>
+  <stressor5_comment>n/a</stressor5_comment>
+  <lsf_interaction>Client goes to daycare, but does not have many friends. Mother reports that client does not get along well with other children her age. &#34;She wants things her way and when she doesn&#x27;t, she throws a fit.&#34; </lsf_interaction>
+  <attainment_highest>Never attended/kindergarten only</attainment_highest>
+  <attainment_repeated>No</attainment_repeated>
+  <attainment_repeated_grades></attainment_repeated_grades>
+  <attainment_repeated_reason></attainment_repeated_reason>
+  <attainment_lastschool></attainment_lastschool>
+  <attainment_district></attainment_district>
+  <attainment_number></attainment_number>
+  <attainment_subjectliked></attainment_subjectliked>
+  <attainment_subjectdisliked></attainment_subjectdisliked>
+  <learning_ability></learning_ability>
+  <learning_iqtest>No</learning_iqtest>
+  <learning_iqscore></learning_iqscore>
+  <dayCare_past90days>0</dayCare_past90days>
+  <cef_status>Underage</cef_status>
+  <cef_current>Never attended/kindergarten only</cef_current>
+  <cef_gpa></cef_gpa>
+  <cef_classification></cef_classification>
+  <cef_iep></cef_iep>
+  <cef_spedtime></cef_spedtime>
+  <cef_spedgrade></cef_spedgrade>
+  <cef_absent>0</cef_absent>
+  <cef_suspended>0</cef_suspended>
+  <cef_collaboration></cef_collaboration>
+  <employment_status>Not in Labor Force</employment_status>
+  <employment_type>Student</employment_type>
+  <vocational_workOutside>No</vocational_workOutside>
+  <vocational_lastwork></vocational_lastwork>
+  <vocational_length></vocational_length>
+  <vocational_last> </vocational_last>
+  <vocational_typework></vocational_typework>
+  <vocational_skills>No</vocational_skills>
+  <vocational_skillType></vocational_skillType>
+  <vocational_career></vocational_career>
+  <military_service>None</military_service>
+  <military_branch></military_branch>
+  <military_dischargeType></military_dischargeType>
+  <military_relatives></military_relatives>
+  <mentalPhys_appearance>Same as stated age</mentalPhys_appearance>
+
+  <mentalPhys_dress>Appropriate</mentalPhys_dress>
+
+  <mentalPhys_hygiene>Good</mentalPhys_hygiene>
+
+  <mentalPhys_nutrition>Height/Weight Appropriate</mentalPhys_nutrition>
+
+  <mentalPhys_prosthetic>None Reported</mentalPhys_prosthetic>
+
+  <mentalBehavior_posture>Normal</mentalBehavior_posture>
+
+  <mentalBehavior_facial>Normal and Responsive</mentalBehavior_facial>
+
+  <mentalMotor_gait>Normal/Ambulatory</mentalMotor_gait>
+
+  <mentalMotor_behavior>Restlessness/Fidgety</mentalMotor_behavior>
+
+  <mentalSpeech_quantity>Talkative</mentalSpeech_quantity>
+
+  <mentalSpeech_quality>Normal</mentalSpeech_quality>
+
+  <mentalSpeech_impairment>None Reported</mentalSpeech_impairment>
+
+  <mentalInterviewer_relationship>Appropriate</mentalInterviewer_relationship>
+
+  <mentalInterviewer_affect>Appropriate/Congruent</mentalInterviewer_affect>
+
+  <mentalInterviewer_mood>Appropriate/Congruent</mentalInterviewer_mood>
+
+  <mental_thought>Logical</mental_thought>
+
+  <mental_preoccupation>Not Reported</mental_preoccupation>
+
+  <mental_delusion>Not Reported</mental_delusion>
+
+  <mental_hallucination>Not Reported</mental_hallucination>
+
+  <mental_consciousness>Alert</mental_consciousness>
+
+  <mental_orientation>Oriented in all spheres (including situation)</mental_orientation>
+
+  <mental_attention>Normal</mental_attention>
+
+  <mental_memory>Intact</mental_memory>
+
+  <mental_ability>Average</mental_ability>
+
+  <mental_insight>Poor/Blames Ownership of Problems</mental_insight>
+
+  <mental_judgment>Poor</mental_judgment>
+
+  <mental_skills>Impaired/Requires Custodian</mental_skills>
+
+  <mental_exam>Positive</mental_exam>
+
+
+  <summary_abilities>1) S: &#34;very intelligent, caring, very good memory&#34;
+2) N: &#34;get along with others, listen&#34;
+3) A: &#34;drawing, numbers and colors&#34;
+4) P: &#34;afternoon&#34;</summary_abilities>
+  <summary_needs>1) L: &#34;does not get along well with others&#34;</summary_needs>
+  <summary_preferences>Client would like individual therapy to deal with managing emotions, family therapy to build positive parenting techniques, health home and case management services to assist family in locating resources.</summary_preferences>
+  <summary_treatment>&#34;I want her to learn how to listen and follow directions; to not throw fits; to learn to get along with others&#34;</summary_treatment>
+  <summary_change>1. Pre-contemplation</summary_change>
+  <summary_interpretive>Keysha is a 4-year-old Hispanic female who is being admitted for individual and family counseling services, health home services as well as case management services. Client is experiencing severe symptoms of anxiety and moderate symptoms of depression and has poor coping skills when dealing with emotions. Keysha does not yet attend school, but attends daycare. However, Keysha does not get along well with others in the daycare setting. Mother reports that client becomes agitated with others when things dont go her way. Keysha spends her free time with her mother and brother. Bio-dad has not been in the picture much over the last year since he and Keyshas mother divorced. Keysha&#x27;s SNAP will be implemented into treatment by using her strength of being very intelligent and caring in order to learn how to manage her emotions and express herself in a healthy manner in case management, individual, and family counseling. Keyshas abilities of coloring and drawing will be implemented in the use of art therapy techniques in order to help Keysha learn ways to manage emotions as well as teach her ways to build and maintain healthy boundaries with others. Keyshas needs of getting along with others and learning to listen will be addressed in family and individual counseling to build skills to build and maintain healthy boundaries, age appropriate coping techniques to manage emotions, and learn how to respect authority figures. Keysha&#x27;s preference of seeing someone in the afternoon will be accommodated. Potential barriers include behavioral changes and inconsistency in attendance and participation. Keysha will be discharged when she is able to use healthy coping techniques instead of becoming angry 4/5 times without prompting. Prognosis is good with consistent participation and attendance. </summary_interpretive>
+  <alert>*NEEDS AN ADRESS UPDATE*</alert>
+  <recommend_care>Outpatient Services</recommend_care>
+  <recommend_focus>Mental Health</recommend_focus>
+  <recommend_services>Case Management; Family Therapy; Individual Therapy</recommend_services>
+  <ICD10>F93.0</ICD10>
+  <icdName>Separation anxiety disorder of childhood</icdName>
+  <sctName>Separation anxiety disorder of childhood (disorder)</sctName>
+  <initiatedDate>11/20/2018</initiatedDate>
+  <resolvedDate></resolvedDate>
+  <notes></notes>
+  <ICD10>F91.3</ICD10>
+  <icdName>Oppositional defiant disorder</icdName>
+  <sctName>Oppositional defiant disorder (disorder)</sctName>
+  <initiatedDate>05/08/2017</initiatedDate>
+  <resolvedDate></resolvedDate>
+  <notes></notes>
+  <ICD10>F41.1</ICD10>
+  <icdName>Generalized anxiety disorder</icdName>
+  <sctName>Generalized anxiety disorder (disorder)</sctName>
+  <initiatedDate>02/12/2017</initiatedDate>
+  <resolvedDate></resolvedDate>
+  <notes></notes>
+  <ICD10>E66.9</ICD10>
+  <icdName>Obesity, unspecified</icdName>
+  <sctName>Obese (finding)</sctName>
+  <initiatedDate>02/08/2019</initiatedDate>
+  <resolvedDate></resolvedDate>
+  <notes></notes>
+  <ICD10>Z59.6</ICD10>
+  <icdName>Low income</icdName>
+  <sctName>Low household income (finding)</sctName>
+  <initiatedDate>02/08/2019</initiatedDate>
+  <resolvedDate></resolvedDate>
+  <notes></notes>
+  <ICD10>J45.909</ICD10>
+  <icdName>Unspecified asthma, uncomplicated</icdName>
+  <sctName>Asthma (disorder)</sctName>
+  <initiatedDate>02/24/2019</initiatedDate>
+  <resolvedDate></resolvedDate>
+  <notes></notes>
+  <ICD10>Z73.4</ICD10>
+  <icdName>Inadequate social skills, not elsewhere classified</icdName>
+  <sctName>Altered growth and development: social skills (finding)</sctName>
+  <initiatedDate>01/09/2019</initiatedDate>
+  <resolvedDate></resolvedDate>
+  <notes></notes>
+  <ICD10>R45.4</ICD10>
+  <icdName>Irritability and anger</icdName>
+  <sctName>Able to control emotions (finding)</sctName>
+  <initiatedDate>01/09/2019</initiatedDate>
+  <resolvedDate></resolvedDate>
+  <notes></notes>
+  <ICD10>F32.9</ICD10>
+  <icdName>Major depressive disorder, single episode, unspecified</icdName>
+  <sctName>Major depression, single episode (disorder)</sctName>
+  <initiatedDate>11/26/2019</initiatedDate>
+  <resolvedDate></resolvedDate>
+  <notes></notes>
+  <referrals_name>None</referrals_name>
+  <referrals_type>Collaboration</referrals_type>
+  <sign_staff>Kyrie Crippen; LBHP under supervision </sign_staff>
+  <sign_license> #pending</sign_license>
+  <sign_date>05/08/2017 @ 17:00:00</sign_date>
+
+
+
+
+</TopmostSubform>
+</xfa:data>
+</xfa:datasets>
+<pdf href="http://forms.okmis.com/printing/PrintIntake_Rev4.pdf" xmlns="http://ns.adobe.com/xdp/pdf/" />
+</xdp:xdp>

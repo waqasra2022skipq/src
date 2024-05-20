@@ -1,0 +1,2 @@
+<?php
+$actionResult = 1;

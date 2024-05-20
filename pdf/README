@@ -1,0 +1,88 @@
+LIVE CYCLE
+design:
+Line "Client was given a copy of this plan" is supposed to be only once in the form and hence <bymailinperson> tag should be only once in your data. If you will repeat this tag entire subform is repeated. If you want me to disable this repeat I can do it. However, as per my understanding there should be only 1 tag named <bymailinperson> in the entire xml for one document. 
+Form/ Subform is not fixed. It is in a flowed layout and hence you cannot resize it. It automatically resize according to the content available in that subform.
+
+Sorry, my bad. Fields name, address, phone and NPI were not read only and hence blue in color. I did that for checking the character spacing.
+
+mfolloup does not contain the header. Header is placed inside the mfollowupheader. mfollowup contains the text fields to store the values of name, address, phone and NPI.
+
+medication folloup is an empty subform just to create some space. I have renamed it to spacer now. PFA the updated file. 
+
+
+ There is actually a scripting involved for the header and footer data to be populated and hence, if you will change the name of the field the scripting will not work and you will not be able to see the data in the resulting PDF. If you want to rename the fields to some other name, you will have to change the scripting on those fields.
+
+it is not duplicate, the fields that are listed 2 times are required to make sure that they work properly as per your data.
+
+
+
+
+
+repeat pages:
+  On a subform there is an option under the binding tab - "repeat subform for each data item".
+  This is the option which is responsible for making some fields repeat based on multiple tags.
+
+wrap vs multiple tags:
+  - the field/object tab, you have a tab "layout" (windows -> layout)>. Under layout, you will find an option for expand to fit.
+    There is an option multiline; and on layout of every field there is an option "expand to fit".
+    On all the fields, allow multiline was turned on. I have now turned on "expand to fit" and now it is working as you want it to. 
+    Now, you wont have to break your text into multiple tags if this is a single continuous line,
+    it will automatically wrap onto next line.
+
+
+
+multiple pages layout:
+  - the latest treatment plan document. I have fixed all the issues mentioned below.
+    I have added <page2> in the data just to categorize the no. of pages.
+    I have also modified the 2nd Page as per the word document. 
+    Attached is an xml file to make you understand how data needs to be presented to PDF.
+     (XML only contains data for 2nd page and Tplanning field)
+
+
+Default Value:
+To get rid of the text in a field, all you have to do is select that field and open the object properties and under value, you should be able to see the default value. You may have to change the type to "user entered (optional)" to view the default value. Remember to change it back to "calculated(read only)" after removing the default value.
+
+Here are the descriptions for each and every field:
+---------------------------------------------------------------------
+Calculated - Read Only A data value will be calculated and displayed through an attached script. Users cannot edit the calculated value.
+
+Calculated - User Can Override - A data value will be calculated and displayed through an attached script. Users can edit the value if the calculation script has been written to accept the input. If a user does edit the calculated value, the custom message you specify in the Override Message box appears.
+
+Protected - Prevents a user from making changes to the value in the field. Indirect changes such as calculations can occur. The protected field is not included in the tabbing sequence and it does not generate events.
+
+Read Only - A data value will be merged or calculated and displayed at run time. Users cannot edit the value.
+
+You should normally use - calculated read only.
+You needed to do the following:
+-Select the binding tab of that particular field and select the binding to "use name".
+
+binding:
+fields are there two times. 1st field (located in master page) is to display the field in master page. 2nd time (located in main page) is to merge xml data with those fields. Scripting is required to make sure that data from 2nd field (located in main page) goes into the 1st field (located in master page).
+
+- No, you dont have to worry about that. That is because of name binding that i have provided. basically there are various ways of binding. i have used 2 binding methods to make it more flexible. 
+- If you want i can remove one of the binding and that will fix the warnings. 
+- What are the bindings used for? 
+- to merge xml data with fields. Nov 14, 2011
+- But I won't need these because I load data from the xdp? Nov 14, 2011
+- You don't both the bindings. Name binding will do the job for you. So i will delete the other binding. Nov 14, 2011
+
+
+Well the scripting on both the fields is not required. It is mandatory that it should be present at only that field. But, 2 fields with same names are required to store the data from XML to form, so that we can later on update the values in header and footer.
+
+Master pages data cannot update directly from XDP/XML data. Remember, once you encountered an issue where in the company name (in header) was just getting updated only on 1st page and not subsequent pages. To fix that issue, I included the scripting and included 1 more field to have the binding correctly with the data from XDP/XML.
+
+
+scripting:
+There is actually a scripting involved for the header and footer data to be populated and hence, if you will change the name of the field the scripting will not work and you will not be able to see the data in the resulting PDF. If you want to rename the fields to some other name, you will have to change the scripting on those fields.
+
+
+Scripting is present on the calculate event for those fields
+Click on window and select script editor
+
+
+reader:
+how come there is no save option when I open the xdp/pdf in IE? One opened with the fields filled in I can print, but not save? 
+Because you may not have Adobe Acrobat installed. You may just have reader. OR 
+you may have both but reader is the default plugin in your browser. You will have to change that option to make sure IE default plugin is acrobat and not reader. 
+Reader does not have the capability to save the PDF (unless those files are reader extended either by Acrobat or by Server solutions). The best way would be to reader extend the files using acrobat.
+

@@ -1,0 +1,1 @@
+<h2><?php echo M('Custom Form'); ?>: <?php echo M('Customer'); ?></h2>

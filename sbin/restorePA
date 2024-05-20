@@ -1,0 +1,35 @@
+#!/bin/bash
+#--------------------
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   echo -e "\nServices not installed!"
+   exit 1
+fi
+#--------------------
+# run on dev database (restored database)
+DB=$1
+PrAuthID=$2
+TrPlanID=$3
+#--------------------
+echo "delete from ClientPrAuth where ID='${PrAuthID}';"
+mysqldump --complete-insert --no-create-info --where "ID=${PrAuthID}" ${DB} ClientPrAuth | grep INSERT
+echo "delete from ClientPrAuthCDC where ClientPrAuthID='${PrAuthID}';"
+mysqldump --complete-insert --no-create-info --where "PrAuthID=${PrAuthID}" ${DB} ClientPrAuthCDC | grep INSERT
+echo "delete from PALines where PrAuthID='${PrAuthID}';"
+mysqldump --complete-insert --no-create-info --where "PrAuthID=${PrAuthID}" ${DB} PALines | grep INSERT
+if [ -n "${TrPlanID}" ]; then
+  echo "delete from PDDom where PrAuthID='${PrAuthID}';"
+  mysqldump --complete-insert --no-create-info --where "PrAuthID=${PrAuthID}" ${DB} PDDom | grep INSERT
+  echo "delete from PDDiag where PrAuthID='${PrAuthID}';"
+  mysqldump --complete-insert --no-create-info --where "PrAuthID=${PrAuthID}" ${DB} PDDiag | grep INSERT
+  echo "delete from PrAuthRVU where PrAuthID='${PrAuthID}';"
+  mysqldump --complete-insert --no-create-info --where "PrAuthID=${PrAuthID}" ${DB} PrAuthRVU | grep INSERT
+  echo "delete from TrPlan where TrPlanID='${TrPlanID}';"
+  mysqldump --complete-insert --no-create-info --where "TrPlanID=${TrPlanID}" ${DB} TrPlan | grep INSERT
+  echo "delete from TrPlanIP where TrPlanID='${TrPlanID}';"
+  mysqldump --complete-insert --no-create-info --where "TrPlanID=${TrPlanID}" ${DB} TrPlanIP | grep INSERT
+  echo "delete from TrPlanS where TrPlanID='${TrPlanID}';"
+  mysqldump --complete-insert --no-create-info --where "TrPlanID=${TrPlanID}" ${DB} TrPlanS | grep INSERT
+fi
+#--------------------

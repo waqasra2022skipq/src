@@ -1,0 +1,186 @@
+Content-type: text/html
+Pragma: no-cache
+
+
+<HTML>
+<HEAD> <TITLE>QTR</TITLE> </HEAD>
+<LINK HREF="/cgi/css/mis.css" REL="stylesheet" TYPE="text/css">
+<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT type="text/javascript" src="/cgi/js/ajaxrequest.js"></SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/pickDate.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vDate.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript">
+function validate(form) 
+{ 
+  return vEntry("notnull",form.QTR,form.YEAR);
+}
+</SCRIPT>
+
+<BODY BGCOLOR=silver >
+<FORM NAME="QTR" ONSUBMIT="return validate(this);" ACTION="/cgi/bin/<<action>>" METHOD="POST" >
+<DIV ALIGN=center>
+<TABLE WIDTH=90% BGCOLOR=white BORDER=0 CELLSPACING=0 CELLPADDING=2 >
+  <TR ><TD CLASS="portheading" COLSPAN=3 ><B><<Title>></B></TD></TR>
+  <TR>
+    <TD CLASS="homesublabel" ALIGN=left WIDTH=10% >&nbsp;</TD>
+    <TD CLASS="homesublabel" ALIGN=left WIDTH=30% >Select Quarter</TD>
+    <TD CLASS="homesublabel" ALIGN=left >
+     <INPUT TYPE=radio NAME="QTR" VALUE=1 CHECKED > First Quarter (Jul-Sep)
+     <BR>
+     <INPUT TYPE=radio NAME="QTR" VALUE=2 > Second Quarter (Oct-Dec)
+     <BR>
+     <INPUT TYPE=radio NAME="QTR" VALUE=3 > Third Quarter (Jan-Mar)
+     <BR>
+     <INPUT TYPE=radio NAME="QTR" VALUE=4 > Fourth Quarter (Apr-Jun)
+     <BR>
+    </TD>
+  </TR>
+  <TR>
+    <TD CLASS="homesublabel" ALIGN=left WIDTH=10% >&nbsp;</TD>
+    <TD CLASS="homesublabel" ALIGN=left WIDTH=30% >Select Year</TD>
+    <TD CLASS="homesublabel" ALIGN=left >
+      <INPUT TYPE=radio NAME="YEAR" VALUE="THIS" CHECKED > This Fiscal year
+      <BR>
+      <INPUT TYPE=radio NAME="YEAR" VALUE="LAST" > Last Fiscal year
+    </TD>
+  </TR>
+  <TR>
+    <TD CLASS="homesublabel" ALIGN=left COLSPAN=3 >OR ENTER DATES FOR DIFFERENT SELECTION</TD>
+  </TR>
+  <TR>
+    <TD CLASS="homesublabel" ALIGN=left WIDTH=10% >&nbsp;</TD>
+    <TD CLASS="homesublabel" ALIGN=left WIDTH=30% >Select FromDate</TD>
+    <TD CLASS="homesublabel" ALIGN=left >
+      <INPUT TYPE=text NAME="FromDate" VALUE="" ONFOCUS="select()" ONCHANGE="return vDate(this);" SIZE=10>
+      <A HREF="javascript:show_calendar('QTR.FromDate');" onmouseover="window.status='Calendar to select date';return true;" onmouseout="window.status='';return true;">
+        <IMG SRC="/images/show_calendar.gif" WIDTH=24 HEIGHT=22 BORDER=0>
+      </A>
+    </TD>
+  </TR>
+  <TR>
+    <TD CLASS="homesublabel" ALIGN=left WIDTH=10% >&nbsp;</TD>
+    <TD CLASS="homesublabel" ALIGN=left WIDTH=30% >Select ToDate</TD>
+    <TD CLASS="homesublabel" ALIGN=left >
+      <INPUT TYPE=text NAME="ToDate" VALUE="" ONFOCUS="select()" ONCHANGE="return vDate(this);" SIZE=10>
+      <A HREF="javascript:show_calendar('QTR.ToDate');" onmouseover="window.status='Calendar to select date';return true;" onmouseout="window.status='';return true;">
+        <IMG SRC="/images/show_calendar.gif" WIDTH=24 HEIGHT=22 BORDER=0>
+      </A>
+    </TD>
+  </TR>
+  <TR>
+    <TD CLASS="homesublabel" ALIGN=left WIDTH=10% >&nbsp;</TD>
+    <TD CLASS="homesublabel" ALIGN=left WIDTH=30% >Clinics</TD>
+    <TD CLASS="homesublabel" ALIGN=left >
+      <SELECT NAME="Report_Clinics" MULTIPLE SIZE=5 >[[DBA->selClinics(%form++<<Report_Clinics>>)]]</SELECT>
+    </TD>
+  </TR>
+  <TR>
+    <TD CLASS="homesublabel" ALIGN=left WIDTH=10% >&nbsp;</TD>
+    <TD CLASS="homesublabel" ALIGN=left WIDTH=30% >Insurance</TD>
+    <TD CLASS="homesublabel" ALIGN=left >
+      <SELECT NAME="InsID" >
+        [[DBA->selInsurance(%form+<<InsID>>)]]
+      </SELECT>
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="homesublabel" ALIGN=left WIDTH=10% >&nbsp;</TD>
+    <TD CLASS="homesublabel" ALIGN=left WIDTH=30% >Referred By</TD>
+    <TD CLASS="homesublabel" ALIGN=left >
+      Search: <INPUT TYPE="text" ID="SearchRefBy1" NAME="SearchRefBy1" VALUE="" ONFOCUS="select()" ONCHANGE="callAjax('Agency','<<ReferredBy1>>','selRefBy1','&name=ReferredBy1&pattern='+this.value,'popup.pl');" SIZE="60" >
+<BR><SPAN ID="selRefBy1"></SPAN>
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="homesublabel" ALIGN=left WIDTH=10% >&nbsp;</TD>
+    <TD CLASS="homesublabel" ALIGN=left WIDTH=30% >Race</TD>
+    <TD CLASS="homesublabel" ALIGN=left >
+      <SELECT NAME="Race" >
+        [[DBA->selxTable(%form+xRaces+<<Race>>+Descr)]]
+      </SELECT>
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="homesublabel" ALIGN=left WIDTH=10% >&nbsp;</TD>
+    <TD CLASS="homesublabel" ALIGN=left WIDTH=30% >Gender</TD>
+    <TD CLASS="homesublabel" ALIGN=left >
+      <SELECT NAME="Gend" >[[DBA->selxTable(%form+xGend+<<Gend>>+Descr)]]</SELECT>
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="portsublabel" COLSPAN="2" >&nbsp;</TD>
+    <TD CLASS="portsublabel" >If MISAges or CARFAges is selected, choose only 1 of them.</TD>
+  </TR>
+  <TR >
+    <TD CLASS="homesublabel" ALIGN=left WIDTH=10% >&nbsp;</TD>
+    <TD CLASS="homesublabel" ALIGN=left WIDTH=30% >MIS Ages</TD>
+    <TD CLASS="homesublabel" ALIGN=left >
+      <SELECT NAME="MISAge"> 
+<OPTION SELECTED VALUE="" >unselected
+<OPTION VALUE="CAT0" >Not Reported
+<OPTION VALUE="CAT1" >0 to 3
+<OPTION VALUE="CAT2" >4 to 7
+<OPTION VALUE="CAT3" >8 to 11
+<OPTION VALUE="CAT4" >12 to 15
+<OPTION VALUE="CAT5" >16 to 19
+<OPTION VALUE="CAT6" >20+
+      </SELECT> 
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="homesublabel" ALIGN=left WIDTH=10% >&nbsp;</TD>
+    <TD CLASS="homesublabel" ALIGN=left WIDTH=30% >CARF Ages</TD>
+    <TD CLASS="homesublabel" ALIGN=left >
+      <SELECT NAME="CARFAge"> 
+<OPTION SELECTED VALUE="" >unselected
+<OPTION VALUE="CAT0" >Not Reported
+<OPTION VALUE="CAT1" >0 to 5
+<OPTION VALUE="CAT2" >6 to 17
+<OPTION VALUE="CAT3" >18 to 40
+<OPTION VALUE="CAT4" >41 to 65
+<OPTION VALUE="CAT5" >65 to 85
+<OPTION VALUE="CAT6" >85+
+      </SELECT> 
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="portsublabel" COLSPAN="2" >&nbsp;</TD>
+    <TD CLASS="portsublabel" >If FromDate and ToDate are input then the report uses them</TD>
+  </TR>
+  <TR >
+    <TD CLASS="portsublabel" COLSPAN=2>&nbsp;</TD>
+    <TD CLASS="portsublabel" >Insurance: defaults to all Insurances</TD>
+  </TR>
+  <TR >
+    <TD CLASS="portsublabel" COLSPAN=2>&nbsp;</TD>
+    <TD CLASS="portsublabel" >Referred By: defaults to all Referrals</TD>
+  </TR>
+  <TR >
+    <TD CLASS="portsublabel" COLSPAN=2>&nbsp;</TD>
+    <TD CLASS="portsublabel" >Ethnicity/Race: defaults to all Ethnicity/Race</TD>
+  </TR>
+  <TR >
+    <TD CLASS="portsublabel" COLSPAN=2>&nbsp;</TD>
+    <TD CLASS="portsublabel" >Gender: defaults to all Genders</TD>
+  </TR>
+  <TR >
+    <TD CLASS="portsublabel" COLSPAN=2>&nbsp;</TD>
+    <TD CLASS="portsublabel" >Ages: defaults to all Ages</TD>
+  </TR>
+</TABLE>
+<INPUT TYPE=submit VALUE="submit">
+<INPUT TYPE=hidden NAME="Type" VALUE="<<Type>>" >
+<INPUT TYPE=hidden NAME="PDF" VALUE="<<PDF>>" >
+<INPUT TYPE=hidden NAME="BHO" VALUE="<<BHO>>" >
+<INPUT TYPE=hidden NAME="MS" VALUE="<<MS>>" >
+<INPUT TYPE=hidden NAME="output" VALUE="<<output>>" >
+</LOADHIDDEN>
+</FORM>
+<SCRIPT LANGUAGE="JavaScript">
+window.focus();
+document.QTR.elements[0].focus();
+callAjax('Agency','<<ReferredBy1>>','selRefBy1','&name=ReferredBy1','popup.pl');
+</SCRIPT>
+
+</BODY>
+</HTML>

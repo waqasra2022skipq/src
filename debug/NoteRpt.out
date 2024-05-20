@@ -1,0 +1,62 @@
+: form-Browser=Telnet
+: form-ClinicIDs=100
+: form-DBNAME=okmis_pcd
+: form-DOCBIN=/home/okmis/www/pcd/cgi/bin
+: form-DOCPARENT=/home/okmis/www/
+: form-DOCROOT=/home/okmis/www/pcd
+: form-Format=JOLTS
+: form-FromDate=2024-05-06
+: form-FromDateD=05/06/2024
+: form-HTTPSERVER=https://pcd.okmis.com
+: form-InsID=353
+: form-LOGINACLID=
+: form-LOGINAGENCY=91
+: form-LOGINEMAIL=wade@okmis.com
+: form-LOGINID=root
+: form-LOGINNAME=Payne County Group
+: form-LOGINPROVID=91
+: form-LOGINSCREEN=ManagerTree.cgi
+: form-LOGINTYPE=0
+: form-LOGINUSERDB=okmis_pcd
+: form-LOGINUSERID=91
+: form-LOGINUSERNAME=  MIS 
+: form-LOGINUSERTYPE=1
+: form-NOW=17:14:09
+: form-NoNonBill=1
+: form-TODAY=2024-05-08
+: form-TheDate=2024-05-08
+: form-ToDate=2024-05-06
+: form-ToDateD=05/06/2024
+: form-Type=TransBilled
+: form-USERLOGINID=okmis_pcd:91
+: form-mlt=SjYLbWGAy7Cj
+: form-output=ss
+: form-query=DBNAME=okmis_pcd&Type=TransBilled&Format=JOLTS&output=ss&ClinicIDs=100&InsID=353&FromDate=2024-05-06&ToDate=2024-05-06&NoNonBill=1
+qTreatment=
+
+  select NoteTrans.*, NoteTrans.RecDate as DenDate
+        ,NoteTrans.PaidDate as NotePaidDate
+        ,Treatment.ClinicID
+        ,Treatment.ContLogDate, Treatment.ContLogBegTime, Treatment.ContLogEndTime
+        ,Treatment.BillDate as OrgBillDate, Treatment.BillStatus, Treatment.StatusDate, Treatment.StatusMsg
+        ,Treatment.ProvID as NoteProvID, Treatment.RecDate as NoteRecDate, Treatment.COPLDate as NoteSchDate
+        ,Treatment.IncAmt, Treatment.AmtDue, Treatment.POS
+        ,Client.LName as ClientLName, Client.FName as ClientFName, Client.ClientID
+        ,Client.ProvID as PrimaryProvID, Client.SSN, Client.DOB, ClientLegal.CustAgency
+        ,ClientReferrals.ReferredBy1NPI, ClientLegal.JOLTS, ProgNotes.GrpSize
+        ,xSC.SCNum,xSC.SCName
+        ,Provider.LName as ProvLName, Provider.FName as ProvFName
+        ,Clinic.Name as ClinicName
+        ,xInsurance.Name as InsName
+    from NoteTrans
+      left join Treatment on Treatment.TrID=NoteTrans.TrID
+      left join ClientACL on ClientACL.ClientID=Treatment.ClientID
+      left join Provider on Provider.ProvID=Treatment.ProvID
+      left join Provider as Clinic on Clinic.ProvID=Treatment.ClinicID
+      left join Client on Client.ClientID=Treatment.ClientID
+      left join ClientReferrals on ClientReferrals.ClientID=Treatment.ClientID
+      left join ClientLegal on ClientLegal.ClientID=Treatment.ClientID
+      left join ProgNotes on ProgNotes.NoteID=Treatment.TrID
+      left join xSC on xSC.SCID=NoteTrans.SCID
+      left join xInsurance on xInsurance.ID=xSC.InsID
+where NoteTrans.BillDate>="2024-05-06" and NoteTrans.BillDate<="2024-05-06"  and  ClientACL.ProvID='91' and  (  Treatment.ClinicID=100  ) and (xInsurance.ID=353)  order by Clinic.Name, Provider.LName, Provider.FName, Client.LName, Client.FName, Treatment.ContLogDate, Treatment.ContLogBegTime

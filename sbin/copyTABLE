@@ -1,0 +1,46 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use DBA;
+
+my $fromtable = 'CDCPA';
+my $totable = 'ClientPrAuthCDC';
+my $ID = 'ID';
+@ADDINS = ('ClinicID','OrgID','AgencyNum','NPI','InsIDNum','ClientKey','ServiceFocus','SSN','DateOfBirth','Age','Gend','Race','RaceWhite','RaceIndian','RaceAsian','RaceBlack','Alert','MHScreen','SAScreen','TraumaScreen','FirstName','MiddleName','MaidenName','LastName','Suffix','Addr1','Addr2','City','CountyofRes','State','Zip','TransDate','TransTime','TransType','BatteredWP','AlertDVAbuse','AlertIVUse','AlertHomeless','AlertOther','AlertSpec','PriReferralNPI','PriReferralType','SecReferralNPI','SecReferralType','CurrentResidence','IncarcerationStatus','LivingSituation','EmplStat','EmplType','MarStat','Pregnant','PregnantDate','CustodyDOC','CustodyOJA','CustodyDHS','AnnualIncome','IncomeDeps','SSI','SSDI','InsMedicare','InsMedicaid','LangEnglish','LangOther','LangSpec','MilitaryStatus','Education','Handicap1','Handicap2','Handicap3','Handicap4','LegalStatus','CommitmentCounty','TobaccoUse','Problem1','Problem2','Problem3','Drug1','Drug2','Drug3','Route1','Route2','Route3','Freq1','Freq2','Freq3','Age1','Age2','Age3','LevelOfCare','SpecEd','Placement','RestrictivePlacement','SelfHarm','AbsentSchool','SuspendedSchool','AbsentDayCare','GAF','CAR1','CAR2','CAR3','CAR4','CAR5','CAR6','CAR7','CAR8','CAR9','SMI','SED','FamilyID','ClinicianOfRecord','ASIMedical','ASIEmploy','ASIAlcohol','ASIDrug','ASILegal','ASIFamily','ASIPsych','Arrested30','Arrested12','SelfHelp30','EthnicHispanic','EthnicIslander','AlertCHomeless','InSchool','TASIChemical','TASISchool','TASIEmploy','TASIFamily','TASIPeer','TASILegal','TASIPsych','AgencySite','GamblingScreen','Email','traumaScore');
+@DELETES = ('PrAuthID','CDCID','LogCDCID');
+############################################################################
+# copy from one table to another
+############################################################################
+my $form = DBForm->new();
+my $dbh = $form->dbconnect();
+my $s=$dbh->prepare("select * from ${fromtable} where ClientID=49202");
+#my $s=$dbh->prepare("select * from ${fromtable}");
+$s->execute() || $form->dberror("copyTABLE: select ${fromtable}");
+while ( $r = $s->fetchrow_hashref )
+{
+  print qq|copy: ID=$r->{'ID'} ClientID=$r->{'ClientID'}\n|;
+warn qq|copy: PrAuthID=$r->{'PrAuthID'}, CDCID=$r->{'CDCID'}\n|;
+  my $rNEW = ();
+  foreach my $f ( sort keys %{ $r } ) { $rNEW->{$f}=$r->{$f}; }
+  $rNEW->{'ClientPrAuthID'} = $r->{'PrAuthID'};  # we changed the PrAuth table to ClientPrAuth table
+warn qq|copy: ClientPrAuthID=$rNEW->{'ClientPrAuthID'}, PrAuthID=$r->{'PrAuthID'}\n|;
+# ADDIN this table fields...
+  my $sCDC=$dbh->prepare("select * from CDC where ID=?");
+  $sCDC->execute($r->{CDCID}) || $form->dberror("copyTABLE: select CDC $r->{CDCID}");
+  if ( my $rCDC = $sCDC->fetchrow_hashref )
+  {
+    foreach my $f ( @ADDINS ) { $rNEW->{$f}=$rCDC->{$f}; }
+  }
+  foreach my $d ( @DELETES ) { delete $rNEW->{$d}; }
+foreach my $f ( sort keys %{ $rNEW } ) { warn "rNEW-$f=$rNEW->{$f}\n"; }
+  my $query = DBA->genReplace($form,$dbh,$totable,$rNEW,"${ID}=$r->{$ID}",$ID);
+#warn qq|query=${query}\n|;
+  my $sUpdate = $dbh->prepare($query);
+  $sUpdate->execute() || $form->dberror($query);
+  $sUpdate->finish();
+}
+$s->finish();
+$form->complete();
+exit;
+############################################################################

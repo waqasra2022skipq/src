@@ -1,0 +1,10 @@
+#cd /usr/local/www
+#find mms/Client mms/Provider oays/Client oays/Provider -type f > tar.infile
+cd /home/keith/databak
+find www -type f -o -type l > tar.infile
+split -l 100 tar.infile tar_
+for File in $(ls -1 tar_*); do
+  echo -e "\ntar using ${File}..."
+  tar -cvf ${File}.tar -T ${File}
+  rm -f ${File}
+done

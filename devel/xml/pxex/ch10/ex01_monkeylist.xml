@@ -1,0 +1,20 @@
+<?xml version="1.0">
+<monkey-list>
+ <monkey>
+  <description xmlns:mm="http://www.jmac.org/projects/monkeys/mm/">
+   <mm:monkey> <!-- start of monkey section -->
+    <mm:name>Virtram</mm:name>
+    <mm:color>teal</mm:color>
+    <mm:favorite-foods>
+     <mm:food>Banana</mm:food> <mm:food>Walnut</mm:food>
+    </mm:favorite-foods>
+    <mm:personality-matrix>
+     F6 30 00 0A 1B E7 9C 20
+    </mm:personality-matrix>
+   </mm:monkey>
+  </description>
+  <location>Living Room</location>
+  <job>Scarecrow</job>
+ </monkey>
+ <!-- Put more monkeys here later -->
+</monkey-list>

@@ -1,0 +1,53 @@
+var xmlhttp;
+// used to pass fld to stateChanged function.
+var xmlField;
+function serverREQ(str,fld,path)
+{
+// did not work as passed in arg to stateChanged.
+  xmlField = fld;
+
+// The keystone of AJAX is the XMLHttpRequest object.
+// All new browsers use the built-in JavaScript XMLHttpRequest object 
+//   to create an XMLHttpRequest object (IE5 and IE6 uses an ActiveXObject).
+  xmlhttp=GetXmlHttpObject();
+  if (xmlhttp==null)
+  {
+    alert ("Your browser does not support XMLHTTP!");
+    return;
+  }
+
+// Define the URL to send to the server
+//   add a parameter (q) to the URL with the content of the input field 
+//   add a random number to prevent the server from using a cached file
+// Creates an XMLHTTP object
+//   and tells the object to execute a function called stateChanged when a change is triggered
+// Opens the XMLHTTP object with the given URL
+// Sends an HTTP request to the server
+  var url=path+"&q="+str+"&sid="+Math.random();
+alert("url=" + url + ", fld=" + fld);
+  xmlhttp.onreadystatechange=stateChanged;
+  xmlhttp.open("GET",url,true);
+  xmlhttp.send(null);
+}
+
+function stateChanged()
+{
+  if (xmlhttp.readyState==4)
+  {
+alert("xmlField="+xmlField+", res="+xmlhttp.responseText);
+    document.getElementById(xmlField).innerHTML=xmlhttp.responseText;
+  }
+}
+
+function GetXmlHttpObject()
+{
+  if (window.XMLHttpRequest) // code for IE7+, Firefox, Chrome, Opera, Safari
+  {
+    return new XMLHttpRequest();
+  }
+  if (window.ActiveXObject) // code for IE6, IE5
+  {
+    return new ActiveXObject("Microsoft.XMLHTTP");
+  }
+  return null;
+}

@@ -1,0 +1,122 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use Cwd;
+use DBI;
+use myForm;
+use myDBI;
+use DBUtil;
+use myConfig;
+use myHTML;
+use SysAccess;
+use gXML;
+use XML::LibXSLT;
+use XML::LibXML;
+binmode STDOUT, ":utf8";
+
+############################################################################
+my $form = myForm->new();
+my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+$form = DBUtil->setDates($form);
+foreach my $f ( sort keys %{$form} ) { warn "genCCDAs: form-$f=$form->{$f}<BR>\n"; }
+if ( ! SysAccess->chkPriv($form,'MUAgent') )
+{ myDBI->error("MUAgent / Access Denied!"); }
+
+my $err = '';
+my $ID = $form->{ID};
+my $sProviderJobs = $dbh->prepare("select * from ProviderJobs where ID=?");
+$sProviderJobs->execute($ID) || myDBI->dberror("select ProviderJobs ${$IDBillDate}");
+if ( my $rProviderJobs = $sProviderJobs->fetchrow_hashref )
+{ 
+  my $token = DBUtil->genToken();
+  my $stamp = DBUtil->Date('','stamp');
+  my $Folder = $rProviderJobs->{'Folder'};
+  my $ProvID = $rProviderJobs->{'ProvID'};
+warn qq|START: token=${token}, stamp=${stamp}\n|;
+warn qq|START: Folder=${Folder}, ProvID=${ProvID}\n|;
+  # withSelection uses form->...IDs
+  $form->{'FromDate'} = $rProviderJobs->{'FromDate'};      
+  $form->{'ToDate'} = $rProviderJobs->{'ToDate'};      
+  $form->{'ClinicIDs'} = $rProviderJobs->{'ClinicIDs'};      
+  $form->{'ProvIDs'} = $rProviderJobs->{'ProvIDs'};      
+  $form->{'InsIDs'} = $rProviderJobs->{'InsIDs'};      
+  $form->{'ClientIDs'} = $rProviderJobs->{'ClientIDs'};      
+  my $cnt = 0;
+  my $with = qq|where Treatment.ContLogDate between '$form->{FromDate}' and '$form->{ToDate}' |;
+  $with .= DBA->withSelection($form,'and','Treatment.ClinicID','Treatment.ProvID','Treatment.ClientID','Treatment.TrID');
+warn qq|with: ${with}\n|;
+  my $sTreatment = $dbh->prepare("select * from Treatment left join xSC on xSC.SCID=Treatment.SCID left join xInsurance on xInsurance.ID=xSC.InsID ${with}");
+  $sTreatment->execute() || myDBI->dberror("genCCDAs: select failed! ${with}");
+  while ( my $r = $sTreatment->fetchrow_hashref )
+  {
+warn qq|START: TrID=$r->{TrID},$r->{ClientID}\n|;
+    $err .= main->genFILES($token,$r->{ProvID},$r->{ClientID},$r->{TrID});
+    $cnt+=1;
+  }
+  unless ( $cnt )
+  {
+    $err .= main->genFILES($token,$ProvID,'none','none');
+  }
+  $sTreatment->finish();
+
+# create temporary directory for files created and zip from this shell...
+  my $BIN = myConfig->cfg('BIN');
+warn qq|${BIN}/zipFILEs $form->{'DOCROOT'} "CCDA_${token}*" ${Folder} ${ProvID}\n|;
+  my $shell = `${BIN}/zipFILEs $form->{'DOCROOT'} "CCDA_${token}*" ${Folder} ${ProvID}`;
+  main->addEDoc($form,$Folder,$ProvID);
+}
+else
+{ warn qq|ID NOT FOUND !\n|; }
+$sProviderJobs->finish();
+myDBI->cleanup();
+exit;
+############################################################################
+sub genFILES
+{
+  my ($self,$token,$NoteProvID,$ClientID,$TrID) = @_;
+##
+# first generate the XML file...
+  my $xml = qq|<?xml version="1.0" encoding="utf-8"?>\n|.gXML->setXML($form,$NoteProvID,$ClientID,$TrID,'','','CCDA nonulls');
+  my $xmlfile = qq|/tmp/XML_${token}_${TrID}.xml|;
+  my $xmlpath = qq|$form->{DOCROOT}${xmlfile}|;
+  open(XML, ">", $xmlpath) || die "Couldn't open '${xmlpath}' file: $!"; 
+  print XML $xml;
+  close(XML);
+
+# next the generate Visit CCDA file...
+  my $visitout = gXML->styleCCDA($form,$xmlfile,'Visit');
+  my $visitfile = qq|/tmp/CCDA_${token}_${TrID}_Visit.xml|;
+  my $visitpath = qq|$form->{DOCROOT}${visitfile}|;
+  open(OUT, ">:encoding(UTF-8)", $visitpath) || die "Couldn't open '${visitpath}' file: $!"; 
+  print OUT $visitout;
+  close(OUT);
+
+# next the generate Referral CCDA file...
+  my $referralout = gXML->styleCCDA($form,$xmlfile,'Referral');
+  my $referralfile = qq|/tmp/CCDA_${token}_${TrID}_Referral.xml|;
+  my $referralpath = qq|$form->{DOCROOT}${referralfile}|;
+  open(OUT, ">:encoding(UTF-8)", $referralpath) || die "Couldn't open '${referralpath}' file: $!"; 
+  print OUT $referralout;
+  close(OUT);
+
+  return();
+}
+sub addEDoc
+{
+  my ($self,$form,$Folder,$ProvID) = @_;
+  my $dbh = $form->dbconnect();
+  my $r = ();
+  $r->{ProvID} = $ProvID;
+  $r->{Title} = $Folder;
+  $r->{Descr} = "CCDA Zip file created ".localtime();
+  $r->{Path} = qq|/Provider/EDocs/${ProvID}/${Folder}.zip|;
+  $r->{CreateProvID} = $form->{LOGINPROVID};
+  $r->{CreateDate} = $form->{TODAY};
+  $r->{Type} = 40;     # CCDAs
+  $r->{Public} = 0;
+  $query = DBA->genReplace($form,$dbh,'ProviderEDocs',$r,"Path='$r->{Path}'");
+  my $sql = $dbh->prepare($query);
+  $sql->execute() || myDBI->dberror($query);
+  $sql->finish();
+  return();
+}
+############################################################################

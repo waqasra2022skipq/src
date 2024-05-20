@@ -1,0 +1,50 @@
+javascript...
+function CurrencyFormatted(amount)
+{
+	var i = parseFloat(amount);
+	if(isNaN(i)) { i = 0.00; }
+	var minus = '';
+	if(i < 0) { minus = '-'; }
+	i = Math.abs(i);
+	i = parseInt((i + .005) * 100);
+	i = i / 100;
+	s = new String(i);
+	if(s.indexOf('.') < 0) { s += '.00'; }
+	if(s.indexOf('.') == (s.length - 2)) { s += '0'; }
+	s = minus + s;
+	return s;
+}
+// end of function CurrencyFormatted()
+
+Here is a Perl function to do currency formatting: 
+
+sub CurrencyFormatted
+{
+	my $n = shift;
+	my $minus = $n < 0 ? '-' : '';
+	$n = abs($n);
+	$n = int(($n + .005) * 100) / 100;
+	$n .= '.00' unless $n =~ /\./;
+	$n .= '0' if substr($n,(length($n) - 2),1) == '.';
+	chop $n if $n =~ /\.\d\d0$/;
+	return "$minus$n";
+}
+# end of subroutine CurrencyFormatted
+
+sub CommaFormatted
+{
+	my $delimiter = ','; # replace comma if desired
+	my($n,$d) = split /\./,shift,2;
+	my @a = ();
+	while($n =~ /\d\d\d\d/)
+	{
+		$n =~ s/(\d\d\d)$//;
+		unshift @a,$1;
+	}
+	unshift @a,$n;
+	$n = join $delimiter,@a;
+	$n = "$n\.$d" if $d =~ /\d/;
+	return $n;
+}
+# end of subroutine CommaFormatted
+

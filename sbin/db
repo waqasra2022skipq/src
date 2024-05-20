@@ -1,0 +1,35 @@
+#!/bin/bash
+#--------------------
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   echo -e "\nServices not installed!"
+   exit 1
+fi
+LogFile=${LOGDIR}/${CMD}
+#--------------------
+TmpFile=/tmp/$$
+DB=$1
+shift
+Stmt=$*
+#-------------------------
+Usage()
+{
+   echo $1
+   echo
+   echo "Usage: ${CMD} database statement"
+   echo
+   exit
+}
+#-------------------------
+if [ -z "${DB}" ]; then Usage "No database!"; fi
+if [ -z "${Stmt}" ]; then Usage "No statement!"; fi
+if [ ! -d ${DBDIR}/${DB} ]; then Usage "Invalid database!"; fi
+if [ -s "${Stmt}" ]; then
+  ${DBCMD} ${DB} < ${Stmt}
+else
+  echo "$Stmt;"
+  echo "$Stmt;" > ${TmpFile}.in
+  ${DBCMD} ${DB} < ${TmpFile}.in
+  rm ${TmpFile}.in
+fi

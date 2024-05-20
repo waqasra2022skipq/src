@@ -1,0 +1,8 @@
+INSERT INTO `user` VALUES ('localhost','okmisorg_devoays','*565C1DF5FF5ECDF9C8CB8D9D6E830B68549B35D7','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','','','','',0,0,0,0,'',NULL);
+INSERT INTO `db` VALUES ('localhost','okmisorg_devoays','okmisorg_devoays','Y','Y','Y','Y','Y','Y','N','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','N','N');
+INSERT INTO `user` VALUES ('localhost','okmisorg_devmms','*565C1DF5FF5ECDF9C8CB8D9D6E830B68549B35D7','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','','','','',0,0,0,0,'',NULL);
+INSERT INTO `db` VALUES ('localhost','okmisorg_devmms','okmisorg_devmms','Y','Y','Y','Y','Y','Y','N','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','N','N');
+INSERT INTO `user` VALUES ('localhost','okmis_demo','*565C1DF5FF5ECDF9C8CB8D9D6E830B68549B35D7','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','','','','',0,0,0,0,'',NULL);
+INSERT INTO `db` VALUES ('localhost','okmis_demo','okmis_demo','Y','Y','Y','Y','Y','Y','N','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','N','N');
+UPDATE mysql.user SET Password=PASSWORD('demo123') WHERE User LIKE '%_demo' AND Host='localhost';
+FLUSH PRIVILEGES;

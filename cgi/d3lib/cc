@@ -1,0 +1,6 @@
+echo "diff nv.d3.css..."
+diff nv.d3.css ../d3org/d3nv/build/nv.d3.css
+echo "diff d3.js..."
+diff d3.js ../d3org/d3/d3.js
+echo "diff nv.d3.js..."
+diff nv.d3.js ../d3org/d3nv/build/nv.d3.js

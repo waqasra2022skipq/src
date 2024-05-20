@@ -1,0 +1,5 @@
+<?php
+$currencies = array(
+	'gbp',
+	);
+?>

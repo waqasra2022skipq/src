@@ -1,0 +1,127 @@
+#!/usr/bin/perl
+###########################################
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use MgrTree;
+use DBA;
+use PDF;
+
+###########################################
+# anything piped to us?
+##
+my @RecIDs = ();
+if ( ! -t STDIN ) { while (<STDIN>) { chomp($_); push(@RecIDs,split(' ',$_)); } }
+#warn "RecIDs=@RecIDs\n";
+#foreach my $id ( @RecIDs) { warn "id=$id\n"; }
+
+# or sent to us?
+$form = DBForm->new();
+foreach my $id ( split(' ',$form->{RecIDs}) ) { push(@RecIDs,$id); }
+
+############################################################################
+$dbh = $form->dbconnect();
+my $qProvider = qq|select Provider.*, ProviderControl.FinMgrID from Provider left join ProviderControl on ProviderControl.ProvID=Provider.ProvID where Provider.ProvID=?|;
+my $sProvider = $dbh->prepare($qProvider);
+my $qInsPaid = qq|select InsPaid.*,Client.clinicClinicID,Client.FName,Client.LName,Client.DOB,Client.Addr1,Client.Addr2,Client.City,Client.ST,Client.Zip from InsPaid left join Client on Client.ClientID=InsPaid.ClientID where InsPaid.ID=?|;
+my $sInsPaid = $dbh->prepare($qInsPaid);
+
+############################################################################
+$pdf = PDF->start("/home/okmis/mis/src/pdf/Receipt.pdt");
+my $cnt = 0;
+foreach my $id ( @RecIDs )
+{ 
+  $sInsPaid->execute($id) || $form->dberror($qInsPaid);
+  if ( my $rInsPaid = $sInsPaid->fetchrow_hashref )
+  {
+    $cnt++;
+    main->genPDFpage($form,$rInsPaid);
+  }
+}
+if ( ${cnt} == 0 )
+{ $pdf->add('',"/R5 14 Tf\n1 0 0 1 40 740 Tm (No Receipt for selection.) Tj\n"); }
+$pdf->finish();
+print $pdf->{outText};
+warn "${cnt} InsPaid Generated\n";
+
+$sProvider->finish();
+$sInsPaid->finish();
+$form->complete();
+exit;
+############################################################################
+sub genPDFpage
+{
+  my ($self,$form,$rReceipt) = @_;
+##
+# Agency Name and address.
+##
+  my $AgencyID = MgrTree->getManager($form,$rReceipt->{clinicClinicID});
+  $sProvider->execute($AgencyID) || $form->dberror($qProvider);
+  my $rAgency = $sProvider->fetchrow_hashref;
+  $pdf->addElement(38,740,$rAgency->{Name},'/R10',14);
+  my $AgencyAddr = $rAgency->{Addr2} eq '' ? "$rAgency->{Addr1}"
+                                           : "$rAgency->{Addr1}, $rAgency->{Addr2}";
+  $pdf->addElement(38,729,$AgencyAddr,'/R10',12);
+  $pdf->addElement(38,718,"$rAgency->{City}, $rAgency->{ST}   $rAgency->{Zip}",'/R10',12);
+  $pdf->addElement(38,707,"Office: $rAgency->{WkPh}",'/R10',12);
+  $pdf->addElement(38,696,"Fax: $rAgency->{Fax}",'/R10',12);
+##
+# Clinic Name and address.
+##
+#  $sProvider->execute($rReceipt->{clinicClinicID}) || $form->dberror($qProvider);
+#  my $rClinic = $sProvider->fetchrow_hashref;
+
+  my $RecDate = DBUtil->Date($rReceipt->{TransDate},'fmt','MM/DD/YYYY');
+  my $ClientName = "$rReceipt->{FName} $rReceipt->{LName} ($rReceipt->{ClientID})";
+  my $Age = DBUtil->Date($rReceipt->{DOB},'age');
+  my $ClientAddr = $rReceipt->{Addr2} eq '' ? "$rReceipt->{Addr1}"
+                                         : "$rReceipt->{Addr1}, $rReceipt->{Addr2}";
+  my $ClientCSZ = "$rReceipt->{City}, $rReceipt->{ST}  $rReceipt->{Zip}";
+  my $PaidAmt = sprintf("%.2f",$rReceipt->{PaidAmt});
+  my $Type = DBA->getxref($form,'xInsPaidTypes',$rReceipt->{Type},'Descr');
+  my $RefID = DBA->getxref($form,'xInsPaidRefIDs',$rReceipt->{RefID},'Descr');
+  $pdf->addElement(155,644,$rReceipt->{ID},'/R5',12);
+  $pdf->addElement(425,644,$RecDate,'/R5',12);
+  $pdf->addElement(155,622,$ClientName,'/R5',12);
+  $pdf->addElement(148,600,"\$",'/R5',12);
+  $pdf->addElement(155,600,$PaidAmt,'/R5',12);
+  if ( $rReceipt->{RecAmt} > 0 )
+  {
+    my $RecAmt = sprintf("%.2f",$rReceipt->{RecAmt});
+    $pdf->addElement(418,600,"\$",'/R5',12);
+    $pdf->addElement(425,600,$RecAmt,'/R5',12);
+  }
+  else {  $pdf->addElement(425,600,"none",'/R5',12); }
+  $pdf->addElement(155,578,$Type,'/R5',12);
+  $pdf->addElement(155,556,$RefID,'/R5',12);
+  $pdf->addElement(155,534,$rReceipt->{ICN},'/R5',12);
+  $sProvider->execute($rReceipt->{'CreateProvID'}) || $form->dberror($qProvider);
+  my $rProvider = $sProvider->fetchrow_hashref;
+  $pdf->addElement(155,512,"$rProvider->{FName} $rProvider->{LName}",'/R5',12);
+
+# bottom of Receipt: Please Send Payment to:
+#  $pdf->addElement(77,208,$rAgency->{Name},'/R10',12);
+#  $pdf->addElement(77,197,$AgencyAddr,'/R10',12);
+#  $pdf->addElement(77,186,"$rAgency->{City}, $rAgency->{ST}   $rAgency->{Zip}",'/R10',12);
+#
+##                    For Questions regarding your invoice contct:
+#  $sProvider->execute($rAgency->{FinMgrID}) || $form->dberror($qProvider);
+#  if ( my $rProvider = $sProvider->fetchrow_hashref )
+#  {
+#    $pdf->addElement(77,119,"$rProvider->{FName} $rProvider->{LName}",'/R10',12);
+#    $pdf->addElement(77,108,$rProvider->{JobTitle},'/R10',12);
+#    $pdf->addElement(77,97,$rAgency->{Name},'/R10',12);
+#    $pdf->addElement(77,86,$rProvider->{WkPh},'/R10',12);
+#  }
+#  else
+#  {
+#    $pdf->addElement(77,119,"No finance coordinator assigned",'/R10',12);
+#    $pdf->addElement(77,108,"please select coordinator under Agency",'/R10',12);
+#    $pdf->addElement(77,97,$rAgency->{Name},'/R10',12);
+#    $pdf->addElement(77,86,"No finance coordinator assigned",'/R10',12);
+#  }
+
+  $pdf->add('deflate',$out);
+  return(1);
+}
+############################################################################

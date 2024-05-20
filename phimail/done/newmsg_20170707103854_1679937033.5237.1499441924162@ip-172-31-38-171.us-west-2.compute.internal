@@ -1,0 +1,8 @@
+recipient: okmis-edge2015@directtest.interopengine.com
+sender: ett@directtest.interopengine.com
+From: ett@directtest.interopengine.com
+To: okmis-edge2015@directtest.interopengine.com
+Date: 7/7/17 10:38 am
+Subject: Testing STARTTLS & PLAIN SASL AUTHENTICATION (Test Case 9,16,20)!
+Files:
+20170707103854_NT_Bad_AllergyConcernElements_r11_v2.xml

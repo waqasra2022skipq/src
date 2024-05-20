@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<?xfa generator="XFA2_0" APIVersion="2.2.4333.0" ?>
+<xdp:xdp xmlns:xdp="http://ns.adobe.com/xdp/" >
+<xfa:datasets xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/" >
+<xfa:data>
+<topmostSubform>
+
+    <recordid>541</recordid>
+    <companyLogo xfa:contentType="image/gif" xfa:transferEncoding="base64">
+    </companyLogo>
+    <companyname>
+      A New View, Inc.
+      2905 S Harr Dr, Ste 102, Midwest City, OK  73110-3049
+      Office: 405-818-8364  Fax: 
+      
+    </companyname> 
+    <reportInfo></reportInfo> 
+    <footerLeft>Cms Test patient / 581</footerLeft> 
+    <footerRight></footerRight> 
+    <agencyname>A New View, Inc.</agencyname> 
+    <agencyaddr>2905 S Harr Dr, Ste 102, Midwest City, OK  73110-3049</agencyaddr> 
+    <agencyphonefax>Office: 405-818-8364  Fax: </agencyphonefax> 
+    <primaryprovider>Help Desk</primaryprovider> 
+    <clinician> </clinician> 
+    <testdate>09/09/2020</testdate> 
+    <testdate_pg2>09/09/2020</testdate_pg2> 
+    <testdate_pg3>09/09/2020</testdate_pg3> 
+    <today>08/10/2021</today> 
+    <clientid>581</clientid> 
+    <clientname>Cms Test patient</clientname> 
+    <clientname_pg2>Cms Test patient</clientname_pg2> 
+    <clientname_pg3>Cms Test patient</clientname_pg3> 
+    <clientnameid>Cms Test patient / 581</clientnameid> 
+    <clientnameid_pg2>Cms Test patient / 581</clientnameid_pg2> 
+    <addr1> </addr1> 
+    <addr2>Amsterdam, NH  </addr2> 
+    <csz></csz> 
+    <sex></sex> 
+    <sex_F></sex_F> 
+    <sex_M></sex_M> 
+    <age>15</age> 
+    <ChangeDate>2021-08-10 01:00:25</ChangeDate>
+    <ChangeProvID>91</ChangeProvID>
+    <ClientID>581</ClientID>
+    <CreateDate>2021-08-10</CreateDate>
+    <CreateProvID>91</CreateProvID>
+    <FormID>186748_1</FormID>
+    <ID>541</ID>
+    <Locked></Locked>
+    <TestDate>2020-09-09</TestDate>
+    <q1>0</q1>
+    <q1_0>0</q1_0>
+    <q2>0</q2>
+    <q2_0>0</q2_0>
+    <q3>0</q3>
+    <q3_0>0</q3_0>
+    <q4>0</q4>
+    <q4_0>0</q4_0>
+    <q5>0</q5>
+    <q5_0>0</q5_0>
+    <q6>0</q6>
+    <q6_0>0</q6_0>
+    <tALL>0</tALL>
+    <t1>0</t1>
+    <t2>0</t2>
+    <t3>0</t3>
+    <total>0</total>
+
+
+</topmostSubform>
+</xfa:data>
+</xfa:datasets>
+<pdf href="http://forms.okmis.com/printing/PrintClientCRAFFT_Rev2.pdf" xmlns="http://ns.adobe.com/xdp/pdf/" />
+</xdp:xdp>

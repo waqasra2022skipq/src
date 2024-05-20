@@ -1,0 +1,13 @@
+select CDC.AgencySite,CDC.AgencyNum,CDC.TransDate,CDC.ClientID
+#      ,CDCPA.PrAuthID,CDC.ID
+      ,CDC.TransType,CDCPA.Status,CDCPA.StatusDate,Client.ProvID
+from CDC
+  left join CDCPA on CDCPA.CDCID=CDC.ID
+  left join Client on Client.ClientID=CDC.ClientID
+   where CDCPA.Fail is null
+   and CDCPA.CDCID is not null
+   and CDCPA.Status='Sent'
+   and ((CDC.TransDate >= '20150120' and CDC.TransDate <= '20151201')
+        or CDC.TransType >= 60)
+ order by CDC.TransType, CDC.TransDate, CDC.TransTime
+;

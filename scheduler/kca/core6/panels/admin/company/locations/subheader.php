@@ -1,0 +1,1 @@
+<h2><?php echo M('Locations'); ?></h2>

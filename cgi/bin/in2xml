@@ -1,0 +1,154 @@
+
+<?xml version="1.0" encoding="utf-8"?>
+
+<NCScript xmlns="http://secure.newcropaccounts.com/interfaceV7"
+          xmlns:NCStandard="http://secure.newcropaccounts.com/interfaceV7:NCStandard"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <Credentials>
+    <partnerName>Millennium</partnerName>
+    <name>demo</name>
+    <password>demo</password>
+    <productName>MillenniumServices</productName>
+    <productVersion>V1.1</productVersion>
+  </Credentials>
+
+  <UserRole>
+    <!-- See XML Schema: UserType for valid values -->
+    <user>LicensedPrescriber</user>
+    <!-- See XML Schema: RoleType for valid values -->
+    <role>doctor</role>
+  </UserRole>
+
+  <Destination>
+    <!-- See XML Schema: RequestedPageType for valid values -->
+    <requestedPage>lab-results</requestedPage>
+  </Destination>
+  <Account ID="okmisorg_devmms-92">
+    <accountName>Millennium Medical Services, LLC</accountName>
+    <siteID>okmisorg_devmms</siteID>
+    <AccountAddress>
+      <address1>3816 Shadowridge Dr.</address1>
+      <city>Norman</city>
+      <state>OK</state>
+      <zip>73072</zip>
+      <zip4>5308</zip4>
+      <country>US</country>
+    </AccountAddress>
+    <accountPrimaryPhoneNumber>4056270276</accountPrimaryPhoneNumber>
+    <accountPrimaryFaxNumber>4055730404</accountPrimaryFaxNumber>
+  </Account>
+  <Location ID="okmisorg_devmms-92-101">
+    <locationName>MMS Norman Clinic</locationName>
+    <LocationAddress>
+      <address1>448 36th Ave NW</address1>
+      <address2>Suite 101</address2>
+      <city>Norman</city>
+      <state>OK</state>
+      <zip>73072</zip>
+      <zip4>4743</zip4>
+      <country>US</country>
+    </LocationAddress>
+    <primaryPhoneNumber>8885737792</primaryPhoneNumber>
+    <primaryFaxNumber>8887538162</primaryFaxNumber>
+    <pharmacyContactNumber>8885737792</pharmacyContactNumber>
+  </Location>
+  <LicensedPrescriber ID="okmisorg_devmms-2238">
+    <LicensedPrescriberName>
+      <last>Hooper</last>
+      <first>Cheryl</first>
+    </LicensedPrescriberName>
+    <dea>MH2643888</dea>
+    <upin>1427140573</upin>
+    <licenseState>OK</licenseState>
+    <licenseNumber>R0048567</licenseNumber>
+    <npi>1427140573</npi>
+  </LicensedPrescriber>
+
+  <Patient ID="okmisorg_devmms-47515">
+    <PatientName>
+      <last>Merrill</last>
+      <first>Dorothy</first>
+    </PatientName>
+    <medicalRecordNumber>okmisorg_devmms-47515</medicalRecordNumber>
+    <PatientAddress>
+      <address1>Elmbrook Home</address1>
+      <address2>1811 9th Ave NW</address2>
+      <city>Ardmore</city>
+      <state>OK</state>
+      <zip>73401</zip>
+      <country>US</country>
+    </PatientAddress>
+    <PatientContact>
+      <homeTelephone>5802233303</homeTelephone>
+    </PatientContact>
+    <PatientCharacteristics>
+      <dob>19181228</dob>
+      <gender>F</gender>
+    </PatientCharacteristics>
+
+    <PatientGuarantor ID="okmisorg_devmms-G47515"> <!--Assign a unique ID for each PatientGuarantor-->
+      <GuarantorName>
+        <last>Merrill</last>
+        <first>Dorothy</first>
+      </GuarantorName>
+      <guarantorDob>19181228</guarantorDob>
+      <guarantorGender>F</guarantorGender>
+      <GuarantorAddress>
+        <address1>Elmbrook Home Somestreet</address1>
+        <address2>1811 9th Ave NW 123</address2>
+        <city>Ardmore</city>
+        <state>OK</state>
+        <zip>73401</zip>
+        <country>US</country>
+      </GuarantorAddress>
+      <GuarantorContact>
+        <homeTelephone>5802233303</homeTelephone>
+      </GuarantorContact>
+      <guarantorRelationship>Self</guarantorRelationship> <!--Self, Spouse, Child, Employer, Unknown-->
+    </PatientGuarantor>
+
+
+    <PatientPayorAndInsured ID="04312"> <!--ID is the HSI number-->
+      <payor>
+        <payorName>Medicare</payorName>
+        <PayorAddress>
+          <address1>701 NW 63rd St.</address1>
+          <address2>Ste 300</address2>
+          <city>Oklahoma City</city>
+          <state>OK</state>
+          <zip>73116</zip>
+          <zip4>7693</zip4>
+          <country>US</country>
+        </PayorAddress>
+        <insuranceServiceProvider>Other</insuranceServiceProvider> <!--Medicare, Medicaid, BCBS, Other-->
+      </payor>
+      <insured>
+        <patientRelationship>Self</patientRelationship>
+        <priorityCode>Primary</priorityCode> <!--Primary, Secondary, Tertirary-->
+        <policyNumber>506381157A</policyNumber>
+        <InsuredName>
+          <last>Merrill</last>
+          <first>Dorothy</first>
+        </InsuredName>
+        <InsuredAddress>
+          <address1>Elmbrook Home</address1>
+          <address2>1811 9th Ave NW</address2>
+          <city>Ardmore</city>
+          <state>OK</state>
+          <zip>73401</zip>
+          <country>US</country>
+        </InsuredAddress>
+        <insuredDob>19181228</insuredDob>
+        <insuredGender>F</insuredGender>
+        <InsuredContact>
+          <homeTelephone>5802233303</homeTelephone>
+        </InsuredContact>
+      </insured>
+    </PatientPayorAndInsured>
+
+
+
+  </Patient>
+
+</NCScript>

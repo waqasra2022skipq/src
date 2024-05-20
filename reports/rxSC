@@ -1,0 +1,7 @@
+select xInsurance.Descr,xSC.SCID,xSC.SCNum,xSC.SCName,xSCRates.UnitLbl,xSCRates.HrsPerUnit
+ from xSC
+  left join xSCRates on xSCRates.SCID=xSC.SCID
+  left join xInsurance on xInsurance.ID=xSC.InsID
+ where xSCRates.UnitLbl='Each' and xSCRates.HrsPerUnit!=1
+   and xSC.Active=1
+ order by xInsurance.Descr,xSC.SCNum

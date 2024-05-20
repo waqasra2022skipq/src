@@ -1,0 +1,215 @@
+<ul class="menuTemplate1 decor1_1" license="2c5o7">
+    <li><a href="#">History</a>
+        <div class="drop decor1_2" style="width: 200px;">
+            <div class="left">
+                <b>Last 15 max</b>
+                <div>
+                    HISTORY
+                </div>
+            </div>
+        </div>
+    </li>
+    <li class="separator"></li>
+    <li><a href="#" class="arrow">Administration</a>
+        <div class="drop decor1_2" style="width: 500px;">
+            <div class="left">
+                <b>Management</b>
+                <div>
+      <A HREF="javascript:ReportWindow('/cgi/bin/mf.cgi?mlt=<<mlt>>&misLINKS=<<misLINKS>>','MillenniumForms',700,1200)" >Corporate Forms</A> <BR />
+      <A HREF="javascript:ReportWindow('/cgi/bin/mf.cgi?ProvID=90&mlt=<<mlt>>&misLINKS=<<misLINKS>>','MillenniumForms',700,1200)" >Forms / Links</A> <BR />
+      [[SysAccess->verify(%form+Privilege=NewProvider)<A HREF="/cgi/bin/mis.cgi?Provider_ProvID=new&view=Provider.cgi&&mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='Add New Providers'; return true;" ONMOUSEOUT="window.status=''" >Add Provider</A> <BR /> ]]
+      [[SysAccess->verify(%form+Privilege=InActiveProvider)<A HREF="/cgi/bin/mis.cgi?MIS_Action=ManagerTreeIA.cgi&mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='List Inactive Providers'; return true;" ONMOUSEOUT="window.status=''" >Inactive Providers List</A> <BR /> ]]
+      [[SysAccess->verify(%form+Privilege=BillingRemit)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=vInsID.cgi&title=Reconcile or Scholarship Notes&action=Remit&mlt=<<mlt>>&misLINKS=<<misLINKS>>','Remit',700,1400)" ONMOUSEOVER="window.status='Manual Reconcile'; return true;" ONMOUSEOUT="window.status=''" >Reconcile / Scholarship</A> <BR /> ]]
+      [[SysAccess->verify(%form+Privilege=Agent)<A HREF="javascript:ReportWindow('/cgi/bin/sm.pl?heading=This report has been retired.&title=If needed please contact MIS Support&mlt=<<mlt>>','SM')" ONMOUSEOVER="window.status='Generate Notes'; return true;" ONMOUSEOUT="window.status=''" >Generate Progress Notes</A> <BR /> ]]
+      [[SysAccess->verify(%form+Privilege=Agent)<A HREF="javascript:ReportWindow('/cgi/bin/sm.pl?heading=This report has been retired.&title=If needed please contact MIS Support&mlt=<<mlt>>','SM')" ONMOUSEOVER="window.status='Generate Notes'; return true;" ONMOUSEOUT="window.status=''" >Generate Physician Notes</A> <BR /> ]]
+      [[SysAccess->verify(%form+Privilege=BillingRemit)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=vInsID.cgi&title=Generate 2nd HCFA&action=2ndHCFA&mlt=<<mlt>>&misLINKS=<<misLINKS>>','2ndHCFA',700,1400)" ONMOUSEOVER="window.status='Generate 2nd HCFA'; return true;" ONMOUSEOUT="window.status=''" >Generate 2nd HCFA (select Primary)</A> <BR /> ]]
+                </div>
+            </div>
+            <div class="left" style="text-align:right; width:100px;">
+                <img src="/cgi/images/admin.jpeg" style="width:128px; height:128px;" />
+            </div>
+            <div style='clear: both;'></div>
+            <div class="left">
+                <b>Provider</b>
+                <div>
+      <A HREF="javascript:ReportWindow('/cgi/bin/TimeClock.cgi?mlt=<<mlt>>&misLINKS=<<misLINKS>>','TimeClock')" ONMOUSEOVER="window.status='Clock In/Out'; return true;" ONMOUSEOUT="window.status=''" >Clock In/Out</A> <BR />
+      [[DBUtil->isNOTNULL(<<ShiftExecPath>>)<A TARGET="_shiftexec" HREF="<<ShiftExecPath>>/index.php" ONMOUSEOVER="window.status='ShiftExec'; return true;" ONMOUSEOUT="window.status=''" >Shift Schedule</A> <BR />]]
+      <A HREF="/cgi/bin/mis.cgi?Provider_ProvID=<<LOGINPROVID>>&view=ListReminders.cgi&mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='Reminders'; return true;" ONMOUSEOUT="window.status=''" >Set up Reminder</A> <BR />
+      [[DBUtil->isNOTNULL(<<SchedulerPath>>)<A TARGET="_scheduler" HREF="<<SchedulerPath>>/index.php" ONMOUSEOVER="window.status='Scheduler'; return true;" ONMOUSEOUT="window.status=''" >Patient Schedule</A> <BR />]]
+      [[SysAccess->verify(%form+Privilege=Agent)<A HREF="/cgi/bin/ListAppointments.cgi?mlt=<<mlt>>&misLINKS=<<misLINKS>>">Appointments List</A> <BR /> ]]
+      [[SysAccess->verify(%form+Privilege=SatSurveys)<A HREF="/cgi/bin/ListSurveys.cgi?mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='Surveys'; return true;" ONMOUSEOUT="window.status=''" >Satisfaction Surveys</A> <BR /> ]]
+                </div>
+            </div>
+            <div class="left">
+                <b>Notes</b>
+                <div>
+      <A HREF="/cgi/bin/ChartList.cgi?Provider_ProvID=<<LOGINPROVID>>&SortType=NotBilled&mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='NotBilled Notes'; return true;" ONMOUSEOUT="window.status=''" >My Notes Not Billed</A> <BR />
+      <A HREF="/cgi/bin/ChartList.cgi?Provider_ProvID=<<LOGINPROVID>>&SortType=inprocess&mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='InProcess Notes'; return true;" ONMOUSEOUT="window.status=''" >My Notes InProcess</A> <BR />
+      <A HREF="/cgi/bin/ChartList.cgi?Provider_ProvID=<<LOGINPROVID>>&SortType=notreconciled&mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='NotReconciled Notes'; return true;" ONMOUSEOUT="window.status=''" >My Notes Not Reconciled</A> <BR />
+      [[SysAccess->verify(%form+Privilege=Notes2Print)<A HREF="/cgi/bin/ListFiles.cgi?Type=Notes&mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='Notes Print'; return true;" ONMOUSEOUT="window.status=''" >Notes Print Files (exp: 5/2017)</A> <BR /> ]]
+      [[SysAccess->verify(%form+Privilege=HCFA2Print)<A HREF="/cgi/bin/ListFiles.cgi?Type=HCFA&mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='HCFA Print'; return true;" ONMOUSEOUT="window.status=''" >HCFA 1500 Print Files</A> <BR /> ]]
+      [[SysAccess->verify(%form+Privilege=Invoices2Print)<A HREF="/cgi/bin/ListFiles.cgi?Type=INV&mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='Invoices Print'; return true;" ONMOUSEOUT="window.status=''" >Invoices Print Files</A> <BR /> ]]
+      [[SysAccess->verify(%form+Privilege=BillingRemit)<A HREF="/cgi/bin/ListFiles.cgi?Type=EBT&mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='Electronic Billing/Remit Files'; return true;" ONMOUSEOUT="window.status=''" >Electronic Billing/Remit Files</A> <BR /> ]]
+      [[SysAccess->verify(%form+Privilege=Elec2Send)<A HREF="/cgi/bin/ListFiles.cgi?Type=HIPPA&mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='Electronic'; return true;" ONMOUSEOUT="window.status=''" >Generated Electronic Billing Files</A> <BR /> ]]
+                </div>
+            </div>
+            <div style='clear: both;'></div>
+        </div>
+    </li>
+    <li class="separator"></li>
+    <li><a href="#" class="arrow">Reports</a>
+        <div class="drop decor1_2" style="width: 400px;">
+            <div class="left">
+                <b>Provider Reports</b>
+                <div>
+      <A HREF="javascript:ReportWindow('/cgi/bin/UserReports.cgi?mlt=<<mlt>>&misLINKS=<<misLINKS>>','UserReports',900,1200)" ONMOUSEOVER="window.status='User Reports'; return true;" ONMOUSEOUT="window.status=''" >User Reports</A> <BR />
+      <A HREF="/cgi/bin/ListFiles.cgi?Type=RPT&mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='My Reports Print'; return true;" ONMOUSEOUT="window.status=''" >My Reports List</A> <BR />
+      [[SysAccess->verify(%form+Privilege=Graphs) <A HREF="javascript:ReportWindow('/cgi/bin/graphs.cgi?mlt=<<mlt>>&misLINKS=<<misLINKS>>','GraphReports',900,1000)" ONMOUSEOVER="window.status='Graph Reports'; return true;" ONMOUSEOUT="window.status=''" >Graph Controller</A> <BR /> ]]
+            [[DBUtil->isEQ(<<LOGINPROVID>>+91) <A HREF="javascript:ReportWindow('/cgi/bin/stats.cgi?ClientID=53531&mlt=<<mlt>>&misLINKS=<<misLINKS>>','Statistics',900,1000)" ONMOUSEOVER="window.status='Statistics Reports'; return true;" ONMOUSEOUT="window.status=''" >Statistics Client 53531</A> <BR /> ]]
+      [[SysAccess->verify(%form+Privilege=MUAgent)<A HREF="javascript:ReportWindow('/cgi/bin/UserReports.cgi?mlt=<<mlt>>&misLINKS=<<misLINKS>>&xtable=xAMSReports','AMSReports',900,1200)" ONMOUSEOVER="window.status='Access Monitoring System Reports (AMS)'; return true;" ONMOUSEOUT="window.status=''" >AMS Reports (Access Monitoring System)</A> <BR /> ]]
+                </div>
+            </div>
+            <div class="left" style="border-left: 44px solid #F7F7F7; text-align:right; width:100px;">
+                <img src="/cgi/images/reports.jpeg" style="width:128px; height:128px;" />
+            </div>
+            <div style='clear: both;'></div>
+            <div class="left">
+                <b>Monthly Quarterly Reports</b>
+                <div>
+      <A HREF="/cgi/bin/ChartList.cgi?Provider_ProvID=<<LOGINPROVID>>&SortType=all&SortRange=l1m&mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='NotBilled Notes'; return true;" ONMOUSEOUT="window.status=''" >My Notes Last 30 Days</A> <BR />
+      [[SysAccess->verify(%form+Privilege=BillingReports)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=Months.html&action=genCARS.cgi&Title=Monthly CARS&mlt=<<mlt>>','CARS')" ONMOUSEOVER="window.status='Monthly CARS'; return true;" ONMOUSEOUT="window.status=''" >Monthly CARS Report</A> <BR /> ]]
+      [[SysAccess->verify(%form+Privilege=BillingReports)<A HREF="javascript:ReportWindow('/cgi/bin/sm.pl?heading=This report has been retired.&title=If needed please contact MIS Support&mlt=<<mlt>>','SM')" ONMOUSEOVER="window.status='Quarterly BHO'; return true;" ONMOUSEOUT="window.status=''" >Quarterly BHO Report</A> <BR /> ]]
+      [[SysAccess->verify(%form+Privilege=BillingReports)<A HREF="javascript:ReportWindow('/cgi/bin/sm.pl?heading=This report has been retired.&title=If needed please contact MIS Support&mlt=<<mlt>>','BHO')" ONMOUSEOVER="window.status='Quarterly BHO'; return true;" ONMOUSEOUT="window.status=''" >Quarterly BHO Report (PDF)</A> <BR /> ]]
+      [[SysAccess->verify(%form+Privilege=BillingReports)<A HREF="javascript:ReportWindow('/cgi/bin/sm.pl?heading=This report has been retired.&title=If needed please contact MIS Support&mlt=<<mlt>>','QA')" ONMOUSEOVER="window.status='Quarterly QA'; return true;" ONMOUSEOUT="window.status=''" >Quarterly QA Report (PDF)</A> <BR /> ]]
+      [[SysAccess->verify(%form+Privilege=BillingReports)<A HREF="javascript:ReportWindow('/cgi/bin/sm.pl?heading=This report has been moved to User Reports.&title=If needed please find it there under the Management section.&mlt=<<mlt>>','Stats')" ONMOUSEOVER="window.status='Quarterly Stats'; return true;" ONMOUSEOUT="window.status=''" >Quarterly Stats Report</A> <BR /> ]]
+      [[SysAccess->verify(%form+Privilege=BillingReports)<A HREF="javascript:ReportWindow('/cgi/bin/sm.pl?heading=This report has been retired.&title=If needed please contact MIS Support&mlt=<<mlt>>','Stats')" ONMOUSEOVER="window.status='Quarterly Stats'; return true;" ONMOUSEOUT="window.status=''" >Quarterly Milestones Stats Report</A> <BR /> ]]
+      [[SysAccess->verify(%form+Privilege=Agent)<A HREF="javascript:ReportWindow('/cgi/bin/sm.pl?heading=This report has been retired.&title=If needed please contact MIS Support&mlt=<<mlt>>','Stats')" ONMOUSEOVER="window.status='Quarterly Stats'; return true;" ONMOUSEOUT="window.status=''" >Quarterly HTM Stats Report</A> <BR /> ]]
+      [[DBUtil->isEQ(<<LOGINPROVID>>+91) <A HREF="javascript:ReportWindow('/cgi/bin/HL7.cgi?mlt=<<mlt>>&misLINKS=<<misLINKS>>','HL7Report',700,1200)" ONMOUSEOVER="window.status='HL7Report'; return true;" ONMOUSEOUT="window.status=''" >HL7 Report</A> <BR /> ]]
+      [[DBUtil->isEQ(<<LOGINPROVID>>+91) <A HREF="javascript:ReportWindow('/cgi/bin/tst.pl?mlt=<<mlt>>&misLINKS=<<misLINKS>>','TEST')" ONMOUSEOVER="window.status='TEST'; return true;" ONMOUSEOUT="window.status=''" >TEST Me</A> <BR /> ]]
+      [[DBUtil->isEQ(<<LOGINPROVID>>+91) <A HREF="javascript:ReportWindow('/cgi/bin/env.cgi?mlt=<<mlt>>&misLINKS=<<misLINKS>>','ENV')" ONMOUSEOVER="window.status='ENVIRONMENT VARIABLES'; return true;" ONMOUSEOUT="window.status=''" >ENV LIST</A> <BR /> ]]
+      [[DBUtil->isEQ(<<LOGINPROVID>>+91) <A HREF="javascript:ReportWindow('/cgi/bin/ShowDeviceDetails.php?mlt=<<mlt>>&misLINKS=<<misLINKS>>','DEVICE')" ONMOUSEOVER="window.status='DEVICE'; return true;" ONMOUSEOUT="window.status=''" >ShowDeviceDetails</A> <BR /> ]]
+                </div>
+            </div>
+        </div>
+    </li>
+    <li class="separator"></li>
+    <li><a href="#" class="arrow">Support</a>
+        <div class="drop decor1_2 dropToLeft" style="width: 520px;">
+            <div class="left">
+                <b>Help or Support</b>
+                <div>
+                  <A HREF="javascript:ReportWindow('https://okmis.zendesk.com/home','HelpWindow')" ><FONT COLOR="green">NEW Millennium Information Services Customer Service!</FONT></A> <BR />
+                  <A HREF="javascript:ReportWindow('http://forms.okmis.com/misdocs/NewProcedures_TrPlan_Problems_PA.pdf','HelpWindow')" >Problems/Treatment Plan/Prior Authorizations New Procedures</A> <BR />
+                  <A HREF="javascript:ReportWindow('http://okmis.helpdocsonline.com/check-settings-for-windows-internet-explorer','HelpWindow')" >Check browser settings for Internet Explorer</A> <BR />
+                  <A HREF="javascript:ReportWindow('http://okmis.helpdocsonline.com/print-carf-intake','HelpWindow')" >Printing Client Information</A> <BR />
+                  <A HREF="javascript:ReportWindow('http://helpx.adobe.com/acrobat/using/display-pdf-browser-acrobat-xi.html#id_48998','HelpWindow')" >Check Safari settings for Adobe Reader</A> <BR />
+                  <A HREF="javascript:ReportWindow('http://okmis.helpdocsonline.com/insurance-2','HelpWindow')" >Insurance</A> <BR />
+                  <A HREF="javascript:ReportWindow('http://okmis.helpdocsonline.com/caqh-process','HelpWindow')" >Insurance Checklists</A> <BR />
+                  <A HREF="javascript:ReportWindow('https://ww4.odmhsas.org/accesscontrol_new/ACMain/login.aspx?ReturnUrl=%2fAccessControl_new%2fclientinfo%2fbrowse.aspx%3fwhatpage%3dcdc2.aspx&whatpage=cdc2.aspx','HelpWindow')" >PICIS Web Site</A> <BR />
+                  <A HREF="javascript:ReportWindow('http://okmis.helpdocsonline.com/prior-authorizations','HelpWindow')" >Prior Authorization</A> <BR />
+                  <A HREF="javascript:ReportWindow('http://forms.okmis.com/misdocs/CDC_Required_Fields.pdf','HelpWindow')" >CDC Required Fields</A> <BR />
+                  <A HREF="javascript:ReportWindow('http://forms.okmis.com/misdocs/HOWTO_IMPROVE_CHANCES_FOR_AUTO-AUTH_20071031.pdf','HelpWindow')" >How to Improve chances for Auth Authorization</A> <BR />
+                  <A HREF="javascript:ReportWindow('http://forms.okmis.com/misdocs/Medicaid_Invalid_Diagnoses.pdf','HelpWindow')" >Invalid Primary Diagnoses for Medicaid Patients</A> <BR />
+                  <A HREF="javascript:ReportWindow('http://okmis.helpdocsonline.com/home','ContactUs',600,900)">Help Desk / Search Information</A> <BR />
+                </div>
+            </div>
+            <div class="left">
+                <b>Printing with Adobe</b>
+                <div>
+                  <A HREF="javascript:ReportWindow('https://www.wintips.org/how-to-disable-automatic-update-in-adobe-reader-dc/','Disable Adobe Updater',600,900)">Disable Adobe Updater</A> <BR />
+                </div>
+            </div>
+            <div class="right" >
+                <img src="/cgi/images/mail.png" style="width:128px; height:128px;" /> <BR />
+                <b>Contact Us</b> <BR />
+                <A HREF="mailto:wade@okmis.com">Wade Hamil</A> <BR />
+                <A HREF="mailto:keith@okmis.com">Keith Stephenson</A> <BR />
+                <A HREF="mailto:darrell@okmis.com">Darrell Valois</A> <BR />
+                <A HREF="mailto:autumn@okmis.com">Autumn Wisenberg</A> <BR />
+            </div>
+            <div class="left" >
+              <b>NewCrop SureScripts</b> <BR />
+              <A HREF="javascript:ReportWindow('http://www.youtube.com/playlist?list=PLC2E55B597A88C7F9&feature=viewall','VideoWindow')" ONMOUSEOVER="window.status='SureScripts Training'; return true;" ONMOUSEOUT="window.status=''" >NewCrop Training Video</A> <BR />
+              <FONT SIZE="-1" >
+<A HREF="mailto:wfarris@newcroprx.com">Wendy Farris</A> <BR />
+Director Customer Support NewCrop, LLC <BR />
+Fax: 832-553-1889 <BR />
+              </FONT>
+            </div>
+            <div class="left" >
+              <b>MyHealth Access Network</b> <BR />
+              <A HREF="javascript:ReportWindow('https://portal-pilot.verinovum.com/','MyHealth')" ONMOUSEOVER="window.status='MyHealth Support'; return true;" ONMOUSEOUT="window.status=''" >MyHealth portal link</A> <BR />
+              <FONT SIZE="-1" >
+<A HREF="mailto:donna.shope@myhealthaccess.net">Donna Shope</A> CHTS-CP <BR />
+Account Manager & Training Manager<BR />
+Office: 918-236-3452<BR />
+Mobile: 918-695-4908<BR />
+Fax:    918-236-3435<BR />
+Web:    www.myhealthaccess.net<BR />
+              </FONT>
+            </div>
+        </div>
+    </li>
+    <li class="separator"></li>
+    <li><a href="#" class="arrow">Training</a>
+        <div class="drop decor1_2 dropToLeft" style="width: 520px;">
+            <div class="left" >
+                <b>Millennium Education Environment</b>
+                <div >
+      <A HREF="javascript:ReportWindow('http://mms.okmoodle.com','moodle')" ONMOUSEOVER="window.status='moodle'; return true;" ONMOUSEOUT="window.status=''" >Click Here</A> <BR />
+                </div>
+            </div>
+            <div class="left">
+                <b>Video Menu</b>
+                <div>
+      <A HREF="javascript:ReportWindow('/movies/EAP1.mov','Movie')" ONMOUSEOVER="window.status='Movie'; return true;" ONMOUSEOUT="window.status=''" >Employee Assistance Program</A> <BR />
+      <A HREF="javascript:ReportWindow('/movies/DIW.mov','Movie')" ONMOUSEOVER="window.status='Movie'; return true;" ONMOUSEOUT="window.status=''" >Drugs in Work Place</A> <BR />
+      <A HREF="javascript:ReportWindow('/movies/OAD.mov','Movie')" ONMOUSEOVER="window.status='Movie'; return true;" ONMOUSEOUT="window.status=''" >Older Adult Development</A> <BR />
+      <A HREF="javascript:ReportWindow('/movies/PsyMeds.mov','Movie')" ONMOUSEOVER="window.status='Movie'; return true;" ONMOUSEOUT="window.status=''" >Psychiatric Medications</A> <BR />
+      <A HREF="javascript:ReportWindow('/movies/CommSeverely.mov','Movie')" ONMOUSEOVER="window.status='Movie'; return true;" ONMOUSEOUT="window.status=''" >Comm w/Severely Confused Older Adults</A> <BR />
+      <A HREF="javascript:ReportWindow('/movies/CommModerately.mov','Movie')" ONMOUSEOVER="window.status='Movie'; return true;" ONMOUSEOUT="window.status=''" >Comm w/Moderately Confused Older Adults</A> <BR />
+      <A HREF="javascript:ReportWindow('/movies/CommOriented.mov','Movie')" ONMOUSEOVER="window.status='Movie'; return true;" ONMOUSEOUT="window.status=''" >Comm w/Oriented Older Adults</A> <BR />
+      <A HREF="javascript:ReportWindow('/movies/Reminiscence.mov','Movie')" ONMOUSEOVER="window.status='Movie'; return true;" ONMOUSEOUT="window.status=''" >Therapeutic Reminiscence</A> <BR />
+      <A HREF="javascript:ReportWindow('/movies/MHProblems.mov','Movie')" ONMOUSEOVER="window.status='Movie'; return true;" ONMOUSEOUT="window.status=''" >MH Problems of Older Adults</A> <BR />
+      <A HREF="javascript:ReportWindow('/movies/GriefLoss.mov','Movie')" ONMOUSEOVER="window.status='Movie'; return true;" ONMOUSEOUT="window.status=''" >Grief, Loss and Older Adults</A> <BR />
+      <A HREF="javascript:ReportWindow('/movies/Conduct.mov','Movie')" ONMOUSEOVER="window.status='Movie'; return true;" ONMOUSEOUT="window.status=''" >Psychotherapy with Conduct</A> <BR />
+      <A HREF="javascript:ReportWindow('/movies/Anxiety.mov','Movie')" ONMOUSEOVER="window.status='Movie'; return true;" ONMOUSEOUT="window.status=''" >Anxiety Disorders</A> <BR />
+      <A HREF="javascript:ReportWindow('/movies/Mood.mov','Movie')" ONMOUSEOVER="window.status='Movie'; return true;" ONMOUSEOUT="window.status=''" >Mood Disorders</A> <BR />
+      <A HREF="javascript:ReportWindow('/movies/Psychotic.mov','Movie')" ONMOUSEOVER="window.status='Movie'; return true;" ONMOUSEOUT="window.status=''" >Psychotic Disorders</A> <BR />
+                </div>
+            </div>
+            <div class="left">
+                <b>Audio Menu</b>
+                <div>
+      <A HREF="javascript:ReportWindow('/movies/Cultural1.mov','Audio')" ONMOUSEOVER="window.status='Audio'; return true;" ONMOUSEOUT="window.status=''" >Cultural Competence - Part 1</A> <BR />
+      <A HREF="javascript:ReportWindow('/movies/Cultural2.mov','Audio')" ONMOUSEOVER="window.status='Audio'; return true;" ONMOUSEOUT="window.status=''" >Cultural Competence - Part 2</A> <BR />
+      <A HREF="javascript:ReportWindow('/movies/DSM-IVReview1.mov','Audio')" ONMOUSEOVER="window.status='Audio'; return true;" ONMOUSEOUT="window.status=''" >DSM-IV Review - Part 1</A> <BR />
+      <A HREF="javascript:ReportWindow('/movies/DSM-IVReview2.mov','Audio')" ONMOUSEOVER="window.status='Audio'; return true;" ONMOUSEOUT="window.status=''" >DSM-IV Review - Part 2</A> <BR />
+      <A HREF="javascript:ReportWindow('/movies/DSM-IVReview3.mov','Audio')" ONMOUSEOVER="window.status='Audio'; return true;" ONMOUSEOUT="window.status=''" >DSM-IV Review - Part 3</A> <BR />
+      <A HREF="javascript:ReportWindow('/movies/DSM-IVReview4.mov','Audio')" ONMOUSEOVER="window.status='Audio'; return true;" ONMOUSEOUT="window.status=''" >DSM-IV Review - Part 4</A> <BR />
+                </div>
+            </div>
+            <div class="left">
+                <b>CARF Core Training</b>
+                <div>
+      <A HREF="javascript:ReportWindow('/movies/bbpath.ppt','Slide')" ONMOUSEOVER="window.status='Slide'; return true;" ONMOUSEOUT="window.status=''" >Bloodborne Pathogens</A> <BR />
+      <A HREF="javascript:ReportWindow('/movies/HIPAA101TrainingPDF.pdf','Slide')" ONMOUSEOVER="window.status='Slide'; return true;" ONMOUSEOUT="window.status=''" >HIPAA 101 Privacy and Security</A> <BR />
+      <A HREF="javascript:ReportWindow('/movies/safetystandards2013.pdf','PDF')" ONMOUSEOVER="window.status='PDF'; return true;" ONMOUSEOUT="window.status=''" >Social Worker Safety</A> <BR />
+      <A HREF="javascript:ReportWindow('/movies/Addiction_Counseling_Competencies.pdf','PDF')" ONMOUSEOVER="window.status='PDF'; return true;" ONMOUSEOUT="window.status=''" >Addiction Counseling Competencies</A> <BR />
+      <A HREF="javascript:ReportWindow('/movies/Behavioral_Health_Services_for_People_Who_Are_Homeless.pdf','PDF')" ONMOUSEOVER="window.status='PDF'; return true;" ONMOUSEOUT="window.status=''" >Behavioral Health Services for People Who Are Homeless</A> <BR />
+      <A HREF="javascript:ReportWindow('/movies/Brief_Interventions_and_Brief_Therapies_for_Substance_Abuse.pdf','PDF')" ONMOUSEOVER="window.status='PDF'; return true;" ONMOUSEOUT="window.status=''" >Brief Interventions and Brief Therapies for Substance Abuse</A> <BR />
+      <A HREF="javascript:ReportWindow('/movies/Improving_Cultural_Competence.pdf','PDF')" ONMOUSEOVER="window.status='PDF'; return true;" ONMOUSEOUT="window.status=''" >Improving Cultural Competence</A> <BR />
+      <A HREF="javascript:ReportWindow('/movies/Substance_Abuse_Treatment-Addressing_the_Specific_Needs_of_Women.pdf','PDF')" ONMOUSEOVER="window.status='PDF'; return true;" ONMOUSEOUT="window.status=''" >Substance Abuse Treatment-Addressing the Specific Needs of Women</A> <BR />
+                </div>
+            </div>
+            <div class="left" >
+                <b>Training Room</b>
+                <div >
+      <A HREF="javascript:ReportWindow('https://forms.okmis.com/ooVoo.html','VideoRoom')" ONMOUSEOVER="window.status='Training Room'; return true;" ONMOUSEOUT="window.status=''" >Enter</A> <BR />
+                </div>
+            </div>
+        </div>
+    </li>
+    <li class="separator"></li>
+    <li><A HREF="/cgi/bin/mis.cgi?logout=1&mlt=<<mlt>>" ONMOUSEOVER="window.status='Logout of MIS'; return true;" ONMOUSEOUT="window.status=''" >Logout</A></li>
+</ul>

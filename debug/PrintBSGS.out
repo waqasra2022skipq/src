@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<?xfa generator="XFA2_0" APIVersion="2.2.4333.0" ?>
+<xdp:xdp xmlns:xdp="http://ns.adobe.com/xdp/" >
+<xfa:datasets xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/" >
+<xfa:data>
+
+  <form>
+   <companyname>Center for Therapeutic Interventions</companyname>
+   <companyaddr>7477 E 46th Place</companyaddr>
+   <companycsz>Tulsa, OK  74145-6305</companycsz>
+   <companyphone>Office: 918-384-0002</companyphone>
+   <companyfax>Fax: 918-384-0004</companyfax>
+   <medicaid>B17158293</medicaid>
+   <restlessyes>0</restlessyes>
+   <restlessno>1</restlessno>
+   <gambledyes>0</gambledyes>
+   <gambledno>1</gambledno>
+   <financialyes>0</financialyes>
+   <financialno>1</financialno>
+  </form>
+
+</xfa:data>
+</xfa:datasets>
+<pdf href="http://forms.okmis.com/printing/PrintBSGS_Rev2.pdf" xmlns="http://ns.adobe.com/xdp/pdf/" />
+</xdp:xdp>

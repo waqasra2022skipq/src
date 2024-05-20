@@ -1,0 +1,150 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use myForm;
+use myDBI;
+use DBA;
+use DBUtil;
+use Time::Local;
+my $DT = localtime();
+############################################################################
+# usage:
+#   MIPSr
+############################################################################
+my $form = myForm->new();
+my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $debug = $form->{'LOGINPROVID'} == 91 ? 0 : 0;
+if ( $debug ) { foreach my $f ( sort keys %{$form} ) { print "form-$f=$form->{$f}\n"; } }
+my $QID = $form->{'Type'};
+$form->{'FromDate'} = '2019-01-01';
+$form->{'ToDate'} = '2019-12-31';
+$form = DBUtil->setDates($form);
+my $DateRange = qq|from $form->{FromDateD} thru $form->{ToDateD}|;
+
+my $multidel = chr(253);
+my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+# join xInsurance needed for withSelection
+my $withSelection = DBA->withSelection($form,'and','Treatment.ClinicID','Treatment.ProvID','Treatment.ClientID','Treatment.TrID');
+my $Header = DBA->withSelectionHeader($form);
+print qq|Header: ${Header}\n| if ( $debug );
+$withSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+our %MIPS = (
+           128 => { 
+                    TITLE        => 'Dementia Associated Behavioral and Psychiatric Symptoms Screening and Management - National Quality Strategy Domain: Effective Clinical Care - Meaningful Measure Area: Prevention, Treatment, and Management of Mental Health',
+                    GCodes       => ['G8416','G8417','G8418','G8419','G8420','G8421','G8422','G8938'],
+                    AGES         => 'and (TIMESTAMPDIFF(YEAR, Client.DOB, Treatment.ContLogDate) >= 18)',
+                  },
+           130 => { 
+                    TITLE        => 'Documentation of Current Medications in the Medical Record - National Quality Strategy Domain: Patient Safety - Meaningful Measure Area: Medication Management',
+                    GCodes       => ['G8427','G8428','G8430'],
+                    AGES         => 'and (TIMESTAMPDIFF(YEAR, Client.DOB, Treatment.ContLogDate) >= 18)',
+                  },
+           283 => { 
+                    TITLE        => 'Dementia Associated Behavioral and Psychiatric Symptoms Screening and Management - National Quality Strategy Domain: Effective Clinical Care - Meaningful Measure Area: Prevention, Treatment, and Management of Mental Health',
+                    GCodes       => ['G9919','G9920','G9921'],
+                    AGES         => '',
+                  },
+           402 => { 
+                    TITLE        => 'Tobacco Use and Help with Quitting Among Adolescents - National Quality Strategy Domain: Community/Population Health - Meaningful Measure Area: Prevention and Treatment of Opioid and Substance Use Disorders',
+                    GCodes       => ['G9458','G9459','G9460'],
+                    AGES         => ' and (
+         (TIMESTAMPDIFF(YEAR, Client.DOB, Treatment.ContLogDate) >= 12)
+         and (TIMESTAMPDIFF(YEAR, Client.DOB, Treatment.ContLogDate) <= 20)
+       )',
+                  },
+           431 => { 
+                    TITLE        => 'Preventive Care and Screening: Unhealthy Alcohol Use: Screening & Brief Counseling - National Quality Strategy Domain: Community/Population Health - Meaningful Measure Area: Prevention and Treatment of Opioid and Substance Use Disorders',
+                    GCodes       => ['G9621','G9622','G9623','G9624'],
+                    AGES         => 'and (TIMESTAMPDIFF(YEAR, Client.DOB, Treatment.ContLogDate) >= 18)',
+                  },
+	       134 => {
+                    TITLE        => 'Preventive Care and Screening: Screening for Depression and Follow-Up Plan Domain: Community/Population Health - Meaningful Me
+asure Area: Prevention, Treatment, and Management of Mental Health',
+                    GCodes       => ['G8431','G8510','G8433','G8432','G8511'],
+                    AGES         => 'and (TIMESTAMPDIFF(YEAR, Client.DOB, Treatment.ContLogDate) >= 12)',
+                  },
+               383 => {
+                    TITLE        => 'Adherence to Antipsychotic Medications For Individuals with Schizophrenia Domain: Patient Safety - Meaningful Measure Area: Prevention, Treatment, and Management of Mental Health',
+                    GCodes       => ['G9512','G9513'],
+                    AGES         => 'and (TIMESTAMPDIFF(YEAR, Client.DOB, Treatment.ContLogDate) >= 18)',
+                  }
+,
+               226 => {
+                    TITLE        => 'Preventive Care and Screening: Tobacco Use: Screening and Cessation Intervention  Domain: Community/Population Health - Meaningful Measure Area: Prevention and Treatment of Opiod and Substance Use Disorders',
+                    GCodes       => ['G9902','G9903','G9904','G9905'],
+                    AGES         => 'and (TIMESTAMPDIFF(YEAR, Client.DOB, Treatment.ContLogDate) >= 18)',
+                  }
+);
+if ( $debug )
+{
+  for my $id ( keys %MIPS ) { print "$id: \n"; foreach my $code ( @{ $MIPS{$id}{'GCodes'} } ) { print qq| code: $code\n|; } }
+  print qq|QID: ${QID}\n|; foreach my $GCode ( @{ $MIPS{$QID}{'GCodes'} } ) { print qq| GCode: ${GCode}\n|; }
+}
+my $TITLE = $MIPS{$QID}{'TITLE'};
+my ($withGCodes,$conj) = (' and (','');
+  foreach my $GCode ( @{ $MIPS{$QID}{'GCodes'} } )
+  { 
+    $withGCodes .= qq|${conj}xSC.SCNum='${GCode}'\n|;
+    $conj = qq|        or |;
+  }
+  $withGCodes .= qq|      )|;
+my $withAges = $MIPS{$QID}{'AGES'};
+  my @FLDS = ('ClinicName:ClinicName','LName:LastName','FName:FirstName','ClientID:ClientID','DOB:DateOfBirth','Age:Age','Race:Race','PrimaryProvider:PrimaryProvider','TrID:TrID','pcount:pcount');
+#my @FLDS = ('ClientID:ClientID','TrID:TrID','pcount:pcount');
+  my $numFLDS = scalar(@FLDS)-2;
+print qq|numFLDS=${numFLDS}\n| if ( $debug );
+  my $qrecord = qq|
+select Treatment.TrID,Treatment.ContLogDate,Treatment.ClinicID,xSC.SCNum
+      ,Client.LName,Client.FName,Client.ClientID
+      ,Clinic.Name as ClinicName
+      ,CONCAT(Counselor.LName,', ',Counselor.FName) as PrimaryProvider
+      ,Client.DOB,TIMESTAMPDIFF(YEAR, Client.DOB, CURDATE()) AS Age
+      ,xRaces.Descr as Race
+      ,misICD10.ICD10
+      ,count(*) as pcount
+ from Treatment 
+  left join Client on Client.ClientID=Treatment.ClientID
+  left join Provider as Clinic on Clinic.ProvID=Client.clinicClinicID
+  left join Provider as Counselor on Counselor.ProvID=Client.ProvID
+  left join okmis_config.xRaces on xRaces.ID=SUBSTRING_INDEX(Client.Race,'${multidel}',1)
+  left join xSC on xSC.SCID=Treatment.SCID
+  left join xInsurance on xInsurance.ID=xSC.InsID
+  left join ClientNoteProblems on ClientNoteProblems.TrID=Treatment.TrID
+  left join okmis_config.misICD10 on misICD10.ID=ClientNoteProblems.UUID
+ where Client.ClientID>100
+   and (Treatment.ContLogDate >= '$form->{FromDate}' and Treatment.ContLogDate<='$form->{ToDate}')
+  ${withAges}
+  ${withGCodes}
+  ${withSelection}
+ group by Client.LName,Client.FName,Client.ClientID
+|;
+print qq|qrecord=\n${qrecord}\n| if ( $debug );
+my $rowcnt = 0;
+my $totals = ();
+print qq|${DT}\n${QID} ${TITLE} ${DateRange} ${Header}\n|;
+foreach my $f ( @FLDS ) { my ($fld,$hdr) = split(':',$f); print qq|${hdr}\t|; }
+foreach my $GCode ( @{ $MIPS{$QID}{'GCodes'} } ) { print qq|${GCode}\t|; }
+print qq|\n|;
+my $srecord = $dbh->prepare($qrecord);
+$srecord->execute();
+#my $rows = $srecord->rows; print qq|rows=${rows}\n|;
+while (my $rrecord = $srecord->fetchrow_hashref)
+{ 
+  $rowcnt++;
+  foreach my $f ( @FLDS ) { my ($fld,$hdr) = split(':',$f); print qq|$rrecord->{$fld}\t|; }
+  foreach my $GCode ( @{ $MIPS{$QID}{'GCodes'} } )
+  { 
+    my $cnt = $rrecord->{'SCNum'} eq $GCode ? '1' : '0';
+    print qq|${cnt}\t|;
+    $totals->{$GCode}+=$cnt;
+  }
+  print qq|\n|;
+}
+foreach my $f ( @FLDS ) { print qq|${rowcnt}\t|; $rowcnt=''; }
+foreach my $GCode ( @{ $MIPS{$QID}{'GCodes'} } ) { print qq|$totals->{$GCode}\t|; }
+print qq|\n|;
+$srecord->finish();
+
+myDBI->cleanup();
+exit;
+############################################################################

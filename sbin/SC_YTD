@@ -1,0 +1,10 @@
+select xInsurance.Descr, xSC.SCNum
+      ,Treatment.SCID, Treatment.ContLogDate, Treatment.TrID
+      ,Treatment.BillDate
+  from Treatment
+  left join xSC on Treatment.SCID=xSC.SCID
+  left join xInsurance on xSC.InsID=xInsurance.ID
+  where Treatment.ContLogDate >= '2002-01-01'
+    and Treatment.ContLogDate <= '2002-12-31'
+  order by xInsurance.Descr, xSC.SCNum
+;

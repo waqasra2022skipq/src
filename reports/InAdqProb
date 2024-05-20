@@ -1,0 +1,8 @@
+select Client.LName,Client.FName,Client.ClientID,ClientProblems.Priority,misICD10.ICD10,misICD10.sctName,count(*) as Count
+ from ClientProblems 
+  left join Client on Client.ClientID=ClientProblems.ClientID
+  left join okmis_config.misICD10 on misICD10.ID=ClientProblems.UUID
+#where sctName NOT REGEXP ".*[(]finding[)]\$"
+#  and sctName NOT REGEXP ".*[(]situation[)]\$"
+#  and sctName NOT REGEXP ".*[(]event[)]\$"
+ group by Client.LName,Client.FName,Client.ClientID

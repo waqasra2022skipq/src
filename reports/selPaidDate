@@ -1,0 +1,10 @@
+select Treatment.TrID, Treatment.ChartEntryDate, Treatment.ContLogDate, Treatment.BillStatus, Treatment.RecDate, NoteTrans.ID, NoteTrans.RecDate, NoteTrans.PaidDate, NoteTrans.PaidAmt
+#select Treatment.TrID
+  from Treatment
+    left join Client on Client.ClientID=Treatment.ClientID
+    left join NoteTrans on NoteTrans.TrID=Treatment.TrID
+    where Treatment.RecDate is not null and NoteTrans.RecDate is not null and NoteTrans.PaidDate is null
+and Treatment.ProvID=2319
+#and Treatment.BillStatus=4
+  order by Treatment.RecDate
+

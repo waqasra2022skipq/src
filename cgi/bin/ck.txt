@@ -1,0 +1,109 @@
+/home/okmis/mis/src/cgi/bin
+
+<?xml version="1.0" encoding="utf-8"?>
+
+<NCScript xmlns="http://secure.newcropaccounts.com/interfaceV7"
+          xmlns:NCStandard="http://secure.newcropaccounts.com/interfaceV7:NCStandard"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <Credentials>
+    <partnerName>Millennium</partnerName>
+    <name>a6d360ec-2159-4db6-b050-a6366fe89b4d</name>
+    <password>b37c260d-88e0-4847-92f3-6fbb86c74a09</password>
+    <productName>MillenniumServices</productName>
+    <productVersion>V1.1</productVersion>
+  </Credentials>
+
+  <UserRole>
+    <!-- See XML Schema: UserType for valid values -->
+    <user>MidlevelPrescriber</user>
+    <!-- See XML Schema: RoleType for valid values -->
+    <role>midlevelPrescriber</role>
+  </UserRole>
+
+  <Destination>
+    <!-- See XML Schema: RequestedPageType for valid values -->
+    <requestedPage>compose</requestedPage>
+  </Destination>
+  <Account ID="okmis_mms-1195">
+    <accountName>Millennium Community Services, LLC</accountName>
+    <siteID>okmis_mms</siteID>
+    <AccountAddress>
+      <address1>448 36th Ave NW</address1>
+      <address2>Suite 101</address2>
+      <city>Norman</city>
+      <state>OK</state>
+      <zip>73072</zip>
+      <zip4>4743</zip4>
+      <country>US</country>
+    </AccountAddress>
+    <accountPrimaryPhoneNumber>4056270276</accountPrimaryPhoneNumber>
+    <accountPrimaryFaxNumber>4055730404</accountPrimaryFaxNumber>
+  </Account>
+  <Location ID="okmis_mms-1195-2304">
+    <locationName>MCS Poteau Clinic</locationName>
+    <LocationAddress>
+      <address1>1212 Reynolds Ave</address1>
+      <city>Poteau</city>
+      <state>OK</state>
+      <zip>74953</zip>
+      <zip4>4215</zip4>
+      <country>US</country>
+    </LocationAddress>
+    <primaryPhoneNumber>9186490172</primaryPhoneNumber>
+    <primaryFaxNumber>9186490315</primaryFaxNumber>
+    <pharmacyContactNumber>9186490172</pharmacyContactNumber>
+  </Location>
+  <SupervisingDoctor ID="okmis_mms-193">
+    <LicensedPrescriberName>
+      <last>Hartman</last>
+      <first>Richard</first>
+      <middle>R.</middle>
+    </LicensedPrescriberName>
+    <dea>BH5035731</dea>
+    <upin>1639110752</upin>
+    <licenseState>OK</licenseState>
+    <licenseNumber>19847</licenseNumber>
+    <npi>1639110752</npi>
+  </SupervisingDoctor>
+
+  <MidlevelPrescriber ID="okmis_mms-2388">
+    <LicensedPrescriberName>
+      <last>Kennedy</last>
+      <first>Carol</first>
+    </LicensedPrescriberName>
+    <dea>MK3670571</dea>
+    <upin>1194119016</upin>
+    <licenseState>OK</licenseState>
+    <licenseNumber>74318</licenseNumber>
+    <npi>1194119016</npi>
+  </MidlevelPrescriber>
+
+  <Patient ID="okmis_mms-55237">
+    <PatientName>
+      <last>Byus</last>
+      <first>Dakota</first>
+    </PatientName>
+    <medicalRecordNumber>okmis_mms-55237</medicalRecordNumber>
+    <PatientAddress>
+      <address1>211 Rowe Street</address1>
+      <address2>Apartment 44</address2>
+      <city>Pocola</city>
+      <state>OK</state>
+      <zip>74902</zip>
+      <country>US</country>
+    </PatientAddress>
+    <PatientContact>
+      <homeTelephone>9186495695</homeTelephone>
+    </PatientContact>
+    <PatientCharacteristics>
+      <dob>20080102</dob>
+      <gender>M</gender>
+    </PatientCharacteristics>
+
+
+
+        <EncounterIdentifier>102</EncounterIdentifier>
+  </Patient>
+
+</NCScript>

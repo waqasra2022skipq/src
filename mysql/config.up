@@ -1,0 +1,5 @@
+#INSERT INTO `user` VALUES ('localhost','okmis','*565C1DF5FF5ECDF9C8CB8D9D6E830B68549B35D7','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','','','','',0,0,0,0,'',NULL);
+UPDATE mysql.user SET Password=PASSWORD('a1000') WHERE User='okmis';   ## AND Host='localhost';
+INSERT INTO `db` VALUES ('localhost','okmis_config','','Y','Y','Y','Y','Y','Y','N','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','N','N');
+update mysql.db set User='' where Host='localhost' and Db='okmis_config';
+FLUSH PRIVILEGES;

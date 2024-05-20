@@ -1,0 +1,5 @@
+select Provider.LName, Provider.FName, Provider.ProvID, LinksLog.Date, LinksLog.Count as Pages, LinksLog.ip
+  from LinksLog
+    left join Provider on Provider.ProvID=LinksLog.ProvID
+  where Provider.ProvID=90
+  order by Provider.LName, Provider.FName, LinksLog.Date

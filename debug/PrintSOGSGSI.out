@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<?xfa generator="XFA2_0" APIVersion="2.2.4333.0" ?>
+<xdp:xdp xmlns:xdp="http://ns.adobe.com/xdp/" >
+<xfa:datasets xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/" >
+<xfa:data>
+<topmostSubform>
+
+ <Page>
+  <recordid>1</recordid>
+   <memberid>Cms Test patient (581)</memberid>
+   <providerid>Help Desk (90)</providerid>
+   <mm>05</mm>
+   <dd>14</dd>
+   <yyyy>2021</yyyy>
+   <admit>1</admit>
+   <update>0</update>
+   <discharge>0</discharge>
+   <ACOM>1</ACOM>
+   <A1>1</A1>
+   <A2>1</A2>
+   <A3>1</A3>
+   <A4>1</A4>
+   <A5>1.00</A5>
+   <A6>1.00</A6>
+   <A7>1</A7>
+   <A8>1</A8>
+   <A9>1</A9>
+   <A10>1</A10>
+   <A11>1</A11>
+   <A12>1</A12>
+   <A13>1</A13>
+   <TotalLost>7.00</TotalLost>
+   <AvgLost>1.00</AvgLost>
+   <G1COM>1</G1COM>
+   <G1D>1</G1D>
+   <G1Y>1</G1Y>
+   <G2D>1</G2D>
+   <G2Y>1</G2Y>
+   <G3D>1</G3D>
+   <G3Y>1</G3Y>
+   <G4D>1</G4D>
+   <G4Y>1</G4Y>
+   <G5D>1</G5D>
+   <G5Y>1</G5Y>
+   <G6D>1</G6D>
+   <G6Y>1</G6Y>
+   <G7D>1</G7D>
+   <G7Y>1</G7Y>
+
+   <medicaidid></medicaidid>
+   <G8COM>1</G8COM>
+   <G8D>1</G8D>
+   <G8Y>1</G8Y>
+   <G9D>1</G9D>
+   <G9Y>1</G9Y>
+   <G10D>1</G10D>
+   <G10Y>1</G10Y>
+   <G11D>1</G11D>
+   <G11Y>1</G11Y>
+   <G12D>1</G12D>
+   <G12Y>1</G12Y>
+   <G13D>1</G13D>
+   <G13Y>1</G13Y>
+   <G14D>1</G14D>
+   <G14Y>1</G14Y>
+   <G15D>1</G15D>
+   <G15Y>1</G15Y>
+   <G16D>1</G16D>
+   <G16Y>1</G16Y>
+   <G16GT>0</G16GT>
+   <G16SAT>0</G16SAT>
+   <G16MHT>1</G16MHT>
+   <G17COM>1</G17COM>
+   <G17>1</G17>
+   <G18>1</G18>
+   <G19>1</G19>
+   <G20>1</G20>
+   <G21>1</G21>
+   <G22>1</G22>
+   <G23></G23>
+   <G24COM>1</G24COM>
+   <G24x1>0</G24x1>
+   <G24x2>0</G24x2>
+   <G24x3>0</G24x3>
+   <G24x4>0</G24x4>
+   <G24x5>0</G24x5>
+   <G24x6>0</G24x6>
+   <G24x7>0</G24x7>
+   <G24x8>0</G24x8>
+
+   <medicaidid></medicaidid>
+   <G25COM>1</G25COM>
+   <G25L>1</G25L>
+   <G25M>1</G25M>
+   <G26L>1</G26L>
+   <G26M>1</G26M>
+   <G27L>1</G27L>
+   <G27M>1</G27M>
+   <G28L>0</G28L>
+   <G28M>0</G28M>
+   <G29L>0</G29L>
+   <G29M>0</G29M>
+   <G30L>0</G30L>
+   <G30M>0</G30M>
+   <G31COM></G31COM>
+   <G31L>0</G31L>
+   <G31M>0</G31M>
+   <G32L>0</G32L>
+   <G32M>0</G32M>
+   <G33L>0</G33L>
+   <G33M>0</G33M>
+   <G34L>0</G34L>
+   <G34M>0</G34M>
+   <G35L>0</G35L>
+   <G35M>0</G35M>
+   <G36L>0</G36L>
+   <G36M>0</G36M>
+
+   <medicaidid></medicaidid>
+   <G37COM>1</G37COM>
+   <G37aL>0</G37aL>
+   <G37aM>0</G37aM>
+   <G37bL>0</G37bL>
+   <G37bM>0</G37bM>
+   <G37cL>0</G37cL>
+   <G37cM>0</G37cM>
+   <G37dL>0</G37dL>
+   <G37dM>0</G37dM>
+   <G37eL>0</G37eL>
+   <G37eM>0</G37eM>
+   <G37fL>0</G37fL>
+   <G37fM>0</G37fM>
+   <G37gL>0</G37gL>
+   <G37gM>0</G37gM>
+   <G37hL>0</G37hL>
+   <G37hM>0</G37hM>
+   <G37iL>0</G37iL>
+   <G37iM>0</G37iM>
+   <TotalPastCOM></TotalPastCOM>
+   <TotalPast>0</TotalPast>
+   <AvgPast>0</AvgPast>
+   <G38COM></G38COM>
+   <G38>1</G38>
+   <G39>1</G39>
+   <G40></G40>
+   <G41>1</G41>
+   <G42a>0</G42a>
+   <G42b>0</G42b>
+
+   <staffsig1>Desk, Help /  #pending /   / (90)</staffsig1>
+   <staffsig2></staffsig2>
+   <date>05/14/2021</date>
+   <medicaidid></medicaidid>
+
+   <l13>1</l13>
+   <l14>1</l14>
+   <l22>1</l22>
+   <l1></l1>
+   <l20>1</l20>
+   <l24></l24>
+   <q25>0</q25>
+   <q26>0</q26>
+   <q27>0</q27>
+
+   <q28>0</q28>
+   <q29>0</q29>
+   <q30>0</q30>
+   <q31>0</q31>
+   <q32>0</q32>
+   <q33>0</q33>
+   <q34>0</q34>
+   <q35>0</q35>
+   <q36>0</q36>
+   <q37a>0</q37a>
+   <q37b>0</q37b>
+   <q37c>0</q37c>
+   <q37d>0</q37d>
+   <q37e>0</q37e>
+   <q37f>0</q37f>
+   <q37g>0</q37g>
+   <q37h>0</q37h>
+   <q37i>0</q37i>
+   <totalpage6>0</totalpage6>
+   <l38>1</l38>
+   <l39>1</l39>
+ </Page>
+
+</topmostSubform>
+</xfa:data>
+</xfa:datasets>
+<pdf href="http://forms.okmis.com/printing/PrintSOGSGSI_Rev2.pdf" xmlns="http://ns.adobe.com/xdp/pdf/" />
+</xdp:xdp>

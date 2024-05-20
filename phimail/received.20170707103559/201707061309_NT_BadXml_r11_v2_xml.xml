@@ -1,0 +1,2 @@
+<?xml version="1.0"?>
+<result><demo><addr><street><node/><node/></street><city/><state/><postalCode/><country/></addr><phone><number/><use/></phone><name><first/><last/></name><gender/><birthdate/><maritalStatus/><race/><ethnicity/><language/><provider><organization><name/><phone/><addr><street><node/><node/></street><city/><state/><postalCode/><country/></addr></organization></provider><rx/><dx/><allergy/></demo><provider><organization><name/><phone/><addr><street><node/><node/></street><city/><state/><postalCode/><country/></addr></organization></provider></result>

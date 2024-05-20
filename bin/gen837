@@ -1,0 +1,907 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use Cwd;
+use DBI;
+use DBForm;
+use myConfig;
+use DBA;
+use MgrTree;
+use DBUtil;
+use cBill;
+use Time::Local;
+my $DT=localtime();
+my ($sec, $min, $hrs, $day, $month, $year, $wday, $julian) = localtime();
+my $BILLDIR = myConfig->cfg('BILLDIR');
+
+############################################################################
+# usage: gen837 InsDescr={InsDescr}\&BillDate=2003-12-15
+#     SkipDiag=1     skip Diagnostic
+#     bcbsok...      InsDescr to select notes by ProvID=Contract.ProvID
+#                      this means since clinic don't enter notes
+#                      only Contracts under Providers get any notes selected
+############################################################################
+##
+# these are needed in the insurance, ask Insurance Provider for them.
+##
+# SenderID:       ISA06=Sender's ID (15/15)                                    pg 639
+# SenderCode:     GS02=Sender's Code (2/15)                                    pg 644
+# ReceiverID:     ISA08=Receiver's ID (15/15)                                  pg 639
+# ReceiverCode:   GS03=Receiver's Code (2/15)                                  pg 644
+# SubName:        LOOP:1000A:NM103=Identification Code (2/80) (Submitter)      pg  67
+# SubID:          LOOP:1000A:NM109=Identification Code (2/80) (Submitter)      pg  67
+# RecName:        LOOP:1000B:NM103=Organization Name (1/60) (Receiver)         pg  74
+# RecID:          LOOP:1000B:NM109=Identification Code (2/80) (Receiver)       pg  74
+# PayName:        LOOP:2010BB:NM103=Organization Name (1/60) (Payer Name)      pg 130
+# PayID:          LOOP:2010BB:NM109=Identification Code (2/80) (Payer Name)    pg 130
+# InsCode:        LOOP:2000B:SBR09=Claim Filing Indicator Code (1/2)           pg 110
+##
+# these are NO LONGER needed, NPI instead.
+# RefID:          LOOP:2010AA:REF01=Reference Identification Qualifier (2/3)   pg  91
+# PIN:            LOOP:2010AA:REF02=Reference Identification          (1/30)   pg  91
+#
+# ContractCode:   LOOP:2300:NTE02=Reference ID Contract Code (1/30)            pg 218
+# ServQual:       LOOP:2400:SV101-1=Product/Service ID Qualifier (2/2)         pg 400
+# ServMeasure:    LOOP:2400:SV103=Units or Basis of Measure (2/2)              pg 400
+# SourceCode:     LOOP:2400:HCP04=Reference ID Repricing Organization ID (1/30)pg 497
+############################################################################
+##
+# Initilization section
+##
+my $PGM = 'gen837';
+$form = DBForm->new();
+$dbh = $form->dbconnect();
+unless ( $form->{InsDescr} )
+{
+  warn qq|\n>>>ERROR! NO InsDescr! Abort!\n\n|;
+  exit;
+}
+
+if((1 ne $wday && '1' ne $wday) && ('medicaid' eq $form->{InsDescr} || 'dmhsas' eq $form->{InsDescr})) {
+  # If it's not monday then dont generate for dmhsas and medicaid
+  warn qq|\n>>>Not monday !!!! SO SKIP generating 837 for dmhsas and medicaid!\n\n|;
+  exit; 
+}
+
+chdir("$form->{DOCROOT}/billing");
+my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+my ($BillDate,$NEXTBILLDATE) = cBill->getBillDate();
+$BillDate = $form->{BillDate} if ( $form->{BillDate} );
+
+#############################################################################
+# select Billing marked with Insurance and BillDate...
+##
+my $qB = qq|
+select Billing837.* from Billing837
+ left join Provider on Provider.ProvID=Billing837.ProvID 
+ left join Client on Client.ClientID=Billing837.ClientID
+ where Billing837.ClinicID=? and Billing837.InsID=? and Billing837.BillDate=?
+ order by Provider.LName, Provider.FName, Provider.ProvID, Client.LName, Client.FName, Client.ClientID, Billing837.TransIDs
+|;
+## and (Billing837.ProvID=132 or Billing837.ProvID=111)
+## and Billing837.ProvID=133
+## and Billing837.ProvID!=133
+## and Billing837.ClientID=5296
+## and Billing837.ClinicID=201
+## and Billing837.ID=739152
+## and (TransIDs=2688953 or TransIDs=2691041 or TransIDs=2688982 or TransIDs=2691057 or TransIDs=2688967 or TransIDs=2691050 or TransIDs=2688974 or TransIDs=2691052 or TransIDs=2688951 or TransIDs=2688976)
+##warn qq|qB=\n${qB}\n|;
+$sB = $dbh->prepare($qB);
+$sClient = $dbh->prepare("select Client.*,ClientRelations.FacIDNPI,ClientRelations.ResAdmitDate from Client left join ClientRelations on ClientRelations.ClientID=Client.ClientID where Client.ClientID=?");
+$sNoteTrans = $dbh->prepare("select NoteTrans.*, Treatment.ContLogDate, Treatment.ContLogBegTime, Treatment.ContLogEndTime from NoteTrans left join Treatment on Treatment.TrID=NoteTrans.TrID where NoteTrans.ID=? and NoteTrans.BillDate='$BillDate'");
+###$sNoteTrans = $dbh->prepare("select NoteTrans.*, Treatment.ContLogDate, Treatment.ContLogBegTime, Treatment.ContLogEndTime from NoteTrans left join Treatment on Treatment.TrID=NoteTrans.TrID where NoteTrans.ID=? and NoteTrans.BillDate='2015-10-05'");   # RERUN
+
+$sProvider=$dbh->prepare("select Provider.ProvID,Provider.LName,Provider.FName,Provider.MName,Provider.Addr1,Provider.Addr2,Provider.City,Provider.ST,Provider.Zip,Provider.SSN,ProviderControl.NPI,ProviderControl.ContractZip from Provider left join ProviderControl on ProviderControl.ProvID=Provider.ProvID where Provider.ProvID=?");
+$sCredentials = $dbh->prepare("select Credentials.*,xCredentials.Abbr from Credentials left join okmis_config.xCredentials on xCredentials.ID=Credentials.CredID where InsID=? and ProvID=? order by Credentials.Rank");
+
+##
+# files to open
+##
+my $genfile = "gen837_${BillDate}_" . DBUtil->Date('','stamp') . '_' . DBUtil->genToken() . '.gen';
+open GEN, ">${genfile}" or die "Couldn't open 'GEN' file: $!"; 
+#############################################################################
+# Static variables for Submitter / Receiver
+##
+## SubName and SubAddr must be less than or equal to 31 in length
+my ($SubName, $SubContact, $SubAddr, $SubCity, $SubST, $SubZip, $SubZip4, $SubPh, $SubFax, $SubMail) = 
+   ('MILLENNIUM INFORMATION SERVICES',
+    'KEITH STEPHENSON',
+    '3816 SHADOWRIDGE DR.',
+    'NORMAN', 'OK', 73072-5308, '', 
+    '4056416109',
+    '4055730404',
+    'support@okmis.com'
+   );
+my $YYMMDD = DBUtil->Date('today','fmt','YYMMDD');
+my $YYYYMMDD = DBUtil->Date('today','fmt','YYYYMMDD');
+my $HHMM = pad0s($hrs, 2) . pad0s($min, 2);
+#my $ICN = DBUtil->FmtStr($YYYYMMDD,9,'R','0');            # Interchange Control Number
+my $ICN = DBUtil->FmtStr($form->getIDX('837'),9,'R','0');  # Interchange Control Number
+#my $GCN = $YYYYMMDD;                                      # Group Control Number
+my $GCN = $form->getIDX('837');                            # Group Control Number
+my $SCN = '000000000';                                     # Segment Control Number pg63, Batch Control Number (RefID), pg64
+my ($InstVersion,$ProfVersion) = ('004010X096A1','005010X222A1');
+my $Version = $ProfVersion;
+my ($Eof, $Eol) = ("*","~");
+my ($rSubmitter,$SubCnt,$SubBatchCnt,$SubClaimCnt,$SubServCnt,$SubAmount,$SubRecordCnt) = ('',1,0,0,0,0,0);
+my ($HLParent,$HLCount) = (0,0);
+##
+# note...(loop 2000A     pg  79)
+#   The PRV*BI is NOT used when the Billing or Pay-to Provider is a group (ie: Rendering Provider is sent in).
+#     and the individual Rendering Provider is used in loop 2310B. The PRV segment is then coded within
+#     the Rendering Provider in loop 2310B.
+#   However, for medicaid, the Billing Provider is being identified at this level even though the Rendering Provider used
+#     so we signal with UseSpeciality (Taxonomy).
+##
+# Service Qualifier (ServQual)
+# HC	Health Care Procedural Coding System (HCPCS)
+# IV	Home Infusion EDI Coalition (HIEC)
+# N1	National Drug Code in 4-4-2 Format
+# N2	National Drug Code in 5-3-2 Format
+# N3	National Drug Code in 5-4-1 Format
+# N4	National Drug Code in 5-4-2 Format
+# ZZ	Mutually Defined
+##
+my ($ICNFLAG,$ServQual,$SVfmt,$NoZeros) = ('P','HC','%.2f',0);
+$SVfmt = '%.1f' if ( $form->{InsDescr} eq 'railroad' );
+$SVfmt = '%.1f' if ( $form->{InsDescr} eq 'medicare' );
+#$NoZeros = 1 if ( $form->{InsDescr} eq 'aetna' );
+
+#############################################################################
+# Begin - Display header
+$tstmsg = $form->{InsDescr} eq 'kls' ? '<<<CHECK 837 BEFORE SENDING>>>' : '';
+$out = qq|${tstmsg}
+${DT}
+$form->{InsDescr} Billing Report (BillDate=${BillDate})
+SUBMITTED BY:\t${SubName}\tCLAIM TYPE :1500/PHY
+             \t${SubAddr}
+             \t${SubCity} ${SubST} ${SubZip}
+
+Interchange Control Number: ${ICN}
+|;
+
+##
+# START THE SHOW. Process Providers/Contracts; select all Contracts
+##
+$out .= qq|InsName\tSubID\tProvider Name\tNPI\tInsCode\tRendering\tClaims\tServices\tAmount\tRecords\tReceiver\tRecID\n|;
+
+my $Sel = DBA->getClinicProviderSelection($form,$ForProvID,'Provider.ProvID');
+##$Sel = qq|and (Provider.ProvID!=100 and Provider.ProvID!=101 and Provider.ProvID!=102)|;
+##$Sel = qq|and (Provider.ProvID=101 or Provider.ProvID=189)|;
+##$Sel = qq|and Provider.ProvID=211|;
+my $qContracts = qq|
+  select Contracts.InsID, Contracts.TaxID, Contracts.Taxonomy, Contracts.UseSpecialty
+        ,Contracts.UseReferring, Contracts.UseRendering, Contracts.UseSFacility, Contracts.UseAgency
+        ,Contracts.ContractCode, Contracts.ServMeasure, Contracts.SourceCode
+        ,xInsurance.Name as InsName, xInsurance.InsCode
+        ,xInsurance.SubID, xInsurance.SenderID, xInsurance.SenderCode , xInsurance.ISASQ
+        ,xInsurance.RecName, xInsurance.RecID, xInsurance.ReceiverID, xInsurance.ReceiverCode, xInsurance.ISARQ
+        ,xInsurance.PayName, xInsurance.PayID
+        ,xInsurance.Addr1 as InsAddr1, xInsurance.Addr2 as InsAddr2
+        ,xInsurance.City as InsCity, xInsurance.ST as InsST, xInsurance.Zip as InsZip
+        ,xInsurance.ISARQ
+        ,Provider.ProvID, Provider.Name, Provider.FName, Provider.LName, Provider.Email
+        ,Provider.Addr1, Provider.Addr2, Provider.City, Provider.ST, Provider.Zip
+        ,Provider.WkPh
+        ,ProviderControl.NPI
+  from Contracts
+    left join Provider on Provider.ProvID=Contracts.ProvID
+    left join ProviderControl on ProviderControl.ProvID=Contracts.ProvID
+    left join xInsurance on xInsurance.ID=Contracts.InsID
+  where Contracts.BillFlag = '1' and Contracts.BillType = 'EL'
+    and Provider.Active=1
+    and xInsurance.Descr='$form->{InsDescr}'
+    ${Sel}
+  order by xInsurance.Descr, Provider.Name
+|;
+#warn qq|g837: qContracts=\n$qContracts\n|;
+$sContracts = $dbh->prepare($qContracts);
+$sContracts->execute() || $form->dberror($qContracts);
+while ( $rContracts = $sContracts->fetchrow_hashref )
+{
+#warn qq|c:$rContracts->{InsName}\t$rContracts->{SubID}\t$rContracts->{Name}\t$rContracts->{NPI}\t$rContracts->{InsCode}\n|;
+  $rSubmitter = $rContracts unless ( $rSubmitter );
+#foreach my $f ( sort keys %{$rSubmitter} ) { print ": rSubmitter-$f=$rSubmitter->{$f}\n"; }
+#foreach my $f ( sort keys %{$rContracts} ) { print ": rContracts-$f=$rContracts->{$f}\n"; }
+  next unless ( main->verifySubmitter($form,$form->{InsDescr},$rSubmitter,$rContracts) );
+  next unless ( main->verifyInsContract($form,$form->{InsDescr},$rContracts) );
+
+  $HLParent=1;  #++;                # next ST transaction
+  $HLCount = 1;               # start count over
+#warn qq|HLParent=$HLParent, $HLCount, $rContracts->{ProvID}, $rContracts->{InsID}, $rContracts->{InsName}\n|;
+  my ($ProvClaimCnt,$ProvServCnt,$ProvAmount,$ProvText,$ProvRecordCnt) = main->ProcessContract($BillDate,$rContracts);
+  if ( $ProvClaimCnt > 0 )
+  {
+    my ($hcnt, $hstr) = main->ProviderHeader($ProvClaimCnt,$ProvAmount,$rContracts);
+    my ($fcnt, $fstr) = main->ProviderFooter($ProvClaimCnt,$ProvAmount,$ProvRecordCnt+$hcnt,$rContracts);
+#warn qq|main: ProviderRecordCnt=$ProvRecordCnt, hcnt=$hcnt, fcnt=$fcnt\n|;
+    print GEN $hstr . $ProvText . $fstr;
+    $SubRecordCnt += $hcnt + fcnt;
+    $out .= qq|$rContracts->{InsName}\t$rContracts->{SubID}\t$rContracts->{Name}\t$rContracts->{NPI}\t$rContracts->{InsCode}\t$rContracts->{UseRendering}\t${ProvClaimCnt}\t${ProvServCnt}\t${ProvAmount}\t${SubRecordCnt}\t$rContracts->{RecName}\t$rContracts->{RecID}\n|;
+    $SubBatchCnt++;
+    $SubClaimCnt += $ProvClaimCnt;
+    $SubServCnt += $ProvServCnt;
+    $SubAmount += $ProvAmount;
+  }
+  else { $HLParent--; }
+}
+$sContracts->finish();
+$sClient->finish();
+$sNoteTrans->finish();
+$sProvider->finish();
+$sCredentials->finish();
+
+$out .= qq|Grand Total:\t\t\t\t$SubBatchCnt\t$SubClaimCnt\t$SubServCnt\t$SubAmount\t$SubRecordCnt\n|;
+
+close(GEN);
+
+$rSubmitter->{SubCnt} = $SubCnt;
+$rSubmitter->{SubBatchCnt} = $SubBatchCnt;
+$rSubmitter->{SubClaimCnt} = $SubClaimCnt;
+$rSubmitter->{SubServCnt} = $SubServCnt;
+$rSubmitter->{SubAmount} = $SubAmount;
+$rSubmitter->{SubRecordCnt} = $SubRecordCnt;
+my $EmailAddr = 'billing@okmis.com ';
+my $EmailSubj = qq|837 for $form->{InsDescr}: ${BillDate} ($form->{DBNAME})|;
+my $claimfile = main->genFiles($form,$rSubmitter,$genfile,$SubClaimCnt);
+$out .= qq|>>>ERROR! NO SERVICES FOR THIS RUN ($claimfile)<<<\n| if ( $SubBatchCnt == 0 );
+print $out . "\n" . $EmailFiles;
+open OUT, ">${BILLDIR}/${claimfile}.out" or die "Couldn't open 'OUT' file: $!";
+print OUT qq|${out}\n|;
+close(OUT);
+$form->complete();
+exit;
+#############################################################################
+sub ProcessContract
+{
+  my ($self,$BillDate,$rC) = @_;
+  my ($PrevClientID,$ClaimCnt,$LineCnt,$Amount,$Text,$RecordCnt) = ('',0,0,0,'',0);
+
+#warn qq|ProcessContract:\n$qB\n=$rC->{ProvID}, $rC->{InsID}, $BillDate\n|;
+#warn qq|$rC->{UseReferring}, $rC->{UseRendering}, $rC->{UseSFacility}\n|;
+  $sB->execute($rC->{ProvID},$rC->{InsID},$BillDate) || $form->dberror($qB);
+  while ( $rB = $sB->fetchrow_hashref )
+  {
+    # this select (Client) Insurance:InsNumID.
+    $sClient->execute($rB->{ClientID}) || $form-dberror("$PGM: select Client: $rB->{ClientID}");
+    $rClient = $sClient->fetchrow_hashref;
+#warn qq|$rB->{ID}: rB-InsID=$rB->{InsID}, rB-ProvID=$rB->{ProvID}, ClientID=$rB->{ClientID}\n|;
+#warn qq|before TransIDs: $rB->{TransIDs}\n|;
+    my ($chkcode,$chkmsg) = cBill->CheckClient($form,$rClient->{ClientID});
+    if ( $chkcode ) { $out .= qq|>>>ERROR! CheckClient: $chkmsg ($rB->{ClientID}: $rB->{TransIDs})\n|; }
+    next if ( $chkcode );
+#warn qq|after TransIDs: $rB->{TransIDs}\n|;
+
+    if ( $PrevClientID eq '' || $PrevClientID != $rClient->{ClientID} )
+    {
+      $ClaimCnt++;    # goes HERE??
+      my ($RecCount,$ClaimText) = main->ProcessClient($rC,$rB,$rClient);
+      $RecordCnt+=$RecCount;
+      $Text.=$ClaimText;
+    }
+    $PrevClientID = $rClient->{ClientID};
+    ## NO GOES HERE!  $ClaimCnt++;    # goes HERE??
+    my ($ServCount,$ClaimAmount,$ClaimText,$RecCount) = main->ProcessClaim($rC,$rB,$rClient);
+    $LineCnt+=$ServCount;
+    $Amount+=$ClaimAmount;
+    $Text.=$ClaimText;
+    $RecordCnt+=$RecCount;
+  }
+#warn qq|ProcessContract: ClaimCnt=$ClaimCnt, LineCnt=$LineCnt, Amount=$Amount, RecordCnt=$RecordCnt\n|;
+  $sB->finish();
+
+  $Amount = sprintf('%.2f',$Amount);
+  return($ClaimCnt,$LineCnt,$Amount,$Text,$RecordCnt);
+}
+sub ProcessClient
+{
+  my ($self,$rC,$rB,$rClient) = @_;
+
+  $HLCount++;                   # next in transaction set.
+  my $InsCode = DBUtil->FmtStr($rC->{InsCode},2,'L');
+  # trim white space, upper case, 1-35/60 etc.
+  (my $LName = uc substr($rClient->{LName},0,60)) =~ s/^\s*(.*?)\s*$/$1/g;
+  ($LName,$rest) = split(/ /,${LName});
+  (my $FName = uc substr($rClient->{FName},0,35)) =~ s/^\s*(.*?)\s*$/$1/g;
+  ($FName,$rest) = split(/ /,${FName});
+  (my $MName = uc substr($rClient->{MName},0,25)) =~ s/^\s*(.*?)\s*$/$1/g;
+  ($MName,$rest) = split(/ /,${MName});
+  my ($InsIDNum,$TrID,$POS,$Prob1,$Prob2,$Prob3,$PAnum,$CLIA)
+       = split('_',$rB->{ClaimKey});
+  $InsIDNum =~ s/[- ]//g;                    # needed for insurances with [- ] in id (medicare).
+  (my $Addr1 = uc substr($rClient->{Addr1},0,55)) =~ s/^\s*(.*?)\s*$/$1/g;
+  (my $Addr2 = uc substr($rClient->{Addr2},0,55)) =~ s/^\s*(.*?)\s*$/$1/g;
+#warn qq|1: ClientID=$rClient->{ClientID}: Addr1=$Addr1, Addr2=$Addr2\n|;
+# trim this weird thing from MS...
+  $Addr1 =~ s:½:1/2:g; $Addr1 =~ s:`::g;
+  $Addr2 =~ s:½:1/2:g; $Addr2 =~ s:`::g;
+#warn qq|2: ClientID=$rClient->{ClientID}: Addr1=$Addr1, Addr2=$Addr2\n|;
+  my $ClientAddr = $Addr1;
+  if ( $Addr1 ne '' && $Addr2 ne '' ) { $ClientAddr = $Addr1 . '*' . $Addr2; }
+  elsif ( $Addr1 eq '' ) { $ClientAddr = $Addr2; }
+  (my $City = uc substr($rClient->{City},0,30)) =~ s/^\s*(.*?)\s*$/$1/g;
+  my $ST = uc $rClient->{ST};
+  (my $Zip = $rClient->{Zip}) =~ s/[- ]//g;
+  my $ClientDOB = DBUtil->Date($rClient->{DOB},'fmt','YYYYMMDD');
+  # trim white space, upper case, 1-60
+  (my $PayName = uc substr($rC->{PayName},0,60)) =~ s/^\s*(.*?)\s*$/$1/g;
+# these 2 defaults not needed. add mandatory below.
+  if ( $PayName eq '' )
+  { ($PayName = uc substr($rC->{RecName},0,60)) =~ s/^\s*(.*?)\s*$/$1/g; }
+  (my $PayID = $rC->{PayID}) =~ s/[- ]//g;       # no spaces
+#warn qq|PayID=$PayID, RecID=$rC->{RecID}\n|;
+  if ( $PayID eq '' )
+  { ($PayID = $rC->{RecID}) =~ s/[- ]//g; }
+
+  #                                      22=Subscriber.
+  #                                       0=No Additional HL records
+  my $str = qq|HL*${HLCount}*${HLParent}*22*0${Eol}|;            # 2000B Segment
+  $str .= qq|SBR*P*18*******${InsCode}${Eol}|;                   # 2000B Segment
+  $str .= qq|NM1*IL*1*${LName}*${FName}*${MName}***MI*${InsIDNum}${Eol}|;
+  $str .= qq|N3*${ClientAddr}${Eol}|;                            # 2010BA Segment
+  $str .= qq|N4*${City}*${ST}*${Zip}${Eol}|;                     # 2010BA Segment
+  $str .= qq|DMG*D8*${ClientDOB}*$rClient->{Gend}${Eol}|;        # 2010BA Segment
+  $str .= qq|NM1*PR*2*${PayName}*****PI*${PayID}${Eol}|;         # 2010BB Payer Name
+  my $cnt = 7;
+  if ( $PayName =~ /magellan/i )
+  {
+    (my $Addr1 = uc substr($rC->{InsAddr1},0,55)) =~ s/^\s*(.*?)\s*$/$1/g;
+    (my $Addr2 = uc substr($rC->{InsAddr2},0,55)) =~ s/^\s*(.*?)\s*$/$1/g;
+    my $InsAddr = $Addr1;
+    if ( $Addr1 ne '' && $Addr2 ne '' ) { $InsAddr = $Addr1 . '*' . $Addr2; }
+    elsif ( $Addr1 eq '' ) { $InsAddr = $Addr2; }
+    (my $City = uc substr($rC->{InsCity},0,30)) =~ s/^\s*(.*?)\s*$/$1/g;
+    my $ST = uc $rC->{InsST};
+    (my $Zip = $rC->{InsZip}) =~ s/[- ]//g;
+    $Zip .= '0000' if ( length($Zip) == 5 );                     # fudge the +4.
+    $str .= qq|N3*${InsAddr}${Eol}|;                             # 2010BB Payer Addr
+    $str .= qq|N4*${City}*${ST}*${Zip}${Eol}|;                   # 2010BB Payer CSZ
+  }
+  return($cnt,$str);
+}
+sub ProcessClaim
+{
+  my ($self,$rC,$rB,$rClient) = @_;
+  my ($Count,$Amount,$Text,$Lines,$lcnt,$Records) = (0,0,'','',0,0);
+  my ($InsIDNum,$TrID,$POS,$Prob1,$Prob2,$Prob3,$PAnum,$CLIA)
+       = split('_',$rB->{ClaimKey});
+
+#warn qq|ID=$rClient->{ClientID}, $rClient->{LName}\n|;
+  my ($BegDate,$EndDate,$ClaimNotes) = ('','','');
+  my ($DiagStr,$DiagPtr,$DiagCnt) = ('','',1);
+  $Prob1 = qq|BK:V7109| if ( !$Prob1 );     # make sure it's not empty, will blow out 837
+  my $DiagStr =  qq|$Prob1|;                # since it's rolled up by this it applies to all SV1 records (see genLine)
+  my $DiagPtr =  qq|${DiagCnt}|;
+  if ( $Prob2 && $Prob2 ne $Prob1 )
+  { $DiagStr .=  qq|*${Prob2}|; $DiagCnt++; $DiagPtr .= qq|:${DiagCnt}|; }
+  if ( $Prob3 && $Prob3 ne $Prob1 && $Prob3 ne $Prob2 )
+  { $DiagStr .=  qq|*${Prob3}|; $DiagCnt++; $DiagPtr .= qq|:${DiagCnt}|; }
+##
+# get the Provider for these claims (each Billing record is for a specific Provider: see setBilling)
+  $sProvider->execute($rB->{ProvID});
+  my $rProvider = $sProvider->fetchrow_hashref;
+  foreach my $TransID ( split('_',$rB->{TransIDs}) )
+  {
+    my ($chkcode,$chkmsg) = cBill->CheckNote($form,$TrID);
+    if ( $chkcode ) { $out .= qq|>>>ERROR! CheckNote: $chkmsg ($rB->{ClientID}: ${TrID})\n|; }
+    next if ( $chkcode );
+
+    $Count++;
+    $sNoteTrans->execute($TransID) || $form-dberror("$PGM: select NoteTrans: $TransID");
+    $rNoteTrans = $sNoteTrans->fetchrow_hashref;
+    $BegDate = $rNoteTrans->{ContDate} unless ( $BegDate );
+    $EndDate = $rNoteTrans->{ContDate};
+    $Amount+=$rNoteTrans->{BillAmt};
+    my @Modifiers = split(/ /,$rNoteTrans->{SCNum});
+    for ( my $i=1; $i<=$#Modifiers; $i++ )     # skip the first element (it=SCNum)
+    { 
+      $ClaimNotes->{$Modifiers[$i]} = qq|Dr. $rProvider->{LName} is the attending physician and is not employed by the hospice.|
+         if ( $Modifiers[$i] eq 'GV' );
+      $ClaimNotes->{$Modifiers[$i]} = qq|Service not related to the hospice patient's terminal condition.;|
+         if ( $Modifiers[$i] eq 'GW' );
+    }
+    my ($cnt,$str) = main->genLine($rC,$rB,$rNoteTrans,$Count,$DiagPtr,$rProvider);
+    $Lines .= $str;
+    $lcnt += $cnt;
+#warn qq|TrID=$TrID, Count=$Count, BegDate=$BegDate, EndDate=$EndDate, BillAmt=$rNoteTrans->{BillAmt}, Amount=$Amount\n|;
+  }
+  if ( $Count > 0 )      # this is here to get BegDate, EndDate, Amount...
+  {
+    $Amount = sprintf('%.2f',$Amount);
+    my ($hcnt,$hstr) = main->ClaimHeader($rC,$rB,$rClient,$rProvider,$BegDate,$EndDate,$Amount,$ClaimNotes,$DiagStr);
+    my ($fcnt,$fstr) = main->ClaimFooter($rC,$rB,$rClient,$Count,$Amount,$Records);
+    $Records += $hcnt + $lcnt + $fcnt;
+    $Text = $hstr . $Lines . $fstr;
+  }
+#warn qq|ProcessClaim: Count=$Count, Amount=$Amount, Records=$Records\n|;
+  return($Count,$Amount,$Text,$Records);
+}
+sub ClaimHeader                         # Claim Segment 2300
+{
+  my ($self,$rC,$rB,$rClient,$rProvider,$FromDate,$ToDate,$ClaimTotal,$ClaimNotes,$DiagStr) = @_;
+#warn qq|ClaimHeader: $FromDate,$ToDate,$ClaimTotal,$ClaimNotes\n|;
+#warn qq|$rC->{UseReferring}, $rC->{UseRendering}, $rC->{UseSFacility}\n|;
+#foreach my $f ( sort keys %{$rB} ) { print ": rB-$f=$rB->{$f}\n"; }
+  my ($InsIDNum,$TrID,$POS,$Prob1,$Prob2,$Prob3,$PAnum,$CLIA)
+       = split('_',$rB->{ClaimKey});
+  $InsIDNum =~ s/[- ]//g;                    # needed for insurances with [- ] in id (medicare).
+  my $CLMTotal = $ClaimTotal;
+  $CLMTotal =~ s/(\.(?:\d*[1-9])?)0+$/$1/ if ( $NoZeros );
+  my $str = qq|CLM*$rClient->{ClientID}*${CLMTotal}***${POS}:B:1*Y*A*Y*Y${Eol}|;
+  my $cnt = 1;
+# Add Admission Date here<<<for Inpatient codes or with one.
+#warn qq|ResAdmitDate: $rClient->{'ResAdmitDate'}, POS: ${POS}\n|;
+  if ( $POS =~ /21|51|61/ && $rClient->{'ResAdmitDate'} ne '' )
+  {
+     my $AdmitDate = DBUtil->Date($rClient->{'ResAdmitDate'},'fmt','YYYYMMDD');
+     $str .= qq|DTP*435*D8*${AdmitDate}${Eol}|; $cnt++; 
+  }
+# to keep the TrID in the 837/835 TEST USING...
+# REF*9F*TrID (9F=Referral Number, see HIPAA 837 pg 470)
+# DID NOT WORK, NEEDS Loop 2310? for Referring Provider!
+#  if ( $TrID ne '' ) { $str .= qq|REF*9F*${TrID}${Eol}|; $cnt++; }
+# PAnum = Prior Authorization Number
+  if ( $PAnum ne '' ) { $str .= qq|REF*G1*${PAnum}${Eol}|; $cnt++; }
+# CLIA = Clinical Laboratory Improvement Amendments
+  if ( $CLIA ne '' ) { $str .= qq|REF*X4*${CLIA}${Eol}|; $cnt++; }
+##
+# 'medicaid' NTE for ContractCode and Clinic Zip+4
+  if ( $form->{InsDescr} =~ /medicaid/i )
+  {
+#   Speciality Contracts: ie. 'G' for Group Specialty (MMS/Medicaid).
+    my $ContractCode = DBUtil->FmtStr($rC->{ContractCode},2,'L');
+## NTE: The value is OKCODE, followed by the contract code of the Billing Provider (if applicable).
+##  This element may also include the 9-character ZIP+4 code of the Rendering Provider 
+##  when the Loop 2310B Rendering Provider Name is used. For SoonerCare purposes, 
+##  the Rendering Provider ZIP+4 code may be used to map the NPI to a legacy Provider Identifier 
+##  in situations when the NPI is a one-to-many match (one NPI for more than one SoonerCare Provider ID).
+##  In these situations the ZIP+4 code for the physical location of the contracted Rendering Provider should be utilized.
+    (my $ProviderZIP = $rProvider->{ContractZip}) =~ s/[- ]//g;      # Rendering Provider.
+    (my $ClinicZIP = $rC->{Zip}) =~ s/[- ]//g;                       # Clinic Provider.
+## I always send one or the other...
+    my $ZIP = length($ProviderZIP) == 9 ? $ProviderZIP : $ClinicZIP;
+    $str .= qq|NTE*ADD*OKCODE${ContractCode}${ZIP}${Eol}|; $cnt++;
+  }
+  foreach my $note ( sort values %{ $ClaimNotes } )  # used in Medicare claims
+  { $str .= qq|NTE*ADD*${note}${Eol}|; $cnt++; }
+  $str .= qq|HI*${DiagStr}${Eol}|; $cnt++;            # required
+
+# HI at the end of 2300 loop.
+  unless ( $form->{SkipDiag} )
+  {
+  }
+
+  if ( $rC->{UseReferring} )
+  {
+    my ($c, $s) = main->Loop2310A($rC,$rB,$rClient);             # Referring Provider
+    if ( $c ) { $cnt+=$c; $str .= $s; }
+  }
+  if ( $rC->{UseRendering} )
+  {
+    my ($c, $s) = main->Loop2310B($rC,$rB,$rClient,$rProvider);  # Rendering Provider
+    if ( $c ) { $cnt+=$c; $str .= $s; }
+  }
+  if ( $rC->{UseSFacility} )
+  {
+    my ($c, $s) = main->Loop2310D($rC,$rB,$rClient);             # Service Facility
+    if ( $c ) { $cnt+=$c; $str .= $s; }
+  }
+  return($cnt,$str);
+}
+sub ClaimFooter
+{
+  my ($self,$rC,$rB,$rClient,$Count,$Amount,$RecordCnt) = @_;
+  return(0,$str);
+}
+sub Loop2310A            # Referring Provider
+{
+  my ($self,$rC,$rB,$rClient) = @_;
+  my $ClientID = $rClient->{'ClientID'};
+  my ($cnt,$str) = (0,'');
+  my $sClientReferrals = $dbh->prepare("select * from ClientReferrals where ClientID=?");
+  $sClientReferrals->execute($ClientID) || $form-dberror("$PGM: select ClientReferrals: ${ClientID}");
+  $rClientReferrals = $sClientReferrals->fetchrow_hashref;
+  my $NPI = $rClientReferrals->{'RefPhysNPI'};
+  my $rRefPhys = DBA->selxref($form,'xNPI','NPI',$NPI);
+
+  my $rOrderingPhys = DBA->selxref($form,'xNPI','NPI',$rClientReferrals->{'OrderingRefPhysNPI'});
+
+  # CHANGE:START handling DN|DQ|DK codes and names based on user given condition as printHCFA.pl
+
+
+
+
+
+
+
+
+  my $DKDQDNCODE = 'DN';
+  my $updatedProvLastName = $rRefPhys->{'ProvLastName'};
+  my $updatedProvFirstName = $rRefPhys->{'ProvLastName'};
+  my $updatedProvMiddleName = $rRefPhys->{'ProvMiddleName'};
+
+  if($rCredentials->{'DesigProvID'} ne '') {
+    my $qProvInsCreds = qq|
+    select Provider.*,LicType,LicNumber,NPI from Provider 
+      left join ProviderLicenses on Provider.ProvID = ProviderLicenses.ProvID 
+      left join ProviderControl on Provider.ProvID = ProviderControl.ProvID 
+      WHERE Provider.ProvID = ?|;
+    my $ProvInsCreds = $dbh->prepare($qProvInsCreds);
+    $ProvInsCreds->execute($rCredentials->{'DesigProvID'});
+    $rProvInsCreds = $ProvInsCreds->fetchrow_hashref;
+
+
+    $DKDQDNCODE = qq|DQ|;
+    $updatedProvLastName = $rProvInsCreds->{'LName'};
+    $updatedProvFirstName = $rProvInsCreds->{'FName'};
+    $updatedProvMiddleName = $rProvInsCreds->{'MName'};
+    $NPI = $rProvInsCreds->{'NPI'}; 
+
+    # if($rOrderingPhys->{'NPI'} eq $rProvInsCreds->{'NPI'}) {
+    #   $DKDQDNCODE = qq|DK|;
+    # }
+
+  }
+
+ 
+
+  # CHANGE:END handling DN|DQ|DK codes and names based on user given condition as printHCFA.pl
+
+
+  # trim white space, upper case, 1-60
+  (my $LName = uc substr($updatedProvLastName,0,60)) =~ s/^\s*(.*?)\s*$/$1/g;
+  (my $FName = uc substr($updatedProvFirstName,0,35)) =~ s/^\s*(.*?)\s*$/$1/g;
+  (my $MName = uc substr($updatedProvMiddleName,0,25)) =~ s/^\s*(.*?)\s*$/$1/g;
+  $sClientReferrals->finish();
+##
+# DN = Referring Provider (2310A)  pg. 283
+##
+# errors out without setting Referring Provider info if...
+  if ( $NPI eq '' )
+  { $out .= qq|>>>ERROR! $rC->{NPI}\t-\t-\t${LName}, ${FName}\tPROVIDER NPI MISSING ProvID=$rB->{ProvID},RefPhysNPI=$rClient->{RefPhysNPI},ClientID=$rClient->{ClientID} (xNPI) (2310A)!\n>>>TAKE CARE OF ABOVE ERRORS BEFORE SENDING THIS FILE!<<<\n|; }
+  elsif ( $LName eq '' )
+  { $out .= qq|>>>ERROR! $rC->{NPI}\t-\t-\t${LName}, ${FName}\tPROVIDER LName MISSING ProvID=$rB->{ProvID},RefPhysNPI=$rClient->{RefPhysNPI},ClientID=$rClient->{ClientID} (xNPI) (2310A)!\n>>>TAKE CARE OF ABOVE ERRORS BEFORE SENDING THIS FILE!<<<\n|; }
+  else   # use 'XX' and NPI, since we always now have NPI
+  { $str = qq|NM1*${DKDQDNCODE}*1*${LName}*${FName}*${MName}***XX*${NPI}${Eol}|; $cnt+=1; }
+  return($cnt,$str);
+}
+sub Loop2310B            # Rendering Provider
+{
+  my ($self,$rC,$rB,$rClient,$rProvider) = @_;
+  my ($cnt,$str,$msg) = (0,'','');
+# take care of 'medicaid' notes before 10/1/2011...see setBilling
+  my ($InsIDNum,$TrID,$POS,$Prob1,$Prob2,$Prob3,$PAnum,$CLIA)
+       = split('_',$rB->{ClaimKey});
+
+#warn qq|2310B: $rC->{UseRendering}\n|;
+  $sCredentials->execute($rC->{InsID},$rB->{ProvID});
+  my $rCredentials = $sCredentials->fetchrow_hashref;
+  # trim white space, upper case, 1-60
+  (my $LName = uc substr($rProvider->{LName},0,60)) =~ s/^\s*(.*?)\s*$/$1/g;
+  $LName =~ s/ 2$//;     # for mms 2 providers.
+  (my $FName = uc substr($rProvider->{FName},0,35)) =~ s/^\s*(.*?)\s*$/$1/g;
+  (my $MName = uc substr($rProvider->{MName},0,25)) =~ s/^\s*(.*?)\s*$/$1/g;
+#warn qq|Loop2310B: $LName, $FName, $rProvider->{SSN}\n|;
+  (my $NPI = $rProvider->{NPI}) =~ s/[- ]//g;
+  (my $SSN = $rProvider->{SSN}) =~ s/[- ]//g;
+  (my $ZIP = $rProvider->{Zip}) =~ s/[- ]//g;
+  my $Taxonomy = $rCredentials->{Taxonomy};
+##
+# 82 = Rendering Provider (2310B)  pg. 291
+##
+  my $QID = $NPI ? 'XX' : '34';
+  my $PID = $NPI ? $NPI : $SSN;
+  if ( $LName eq '' || $FName eq '' || $PID eq '' )
+  { $msg .= qq|!$rC->{NPI}\t-\t-\t${LName}, ${FName}, ${NPI}, ${SSN}\tPROVIDER INFO MISSING $rB->{ID} (LName,FName,NPI,SSN) (2310B)!\n|; }
+  else { $str .= qq|NM1*82*1*${LName}*${FName}*${MName}***${QID}*${PID}${Eol}|; $cnt+=1; }
+#foreach my $f ( sort keys %{$rC} ) { print ": rC-$f=$rC->{$f}\n"; }
+#warn qq|rC: $rC->{Taxonomy}, $Taxonomy\n|;
+  $Taxonomy = $rC->{Taxonomy} unless ( $Taxonomy );         # Default to Clinic Taxonomy
+  if ( $Taxonomy eq '' )
+  { $msg .= qq|!$rC->{NPI}\t-\t-\t${LName}, ${FName}\tPROVIDER TAXONOMY MISSING $rB->{ID} (Credentials) (2310B)!\n|; }
+  elsif ( $rC->{UseSpecialty} ) { null; }                   # sent in Billing section
+  else { $str .= qq|PRV*PE*PXC*${Taxonomy}${Eol}|; $cnt+=1; }
+#warn qq|Credentials=$rCredentials->{Abbr}, ZIP=$ZIP\n|;
+  if ( $rCredentials->{Abbr} =~ /indlbhp/i && $ZIP eq '' )
+  { $msg .= qq|!$rC->{NPI}\t-\t-\t${LName}, ${FName}\tILBHP PROVIDER ZIP MISSING $rB->{ID} (Provider) (2310B)!\n|; }
+  if ( $msg ne '' )                # error out without setting Rendering Provider info.
+  { $out .= qq|$msg">>>ERRORS! \n>>>TAKE CARE OF ABOVE ERRORS BEFORE SENDING THIS FILE!<<<\n|; return(0,''); }
+  return($cnt,$str);
+}
+sub Loop2310D            # Service Facility
+{
+  my ($self,$rC,$rB,$rClient) = @_;
+  my ($OrgName,$Addr,$City,$ST,$Zip,$cnt) = ('','','','','',3);
+#warn qq|FacIDNPI: $rClient->{'FacIDNPI'}\n|;
+  (my $NPI = $rClient->{FacIDNPI}) =~ s/[- ]//g;
+  my $QID = '';
+  if ( $NPI eq '' )
+  {
+    $OrgName = $rC->{Name} eq '' ? qq|$rC->{FName} $rC->{LName}| : $rC->{Name};
+    $Addr = $rC->{Addr1}; $City = $rC->{City}; $ST = $rC->{ST}; $Zip = $rC->{Zip};
+#warn qq|Clinic: OrgName=$OrgName, Addr=$Addr, City=$City, Zip=$Zip\n|;
+  }
+  else
+  {
+    my $rFacility = DBA->selxref($form,'xNPI','NPI',$NPI);
+    $QID = 'XX';
+    $OrgName = $rFacility->{'ProvOrgName'};
+    $Addr = $rFacility->{Addr1}; $City = $rFacility->{City}; $ST = $rFacility->{ST}; $Zip = $rFacility->{Zip};
+#warn qq|FacIDNPI: OrgName=$OrgName, Addr=$Addr, City=$City, Zip=$Zip\n|;
+  }
+#warn qq|OrgName=$OrgName, Addr=$Addr, City=$City\n|;
+  # trim white space, upper case, 1-60
+  $OrgName =~ s/^\s*(.*?)\s*$/$1/g; $OrgName = uc substr($OrgName,0,60);
+  $Addr =~ s/^\s*(.*?)\s*$/$1/g; $Addr = uc substr($Addr,0,55);
+  $City =~ s/^\s*(.*?)\s*$/$1/g; $City = uc substr($City,0,30);
+#warn qq|OrgName=$OrgName, Addr=$Addr, City=$City, Zip=$Zip\n|;
+  return(0,'') if ( $OrgName eq '' || $Addr eq '' || $City eq '' );
+  $ST = uc $ST;
+#warn qq|before: Zip=$Zip\n|;
+  $Zip =~ s/[- ]//g;
+  $Zip .= '0000' if ( length($Zip) == 5 );     # fudge the +4.
+#warn qq|after: Zip=$Zip\n|;
+  ##my $str = qq|NM1*77*2*${OrgName}${Eol}|;
+  my $str = qq|NM1*77*2*${OrgName}*****${QID}*${NPI}${Eol}|;
+#  my $LargeName = substr($OrgName,60);
+#  if ( $LargeName ) { $str .= qq|N2*${LargeName}${Eol}|; $cnt+=1; }
+  $str .= qq|N3*${Addr}${Eol}|;
+  $str .= qq|N4*${City}*${ST}*${Zip}${Eol}|;
+#warn qq|2310D: cnt=$cnt, str=$str\n|;
+  return($cnt,$str);
+}
+sub genLine             # Service Lines (2400)
+{
+  my ($self,$rC,$rB,$rNote,$Cnt,$DiagPtr,$rProvider) = @_;
+  my ($POS,$msg) = ('','');
+  (my $ServiceID = $rNote->{SCNum}) =~ s/ /:/g;
+  my $ServiceDate = DBUtil->Date($rNote->{ContLogDate},'fmt','YYYYMMDD');
+  my $SV1Total = $rC->{ServMeasure} eq 'MJ' ? int($rNote->{Duration} / 60) : sprintf($SVfmt,$rNote->{Units});
+  my $SV1BillAmt = $rNote->{BillAmt};
+  my ($InsIDNum,$TrID,$POS,$Prob1,$Prob2,$Prob3,$PAnum,$CLIA)
+       = split('_',$rB->{ClaimKey});
+  $InsIDNum =~ s/[- ]//g;                    # needed for insurances with [- ] in id (medicare).
+
+  $SV1BillAmt =~ s/(\.(?:\d*[1-9])?)0+$/$1/ if ( $NoZeros );
+  $SV1Total =~ s/(\.(?:\d*[1-9])?)0+$/$1/ if ( $NoZeros );
+  my $cnt = 4;
+  my $str = qq|LX*${Cnt}${Eol}|;                            # 2400 Segment
+  $POS = '';                                                # POS on CLM*,
+                                                            #   only here if different now
+  $str .= qq|SV1*${ServQual}:${ServiceID}*${SV1BillAmt}*$rC->{ServMeasure}*${SV1Total}*${POS}**${DiagPtr}${Eol}|;
+  $str .= qq|DTP*472*D8*${ServiceDate}${Eol}|;              # 2400 Segment
+  $str .= qq|REF*6R*T$rNote->{ID}${Eol}|;                   # 2400 Segment
+  if ( $rC->{SourceCode} ne '' )                            # 2400 Segment:
+                                                            #   HCP 10=Other Pricing
+  {
+    my $SourceCode = $rC->{SourceCode};
+    $str .= qq|HCP*10*${SV1BillAmt}**${SourceCode}${Eol}|; $cnt++;
+  }
+  if ( $ServiceID eq '81002'       # add each service code for Ordering Provider
+    || $ServiceID eq '80305:QW'    ) 
+  {
+    # trim white space, upper case, 1-60
+    (my $LName = uc substr($rProvider->{LName},0,60)) =~ s/^\s*(.*?)\s*$/$1/g;
+    $LName =~ s/ 2$//;     # for mms 2 providers.
+    (my $FName = uc substr($rProvider->{FName},0,35)) =~ s/^\s*(.*?)\s*$/$1/g;
+    (my $MName = uc substr($rProvider->{MName},0,25)) =~ s/^\s*(.*?)\s*$/$1/g;
+#warn qq|Loop2310B: $LName, $FName, $rProvider->{SSN}\n|;
+    (my $NPI = $rProvider->{NPI}) =~ s/[- ]//g;
+    (my $SSN = $rProvider->{SSN}) =~ s/[- ]//g;
+    (my $ZIP = $rProvider->{Zip}) =~ s/[- ]//g;
+    my $Taxonomy = $rCredentials->{Taxonomy};
+##
+# DK = Ordering Provider (2420E) pg. 529 same as Rendering Provider (2310B)  pg. 291
+##
+    my $QID = $NPI ? 'XX' : '34';
+    my $PID = $NPI ? $NPI : $SSN;
+    if ( $LName eq '' || $FName eq '' || $PID eq '' )
+    { $msg .= qq|!$rC->{NPI}\t-\t-\t${LName}, ${FName}, ${NPI}, ${SSN}\tPROVIDER INFO MISSING $rB->{ID} (LName,FName,NPI,SSN) (2310B)!\n|; }
+    else { $str .= qq|NM1*DK*1*${LName}*${FName}*${MName}***${QID}*${PID}${Eol}|; $cnt+=1; }
+    if ( $msg ne '' )                # error out without setting Rendering Provider info.
+    { $out .= qq|$msg">>>ERRORS! \n>>>TAKE CARE OF ABOVE ERRORS BEFORE SENDING THIS FILE!<<<\n|; return(0,''); }
+  }
+  return($cnt,$str);
+}
+#############################################################################
+sub ProviderHeader                     # Transaction Set Segment
+{
+  my ($self,$Count,$Amount,$rContracts) = @_;
+  $SCN++;                                  # bump the Segment Control Number.
+  my $BCN = $SCN;                          # BHT Batch Control Number (same as SCN w/o formating).
+#warn qq|SCN=$SCN, BCN=$BCN\n|;
+#stays formatted...  $SCN = DBUtil->FmtStr($SCN,9,'R','0');   # format the Segment Control Number.
+  (my $SubID = $rContracts->{SubID}) =~ s/[- ]//g;
+  # trim white space, upper case, 1-60
+  (my $RecName = uc substr($rContracts->{RecName},0,60)) =~ s/^\s*(.*?)\s*$/$1/g;
+  (my $RecID = $rContracts->{RecID}) =~ s/[- ]//g;       # no spaces
+  my $UseName = $rContracts->{Name} eq '' ? qq|$rContracts->{FName} $rContracts->{LName}| : $rContracts->{Name};
+  # trim white space, upper case, 1-60
+  (my $OrgName = uc substr($UseName,0,60)) =~ s/^\s*(.*?)\s*$/$1/g;
+  (my $TaxID = $rContracts->{TaxID}) =~ s/[- ]//g;
+  (my $NPI = $rContracts->{NPI}) =~ s/[- ]//g;
+  my $Taxonomy = $rContracts->{Taxonomy};
+
+  my $ClinicID = $rContracts->{ProvID};
+# Use the Agency as the BillTo/PayTo Provider Address? (not the Clinic?)
+  $ClinicID = MgrTree->getAgency($form,$ClinicID) if ( $rContracts->{UseAgency} );
+  $sProvider->execute($ClinicID);
+  my $rProvider = $sProvider->fetchrow_hashref;
+  (my $Addr = uc substr($rProvider->{Addr1},0,55)) =~ s/^\s*(.*?)\s*$/$1/g;
+  (my $City = uc substr($rProvider->{City},0,30)) =~ s/^\s*(.*?)\s*$/$1/g;
+  my $ST = uc $rProvider->{ST};
+  (my $Zip = $rProvider->{Zip}) =~ s/[- ]//g;
+
+  my $str = qq|ST*837*${SCN}*${Version}${Eol}|;                     # start Segment
+#                0019=Information Source, 00=Original
+  $str .= qq|BHT*0019*00*${SCN}*${YYYYMMDD}*${HHMM}*CH${Eol}|;      # start Segment
+  $str .= qq|NM1*41*2*${SubName}*****46*${SubID}${Eol}|;            # 1000A Segment
+  $str .= qq|PER*IC*${SubContact}*TE*${SubPh}${Eol}|;               # 1000A Segment
+  $str .= qq|NM1*40*2*${RecName}*****46*${RecID}${Eol}|;            # 1000B Segment
+  #                          20=Information Source
+  #                             1=Additional HL records
+  $str .= qq|HL*${HLParent}**20*1${Eol}|;                           # 2000A Segment
+  my $cnt=6;
+### TEST for Billing clinic first...either here or in 2310B
+  if ( $rContracts->{UseSpecialty} )
+  { $str .= qq|PRV*BI*PXC*$rContracts->{Taxonomy}${Eol}|; $cnt+=1; }# 2000A Segment
+#                85 = Billing Provider (2010AA)    pg. 84
+#  my $EntityTypeQual = $NPI eq '1558693838' ? 1
+#                     : $NPI eq '1124008743' ? 1
+#                     : 2;
+  my $EntityTypeQual = 2;
+  $str .= qq|NM1*85*${EntityTypeQual}*${OrgName}*****XX*${NPI}${Eol}|; $cnt+=1; # 2010AA Segment
+  $str .= qq|N3*${Addr}${Eol}|; $cnt+=1;                            # 2010AA Segment
+  $str .= qq|N4*${City}*${ST}*${Zip}${Eol}|; $cnt+=1;               # 2010AA Segment
+  $str .= qq|REF*EI*${TaxID}${Eol}|; $cnt+=1;                       # 2010AA Segment
+  return($cnt,$str);
+}
+sub ProviderFooter                     # Transaction Set Segment
+{
+  my ($self,$Count,$Amount,$Records,$rContracts) = @_;
+
+#warn qq|ProviderFooter: Count=$Count, Amount=$Amount, Records=$Records\n|;
+  my $TotalClaims = $Count;
+  my $TotalCharges = sprintf('%.2f',$Amount);
+  my $RecsPerProv = $Records + 1;          # count the SE itself.
+  my $str = qq|SE*${RecsPerProv}*${SCN}${Eol}|;
+  return(1,$str);
+}
+#############################################################################
+sub verifySubmitter
+{
+  my ($self,$form,$InsDescr,$Prev,$rC) = @_;
+  my $vcode = 1;
+#foreach my $f ( sort keys %{$Prev} ) { print ": Prev-$f=$Prev->{$f}\n"; }
+#foreach my $f ( sort keys %{$rC} ) { print ": rC-$f=$rC->{$f}\n"; }
+  if ( $rC->{SubID} eq '' )
+  { $out .= qq|>>>ERROR! $InsDescr: $rC->{Name} ($rC->{NPI}): SUBMITTER ID! DOES NOT MATCH '$Prev->{SubID}'\n|; $vcode=0; }
+  if ( $rC->{RecName} eq '' )
+  { $out .= qq|>>>ERROR! $InsDescr: $rC->{Name} ($rC->{NPI}): RECEIVER NAME! DOES NOT MATCH '$Prev->{RecName}'\n|; $vcode=0; }
+  if ( $rC->{RecID} eq '' )
+  { $out .= qq|>>>ERROR! $InsDescr: $rC->{Name} ($rC->{NPI}): RECEIVER TAXID! DOES NOT MATCH '$Prev->{RecID}'\n|; $vcode=0; }
+  if ( $rC->{ISASQ} eq '' )
+  { $out .= qq|>>>ERROR! $InsDescr: $rC->{Name} ($rC->{NPI}): SUBMITTER Interchange ID Qualifier! DOES NOT MATCH '$Prev->{ISASQ}'\n|; $vcode=0; }
+  if ( $rC->{ISARQ} eq '' )
+  { $out .= qq|>>>ERROR! $InsDescr: $rC->{Name} ($rC->{NPI}): RECEIVER Interchange ID Qualifier! DOES NOT MATCH '$Prev->{ISARQ}'\n|; $vcode=0; }
+  return($vcode);
+}
+sub verifyInsContract
+{
+  my ($self,$form,$InsDescr,$rC) = @_;
+  my $vcode = 1;
+  if ( $rC->{SubID} eq '' )
+  { $out .= qq|>>>ERROR! $InsDescr: $rC->{Name} ($rC->{NPI}): NO SUBMITTER ID! $rC->{Name},$rC->{FName},$rC->{LName}\n|; $vcode=0; }
+  if ( $rC->{RecName} eq '' )
+  { $out .= qq|>>>ERROR! $InsDescr: $rC->{Name} ($rC->{NPI}): NO RECEIVER NAME! $rC->{Name},$rC->{FName},$rC->{LName}\n|; $vcode=0; }
+  if ( $rC->{RecID} eq '' )
+  { $out .= qq|>>>ERROR! $InsDescr: $rC->{Name} ($rC->{NPI}): NO RECEIVER TAXID! $rC->{Name},$rC->{FName},$rC->{LName}\n|; $vcode=0; }
+  if ( $rC->{InsCode} eq '' )
+  { $out .= qq|>>>ERROR! $InsDescr: $rC->{Name} ($rC->{NPI}): NO INSURANCE CODE! $rC->{Name},$rC->{FName},$rC->{LName}\n|; $vcode=0; }
+  if ( $rC->{NPI} eq '' )
+  { $out .= qq|>>>ERROR! $InsDescr: $rC->{Name} ($rC->{NPI}): NO NPI NUMBER! $rC->{Name},$rC->{FName},$rC->{LName} (Contract)\n|; $vcode=0; }
+  if ( $rC->{Taxonomy} eq '' )
+  { $out .= qq|>>>ERROR! $InsDescr: $rC->{Name} ($rC->{NPI}): NO Taxonomy! $rC->{Name},$rC->{FName},$rC->{LName} (Contract)\n|; $vcode=0; }
+  if ( $rC->{ServMeasure} eq '' )
+  { $out .= qq|>>>ERROR! $InsDescr: $rC->{Name} ($rC->{NPI}): NO SERVICE MEASUREMENT! $rC->{Name},$rC->{FName},$rC->{LName} (Contract)\n|; $vcode=0; }
+  if ( $rC->{TaxID} eq '' )
+  { $out .= qq|>>>ERROR! $InsDescr: $rC->{Name} ($rC->{NPI}): NO TaxID! $rC->{Name},$rC->{FName},$rC->{LName} (Contract)\n|; $vcode=0; }
+  if ( $rC->{ISASQ} eq '' )
+  { $out .= qq|>>>ERROR! $InsDescr: $rC->{Name} ($rC->{NPI}): NO SUBMITTER Interchange ID Qualifier! $rC->{Name},$rC->{FName},$rC->{LName}\n|; $vcode=0; }
+  if ( $rC->{ISARQ} eq '' )
+  { $out .= qq|>>>ERROR! $InsDescr: $rC->{Name} ($rC->{NPI}): NO RECEIVER Interchange ID Qualifier! $rC->{Name},$rC->{FName},$rC->{LName}\n|; $vcode=0; }
+# Use the Agency as the BillTo/PayTo Provider Address? (not the Clinic?)
+  my $ClinicID = $rC->{UseAgency} ? MgrTree->getAgency($form,$rC->{ProvID}) : $rC->{ProvID};
+  $sProvider->execute($ClinicID);
+  my $rProvider = $sProvider->fetchrow_hashref;
+  (my $ZIP = $rProvider->{Zip}) =~ s/[- ]//g;
+  if ( length($ZIP) < 9 )
+  { $out .= qq|>>>ERROR! $InsDescr: $rC->{Name} ($rC->{NPI}): Zip NOT Zip+4 (${ZIP})! $rC->{Name},$rC->{FName},$rC->{LName}\n|; $vcode=0; }
+  return($vcode);
+}
+#############################################################################
+# generate the final files with count in the name.
+sub genFiles
+{
+  my ($self,$form,$rSubmitter,$srcfile,$Count) = @_;
+# BillDate and ForProvID are global.
+  my $stamp = DBUtil->Date('','stamp');
+  my $token = DBUtil->genToken(); 
+  my $claimfile = "$form->{DBNAME}.$form->{InsDescr}.${Count}.${stamp}.837";
+# this file is for the ElecList.cgi
+  my $listfile = "$form->{DBNAME}_${ForProvID}_$form->{InsDescr}_${Count}_${BillDate}_${stamp}_${token}.837";
+  my $nl = '';
+  $nl = "\n" if ( $form->{InsDescr} eq 'kls' );
+# copy tricare to /home/tricare....in shell
+  if ( open(GEN,"${srcfile}") )
+  { 
+    my $gen = <GEN>;
+    my ($hcnt, $hstr) = main->SubmitterHeader($rSubmitter);         # loop 1000A
+    my ($fcnt, $fstr) = main->SubmitterFooter($rSubmitter);         # loop 1000A
+    my $file = $hstr . $gen . $fstr;
+    print qq|genFiles: $claimfile, ${BILLDIR}/${claimfile}.txt |;
+    open TXT, ">${BILLDIR}/${claimfile}.txt" or die "Couldn't open 'TXT' file: $!";
+    open SND, ">${BILLDIR}/${claimfile}" or die "Couldn't open 'SND' file: $!"; 
+    open LST, ">${listfile}" or die "Couldn't open 'LST' file: $!"; 
+#   print it here (eq)...
+    if ( $nl eq '' ) { print SND ${file}; }
+    if ( $nl eq '' ) { print LST ${file}; }
+    foreach my $line ( split('~',$file) )
+    {
+      print TXT qq|${line}~\n|;
+#     or here (ne)...
+      if ( $nl ne '' ) { print SND qq|${line}~${nl}|; }
+      if ( $nl ne '' ) { print LST qq|${line}~${nl}|; }
+    }
+    close(GEN);
+    close(TXT);
+    close(SND);
+    close(LST);
+  }
+  else { die "Couldn't open '${srcfile}' file: $!"; }
+  return($claimfile);
+}
+sub SubmitterHeader                     # Interchange Control Segment
+{
+  my ($self,$rSubmitter) = @_;
+  my $AuthInfoQ = '00';                 # No Authorization Information Present (No Meaningful Information in I02)
+  my $AuthInfo = '          ';          # Info must be 10 characters long
+  my $SecuInfoQ = '00';                 # No Security Information Present (No Meaningful Information in I04
+  my $SecuInfo = '          ';          # Info must be 10 characters long
+  my $ISASQ = DBUtil->FmtStr($rSubmitter->{ISASQ},2,'L');
+  my $ISARQ = DBUtil->FmtStr($rSubmitter->{ISARQ},2,'L');
+  my $AckReq = '0';                     # Acknowledgement Request for everyone but selectcare!
+  (my $SubID = $rSubmitter->{SubID}) =~ s/[- ]//g;
+  if ( $form->{InsDescr} eq 'selectcare' )
+  {
+    $AckReq = '1';                      # Acknowledgement Request
+  }
+  elsif ( $form->{InsDescr} eq 'tricare' )
+  {
+    $AuthInfoQ = '03';                  # Additional Data Identification
+    $AuthInfo = DBUtil->FmtStr($SubID,10,'L');
+  }
+  (my $SenderID = $rSubmitter->{SenderID} ? $rSubmitter->{SenderID} : $SubID) =~ s/[- ]//g; 
+  (my $ReceiverID = $rSubmitter->{ReceiverID} ? $rSubmitter->{ReceiverID} : $rSubmitter->{RecID}) =~ s/[- ]//g; 
+  my $FmtSID = DBUtil->FmtStr($SenderID,15,'L');       # fixed length with spaces
+  my $FmtRID = DBUtil->FmtStr($ReceiverID,15,'L');     # fixed length with spaces
+  my $str = qq|ISA*${AuthInfoQ}*${AuthInfo}*${SecuInfoQ}*${SecuInfo}*${ISASQ}*${FmtSID}*${ISARQ}*${FmtRID}*${YYMMDD}*${HHMM}*^*00501*${ICN}*${AckReq}*${ICNFLAG}*:${Eol}|;
+  (my $SenderCode = $rSubmitter->{SenderCode} ? $rSubmitter->{SenderCode} : $SenderID) =~ s/[- ]//g; 
+  (my $ReceiverCode = $rSubmitter->{ReceiverCode} ? $rSubmitter->{ReceiverCode} : $ReceiverID) =~ s/[- ]//g; 
+  $str .= qq|GS*HC*${SenderCode}*${ReceiverCode}*${YYYYMMDD}*${HHMM}*${GCN}*X*${Version}${Eol}|;
+  return(2,$str);
+}
+sub SubmitterFooter                     # Interchange Control Segment
+{
+  my ($self,$rSubmitter) = @_;
+  my $str = qq|GE*$rSubmitter->{SubBatchCnt}*${GCN}${Eol}|;
+  $str .= qq|IEA*$rSubmitter->{SubCnt}*${ICN}${Eol}|;
+  return(2,$str);
+}
+#############################################################################
+sub pad0s
+{
+  my ($Num, $Width) = @_;
+  $Num = length $Num < $Width ? '0' x ($Width - length $Num) . $Num : $Num;
+  return($Num);
+}
+#############################################################################

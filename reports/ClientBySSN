@@ -1,0 +1,67 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use DBA;
+use DBUtil;
+use Time::Local;
+$DT = localtime();
+############################################################################
+# usage:
+#   ClientBySSN ForProvID=id
+############################################################################
+my $form = DBForm->new();
+my $dbh = $form->dbconnect();
+my $multidel = chr(253);
+my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+my $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID','where');
+$ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+$qClient = qq|select 
+     Clinic.Name as Clinic, Client.clinicClinicID
+     ,Provider.LName as ProvLName, Provider.FName as ProvFName
+     ,Client.ProvID as PrimaryProvID
+     ,Client.LName, Client.FName, Client.ClientID, Client.Active
+     ,Client.DOB, Client.Gend, xRaces.Descr as Race, Client.SSN
+     ,truncate((to_days(curdate()) - to_days(Client.DOB)) / 365,0) as Age
+     ,Client.Zip, Client.HmPh
+     ,ClientIntake.IntDate
+     ,ClientReferrals.RefDate
+     ,ClientReferrals.ReferredBy1NPI, ClientReferrals.ReferredBy2NPI
+     ,ClientSocial.ReligionName
+     ,xCustAgency.Descr as CustAgency
+  from Client
+    left join ClientIntake on ClientIntake.ClientID=Client.ClientID
+    left join ClientLegal on ClientLegal.ClientID=Client.ClientID
+    left join ClientReferrals on ClientReferrals.ClientID=Client.ClientID
+    left join ClientSocial on ClientSocial.ClientID=Client.ClientID
+    left join Provider on Provider.ProvID=Client.ProvID
+    left join Provider as Clinic on Clinic.ProvID=Client.clinicClinicID
+    left join okmis_config.xCustAgency on xCustAgency.ID=ClientLegal.CustAgency
+    left join okmis_config.xRaces on xRaces.ID=SUBSTRING_INDEX(Client.Race,'${multidel}',1)
+  ${ClinicSelection}
+  order by Client.SSN, Client.LName, Client.FName
+|;
+#warn qq|q=\n$qClient\n|;
+############################################################################
+my ($SSN,$PrevSSN) = ('','');
+my ($ThisLine,$PrevLine) = ('','');
+print qq|${DT}\nDuplicate Clients By SSN Report\n|;
+print qq|Clinic\tLName\tFName\tSSN\tID\tActive\tDOB\tGend\tRace\tAge\tZip\tHomePh\tIntDate\tRefDate\tPrimary Referred By\tSecondary Referred By\tCustAgency\tProvider\tReligion\n|;
+my $sClient = $dbh->prepare($qClient);
+$sClient->execute() || $form->dberror($qClient);
+while ( my $rClient = $sClient->fetchrow_hashref )
+{
+  $SSN = $rClient->{'SSN'};
+#print qq|$PrevSSN, $SSN\n|;
+  print $PrevLine if ( $SSN eq $PrevSSN );
+  my $Client = qq|$rClient->{LName}, $rClient->{FName} ($rClient->{ClientID})|;
+  my $Provider = qq|$rClient->{ProvLName}, $rClient->{ProvFName} ($rClient->{PrimaryProvID})|;
+  $PrevLine = qq|$rClient->{'Clinic'}\t$rClient->{'LName'}\t$rClient->{'FName'}\t$rClient->{'SSN'}\t$rClient->{'ClientID'}\t$rClient->{'Active'}\t$rClient->{'DOB'}\t$rClient->{'Gend'}\t$rClient->{'Race'}\t$rClient->{'Age'}\t$rClient->{'Zip'}\t$rClient->{'HmPh'}\t$rClient->{'IntDate'}\t$rClient->{'RefDate'}\t$rClient->{'ReferredBy1NPI'}\t$rClient->{'ReferredBy2NPI'}\t$rClient->{'CustAgency'}\t${Provider}\t$rClient->{'ReligionName'}\n|;
+  print $PrevLine if ( $SSN eq $PrevSSN );
+
+  $PrevSSN = $rClient->{'SSN'};
+}
+$sClient->finish();
+$form->complete();
+exit;
+############################################################################

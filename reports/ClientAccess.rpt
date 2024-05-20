@@ -1,0 +1,1 @@
+select Provider.LName, Provider.FName, Client.LName, Client.FName, Client.ClientID from ClientAccess left join Provider on ClientAccess.ProvID=Provider.ProvID left join Client on Client.ClientID=ClientAccess.ClientID order by Provider.LName, Client.LName;

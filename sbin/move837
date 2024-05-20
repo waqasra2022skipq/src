@@ -1,0 +1,21 @@
+#!/bin/bash
+# kls, daily 11/11/2008
+# ------------------------------------
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   echo -e "\nServices not installed!"
+   exit 1
+fi
+ACCTS=$(${MISBIN}/accts LIVE)
+ACCTS=mms
+# ------------------------------------
+for ACCT in $ACCTS; do
+  if [ -d ${WWW}/billing ]; then
+    cd ${WWW}/billing
+    echo "check ${WWW}/billing..."
+    for fn in $(/bin/ls -1 okmis_*.837 2>/dev/null); do
+      mv -v ${fn} ${WWW}/${ACCT}/Provider/EFiles/837
+    done
+  fi
+done

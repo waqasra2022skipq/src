@@ -1,0 +1,2180 @@
+#!/usr/bin/perl
+############################################################################
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use myForm;
+use myDBI;
+use DBA;
+use myConfig;
+use MgrTree;
+use DBUtil;
+use Time::Local;
+
+use PDFlib::PDFlib;
+use strict;
+############################################################################
+my $form = myForm->new();
+my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $IDs = $form->{'IDs'};
+#warn "PrintClientASI: IDs=$form->{'IDs'}\n";
+##
+# prepare selects...
+##
+my $sClientASI = $dbh->prepare("select * from ClientASI where ID=?");
+my $sClient = $dbh->prepare("select * from Client where ClientID=?");
+my $sProvider = $dbh->prepare("select * from Provider where ProvID=?");
+
+############################################################################
+my $searchpath = "../data";
+
+my $pagewidth = 612;
+my $pageheight = 792;
+my $fontname= "Arial";
+my $boldfontname= "Arial-BoldMT";
+my $fontsizesmall = 8;
+my $fontsize = 9;
+my $fontsizemid = 10;
+my $fontsizelarge = 11;
+my $fontsizemidlarge = 12;
+my $fontsizexlarge = 13;
+my $fontsizemidxlarge = 14;
+my $fontsizexxlarge = 15;
+my $basefontoptions = "fontname=" . $fontname . " fontsize=" . $fontsize . " embedding encoding=unicode charref";
+my $basefontoptions_i = $basefontoptions . " fontstyle=italic";
+my $basefontoptions_u = $basefontoptions . " underline=true underlineposition=-15% underlinewidth=0.3";
+my $baseboldfontoptions = "fontname=" . $boldfontname . " fontsize=" . $fontsize . " embedding encoding=unicode";
+my $baseboldfontoptions_u = $baseboldfontoptions . " underline=true underlineposition=-15% underlinewidth=0.3";
+my $basemidfontoptions = $basefontoptions . " fontsize=" . $fontsizemid;
+my $basemidfontoptions_i = $basemidfontoptions . " fontstyle=italic";
+my $basemidfontoptions_u = $basemidfontoptions . " underline=true underlineposition=-15% underlinewidth=0.3";
+my $baseboldmidfontoptions = $baseboldfontoptions . " fontsize=" . $fontsizemid;
+my $baseboldmidfontoptions_u = $baseboldmidfontoptions . " underline=true underlineposition=-15% underlinewidth=0.3";
+my $baseboldmidfontoptions_i = $baseboldmidfontoptions . " fontstyle=italic";
+my $baselargefontoptions = $basefontoptions . " fontsize=" . $fontsizelarge;
+my $baseboldlargefontoptions = $baseboldfontoptions . " fontsize=" . $fontsizelarge;
+my $baseboldlargefontoptions_u = $baseboldlargefontoptions . " underline=true underlineposition=-15% underlinewidth=0.3";
+my $baseboldlargefontoptions_ui = $baseboldlargefontoptions_u . " fontstyle=italic";
+my $baseboldlargefontoptions_i = $baseboldlargefontoptions . " fontstyle=italic";
+my $basesmallfontoptions = $basefontoptions . " fontsize=" . $fontsizesmall;
+my $basesmallfontoptions_i = $basesmallfontoptions . " fontstyle=italic";
+my $baseboldsmallfontoptions = $baseboldfontoptions . " fontsize=" . $fontsizesmall;
+my $basemidlargefontoptions = $basefontoptions . " fontsize=" . $fontsizemidlarge;
+my $basemidlargefontoptions_i = $basemidlargefontoptions . " fontstyle=italic";
+my $basemidxlargefontoptions = $basefontoptions . " fontsize=" . $fontsizemidxlarge;
+my $baseboldmidxlargefontoptions = $baseboldfontoptions . " fontsize=" . $fontsizemidxlarge;
+my $basemidxlargefontoptions_i = $basemidxlargefontoptions . " fontstyle=italic";
+my $baseboldmidlargefontoptions = $baseboldfontoptions . " fontsize=" . $fontsizemidlarge;
+my $baseboldmidlargefontoptions_u = $baseboldmidlargefontoptions . " underline=true underlineposition=-15% underlinewidth=0.3";
+my $baseboldxlargefontoptions = $baseboldfontoptions . " fontsize=" . $fontsizexlarge;
+my $baseboldxlargefontoptions_i = $baseboldxlargefontoptions . " fontstyle=italic";
+my $basecheckfontoptions = "fontname={DejaVuSans} encoding=unicode fontsize=10 charref";
+
+my $marginleft = 30;
+my $margintop = 35;
+my $marginbottom = $pageheight - 33;
+my $contentwidth = $pagewidth - 2 * $marginleft;
+my $h_header = 65;
+my $w_rect = 13.9;
+my $h_rect = 9.7;
+
+my $pagecount = 0;
+
+my ($sec, $min, $hrs, $day, $month, $year, $wday, $julian) = localtime();
+my $formid = $hrs.$min;
+my $filename = '/tmp/'.$form->{'LOGINID'}.'_'.DBUtil->genToken().'_'.DBUtil->Date('','stamp').'.pdf';
+my $outfile = $form->{'file'} eq ''                # create and print pdf else just create.
+              ? $form->{'DOCROOT'}.$filename
+              : $form->{'file'};
+my $outfile = "kls.pdf";
+############################################################################
+
+eval {
+
+  # create a new PDFlib object 
+  my $p = new PDFlib::PDFlib;
+
+  $p->set_option("SearchPath={{" . $searchpath . "}}");
+
+  # This mean we don't have to check error return values, but will
+  # get an exception in case of runtime problems.
+  
+  $p->set_option("errorpolicy=exception");
+
+  # all strings are expected as utf8
+  $p->set_option("stringformat=utf8");
+
+  $p->begin_document($outfile, "");
+
+  $p->set_info("Creator", "Millennium Information Services");
+  $p->set_info("Author", "Keith Stephenson");
+  $p->set_info("Title", "Client ASI");
+
+  main->printClientASI($p);
+
+  $p->end_document("");
+
+};
+
+if ($@) {
+  die("$0: PDFlib Exception occurred:\n$@");
+}
+
+$sClientASI->finish();
+$sClient->finish();
+$sProvider->finish();
+myDBI->cleanup();
+if ( $form->{'file'} eq '' )                # create and print pdf.
+{ print qq|Location: ${filename}\n\n|; }
+exit;
+
+############################################################################
+sub printClientASI
+{
+  my ($self, $p) = @_;
+
+  foreach my $ID ( split(' ',$IDs) )
+  { 
+  #warn "PrintClientASI: ID=${ID}\n";
+    $sClientASI->execute($ID) || myDBI->dberror("select ClientASI ${ID}");
+    while ( my $rClientASI = $sClientASI->fetchrow_hashref )
+    { 
+      $sClient->execute($rClientASI->{'G1'}) || myDBI->dberror("select Client: $rClientASI->{'G1'}");
+      my $rClient = $sClient->fetchrow_hashref;
+      main->createPages($p, $rClientASI, $rClient);
+      main->createPageCount($p);
+    }
+  }
+}
+
+sub createPages
+{
+  my ($self, $p, $rClientASI, $rClient) = @_;
+##
+# Header info...
+  my $AgencyID = MgrTree->getAgency($form,$rClient->{'clinicClinicID'});
+  $sProvider->execute($AgencyID) || myDBI->dberror("printClientASI: select Provider $AgencyID");
+  my $rAgency = $sProvider->fetchrow_hashref;
+  my $AgencyName = $rAgency->{Name};
+  my $AgencyAddr = $rAgency->{Addr1} . ', ';
+  $AgencyAddr .= $rAgency->{Addr2} . ', ' if ( $rAgency->{Addr2} );
+  my $AgencyCSZ = $rAgency->{City} . ', ' . $rAgency->{ST} . '  ' . $rAgency->{Zip};
+  my $AgencyPh = 'Office: ' . $rAgency->{WkPh} . '  Fax: ' . $rAgency->{Fax};
+##
+  $rClientASI->{'ClientName'} = qq|$rClient->{'FName'} $rClient->{'LName'}|;
+  my $addr1 = $rClient->{'Addr1'};
+  my $addr2 = $rClient->{'Addr2'};
+  my $csz = qq|$rClient->{'City'}, $rClient->{'ST'}  $rClient->{'Zip'}|;
+  if ( $addr2 eq '' ) { $addr2 = $csz; $csz = ''; }
+  $rClientASI->{'ClientAddress'} = qq|${addr1}\n${addr2}\n${csz}|;
+
+  $rClientASI->{'G2'} = substr($rClientASI->{'G2'},7,4);
+  $rClientASI->{'G4'} = DBUtil->Date($rClientASI->{'G4'},'fmt','MMDDYY');
+  $rClientASI->{'G5'} = DBUtil->Date($rClientASI->{'G5'},'fmt','MMDDYY');
+  $rClientASI->{'G16'} = DBUtil->Date($rClientASI->{'G16'},'fmt','MMDDYY');
+#
+  my $HeaderInfo = { 
+    'companyname' => $AgencyName, 
+    'companyaddr' =>  $AgencyAddr, 
+    'companycsz' => $AgencyCSZ, 
+    'companyphone' => $AgencyPh,
+    'LOGO' => $rAgency->{'LOGO'} 
+                  };
+#
+# None of these are input...so not output.
+#   $rClientASI->{'F23T'} 
+#   $rClientASI->{'G19T'} 
+#   $rClientASI->{'G21T'} 
+#   $rClientASI->{'G22T'} 
+#   $rClientASI->{'G23T'} 
+#   $rClientASI->{'G24T'} 
+#   $rClientASI->{'G25T'} 
+#   $rClientASI->{'G26T'} 
+#   $rClientASI->{'G27T'} 
+#   $rClientASI->{'G29T'} 
+#   $rClientASI->{'L16T'} 
+#
+#####################
+  my $xpos;
+  my $ypos;
+  my $h_tf;
+
+  main->createHeader($p, $HeaderInfo);
+
+##
+# INSTRUCTIONS
+  $ypos = $margintop + $h_header;
+
+  $ypos += 14;
+  $p->fit_textline("INSTRUCTIONS", 77.3, $ypos, $baseboldmidlargefontoptions);
+
+  $ypos += 5;
+  $p->fit_textline("1.", $marginleft, $ypos + 11, $basemidfontoptions);
+  $h_tf = main->renderTextflow($p, "<$basefontoptions_u>Leave No Blanks <underline=false>- Where appropriate code items:", 45, $ypos, 212);
+  $ypos += $h_tf;
+
+  $ypos += 15;
+  $p->fit_textline("X = question not answered", 47, $ypos, $baseboldfontoptions);
+  $ypos += 11;
+  $p->fit_textline("N = questions not applicable", 47, $ypos, $baseboldfontoptions);
+  $ypos += 4;
+  $h_tf = main->renderTextflow($p, "Use <$basefontoptions_u>only<underline=false> one character per item.", 45, $ypos, 180);
+  $ypos += $h_tf;
+
+  $ypos += 4;
+  $p->fit_textline("2.", $marginleft, $ypos + 11, $basemidfontoptions);
+  $h_tf = main->renderTextflow($p, "Item numbers <$basefontoptions_u>underlined<underline=false> are to be asked at follow-up. Items with an asterisk are cumulative and should be rephrased at follow-up (see Manual).", 45, $ypos, 212);
+  $ypos += $h_tf;
+
+  $ypos += 4;
+  $p->fit_textline("3.", $marginleft, $ypos + 11, $basemidfontoptions);
+  $h_tf = main->renderTextflow($p, "Space is provided after sections for additional comments.", 45, $ypos, 212);
+  $ypos += $h_tf;
+##
+
+  main->renderLine($p, 214, 107, 214, 272);
+
+##
+# SEVERITY RATINGS
+  $ypos = $margintop + $h_header;
+
+  $ypos += 14;
+  $p->fit_textline("SEVERITY RATINGS", 248, $ypos, $baseboldmidlargefontoptions);
+
+  $ypos += 5;
+  $h_tf = main->renderTextflow($p, "The severity ratings are interviewer estimates of the patient’s need for additional treatment in each area. The scales range from 0 (no treatment necessary) to 9 (treatment needed to intervene in life-", 218, $ypos, 394);
+  $ypos += $h_tf;
+
+  $ypos += 8;
+  $h_tf = main->renderTextflow($p, "Each ratings is based upon the patient’s history of problem symptoms, present condition and subjective assessment of his treatment needs in a given area. For a detailed description of severity ratings’ derivation procedures and conventions, see manual.  <$baseboldfontoptions>Note:  <$basefontoptions>These severity ratings are optional.", 218, $ypos, 394);
+  $ypos += $h_tf;
+##
+
+  main->renderLine($p, 398, 107, 398, 272);
+
+##
+# Addiction Severity
+  $ypos = $margintop + $h_header;
+
+  $h_tf = main->renderTextflow($p, "<$baseboldmidxlargefontoptions>Addiction Severity Index <$basemidxlargefontoptions_i>Fifth Edition", 414, $ypos, 575);
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  main->renderLine($p, 402, $ypos, $marginleft + $contentwidth, $ypos);
+
+  $ypos += 25;
+  $h_tf = main->renderTextflow($p, "SUMMARY OF PATIENTS RATING SCALE", 414, $ypos, 575, $baseboldmidfontoptions . " lastalignment=center");
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("0 - Not at all", 454, $ypos, $basemidfontoptions);
+  $ypos += 12;
+  $p->fit_textline("1 - Slightly", 454, $ypos, $basemidfontoptions);
+  $ypos += 12;
+  $p->fit_textline("2 - Moderately", 454, $ypos, $basemidfontoptions);
+  $ypos += 12;
+  $p->fit_textline("3 - Considerably", 454, $ypos, $basemidfontoptions);
+  $ypos += 12;
+  $p->fit_textline("4 - Extremely", 454, $ypos, $basemidfontoptions);
+##
+
+  main->renderLine($p, $marginleft, 275, $marginleft + $contentwidth, 275);
+
+##
+# GENERAL INFORMATION column 1
+  $xpos = $marginleft;
+  $ypos = 275;
+
+  $ypos += 25;
+  $p->fit_textline("G1.", $xpos, $ypos, $basefontoptions);
+  $p->fit_textline("I.D. NUMBER", 48, $ypos, $basefontoptions);
+  main->renderRects($p, 200, $ypos + 2, 4, $rClientASI->{'G1'});
+
+  $ypos += 5;
+  $p->fit_textline("G2.", $xpos, $ypos + 11, $basefontoptions);
+  $h_tf = main->renderTextflow($p, "LAST 4 DIGITS OF SSN", 48, $ypos, 120, $basefontoptions);
+  main->renderRects($p, 200, $ypos + $h_rect + 4, 4, $rClientASI->{'G2'});
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("G3.", $xpos, $ypos, $basefontoptions);
+  $p->fit_textline("PROGRAM NUMBER", 48, $ypos, $basefontoptions);
+  main->renderRects($p, 200, $ypos + 2, 3, $rClientASI->{'G3'});
+
+  $ypos += 5;
+  $p->fit_textline("G4.", $xpos, $ypos + 11, $basefontoptions);
+  $h_tf = main->renderTextflow($p, "DATE OF ADMISSION", 48, $ypos, 120, $basefontoptions);
+  main->renderRects($p, 200, $ypos + $h_rect + 4, 6, $rClientASI->{'G4'});
+  $p->fit_textline("Mth.", 122, $ypos + $h_rect + 14, $basesmallfontoptions);
+  $p->fit_textline("Day", 150, $ypos + $h_rect + 14, $basesmallfontoptions);
+  $p->fit_textline("Year", 180, $ypos + $h_rect + 14, $basesmallfontoptions);
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("G5.", $xpos, $ypos + 11, $basefontoptions);
+  $h_tf = main->renderTextflow($p, "DATE OF INTERVIEW", 48, $ypos, 120, $basefontoptions);
+  main->renderRects($p, 200, $ypos + $h_rect + 4, 6, $rClientASI->{'G5'});
+  $p->fit_textline("Mth.", 122, $ypos + $h_rect + 14, $basesmallfontoptions);
+  $p->fit_textline("Day", 150, $ypos + $h_rect + 14, $basesmallfontoptions);
+  $p->fit_textline("Year", 180, $ypos + $h_rect + 14, $basesmallfontoptions);
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("G6.", $xpos, $ypos, $basefontoptions);
+  $p->fit_textline("TIME BEGUN", 48, $ypos, $basefontoptions);
+  main->renderRects($p, 200, $ypos + 2, 5, $rClientASI->{'G6'});
+
+  $ypos += 16;
+  $p->fit_textline("G7.", $xpos, $ypos, $basefontoptions);
+  $p->fit_textline("TIME ENDED", 48, $ypos, $basefontoptions);
+  main->renderRects($p, 200, $ypos + 2, 5, $rClientASI->{'G7'});
+
+  $ypos += 16;
+  $p->fit_textline("G8.", $xpos, $ypos, $basefontoptions);
+  $p->fit_textline("CLASS:", 48, $ypos, $basefontoptions);
+  main->renderRects($p, 200, $ypos + 2, 1, $rClientASI->{'G8'});
+  $ypos += 5;
+  $h_tf = main->renderTextflow($p, "1 - Intake\n2 - Follow-up", 48, $ypos, 103, $basesmallfontoptions);
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("G9.", $xpos, $ypos, $basefontoptions);
+  $p->fit_textline("CONTACT CODE:", 48, $ypos, $basefontoptions);
+  main->renderRects($p, 200, $ypos + 2, 1, $rClientASI->{'G9'});
+  $ypos += 5;
+  $h_tf = main->renderTextflow($p, "1 - In Person\n2 - Phone", 48, $ypos, 103, $basesmallfontoptions);
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("G10.", $xpos, $ypos, $basefontoptions);
+  $p->fit_textline("GENDER:", 52, $ypos, $basefontoptions);
+  main->renderRects($p, 200, $ypos + 2, 1, $rClientASI->{'G10'});
+  $ypos += 5;
+  $h_tf = main->renderTextflow($p, "1 - Male\n2 - Female", 52, $ypos, 103, $basesmallfontoptions);
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("G11.", $xpos, $ypos + 11, $basefontoptions);
+  $h_tf = main->renderTextflow($p, "INTERVIEWER CODE NUMBER", 52, $ypos, 120, $basefontoptions);
+  main->renderRects($p, 200, $ypos + $h_rect + 4, 2, $rClientASI->{'G11'});
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("G12.", $xpos, $ypos, $basefontoptions);
+  $p->fit_textline("SPECIAL:", 52, $ypos, $basefontoptions);
+  main->renderRects($p, 200, $ypos + 2, 1, $rClientASI->{'G12'});
+  $ypos += 5;
+  $h_tf = main->renderTextflow($p, "1 - Patient terminated\n2 - Patient refused\n3 - Patient unable to respond", 52, $ypos, 156, $basesmallfontoptions);
+  $ypos += $h_tf;
+##
+
+  main->renderLine($p, 214, 281, 214, 770);
+
+##
+# GENERAL INFORMATION column 2
+  $xpos = 218;
+  $ypos = 275;
+
+  $ypos += 11;
+  $p->fit_textline("GENERAL INFORMATION", 252, $ypos, $baseboldfontoptions);
+
+  $ypos += 18;
+  $p->fit_textline("NAME", $xpos, $ypos, $basefontoptions);
+  main->renderTextflow($p, $rClientASI->{'ClientName'}, 250, $ypos - 10, 394, $basesmallfontoptions);
+
+  $ypos += 9;
+
+  $ypos += 16;
+  $p->fit_textline("CURRENT ADDRESS", $xpos, $ypos, $basefontoptions);
+  main->renderTextflow($p, $rClientASI->{'ClientAddress'}, $xpos + 3, $ypos, 394, $basesmallfontoptions);
+
+  $ypos += 36;
+
+  $ypos += 16;
+  $p->fit_textline("G13.", $xpos, $ypos, $basefontoptions);
+  $p->fit_textline("GEOGRAPHIC CODE", 240, $ypos, $basefontoptions . " charspacing=-0.3");
+  main->renderRects($p, 394, $ypos + 2, 3, $rClientASI->{'G13'});
+
+  $ypos += 5;
+  $p->fit_textline("G14.", $xpos, $ypos + 11, $basefontoptions);
+  $h_tf = main->renderTextflow($p, "How long have you lived at this address?", 240, $ypos, 325, $basefontoptions);
+  main->renderRects($p, 357, $ypos + $h_rect + 4, 2, $rClientASI->{'G14Year'});
+  main->renderRects($p, 394, $ypos + $h_rect + 4, 2, $rClientASI->{'G14M'});
+  $p->fit_textline("Years", 333, $ypos + $h_rect + 14, $basesmallfontoptions);
+  $p->fit_textline("Months", 368, $ypos + $h_rect + 14, $basesmallfontoptions);
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("G15.", $xpos, $ypos + 11, $basefontoptions);
+  $h_tf = main->renderTextflow($p, "Is this residence owned by your or your family?", 240, $ypos, 335, $basefontoptions);
+  main->renderRects($p, 394, $ypos + $h_rect + 4, 1, $rClientASI->{'G15'});
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("G16.", $xpos, $ypos + 11, $basefontoptions);
+  $h_tf = main->renderTextflow($p, "DATE OF BIRTH", 240, $ypos, 282, $basefontoptions);
+  main->renderRects($p, 394, $ypos + $h_rect + 4, 6, $rClientASI->{'G16'});
+  $p->fit_textline("Mth.", 314, $ypos + $h_rect + 14, $basesmallfontoptions);
+  $p->fit_textline("Day", 344, $ypos + $h_rect + 14, $basesmallfontoptions);
+  $p->fit_textline("Year", 371, $ypos + $h_rect + 14, $basesmallfontoptions);
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("G17.", $xpos, $ypos, $basefontoptions);
+  $p->fit_textline("RACE", 240, $ypos, $basefontoptions);
+  main->renderRects($p, 394, $ypos + 2, 1, $rClientASI->{'G17'});
+  $ypos += 5;
+  $h_tf = main->renderTextflow($p, "1 - White (Not of Hispanic Origin)\n2 - Black (Not of Hispanic Origin)\n3 - American Indian\n4 - Alaskan Native\n5 - Asian or Pacific Islander\n6 - Hispanic - Mexican\n7 - Hispanic - Puerto Rican\n8 - Hispanic - Cuban\n9 - Other Hispanic", 240, $ypos, 358, $basesmallfontoptions);
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("G18.", $xpos, $ypos, $basefontoptions);
+  $p->fit_textline("RELIGIOUS PREFERENCE", 240, $ypos, $basefontoptions);
+  main->renderRects($p, 394, $ypos + 2, 1, $rClientASI->{'G18'});
+  $ypos += 5;
+  $h_tf = main->renderTextflow($p, "1 - Protestant\n2 - Catholic\n3 - Jewish\n4 - Islamic\n5 - Other\n6 - None", 240, $ypos, 290, $basesmallfontoptions);
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("G19.", $xpos, $ypos + 11, $basefontoptions_u);
+  main->renderRects($p, 394, $ypos + $h_rect + 4, 1, $rClientASI->{'G19'});
+  $h_tf = main->renderTextflow($p, "Have you been in a controlled environment in the past 30 days?", 240, $ypos, 374, $basefontoptions);
+  $ypos += $h_tf;
+  $ypos += 5;
+  $h_tf = main->renderTextflow($p, "1 - No\n2 - Jail\n3 - Alcohol or Drug Treatment\n4 - Medical Treatment\n5 - Psychiatric Treatment\n6 - Other", 240, $ypos, 346, $basesmallfontoptions);
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("G20.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("How many days?", 240, $ypos, $basefontoptions);
+  main->renderRects($p, 394, $ypos + 2, 1, $rClientASI->{'G20'});
+##
+
+  main->renderLine($p, 398, 281, 398, 770);
+
+##
+# GENERAL INFORMATION column 3
+  $xpos = 402;
+  $ypos = 275;
+
+  $ypos += 11;
+  $p->fit_textline("ADDITIONAL TEST RESULTS", 428.6, $ypos, $baseboldfontoptions);
+
+  $ypos += 18;
+  $p->fit_textline("G21.", $xpos, $ypos, $basefontoptions);
+  $p->fit_textline("Shipley C.Q.", 424, $ypos, $basefontoptions);
+  main->renderRects($p, 582, $ypos + 2, 3, $rClientASI->{'G21'});
+
+  $ypos += 16;
+  $p->fit_textline("G22.", $xpos, $ypos, $basefontoptions);
+  $p->fit_textline("Shipley I.Q.", 424, $ypos, $basefontoptions);
+  main->renderRects($p, 582, $ypos + 2, 3, $rClientASI->{'G22'});
+
+  $ypos += 16;
+  $p->fit_textline("G23.", $xpos, $ypos, $basefontoptions);
+  $p->fit_textline("Beck Total Score", 424, $ypos, $basefontoptions);
+  main->renderRects($p, 582, $ypos + 2, 2, $rClientASI->{'G23'});
+
+  $ypos += 16;
+  $p->fit_textline("G24.", $xpos, $ypos, $basefontoptions);
+  $p->fit_textline("SCL-90 Total", 424, $ypos, $basefontoptions);
+  main->renderRects($p, 582, $ypos + 2, 3, $rClientASI->{'G24'});
+
+  $ypos += 16;
+  $p->fit_textline("G25.", $xpos, $ypos, $basefontoptions);
+  $p->fit_textline("MAST", 424, $ypos, $basefontoptions);
+  main->renderRects($p, 582, $ypos + 2, 2, $rClientASI->{'G25'});
+
+  $ypos += 16;
+  $p->fit_textline("G26.", $xpos, $ypos, $basefontoptions);
+  main->renderRects($p, 582, $ypos + 2, 3, $rClientASI->{'G26'});
+
+  $ypos += 16;
+  $p->fit_textline("G27.", $xpos, $ypos, $basefontoptions);
+  main->renderRects($p, 582, $ypos + 2, 3, $rClientASI->{'G27'});
+
+  $ypos += 16;
+  $p->fit_textline("G28.", $xpos, $ypos, $basefontoptions);
+  main->renderRects($p, 582, $ypos + 2, 3, $rClientASI->{'G28'});
+
+  $ypos += 40;
+  $p->fit_textline("SEVERITY PROFILE", 444, $ypos, $baseboldfontoptions);
+  $ypos += 20;
+
+  main->renderLine($p, 416.6, $ypos + 146, 582, $ypos + 146, 2);
+  foreach my $i (0..9) {
+    my $y = $ypos + 14.6 * (9 - $i);
+    main->renderLine($p, 416.6, $y, 582, $y, ($i eq 9) ? 1.6 : 0.5);
+    $p->fit_textline($i, 421.2, $y + 11, $basemidlargefontoptions);
+  }
+
+  my @categories = ("Problems", "Medical", "Employ/", "Alcohol", "Drug", "Legal", "Family/Social", "Psychiatric");
+  foreach my $i (0..7) {
+    my $x = 431.9 + 20 * $i;
+    main->renderLine($p, $x, $ypos, $x, $ypos + 224);
+    $p->fit_textline($categories[$i], $x - 12, $ypos + 224, (($i eq 0) ? $baseboldmidfontoptions : $basemidfontoptions) . " orientate=west");
+  }
+
+# KLS
+# Based on these values, put a check in the proper location on the 'SEVERITY PROFILE' grid.
+#$rClientASI->{'SPMedical'}
+#$rClientASI->{'SPEmpSup'}
+#$rClientASI->{'SPAlcohol'}
+#$rClientASI->{'SPDrugs'}
+#$rClientASI->{'SPLegal'}
+#$rClientASI->{'SPFamily'}
+#$rClientASI->{'SPP'}
+
+  main->createFooter($p);
+
+  main->createHeader($p, $HeaderInfo);
+
+##
+# MEDICAL STATUS column 1
+  $xpos = $marginleft;
+  $ypos = $margintop + $h_header;
+  $ypos += 14;
+
+  main->renderRects($p, $xpos + $w_rect * 4, $ypos, 4, $formid);
+
+  $ypos += 5;
+  $p->fit_textline("M1.", $xpos, $ypos + 11, $basefontoptions_u);
+  main->renderRects($p, 222, $ypos + $h_rect + 4, 2, $rClientASI->{'M1'});
+  $h_tf = main->renderTextflow($p, "How many times in your life have you been hospitalized for medical problems?", 48, $ypos, 168);
+  $ypos += $h_tf;
+  $ypos += 11;
+  $p->fit_textline("(Include o.d.’s, d.t.’s, exclude detox.)", 48, $ypos, $basefontoptions);
+
+  $ypos += 5;
+  $p->fit_textline("M2.", $xpos, $ypos + 11, $basefontoptions);
+  main->renderRects($p, 185, $ypos + $h_rect + 4, 2, $rClientASI->{'M2Y'});
+  main->renderRects($p, 222, $ypos + $h_rect + 4, 2, $rClientASI->{'M2M'});
+  $p->fit_textline("Years", 162, $ypos + $h_rect + 14, $basesmallfontoptions);
+  $p->fit_textline("Months", 196, $ypos + $h_rect + 14, $basesmallfontoptions);
+  $h_tf = main->renderTextflow($p, "How long ago was your last hospitalization for a physical problem?", 48, $ypos, 148);
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("M3.", $xpos, $ypos + 11, $basefontoptions);
+  $h_tf = main->renderTextflow($p, "Do you have any chronic medical problems which continue to interfere with your life?", 48, $ypos, 196);
+  main->renderRects($p, 222, $ypos + $h_rect + 4, 1, $rClientASI->{'M3'});
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("M4.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "Are you taking any prescribed medication on a regular basis for a physical problem?   0 - No  1 - Yes", 48, $ypos, 196);
+  main->renderRects($p, 222, $ypos + $h_rect + 4, 1, $rClientASI->{'M4'});
+  $ypos += $h_tf;
+##
+
+  main->renderLine($p, 226, 107, 226, 294);
+
+##
+# MEDICAL STATUS column 2
+  $xpos = 230;
+  $ypos = $margintop + $h_header;
+
+  $ypos += 14;
+  $p->fit_textline("MEDICAL STATUS", 265, $ypos, $baseboldmidlargefontoptions);
+
+  $ypos += 5;
+  $p->fit_textline("M5.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "Do you receive a pension for a physical disability? (Exclude psychiatric disability.)", 248, $ypos, 370);
+  main->renderRects($p, 403, $ypos + $h_rect + 4, 1, $rClientASI->{'M5'});
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $h_tf = main->renderTextflow($p, "0 - No\n1 - Yes", 248, $ypos, 280, $basesmallfontoptions);
+  $ypos += $h_tf;
+  main->renderTextflow($p, $rClientASI->{'M5T'}, 275, 152, 400, $basesmallfontoptions, $ypos, "verticalalign=bottom");
+  main->renderLine($p, 273, $ypos + 2, 402, $ypos + 2);
+  $ypos += 10;
+  $p->fit_textline("Specify", 302, $ypos, $basesmallfontoptions);
+
+  $ypos += 5;
+  $p->fit_textline("M6.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "How many days have you experienced medical problems in the past 30 days?", 248, $ypos, 370);
+  main->renderRects($p, 403, $ypos + $h_rect + 4, 2, $rClientASI->{'M6'});
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $h_tf = main->renderTextflow($p, "For questions M7 & M8 please ask the patient to use the <$baseboldmidfontoptions_i>Patient’s Rating Scale", $xpos, $ypos, 404, $basemidfontoptions_i . " charspacing=-0.3");
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("M7.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "How troubled or bothered have you been by these medical problems in the past 30 days?", 248, $ypos, 378);
+  main->renderRects($p, 403, $ypos + $h_rect + 4, 1, $rClientASI->{'M7'});
+  $ypos += $h_tf;
+##
+
+  main->renderLine($p, 407, 107, 407, 294);
+
+##
+# MEDICAL STATUS column 3
+  $xpos = 411;
+  $ypos = $margintop + $h_header;
+  $ypos += 6;
+
+  $ypos += 5;
+  $p->fit_textline("M8.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "How important to you now is treatment for these medical problems?", 429, $ypos, 542);
+  main->renderRects($p, 582, $ypos + $h_rect + 4, 1, $rClientASI->{'M8'});
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("Interviewer Severity Rating", 435, $ypos, $baseboldmidfontoptions_i);
+
+  $ypos += 3;
+  $p->fit_textline("M9.", $xpos, $ypos + 11, $basefontoptions);
+  $h_tf = main->renderTextflow($p, "How would you rate the patient’s need for medicaltreatment?", 429, $ypos, 552);
+  main->renderRects($p, 582, $ypos + $h_rect + 4, 1, $rClientASI->{'M9'});
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("Confidence Rating", 453, $ypos, $baseboldmidfontoptions_i);
+  $ypos += 3;
+  $h_tf = main->renderTextflow($p, "Is the above information significantly distorted by:", $xpos, $ypos, 560);
+  $ypos += $h_tf;
+  $ypos += 11;
+  $p->fit_textline("M10.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Patient’s misrepresentation?", 432, $ypos, $basefontoptions);
+  main->renderRects($p, 582, $ypos + 2, 1, $rClientASI->{'M10'});
+  $ypos += 10;
+  $p->fit_textline("0 - No  1 - Yes", 447, $ypos, $basesmallfontoptions);
+
+  $ypos += 3;
+  $p->fit_textline("M11.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "Patient’s inability to understand?", 432, $ypos, 512);
+  main->renderRects($p, 582, $ypos + $h_rect + 4, 1, $rClientASI->{'M11'});
+  $ypos += $h_tf;
+  $ypos += 10;
+  $p->fit_textline("0 - No  1 - Yes", 447, $ypos, $basesmallfontoptions);
+##
+
+  main->renderLine($p, $marginleft, 297, $marginleft + $contentwidth, 297);
+
+  $p->fit_textline("COMMENTS", $marginleft, 309, $baseboldmidfontoptions);
+  main->renderTextflow($p, $rClientASI->{'MCOM'}, $marginleft, 309, $marginleft + $contentwidth);
+
+  main->renderLine($p, $marginleft, 360, $marginleft + $contentwidth, 360);
+  $p->fit_textline("EMPLOYMENT/SUPPORT STATUS", 215, 372, $baseboldmidlargefontoptions);
+
+##
+# EMPLOYMENT/SUPPORT STATUS column 1
+  $xpos = $marginleft;
+  $ypos = 382;
+
+  $ypos += 11;
+  $p->fit_textline("E1.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Education completed", 48, $ypos, $basefontoptions);
+  main->renderRects($p, 180, $ypos + 2, 2, $rClientASI->{'E1Y'});
+  main->renderRects($p, 222, $ypos + 2, 2, $rClientASI->{'E1M'});
+  $p->fit_textline("Years", 156, $ypos + 12, $basesmallfontoptions);
+  $p->fit_textline("Months", 196, $ypos + 12, $basesmallfontoptions);
+
+  $ypos += 5;
+  $p->fit_textline("E2.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "Training or technical education completed", 48, $ypos, 154);
+  main->renderRects($p, 222, $ypos + $h_rect + 12, 2, $rClientASI->{'E2'});
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("E3.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "Do you have a profession, trade or skill?", 48, $ypos, 175);
+  main->renderRects($p, 222, $ypos + $h_rect + 4, 1, $rClientASI->{'E2'});
+  $ypos += $h_tf;
+  $h_tf = main->renderTextflow($p, "0 - No\n1 - Yes", 48, $ypos, 88, $basesmallfontoptions);
+  $ypos += $h_tf;
+  main->renderTextflow($p, $rClientASI->{'E3T'}, 80, 446, 222, $basesmallfontoptions, $ypos, "verticalalign=bottom");
+  $ypos += 10;
+  $p->fit_textline("Please Specify", 115, $ypos, $basesmallfontoptions);
+
+  $ypos += 16;
+  $p->fit_textline("E4.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Do you have a valid driver’s license?", 48, $ypos, $basefontoptions);
+  main->renderRects($p, 222, $ypos + 2, 1, $rClientASI->{'E4'});
+  $ypos += 10;
+  $p->fit_textline("0-No 1-Yes", 48, $ypos, $basesmallfontoptions);
+
+  $ypos += 5;
+  $p->fit_textline("E5.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "Do you have an automobile available for use? (Answer No if no valid driver’s license.)", 48, $ypos, 198);
+  main->renderRects($p, 222, $ypos + $h_rect + 4, 1, $rClientASI->{'E5'});
+  $ypos += $h_tf;
+  $p->fit_textline("0-No 1-Yes", 144, $ypos, $basesmallfontoptions);
+
+  $ypos += 5;
+  $p->fit_textline("E6.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "How long was your longest full-time job?", 48, $ypos, 138);
+  main->renderRects($p, 183, $ypos + $h_rect + 4, 2, $rClientASI->{'E6Y'});
+  main->renderRects($p, 222, $ypos + $h_rect + 4, 2, $rClientASI->{'E6M'});
+  $p->fit_textline("Years", 160, $ypos + $h_rect + 14, $basesmallfontoptions);
+  $p->fit_textline("Months", 196, $ypos + $h_rect + 14, $basesmallfontoptions);
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("E7.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Usual (or last) occupation?", 48, $ypos, $basefontoptions);
+  main->renderRects($p, 222, $ypos + 2, 1, $rClientASI->{'E7'});
+  $ypos += 25;
+  main->renderTextflow($p, $rClientASI->{'E7T'}, $xpos + 18, 582, 222, $basesmallfontoptions, $ypos, "verticalalign=bottom");
+  $ypos += 10;
+  $p->fit_textline("Specify in Detail", 79, $ypos, $basesmallfontoptions);
+
+  $ypos += 5;
+  $p->fit_textline("E8.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "Does someone contribute to your support in any way?", 48, $ypos, 178);
+  main->renderRects($p, 222, $ypos + $h_rect + 4, 1, $rClientASI->{'E8'});
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("E9.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "(ONLY IF “ITEM 8” IS YES) Does this constitute the majority of your support?", 48, $ypos, 170);
+  main->renderRects($p, 222, $ypos + $h_rect + 4, 1, $rClientASI->{'E9'});
+  $ypos += $h_tf;
+##
+
+  main->renderLine($p, 226, 377, 226, 705);
+
+##
+# EMPLOYMENT/SUPPORT STATUS column 2
+  $xpos = 230;
+  $ypos = 382;
+
+  $p->fit_textline("E10.", $xpos, $ypos + 11, $basefontoptions);
+  $h_tf = main->renderTextflow($p, "Usual employment pattern, past 3 years.", 251, $ypos, 362);
+  main->renderRects($p, 403, $ypos + $h_rect + 4, 1, $rClientASI->{'E10'});
+  $ypos += $h_tf;
+  $ypos += 5;
+  $h_tf = main->renderTextflow($p, "1 - full time (40 hrs/wk)\n2 - part time (reg. hrs.)\n3 - part time (irreg., daywork)\n4 - student\n5 - service\n6 - retired/disability\n7 - unemployed\n8 - in controlled environment", 251, $ypos, 370, $basesmallfontoptions);
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("E11.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "How many days were you paid for working in the past 30?", 251, $ypos, 374, "charspacing=-0.2");
+  main->renderRects($p, 403, $ypos + $h_rect + 4, 2, $rClientASI->{'E11'});
+  $ypos += $h_tf;
+  $ypos += 11;
+  $p->fit_textline("(include “under the table” work.)", 251, $ypos, $basefontoptions);
+
+  $ypos += 5;
+  $h_tf = main->renderTextflow($p, "How much money did you receive from the following sources in the past 30 days?", $xpos, $ypos, 398);
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("E12.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "Employment (net income)", 251, $ypos, 306);
+  main->renderRects($p, 403, $ypos + $h_rect + 4, 4, $rClientASI->{'E12'});
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("E13.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "Unemployment compensation", 251, $ypos, 313);
+  main->renderRects($p, 403, $ypos + $h_rect + 4, 4, $rClientASI->{'E13'});
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("E14.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("DPA", 251, $ypos, $basefontoptions);
+  main->renderRects($p, 403, $ypos + 2, 4, $rClientASI->{'E14'});
+
+  $ypos += 5;
+  $p->fit_textline("E15.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "Pension, benefits or social security", 251, $ypos, 326);
+  main->renderRects($p, 403, $ypos + $h_rect + 4, 4, $rClientASI->{'E15'});
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("E16.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "Mate, family or friends (Money for personal expenses)", 251, $ypos, 340);
+  main->renderRects($p, 403, $ypos + $h_rect + 4, 4, $rClientASI->{'E16'});
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("E17.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Illegal", 251, $ypos, $basefontoptions);
+  main->renderRects($p, 403, $ypos + 2, 4, $rClientASI->{'E17'});
+##
+
+  main->renderLine($p, 407, 377, 407, 705);
+
+##
+# EMPLOYMENT/SUPPORT STATUS column 3
+  $xpos = 411;
+  $ypos = 377;
+
+  $p->fit_textline("E18.", $xpos, $ypos + 11, $basefontoptions);
+  $h_tf = main->renderTextflow($p, "How many people depend on you for the majority of their food, shelter, etc.?", 432, $ypos, 552);
+  main->renderRects($p, 582, $ypos + $h_rect + 4, 1, $rClientASI->{'E18'});
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("E19.", $xpos, $ypos + 11, $basefontoptions);
+  $h_tf = main->renderTextflow($p, "How many days have you experienced employment problems in the past 30?", 432, $ypos, 552);
+  main->renderRects($p, 582, $ypos + $h_rect + 4, 1, $rClientASI->{'E19'});
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $h_tf = main->renderTextflow($p, "For questions E20&E21 please ask patient to use the <$baseboldmidfontoptions_i>Patient Rating Scale.", $xpos, $ypos, 578, $basemidfontoptions_i . " charspacing=-0.4");
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("E20.", $xpos, $ypos + 11, $basefontoptions);
+  $h_tf = main->renderTextflow($p, "How troubled or bothered have you been by these employment problems in the past 30 days?", 432, $ypos, 552);
+  main->renderRects($p, 582, $ypos + $h_rect + 4, 1, $rClientASI->{'E20'});
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("E21.", $xpos, $ypos + 11, $basefontoptions);
+  $h_tf = main->renderTextflow($p, "How important to you now is counseling for these employment problems?", 432, $ypos, 552);
+  main->renderRects($p, 582, $ypos + $h_rect + 4, 1, $rClientASI->{'E21'});
+  $ypos += $h_tf;
+
+  $ypos += 17;
+  $p->fit_textline("Interviewer Severity Rating", 435, $ypos, $baseboldmidfontoptions_i);
+
+  $ypos += 5;
+  $p->fit_textline("E22.", $xpos, $ypos + 11, $basefontoptions);
+  $h_tf = main->renderTextflow($p, "How would you rate the patient’s need for employment counseling?", 432, $ypos, 558);
+  main->renderRects($p, 582, $ypos + $h_rect + 4, 1, $rClientASI->{'E22'});
+  $ypos += $h_tf;
+
+  $ypos += 17;
+  $p->fit_textline("Confidence Rating", 453, $ypos, $baseboldmidfontoptions_i);
+
+  $ypos += 5;
+  $h_tf = main->renderTextflow($p, "Is the above information significantly distorted by:", $xpos, $ypos, 558);
+  $ypos += $h_tf;
+  $ypos += 11;
+  $p->fit_textline("E23.", $xpos, $ypos, $basefontoptions);
+  $p->fit_textline("Patient’s misrepresentation?", 432, $ypos, $basefontoptions);
+  main->renderRects($p, 582, $ypos + 2, 1, $rClientASI->{'E23'});
+
+  $ypos += 5;
+  $p->fit_textline("E24.", $xpos, $ypos + 11, $basefontoptions);
+  $h_tf = main->renderTextflow($p, "Patient’s inability to understand?", 432, $ypos, 558);
+  main->renderRects($p, 582, $ypos + $h_rect + 4, 1, $rClientASI->{'E24'});
+  $ypos += $h_tf;
+##
+
+  main->renderLine($p, $marginleft, 708, $marginleft + $contentwidth, 708);
+
+  $p->fit_textline("COMMENTS", $marginleft, 720, $baseboldmidfontoptions);
+  main->renderTextflow($p, $rClientASI->{'ECOM'}, $marginleft, 720, $marginleft + $contentwidth);
+
+  main->createFooter($p);
+
+  main->createHeader($p, $HeaderInfo);
+
+  $p->fit_textline("DRUG/ALCOHOL USE", 232, $margintop + $h_header + 14, $baseboldmidlargefontoptions);
+
+##
+# DRUG/ALCOHOL USE column 1
+  $xpos = $marginleft;
+  $ypos = $margintop + $h_header + 14;
+
+  main->renderRects($p, $xpos + $w_rect * 4, $ypos, 4, $formid);
+
+  $ypos += 5;
+  $ypos += 25;
+  main->renderTextflow($p, "Past 30 Days", 124, 119, 152, $basesmallfontoptions . " lastalignment=center", $ypos, "verticalalign=bottom");
+  main->renderTextflow($p, "Lifetime Years", 164, 119, 188, $basesmallfontoptions . " lastalignment=center", $ypos, "verticalalign=bottom");
+  main->renderTextflow($p, "Use Route Admin", 193, 114, 214, $basesmallfontoptions . " lastalignment=center", $ypos, "verticalalign=bottom");
+
+  $p->fit_textline("D1.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "Alcohol - any use at all", 48, $ypos, 107);
+  main->renderRects($p, 150, $ypos + $h_rect + 4, 2, $rClientASI->{'D1D'});
+  main->renderRects($p, 190, $ypos + $h_rect + 4, 2, $rClientASI->{'D1Y'});
+  main->renderRects($p, 214, $ypos + $h_rect + 4, 1, $rClientASI->{'D1R'});
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("D2.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "Alcohol to Intoxication", 48, $ypos, 107);
+  main->renderRects($p, 150, $ypos + $h_rect + 4, 2, $rClientASI->{'D2D'});
+  main->renderRects($p, 190, $ypos + $h_rect + 4, 2, $rClientASI->{'D2Y'});
+  main->renderRects($p, 214, $ypos + $h_rect + 4, 1, $rClientASI->{'D2R'});
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("D3.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Heroin", 48, $ypos, $basefontoptions);
+  main->renderRects($p, 150, $ypos + 2, 2, $rClientASI->{'D3D'});
+  main->renderRects($p, 190, $ypos + 2, 2, $rClientASI->{'D3Y'});
+  main->renderRects($p, 214, $ypos + 2, 1, $rClientASI->{'D3R'});
+
+  $ypos += 16;
+  $p->fit_textline("D4.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Methadone", 48, $ypos, $basefontoptions);
+  main->renderRects($p, 150, $ypos + 2, 2, $rClientASI->{'D4D'});
+  main->renderRects($p, 190, $ypos + 2, 2, $rClientASI->{'D4Y'});
+  main->renderRects($p, 214, $ypos + 2, 1, $rClientASI->{'D4R'});
+
+  $ypos += 5;
+  $p->fit_textline("D5.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "Other opiates/analgesics", 48, $ypos, 107);
+  main->renderRects($p, 150, $ypos + $h_rect + 4, 2, $rClientASI->{'D5D'});
+  main->renderRects($p, 190, $ypos + $h_rect + 4, 2, $rClientASI->{'D5Y'});
+  main->renderRects($p, 214, $ypos + $h_rect + 4, 1, $rClientASI->{'D5R'});
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("D6.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Barbiturates", 48, $ypos, $basefontoptions);
+  main->renderRects($p, 150, $ypos + 2, 2, $rClientASI->{'D6D'});
+  main->renderRects($p, 190, $ypos + 2, 2, $rClientASI->{'D6Y'});
+  main->renderRects($p, 214, $ypos + 2, 1, $rClientASI->{'D6R'});
+
+  $ypos += 5;
+  $p->fit_textline("D7.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "Other sedatives/hyp/tranquilizers", 48, $ypos, 107);
+  main->renderRects($p, 150, $ypos + $h_rect + 4, 2, $rClientASI->{'D7D'});
+  main->renderRects($p, 190, $ypos + $h_rect + 4, 2, $rClientASI->{'D7Y'});
+  main->renderRects($p, 214, $ypos + $h_rect + 4, 1, $rClientASI->{'D7R'});
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("D8.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Cocaine", 48, $ypos, $basefontoptions);
+  main->renderRects($p, 150, $ypos + 2, 2, $rClientASI->{'D8D'});
+  main->renderRects($p, 190, $ypos + 2, 2, $rClientASI->{'D8Y'});
+  main->renderRects($p, 214, $ypos + 2, 1, $rClientASI->{'D8R'});
+
+  $ypos += 16;
+  $p->fit_textline("D9.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Amphetamines", 48, $ypos, $basefontoptions);
+  main->renderRects($p, 150, $ypos + 2, 2, $rClientASI->{'D9D'});
+  main->renderRects($p, 190, $ypos + 2, 2, $rClientASI->{'D9Y'});
+  main->renderRects($p, 214, $ypos + 2, 1, $rClientASI->{'D9R'});
+
+  $ypos += 16;
+  $p->fit_textline("D10.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Cannabis", 51, $ypos, $basefontoptions);
+  main->renderRects($p, 150, $ypos + 2, 2, $rClientASI->{'D10D'});
+  main->renderRects($p, 190, $ypos + 2, 2, $rClientASI->{'D10Y'});
+  main->renderRects($p, 214, $ypos + 2, 1, $rClientASI->{'D10R'});
+
+  $ypos += 16;
+  $p->fit_textline("D11.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Hallucinogens", 51, $ypos, $basefontoptions);
+  main->renderRects($p, 150, $ypos + 2, 2, $rClientASI->{'D11D'});
+  main->renderRects($p, 190, $ypos + 2, 2, $rClientASI->{'D11Y'});
+  main->renderRects($p, 214, $ypos + 2, 1, $rClientASI->{'D11R'});
+
+  $ypos += 16;
+  $p->fit_textline("D12.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Inhalants", 51, $ypos, $basefontoptions);
+  main->renderRects($p, 150, $ypos + 2, 2, $rClientASI->{'D12D'});
+  main->renderRects($p, 190, $ypos + 2, 2, $rClientASI->{'D12Y'});
+  main->renderRects($p, 214, $ypos + 2, 1, $rClientASI->{'D12R'});
+
+  $ypos += 5;
+  $p->fit_textline("D13.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "More than one substance per day (including alcohol)", 51, $ypos, 168);
+  main->renderRects($p, 214, $ypos + $h_rect + 4, 1, $rClientASI->{'D13'});
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $h_tf = main->renderTextflow($p, "<$basefontoptions_u>Note: <underline=false>See manual for representative examples for each drug class", $xpos, $ypos, 214);
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $h_tf = main->renderTextflow($p, "<$basefontoptions_u>Route of Administration: <underline=false>1 = Oral, 2 = Nasal 3 = Smoking,  4 = Non IV inj.,  5 = IV inj.", $xpos, $ypos, 214);
+  $ypos += $h_tf;
+##
+
+##
+# DRUG/ALCOHOL USE column 2
+  $xpos = 222;
+  $ypos = $margintop + $h_header + 19;
+
+  $p->fit_textline("D14.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "Which substance is the major problem? <$basefontoptions_i>Please code as above or <$basefontoptions>00 - No problem; 15 - Alcohol & Drug (Dual addiction); 16-Polydrug;\n<$basefontoptions_i>when not clear, ask patient.", 243, $ypos, 356, "charspacing=-0.3");
+  main->renderRects($p, 396, $ypos + $h_rect + 4, 2, $rClientASI->{'D14'});
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("D15.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "How long was your last period of voluntary abstinence from this major substance?\n(00 - never abstinent)", 243, $ypos, 356, "charspacing=-0.3");
+  main->renderRects($p, 396, $ypos + $h_rect + 4, 2, $rClientASI->{'D15'});
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("D16.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "How many months ago did this abstinence end?\n(00 - still abstinent)", 243, $ypos, 356);
+  main->renderRects($p, 396, $ypos + $h_rect + 4, 2, $rClientASI->{'D16'});
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("How many times have you:", $xpos, $ypos, $basefontoptions);
+
+  $ypos += 16;
+  $p->fit_textline("D17.", 240, $ypos, $basefontoptions_u);
+  $p->fit_textline("Had alcohol d.t.’s?", 261, $ypos, $basefontoptions);
+  main->renderRects($p, 396, $ypos + 2, 2, $rClientASI->{'D17'});
+  $ypos += 11;
+  $p->fit_textline("D18.", 240, $ypos, $basefontoptions_u);
+  $p->fit_textline("Overdosed on drugs?", 261, $ypos, $basefontoptions);
+  main->renderRects($p, 396, $ypos + 2, 2, $rClientASI->{'D18'});
+
+  $ypos += 5;
+  $h_tf = main->renderTextflow($p, "How many time in your life have you been treated for:", $xpos, $ypos, 396);
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("D19.", 240, $ypos, $basefontoptions_u);
+  $p->fit_textline("Alcohol Abuse:", 261, $ypos, $basefontoptions);
+  main->renderRects($p, 396, $ypos + 2, 2, $rClientASI->{'D19'});
+  $ypos += 11;
+  $p->fit_textline("D20.", 240, $ypos, $basefontoptions_u);
+  $p->fit_textline("Drug Abuse:", 261, $ypos, $basefontoptions);
+  main->renderRects($p, 396, $ypos + 2, 2, $rClientASI->{'D20'});
+
+  $ypos += 16;
+  $p->fit_textline("How many of these were detox only?", $xpos, $ypos, $basefontoptions);
+
+  $ypos += 16;
+  $p->fit_textline("D21.", 240, $ypos, $basefontoptions_u);
+  $p->fit_textline("Alcohol:", 261, $ypos, $basefontoptions);
+  main->renderRects($p, 396, $ypos + 2, 2, $rClientASI->{'D21'});
+  $ypos += 11;
+  $p->fit_textline("D22.", 240, $ypos, $basefontoptions_u);
+  $p->fit_textline("Drug:", 261, $ypos, $basefontoptions);
+  main->renderRects($p, 396, $ypos + 2, 2, $rClientASI->{'D22'});
+
+  $ypos += 5;
+  $h_tf = main->renderTextflow($p, "How much would you say you spent during the past 30 days on:", $xpos, $ypos, 396);
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("D23.", 240, $ypos, $basefontoptions_u);
+  $p->fit_textline("Alcohol?", 261, $ypos, $basefontoptions);
+  main->renderRects($p, 396, $ypos + 2, 2, $rClientASI->{'D23'});
+  $ypos += 11;
+  $p->fit_textline("D24.", 240, $ypos, $basefontoptions_u);
+  $p->fit_textline("Drug?", 261, $ypos, $basefontoptions);
+  main->renderRects($p, 396, $ypos + 2, 2, $rClientASI->{'D24'});
+##
+
+##
+# DRUG/ALCOHOL USE column 3
+  $xpos = 404;
+  $ypos = $margintop + $h_header + 19;
+
+  $p->fit_textline("D25.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "How many days have you been treated in an outpatient setting for alcohol or drugs in the past 30 days?\n(Include NA, AA).", 425, $ypos, 548);
+  main->renderRects($p, 582, $ypos + $h_rect + 4, 2, $rClientASI->{'D25'});
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $h_tf = main->renderTextflow($p, "How many days in the past 30 have you experienced:", $xpos, $ypos, 548);
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("D26.", 422, $ypos, $basefontoptions_u);
+  $p->fit_textline("Alcohol Problems?", 443, $ypos, $basefontoptions);
+  main->renderRects($p, 582, $ypos + 2, 2, $rClientASI->{'D26'});
+  $ypos += 11;
+  $p->fit_textline("D27.", 422, $ypos, $basefontoptions_u);
+  $p->fit_textline("Drug Problems?", 443, $ypos, $basefontoptions);
+  main->renderRects($p, 582, $ypos + 2, 2, $rClientASI->{'D27'});
+
+  $ypos += 8;
+  $h_tf = main->renderTextflow($p, "For questions D28 - D31 please ask the patient to use the <$baseboldmidfontoptions_i>Patient’s Rating Scale.", $xpos, $ypos, 582, $basemidfontoptions_i . " charspacing=-0.3");
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $h_tf = main->renderTextflow($p, "How troubled or bothered have you been in the past 30 days by these:", $xpos, $ypos, 576);
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("D28.", 422, $ypos, $basefontoptions_u);
+  $p->fit_textline("Alcohol Problems?", 443, $ypos, $basefontoptions);
+  main->renderRects($p, 582, $ypos + 2, 2, $rClientASI->{'D28'});
+  $ypos += 11;
+  $p->fit_textline("D29.", 422, $ypos, $basefontoptions_u);
+  $p->fit_textline("Drug Problems?", 443, $ypos, $basefontoptions);
+  main->renderRects($p, 582, $ypos + 2, 2, $rClientASI->{'D29'});
+
+  $ypos += 5;
+  $h_tf = main->renderTextflow($p, "How important to you now is treatment for these:", $xpos, $ypos, 576);
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("D30.", 422, $ypos, $basefontoptions_u);
+  $p->fit_textline("Alcohol Problems?", 443, $ypos, $basefontoptions);
+  main->renderRects($p, 582, $ypos + 2, 2, $rClientASI->{'D30'});
+  $ypos += 11;
+  $p->fit_textline("D31.", 422, $ypos, $basefontoptions_u);
+  $p->fit_textline("Drug Problems?", 443, $ypos, $basefontoptions);
+  main->renderRects($p, 582, $ypos + 2, 2, $rClientASI->{'D31'});
+
+  $ypos += 8;
+  $h_tf = main->renderTextflow($p, "Interviewer Severity Rating", 432, $ypos, 540, $baseboldlargefontoptions_i . " lastalignment=center");
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $h_tf = main->renderTextflow($p, "How would you rate the patient’s need for treatment for:", $xpos, $ypos, 576);
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("D32.", 422, $ypos, $basefontoptions_u);
+  $p->fit_textline("Alcohol Abuse?", 443, $ypos, $basefontoptions);
+  main->renderRects($p, 582, $ypos + 2, 2, $rClientASI->{'D32'});
+  $ypos += 11;
+  $p->fit_textline("D33.", 422, $ypos, $basefontoptions_u);
+  $p->fit_textline("Drug Abuse?", 443, $ypos, $basefontoptions);
+  main->renderRects($p, 582, $ypos + 2, 2, $rClientASI->{'D33'});
+
+  $ypos += 21;
+  $p->fit_textline("Confidence Rating", 438, $ypos, $baseboldlargefontoptions_i);
+
+  $ypos += 5;
+  $h_tf = main->renderTextflow($p, "Is the above information significantly distorted by:", $xpos, $ypos, 576);
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("D34.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Patient’s misrepresentation?", 425, $ypos, $basefontoptions);
+  main->renderRects($p, 582, $ypos + 2, 2, $rClientASI->{'D34'});
+  $ypos += 10;
+  $p->fit_textline("0 - No 1 - Yes", 427, $ypos, $basesmallfontoptions);
+
+  $ypos += 16;
+  $p->fit_textline("D35.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Patient’s inability to understand?", 425, $ypos, $basefontoptions . " charspacing=-0.2");
+  main->renderRects($p, 582, $ypos + 2, 2, $rClientASI->{'D35'});
+  $ypos += 10;
+  $p->fit_textline("0 - No 1 - Yes", 427, $ypos, $basesmallfontoptions);
+##
+
+  $p->fit_textline("COMMENTS", $marginleft, 575, $baseboldmidfontoptions_u);
+  main->renderTextflow($p, $rClientASI->{'DCOM'}, $marginleft, 575, $marginleft + $contentwidth);
+  
+  main->createFooter($p);
+
+  main->createHeader($p, $HeaderInfo);
+
+  $p->fit_textline("LEGAL STATUS", 250, $margintop + $h_header + 14, $baseboldmidlargefontoptions);
+
+##
+# LEGAL STATUS column 1
+  $xpos = $marginleft;
+  $ypos = $margintop + $h_header + 14;
+
+  main->renderRects($p, $xpos + $w_rect * 4, $ypos, 4, $formid);
+
+  $ypos += 5;
+  $p->fit_textline("L1.", $xpos, $ypos + 11, $basefontoptions);
+  $h_tf = main->renderTextflow($p, "Was this admission prompeted or suggested by the crimina justice system (judge, probation/parole officer, etc.)\n<$basesmallfontoptions>0 - No  1 - Yes", 48, $ypos, 194);
+  main->renderRects($p, 213, $ypos + $h_rect + 4, 1, $rClientASI->{'L1'});
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("L2.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "Are you on probation or parole?\n<$basesmallfontoptions>0 - No  1 - Yes", 48, $ypos, 194);
+  main->renderRects($p, 213, $ypos + $h_rect + 4, 1, $rClientASI->{'L2'});
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $h_tf = main->renderTextflow($p, "How many times in your life have you been arrested and charged with the following:", $marginleft, $ypos, 197, "charspacing=-0.2");
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("L3.", 48, $ypos, $basefontoptions_u);
+  $p->fit_textline("- shoplifting/vandalism", 64, $ypos, $basefontoptions);
+  main->renderDotLine($p, 183, $ypos, 154, $ypos);
+  main->renderRects($p, 213, $ypos + 2, 2, $rClientASI->{'L3'});
+
+  $ypos += 16;
+  $p->fit_textline("L4.", 48, $ypos, $basefontoptions_u);
+  $p->fit_textline("- parole/probation violations", 64, $ypos, $basefontoptions);
+  main->renderDotLine($p, 183, $ypos, 174, $ypos);
+  main->renderRects($p, 213, $ypos + 2, 2, $rClientASI->{'L4'});
+
+  $ypos += 16;
+  $p->fit_textline("L5.", 48, $ypos, $basefontoptions_u);
+  $p->fit_textline("- drug charges", 64, $ypos, $basefontoptions);
+  main->renderDotLine($p, 183, $ypos, 121, $ypos);
+  main->renderRects($p, 213, $ypos + 2, 2, $rClientASI->{'L5'});
+
+  $ypos += 16;
+  $p->fit_textline("L6.", 48, $ypos, $basefontoptions_u);
+  $p->fit_textline("- forgery", 64, $ypos, $basefontoptions);
+  main->renderDotLine($p, 183, $ypos, 99, $ypos);
+  main->renderRects($p, 213, $ypos + 2, 2, $rClientASI->{'L6'});
+
+  $ypos += 16;
+  $p->fit_textline("L7.", 48, $ypos, $basefontoptions_u);
+  $p->fit_textline("- weapons offense", 64, $ypos, $basefontoptions);
+  main->renderDotLine($p, 183, $ypos, 137, $ypos);
+  main->renderRects($p, 213, $ypos + 2, 2, $rClientASI->{'L7'});
+
+  $ypos += 16;
+  $p->fit_textline("L8.", 48, $ypos, $basefontoptions_u);
+  $p->fit_textline("- burglary, larceny, B&E", 64, $ypos, $basefontoptions);
+  main->renderDotLine($p, 183, $ypos, 158, $ypos);
+  main->renderRects($p, 213, $ypos + 2, 2, $rClientASI->{'L8'});
+
+  $ypos += 16;
+  $p->fit_textline("L9.", 48, $ypos, $basefontoptions_u);
+  $p->fit_textline("- robbery", 64, $ypos, $basefontoptions);
+  main->renderDotLine($p, 183, $ypos, 101, $ypos);
+  main->renderRects($p, 213, $ypos + 2, 2, $rClientASI->{'L9'});
+
+  $ypos += 16;
+  $p->fit_textline("L10.", 48, $ypos, $basefontoptions_u);
+  $p->fit_textline("- assault", 68, $ypos, $basefontoptions);
+  main->renderDotLine($p, 183, $ypos, 103, $ypos);
+  main->renderRects($p, 213, $ypos + 2, 2, $rClientASI->{'L10'});
+
+  $ypos += 16;
+  $p->fit_textline("L11.", 48, $ypos, $basefontoptions_u);
+  $p->fit_textline("- arson", 68, $ypos, $basefontoptions);
+  main->renderDotLine($p, 183, $ypos, 99, $ypos);
+  main->renderRects($p, 213, $ypos + 2, 2, $rClientASI->{'L11'});
+
+  $ypos += 16;
+  $p->fit_textline("L12.", 48, $ypos, $basefontoptions_u);
+  $p->fit_textline("- rape", 68, $ypos, $basefontoptions);
+  main->renderDotLine($p, 183, $ypos, 94, $ypos);
+  main->renderRects($p, 213, $ypos + 2, 2, $rClientASI->{'L12'});
+
+  $ypos += 16;
+  $p->fit_textline("L13.", 48, $ypos, $basefontoptions_u);
+  $p->fit_textline("- homicide, manslaughter", 68, $ypos, $basefontoptions);
+  main->renderDotLine($p, 183, $ypos, 170, $ypos);
+  main->renderRects($p, 213, $ypos + 2, 2, $rClientASI->{'L13'});
+
+  $ypos += 16;
+  $p->fit_textline("L14.", 48, $ypos, $basefontoptions_u);
+  $p->fit_textline("- prostitution", 68, $ypos, $basefontoptions);
+  main->renderDotLine($p, 183, $ypos, 121, $ypos);
+  main->renderRects($p, 213, $ypos + 2, 2, $rClientASI->{'L14'});
+
+  $ypos += 16;
+  $p->fit_textline("L15.", 48, $ypos, $basefontoptions_u);
+  $p->fit_textline("- contempt of court", 68, $ypos, $basefontoptions);
+  main->renderDotLine($p, 183, $ypos, 145, $ypos);
+  main->renderRects($p, 213, $ypos + 2, 2, $rClientASI->{'L15'});
+
+  $ypos += 16;
+  $p->fit_textline("L16.", 48, $ypos, $basefontoptions_u);
+  $p->fit_textline("- other", 68, $ypos, $basefontoptions);
+  main->renderDotLine($p, 183, $ypos, 98, $ypos);
+  main->renderRects($p, 213, $ypos + 2, 2, $rClientASI->{'L16'});
+##
+
+##
+# LEGAL STATUS column 2
+  $xpos = 221;
+  $ypos = $margintop + $h_header + 19;
+
+  $p->fit_textline("L17.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "How many of these charges resulted in convictions?", 242, $ypos, 360);
+  main->renderRects($p, 396, $ypos + $h_rect + 4, 2, $rClientASI->{'L17'});
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $h_tf = main->renderTextflow($p, "How many time in your life have you been charged with the following", $xpos, $ypos, 396, $baseboldfontoptions);
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("L18.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "Disorderly conduct, vagrancy, public intoxication", 242, $ypos, 360);
+  main->renderRects($p, 396, $ypos + $h_rect + 4, 2, $rClientASI->{'L18'});
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("L19.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Driving while intoxicated", 242, $ypos, $basefontoptions);
+  main->renderRects($p, 396, $ypos + 2, 2, $rClientASI->{'L19'});
+
+  $ypos += 5;
+  $p->fit_textline("L20.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "Major driving violations\n(reckless driving, speeding,  no license, etc.)", 242, $ypos, 360);
+  main->renderRects($p, 396, $ypos + $h_rect + 4, 2, $rClientASI->{'L20'});
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("L21.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "How many months were you incarcerated in your life?", 242, $ypos, 360);
+  main->renderRects($p, 396, $ypos + $h_rect + 4, 2, $rClientASI->{'L21'});
+  $p->fit_textline("Months", 369, $ypos + $h_rect + 14, $basesmallfontoptions);
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("L22.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "How long was your last incarceration?", 242, $ypos, 360);
+  main->renderRects($p, 396, $ypos + $h_rect + 4, 2, $rClientASI->{'L22'});
+  $p->fit_textline("Months", 369, $ypos + $h_rect + 14, $basesmallfontoptions);
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("L23.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "What was it for? <$basesmallfontoptions_i>(use codes 3-16, 18-20.  If multiple charges, code most severe)", 242, $ypos, 360);
+  main->renderRects($p, 396, $ypos + $h_rect + 4, 2, $rClientASI->{'L23'});
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("L24.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "Are you presently awaiting charges, trial or sentence?\n<$basesmallfontoptions>0 - No  1 - Yes", 242, $ypos, 360);
+  main->renderRects($p, 396, $ypos + $h_rect + 4, 2, $rClientASI->{'L24'});
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("L25.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "What for? (If multiple charges, use most severe).", 242, $ypos, 360);
+  main->renderRects($p, 396, $ypos + $h_rect + 4, 2, $rClientASI->{'L25'});
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("L26.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "How many days in the past 30 were you detained of incarcerated?", 242, $ypos, 360);
+  main->renderRects($p, 396, $ypos + $h_rect + 4, 2, $rClientASI->{'L26'});
+  $ypos += $h_tf;
+##
+
+##
+# LEGAL STATUS column 3
+  $xpos = 404;
+  $ypos = $margintop + $h_header + 19;
+
+  $p->fit_textline("L27.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "How many days in the past 30 have you engaged in illegal activities for profit?", 425, $ypos, 546);
+  main->renderRects($p, 582, $ypos + $h_rect + 4, 2, $rClientASI->{'L27'});
+  $ypos += $h_tf;
+
+  $ypos += 8;
+  $h_tf = main->renderTextflow($p, "For questions <$baseboldmidfontoptions_i>L28 & L29 <$basemidfontoptions_i>please ask the patient to use the <$baseboldmidfontoptions_i>Patient’s Rating Scale.", $xpos, $ypos, 582, $basemidfontoptions_i . " charspacing=-0.3");
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("L28.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "How serious do you feel your present legal problems are?\n(Exclude civil problems)", 425, $ypos, 546);
+  main->renderRects($p, 582, $ypos + $h_rect + 4, 1, $rClientASI->{'L28'});
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("L29.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "How important to you now is counseling or referral for these legal problems?", 425, $ypos, 546);
+  main->renderRects($p, 582, $ypos + $h_rect + 4, 1, $rClientASI->{'L29'});
+  $ypos += $h_tf;
+
+  $ypos += 8;
+  $h_tf = main->renderTextflow($p, "Interviewer Severity Rating", 432, $ypos, 540, $baseboldlargefontoptions_i . " lastalignment=center");
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("L30.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "How would you rate the patient’s need for legal services or counseling?", 425, $ypos, 560);
+  main->renderRects($p, 582, $ypos + $h_rect + 4, 1, $rClientASI->{'L30'});
+  $ypos += $h_tf;
+
+  $ypos += 21;
+  $p->fit_textline("Confidence Rating", 438, $ypos, $baseboldlargefontoptions_i);
+
+  $ypos += 5;
+  $h_tf = main->renderTextflow($p, "Is the above information significantly distorted by:", $xpos, $ypos, 576);
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("L31.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Patient’s misrepresentation?", 425, $ypos, $basefontoptions);
+  main->renderRects($p, 582, $ypos + 2, 1, $rClientASI->{'L31'});
+
+  $ypos += 16;
+  $p->fit_textline("L32.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Patient’s inability to understand?", 425, $ypos, $basefontoptions);
+  main->renderRects($p, 582, $ypos + 2, 1, $rClientASI->{'L32'});
+##
+
+  $p->fit_textline("COMMENTS", $marginleft, 466, $baseboldmidfontoptions);
+  main->renderTextflow($p, $rClientASI->{'LCOM'}, $marginleft, 466, $marginleft + $contentwidth);
+
+  $p->fit_textline("Family History", 262, 538, $baseboldmidlargefontoptions);
+
+##
+# Family History
+  $xpos = $marginleft;
+  $ypos = 538;
+
+  $ypos += 5;
+  $h_tf = main->renderTextflow($p, "Have any of your relatives had what you would call a significant drinking, drug use or psych problem - one that did or should have led to treatment?", $xpos, $ypos, $marginleft + $contentwidth, $basemidfontoptions);
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("Mother’s Side", 105, $ypos, $basefontoptions_u);
+  $p->fit_textline("Father’s Side", 300, $ypos, $basefontoptions_u);
+  $p->fit_textline("Siblings", 472, $ypos, $basefontoptions_u);
+
+  $ypos += 11;
+  $p->fit_textline("Alc", 105, $ypos, $basefontoptions);
+  $p->fit_textline("Drug", 146, $ypos, $basefontoptions);
+  $p->fit_textline("Psych", 189, $ypos, $basefontoptions);
+
+  $ypos += 16;
+  $p->fit_textline("H1.", $xpos, $ypos, $basefontoptions);
+  $p->fit_textline("Grandmother", $xpos + 18, $ypos, $basefontoptions);
+  main->renderRects($p, 119, $ypos + 2, 1, $rClientASI->{'H1A'});
+  main->renderRects($p, 163, $ypos + 2, 1, $rClientASI->{'H1D'});
+  main->renderRects($p, 208, $ypos + 2, 1, $rClientASI->{'H1P'});
+
+  $ypos += 16;
+  $p->fit_textline("H2.", $xpos, $ypos, $basefontoptions);
+  $p->fit_textline("Grandfather", $xpos + 18, $ypos, $basefontoptions);
+  main->renderRects($p, 119, $ypos + 2, 1, $rClientASI->{'H2A'});
+  main->renderRects($p, 163, $ypos + 2, 1, $rClientASI->{'H2D'});
+  main->renderRects($p, 208, $ypos + 2, 1, $rClientASI->{'H2P'});
+
+  $ypos += 16;
+  $p->fit_textline("H3.", $xpos, $ypos, $basefontoptions);
+  $p->fit_textline("Mother", $xpos + 18, $ypos, $basefontoptions);
+  main->renderRects($p, 119, $ypos + 2, 1, $rClientASI->{'H3A'});
+  main->renderRects($p, 163, $ypos + 2, 1, $rClientASI->{'H3D'});
+  main->renderRects($p, 208, $ypos + 2, 1, $rClientASI->{'H3P'});
+
+  $ypos += 16;
+  $p->fit_textline("H4.", $xpos, $ypos, $basefontoptions);
+  $p->fit_textline("Aunt", $xpos + 18, $ypos, $basefontoptions);
+  main->renderRects($p, 119, $ypos + 2, 1, $rClientASI->{'H4A'});
+  main->renderRects($p, 163, $ypos + 2, 1, $rClientASI->{'H4D'});
+  main->renderRects($p, 208, $ypos + 2, 1, $rClientASI->{'H4P'});
+
+  $ypos += 16;
+  $p->fit_textline("H5.", $xpos, $ypos, $basefontoptions);
+  $p->fit_textline("Uncle", $xpos + 18, $ypos, $basefontoptions);
+  main->renderRects($p, 119, $ypos + 2, 1, $rClientASI->{'H5A'});
+  main->renderRects($p, 163, $ypos + 2, 1, $rClientASI->{'H5D'});
+  main->renderRects($p, 208, $ypos + 2, 1, $rClientASI->{'H5P'});
+
+  $xpos = 222;
+  $ypos = 583;
+
+  $ypos += 11;
+  $p->fit_textline("Alc", 300, $ypos, $basefontoptions);
+  $p->fit_textline("Drug", 336, $ypos, $basefontoptions);
+  $p->fit_textline("Psych", 373, $ypos, $basefontoptions);
+
+  $ypos += 16;
+  $p->fit_textline("H6.", $xpos, $ypos, $basefontoptions);
+  $p->fit_textline("Grandmother", $xpos + 18, $ypos, $basefontoptions);
+  main->renderRects($p, 314, $ypos + 2, 1, $rClientASI->{'H6A'});
+  main->renderRects($p, 353, $ypos + 2, 1, $rClientASI->{'H6D'});
+  main->renderRects($p, 391, $ypos + 2, 1, $rClientASI->{'H6P'});
+
+  $ypos += 16;
+  $p->fit_textline("H7.", $xpos, $ypos, $basefontoptions);
+  $p->fit_textline("Grandfather", $xpos + 18, $ypos, $basefontoptions);
+  main->renderRects($p, 314, $ypos + 2, 1, $rClientASI->{'H7A'});
+  main->renderRects($p, 353, $ypos + 2, 1, $rClientASI->{'H7D'});
+  main->renderRects($p, 391, $ypos + 2, 1, $rClientASI->{'H7P'});
+
+  $ypos += 16;
+  $p->fit_textline("H8.", $xpos, $ypos, $basefontoptions);
+  $p->fit_textline("Mother", $xpos + 18, $ypos, $basefontoptions);
+  main->renderRects($p, 314, $ypos + 2, 1, $rClientASI->{'H8A'});
+  main->renderRects($p, 353, $ypos + 2, 1, $rClientASI->{'H8D'});
+  main->renderRects($p, 391, $ypos + 2, 1, $rClientASI->{'H8P'});
+
+  $ypos += 16;
+  $p->fit_textline("H9.", $xpos, $ypos, $basefontoptions);
+  $p->fit_textline("Aunt", $xpos + 18, $ypos, $basefontoptions);
+  main->renderRects($p, 314, $ypos + 2, 1, $rClientASI->{'H9A'});
+  main->renderRects($p, 353, $ypos + 2, 1, $rClientASI->{'H9D'});
+  main->renderRects($p, 391, $ypos + 2, 1, $rClientASI->{'H9P'});
+
+  $ypos += 16;
+  $p->fit_textline("H10.", $xpos, $ypos, $basefontoptions);
+  $p->fit_textline("Uncle", $xpos + 21, $ypos, $basefontoptions);
+  main->renderRects($p, 314, $ypos + 2, 1, $rClientASI->{'H10A'});
+  main->renderRects($p, 353, $ypos + 2, 1, $rClientASI->{'H10D'});
+  main->renderRects($p, 391, $ypos + 2, 1, $rClientASI->{'H10P'});
+
+  $xpos = 404;
+  $ypos = 583;
+
+  $ypos += 11;
+  $p->fit_textline("Alc", 472, $ypos, $basefontoptions);
+  $p->fit_textline("Drug", 514, $ypos, $basefontoptions);
+  $p->fit_textline("Psych", 555, $ypos, $basefontoptions);
+
+  $ypos += 16;
+  $p->fit_textline("H11.", $xpos, $ypos, $basefontoptions);
+  $p->fit_textline("Brother", $xpos + 21, $ypos, $basefontoptions);
+  main->renderRects($p, 486, $ypos + 2, 1, $rClientASI->{'H11A'});
+  main->renderRects($p, 530, $ypos + 2, 1, $rClientASI->{'H11D'});
+  main->renderRects($p, 576, $ypos + 2, 1, $rClientASI->{'H11P'});
+
+  $ypos += 16;
+  $p->fit_textline("H12.", $xpos, $ypos, $basefontoptions);
+  $p->fit_textline("Sister", $xpos + 21, $ypos, $basefontoptions);
+  main->renderRects($p, 486, $ypos + 2, 1, $rClientASI->{'H12A'});
+  main->renderRects($p, 530, $ypos + 2, 1, $rClientASI->{'H12D'});
+  main->renderRects($p, 576, $ypos + 2, 1, $rClientASI->{'H12P'});
+
+  $xpos = $marginleft;
+  $ypos = 668;
+
+  $ypos += 16;
+  $h_tf = main->renderTextflow($p, "<$baseboldmidfontoptions_i>Direction:<$basemidfontoptions> Place “0” in relative category where the answer is clearly <$basemidfontoptions_u>no for all relatives in the category;<underline=false> “1” where the answer is clearly yes for any relative within the category; “X” where the answer is uncertain or “I don’t know” and “N” where there <underline=true>never was a relatives from that category.<underline=false> Code most problematic relative in cases of multiple members per category.", $xpos, $ypos, $marginleft + $contentwidth, $basemidfontoptions);
+  $ypos += $h_tf;
+##
+
+  main->createFooter($p);
+
+  main->createHeader($p, $HeaderInfo);
+
+  $p->fit_textline("FAMILY/SOCIAL RELATIONSHIPS", 214, $margintop + $h_header + 14, $basemidlargefontoptions);
+
+##
+# FAMILY/SOCIAL RELATIONSHIPS column 1
+  $xpos = $marginleft;
+  $ypos = $margintop + $h_header + 14;
+
+  main->renderRects($p, $xpos + 4 * $w_rect, $ypos, 4, $formid);
+
+  $ypos += 16;
+  $p->fit_textline("F1.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Marital Status", $xpos + 18, $ypos, $basefontoptions);
+  main->renderRects($p, 212, $ypos + 2, 1, $rClientASI->{'F1'});
+
+  $ypos += 5;
+  $h_tf = main->renderTextflow($p, "1 - Married\n2 - Remarried\n3 - Widowed", $xpos + 18, $ypos, 109, $basesmallfontoptions);
+  $h_tf = main->renderTextflow($p, "4 - Separated\n5 - Divorced\n6 - Never Married", 135, $ypos, 208, $basesmallfontoptions);
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("F2.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "How long have you been in this marital status?", $xpos + 18, $ypos, 149, $basefontoptions);
+  main->renderRects($p, 182, $ypos + $h_rect + 4, 2, $rClientASI->{'F2Y'});
+  main->renderRects($p, 212, $ypos + $h_rect + 4, 2, $rClientASI->{'F2M'});
+  $p->fit_textline("Years", 158, $ypos + $h_rect + 14, $basesmallfontoptions);
+  $p->fit_textline("Months", 186, $ypos + $h_rect + 14, $basesmallfontoptions);
+  $ypos += $h_tf;
+  $ypos += 11;
+  $p->fit_textline("(If never married, since age 18).", $xpos + 18, $ypos, $basefontoptions_i);
+
+  $ypos += 16;
+  $p->fit_textline("F3.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Are you satisfied with this situation?", $xpos + 18, $ypos, $basefontoptions);
+  main->renderRects($p, 212, $ypos + 2, 1, $rClientASI->{'F3'});
+  $h_tf = main->renderTextflow($p, "0 - No\n1 - Indifferent\n2 - Yes", $xpos + 18, $ypos, 109, $basesmallfontoptions);
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("F4.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Usual living arrangements (past 3 yr.)", $xpos + 18, $ypos, $basefontoptions . " charspacing=-0.2");
+  $h_tf = main->renderTextflow($p, "1 - With sexual partner and children\n2 - With sexual partner alone\n3 - With children alone\n4 - With parents\n5 - With family\n6 - With friends\n7 - Alone\n8 - Controlled environment\n9 - No stable arrangements", $xpos + 18, $ypos, 194, $basesmallfontoptions);
+  main->renderRects($p, 212, $ypos + 2, 1, $rClientASI->{'F4'});
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("F5.", $xpos, $ypos + 11, $basefontoptions);
+  $h_tf = main->renderTextflow($p, "How long have you lived in those arrangements?", $xpos + 18, $ypos, 149, $basefontoptions);
+  main->renderRects($p, 182, $ypos + $h_rect + 4, 2, $rClientASI->{'F5Y'});
+  main->renderRects($p, 212, $ypos + $h_rect + 4, 2, $rClientASI->{'F5M'});
+  $p->fit_textline("Years", 158, $ypos + $h_rect + 14, $basesmallfontoptions);
+  $p->fit_textline("Months", 186, $ypos + $h_rect + 14, $basesmallfontoptions);
+  $ypos += $h_tf;
+  $ypos += 11;
+  $p->fit_textline("(If with parents or family, since age 18).", $xpos + 18, $ypos, $basefontoptions);
+
+  $ypos += 5;
+  $p->fit_textline("F6.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "Are you satisfied with these living arrangements?", $xpos + 18, $ypos, 188, $basefontoptions);
+  main->renderRects($p, 212, $ypos + $h_rect + 4, 1, $rClientASI->{'F6'});
+  $ypos += $h_tf;
+  $h_tf = main->renderTextflow($p, "0 - No\n1 - Indifferent\n2 - Yes", $xpos + 18, $ypos, 109, $basesmallfontoptions);
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("Do you live with anyone who:", $xpos, $ypos, $basefontoptions);
+  $ypos += 11;
+  $p->fit_textline("0 - No  1 - Yes", $xpos + 18, $ypos, $basesmallfontoptions);
+
+  $ypos += 16;
+  $p->fit_textline("F7.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Has a current alcohol problem?", $xpos + 18, $ypos, $basefontoptions);
+  main->renderRects($p, 212, $ypos + 2, 1, $rClientASI->{'F7'});
+
+  $ypos += 16;
+  $p->fit_textline("F8.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Uses non-prescribed drugs?", $xpos + 18, $ypos, $basefontoptions);
+  main->renderRects($p, 212, $ypos + 2, 1, $rClientASI->{'F8'});
+
+  $ypos += 5;
+  $p->fit_textline("F9.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "With whom do you spend most of your free time:", $xpos + 18, $ypos, 188, $basefontoptions);
+  main->renderRects($p, 212, $ypos + $h_rect + 4, 1, $rClientASI->{'F9'});
+  $ypos += $h_tf;
+  $h_tf = main->renderTextflow($p, "1 - Family\n2 - Friends\n3 - Alone", $xpos + 18, $ypos, 109, $basesmallfontoptions);
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("F10.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "Are you satisfied with spending your free time this way?", $xpos + 21, $ypos, 188, $basefontoptions);
+  main->renderRects($p, 212, $ypos + $h_rect + 4, 1, $rClientASI->{'F10'});
+  $ypos += $h_tf;
+  $h_tf = main->renderTextflow($p, "0 - No\n1 - Indifferent\n2 - Yes", $xpos + 21, $ypos, 109, $basesmallfontoptions);
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("F11.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "How many close friends do you have?", $xpos + 21, $ypos, 188, $basefontoptions);
+  main->renderRects($p, 212, $ypos + $h_rect + 4, 1, $rClientASI->{'F11'});
+  $ypos += $h_tf;
+##
+
+##
+# FAMILY/SOCIAL RELATIONSHIPS column 2
+  $xpos = 220;
+  $ypos = $margintop + $h_header + 19;
+
+  $h_tf = main->renderTextflow($p, "Direction for F12-F26: Place “0” in relative category where the answer is clearly <$basefontoptions_u>no for all relatives in the category;<underline=false> “1” where the answer is clearly <underline=true>yes for any relative within the category;<underline=false> “X” where the answer is <underline=true>uncertain or “I don’t know”<underline=false> and “N” where there <underline=true>never was a relative from that category.\n<underline=false>Would you say you have had close, long lasting, personal relationships with any of the following people in your life:", $xpos, $ypos, 396, $basefontoptions);
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("F12.", $xpos, $ypos, $basefontoptions);
+  $p->fit_textline("Mother", $xpos + 21, $ypos, $basefontoptions);
+  main->renderDotLine($p, 376, $ypos, 268, $ypos);
+  main->renderRects($p, 394, $ypos + 2, 1, $rClientASI->{'F12'});
+
+  $ypos += 16;
+  $p->fit_textline("F13.", $xpos, $ypos, $basefontoptions);
+  $p->fit_textline("Father", $xpos + 21, $ypos, $basefontoptions);
+  main->renderDotLine($p, 376, $ypos, 266, $ypos);
+  main->renderRects($p, 394, $ypos + 2, 1, $rClientASI->{'F13'});
+
+  $ypos += 16;
+  $p->fit_textline("F14.", $xpos, $ypos, $basefontoptions);
+  $p->fit_textline("Brothers/Sisters", $xpos + 21, $ypos, $basefontoptions);
+  main->renderDotLine($p, 376, $ypos, 306, $ypos);
+  main->renderRects($p, 394, $ypos + 2, 1, $rClientASI->{'F14'});
+
+  $ypos += 16;
+  $p->fit_textline("F16.", $xpos, $ypos, $basefontoptions);
+  $p->fit_textline("Children", $xpos + 21, $ypos, $basefontoptions);
+  main->renderDotLine($p, 376, $ypos, 278, $ypos);
+  main->renderRects($p, 394, $ypos + 2, 1, $rClientASI->{'F16'});
+
+  $ypos += 16;
+  $p->fit_textline("F17.", $xpos, $ypos, $basefontoptions);
+  $p->fit_textline("Friends", $xpos + 21, $ypos, $basefontoptions);
+  main->renderDotLine($p, 376, $ypos, 274, $ypos);
+  main->renderRects($p, 394, $ypos + 2, 1, $rClientASI->{'F17'});
+
+  $ypos += 5;
+  $h_tf = main->renderTextflow($p, "Have you had significant periods in which you have experienced serious problems getting along with:", $xpos, $ypos, 396, $basefontoptions);
+  $ypos += $h_tf;
+  $ypos += 5;
+
+  $ypos += 20;
+  main->renderTextflow($p, "Past 30 Days", 337, 360, 365, $basesmallfontoptions . " lastalignment=center", $ypos, "verticalalign=center");
+  main->renderTextflow($p, "In Your Life", 371, 360, 397, $basesmallfontoptions . " lastalignment=center", $ypos, "verticalalign=center");
+
+  $ypos += 16;
+  $p->fit_textline("F18.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Mother", $xpos + 21, $ypos, $basefontoptions);
+  main->renderDotLine($p, 342, $ypos, 271, $ypos);
+  main->renderRects($p, 360, $ypos + 2, 1, $rClientASI->{'F18D'});
+  main->renderRects($p, 394, $ypos + 2, 1, $rClientASI->{'F18L'});
+
+  $ypos += 16;
+  $p->fit_textline("F19.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Father", $xpos + 21, $ypos, $basefontoptions);
+  main->renderDotLine($p, 342, $ypos, 267, $ypos);
+  main->renderRects($p, 360, $ypos + 2, 1, $rClientASI->{'F19D'});
+  main->renderRects($p, 394, $ypos + 2, 1, $rClientASI->{'F19L'});
+
+  $ypos += 16;
+  $p->fit_textline("F20.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Brothers/Sisters", $xpos + 21, $ypos, $basefontoptions);
+  main->renderDotLine($p, 342, $ypos, 306, $ypos);
+  main->renderRects($p, 360, $ypos + 2, 1, $rClientASI->{'F20D'});
+  main->renderRects($p, 394, $ypos + 2, 1, $rClientASI->{'F20L'});
+
+  $ypos += 16;
+  $p->fit_textline("F21.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Sexual partner/spouse", $xpos + 21, $ypos, $basefontoptions);
+  main->renderDotLine($p, 342, $ypos, 332, $ypos);
+  main->renderRects($p, 360, $ypos + 2, 1, $rClientASI->{'F21D'});
+  main->renderRects($p, 394, $ypos + 2, 1, $rClientASI->{'F21L'});
+
+  $ypos += 16;
+  $p->fit_textline("F22.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Children", $xpos + 21, $ypos, $basefontoptions);
+  main->renderDotLine($p, 342, $ypos, 276, $ypos);
+  main->renderRects($p, 360, $ypos + 2, 1, $rClientASI->{'F22D'});
+  main->renderRects($p, 394, $ypos + 2, 1, $rClientASI->{'F22L'});
+
+  $ypos += 16;
+  $p->fit_textline("F23.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Other signficant family", $xpos + 21, $ypos, $basefontoptions);
+  main->renderDotLine($p, 342, $ypos, 331, $ypos);
+  main->renderRects($p, 360, $ypos + 2, 1, $rClientASI->{'F23D'});
+  main->renderRects($p, 394, $ypos + 2, 1, $rClientASI->{'F23L'});
+
+  $ypos += 16;
+  $p->fit_textline("F24.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Close friends", $xpos + 21, $ypos, $basefontoptions);
+  main->renderDotLine($p, 342, $ypos, 296, $ypos);
+  main->renderRects($p, 360, $ypos + 2, 1, $rClientASI->{'F24D'});
+  main->renderRects($p, 394, $ypos + 2, 1, $rClientASI->{'F24L'});
+
+  $ypos += 16;
+  $p->fit_textline("F25.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Neighbors", $xpos + 21, $ypos, $basefontoptions);
+  main->renderDotLine($p, 342, $ypos, 283, $ypos);
+  main->renderRects($p, 360, $ypos + 2, 1, $rClientASI->{'F25D'});
+  main->renderRects($p, 394, $ypos + 2, 1, $rClientASI->{'F25L'});
+
+  $ypos += 16;
+  $p->fit_textline("F26.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Co-Workers", $xpos + 21, $ypos, $basefontoptions);
+  main->renderDotLine($p, 342, $ypos, 290, $ypos);
+  main->renderRects($p, 360, $ypos + 2, 1, $rClientASI->{'F26D'});
+  main->renderRects($p, 394, $ypos + 2, 1, $rClientASI->{'F26L'});
+
+  $ypos += 5;
+  $h_tf = main->renderTextflow($p, "Did any of these people (F18-F26) abuse you?", $xpos, $ypos, 322, $basefontoptions);
+  $ypos += $h_tf;
+  $ypos += 10;
+  $p->fit_textline("0 = No  1 = Yes", $xpos, $ypos, $basesmallfontoptions);
+
+  main->renderTextflow($p, "Past 30 Days", 337, 540, 365, $basesmallfontoptions . " lastalignment=center", $ypos, "verticalalign=center");
+  main->renderTextflow($p, "In Your Life", 371, 540, 397, $basesmallfontoptions . " lastalignment=center", $ypos, "verticalalign=center");
+
+  $ypos += 5;
+  $p->fit_textline("F27.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "Emotionally (make you feel bad through harsh words)?", $xpos + 21, $ypos, 336, $basefontoptions);
+  main->renderRects($p, 360, $ypos + $h_rect + 4, 1, $rClientASI->{'F27D'});
+  main->renderRects($p, 394, $ypos + $h_rect + 4, 1, $rClientASI->{'F27L'});
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("F28.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "Physically (caused you physical harm)?", $xpos + 21, $ypos, 336, $basefontoptions);
+  main->renderRects($p, 360, $ypos + $h_rect + 4, 1, $rClientASI->{'F28D'});
+  main->renderRects($p, 394, $ypos + $h_rect + 4, 1, $rClientASI->{'F28L'});
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("F29.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "Sexually (forced sexual advances or sexual acts)?", $xpos + 21, $ypos, 348, $basefontoptions . " charspacing=-0.2");
+  main->renderRects($p, 360, $ypos + $h_rect + 4, 1, $rClientASI->{'F29D'});
+  main->renderRects($p, 394, $ypos + $h_rect + 4, 1, $rClientASI->{'F29L'});
+  $ypos += $h_tf;
+##
+
+##
+# FAMILY/SOCIAL RELATIONSHIPS column 3
+  $xpos = 404;
+  $ypos = $margintop + $h_header + 19;
+
+  $h_tf = main->renderTextflow($p, "How many days in the past 30 have you had serious conflicts:", $xpos, $ypos, $marginleft + $contentwidth, $basefontoptions);
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("F30.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("With your family?", $xpos + 21, $ypos, $basefontoptions);
+  main->renderRects($p, 582, $ypos + 2, 2, $rClientASI->{'F30'});
+
+  $ypos += 16;
+  $p->fit_textline("F31.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("With other people?", $xpos + 21, $ypos, $basefontoptions);
+  main->renderRects($p, 582, $ypos + 2, 2, $rClientASI->{'F31'});
+  $ypos += 11;
+  $p->fit_textline("(excluding family)", $xpos + 21, $ypos, $basefontoptions);
+
+  $ypos += 8;
+  $h_tf = main->renderTextflow($p, "For questions <$baseboldmidfontoptions_i>F32-F35<$basemidfontoptions_i> please ask the patient to use the <$baseboldmidfontoptions_i>Patient’s Rating Scale", $xpos, $ypos, $marginleft + $contentwidth, $basemidfontoptions_i . " charspacing=-0.2");
+  $ypos += $h_tf;
+
+  $ypos += 8;
+  $h_tf = main->renderTextflow($p, "How troubled or bothered have you been in the past 30 days by these:", $xpos, $ypos, $marginleft + $contentwidth, $basefontoptions);
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("F32.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Family problems", $xpos + 21, $ypos, $basefontoptions);
+  main->renderRects($p, 582, $ypos + 2, 1, $rClientASI->{'F32'});
+
+  $ypos += 16;
+  $p->fit_textline("F33.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Social problems", $xpos + 21, $ypos, $basefontoptions);
+  main->renderRects($p, 582, $ypos + 2, 1, $rClientASI->{'F33'});
+
+  $ypos += 5;
+  $h_tf = main->renderTextflow($p, "How important to you now is treatment or counseling for these:", $xpos, $ypos, 562, $basefontoptions);
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("F34.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Family problems", $xpos + 21, $ypos, $basefontoptions);
+  main->renderRects($p, 582, $ypos + 2, 1, $rClientASI->{'F34'});
+
+  $ypos += 16;
+  $p->fit_textline("F35.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Social problems", $xpos + 21, $ypos, $basefontoptions);
+  main->renderRects($p, 582, $ypos + 2, 1, $rClientASI->{'F35'});
+
+  $ypos += 8;
+  $h_tf = main->renderTextflow($p, "Interviewer Severity Rating", 432, $ypos, 540, $baseboldlargefontoptions_i . " lastalignment=center");
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("F36.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "How would you rate the patient’s need for family and/or social counseling?", $xpos + 21, $ypos, 576);
+  main->renderRects($p, 582, $ypos + $h_rect + 4, 1, $rClientASI->{'F36'});
+  $ypos += $h_tf;
+
+  $ypos += 21;
+  $p->fit_textline("Confidence Rating", 438, $ypos, $baseboldlargefontoptions_i);
+
+  $ypos += 5;
+  $h_tf = main->renderTextflow($p, "Is the above information significantly distorted by:", $xpos, $ypos, 576);
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("F37.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Patient’s misrepresentation?", 425, $ypos, $basefontoptions);
+  main->renderRects($p, 582, $ypos + 2, 1, $rClientASI->{'F37'});
+  $ypos += 10;
+  $p->fit_textline("0 - No 1 - Yes", 427, $ypos, $basesmallfontoptions);
+
+  $ypos += 16;
+  $p->fit_textline("F38.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Patient’s inability to understand?", 425, $ypos, $basefontoptions);
+  main->renderRects($p, 582, $ypos + 2, 1, $rClientASI->{'F38'});
+  $ypos += 10;
+  $p->fit_textline("0 - No 1 - Yes", 427, $ypos, $basesmallfontoptions);
+
+  $ypos += 19;
+  $p->fit_textline("COMMENTS", $xpos, $ypos, $baseboldmidfontoptions);
+  main->renderTextflow($p, $rClientASI->{'FCOM'}, $xpos, $ypos, 582);
+##
+  
+  main->createFooter($p);
+
+  main->createHeader($p, $HeaderInfo);
+
+  $p->fit_textline("PSYCHIATRIC STATUS", 242, $margintop + $h_header + 14, $basemidlargefontoptions);
+
+##
+# PSYCHIATRIC STATUS column 1
+  $xpos = $marginleft;
+  $ypos = $margintop + $h_header + 14;
+
+  main->renderRects($p, $xpos + 4 * $w_rect, $ypos, 4, $formid);
+
+  $ypos += 5;
+  $h_tf = main->renderTextflow($p, "How many times have you been treated for any psychological or emotional problems?", $xpos, $ypos, 213, $basefontoptions);
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("P1.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("In a hospital", $xpos + 18, $ypos, $basefontoptions);
+  main->renderRects($p, 213, $ypos + 2, 2, $rClientASI->{'P1'});
+
+  $ypos += 16;
+  $p->fit_textline("P2.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("As an Outpatient or Private pt.", $xpos + 18, $ypos, $basefontoptions);
+  main->renderRects($p, 213, $ypos + 2, 2, $rClientASI->{'P2'});
+
+  $ypos += 5;
+  $p->fit_textline("P3.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "Do you receive a pension for a psychiatric disability?", $xpos + 18, $ypos, 172, $basefontoptions);
+  main->renderRects($p, 213, $ypos + $h_rect + 4, 1, $rClientASI->{'P3'});
+  $ypos += $h_tf;
+  $ypos += 10;
+  $p->fit_textline("0 - No  1 - Yes", $xpos + 18, $ypos, $basesmallfontoptions);
+
+  $ypos += 5;
+  $h_tf = main->renderTextflow($p, "Have you had a significant period, (that was not a direct result of drug/alcohol use), in which you have:", $xpos, $ypos, 196, $basefontoptions);
+  $ypos += $h_tf;
+  $ypos += 5;
+
+  $ypos += 20;
+  main->renderTextflow($p, "Past 30 Days", 152, 251, 182, $basesmallfontoptions . " lastalignment=center", $ypos, "verticalalign=center");
+  main->renderTextflow($p, "In Your Life", 190, 251, 216, $basesmallfontoptions . " lastalignment=center", $ypos, "verticalalign=center");
+
+  $p->fit_textline("P4.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "Experienced serious depression", $xpos + 18, $ypos, 144, $basefontoptions);
+  main->renderRects($p, 173, $ypos + $h_rect + 4, 1, $rClientASI->{'P4D'});
+  main->renderRects($p, 213, $ypos + $h_rect + 4, 1, $rClientASI->{'P4L'});
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("P5.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "Experienced serious anxiety or tension", $xpos + 18, $ypos, 144, $basefontoptions);
+  main->renderRects($p, 173, $ypos + $h_rect + 4, 1, $rClientASI->{'P5D'});
+  main->renderRects($p, 213, $ypos + $h_rect + 4, 1, $rClientASI->{'P5L'});
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("P6.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Experienced hallucinations", $xpos + 18, $ypos, $basefontoptions);
+  main->renderRects($p, 173, $ypos + 2, 1, $rClientASI->{'P6D'});
+  main->renderRects($p, 213, $ypos + 2, 1, $rClientASI->{'P6L'});
+
+  $ypos += 5;
+  $p->fit_textline("P7.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "Experienced trouble understanding, concentrating or remembering", $xpos + 18, $ypos, 156, $basefontoptions);
+  main->renderRects($p, 173, $ypos + $h_rect + 4, 1, $rClientASI->{'P7D'});
+  main->renderRects($p, 213, $ypos + $h_rect + 4, 1, $rClientASI->{'P7L'});
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("P8.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "Experienced trouble controlling violent behavior", $xpos + 18, $ypos, 156, $basefontoptions);
+  main->renderRects($p, 173, $ypos + $h_rect + 4, 1, $rClientASI->{'P8D'});
+  main->renderRects($p, 213, $ypos + $h_rect + 4, 1, $rClientASI->{'P8L'});
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("P9.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "Experienced serious thoughts of suicide", $xpos + 18, $ypos, 156, $basefontoptions);
+  main->renderRects($p, 173, $ypos + $h_rect + 4, 1, $rClientASI->{'P9D'});
+  main->renderRects($p, 213, $ypos + $h_rect + 4, 1, $rClientASI->{'P9L'});
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("P10.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Attempted suicide", $xpos + 21, $ypos, $basefontoptions);
+  main->renderRects($p, 173, $ypos + 2, 1, $rClientASI->{'P10D'});
+  main->renderRects($p, 213, $ypos + 2, 1, $rClientASI->{'P10L'});
+
+  $ypos += 5;
+  $p->fit_textline("P11.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "Been prescribed medication for any psychological emotional problem", $xpos + 21, $ypos, 156, $basefontoptions);
+  main->renderRects($p, 173, $ypos + $h_rect + 4, 1, $rClientASI->{'P11D'});
+  main->renderRects($p, 213, $ypos + $h_rect + 4, 1, $rClientASI->{'P11L'});
+  $ypos += $h_tf;
+##
+
+##
+# PSYCHIATRIC STATUS column 2
+  $xpos = 221;
+  $ypos = $margintop + $h_header + 19;
+
+  $p->fit_textline("P12.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "How many days in the past 30 have you experienced these psychological or emotional problems?", $xpos + 21, $ypos, 354, $basefontoptions);
+  main->renderRects($p, 399, $ypos + $h_rect + 4, 2, $rClientASI->{'P12'});
+  $ypos += $h_tf;
+
+  $ypos += 8;
+  $h_tf = main->renderTextflow($p, "For questions <$baseboldmidfontoptions_i>P12 & P13<$basemidfontoptions_i> please ask the patient to use the <$baseboldmidfontoptions_i>Patient’s Rating Scale.", $xpos, $ypos, 399, $basemidfontoptions_i . " charspacing=-0.2");
+  $ypos += $h_tf;
+
+  $ypos += 8;
+  $p->fit_textline("P13.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "How much have you been troubled or bothered by these psychological or emotional problems in the past 30 days?", $xpos + 21, $ypos, 366, $basefontoptions);
+  main->renderRects($p, 399, $ypos + $h_rect + 4, 1, $rClientASI->{'P13'});
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("P14.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "How important to you now is treatment for these psychological problems?", $xpos + 21, $ypos, 366, $basefontoptions);
+  main->renderRects($p, 399, $ypos + $h_rect + 4, 1, $rClientASI->{'P14'});
+  $ypos += $h_tf;
+
+  $ypos += 8;
+  $h_tf = main->renderTextflow($p, "THE FOLLOWING ITEMS ARE TO BE COMPLETED BY THE INTERVIEWER", $xpos, $ypos, 399, $basefontoptions_i);
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("At the time of the interview, is patient:", $xpos, $ypos, $basefontoptions);
+  $ypos += 10;
+  $p->fit_textline("0 - No  1 - Yes", 256, $ypos, $basesmallfontoptions);
+
+  $ypos += 19;
+  $p->fit_textline("P15.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Obviously depressed/withdrawn", $xpos + 21, $ypos, $basefontoptions);
+  main->renderRects($p, 399, $ypos + 2, 1, $rClientASI->{'P15'});
+
+  $ypos += 16;
+  $p->fit_textline("P16.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Obviously hostile", $xpos + 21, $ypos, $basefontoptions);
+  main->renderRects($p, 399, $ypos + 2, 1, $rClientASI->{'P16'});
+
+  $ypos += 16;
+  $p->fit_textline("P17.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Obviously anxious/nervous", $xpos + 21, $ypos, $basefontoptions);
+  main->renderRects($p, 399, $ypos + 2, 1, $rClientASI->{'P17'});
+
+  $ypos += 5;
+  $p->fit_textline("P18.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "Having trouble with reality testing, thought disorders, paranoid thinking", $xpos + 21, $ypos, 366, $basefontoptions);
+  main->renderRects($p, 399, $ypos + $h_rect + 4, 1, $rClientASI->{'P18'});
+  $ypos += $h_tf;
+
+  $ypos += 5;
+  $p->fit_textline("P19.", $xpos, $ypos + 11, $basefontoptions_u);
+  $h_tf = main->renderTextflow($p, "Having trouble comprehending, concentrating, remembering", $xpos + 21, $ypos, 366, $basefontoptions);
+  main->renderRects($p, 399, $ypos + $h_rect + 4, 1, $rClientASI->{'P19'});
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("P20.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Having suicidal thoughts", $xpos + 21, $ypos, $basefontoptions);
+  main->renderRects($p, 399, $ypos + 2, 1, $rClientASI->{'P20'});
+##
+
+##
+# PSYCHIATRIC STATUS column 3
+  $xpos = 407;
+  $ypos = $margintop + $h_header + 19;
+
+  $p->fit_textline("P21.", $xpos, $ypos + 11, $basefontoptions);
+  $h_tf = main->renderTextflow($p, "How would you rate the patient’s need for psychiatric/psychological treatment?", $xpos + 21, $ypos, 560, $basefontoptions);
+  main->renderRects($p, 582, $ypos + $h_rect + 4, 1, $rClientASI->{'P21'});
+  $ypos += $h_tf;
+
+  $ypos += 21;
+  $p->fit_textline("Confidence Rating", 438, $ypos, $baseboldlargefontoptions_i);
+
+  $ypos += 5;
+  $h_tf = main->renderTextflow($p, "Is the above information significantly distorted by:", $xpos, $ypos, 560);
+  $ypos += $h_tf;
+
+  $ypos += 16;
+  $p->fit_textline("P22.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Patient’s misrepresentation?", $xpos + 21, $ypos, $basefontoptions);
+  main->renderRects($p, 582, $ypos + 2, 1, $rClientASI->{'P22'});
+  $ypos += 10;
+  $p->fit_textline("0 - No 1 - Yes", $xpos + 21, $ypos, $basesmallfontoptions);
+
+  $ypos += 16;
+  $p->fit_textline("P23.", $xpos, $ypos, $basefontoptions_u);
+  $p->fit_textline("Patient’s inability to understand?", $xpos + 21, $ypos, $basefontoptions);
+  main->renderRects($p, 582, $ypos + 2, 1, $rClientASI->{'P23'});
+  $ypos += 10;
+  $p->fit_textline("0 - No 1 - Yes", $xpos + 21, $ypos, $basesmallfontoptions);
+##
+
+  $p->fit_textline("COMMENTS", $marginleft, 525, $baseboldmidfontoptions);
+  main->renderTextflow($p, $rClientASI->{'PCOM'}, $marginleft, 525, $marginleft + $contentwidth);
+
+  main->createFooter($p);
+
+}
+
+sub createPageCount {
+  my ($self, $p) = @_;
+
+  for(my $i = 1; $i < $pagecount+1; $i++) {
+    # Revisit page $i
+    $p->resume_page("pagenumber $i");
+
+    # Add the total number of pages
+    $p->fit_textline(" of " . $pagecount, 306, $marginbottom + 14, $baseboldmidfontoptions);
+    $p->end_page_ext("");
+  }
+}
+
+sub createHeader {
+  my ($self, $p, $HeaderInfo) = @_;
+
+  my $Company = $HeaderInfo->{'companyname'};
+  my $Address = "$HeaderInfo->{'companyaddr'}\n$HeaderInfo->{'companycsz'}";
+  my $OffceFax = $HeaderInfo->{'companyphone'};
+
+  my $tf;
+
+  $p->begin_page_ext($pagewidth, $pageheight, "topdown");
+  my $ypos = $margintop;
+
+  $ypos += $fontsizelarge;
+  $p->fit_textline($Company, $pagewidth / 2, $ypos, $baseboldlargefontoptions . " position={center bottom}");
+
+  my $h_address = 2 * $fontsizexxlarge;
+  $ypos += $h_address;
+  my $w_address = 150;
+  my $x_address = $pagewidth / 2 - $w_address / 2;
+  $tf = $p->create_textflow($Address, $baseboldlargefontoptions . " leading=110% alignment=justify lastalignment=center");
+  $p->fit_textflow($tf, $x_address, $ypos, $x_address+$w_address, $ypos - $h_address, "verticalalign=center");
+
+  $ypos += $fontsizelarge;
+  $p->fit_textline($OffceFax, $pagewidth / 2, $ypos, $baseboldlargefontoptions . " position={center bottom}");
+
+  # -----------------------------------
+  # Place image of logo
+  # -----------------------------------
+  my $y_offsetlogo = 2;
+  $ypos += $y_offsetlogo;
+  my $h_logo = $ypos - $margintop;
+  my $w_logo = 150;
+  
+  my ($logodirectory, $logofilename) = $HeaderInfo->{'LOGO'} =~ m/(.*\/)(.*)$/;
+  if ( $logofilename eq '' ) { $logofilename = 'logo.png'; }
+  elsif ( not -e "/usr/local/PDFlib/${logofilename}" ) { $logofilename = 'logo.png'; }
+  my $logoimage = $p->load_image("auto", $logofilename, "");
+  $p->fit_image($logoimage, $marginleft, $ypos, "boxsize={" . $w_logo . " " .  $h_logo . "} fitmethod=meet");
+  $p->close_image($logoimage);
+  ##
+
+}
+
+sub createFooter {
+  my ($self, $p) = @_;
+
+  $p->fit_textline("Page " . (++$pagecount), 268.4, $marginbottom + 14, $baseboldmidfontoptions);
+  $p->suspend_page("");
+}
+
+sub renderLine {
+  my ($self, $p, $xpos_start, $ypos_start, $xpos_end, $ypos_end, $linewidth) = @_;
+
+  $p->set_graphics_option("dasharray=none");
+  $p->setlinewidth(($linewidth ? $linewidth : 0.5));
+  $p->moveto($xpos_start, $ypos_start);
+  $p->lineto($xpos_end, $ypos_end);
+  $p->stroke();
+}
+
+sub renderDotLine {
+  my ($self, $p, $xpos_start, $ypos_start, $xpos_end, $ypos_end) = @_;
+  $p->set_graphics_option("dasharray={0.9 1.4}");
+  $p->setlinewidth(0.9);
+  $p->moveto($xpos_start, $ypos_start);
+  $p->lineto($xpos_end, $ypos_end);
+  $p->stroke();
+}
+
+sub renderTextflow {
+  my ($self, $p, $text, $xpos_start, $ypos, $xpos_end, $optlist, $ypos_end, $optlist2) = @_;
+
+  my $tf;
+  my $h_tf;
+  my $result;
+
+  $tf = $p->create_textflow($text, $basefontoptions . " leading=120% " . ($optlist ? $optlist : ""));
+  $result = $p->fit_textflow($tf, $xpos_start, ($ypos_end ? $ypos_end : $marginbottom), $xpos_end, $ypos, ($optlist2 ? $optlist2 : ""));
+  $h_tf = $p->info_textflow($tf, "textheight");
+
+  return $h_tf;
+}
+
+sub renderRects {
+  my ($self, $p, $xposend, $ypos, $count, $data) = @_;
+
+  my $x_offset_data = 4.7;
+  my $y_offset_data = 2;
+  my $char;
+
+  $p->setlinewidth(0.5);
+  $p->set_graphics_option("linejoin=0");
+  $p->set_graphics_option("dasharray=none");
+
+  foreach my $i (0..($count-1)) {
+    $p->rect($xposend - ($count-$i) * $w_rect, $ypos, $w_rect, $h_rect);
+    $p->stroke();
+    $char = substr($data, $i, 1);
+    if ($char ne '') {
+        $p->fit_textline($char, $xposend - ($count-$i) * $w_rect + $x_offset_data, $ypos - $y_offset_data, $basesmallfontoptions);
+    }
+  }
+}
+
+############################################################################

@@ -1,0 +1,193 @@
+#!/usr/bin/perl
+###########################################
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use MgrTree;
+use DBA;
+use PDF;
+
+###########################################
+# anything piped to us?
+##
+  open DEBUG, ">/home/okmis/mis/src/debug/genInvPDF.out" or die "Couldn't open file: $!";
+my @InvIDs = ();
+if ( ! -t STDIN ) { while (<STDIN>) { chomp($_); push(@InvIDs,split(' ',$_)); } }
+print DEBUG "InvIDs=@InvIDs\n";
+foreach my $id ( @InvIDs) { print DEBUG "STDIN: id=$id\n"; }
+
+# or sent to us?
+$form = DBForm->new();
+foreach my $id ( split(' ',$form->{IDs}) ) { push(@InvIDs,$id); }
+foreach my $id ( @InvIDs) { print DEBUG "form: id=$id\n"; }
+
+############################################################################
+$dbh = $form->dbconnect();
+my $qProvider = qq|select Provider.*, ProviderControl.FinMgrID from Provider left join ProviderControl on ProviderControl.ProvID=Provider.ProvID where Provider.ProvID=?|;
+my $sProvider = $dbh->prepare($qProvider);
+my $qInvoices = qq|select * from Invoices left join Client on Client.ClientID=Invoices.ClientID where Invoices.ID=?|;
+my $sInvoices = $dbh->prepare($qInvoices);
+my $qInvItems = qq|select * from InvItems where InvItems.InvID=? order by InvItems.ContDate|;
+my $sInvItems = $dbh->prepare($qInvItems);
+
+############################################################################
+$pdf = PDF->start("/home/okmis/mis/src/pdf/Invoice.pdt");
+my $cnt = 0;
+foreach my $id ( @InvIDs )
+{ 
+print DEBUG qq|now: id=$id\n|;
+  $sInvoices->execute($id) || $form->dberror($qInvoices);
+  if ( my $rInvoices = $sInvoices->fetchrow_hashref )
+  {
+    $cnt++;
+    my ($invtotal,$pageno,$itemcnt,$itemsperpage) = (0,0,0,13);
+    my @pages = ();
+    my @items = ();
+print DEBUG qq|read: ID=$rInvoices->{ID}\n|;
+    $sInvItems->execute($rInvoices->{ID}) || $form->dberror($qInvItems);
+    while ( my $rInvItems = $sInvItems->fetchrow_hashref )
+    {
+      $itemcnt++;
+print DEBUG qq|itemcnt: ${itemcnt} ID=$rInvItems->{ID}\n|;
+      push(@items,$rInvItems);
+      if ( $itemcnt % $itemsperpage == 0 ) { push(@pages,[@items]); @items = (); }
+      $invtotal += $rInvItems->{AmtDue};
+    }
+    if ( $itemcnt % $itemsperpage != 0 ) { push(@pages,[@items]) }
+    foreach my $items ( @pages )
+    { $pageno++; main->genPDFpage($form,$rInvoices,$items,$invtotal,$pageno); }
+  }
+}
+if ( ${cnt} == 0 )
+{ $pdf->add('',"/R5 14 Tf\n1 0 0 1 40 740 Tm (No Invoice for selection.) Tj\n"); }
+$pdf->finish();
+print $pdf->{outText};
+warn "${cnt} Invoices Generated\n";
+
+$sProvider->finish();
+$sInvoices->finish();
+$sInvItems->finish();
+$form->complete();
+  close(DEBUG);
+exit;
+############################################################################
+############################################################################
+sub genPDFpage
+{
+  my ($self,$form,$rInvoice,$InvItems,$InvTotal,$PageNo) = @_;
+##
+# Agency Name and address.
+##
+  my $AgencyID = MgrTree->getManager($form,$rInvoice->{clinicClinicID});
+  $sProvider->execute($AgencyID) || $form->dberror($qProvider);
+  my $rAgency = $sProvider->fetchrow_hashref;
+  $pdf->addElement(38,740,$rAgency->{Name},'/R10',14);
+  my $AgencyAddr = $rAgency->{Addr2} eq '' ? "$rAgency->{Addr1}"
+                                           : "$rAgency->{Addr1}, $rAgency->{Addr2}";
+  $pdf->addElement(38,729,$AgencyAddr,'/R10',12);
+  $pdf->addElement(38,718,"$rAgency->{City}, $rAgency->{ST}   $rAgency->{Zip}",'/R10',12);
+  $pdf->addElement(38,707,"Office: $rAgency->{WkPh}",'/R10',12);
+  $pdf->addElement(38,696,"Fax: $rAgency->{Fax}",'/R10',12);
+
+  my $InvDate = DBUtil->Date($rInvoice->{InvDate},'fmt','MM/DD/YY');
+  $pdf->addElement(515,740,$InvDate,'/R5',12);
+  $pdf->addElement(515,729,"$rInvoice->{ID}",'/R5',12);
+##
+# Clinic Name and address.
+##
+#  $sProvider->execute($rInvoice->{clinicClinicID}) || $form->dberror($qProvider);
+#  my $rClinic = $sProvider->fetchrow_hashref;
+
+  $pdf->addElement(177,666,$rInvoice->{ClientID},'/R5',12);
+  my $Age = DBUtil->Date($rInvoice->{DOB},'age');
+  my $InvAddr = $rInvoice->{Addr2} eq '' ? "$rInvoice->{Addr1}"
+                                         : "$rInvoice->{Addr1}, $rInvoice->{Addr2}";
+  $pdf->addElement(318,677,"To the Parent or Guardian of:",'/R10',12) if ( $Age < 18 );
+  $pdf->addElement(318,666,"$rInvoice->{FName} $rInvoice->{LName}",'/R5',12);
+  $pdf->addElement(318,655,$InvAddr,'/R5',12);
+  $pdf->addElement(318,644,"$rInvoice->{City}, $rInvoice->{ST}  $rInvoice->{Zip}",'/R5',12);
+  $pdf->addElement(318,575,$rInvoice->{HmPh},'/R5',12);
+
+  main->genLines($InvItems);
+  $pdf->addElement(530,232,"PAGE ${PageNo}",'/R5',10);
+  $pdf->addElement(530,132,"INVOICE",'/R5',10);
+  my $TotalCharge = sprintf("%.2f",$InvTotal);
+  $pfx = '*' x (9-length($TotalCharge));
+  $pdf->addElement(535,112,"${pfx}${TotalCharge}",'/R5',10);
+
+# bottom of Invoice: Please Send Payment to:
+  $pdf->addElement(77,208,$rAgency->{Name},'/R10',12);
+  $pdf->addElement(77,197,$AgencyAddr,'/R10',12);
+  $pdf->addElement(77,186,"$rAgency->{City}, $rAgency->{ST}   $rAgency->{Zip}",'/R10',12);
+
+#                    For Questions regarding your invoice contact:
+  $sProvider->execute($rAgency->{FinMgrID}) || $form->dberror($qProvider);
+  if ( my $rProvider = $sProvider->fetchrow_hashref )
+  {
+    $pdf->addElement(77,119,"$rProvider->{FName} $rProvider->{LName}",'/R10',12);
+    $pdf->addElement(77,108,$rProvider->{JobTitle},'/R10',12);
+    $pdf->addElement(77,97,$rAgency->{Name},'/R10',12);
+    $pdf->addElement(77,86,$rProvider->{WkPh},'/R10',12);
+  }
+  else
+  {
+    $pdf->addElement(77,119,"No finance coordinator assigned",'/R10',12);
+    $pdf->addElement(77,108,"please select coordinator under Agency",'/R10',12);
+    $pdf->addElement(77,97,$rAgency->{Name},'/R10',12);
+    $pdf->addElement(77,86,"No finance coordinator assigned",'/R10',12);
+  }
+
+  $pdf->add('deflate',$out);
+#  $pdf->add('',$out);
+  return(1);
+}
+############################################################################
+sub genLines
+{
+  my ($self,$Lines) = @_;
+  my $TotalCharge = 0;
+  my $ystart = 535;   # to start y @ 535;
+  my $cnt = 0; my $Const = 0;
+  foreach my $rInvItems ( @$Lines )
+  { 
+    my $y = ($ystart - ($cnt * 11) - $Const);
+    $cnt++;
+
+    my $ContDate = DBUtil->Date($rInvItems->{ContDate},'fmt','MM/DD/YY');
+#print DEBUG qq|ClientID=$r->{ClientID}, $rInvItems->{ContDate}, $ContDate\n|;
+    $pdf->addElement(31,$y,$ContDate,'/R5',10);
+    $pdf->addElement(78,$y,$rInvItems->{SCNum},'/R5',10);
+    my $Descr = $rInvItems->{'Descr'}.' / #'.$rInvItems->{'TrID'}.'';
+    if ( length($Descr)> 30 )
+    { 
+      my $i = 30;
+      until ( $i == 0 || substr($Descr,$i,1) eq ' ' ) { $i--; }
+#print DEBUG qq|  i=$i\n|;
+      $pdf->addElement(148,$y,substr($Descr,0,$i),'/R5',10);
+      $pdf->addElement(148,$y-11,substr($Descr,$i,30),'/R5',10);
+      $Const += 11;
+    }
+    else
+    { $pdf->addElement(148,$y,$Descr,'/R5',10); }
+    $pdf->addElement(292,$y,$rInvItems->{Units},'/R5',10);
+    $BillAmt = sprintf("%.2f",$rInvItems->{BillAmt});
+    $pfx = '*' x (9-length($BillAmt));
+    $pdf->addElement(318,$y,"${pfx}${BillAmt}",'/R5',10);
+    $pdf->addElement(374,$y,$rInvItems->{InsCode},'/R5',10);
+    $PaidAmt = sprintf("%.2f",$rInvItems->{PaidAmt});
+    $pfx = '*' x (9-length($PaidAmt));
+    $pdf->addElement(408,$y,"${pfx}${PaidAmt}",'/R5',10);
+#print DEBUG qq|  BillAmt=$rInvItems->{BillAmt}, $BillAmt, $rInvItems->{PaidAmt}, $PaidAmt\n|;
+    $PaidDate = DBUtil->Date($rInvItems->{'PaidDate'},'fmt','MM/DD/YY');
+    $pdf->addElement(468,$y,$PaidDate,'/R5',10);
+    $AmtDue = sprintf("%.2f",$rInvItems->{AmtDue});
+    $pfx = '*' x (9-length($AmtDue));
+    $pdf->addElement(535,$y,"${pfx}${AmtDue}",'/R5',10);
+    $TotalCharge += $AmtDue;
+  }
+  $TotalCharge = sprintf("%.2f",$TotalCharge);
+  $pfx = '*' x (9-length($TotalCharge));
+  $pdf->addElement(535,212,"${pfx}${TotalCharge}",'/R5',10);
+  return($out);
+}
+############################################################################

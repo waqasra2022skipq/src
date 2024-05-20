@@ -1,0 +1,5 @@
+#!/bin/bash
+while [ 1 ]; do
+echo "keep alive"
+sleep .5
+done

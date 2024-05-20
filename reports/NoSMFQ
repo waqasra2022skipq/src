@@ -1,0 +1,67 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use myForm;
+use myDBI;
+use DBA;
+use DBUtil;
+use Time::Local;
+my $DT = localtime();
+############################################################################
+# usage:
+#   NoSMFQ ForProvID=id
+############################################################################
+my $form = myForm->new();
+my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+#foreach my $f ( sort keys %{$form} ) { warn "form-$f=$form->{$f}\n"; }
+
+my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+# join xInsurance needed for withSelection
+my $ClinicSelection = DBA->withSelection($form,'and','Client.clinicClinicID','','','');
+my $Header = DBA->withSelectionHeader($form);
+$ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+my $sProvider = $dbh->prepare("select LName, FName from Provider where ProvID=?");
+my $qClient = qq"
+select Client.LName, Client.FName, Client.ClientID, Client.DOB, Client.ProvID, Client.Active
+      ,ClientPrAuth.PAnumber, ClientPrAuth.EffDate, ClientPrAuth.ExpDate, ClientPrAuthCDC.TransType
+      ,ClientSMFQ.TestDate as TestSMFQ
+  from Client 
+    left join ClientACL on ClientACL.ClientID=Client.ClientID
+    left join ClientSMFQ on ClientSMFQ.ClientID=Client.ClientID
+    left join ClientPrAuth on ClientPrAuth.ClientID=Client.ClientID
+    left join ClientPrAuthCDC on ClientPrAuthCDC.ClientPrAuthID=ClientPrAuth.ID
+    left join Insurance on Insurance.InsNumID=ClientPrAuth.InsuranceID
+    left join xInsurance on xInsurance.ID=Insurance.InsID
+  where ClientACL.ProvID='${ForProvID}'
+    and (
+          ClientPrAuth.PAnumber is not null
+          and curdate() between ClientPrAuth.EffDate and ClientPrAuth.ExpDate
+        )
+    and (ClientPrAuthCDC.TransType=23 || ClientPrAuthCDC.TransType=42)
+    and ClientSMFQ.TestDate is null
+  ${ClinicSelection}
+  group by Client.LName, Client.FName, Client.ClientID";
+#warn qq|qClient=\n${qClient}\n|;
+my $sClient = $dbh->prepare($qClient);
+print qq|${DT}\n${Header}Missing SMFQ Report.\nClients with missing any SMFQ report.\n|;
+print qq|Client Name\tClientID\tActive\tDOB\tAge\tPA Number\tTransType\tProvider Name\tMessage\n|;
+$sClient->execute();
+while (my $rClient = $sClient->fetchrow_hashref)
+{ 
+  my $ClientID = $rClient->{'ClientID'};
+  my $ActiveFlag = $rClient->{'Active'} ? 'Yes' : 'No';;
+  my $ClientName = qq|$rClient->{'LName'}, $rClient->{'FName'} ($rClient->{'ClientID'})|;
+  my $Age = DBUtil->Date($rClient->{DOB}, 'age');
+  next if ( $Age > 12 );
+  my $msg = 'NO CLIENT SMFQ TESTS';
+  $sProvider->execute($rClient->{ProvID});
+  my ($ProvLName, $ProvFName) = $sProvider->fetchrow_array;
+  my $ProvName = qq|$ProvLName, $ProvFName ($rClient->{ProvID})|; 
+  print qq|${ClientName}\t${ClientID}\t${ActiveFlag}\t$rClient->{'DOB'}\t${Age}\t$rClient->{'PAnumber'}\t$rClient->{'TransType'}\t${ProvName}\t${msg}\n|;
+}
+
+$sProvider->finish();
+$sClient->finish();
+myDBI->cleanup();
+exit;
+############################################################################

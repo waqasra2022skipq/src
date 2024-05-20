@@ -1,0 +1,5 @@
+select Client.FName, Client.LName, Client.ClientID, Provider.FName, Provider.LName, Client.CreateDate, Client.RecDOLC
+ from Client
+  left join Provider on Provider.ProvID=Client.ProvID 
+ where Client.FName is null or Client.LName is null 
+ order by Provider.LName, Provider.FName

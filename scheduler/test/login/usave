@@ -1,0 +1,8 @@
+cp ../../core6/lib/ntsRequest.php ../../core6/lib/ntsRequest_20190901.php
+cp ../../core6/lib/ntsUser.php ../../core6/lib/ntsUser_20190901.php
+cp ../../core6/model/user/check_password.php ../../core6/model/user/check_password_20190901.php
+cp ../../core6/model/user/create.php ../../core6/model/user/create_20190901.php
+cp ../../core6/panels/admin/company/staff/create/action.php ../../core6/panels/admin/company/staff/create/action_20190901.php
+cp ../../core6/panels/admin/root.php ../../core6/panels/admin/root_20190901.php
+cp ../../core6/panels/anon/login/action.php ../../core6/panels/anon/login/action_20190901.php
+cp ../../core6/panels/anon/register/action.php ../../core6/panels/anon/register/action_20190901.php

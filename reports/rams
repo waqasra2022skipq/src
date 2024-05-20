@@ -1,0 +1,9 @@
+CALL emradv_sp_AMS_CalculateAMSReport(
+'',                                                  ## Provider or ALL
+'',                                                ## Agency or ALL
+STR_TO_DATE('2018-11-01','%Y-%m-%d'),                         ## From Date
+STR_TO_DATE('2018-11-30','%Y-%m-%d'),                           ## To Date
+'patienteducation',                                             ## Activity Name
+'ACIonly',                                                  ## 'Stage2' or 'Stage3' or 'ACITransition' or 'ACIonly'
+'1','1');
+

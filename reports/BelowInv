@@ -1,0 +1,109 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use DBA;
+use DBUtil;
+use cBill;
+use Inv;
+use Time::Local;
+$DT = localtime();
+############################################################################
+# usage:
+#   BelowInv ForProvID=id\&CurDate=date
+############################################################################
+$form = DBForm->new();
+my $dbh = $form->dbconnect();
+my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+my $CURDATE = $form->{CurDate} ? $form->{CurDate} : $form->{TODAY};
+$CURDATE = $form->{'sYearMonth'} ? $form->{'sYearMonth'}.'-01' : $CURDATE; # YM input overrides.
+
+############################################################################
+my $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID','where');
+# We don't care about Active=1 Clients, it's based on PA for period.
+# get current PAs.
+my $sClient = $dbh->prepare("select * from Client ${ClinicSelection} order by LName, FName");
+my $sProvider = $dbh->prepare("select * from Provider where ProvID=?");
+############################################################################
+# Start the process.
+my $cnt=0;
+print qq|${DT}\nBelow Inventory Report ${CURDATE}\nLegend: Type A=Amount Auth, U=Units Auth\n|;
+print qq|Type\tClinicName\tClient\tProvider\tCode\tAuthPeriod\tAuth\tUsed\tLeft\n|;
+$sClient->execute();
+while ( $rClient = $sClient->fetchrow_hashref )
+{
+  my $inv = Inv->setInv($form,$rClient->{'ClientID'},$CURDATE);
+
+  my $BillingReportFlag = SysAccess->chkPriv($form,'BillingReports',$form->{'LOGINPROVID'});
+  my $ClientName = qq|$rClient->{'LName'}, $rClient->{'FName'} ($rClient->{'ClientID'})|;
+  my $PGCode = $inv->{'PAgroup'};
+
+  $sProvider->execute($inv->{ProviderID});
+  my $rProvider = $sProvider->fetchrow_hashref;
+  my $ProvName = qq|$rProvider->{'LName'}, $rProvider->{'FName'}|;
+  $sProvider->execute($inv->{ClinicID});
+  my $rClinic = $sProvider->fetchrow_hashref;
+  my $ClinicName = $rClinic->{'Name'};
+
+  if ( $inv->{'PAgroup'} eq '' )
+  { $cnt += main->testSC($form,$inv,$ClientName,$ProvName,$ClinicName); }
+  else
+  {
+    # CurPeriod: MM/DD/YYYY-MM/DD/YYYY
+    my $CurPeriod = $inv->{'CurPeriod'};
+    $CurAmtAuth = sprintf("%.2f",$inv->{$CurPeriod}->{'AmtAuth'});
+    $CurAmtUsed = sprintf("%.2f",$inv->{$CurPeriod}->{'AmtUsed'});
+    $CurPctAmt = $CurAmtAuth > 0 ?  sprintf("%.1f",(($CurAmtLeft / $CurAmtAuth) * 100)) : '0.0';
+    $CurAmtLeft = sprintf("%.2f",$inv->{$CurPeriod}->{'AmtAuth'} - $inv->{$CurPeriod}->{'AmtUsed'});
+
+    next if ( $CurAmtLeft >= 0 );
+
+    $AmtLeft = sprintf("%.2f",$inv->{'AmtAuth'} - $inv->{'AmtUsed'});
+    $AmtAuth = sprintf("%.2f",$inv->{'AmtAuth'});
+    $AmtUsed = sprintf("%.2f",$inv->{'AmtUsed'});
+    $PctAmt = $AmtAuth > 0 ?  sprintf("%.1f",(($AmtLeft / $AmtAuth) * 100)) : '0.0';
+
+    print qq|A\t${ClinicName}\t${ClientName}\t${ProvName}\t${PGCode}\t$inv->{'AuthPeriod'}\t$inv->{AmtAuth}\t$inv->{AmtUsed}\t$inv->{AmtLeft}\n|;
+    foreach my $Dates ( @{$inv->{PADates}} )
+    {
+      my ($BDate,$EDate) = split('/',$Dates);
+print qq|BDate=$BDate,EDate=$EDate\n| if ( $form->{debug} );
+      my $fBDate = DBUtil->Date($BDate,'fmt','MM/DD/YYYY');
+      my $fEDate = DBUtil->Date($EDate,'fmt','MM/DD/YYYY');
+print qq|fBDate=$fBDate,fEDate=$fEDate\n| if ( $form->{debug} );
+      my $key = "${fBDate}-${fEDate}";
+      print qq|\t\t\t\t\t${key}\t$inv->{$key}->{AmtAuth}\t$inv->{$key}->{AmtUsed}\t$inv->{$key}->{AmtLeft}\n|;
+    }
+    $cnt++;
+  }
+}
+print qq|${cnt} Auth in report.\n|;
+$sClient->finish();
+$sProvider->finish();
+$form->complete();
+exit;
+############################################################################
+sub testSC
+{
+  my ($self,$form,$inv,$ClientName,$ProvName,$ClinicName) = @_; 
+  my $cnt=0;
+  foreach $SCID ( keys %{ $inv->{PASCID} } )
+  {
+#warn qq|SCID=$SCID\n|;
+#foreach my $f ( sort keys %{$inv->{$SCID}} ) { warn "Report: inv-${SCID}-$f=$inv->{$SCID}->{$f}\n"; }
+    next unless ($SCID =~ /\d/);
+    my $ExInv = DBA->getxref($form,'xSC',$SCID,'ExInv');
+    my $PAReq = DBA->getxref($form,'xSC',$SCID,'PAReq');
+    my $Auth = $inv->{$SCID}->{UnitsAuth};
+    my $Used = $inv->{$SCID}->{UnitsUsed};
+    my $Left = $inv->{$SCID}->{UnitsLeft};
+print qq|$ClientName, $SCID, ExInv=$ExInv, PAReq=$PAReq, Total=$Total, Left=$Left\n| if ( $form->{debug} );
+    next if ( $ExInv );                         # Exclude from report.
+    next unless ( $PAReq );                     # Inventory always ok.
+    next if ( $Left >= 0 );                     # not Below Inventory.
+    my $SCName = DBA->getxref($form,'xSC',$SCID,'SCName');
+    print qq|U\t${ClinicName}\t${ClientName}\t${ProvName}\t${SCName}\t${Auth}\t${Used}\t${Left}\n|;
+    $cnt++;
+  } 
+  return($cnt);
+}

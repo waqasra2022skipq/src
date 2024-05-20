@@ -1,0 +1,13 @@
+touch constants.php ../../core6/app/constants.php
+touch ../../core6/assets/css/style.css
+touch ../../core6/defaults/language/emails.xml
+touch ../../core6/lib/ntsEmailTemplateManager.php
+touch ../../core6/model/appointment/_notifier.php
+touch checked-in.php ../../core6/model/appointment/checked-in.php
+touch complete.php ../../core6/model/appointment/complete.php
+touch email.php ../../core6/model/user/email.php
+touch ntsAppointment.php ../../core6/objects/ntsAppointment.php
+touch _keys.php ../../core6/panels/admin/conf/email_templates/_keys.php
+touch _action-checked-in.php ../../core6/panels/admin/manage/appointments/update/_action-checked-in.php
+touch ../../core6/plugins/sms/defaults/language/sms.xml
+touch sms.php ../../core6/plugins/sms/model/user/sms.php

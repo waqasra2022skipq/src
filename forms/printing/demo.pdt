@@ -1,0 +1,916 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<?xfa generator="XFA2_0" APIVersion="2.2.4333.0" ?>
+<xdp:xdp xmlns:xdp="http://ns.adobe.com/xdp/" >
+<xfa:datasets xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/" >
+<xfa:data>
+<TopmostSubform>
+
+  <fident>1 Patient (36238)</fident> 
+  <fstamp>Wed May 22 10:13:44 2019</fstamp> 
+  <Page1>
+    <recordid>8</recordid> 
+
+  <companyname>Family Counseling</companyname> 
+  <companyaddr>4001 Knights Bridge</companyaddr> 
+  <companycsz>Norman, OK  73072</companycsz> 
+  <companyphone>Office: 405-641-6109  Fax: 405-641-0000</companyphone> 
+  <companyfax></companyfax> 
+  <assessmenttype>Initial Assessment</assessmenttype> 
+
+    <referraldetails>
+
+    </referraldetails>
+    <flowed>
+     <referringphysician>None</referringphysician>
+
+  <transportedby>    </transportedby>
+     <reasonforreferral></reasonforreferral>
+     <referredto>None</referredto>
+
+    </flowed>
+    <intakeinfoheader>
+     <intakedate>09/19/2002 </intakedate>
+     <readmission>0</readmission>
+    </intakeinfoheader>
+    <identifyinfo>
+     <contactinfo>1  Patient</contactinfo>     <contactinfo>Some Health Care Services</contactinfo>     <contactinfo>Some Street</contactinfo>     <contactinfo>Norman, OK 73069</contactinfo>
+     <ssn>456-78-0000</ssn>
+     <email>support@okmis.com</email>
+     <hair></hair>
+     <eyes></eyes>
+     <pstatus></pstatus>
+     <race></race>
+     <gender>Female</gender>
+     <carrier></carrier>
+     <weight></weight>
+     <height></height>
+     <age>92</age>
+     <pob></pob>
+     <dob>1926-09-23</dob>
+     <cellphn></cellphn>
+     <workphn></workphn>
+     <homephn>405-333-3333</homephn>
+     <mstatus></mstatus>
+
+    </identifyinfo>
+    <emergencycontact>
+     <ec1>
+      <contactinfo>  </contactinfo>
+      <relationship>self</relationship>
+      <email></email>
+      <homephn></homephn>
+      <workphn></workphn>
+      <cellphn></cellphn>
+      <carrier></carrier>
+      <legalguardian>1</legalguardian>
+      <emergencycontact></emergencycontact>
+      <specialinstructions></specialinstructions>
+     </ec1>
+     <ec2>
+      <contactinfo>Casdlkgu  Easdlasaoi</contactinfo>
+      <contactinfo>Any Street</contactinfo>
+      <contactinfo>Any Town, OK 73777</contactinfo>
+      <relationship>natural daughter</relationship>
+      <email></email>
+      <homephn>405-222-2222</homephn>
+      <workphn>405-666-6666</workphn>
+      <cellphn></cellphn>
+      <carrier></carrier>
+      <legalguardian></legalguardian>
+      <emergencycontact>1</emergencycontact>
+      <specialinstructions></specialinstructions>
+     </ec2>
+
+    </emergencycontact>
+    <healthcareinfo>
+      <healthcareinfoalert>
+       <alert></alert>
+
+      </healthcareinfoalert>
+      <healthcareinfo>
+        <primarycarephysician>
+     <contactinfo>None</contactinfo>
+
+        </primarycarephysician>
+        <designatedhospital>
+     <contactinfo>None</contactinfo>
+
+        </designatedhospital>
+        <designatedpharmacy>
+     <contactinfo>None</contactinfo>
+
+        </designatedpharmacy>
+      </healthcareinfo>
+      <medicaldocs>
+      <advdirective></advdirective><dnr></dnr><livingwill></livingwill>
+
+      </medicaldocs>
+    </healthcareinfo>
+    <insurance>
+      <insurancedetails>
+     <primary>
+      <name>Medicare</name>
+      <paphn>866-280-6520</paphn>
+      <pholder></pholder>
+      <pnumber>555555555D</pnumber>
+      <deductible>0.00</deductible>
+      <copay>0.00</copay>
+     </primary>
+     <guarantor>
+      <name></name>
+      <relationship></relationship>
+      <homephn></homephn>
+      <cellphn></cellphn>
+      <workphn></workphn>
+      <employer></employer>
+      <email></email>
+      <deductible>0.00</deductible>
+      <copay>0.00</copay>
+     </guarantor>
+     <secondary>
+      <name>Medicaid</name>
+      <paphn>800-522-3414</paphn>
+      <pholder></pholder>
+      <pnumber>M111111-02</pnumber>
+      <deductible>0.00</deductible>
+      <copay>0.00</copay>
+     </secondary>
+
+      </insurancedetails>
+    </insurance>
+    <presentingproblem>
+      <primary></primary>
+      <secondary></secondary>
+      <tertiary></tertiary>
+      <history>Client referred for psych consult due increasing freq of episodes of agiation/aggression &#38; increasing freq. of instability &#38; falls.  Cl oriented x1, affect appro/congruent, mood clam, memories impaired x3.  Executive functioning markedly impaired.  Current medications increase, Seroquel 50mg HS; Remeron 30mg HS; Depakote 250mg TID &#38; Lorazepam 0.5mg 1or 2 tabs Q6hrs PRN. Nursing staff report an increase in fallingafter Lorazepam is administered. Recored freq of episoed; Jan - 3, Jul-2, Aug -2, Sept 1-10-3 Seroquel ws decr from 75mg HS to 50mg HS on 08/09/02</history>
+      <solutions></solutions>
+      <description></description>
+
+    </presentingproblem>
+    <healthhistory>
+      <medicalhistory>
+       <t1></t1>
+       <t2></t2>
+      </medicalhistory>
+      <biomedicalconditions>none reported</biomedicalconditions>
+      <sexualhistory>
+       <sexques></sexques>
+       <sexhistory>
+        <t0></t0>
+        <t1></t1>
+        <t2>Unknown</t2>
+        <t3></t3>
+        <t4></t4>
+        <t5></t5>
+        <t6></t6>
+        <t7></t7>
+        <t8></t8>
+        <std>none reported</std>
+       </sexhistory>
+      </sexualhistory>
+      <medicalallergies>none reported</medicalallergies>
+      <foodallergies>none reported</foodallergies>
+      <neededimmunizations></neededimmunizations>
+
+    </healthhistory>
+    <medications>
+      <medications>
+       <physician> PROVIDER  SAMPLE   </physician>
+       <medication>Crestor 40 mg tablet</medication>
+       <drugtype>1 tablet by mouth three times a day</drugtype>
+       <drugdate>06/12/2014</drugdate>
+       <reason></reason>
+      </medications>
+      <medications>
+       <physician> PROVIDER  SAMPLE   </physician>
+       <medication>Accupril 10 mg tablet</medication>
+       <drugtype>1 tablet by mouth twice a day</drugtype>
+       <drugdate>06/12/2014</drugdate>
+       <reason></reason>
+      </medications>
+      <medications>
+       <physician> PROVIDER  SAMPLE   </physician>
+       <medication>Crestor 20 mg tablet</medication>
+       <drugtype>1 tablet apply to face twice a day</drugtype>
+       <drugdate>06/12/2014</drugdate>
+       <reason></reason>
+      </medications>
+
+    </medications>
+    <hearingvision>
+     <hscreendate>Unknown ; Unknown date</hscreendate>
+     <vscreendate>Unknown ; Unknown date</vscreendate>
+
+    </hearingvision>
+    <develop>Unknown</develop>
+
+    <prenatal></prenatal>
+
+    <perinatal></perinatal>
+
+    <postnatal></postnatal>
+
+    <toileting>
+    <daytime></daytime>
+    <nighttime></nighttime>
+
+    </toileting>
+    <emergencyroomvisits>
+     <date></date>
+
+    </emergencyroomvisits>
+    <motormilestones>
+    <mm>Unknown</mm>
+
+    </motormilestones>
+    <grossmotor>
+     <t1></t1>
+     <t2></t2>
+     <t3></t3>
+     <t4></t4>
+     <t5></t5>
+     <t6></t6>
+     <t7></t7>
+     <t8></t8>
+     <t9></t9>
+     <t10></t10>
+     <t11></t11>
+     <t12></t12>
+     <t13></t13>
+
+    </grossmotor>
+    <selfhelpskills>
+     <t1></t1>
+     <t2></t2>
+     <t3></t3>
+     <t4></t4>
+     <t5></t5>
+     <t6></t6>
+     <t7></t7>
+     <t8></t8>
+     <t9></t9>
+     <t10></t10>
+     <t11></t11>
+
+    </selfhelpskills>
+    <movementbalance>
+     <t1></t1>
+     <t2></t2>
+     <t3></t3>
+     <t4></t4>
+     <t5></t5>
+     <t6></t6>
+     <t7></t7>
+     <t8></t8>
+     <t9></t9>
+     <t10></t10>
+     <t11></t11>
+     <t12></t12>
+     <t13></t13>
+     <t14></t14>
+
+    </movementbalance>
+    <touch>
+     <t1></t1>
+     <t2></t2>
+     <t3></t3>
+     <t4></t4>
+     <t5></t5>
+     <t6></t6>
+     <t7></t7>
+     <t8></t8>
+     <t9></t9>
+     <t10></t10>
+     <t11></t11>
+     <t12></t12>
+     <t13></t13>
+     <t14></t14>
+     <t15></t15>
+     <t16></t16>
+     <t17></t17>
+     <t18></t18>
+     <t19></t19>
+     <t20></t20>
+     <t21></t21>
+
+    </touch>
+    <auditory>
+     <t1></t1>
+     <t2></t2>
+     <t3></t3>
+     <t4></t4>
+     <t5></t5>
+     <t6></t6>
+     <t7></t7>
+     <t8></t8>
+     <t9></t9>
+     <t10></t10>
+     <t11></t11>
+     <t12></t12>
+     <t13></t13>
+     <t14></t14>
+     <t15></t15>
+     <t16></t16>
+
+    </auditory>
+    <emotional>
+     <t1></t1>
+     <t2></t2>
+     <t3></t3>
+     <t4></t4>
+     <t5></t5>
+     <t6></t6>
+     <t7></t7>
+     <t8></t8>
+     <t9></t9>
+     <t10></t10>
+     <t11></t11>
+     <t12></t12>
+     <t13></t13>
+     <t14></t14>
+     <t15></t15>
+     <t16></t16>
+     <t17></t17>
+     <t18></t18>
+     <t19></t19>
+     <t20></t20>
+     <t21></t21>
+     <t22></t22>
+     <t23></t23>
+     <t24></t24>
+     <t25></t25>
+     <t26></t26>
+     <t27></t27>
+     <t28></t28>
+     <t29></t29>
+     <t30></t30>
+     <t31></t31>
+     <t32></t32>
+     <t33></t33>
+     <t34></t34>
+     <t35></t35>
+     <t36></t36>
+     <t37></t37>
+     <t38></t38>
+     <t39></t39>
+     <t40></t40>
+     <t41></t41>
+     <t42></t42>
+     <t43></t43>
+     <t44></t44>
+     <t45></t45>
+     <t46></t46>
+     <t47></t47>
+     <t48></t48>
+     <t49></t49>
+     <t50></t50>
+     <t51></t51>
+     <t52></t52>
+     <t53></t53>
+     <t54></t54>
+     <t55></t55>
+     <t56></t56>
+     <t57></t57>
+     <t58></t58>
+     <t59></t59>
+     <t60></t60>
+     <t61></t61>
+     <t62></t62>
+     <t63></t63>
+     <t64></t64>
+     <t65></t65>
+
+    </emotional>
+    <academic>
+     <t1></t1>
+     <t2></t2>
+     <t3></t3>
+     <t4></t4>
+     <t5></t5>
+     <t6></t6>
+     <t7></t7>
+     <t8></t8>
+
+    </academic>
+    <handicaps>
+      <t1></t1>
+
+    </handicaps>
+    <mhhistory>
+     <mhtdata>
+      <where></where>
+      <type>MH / In Patient</type>
+      <when>09/04/2001</when>
+      <howlong></howlong>
+      <reason></reason>
+     </mhtdata>
+      <suicide>
+       <attempts></attempts>
+       <last></last>
+       <family></family>
+       <firearms></firearms>
+       <noofselfharm></noofselfharm>
+      </suicide>
+
+    </mhhistory>
+    <substancehistory>
+     <timesperday></timesperday>
+     <history>I have not been intoxicated. I did not use alcohol in last 30 days.</history>
+       <usedalcohol></usedalcohol>
+     <nooftimes></nooftimes>
+     <currentdata><current>None</current></currentdata>
+     <historyofivdrug>
+      <history>No</history>
+      <noofdrug></noofdrug>
+     </historyofivdrug>
+
+    </substancehistory>
+    <craftscreen>
+     <t1></t1>
+     <t2></t2>
+     <t3></t3>
+     <t4></t4>
+     <t5></t5>
+     <t6></t6>
+     <t7>No</t7>
+
+    </craftscreen>
+    <sat>
+     <satdatahdr>
+      <total>0</total>
+      <detox>0</detox>
+     </satdatahdr>
+     <sat2datahdr>
+      <total>0</total>
+      <detox>0</detox>
+     </sat2datahdr>
+
+    </sat>
+    <familyhistorydrug>
+     <prenatal>No</prenatal>
+     <substanceabuse><name>None</name></substanceabuse>
+     <psychproblems><name>None</name></psychproblems>
+     <orientation> </orientation>
+
+    </familyhistorydrug>
+    <gambling>
+     <t1></t1>
+     <t2></t2>
+     <t3></t3>
+     <t4></t4>
+     <t5></t5>
+     <t7></t7>
+     <t8></t8>
+     <t9></t9>
+     <t10></t10>
+     <t11></t11>
+     <t12></t12>
+     <t13></t13>
+     <t14></t14>
+     <t15></t15>
+     <t16></t16>
+     <t17></t17>
+     <t18></t18>
+     <t19></t19>
+     <t20></t20>
+     <t21></t21>
+     <t22></t22>
+     <t23></t23>
+     <t24></t24>
+     <t25></t25>
+     <t26></t26>
+     <history></history>
+     <description></description>
+
+    </gambling>
+    <traumaques>
+     <traumaques></traumaques>
+    <Table>
+    <Row>
+     <office></office>
+     <office></office>
+     <office></office>
+    </Row>
+    <Row>
+     <office></office>
+     <office></office>
+     <office></office>
+    </Row>
+    <Row>
+     <office></office>
+     <office></office>
+     <office></office>
+    </Row>
+    <Row>
+     <office></office>
+     <office></office>
+     <office></office>
+    </Row>
+    <Row>
+     <office></office>
+     <office></office>
+     <office></office>
+    </Row>
+    <Row><office></office></Row>
+    <Row>
+     <office></office>
+     <office></office>
+     <office></office>
+    </Row>
+    <Row><office></office></Row>
+    <Row>
+     <office></office>
+     <office></office>
+     <office></office>
+    </Row>
+    <Row><office></office></Row>
+    <Row>
+     <office></office>
+     <office></office>
+     <office></office>
+    </Row>
+    <Row>
+     <office></office>
+     <office></office>
+     <office></office>
+    </Row>
+    <Row><office></office></Row>
+    <Row>
+     <office></office>
+     <office></office>
+     <office></office>
+    </Row>
+    <Row><office></office></Row>
+    <Row>
+     <office></office>
+     <office></office>
+     <office></office>
+    </Row>
+    <Row><office></office></Row>
+    <Row>
+     <office></office>
+     <office></office>
+     <office></office>
+    </Row>
+    <Row><office></office></Row>
+    <Row>
+     <office></office>
+     <office></office>
+     <office></office>
+    </Row>
+    <Row><office></office></Row>
+    <Row>
+     <office></office>
+     <office></office>
+     <office></office>
+    </Row>
+    <Row><office></office></Row>
+    <Row>
+     <office></office>
+     <office></office>
+     <office></office>
+    </Row>
+    <Row><office></office></Row>
+    <Row>
+     <office></office>
+     <office></office>
+     <office></office>
+    </Row>
+    <Row><office></office></Row>
+    <Row>
+     <office></office>
+     <office></office>
+     <office></office>
+    </Row>
+    <Row><office></office></Row>
+    <Row>
+     <office></office>
+     <office></office>
+     <office></office>
+    </Row>
+    <Row><office></office></Row>
+    <Row>
+     <office></office>
+     <office></office>
+     <office></office>
+    </Row>
+    <Row><office></office></Row>
+    <Row>
+     <office></office>
+     <office></office>
+     <office></office>
+    </Row>
+    <Row>
+     <office></office>
+     <office></office>
+     <office></office>
+    </Row>
+    <Row>
+     <office></office>
+     <office></office>
+     <office></office>
+    </Row>
+    <Row>
+     <office></office>
+     <office></office>
+     <office></office>
+    </Row>
+    <Row>
+     <office></office>
+     <office></office>
+     <office></office>
+    </Row>
+    <Row><office></office></Row>
+    </Table>
+
+    </traumaques>
+    <violent>
+     <violentdata><name>None</name></violentdata>
+     <battered></battered>
+     <witnessed></witnessed>
+
+    </violent>
+    <trauma>
+
+    </trauma>
+    <familyhistory>
+     <fhdata>
+      <marstat></marstat>
+      <length>unanswered</length>
+      <number></number>
+      <RelHistory></RelHistory>
+      <sigother>None</sigother>
+     </fhdata>
+
+    </familyhistory>
+    <familyrelations>
+     <frdata>
+      <cfs></cfs>
+      <description></description>
+      <parents></parents>
+      <lived>  </lived>
+      <length></length>
+      <usual></usual>
+      <discipline></discipline>
+      <punishment></punishment>
+     </frdata>
+
+    </familyrelations>
+    <familysiblings>
+     <fsdata><name>None</name></fsdata>
+
+    </familysiblings>
+    <currentliving>
+     <type></type>
+     <outofhome>None</outofhome>
+     <placement>Not in out-of-home treatment</placement>
+     <admit> </admit>
+     <level></level>
+     <ppos>No</ppos>     <placements></placements>
+     <past90days></past90days>
+     <correctional></correctional>
+      <chronic></chronic>
+      <frequent></frequent>
+
+    </currentliving>
+    <familyinhome>
+     <fidata><name>None</name></fidata>
+     <arrangement>
+      <usual></usual>
+      <satisfied></satisfied>
+     </arrangement>
+
+    </familyinhome>
+    <resources>
+     <income><source>None Reported</source></income>
+     <total>
+      <totalsource></totalsource>
+      <totallast>0.00</totallast>
+      <totalyearly>0.00</totalyearly>
+     </total>
+     <number></number>
+     <able></able>
+     <concerns>
+      <t1></t1>
+      <t2></t2>
+      <t3></t3>
+      <t4></t4>
+      <t5></t5>
+      <t6></t6>
+      <t7></t7>
+     </concerns>
+     <currentsupport>
+      <receives> Inactive</receives>
+      <active></active>
+      <constitutes></constitutes>
+      <family></family>
+      <employer></employer>
+      <church></church>
+      <selfhelp></selfhelp>
+      <days></days>
+     </currentsupport>
+
+    </resources>
+    <legal>
+     <legalinfo>
+      <status></status>
+      <county></county>
+      <custody></custody>
+      <jolts> </jolts>
+      <probation></probation>
+      <caseworker></caseworker>
+      <workphn></workphn>
+      <cellphn></cellphn>
+      <arrests></arrests>
+      <last30days></last30days>
+     </legalinfo>
+     <legalhistory>
+      <lhdata><date>None Reported</date></lhdata>
+     </legalhistory>
+
+    </legal>
+    <cultural>
+     <ethnicity>
+      <origin></origin>
+      <tribal></tribal>
+     </ethnicity>
+     <traditional></traditional>
+     <gang></gang>
+     <gangvalues></gangvalues>
+     <other></other>
+     <othervalues></othervalues>
+     <unique></unique>
+     <important></important>
+
+    </cultural>
+    <language>
+     <lang>
+      <primary>English</primary>
+      <secondary></secondary>
+      <reads></reads>
+      <writes></writes>
+      <speaks></speaks>
+     </lang>
+     <detailed>Client is a poor historian</detailed>
+
+    </language>
+    <religion>
+     <population></population>
+     <clientprefers></clientprefers>
+     <clientsees></clientsees>
+     <clientfeels>No</clientfeels>
+     <howclientfeel></howclientfeel>
+     <meaninggod></meaninggod>
+     <churchchild></churchchild>
+     <religionchild></religionchild>
+     <churchnow></churchnow>
+     <religionnow></religionnow>
+     <clientbehav></clientbehav>
+     <clientexp>No</clientexp>
+     <howclientexp></howclientexp>
+
+    </religion>
+    <leisure>
+     <recreational>
+      <freetime></freetime>
+      <satisfied></satisfied>
+      <closefriends></closefriends>
+     </recreational>
+     <interests></interests>
+     <preferred></preferred>
+
+    </leisure>
+    <eduhistory>
+     <attainment>
+      <highest></highest>
+      <repeated> </repeated>
+      <lastschool></lastschool>
+      <district></district>
+      <number></number>
+      <subjectsliked></subjectsliked>
+      <subjectsdisliked></subjectsdisliked>
+     </attainment>
+     <learning>
+      <ability></ability>
+      <iqscore></iqscore>
+     </learning>
+     <daycare>
+      <past90days></past90days>
+     </daycare>
+
+    </eduhistory>
+    <education>
+     <school>
+      <status></status>
+      <gpa> </gpa>
+      <special></special>
+      <iep></iep>
+      <spedtime></spedtime>
+      <spedgrade></spedgrade>
+     </school>
+     <absent></absent>
+     <suspended></suspended>
+     <collaboration></collaboration>
+
+    </education>
+    <vochistory>
+     <employment>
+      <status></status>
+      <type></type>
+      <lastwork></lastwork>
+      <length></length>
+      <last> </last>
+      <typework></typework>
+      <skills></skills>
+     </employment>
+      <branch></branch>
+      <discharge></discharge>
+      <relatives></relatives>
+
+    </vochistory>
+    <functionlevel>
+     <stressors></stressors>
+     <level>Limited by behaviors</level>
+
+    </functionlevel>
+    <msexam>
+     <physical>
+      <t1>Same as stated age</t1>
+      <t2>Appropriate</t2>
+      <t3>Good</t3>
+      <t4>Height/Weight Appropriate</t4>
+      <t5>None Reported</t5>
+     </physical>
+     <interviewbehavior>
+      <t1>Normal</t1>
+      <t2>Normal and Responsive</t2>
+     </interviewbehavior>
+     <motoractivity>
+      <t1>Right leg weakness</t1>
+      <t2>Slowed</t2>
+     </motoractivity>
+     <speech>
+      <t1>Normal</t1>
+      <t2>Normal</t2>
+      <t3>None Reported</t3>
+     </speech>
+     <iprelation>
+      <t1>Appropriate</t1>
+      <t2>Appropriate/Congruent</t2>
+      <t3>Calm</t3>
+      <t4>Circumstantial; Distracted; Incoherent; Loose; Tangential</t4>
+      <t5>Not Reported</t5>
+      <t6>Not Reported</t6>
+      <t7>Not Reported</t7>
+      <t8>Alert</t8>
+      <t9>Oriented to Person Only</t9>
+      <t10>Severely Impaired</t10>
+      <t11>Immediate memory Deficit</t11>
+      <t12>Above Average</t12>
+      <t13></t13>
+      <t14>Impaired</t14>
+      <t15>Impaired/Requires Custodian</t15>
+      <t16></t16>
+     </iprelation>
+
+    </msexam>
+    <diagnoses>
+     <conclusions>
+     </conclusions>
+     <axis11></axis11>
+     <axis12></axis12>
+     <axis13></axis13>
+     <axis21></axis21>
+     <axis22></axis22>
+     <axis3></axis3>
+     <axis4></axis4>
+     <axis51></axis51>
+     <axis52></axis52>
+
+    </diagnoses>
+    <summary>
+     <preferences></preferences>
+     <goal></goal>
+     <stage></stage>
+
+    </summary>
+    <isummary>Dx Impression ; 290.0 Dementia of the Alxheimre&#x27;s Type, w/late onset, uncomplicated, w/Behavioral distrubance.  Nursing staff report and records support increase inlevel of &#38; freq of agiation/aggression since decrease of Seroquel on 08/09/02.  Client exhibits few symptoms of depression.  May wish to D/C Remeron, stay use of Lorazepam on a trial basis &#38; observe for effect on stability &#38; falling.  reinstating previous Seroquel dose may reverse increasing trend of freq of agitation.  Will monitor &#38; follow.</isummary>
+
+    <recommendations>
+     <recommend>
+      <levelofcare></levelofcare>
+      <servicefocus></servicefocus>
+     </recommend>
+     <services></services>
+     <referrals>None</referrals>
+
+    </recommendations>
+    <completedby>Sample, Provider /  #pending / LCSW  / (353) 2002-09-19</completedby>
+
+   </Page1>
+
+</TopmostSubform>
+</xfa:data>
+</xfa:datasets>
+<pdf href="http://forms.okmis.com/printing/PrintIntake_Rev3.pdf" xmlns="http://ns.adobe.com/xdp/pdf/" />
+</xdp:xdp>

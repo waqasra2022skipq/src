@@ -1,0 +1,133 @@
+%!PS-Adobe-2.0
+%%Creator: mostly vi :-)
+
+/inches { 72 mul } def
+/TM 96 def
+/TMy 72 11 mul TM sub def
+/LM 72 2 div def
+/RM 72 2 div def
+% Upper Left origin point for all positioning
+/ULOrigin { LM PageHeight TM sub } def
+/ULOriginX { ULOrigin pop } def
+/ULOriginY { ULOrigin exch pop } def
+/BodyLeftEdge { ULOriginX 6 add } def
+/RMx 8.5 inches RM sub def
+/PageWidth 612 def
+/PageHeight 792 def
+/CurrentX { currentpoint pop } def
+/CurrentY { currentpoint exch pop } def
+/inches { 72 mul } def
+/CBSize { 8 8 } def
+/Header /Times-Bold findfont 13 scalefont def
+/SubHeader /Times-Bold findfont 10 scalefont def
+/Body /Times findfont 12 scalefont def
+/BodyItalic /Times-Italic findfont 12 scalefont def
+/BodyCaps /Times findfont 11.5 scalefont def
+
+/=space { =only ( ) =only } bind def
+
+% =show - show a string and then print the string & current point to stdout
+/=show { % string => ---
+dup show =space currentpoint exch =space =
+} bind def
+
+% reportPos - report current position and label
+/reportPos { % LabelString => ---
+  =space currentpoint exch =space =
+} bind def
+
+% uline - draw an underline length long 2 points below current y
+%         after call current point will be (original crnt pt) + (length, 0)
+/uline { % length => ---
+  0 -2 rmoveto 0 rlineto currentpoint stroke 2 add moveto
+} bind def
+
+% uline-eol - draw underline to RMx - 6
+/uline-eol { % --- => ---
+  0 -2 rmoveto RMx 6 sub CurrentY lineto stroke
+} bind def
+
+% uscoreShow - set an underscore matching string 1 point below currentpoint
+%              after call currentpoint will be original currentpoint
+/uscoreShow { % string => ---
+  currentpoint 
+    0 -1 rmoveto 2 index stringwidth pop 0 rlineto 
+    stroke
+    moveto
+    show
+} bind def
+
+% box - draw a rectangle in current line settings
+% x,y is origin
+/box  % stack: x y width height => ---
+{ newpath 4 2 roll moveto
+  1 index 0 rlineto
+  0 exch neg rlineto
+  neg 0 rlineto
+  closepath
+  stroke
+} def
+
+% =boxOnLineR - draw a rectangle in current line settings starting at baseline
+%               add label on right with 6 point space in current font
+%               describe it to stdout
+%               x,y is lower-left origin
+/=boxOnLineR {% stack: label x y width height => ---
+  4 index =only (: ) =only 3 index =space 2 index =
+  3 index 2 index 6 add add  % x position of label
+  3 index 6 2 roll
+  boxOnLine
+  moveto show
+} bind def
+
+% boxOnLine - draw a rectangle in current line settings starting at baseline
+% x,y is origin
+/boxOnLine {% stack: x y width height => ---
+  newpath
+  4 2 roll moveto
+  dup 0 exch rlineto  
+  exch dup 0 rlineto exch
+  pop neg 0 exch rlineto
+  closepath
+  stroke
+} def
+
+% llcb - left-labeled check box
+% x,y is coord of checkbox
+/llcb  % stack: string x y => ---
+{ newpath moveto
+  -4 0 rmoveto
+  dup stringwidth pop
+  neg 0 rmoveto
+  show
+  4 0 rmoveto
+  1 setlinewidth
+  0 9 rlineto
+  9 0 rlineto
+  0 -9 rlineto
+  closepath
+  stroke
+} def
+
+% rlcb - right-labeled check box
+% x,y is coord of checkbox
+/rlcb  % stack: string x y => ---
+{ newpath moveto
+  1 setlinewidth
+  0 9 rlineto
+  9 0 rlineto
+  0 -9 rlineto
+  closepath
+  13 0 rmoveto
+  show
+  stroke
+} def
+
+% page centered show
+/cshow  % stack: y string => ---
+{ dup stringwidth pop
+  2 div neg 306 add  % calc x coord
+  3 -1 roll  % move y coord to top
+  moveto
+  show
+} def 

@@ -1,0 +1,130 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use DBA;
+#use strict;
+use XML::Parser;
+###################################################################
+# takes 2 arguments: DBNAME and file
+# updates the ClientMeds table from xml file
+#   see <Table> end
+###################################################################
+my $form = DBForm->new();
+my $dbh = $form->dbconnect();
+my $file = $form->{file};
+print qq|file=$file\n|;
+
+my $parser = XML::Parser->new(
+ Handlers =>
+ {
+   Init =>    \&handle_xml_start,
+   Final =>   \&handle_xml_end,
+   Start =>   \&handle_elem_start,
+   End =>     \&handle_elem_end,
+   Char =>    \&handle_char_data,
+ }                           );
+# globals variables...
+my $element;           # points to a hash of element contents
+my $element_name;      # name of current element
+#
+# read in the data and run the parser on it
+#
+print qq|parseNewCrop: file=$file\n|;
+if( $file )
+{ $parser->parsefile( $file ); }
+else
+{
+    my $input = "";
+    while( <STDIN> ) { $input .= $_; }
+    $parser->parse( $input );
+}
+$form->complete();
+exit;
+###################################################################
+###
+### Handlers
+###
+#
+# As processing starts, output the beginning of an HTML file.
+# 
+sub handle_xml_start
+{
+  print "xml_start\n";
+}
+#
+# save element name and attributes
+#
+sub handle_elem_start
+{
+  my( $obj, $name, %atts ) = @_;
+#print "handle_elem_start: name=$name, atts=$atts\n";
+  $element_name = $name;
+  if( $name eq 'Table' )
+  {
+    print qq|found start: <Table>\n|;
+    $element = {};
+  }
+} 
+# collect character data into the recent element's buffer
+#
+sub handle_char_data
+{
+  my( $obj, $data ) = @_;
+#print "handle_char_data: data=$data\n";
+  return if $data =~ /^\s*$/;
+
+  # Perform some minimal entitizing of naughty characters
+#  $data =~ s/\r//g;               # carriage return
+#  $data =~ s/\n/ /g;              # new line
+#  $data =~ s/\t/ /g;              # tab to space
+#  $data =~ s// /g;              # new line
+  $element->{ $element_name } .= $data;
+}
+#
+# if this is an <Table>, collect all the data into a element
+#
+sub handle_elem_end
+{
+  my( $obj, $name ) = @_;
+#print "handle_elem_end: name=$name\n";
+  if( $name eq 'Table' )
+  {
+    print qq|found end: <Table>\n|;
+    #&prt;
+    my $ClientMedsFields = ();
+    my $sf = $dbh->prepare("show fields from ClientMeds");
+    $sf->execute() || $form->dberror("show fields");
+    while ( my $flds = $sf->fetchrow_hashref )
+    { $ClientMedsFields->{$flds->{'Field'}} = 1; }   # save the field name }
+    $sf->finish();
+    my $r = $element;
+    ($DB,$r->{'ClientID'}) = split('-',$r->{'ExternalPatientID'},2);
+    $r->{'Active'} = 1;        # these are the active meds only
+    print qq|form: DBNAME=$form->{DBNAME}, file: DB=${DB}, ClientID: $r->{ClientID}\n|;
+    foreach my $f ( sort keys %{$r} )
+    { unless ( $ClientMedsFields->{$f} ) { my $l = length($r->{$f}); delete $r->{$f}; print qq|delete Field=$f (length${l})\n|; } }
+    my $ID = DBA->doUpdate($form,'ClientMeds',$r,"ClientID='$r->{ClientID}' and PrescriptionGuid='$r->{PrescriptionGuid}'");
+# set the Create values because not set in doUpdate.
+    my $sClientMeds = $dbh->prepare("update ClientMeds set CreateDate='$form->{TODAY}',CreateProvID='$form->{LOGINPROVID}' where ClientID=? and CreateDate is NULL");
+    $sClientMeds->execute($r->{ClientID}) || $form->dberror("update ClientMeds $r->{ClientID}");
+    $sClientMeds->finish();
+print qq|update ClientMeds ID=$ID, DateMovedToPreviousMedications=$r->{DateMovedToPreviousMedications}\n|;
+  }
+}
+#
+# Output the close of the file at the end of processing.
+#
+sub handle_xml_end
+{
+  print qq|xml_end\n|;
+}
+sub prt
+{
+  foreach my $f ( sort( keys( %{ $element } )))
+  {
+    print qq|element: ${f}=$element->{$f}=\n|;
+#    foreach my $a ( sort keys %{ $element->{$f} } )
+#    { print qq|element: ${f}-${a}=$element->{$f}->{$a}=\n|; }
+  }
+}

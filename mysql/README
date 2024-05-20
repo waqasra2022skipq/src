@@ -1,0 +1,39 @@
+service mysqld [start|stop|restart]
+
+check open mysql processes...
+mysqladmin processlist
+
+
+mysql> kill Id; (Id from processlist)
+
+interserver suggest...
+mysqlcheck --all-databases --fast --silent
+also: JOHN ran
+ 2863 ?        Ss     0:00  \_ sshd: root@pts/1
+ 2867 pts/1    Ss     0:00      \_ -bash
+ 3208 pts/1    S+     0:00          \_ /bin/sh /admin/mycheck repair
+ 3210 pts/1    S+     0:00              \_ /usr/bin/mysqlcheck --all-databases --silent --repair
+
+
+FLUSH/flush tables;
+FLUSH/flush local tables;
+
+
+to optimize table for utf... for moodle emogies
+https://mathiasbynens.be/notes/mysql-utf8mb4
+in the my.cnf files...
+[client]
+default-character-set = utf8mb4
+
+[mysql]
+default-character-set = utf8mb4
+
+[mysqld]
+character-set-client-handshake = FALSE
+character-set-server = utf8mb4
+collation-server = utf8mb4_unicode_ci
+
+then...
+mysql> SHOW VARIABLES WHERE Variable_name LIKE 'character\_set\_%' OR Variable_name LIKE 'collation%';
+$ mysqlcheck -u root -p --auto-repair --optimize --all-databases
+

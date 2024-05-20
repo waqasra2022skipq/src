@@ -1,0 +1,32 @@
+#!/usr/bin/perl
+use XML::LibXML;
+
+my $dom = XML::LibXML->load_xml( IO => \*DATA );
+
+for my $node ( $dom->findnodes('//*[local-name()="model"]') ) {
+    my $mh   = $node->findvalue('*[local-name()="mh"]');
+    my $attr = $node->findvalue('*[local-name()="attribute"]');
+
+    print "mh = $mh, attr = $attr\n";
+}
+
+__DATA__
+<root xmlns="http://www.ca.com/spectrum/restful/schema/response">
+  <error>EndOfResults</error>
+  <throttle>86</throttle>
+  <total-models>86</total-models>
+  <model-responses>
+    <model>
+      <mh>0x100540</mh>
+      <attribute id="0x1006e">wltvbswfc02</attribute>
+    </model>
+    <model>
+      <mh>0x100c80</mh>
+      <attribute id="0x1006e">wltvsutm1ds02</attribute>
+    </model>
+    <model>
+      <mh>0x100c49</mh>
+      <attribute id="0x1006e">wltvsdora03</attribute>
+    </model>
+  </model-responses>
+</root>

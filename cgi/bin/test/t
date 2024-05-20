@@ -1,0 +1,37 @@
+
+  elsif ( $r->{'Type'} == 2 )                           # physician
+  {
+    my $dlm = '';
+    my $notetext = '';
+    if ( $rNote->{'Maladaptive'} )
+    {
+      $notetext .= qq|${dlm}1. The need to manage maladaptive communication (related to, e.g., high anxiety, high reactivity, repeated questions, or disagreement) among participants that complicates delivery of care.|;
+      $dlm = "\n";
+    }
+    if ( $rNote->{'Interfere'} )
+    {
+      $notetext .= qq|${dlm}2. Caregiver emotions or behaviors that interfere with implementation of the treatment plan.|;
+      $dlm = "\n";
+    }
+    if ( $rNote->{'Sentinel'} )
+    {
+      $notetext .= qq|${dlm}3. Evidence or disclosure of a sentinel event and mandated report to a third party (e.g., abuse or neglect with report to state agency) with initiation of discussion of the sentinel event and/or report with patient and other visit participants.|;
+      $dlm = "\n";
+    }
+    if ( $rNote->{'PlayOvercome'} )
+    {
+      $notetext .= qq|${dlm}4. Use of play equipment, physical devices, interpreter or translator to overcome barriers to diagnostic or therapeutic interaction with a patient who is not fluent in the same language or who has not developed or lost expressive or receptive language skills to use or understand typical language|;
+      $dlm = "\n";
+    }
+    #$out .= $self->getParticipants($rNote->{TrID});
+    $notetext .= qq|($rNote->{RefReason}).qq|</ReferralReason>\n|;
+    $notetext .= qq|($rNote->{RefDetail}).qq|</ReferralDetail>\n|;
+    $notetext .= qq|($rNote->{Complaint}).qq|</ChiefComplaint>\n|;
+    $notetext .= qq|($rNote->{Concerns}).qq|</HealthConcern>\n|;
+    $notetext .= qq|($rNote->{PresentHistory}).qq|</IllnessHistory>\n|;
+    $notetext .= qq|($rNote->{SocialHistory}).qq|</PastHistory>\n|;
+    $notetext .= qq|($rNote->{Review}).qq|</RevSystem>\n|;
+    $notetext .= qq|($rNote->{Findings}).qq|</ObjFindings>\n|;
+    $notetext .= qq|notetext .= qq|      <ptext>|.DBA->getxref($form,'xProgress',$rNote->{Progress},'Descr').qq|</ptext>\n|;
+    $notetext .= qq|($rNote->{'ProgEvidence'}).qq|</progress>\n|;
+  }

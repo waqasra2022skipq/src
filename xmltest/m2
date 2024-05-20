@@ -1,0 +1,30 @@
+#!/usr/bin/perl --
+use strict; use warnings;
+use XML::LibXML;
+
+my $filepath = 'me';
+  my $docfile = '';
+# load_xml: initializes the parser and parse_file()
+  eval { $docfile = XML::LibXML->load_xml(location => $filepath); };
+  return('parse_error') if ( $@ );
+
+for my $name ( $docfile->findnodes( q{//*[local-name()="name"]/@name} ) ) {
+    printf "%-25s %s %s\n", $name->nodePath, $name->nodeValue, $name->to_literal;
+}
+print "\n\n";
+for my $name ( $docfile->findnodes( q{//*[local-name()="name"]} ) ) {
+    printf "%-25s %s\n", $name->nodePath, $name->to_literal;
+}
+print "\n\n";
+
+for my $node ( $docfile->findnodes( q{//*[name()="patient"]} ) ) {
+    print "@{[ $node->nodePath ]}\n";
+## any children    ## ./*
+## any descendants ## .//*
+## anywhere        ## //*
+    for my $name ( $node->findnodes( q{./*[local-name()="name"]/@name} ) ) {
+  (my $city = $name->textContent) =~ s/^\s*(.*?)\s*$/$1/g;
+        printf "%-25s %s\n", $name->nodePath, $name->nodeValue, $name->to_literal;
+    }
+    print "\n\n";
+}

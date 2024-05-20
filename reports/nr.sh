@@ -1,0 +1,1 @@
+./noteReport DBNAME=okmis_mms\&Type=inprocess\&hdrline=\&Active=\&CQM=\&CustAgency=\&Days=\&Folder=\&Format=Extended\&InsCode=\&sYearMonth=\&ReportDescr=\&xtable=\&submit=1\&output=ss\&ClinicIDs=\&InsID=\&ProvIDs=\&ClientIDs=\&FromDate=2019-10-23\&ToDate=2019-11-22\&daterange=

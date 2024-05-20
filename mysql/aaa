@@ -1,0 +1,2 @@
+INSERT INTO `db` VALUES ('localhost','AMSReport','okmis','Y','Y','Y','Y','Y','Y','N','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y');
+FLUSH PRIVILEGES;

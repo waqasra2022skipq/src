@@ -1,0 +1,7 @@
+select Client.LName as Client, Client.FName, Client.ClientID, Provider.LName as Designated, Provider.FName as Provider
+ from Insurance
+  left join Provider on Provider.ProvID=Insurance.DesigProvID
+  left join Client on Client.ClientID=Insurance.ClientID
+ where Insurance.DesigProvID is not null
+   and Client.Active=1
+ order by Client.LName,Client.FName

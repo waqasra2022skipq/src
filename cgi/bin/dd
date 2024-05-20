@@ -1,0 +1,3 @@
+1215: /home/okmis/mis/src/cgi/bin/printClientPrAuth.cgi: PDFlib Exception occurred:
+1215: PDFlib Error [2126] resume_page: Page number 1 has not been suspended at /usr/local/share/perl5/PDFlib/PDFlib.pm line 1476.
+1215:  at /home/okmis/mis/src/cgi/bin/printClientPrAuth.cgi line 981.

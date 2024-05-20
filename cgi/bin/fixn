@@ -1,0 +1,4 @@
+mv printNotes.pl in.pl
+tr -d '\r' < in.pl > printNotes.pl
+chmod 755 printNotes.pl
+chown root:adm printNotes.pl

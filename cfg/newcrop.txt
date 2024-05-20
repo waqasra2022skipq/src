@@ -1,0 +1,882 @@
+                        CreateDate: 2017-08-23
+                  PrescriptionDate: 2016-08-02 14:14:40
+                            DrugID: 451599
+                          DrugName: Wellbutrin XL
+                  PrescriptionGuid: fd6853b2-56f6-45a0-80cf-1b6f710b38c3
+                         OrderGUID: e2c27e42-61df-4276-9f7d-9a7160bf97b8
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: fd6853b2-56f6-45a0-80cf-1b6f710b38c3
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 993545
+            SourcePrescriptionGuid: 00000000-0000-0000-0000-000000000000
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: NULL
+                              
+                        CreateDate: 2017-08-23
+                  PrescriptionDate: 2016-08-02 14:14:40
+                            DrugID: 451600
+                          DrugName: Wellbutrin XL
+                  PrescriptionGuid: 00b68814-abff-4598-b7ed-63ccd648b3be
+                         OrderGUID: e2c27e42-61df-4276-9f7d-9a7160bf97b8
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: 00b68814-abff-4598-b7ed-63ccd648b3be
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 993564
+            SourcePrescriptionGuid: 00000000-0000-0000-0000-000000000000
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: NULL
+                              
+                        CreateDate: 2017-08-23
+                  PrescriptionDate: 2016-08-02 14:14:40
+                            DrugID: 176033
+                          DrugName: doxepin
+                  PrescriptionGuid: 1335320d-dff1-4fc4-bb37-4646308c410f
+                         OrderGUID: e2c27e42-61df-4276-9f7d-9a7160bf97b8
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: 1335320d-dff1-4fc4-bb37-4646308c410f
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 1000070
+            SourcePrescriptionGuid: 00000000-0000-0000-0000-000000000000
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: NULL
+                              
+                        CreateDate: 2017-08-23
+                  PrescriptionDate: 2016-08-02 14:14:40
+                            DrugID: 298900
+                          DrugName: buspirone
+                  PrescriptionGuid: 9e7f2335-fbe5-45d3-b0c0-32900228e7ae
+                         OrderGUID: e2c27e42-61df-4276-9f7d-9a7160bf97b8
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: 9e7f2335-fbe5-45d3-b0c0-32900228e7ae
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 866018
+            SourcePrescriptionGuid: 00000000-0000-0000-0000-000000000000
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: NULL
+                              
+                        CreateDate: 2017-08-23
+                  PrescriptionDate: 2016-08-24 13:56:57
+                            DrugID: 451600
+                          DrugName: Wellbutrin XL
+                  PrescriptionGuid: 411dceb8-8a06-4817-b3cc-27d2972263dd
+                         OrderGUID: c474f30e-64b7-4bb5-9da9-273aba055500
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: 411dceb8-8a06-4817-b3cc-27d2972263dd
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 993564
+            SourcePrescriptionGuid: 00b68814-abff-4598-b7ed-63ccd648b3be
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: NULL
+                              
+                        CreateDate: 2017-08-23
+                  PrescriptionDate: 2016-08-24 13:56:57
+                            DrugID: 451599
+                          DrugName: Wellbutrin XL
+                  PrescriptionGuid: 589b96fc-ec55-482f-bb14-aab2daaf0855
+                         OrderGUID: c474f30e-64b7-4bb5-9da9-273aba055500
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: 589b96fc-ec55-482f-bb14-aab2daaf0855
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 993545
+            SourcePrescriptionGuid: fd6853b2-56f6-45a0-80cf-1b6f710b38c3
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: NULL
+                              
+                        CreateDate: 2017-08-23
+                  PrescriptionDate: 2016-08-24 13:56:57
+                            DrugID: 298900
+                          DrugName: buspirone
+                  PrescriptionGuid: 1f593348-ae52-4745-a5d6-027e883932b0
+                         OrderGUID: c474f30e-64b7-4bb5-9da9-273aba055500
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: 1f593348-ae52-4745-a5d6-027e883932b0
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 866018
+            SourcePrescriptionGuid: 9e7f2335-fbe5-45d3-b0c0-32900228e7ae
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: NULL
+                              
+                        CreateDate: 2017-08-23
+                  PrescriptionDate: 2016-08-24 13:56:57
+                            DrugID: 176033
+                          DrugName: doxepin
+                  PrescriptionGuid: 77a8b82f-3f00-4c28-856c-9c1274b0a5ba
+                         OrderGUID: c474f30e-64b7-4bb5-9da9-273aba055500
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: 77a8b82f-3f00-4c28-856c-9c1274b0a5ba
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 1000070
+            SourcePrescriptionGuid: 1335320d-dff1-4fc4-bb37-4646308c410f
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: NULL
+                              
+                        CreateDate: 2017-08-23
+                  PrescriptionDate: 2016-08-24 13:58:04
+                            DrugID: 216465
+                          DrugName: Zyprexa
+                  PrescriptionGuid: 02f17971-8d18-4aea-a8ad-253bc1d1d4f7
+                         OrderGUID: 59c4dc77-77c5-4c05-88c6-fd5c7e66ea24
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: 02f17971-8d18-4aea-a8ad-253bc1d1d4f7
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 284514
+            SourcePrescriptionGuid: 00000000-0000-0000-0000-000000000000
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: NULL
+                              
+                        CreateDate: 2017-08-23
+                  PrescriptionDate: 2016-11-02 17:43:17
+                            DrugID: 216465
+                          DrugName: Zyprexa
+                  PrescriptionGuid: 57133c51-2932-4d6e-8f3d-0fb62626605f
+                         OrderGUID: 495e16ea-343d-40f8-97b9-35cc8a788e74
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: 57133c51-2932-4d6e-8f3d-0fb62626605f
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 284514
+            SourcePrescriptionGuid: 02f17971-8d18-4aea-a8ad-253bc1d1d4f7
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: NULL
+                              
+                        CreateDate: 2017-08-23
+                  PrescriptionDate: 2016-11-02 17:43:18
+                            DrugID: 216465
+                          DrugName: Zyprexa
+                  PrescriptionGuid: 93276e34-9c97-4bbb-812e-d55c264e3cc9
+                         OrderGUID: 495e16ea-343d-40f8-97b9-35cc8a788e74
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: 93276e34-9c97-4bbb-812e-d55c264e3cc9
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 284514
+            SourcePrescriptionGuid: 02f17971-8d18-4aea-a8ad-253bc1d1d4f7
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: okmis_mms-50877
+                              
+                        CreateDate: 2017-08-23
+                  PrescriptionDate: 2016-11-02 17:43:17
+                            DrugID: 451600
+                          DrugName: Wellbutrin XL
+                  PrescriptionGuid: ae97f655-e9b4-4226-91e9-c3d83e502226
+                         OrderGUID: 495e16ea-343d-40f8-97b9-35cc8a788e74
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: ae97f655-e9b4-4226-91e9-c3d83e502226
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 993564
+            SourcePrescriptionGuid: 411dceb8-8a06-4817-b3cc-27d2972263dd
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: NULL
+                              
+                        CreateDate: 2017-08-23
+                  PrescriptionDate: 2016-11-02 17:43:17
+                            DrugID: 451599
+                          DrugName: Wellbutrin XL
+                  PrescriptionGuid: d8fa665d-9107-4dd1-8f22-29ae43867d39
+                         OrderGUID: 495e16ea-343d-40f8-97b9-35cc8a788e74
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: d8fa665d-9107-4dd1-8f22-29ae43867d39
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 993545
+            SourcePrescriptionGuid: 589b96fc-ec55-482f-bb14-aab2daaf0855
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: NULL
+                              
+                        CreateDate: 2017-08-23
+                  PrescriptionDate: 2016-11-02 17:43:17
+                            DrugID: 298900
+                          DrugName: buspirone
+                  PrescriptionGuid: c608ddf6-a282-461d-91f2-6e7709fa0ea9
+                         OrderGUID: 495e16ea-343d-40f8-97b9-35cc8a788e74
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: c608ddf6-a282-461d-91f2-6e7709fa0ea9
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 866018
+            SourcePrescriptionGuid: 1f593348-ae52-4745-a5d6-027e883932b0
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: NULL
+                              
+                        CreateDate: 2017-08-23
+                  PrescriptionDate: 2016-11-02 17:43:17
+                            DrugID: 176033
+                          DrugName: doxepin
+                  PrescriptionGuid: f5863562-9501-4f51-82a9-47bce5d142c6
+                         OrderGUID: 495e16ea-343d-40f8-97b9-35cc8a788e74
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: f5863562-9501-4f51-82a9-47bce5d142c6
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 1000070
+            SourcePrescriptionGuid: 77a8b82f-3f00-4c28-856c-9c1274b0a5ba
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: NULL
+                              
+                        CreateDate: 2017-08-23
+                  PrescriptionDate: 2016-12-06 14:22:42
+                            DrugID: 216465
+                          DrugName: Zyprexa
+                  PrescriptionGuid: 574d708b-6750-404d-a828-f1cf8d613110
+                         OrderGUID: ec34aa4f-4395-4c38-aa3e-b0539cf649a9
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: 574d708b-6750-404d-a828-f1cf8d613110
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 284514
+            SourcePrescriptionGuid: 57133c51-2932-4d6e-8f3d-0fb62626605f
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: NULL
+                              
+                        CreateDate: 2017-08-23
+                  PrescriptionDate: 2016-12-06 14:22:42
+                            DrugID: 451600
+                          DrugName: Wellbutrin XL
+                  PrescriptionGuid: cf98c085-c167-4c42-8f1e-789cbaa60d6f
+                         OrderGUID: ec34aa4f-4395-4c38-aa3e-b0539cf649a9
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: cf98c085-c167-4c42-8f1e-789cbaa60d6f
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 993564
+            SourcePrescriptionGuid: ae97f655-e9b4-4226-91e9-c3d83e502226
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: NULL
+                              
+                        CreateDate: 2017-08-23
+                  PrescriptionDate: 2016-12-06 14:22:42
+                            DrugID: 298900
+                          DrugName: buspirone
+                  PrescriptionGuid: 884cedf8-ea2d-440a-8645-3a14dc6a3c4f
+                         OrderGUID: ec34aa4f-4395-4c38-aa3e-b0539cf649a9
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: 884cedf8-ea2d-440a-8645-3a14dc6a3c4f
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 866018
+            SourcePrescriptionGuid: c608ddf6-a282-461d-91f2-6e7709fa0ea9
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: okmis_mms-50877
+                              
+                        CreateDate: 2017-08-23
+                  PrescriptionDate: 2016-12-06 14:22:42
+                            DrugID: 176033
+                          DrugName: doxepin
+                  PrescriptionGuid: a9eb3b43-88c6-469a-aa43-ce78c49eb407
+                         OrderGUID: ec34aa4f-4395-4c38-aa3e-b0539cf649a9
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: a9eb3b43-88c6-469a-aa43-ce78c49eb407
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 1000070
+            SourcePrescriptionGuid: f5863562-9501-4f51-82a9-47bce5d142c6
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: NULL
+                              
+                        CreateDate: 2017-08-23
+                  PrescriptionDate: 2017-01-25 14:00:13
+                            DrugID: 216465
+                          DrugName: Zyprexa
+                  PrescriptionGuid: d4a3e88c-9846-4247-91b6-e2509d3c09cd
+                         OrderGUID: f1f08552-59c6-41f0-9f29-2b5c941a943c
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: d4a3e88c-9846-4247-91b6-e2509d3c09cd
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 284514
+            SourcePrescriptionGuid: 574d708b-6750-404d-a828-f1cf8d613110
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: NULL
+                              
+                        CreateDate: 2017-08-23
+                  PrescriptionDate: 2017-01-25 14:00:13
+                            DrugID: 451600
+                          DrugName: Wellbutrin XL
+                  PrescriptionGuid: aaf0d60a-58d4-4603-81d4-417fac509a80
+                         OrderGUID: f1f08552-59c6-41f0-9f29-2b5c941a943c
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: aaf0d60a-58d4-4603-81d4-417fac509a80
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 993564
+            SourcePrescriptionGuid: cf98c085-c167-4c42-8f1e-789cbaa60d6f
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: NULL
+                              
+                        CreateDate: 2017-08-23
+                  PrescriptionDate: 2017-01-25 14:00:13
+                            DrugID: 451599
+                          DrugName: Wellbutrin XL
+                  PrescriptionGuid: dc0d9c8a-1ecd-4be4-8401-d4f624319d2b
+                         OrderGUID: f1f08552-59c6-41f0-9f29-2b5c941a943c
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: dc0d9c8a-1ecd-4be4-8401-d4f624319d2b
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 993545
+            SourcePrescriptionGuid: d8fa665d-9107-4dd1-8f22-29ae43867d39
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: NULL
+                              
+                        CreateDate: 2017-08-23
+                  PrescriptionDate: 2017-01-25 14:00:13
+                            DrugID: 239455
+                          DrugName: buspirone
+                  PrescriptionGuid: b5ba335c-16dc-4729-ac80-10d96ff34e99
+                         OrderGUID: f1f08552-59c6-41f0-9f29-2b5c941a943c
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: b5ba335c-16dc-4729-ac80-10d96ff34e99
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 866090
+            SourcePrescriptionGuid: 00000000-0000-0000-0000-000000000000
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: NULL
+                              
+                        CreateDate: 2017-08-23
+                  PrescriptionDate: 2017-02-22 13:23:22
+                            DrugID: 216465
+                          DrugName: Zyprexa
+                  PrescriptionGuid: fd47ed0c-1208-4404-a480-6be1792437b6
+                         OrderGUID: ef3903a9-fe1d-4811-a4e0-7da8481b94e0
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: fd47ed0c-1208-4404-a480-6be1792437b6
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 284514
+            SourcePrescriptionGuid: d4a3e88c-9846-4247-91b6-e2509d3c09cd
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: NULL
+                              
+                        CreateDate: 2017-08-23
+                  PrescriptionDate: 2017-02-22 13:23:22
+                            DrugID: 451600
+                          DrugName: Wellbutrin XL
+                  PrescriptionGuid: 878eaab6-fd1b-437e-95b0-5e5025af3d11
+                         OrderGUID: ef3903a9-fe1d-4811-a4e0-7da8481b94e0
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: 878eaab6-fd1b-437e-95b0-5e5025af3d11
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 993564
+            SourcePrescriptionGuid: aaf0d60a-58d4-4603-81d4-417fac509a80
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: NULL
+                              
+                        CreateDate: 2017-08-23
+                  PrescriptionDate: 2017-02-22 13:23:23
+                            DrugID: 451599
+                          DrugName: Wellbutrin XL
+                  PrescriptionGuid: 152c2390-d15d-4a47-95b0-ad469ca73132
+                         OrderGUID: ef3903a9-fe1d-4811-a4e0-7da8481b94e0
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: 152c2390-d15d-4a47-95b0-ad469ca73132
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 993545
+            SourcePrescriptionGuid: dc0d9c8a-1ecd-4be4-8401-d4f624319d2b
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: okmis_mms-50877
+                              
+                        CreateDate: 2017-08-23
+                  PrescriptionDate: 2017-02-22 13:23:22
+                            DrugID: 239455
+                          DrugName: buspirone
+                  PrescriptionGuid: 4845fb3d-2874-4a6f-8112-f924b5eeb1fc
+                         OrderGUID: ef3903a9-fe1d-4811-a4e0-7da8481b94e0
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: 4845fb3d-2874-4a6f-8112-f924b5eeb1fc
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 866090
+            SourcePrescriptionGuid: b5ba335c-16dc-4729-ac80-10d96ff34e99
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: NULL
+                              
+                        CreateDate: 2017-08-23
+                  PrescriptionDate: 2017-02-22 13:23:22
+                            DrugID: 176033
+                          DrugName: doxepin
+                  PrescriptionGuid: f1eee143-f13a-47ea-95cb-41da5ac16869
+                         OrderGUID: ef3903a9-fe1d-4811-a4e0-7da8481b94e0
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: f1eee143-f13a-47ea-95cb-41da5ac16869
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 1000070
+            SourcePrescriptionGuid: a9eb3b43-88c6-469a-aa43-ce78c49eb407
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: NULL
+                              
+                        CreateDate: 2017-08-23
+                  PrescriptionDate: 2017-04-18 13:11:17
+                            DrugID: 176033
+                          DrugName: doxepin
+                  PrescriptionGuid: 15e25f0f-0fc0-462d-a06f-1cbeb2eced90
+                         OrderGUID: bb0bcdba-c6bc-4353-93bb-64043554c8bf
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: 15e25f0f-0fc0-462d-a06f-1cbeb2eced90
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 1000070
+            SourcePrescriptionGuid: f1eee143-f13a-47ea-95cb-41da5ac16869
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: okmis_mms-50877
+                              
+                        CreateDate: 2017-08-23
+                  PrescriptionDate: 2017-04-18 13:11:17
+                            DrugID: 216465
+                          DrugName: Zyprexa
+                  PrescriptionGuid: 99660978-86c2-4f1f-bd83-ef2b0273f8e3
+                         OrderGUID: bb0bcdba-c6bc-4353-93bb-64043554c8bf
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: 99660978-86c2-4f1f-bd83-ef2b0273f8e3
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 284514
+            SourcePrescriptionGuid: fd47ed0c-1208-4404-a480-6be1792437b6
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: okmis_mms-50877
+                              
+                        CreateDate: 2017-08-23
+                  PrescriptionDate: 2017-04-18 13:11:17
+                            DrugID: 239455
+                          DrugName: buspirone
+                  PrescriptionGuid: e5ca46dc-19bd-40eb-8a10-da0930096cff
+                         OrderGUID: bb0bcdba-c6bc-4353-93bb-64043554c8bf
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: e5ca46dc-19bd-40eb-8a10-da0930096cff
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 866090
+            SourcePrescriptionGuid: 4845fb3d-2874-4a6f-8112-f924b5eeb1fc
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: okmis_mms-50877
+                              
+                        CreateDate: 2017-08-23
+                  PrescriptionDate: 2017-04-18 13:11:17
+                            DrugID: 451600
+                          DrugName: Wellbutrin XL
+                  PrescriptionGuid: 6979ddc7-3369-453d-8320-0f225e15700a
+                         OrderGUID: bb0bcdba-c6bc-4353-93bb-64043554c8bf
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: 6979ddc7-3369-453d-8320-0f225e15700a
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 993564
+            SourcePrescriptionGuid: 878eaab6-fd1b-437e-95b0-5e5025af3d11
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: okmis_mms-50877
+                              
+                        CreateDate: 2017-08-23
+                  PrescriptionDate: 2017-06-14 13:58:52
+                            DrugID: 216465
+                          DrugName: Zyprexa
+                  PrescriptionGuid: 09fe1c39-b19c-4093-bcfa-5669a6fe3551
+                         OrderGUID: 67a6291c-2839-46b5-902e-ea947b919820
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: 09fe1c39-b19c-4093-bcfa-5669a6fe3551
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 284514
+            SourcePrescriptionGuid: 99660978-86c2-4f1f-bd83-ef2b0273f8e3
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: okmis_mms-50877
+                              
+                        CreateDate: 2017-08-23
+                  PrescriptionDate: 2017-06-14 13:58:52
+                            DrugID: 451600
+                          DrugName: Wellbutrin XL
+                  PrescriptionGuid: 9c961ee3-4787-4327-8107-69211f46ca1f
+                         OrderGUID: 67a6291c-2839-46b5-902e-ea947b919820
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: 9c961ee3-4787-4327-8107-69211f46ca1f
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 993564
+            SourcePrescriptionGuid: 6979ddc7-3369-453d-8320-0f225e15700a
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: okmis_mms-50877
+                              
+                        CreateDate: 2017-08-23
+                  PrescriptionDate: 2017-06-14 13:58:51
+                            DrugID: 239455
+                          DrugName: buspirone
+                  PrescriptionGuid: 9941e939-abd8-417c-aac6-cd87a39a29b6
+                         OrderGUID: 67a6291c-2839-46b5-902e-ea947b919820
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: 9941e939-abd8-417c-aac6-cd87a39a29b6
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 866090
+            SourcePrescriptionGuid: e5ca46dc-19bd-40eb-8a10-da0930096cff
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: okmis_mms-50877
+                              
+                        CreateDate: 2017-08-23
+                  PrescriptionDate: 2017-06-14 13:58:51
+                            DrugID: 176033
+                          DrugName: doxepin
+                  PrescriptionGuid: 823b3588-803f-4d00-b4b0-29f629c65bd0
+                         OrderGUID: 67a6291c-2839-46b5-902e-ea947b919820
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: 823b3588-803f-4d00-b4b0-29f629c65bd0
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 1000070
+            SourcePrescriptionGuid: 15e25f0f-0fc0-462d-a06f-1cbeb2eced90
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: okmis_mms-50877
+                              
+                        CreateDate: 2017-08-23
+                  PrescriptionDate: 2017-06-14 13:58:51
+                            DrugID: 451599
+                          DrugName: Wellbutrin XL
+                  PrescriptionGuid: 23a0cf6f-25b1-4fb8-a69e-01f235a82dac
+                         OrderGUID: 67a6291c-2839-46b5-902e-ea947b919820
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: 23a0cf6f-25b1-4fb8-a69e-01f235a82dac
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 993545
+            SourcePrescriptionGuid: 152c2390-d15d-4a47-95b0-ad469ca73132
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: okmis_mms-50877
+                              
+                        CreateDate: 2017-11-08
+                  PrescriptionDate: 2017-09-01 16:51:36
+                            DrugID: 216465
+                          DrugName: Zyprexa
+                  PrescriptionGuid: 1bc4f836-593e-45e2-bba3-6078ed66147f
+                         OrderGUID: 3ba45d23-ea52-4402-be5c-1efa1a17205d
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: 1bc4f836-593e-45e2-bba3-6078ed66147f
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 284514
+            SourcePrescriptionGuid: 09fe1c39-b19c-4093-bcfa-5669a6fe3551
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: okmis_mms-50877
+                              
+                        CreateDate: 2017-11-08
+                  PrescriptionDate: 2017-09-01 16:51:35
+                            DrugID: 451600
+                          DrugName: Wellbutrin XL
+                  PrescriptionGuid: 015e45df-a87a-467a-ba26-515dd7a36a3f
+                         OrderGUID: 3ba45d23-ea52-4402-be5c-1efa1a17205d
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: 015e45df-a87a-467a-ba26-515dd7a36a3f
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 993564
+            SourcePrescriptionGuid: 9c961ee3-4787-4327-8107-69211f46ca1f
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: okmis_mms-50877
+                              
+                        CreateDate: 2017-11-08
+                  PrescriptionDate: 2017-09-01 16:51:35
+                            DrugID: 239455
+                          DrugName: buspirone
+                  PrescriptionGuid: b249f0da-055a-4602-81f0-e7197f858899
+                         OrderGUID: 3ba45d23-ea52-4402-be5c-1efa1a17205d
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: b249f0da-055a-4602-81f0-e7197f858899
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 866090
+            SourcePrescriptionGuid: 9941e939-abd8-417c-aac6-cd87a39a29b6
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: okmis_mms-50877
+                              
+                        CreateDate: 2017-11-08
+                  PrescriptionDate: 2017-09-01 16:51:35
+                            DrugID: 176033
+                          DrugName: doxepin
+                  PrescriptionGuid: 5213f116-b48d-4056-b933-baf9721a4700
+                         OrderGUID: 3ba45d23-ea52-4402-be5c-1efa1a17205d
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: 5213f116-b48d-4056-b933-baf9721a4700
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 1000070
+            SourcePrescriptionGuid: 00000000-0000-0000-0000-000000000000
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: okmis_mms-50877
+                              
+                        CreateDate: 2017-12-27
+                  PrescriptionDate: 2017-11-08 14:18:36
+                            DrugID: 451600
+                          DrugName: Wellbutrin XL
+                  PrescriptionGuid: c3ca7803-ac26-482e-bedb-004a816849c4
+                         OrderGUID: f3aaaa6d-e769-479e-8dfb-08486618c25d
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: c3ca7803-ac26-482e-bedb-004a816849c4
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 993564
+            SourcePrescriptionGuid: 015e45df-a87a-467a-ba26-515dd7a36a3f
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: okmis_mms-50877
+                              
+                        CreateDate: 2017-12-27
+                  PrescriptionDate: 2017-11-08 14:18:36
+                            DrugID: 239455
+                          DrugName: buspirone
+                  PrescriptionGuid: 551d7e46-c8c8-4055-b326-1cae24c5a0dc
+                         OrderGUID: f3aaaa6d-e769-479e-8dfb-08486618c25d
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: 551d7e46-c8c8-4055-b326-1cae24c5a0dc
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 866090
+            SourcePrescriptionGuid: b249f0da-055a-4602-81f0-e7197f858899
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: okmis_mms-50877
+                              
+                        CreateDate: 2017-12-27
+                  PrescriptionDate: 2017-11-08 14:18:36
+                            DrugID: 216465
+                          DrugName: Zyprexa
+                  PrescriptionGuid: ecff9160-f22d-4226-ace4-d93f0aaccb73
+                         OrderGUID: f3aaaa6d-e769-479e-8dfb-08486618c25d
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: ecff9160-f22d-4226-ace4-d93f0aaccb73
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 284514
+            SourcePrescriptionGuid: 1bc4f836-593e-45e2-bba3-6078ed66147f
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: okmis_mms-50877
+                              
+                        CreateDate: 2017-12-27
+                  PrescriptionDate: 2017-11-08 14:18:35
+                            DrugID: 176033
+                          DrugName: doxepin
+                  PrescriptionGuid: 8075c579-e5cd-4f34-afcc-ffeb2eb3f1ab
+                         OrderGUID: f3aaaa6d-e769-479e-8dfb-08486618c25d
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: 8075c579-e5cd-4f34-afcc-ffeb2eb3f1ab
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 1000070
+            SourcePrescriptionGuid: 5213f116-b48d-4056-b933-baf9721a4700
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: okmis_mms-50877
+                              
+                        CreateDate: 2018-02-21
+                  PrescriptionDate: 2017-12-27 11:15:54
+                            DrugID: 216465
+                          DrugName: Zyprexa
+                  PrescriptionGuid: 87375d9b-897c-4f65-ae78-5142e7869406
+                         OrderGUID: 912780c1-f006-4815-8074-404d840cdf38
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: 87375d9b-897c-4f65-ae78-5142e7869406
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 284514
+            SourcePrescriptionGuid: ecff9160-f22d-4226-ace4-d93f0aaccb73
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: okmis_mms-50877
+                              
+                        CreateDate: 2018-02-21
+                  PrescriptionDate: 2017-12-27 11:15:54
+                            DrugID: 451600
+                          DrugName: Wellbutrin XL
+                  PrescriptionGuid: 6c5388a4-3be5-41e8-a3c4-cf5308c59deb
+                         OrderGUID: 912780c1-f006-4815-8074-404d840cdf38
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: 6c5388a4-3be5-41e8-a3c4-cf5308c59deb
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 993564
+            SourcePrescriptionGuid: c3ca7803-ac26-482e-bedb-004a816849c4
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: okmis_mms-50877
+                              
+                        CreateDate: 2018-02-21
+                  PrescriptionDate: 2017-12-27 11:15:54
+                            DrugID: 239455
+                          DrugName: buspirone
+                  PrescriptionGuid: 0d734e16-dc66-4693-a6fe-e84a844c3405
+                         OrderGUID: 912780c1-f006-4815-8074-404d840cdf38
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: 0d734e16-dc66-4693-a6fe-e84a844c3405
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 866090
+            SourcePrescriptionGuid: 551d7e46-c8c8-4055-b326-1cae24c5a0dc
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: okmis_mms-50877
+                              
+                        CreateDate: 2018-02-21
+                  PrescriptionDate: 2017-12-27 11:15:54
+                            DrugID: 176033
+                          DrugName: doxepin
+                  PrescriptionGuid: 8069e3a9-bb71-465c-b8a1-0d2aadb916d4
+                         OrderGUID: 912780c1-f006-4815-8074-404d840cdf38
+               ExternalPhysicianID: okmis_mms-2238
+                     PhysicianName:  Cheryl  Hooper   
+                  ExternalDrugName: NULL
+          OriginalPrescriptionGuid: 8069e3a9-bb71-465c-b8a1-0d2aadb916d4
+                    ExternalUserID: okmis_mms-2238
+                         PatientID: okmis_mms-50877
+                     PatientIDType: 
+                             rxcui: 1000070
+            SourcePrescriptionGuid: 8075c579-e5cd-4f34-afcc-ffeb2eb3f1ab
+                  PharmacyFullInfo: FAMILY PHARMACY #3  Phone: 5802373801 221 SOUTH 30TH ST Enid
+                 ExternalPatientID: okmis_mms-50877
+                             

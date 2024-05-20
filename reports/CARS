@@ -1,0 +1,190 @@
+#!/usr/bin/perl
+############################################################################
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use DBA;
+use DBUtil;
+use Time::Local;
+$DT = localtime();
+############################################################################
+# usage:
+#   CARS ForProvID=id\&Type={trend/overall}\&ToDate=YYYY-MM-DD
+# for CARS
+#   trend   = previous - current
+#   overall = first - current
+# for GAF
+#   trend   = current - previous
+#   overall = current - first
+############################################################################
+$form = DBForm->new();
+if ( ! SysAccess->verify($form,'Privilege=QAReports') )
+{ $form->error("Access Denied! / Privilege"); }
+$form = DBUtil->setDates($form);
+my $DateRange = qq|from $form->{FromDateD} thru $form->{ToDateD}|;
+$dbh = $form->dbconnect();
+#foreach my $f ( sort keys %{$form} ) { print "CARS: form-$f=$form->{$f}\n"; }
+##
+# defaults to overall
+##
+my $Type = $form->{Type} ? $form->{Type} : 'overall';
+%Clients=();
+$sClient = $dbh->prepare("select * from Client where ClientID=?");
+$Prev='';
+
+$form->{Report_Clinics} = $form->{ClinicIDs};   # GenReport uses ClinicIDs.
+my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+my $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID','where');
+my $Active = qq| and Active=1 | if ( $form->{Active} );
+############################################################################
+$stmt = "select * from PDDom
+  left join Client on Client.ClientID=PDDom.ClientID
+  left join ClientPrAuth on ClientPrAuth.ID=PDDom.PrAuthID
+  ${ClinicSelection} ${Active}";
+$stmt .= " and ClientPrAuth.EffDate <= '$form->{ToDate}'" if ( $form->{ToDate} );
+$stmt .= " order by PDDom.ClientID, ClientPrAuth.EffDate desc";
+#warn qq|CARS: stmt=$stmt\n|;
+$sPDDom = $dbh->prepare($stmt);
+$sPDDom->execute();
+while ( $rPDDom = $sPDDom->fetchrow_hashref )
+{
+  $ClientID = $rPDDom->{ClientID};
+  if ( $Prev eq $ClientID )
+  { $Cnt++; }
+  else
+  { $Cnt=1; $Prev=$ClientID; }
+  if ( $Cnt == 1 )
+  { &setCount('Score1'); }
+  elsif ( $Cnt == 2 || $Type =~ /overall/i )
+  { &setCount('Score2'); }
+}
+############################################################################
+$Prev='';
+$stmt = "select * from PDDiag
+  left join Client on Client.ClientID=PDDiag.ClientID
+  left join ClientPrAuth on ClientPrAuth.ID=PDDiag.PrAuthID
+  ${ClinicSelection} ${Active}";
+$stmt .= " and ClientPrAuth.EffDate <= '$form->{ToDate}'" if ( $form->{ToDate} );
+$stmt .= " order by PDDiag.ClientID, ClientPrAuth.EffDate desc";
+#warn qq|CARS: stmt=$stmt\n|;
+$sPDDiag = $dbh->prepare($stmt);
+$sPDDiag->execute();
+while ( $rPDDiag = $sPDDiag->fetchrow_hashref )
+{
+  $ClientID = $rPDDiag->{ClientID};
+  if ( $Prev eq $ClientID )
+  { $Cnt++; }
+  else
+  { $Cnt=1; $Prev=$ClientID; }
+  $Score = $rPDDiag->{Axis5Curr};
+  if ( $Cnt == 1 )
+  { $Clients{$ClientID}{GAF1} = $Score; }
+  elsif ( $Cnt == 2 || $Type =~ /overall/i )
+  { $Clients{$ClientID}{GAF2} = $Score; }
+}
+############################################################################
+sub setCount($)
+{
+  my ($rec) = @_;
+
+  for ( my $i=1; $i<=9; $i++ )
+  { 
+    $Name = 'Dom' . $i . 'Score';
+    $Score=$rPDDom->{$Name}; 
+    $Clients{$ClientID}{$rec}{$Name}=$Score;
+#print "$ClientID, $Name=$Score\n";
+  }
+  return(1);
+}
+############################################################################
+print "${DT}\nCARS (Scores/Diag) Report (Type: $Type, Date: $form->{ToDate})\n";
+print "Client\tActive\tAge";
+print "\tInitialDOM6\tCurrentDOM6\tDiff";
+print "\tInitialDOM7\tCurrentDOM7\tDiff";
+print "\tInitialDOM2\tCurrentDOM2\tDiff";
+print "\tInitialDOM3\tCurrentDOM3\tDiff";
+print "\tInitialDOM1\tCurrentDOM1\tDiff";
+print "\tInitialCORE\tCurrentCORE\tDiff";
+print "\tInitialDOM4\tCurrentDOM4\tDiff";
+print "\tInitialDOM5\tCurrentDOM5\tDiff";
+print "\tInitialDOM8\tCurrentDOM8\tDiff";
+print "\tInitialDOM9\tCurrentDOM9\tDiff";
+print "\tInitialTOTAL\tCurrentTOTAL\tDiff";
+print "\tCurrentGAF\tInitialGAF\tDiff";
+print "\n";
+foreach $id ( keys %Clients )
+{
+#warn qq|CARS: id=$id\n|;
+  $sClient->execute($id);
+  $rClient = $sClient->fetchrow_hashref;
+  $DOB = $rClient->{DOB};
+  $Age = DBUtil->Date( $DOB, 'age' );
+##  next if ( $Age >= 60 );
+
+  $Client_Name = $rClient->{LName};
+  $Client_Name .= ", $rClient->{FName}" if ( $rClient->{FName} );
+  $Client_Name .= " $rClient->{Suffix}" if ( $rClient->{Suffix} );
+  $Client_Name .= " ($id)";
+  print "$Client_Name\t$rClient->{Active}\t$Age";
+
+  $Core1 = 0; $Core2 = 0;
+  $Total1 = 0; $Total2 = 0;
+
+  for my $i ( 6,7,2,3,1 )
+  {
+    my $Name = 'Dom' . $i . 'Score';
+    $Score1 = $Clients{$id}{Score1}{$Name};
+    $Score2 = $Clients{$id}{Score2}{$Name};
+#print "\n$ClientID, $Name=$Score1 $Name=$Score2\n";
+    if ( $Score1 && $Score2 )
+    { $Diff = sprintf("%.2f", $Score2 - $Score1); }
+    else
+    { $Diff = ''; }
+    print "\t$Score2\t$Score1\t$Diff";
+    $Core1 += $Score1; $Core2 += $Score2;
+    $Total1 += $Score1; $Total2 += $Score2;
+  }
+  if ( $Core1 && $Core2 )
+  { $Diff = sprintf("%.2f", $Core2 - $Core1); }
+  else
+  { $Diff = ''; }
+  print "\t$Core2\t$Core1\t$Diff";
+
+  for my $i ( 4,5,8,9 )
+  {
+    my $Name = 'Dom' . $i . 'Score';
+    $Score1 = $Clients{$id}{Score1}{$Name};
+    $Score2 = $Clients{$id}{Score2}{$Name};
+#print "\n$ClientID, $Name=$Score1 $Name=$Score2\n";
+    if ( $Score1 && $Score2 )
+    { $Diff = sprintf("%.2f", $Score2 - $Score1); }
+    else
+    { $Diff = ''; }
+    print "\t$Score2\t$Score1\t$Diff";
+    $Total1 += $Score1; $Total2 += $Score2;
+  }
+  if ( $Total1 && $Total2 )
+  { $Diff = sprintf("%.2f", $Total2 - $Total1); }
+  else
+  { $Diff = ''; }
+  print "\t$Total2\t$Total1\t$Diff";
+
+# GAF (Axis5Curr)
+  $GAF1 = $Clients{$id}{GAF1};
+  $GAF1 = $GAF1 eq '' ? '' : sprintf("%.2f", $GAF1);
+  $GAF2 = $Clients{$id}{GAF2};
+  $GAF2 = $GAF2 eq '' ? '' : sprintf("%.2f", $GAF2);
+  if ( $Clients{$id}{GAF1} eq ''
+    || $Clients{$id}{GAF2} eq '' )
+  { $GAF = 'NULL'; }
+  else
+  { $GAF = sprintf("%.2f", $Clients{$id}{GAF1} - $Clients{$id}{GAF2}); }
+  print "\t$GAF1\t$GAF2\t$GAF";
+  print "\n";
+}
+$sClient->finish();
+$sPDDom->finish();
+$sPDDiag->finish();
+$form->complete();
+exit;
+############################################################################

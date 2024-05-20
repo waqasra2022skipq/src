@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<?xfa generator="XFA2_0" APIVersion="2.2.4333.0" ?>
+<xdp:xdp xmlns:xdp="http://ns.adobe.com/xdp/" >
+<xfa:datasets xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/" >
+<xfa:data>
+<root>
+
+  <record>
+   <agencyname>Center for Therapeutic Interventions</agencyname>
+   <agencyaddress>7477 E 46th Place</agencyaddress>
+   <agencycsz>Tulsa, OK  74145-6305</agencycsz>
+   <agencyphone>Office: 918-384-0002</agencyphone>
+   <clientname>Charles Evans</clientname>
+   <idnumber>9748</idnumber>
+   <row1>
+    <vdate1>021121</vdate1>
+    <vdate2>082521</vdate2>
+    <vdate3>021022</vdate3>
+    <vdate4>080822</vdate4>
+</row1>
+   <row2>
+    <stime1>1100</stime1>
+    <stime2>1600</stime2>
+    <stime3>1535</stime3>
+    <stime4>1230</stime4>
+</row2>
+   <row3>
+    <smoke1>1</smoke1>
+    <quit1>0</quit1>
+    <light1>0</light1>
+    <heavy1>0</heavy1>
+    <smoke2>1</smoke2>
+    <quit2>0</quit2>
+    <light2>0</light2>
+    <heavy2>0</heavy2>
+    <smoke3>0</smoke3>
+    <quit3>0</quit3>
+    <light3>1</light3>
+    <heavy3>0</heavy3>
+    <smoke4>0</smoke4>
+    <quit4>0</quit4>
+    <light4>1</light4>
+    <heavy4>0</heavy4>
+</row3>
+   <row4>
+    <benefits1>0</benefits1>
+    <harms1>0</harms1>
+    <message1>0</message1>
+    <difficulty1>0</difficulty1>
+    <benefits2>0</benefits2>
+    <harms2>0</harms2>
+    <message2>0</message2>
+    <difficulty2>0</difficulty2>
+    <benefits3>1</benefits3>
+    <harms3>1</harms3>
+    <message3>1</message3>
+    <difficulty3>1</difficulty3>
+    <benefits4>1</benefits4>
+    <harms4>1</harms4>
+    <message4>1</message4>
+    <difficulty4>1</difficulty4>
+</row4>
+   <row5>
+    <reason1></reason1>
+    <qyes1>0</qyes1>
+    <qno1>1</qno1>
+    <reason2></reason2>
+    <qyes2>0</qyes2>
+    <qno2>1</qno2>
+    <reason3>vapes, used to dip, may want to quit in the future. </reason3>
+    <qyes3>0</qyes3>
+    <qno3>1</qno3>
+    <reason4>Cutting back on vaping significantly but not ready to let go altogether. </reason4>
+    <qyes4>0</qyes4>
+    <qno4>1</qno4>
+</row5>
+   <row6>
+    <qdate1></qdate1>
+    <problem1>0</problem1>
+    <materials1>0</materials1>
+    <identify1>0</identify1>
+    <refer1>0</refer1>
+    <pharma1>0</pharma1>
+    <qdate2></qdate2>
+    <problem2>0</problem2>
+    <materials2>0</materials2>
+    <identify2>0</identify2>
+    <refer2>0</refer2>
+    <pharma2>0</pharma2>
+    <qdate3></qdate3>
+    <problem3>0</problem3>
+    <materials3>0</materials3>
+    <identify3>0</identify3>
+    <refer3>0</refer3>
+    <pharma3>0</pharma3>
+    <qdate4></qdate4>
+    <problem4>0</problem4>
+    <materials4>0</materials4>
+    <identify4>0</identify4>
+    <refer4>0</refer4>
+    <pharma4>0</pharma4>
+</row6>
+   <row7>
+    <assess1>0</assess1>
+    <ask1>0</ask1>
+    <reinforce1>0</reinforce1>
+    <encourage1>0</encourage1>
+    <set1>0</set1>
+    <assess2>0</assess2>
+    <ask2>0</ask2>
+    <reinforce2>0</reinforce2>
+    <encourage2>0</encourage2>
+    <set2>0</set2>
+    <assess3>0</assess3>
+    <ask3>0</ask3>
+    <reinforce3>0</reinforce3>
+    <encourage3>0</encourage3>
+    <set3>0</set3>
+    <assess4>0</assess4>
+    <ask4>0</ask4>
+    <reinforce4>0</reinforce4>
+    <encourage4>0</encourage4>
+    <set4>0</set4>
+</row7>
+   <row8>
+    <comments1></comments1>
+    <comments2></comments2>
+    <comments3></comments3>
+    <comments4></comments4>
+</row8>
+   <row9>
+    <etime1>1105</etime1>
+    <etime2>1605</etime2>
+    <etime3>1538</etime3>
+    <etime4>1232</etime4>
+</row9>
+   <row10>
+    <sign1>sign here</sign1>
+    <sign2>sign here</sign2>
+    <sign3>sign here</sign3>
+    <sign4>sign here</sign4>
+</row10>
+   <row11>
+    <credentials1>credentials here</credentials1>
+    <credentials2>credentials here</credentials2>
+    <credentials3>credentials here</credentials3>
+    <credentials4>credentials here</credentials4>
+</row11>
+  </record>
+
+</root>
+</xfa:data>
+</xfa:datasets>
+<pdf href="http://forms.okmis.com/printing/PrintClientSATobacco_Rev2.pdf" xmlns="http://ns.adobe.com/xdp/pdf/" />
+</xdp:xdp>

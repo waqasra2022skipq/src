@@ -1,0 +1,46 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use DBA;
+
+############################################################################
+############################################################################
+$form = DBForm->new;
+$dbh = $form->dbconnect;
+my $InsID=$form->{InsID};
+my $Year = DBUtil->Date($form->{TODAY},'fmt','YYYY');
+my $ExpDate = $Year-1 . '-12-31';
+my $EffDate = $Year . '-01-01';
+my $q = qq|select * from xInsurance where ID=$InsID|;
+#warn "s=$q\n";
+$s = $dbh->prepare($q);
+$s->execute();
+if ( $r = $s->fetchrow_hashref )
+{
+  print qq|#Insurance: $r->{Name}\n|;
+  my $qxSC = qq|select * from xSC where Active=1 and InsID=? order by SCNum|;
+  $sxSC = $dbh->prepare($qxSC);
+  my $qxSCRates = qq|select * from xSCRates where SCID=? and ExpDate is null|;
+  $sxSCRates = $dbh->prepare($qxSCRates);
+  $sxSC->execute($InsID);
+  while ( my $rxSC = $sxSC->fetchrow_hashref )
+  {
+    my $Cred = DBA->getxref($form,'xCredentials',$rxSC->{CredID},'Descr');
+    my $Res = DBA->getxref($form,'xSCRestrictions',$rxSC->{Restriction},'Descr');
+    print qq|\n# $rxSC->{SCNum}: $rxSC->{SCName}: $Cred: $Res: $rxSC->{PAReq}\n|;
+    $sxSCRates->execute($rxSC->{SCID});
+    while ( my $rxSCRates = $sxSCRates->fetchrow_hashref )
+    {
+#      my $ExpDate = substr($rxSCRates->{EffDate},0,4) . '-12-31';
+      print qq|update xSCRates set ExpDate='$ExpDate' where ID=$rxSCRates->{ID};   #$rxSCRates->{EffDate},$rxSCRates->{ExpDate}\n|;
+      print qq|INSERT INTO xSCRates (ID,SCID,ServiceRate,RVUPct,HrsPerUnit,UnitLbl,RatePct,CommissionPct,EffDate,ExpDate,CreateProvID,CreateDate,ChangeProvID,ChangeDate) VALUES (NULL,$rxSCRates->{SCID},'$rxSCRates->{ServiceRate}','$rxSCRates->{RVUPct}','$rxSCRates->{HrsPerUnit}','$rxSCRates->{UnitLbl}','$rxSCRates->{RatePct}','$rxSCRates->{CommissionPct}','$EffDate',NULL,$form->{LOGINPROVID},'$form->{TODAY}',$form->{LOGINPROVID},'$form->{TODAY}');\n|;
+    }
+  }
+  $sxSC->finish();
+  $sxSCRates->finish();
+}
+$s->finish();
+$form->complete();
+exit;
+#############################################################################

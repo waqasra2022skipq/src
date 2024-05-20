@@ -1,0 +1,4 @@
+mv $1.cgi $2.cgi
+chmod 755 $2.cgi
+chown root:adm $2.cgi
+

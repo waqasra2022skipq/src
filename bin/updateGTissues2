@@ -1,0 +1,49 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+
+use strict;
+use warnings;
+use  DBI;
+use  DBForm;
+use  DBA;
+
+############################################################################
+# This routine marks Reviewed for certain DBs
+############################################################################
+my $form = DBForm->new();
+my $dbh = $form->dbconnect();
+my $GTerr = $dbh->prepare("SELECT trid,clientid,scnum,billstatus,xBillStatus.Descr,mod4,billedamt,amtdue,billdate FROM `Treatment` left join xSC on xSC.scid = Treatment.scid
+left join xBillStatus on Treatment.BillStatus = xBillStatus.ID
+WHERE mod4 = 'GT' and xSC.SCNum not like 'X%' and instr(xSC.SCNum,'GT') > 0
+and billdate > '2020-03-01'
+and billstatus in (4,6)");
+
+#my $GTerr = $dbh->prepare("SELECT trid,scnum,billstatus,xBillStatus.Descr,mod4,billedamt,,amtdue FROM `Treatment` left join xSC on xSC.scid = Treatment.scid left join xBillStatus on #Treatment.BillStatus = xBillStatus.ID WHERE billdate > '2020-03-15' and xSC.SCNum in ('H0004 HE GT','H0004 HF GT','H0004 HV GT') and billstatus in (6)");
+
+#my $GTupdate = $dbh->prepare("update `Treatment` set AmtDue = billedamt,mod4= null,billstatus=1 
+#WHERE mod4 = 'GT' 
+#and billdate > '2020-03-01'
+#and billstatus in (4,6)
+#and scid in (select scid from xSC where SCNum not like 'X%' and instr(xSC.SCNum,'GT') > 0) ");
+
+print qq|DBNAME=$form->{'DBNAME'}\n|;
+#main->GTerrors($p); 
+
+my ($self) = @_;
+$GTerr->execute() || $form->dberror("GTerrors: ");
+
+while (my @ary = $GTerr->fetchrow_array ()) 
+{
+    my $delim = "--";
+    for (my $i = 0; $i < @ary; $i++)
+    {
+        $ary[$i] = "NULL" if !defined ($ary[$i]);   # NULL value?
+        print $delim . $ary[$i];
+        $delim = ",";
+    }
+    print "\n";
+}
+
+$GTerr->finish();
+
+exit;  

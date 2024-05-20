@@ -1,0 +1,24 @@
+    text {
+           font: 12px sans-serif;
+         }
+    svg {
+          display: block;
+        }
+    html, body {
+          margin-top: 10;
+          margin-right: 10;
+          margin-bottom: 10;
+          margin-left: 10;
+          padding: 5px;
+          height: 450;
+          width: 900;
+       }
+    #chart1, svg {
+          margin-top: 10;
+          margin-right: 10;
+          margin-bottom: 10;
+          margin-left: 10;
+          padding: 5px;
+          height: 500;
+          width: 1000;
+       }

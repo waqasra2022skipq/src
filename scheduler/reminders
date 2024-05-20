@@ -1,0 +1,22 @@
+#!/bin/bash
+# kls, daily 11/4/08
+# ------------------------------------
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   print "\nServices not installed!"
+   exit 1
+fi
+cd ${SCHEDULER}
+print "\nScheduler Reminders pwd=$(pwd)..."
+# ------------------------------------
+# send out scheduler reminders...
+  for ACCT in $(/bin/ls -1 *.cfg); do
+    dir=$(echo ${ACCT} | awk -F. '{print $1}')
+    if [ ${dir} != "mms" -a ${dir} != "tsi" -a ${dir} != "tccf" ]; then continue; fi
+    url=${dir}.okmis.com
+    if [ ${dir} == "tccf" ]; then url=lbhp.okmis.com; fi
+    print "\nReminders for ${url} ..."
+    wget --no-check-certificate -O ${SCHEDULER}/reminders.out "https://${url}/scheduler/${dir}/index.php?nts-reminder=1"
+  done
+# ------------------------------------

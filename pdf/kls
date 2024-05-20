@@ -1,0 +1,50 @@
+%PDF-1.2
+1 0 obj
+<</Type/Font/Name/R10/Subtype/Type1/BaseFont/Times-Roman>>
+endobj
+2 0 obj
+<</Type/Font/Name/R5/Subtype/Type1/BaseFont/Times-Bold>>
+endobj
+3 0 obj
+<</Length 1095 >>
+stream
+0.1 0 0 0.1 0 0 cm q q 10 0 0 10 0 0 cm 
+BT
+/R10 11 Tf
+1 0 0 1 430 740 Tm (INVOICE DATE:)Tj
+1 0 0 1 455 729 Tm (INVOICE #:)Tj
+1 0 0 1 400 575 Tm (Client Phone#:)Tj
+1 0 0 1 38 557 Tm (Date)Tj
+1 0 0 1 78 557 Tm (Code)Tj
+1 0 0 1 148 557 Tm (Description / TrID)Tj
+1 0 0 1 294 557 Tm (Un)Tj
+1 0 0 1 318 557 Tm (Charge)Tj
+1 0 0 1 374 557 Tm (Type)Tj
+1 0 0 1 408 557 Tm (Payment)Tj
+1 0 0 1 468 557 Tm (PayDate)Tj
+1 0 0 1 528 557 Tm (AmtDue)Tj
+1 0 0 1 77 219 Tm (Please Send Payment to:)Tj
+1 0 0 1 77 130 Tm (For questions regarding your invoice contact:)Tj
+1 0 0 1 480 212 Tm (TOTAL: $)Tj
+1 0 0 1 480 112 Tm (TOTAL: $)Tj
+ET
+Q 10 w 300 6900 m 5800 6900 l S q 10 0 0 10 0 0 cm
+Q 1 i 10 w
+300 5700 m 5800 5700 l 5800 2500 l 300 2500 l h
+300 5500 m 5800 5500 l
+700 5700 m 700 2500 l
+1400 5700 m 1400 2500 l
+2900 5700 m 2900 2500 l
+3100 5700 m 3100 2500 l
+3700 5700 m 3700 2500 l
+4000 5700 m 4000 2500 l
+4600 5700 m 4600 2500 l
+5200 5700 m 5200 2500 l
+S q 10 0 0 10 0 0 cm
+Q 1 i 10 w
+5200 2300 m 5800 2300 l 5800 2000 l 5200 2000 l h
+5200 1300 m 5800 1300 l 5800 1000 l 5200 1000 l h
+S q 10 0 0 10 0 0 cm
+Q
+endstream
+endobj

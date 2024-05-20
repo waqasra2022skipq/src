@@ -1,0 +1,2 @@
+ALTER TABLE `ProviderLicenses` ADD `Taxonomy` VARCHAR(20) NULL DEFAULT NULL;
+ALTER TABLE `ProviderLicenses` ADD `Specialty` VARCHAR(50) NULL DEFAULT NULL;

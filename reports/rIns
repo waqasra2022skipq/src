@@ -1,0 +1,4 @@
+select Name,Addr1,Addr2,City,ST,Zip,PayID,Ph1,Ph2,Fax
+ from xInsurance
+ where ClearingHouse='officeally' or ClearingHouse='availity'
+;

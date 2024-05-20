@@ -1,0 +1,7 @@
+$rClientASI->{'SPMedical'}
+$rClientASI->{'SPEmpSup'}
+$rClientASI->{'SPAlcohol'}
+$rClientASI->{'SPDrugs'}
+$rClientASI->{'SPLegal'}
+$rClientASI->{'SPFamily'}
+$rClientASI->{'SPPsych'}

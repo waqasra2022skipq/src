@@ -1,0 +1,310 @@
+-- MySQL dump 10.13  Distrib 5.6.41, for Linux (x86_64)
+--
+-- Host: localhost    Database: okmis_mms
+-- ------------------------------------------------------
+-- Server version	5.6.41
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `laborderheader`
+--
+
+DROP TABLE IF EXISTS `laborderheader`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `laborderheader` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `patientexternalid` varchar(100) DEFAULT NULL,
+  `patientinternalid` varchar(100) DEFAULT NULL,
+  `patientfirstname` varchar(100) DEFAULT NULL,
+  `patientlastname` varchar(100) DEFAULT NULL,
+  `ordercontrol` varchar(100) DEFAULT NULL,
+  `placerordernumber` varchar(100) DEFAULT NULL,
+  `fillerordernumber` varchar(100) DEFAULT NULL,
+  `placergroupnumber` varchar(100) DEFAULT NULL,
+  `orderstatusvalue` varchar(100) DEFAULT NULL,
+  `orderstatusdescription` varchar(100) DEFAULT NULL,
+  `responceflag` varchar(100) DEFAULT NULL,
+  `quantitytiming` varchar(100) DEFAULT NULL,
+  `parent` varchar(100) DEFAULT NULL,
+  `transactiondatetime` datetime DEFAULT NULL,
+  `enteredby` varchar(100) DEFAULT NULL,
+  `verifyby` varchar(100) DEFAULT NULL,
+  `orderingprovidernpi` varchar(100) DEFAULT NULL,
+  `orderingproviderfirstname` varchar(100) DEFAULT NULL,
+  `orderingprovidermiddlename` varchar(100) DEFAULT NULL,
+  `orderingproviderlastname` varchar(100) DEFAULT NULL,
+  `entererslocation` varchar(100) DEFAULT NULL,
+  `phonenumber` varchar(100) DEFAULT NULL,
+  `ordereffectivedatetime` varchar(100) DEFAULT NULL,
+  `ordercontrolcode` varchar(100) DEFAULT NULL,
+  `ordercontrolreason` varchar(100) DEFAULT NULL,
+  `enteringorganization` varchar(100) DEFAULT NULL,
+  `enteringdevice` varchar(100) DEFAULT NULL,
+  `actionby` varchar(100) DEFAULT NULL,
+  `labname` varchar(100) DEFAULT NULL,
+  `messagedatetime` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `laborderheader`
+--
+
+LOCK TABLES `laborderheader` WRITE;
+/*!40000 ALTER TABLE `laborderheader` DISABLE KEYS */;
+/*!40000 ALTER TABLE `laborderheader` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2019-02-11 23:00:30
+-- MySQL dump 10.13  Distrib 5.6.41, for Linux (x86_64)
+--
+-- Host: localhost    Database: okmis_mms
+-- ------------------------------------------------------
+-- Server version	5.6.41
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `laborderrequest`
+--
+
+DROP TABLE IF EXISTS `laborderrequest`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `laborderrequest` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `patientid` int(11) DEFAULT NULL,
+  `comonorderid` int(11) DEFAULT NULL,
+  `placerordernumber` varchar(100) DEFAULT NULL,
+  `fillerordernumber` varchar(100) DEFAULT NULL,
+  `universalservicecode` varchar(100) DEFAULT NULL,
+  `universalservicedescription` varchar(200) DEFAULT NULL,
+  `priority` varchar(100) DEFAULT NULL,
+  `requesteddatetime` datetime DEFAULT NULL,
+  `observationdatetime` datetime DEFAULT NULL,
+  `observationenddatetime` datetime DEFAULT NULL,
+  `collectionvolume` varchar(100) DEFAULT NULL,
+  `collectionidentifier` varchar(100) DEFAULT NULL,
+  `specimenactioncode` varchar(100) DEFAULT NULL,
+  `dangercode` varchar(100) DEFAULT NULL,
+  `relevantclinicalinfo` varchar(100) DEFAULT NULL,
+  `specimenreciveddatetime` datetime DEFAULT NULL,
+  `specimensource` varchar(100) DEFAULT NULL,
+  `orderingprovidernpi` varchar(100) DEFAULT NULL,
+  `orderingproviderfirstname` varchar(100) DEFAULT NULL,
+  `orderingproviderlastname` varchar(100) DEFAULT NULL,
+  `ordercallbackphonenumber` varchar(100) DEFAULT NULL,
+  `placerfield1` varchar(100) DEFAULT NULL,
+  `placerfield2` varchar(100) DEFAULT NULL,
+  `fillerfield1code` varchar(100) DEFAULT NULL,
+  `fillerfield1description` varchar(100) DEFAULT NULL,
+  `statuschngdatetime` datetime DEFAULT NULL,
+  `changetopractice` varchar(100) DEFAULT NULL,
+  `diagnosticservsectid` varchar(100) DEFAULT NULL,
+  `resultstatuscode` varchar(100) DEFAULT NULL,
+  `resultstatusdescription` varchar(100) DEFAULT NULL,
+  `parentresult` varchar(100) DEFAULT NULL,
+  `quantitytiming` varchar(100) DEFAULT NULL,
+  `resultcopiesto` varchar(100) DEFAULT NULL,
+  `parent` varchar(100) DEFAULT NULL,
+  `transportationmode` varchar(100) DEFAULT NULL,
+  `reasonofstudy` varchar(200) DEFAULT NULL,
+  `principalresultinterperter` varchar(100) DEFAULT NULL,
+  `assistantresultinterperter` varchar(100) DEFAULT NULL,
+  `technician` varchar(100) DEFAULT NULL,
+  `transcriptionist` varchar(100) DEFAULT NULL,
+  `scheduleddatetime` datetime DEFAULT NULL,
+  `numberofsamplecontainers` varchar(100) DEFAULT NULL,
+  `transportlogisticsofcollectedsample` varchar(100) DEFAULT NULL,
+  `collectorscomment` varchar(100) DEFAULT NULL,
+  `transportarrangementresponsibility` varchar(100) DEFAULT NULL,
+  `transportarranged` varchar(100) DEFAULT NULL,
+  `escortrequired` varchar(100) DEFAULT NULL,
+  `plannedpatienttransportcomment` varchar(100) DEFAULT NULL,
+  `labname` varchar(100) DEFAULT NULL,
+  `labaddress` varchar(100) DEFAULT NULL,
+  `city` varchar(100) DEFAULT NULL,
+  `state` varchar(100) DEFAULT NULL,
+  `zip` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `laborderrequest`
+--
+
+LOCK TABLES `laborderrequest` WRITE;
+/*!40000 ALTER TABLE `laborderrequest` DISABLE KEYS */;
+/*!40000 ALTER TABLE `laborderrequest` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2019-02-11 23:00:30
+-- MySQL dump 10.13  Distrib 5.6.41, for Linux (x86_64)
+--
+-- Host: localhost    Database: okmis_mms
+-- ------------------------------------------------------
+-- Server version	5.6.41
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `laborderresponse`
+--
+
+DROP TABLE IF EXISTS `laborderresponse`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `laborderresponse` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `patientid` int(11) DEFAULT NULL,
+  `comonorderid` int(11) DEFAULT NULL,
+  `valuetype` varchar(100) DEFAULT NULL,
+  `valuetypedescription` varchar(100) DEFAULT NULL,
+  `observationidentifier` varchar(100) DEFAULT NULL,
+  `loinccode` varchar(100) DEFAULT NULL,
+  `loincdescription` varchar(100) DEFAULT NULL,
+  `codingsystemname` varchar(100) DEFAULT NULL,
+  `observationalternateidentifier` varchar(100) DEFAULT NULL,
+  `observationdescriptionidentifier` varchar(100) DEFAULT NULL,
+  `observationalternateidentifiercodingsystem` varchar(100) DEFAULT NULL,
+  `observationsubid` varchar(100) DEFAULT NULL,
+  `observationvalue` varchar(100) DEFAULT NULL,
+  `units` varchar(100) DEFAULT NULL,
+  `referencesrange` varchar(100) DEFAULT NULL,
+  `abnormalflags` varchar(100) DEFAULT NULL,
+  `probability` varchar(100) DEFAULT NULL,
+  `natureofabnormaltest` varchar(100) DEFAULT NULL,
+  `observresultstatuscode` varchar(100) DEFAULT NULL,
+  `observresultstatusdescription` varchar(100) DEFAULT NULL,
+  `datelastobsnormalvalues` datetime DEFAULT NULL,
+  `userdefinedaccesschecks` varchar(100) DEFAULT NULL,
+  `observationdatetime` datetime DEFAULT NULL,
+  `producersid` varchar(100) DEFAULT NULL,
+  `producersiddescription` varchar(100) DEFAULT NULL,
+  `responsibleobserver` varchar(100) DEFAULT NULL,
+  `observationmethod` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `laborderresponse`
+--
+
+LOCK TABLES `laborderresponse` WRITE;
+/*!40000 ALTER TABLE `laborderresponse` DISABLE KEYS */;
+/*!40000 ALTER TABLE `laborderresponse` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2019-02-11 23:00:30
+-- MySQL dump 10.13  Distrib 5.6.41, for Linux (x86_64)
+--
+-- Host: localhost    Database: okmis_mms
+-- ------------------------------------------------------
+-- Server version	5.6.41
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `laborderresponsenotes`
+--
+
+DROP TABLE IF EXISTS `laborderresponsenotes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `laborderresponsenotes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `patientid` int(11) DEFAULT NULL,
+  `comonorderid` int(11) DEFAULT NULL,
+  `sourceofcomment` varchar(100) DEFAULT NULL,
+  `comment` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `laborderresponsenotes`
+--
+
+LOCK TABLES `laborderresponsenotes` WRITE;
+/*!40000 ALTER TABLE `laborderresponsenotes` DISABLE KEYS */;
+/*!40000 ALTER TABLE `laborderresponsenotes` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2019-02-11 23:00:30

@@ -1,0 +1,148 @@
+A:link    { color: blue; }
+A:visited { color: blue; }
+A:active  { color: blue; }
+BODY { 
+    color: white;
+    background: black;
+    text-align: left;
+    font-family: "Verdana";
+    font-size: large; 
+     }
+BLOCKQUOTE {
+    margin-left: .5in;
+    margin-right: .5in;
+           }
+.default { 
+    background: silver;
+    border-style: none;
+    padding-left: 3pt;
+    padding-right: 3pt;
+    color: black; 
+    font-family: Verdana "Times New Roman" "Times Roman" serif;
+    font-size: medium;
+    font-weight: normal;
+         }
+.sheader { 
+    background: silver;
+    border-style: none;
+    padding-left: 3pt;
+    padding-right: 3pt;
+    color: black; 
+    font-family: Verdana "Times New Roman" "Times Roman" serif;
+    font-size: medium;
+    font-weight: normal;
+         }
+.stitle { 
+    background-color: white; 
+    border: 0;
+    border-style: none;
+    color: black; 
+    text-decoration: underline;
+    font-family: Verdana "Times New Roman" "Times Roman" serif;
+    font-size: small; 
+    font-weight: normal;
+    vertical-align: top; 
+       }
+.sbody { 
+    background-color: white; 
+    border: 0;
+    border-style: none;
+    color: black; 
+    font-family: Verdana "Times New Roman" "Times Roman" serif;
+    font-size: small; 
+    font-weight: normal;
+    vertical-align: top; 
+       }
+.sbuttons { 
+    background-color: black; 
+    border: 0;
+    border-style: none;
+    color: white; 
+    text-align: right;
+    font-family: Verdana "Times New Roman" "Times Roman" serif;
+    font-size: medium; 
+    font-weight: normal;
+    vertical-align: top; 
+       }
+.section { 
+    background: silver;
+    border-style: none;
+    padding-left: 3pt;
+    padding-right: 3pt;
+    color: black; 
+    text-align: left;
+    font-family: Verdana "Times New Roman" "Times Roman" serif;
+    font-size: medium;
+    font-weight: normal;
+         }
+.header { 
+    background: black;
+    border-style: none;
+    color: white; 
+    font-family: Verdana "Times New Roman" "Times Roman" serif;
+    font-size: x-large;
+    font-weight: bold;
+        }
+.subheader { 
+    background: black;
+    border-style: none;
+    color: white; 
+    font-family: Verdana "Times New Roman" "Times Roman" serif;
+    font-size: large;
+    font-weight: normal;
+           }
+.title { 
+    background: black;
+    border-style: none;
+    color: white; 
+    font-family: Verdana "Times New Roman" "Times Roman" serif;
+    font-size: medium;
+    font-weight: normal;
+       }
+.subtitle { 
+    background: black;
+    border-style: none;
+    color: white; 
+    font-family: Verdana "Times New Roman" "Times Roman" serif;
+    font-size: small;
+    font-weight: normal;
+          }
+.letter { 
+    background: white;
+    border-style: none;
+    color: black; 
+    font-family: Verdana "Times New Roman" "Times Roman" serif;
+    font-size: medium;
+    font-weight: normal;
+        }
+.memo { 
+    background-color: white; 
+    border: 0;
+    border-style: none;
+    color: black; 
+    text-align: left;
+    font-family: Verdana "Times New Roman" "Times Roman" serif;
+    font-size: small; 
+    font-weight: normal;
+    vertical-align: top; 
+       }
+.legend { 
+    background-color: silver; 
+    border-style: none;
+    color: black; 
+    text-align: left;
+    font-family: Verdana "Times New Roman" "Times Roman" serif;
+    font-size: small; 
+    font-weight: normal;
+    vertical-align: top; 
+       }
+.guide { 
+    background-color: silver; 
+    border-style: none;
+    color: black; 
+    text-align: left;
+    font-family: Verdana "Times New Roman" "Times Roman" serif;
+    font-size: x-small; 
+    font-weight: normal;
+    vertical-align: top; 
+       }

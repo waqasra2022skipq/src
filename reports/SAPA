@@ -1,0 +1,141 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use myForm;
+use myDBI;
+use DBA;
+use DBUtil;
+use Time::Local;
+my $DT = localtime();
+############################################################################
+# usage:
+#   SAPA ForProvID=id
+############################################################################
+my $form = myForm->new();
+my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $cdbh = myDBI->dbconnect('okmis_config');
+#foreach my $f ( sort keys %{$form} ) { warn "form-$f=$form->{$f}\n"; }
+my $Back6 = DBUtil->Date('',-6,0);    # 6 months ago
+my $BackDate = DBUtil->Date($Back6,'fmt','YYYYMMDD');
+#warn qq|BackDate=${BackDate}\n|;
+#warn qq|TestDate=${TestDate}\n|;
+
+my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+# join xInsurance needed for withSelection
+my $ClinicSelection = DBA->withSelection($form,'and','Client.clinicClinicID','','','');
+my $Header = DBA->withSelectionHeader($form);
+$ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+my $sxServiceFocus = $cdbh->prepare("select * from xServiceFocus where CDC=?");
+my $sClientDischarge = $dbh->prepare("select * from ClientDischarge left join ClientDischargeCDC on ClientDischargeCDC.ClientID=ClientDischarge.ClientID where ClientDischarge.ClientID=? order by ClientDischargeCDC.StatusDate desc");
+my $sClientASI = $dbh->prepare("select * from ClientASI where G1=? order by G5 desc");
+my $sClientASAM = $dbh->prepare("select * from ClientASAM where ClientID=? order by TestDate desc");
+my $sClientODAS = $dbh->prepare("select * from ClientODAS where ClientID=? order by TestDate desc");
+my $sClientTASI = $dbh->prepare("select * from ClientTASI where ClientID=? order by IntDate desc");
+# with ClientID      ,CONCAT(Client.LName,', ',Client.FName,' (',Client.ClientID,')') as ClientName
+my $qClient = qq"
+select Client.ClientID, Client.Active 
+      ,CONCAT(Client.LName,', ',Client.FName) as ClientName
+      ,Client.SSN, Client.DOB, Client.Gend
+      ,Client.Addr1, Client.Addr2, Client.City, Client.ST
+      ,Client.Zip
+      ,Clinic.Name as ClinicName
+      ,CONCAT(Counselor.LName,', ',Counselor.FName,' (',Counselor.ProvID,')') as PrimaryProvider
+      ,DATE_FORMAT(ClientPrAuthCDC.StatusDate,'%m/%d/%Y') as StatusDate
+      ,DATE_FORMAT(ClientPrAuth.ExpDate,'%m/%d/%Y') as ExpDate
+      ,ClientPrAuthCDC.ServiceFocus
+      ,ClientPrAuthCDC.CAR1, ClientPrAuthCDC.CAR2, ClientPrAuthCDC.CAR3
+      ,ClientPrAuthCDC.CAR4, ClientPrAuthCDC.CAR5, ClientPrAuthCDC.CAR6
+      ,ClientPrAuthCDC.CAR7, ClientPrAuthCDC.CAR8, ClientPrAuthCDC.CAR9
+  from Client
+    left join ClientACL on ClientACL.ClientID=Client.ClientID
+    left join Provider as Clinic on Clinic.ProvID=Client.clinicClinicID
+    left join Provider as Counselor on Counselor.ProvID=Client.ProvID
+    left join ClientIntake on ClientIntake.ClientID=Client.ClientID
+    left join ClientPrAuth on ClientPrAuth.ClientID=Client.ClientID
+    left join ClientPrAuthCDC on ClientPrAuthCDC.ClientPrAuthID=ClientPrAuth.ID
+    left join Insurance on Insurance.InsNumID=ClientPrAuth.InsuranceID
+    left join xInsurance on xInsurance.ID=Insurance.InsID
+  where ClientACL.ProvID='${ForProvID}'
+    and (
+          ClientPrAuth.PAnumber is not null
+          and curdate() between ClientPrAuth.EffDate and ClientPrAuth.ExpDate
+        )
+    and ClientPrAuthCDC.ServiceFocus IN ('02','03','06','13','19','20','21')
+  ${ClinicSelection}
+  group by Client.Active, Client.LName, Client.FName";
+#warn qq|qClient=\n${qClient}\n|;
+my $sClient = $dbh->prepare($qClient);
+print qq|${DT}\n${Header}Missing Substance Abuse Prior Authorization Report.\nClients with missing any Substance Abuse Prior Authorization Dates report.\n|;
+print qq|Clinic Name\tClient Name\tClientID\tActive\tDOB\tAge\tProvider Name\tService Focus\tStatus Date\tExpire Date\tCARS Total\tASI Date\tASAM Date\tODASL Date\tLast Discharge Date\n|;
+$sClient->execute();
+while (my $rClient = $sClient->fetchrow_hashref)
+{ 
+## in select  next if ( $rClient->{'ServiceFocus'} eq '' );     # SubstanceAbuse service focus
+  my $ClientID = $rClient->{'ClientID'};
+  my $ActiveFlag = $rClient->{'Active'} ? 'Yes' : 'No';;
+  my $Age = DBUtil->Date($rClient->{DOB}, 'age');
+  $sxServiceFocus->execute($rClient->{'ServiceFocus'});
+  my $rxServiceFocus = $sxServiceFocus->fetchrow_hashref;
+  my $ServiceFocus = qq|$rClient->{'ServiceFocus'} $rxServiceFocus->{'Descr'}|;
+  my $CARSTotal = $rClient->{'CAR1'}
+                  + $rClient->{'CAR2'}
+                  + $rClient->{'CAR3'} + $rClient->{'CAR4'}
+                  + $rClient->{'CAR5'}
+                  + $rClient->{'CAR6'}
+                  + $rClient->{'CAR7'}
+                  + $rClient->{'CAR8'}
+                  + $rClient->{'CAR9'};
+  my $ASIDate = '';
+  if ( $Age < 18 )
+  {
+    $sClientTASI->execute($ClientID);
+    $rClientTASI = $sClientTASI->fetchrow_hashref;
+    $ASIDate = $rClientTASI->{'IntDate'};
+  }
+  else
+  {
+    $sClientASI->execute($ClientID);
+    $rClientASI = $sClientASI->fetchrow_hashref;
+    $ASIDate = $rClientASI->{'G5'};
+  }
+  if ( $ASIDate eq '' ) { $ASIDate = 'Missing'; }
+  else
+  { 
+    my $TestDate = DBUtil->Date($ASIDate,'fmt','YYYYMMDD');
+    my $exp = $TestDate < $BackDate ? ' Expired' : '';
+    $ASIDate = DBUtil->Date($ASIDate,'fmt','MM/DD/YYYY').$exp;
+  }
+  $sClientASAM->execute($ClientID);
+  my $rClientASAM = $sClientASAM->fetchrow_hashref;
+  my $ASAMDate = 'Missing';
+  if ( $rClientASAM->{'TestDate'} ne '' )
+  { 
+    my $TestDate = DBUtil->Date($rClientASAM->{'TestDate'},'fmt','YYYYMMDD');
+    my $exp = $TestDate < $BackDate ? ' Expired' : '';
+    $ASAMDate = DBUtil->Date($rClientASAM->{'TestDate'},'fmt','MM/DD/YYYY').$exp;
+  }
+  $sClientODAS->execute($ClientID);
+  my $rClientODAS = $sClientODAS->fetchrow_hashref;
+  my $ODASDate = 'Missing';
+  if ( $rClientODAS->{'TestDate'} ne '' )
+  { 
+    my $TestDate = DBUtil->Date($rClientODAS->{'TestDate'},'fmt','YYYYMMDD');
+    my $exp = $TestDate < $BackDate ? ' Expired' : '';
+    $ODASDate = DBUtil->Date($rClientODAS->{'TestDate'},'fmt','MM/DD/YYYY').$exp;
+  }
+  $sClientDischarge->execute($ClientID);
+  my $rClientDischarge = $sClientDischarge->fetchrow_hashref;
+  my $DischargeDate = DBUtil->Date($rClientDischarge->{'StatusDate'},'fmt','MM/DD/YYYY');
+  print qq|$rClient->{'ClinicName'}\t$rClient->{'ClientName'}\t$rClient->{'ClientID'}\t${ActiveFlag}\t$rClient->{'DOB'}\t${Age}\t$rClient->{PrimaryProvider}\t${ServiceFocus}\t$rClient->{'StatusDate'}\t$rClient->{'ExpDate'}\t${CARSTotal}\t${ASIDate}\t${ASAMDate}\t${ODASDate}\t${DischargeDate}\n|;
+}
+
+$sClient->finish();
+$sxServiceFocus->finish();
+$sClientASI->finish();
+$sClientASAM->finish();
+$sClientODAS->finish();
+$sClientTASI->finish();
+$sClientDischarge->finish();
+myDBI->cleanup();
+exit;
+############################################################################

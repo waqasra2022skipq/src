@@ -1,0 +1,30 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBForm;
+############################################################################
+my $form = DBForm->new();
+my $dbh = $form->dbconnect();
+# fix to Note Reviewed for Scholarshipped or Reconciled.
+#   BillStatus:0=new 1=rebill 2=unbillable 3=inprocess 4=scholarship 5=reconciled 6=denied
+#   RevStatus: 0=Provider needed, 1=Provider needed after changes, 2=Mgr needed, 3=Note approved
+if ( $form->{'fix'} )
+{
+  my $sfixReviewed = $dbh->prepare('update Treatment set RevStatus=3 where RevStatus<3 and (BillStatus=3 or BillStatus=4 or BillStatus=5)'); 
+  $sfixReviewed->execute();
+  my $cnt = $sfixReviewed->rows;
+  $sfixReviewed->finish();
+  print qq|$cnt rows updated.\n|;
+}
+else
+{
+  my $s = $dbh->prepare('select * from Treatment where RevStatus<3 and (BillStatus=3 or BillStatus=4 or BillStatus=5)'); 
+  $s->execute();
+  my $cnt = $s->rows;
+  while ( my $r=$s->fetchrow_hashref )
+  { print qq|  $r->{TrID},$r->{ContLogDate},$r->{BillStatus},$r->{RevStatus},$r->{MgrRevDate},$r->{ProvOKDate}\n|; }
+  $s->finish();
+  print qq|$cnt rows found.\n|;
+}
+$form->complete();
+############################################################################
+exit;

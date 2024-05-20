@@ -1,0 +1,47 @@
+#!/bin/sh
+#
+# Startup script for the mysql Server
+# kls, 07/09/99
+#
+# description: mysql is freeware
+
+SqlDir=/usr/local/mysql
+LogFile=/tmp/mysqld.out
+#------------------------------------
+start_()
+{
+   cd ${SqlDir}
+   bin/safe_mysqld &
+   /bin/sleep 1
+   /bin/ps ax | /bin/grep sql | /bin/grep -v start | /bin/grep -v grep
+   return
+}
+stop_()
+{
+   cd ${SqlDir}
+   bin/mysqladmin shutdown
+   /bin/sleep 1
+   /bin/ps ax | /bin/grep sql | /bin/grep -v stop | /bin/grep -v grep
+   return
+}
+#------------------------------------
+#------------------------------------
+echo "$(date)" > ${LogFile}
+
+( echo "command: $*"
+# See how we were called.
+case "$1" in
+  restart) stop_
+           start_
+           ;;
+    start) start_ ;;
+     stop) stop_ ;;
+   status) bin/mysqladmin status ;;
+        *) echo "Usage: $0 {start|stop|restart|status}"
+           exit 1
+           ;;
+esac
+) >> ${LogFile} 2>&1
+/bin/cat ${LogFile}
+
+exit 0

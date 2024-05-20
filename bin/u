@@ -1,0 +1,2 @@
+update ClientPrAuthCDCSent set Status='Approved' where Status='Accepted';
+update ClientDischargeCDCSent set Status='Approved' where Status='Accepted';

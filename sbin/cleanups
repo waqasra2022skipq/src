@@ -1,0 +1,134 @@
+#!/bin/bash
+# kls, daily 11/11/2008
+# ------------------------------------
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   echo -e "\nServices not installed!"
+   exit 1
+fi
+#LogFile=${LOGDIR}/${CMD}
+# ------------------------------------
+#(
+  echo -e "\n======================================"
+  echo -e "${CMD} Started: $(date)"
+  echo -e "pwd=$(pwd)"
+  # ------------------------------------
+  echo -e "\nempty ${SRC}/mislog..."
+  /bin/cp -vf /dev/null ${SRC}/mislog
+
+  echo -e "\ncleanup /tmp 'uec' files..."
+  rm -vrf /tmp/*.uec
+  find /tmp/CGItemp* -mtime +1 -type f -exec rm -vf {} \;
+
+  echo -e "\ncleanup ${BACKDIR} files..."
+  find ${BACKDIR}/837 -mtime +365 -type f -exec rm -vf {} \;
+  find ${BACKDIR}/835 -mtime +365 -type f -exec rm -vf {} \;
+  find ${BACKDIR}/271 -mtime +7 -type f -exec rm -vf {} \;
+  find ${BACKDIR}/270 -mtime +7 -type f -exec rm -vf {} \;
+  find ${BACKDIR}/availity -mtime +365 -type f -exec rm -vf {} \;
+  find ${BACKDIR}/dmh -mtime +365 -type f -exec rm -vf {} \;
+  find ${BACKDIR}/FTP -mtime +365 -type f -exec rm -vf {} \;
+  find ${BACKDIR}/officeally -mtime +365 -type f -exec rm -vf {} \;
+  find ${BACKDIR}/ohca -mtime +365 -type f -exec rm -vf {} \;
+  find ${BACKDIR}/tricare -mtime +365 -type f -exec rm -vf {} \;
+
+  if [ -d ${ADMINDIR} ]; then
+    cd ${ADMINDIR}
+    echo -e "\ncleanup ${ADMINDIR} files...pwd=$(pwd)"
+    find ${ADMINDIR}/271/* -mtime +7 -type f -exec mv -vf {} ${BACKDIR}/271 \;
+    # skip do and done directories
+    find ${ADMINDIR}/835/* -mtime +7 -type f -not \( -path "${ADMINDIR}/835/do/*" -o -path "${ADMINDIR}/835/done*" \) -exec mv -vf {} ${BACKDIR}/835 \;
+    # OR USE find ${ADMINDIR}/835/* -mtime +7 -type f -not \( -path "${ADMINDIR}/835/do*" \) -exec mv -vf {} ${BACKDIR}/835 \;
+    find ${ADMINDIR}/837/* -mtime +7 -type f -exec mv -vf {} ${BACKDIR}/837 \;
+  fi
+  if [ -d ${BILLDIR} ]; then
+    cd ${BILLDIR}
+    echo -e "\ncleanup ${BILLDIR} files...pwd=$(pwd)"
+    mv -fv *.837 ${BACKDIR}/837
+    mv -fv *.837.out ${BACKDIR}/837
+    mv -fv *.837.txt ${BACKDIR}/837
+    find ${BILLDIR}/* -mtime +1 -type f -exec rm -vf {} \;
+  fi
+  if [ -d ${REMITDIR} ]; then
+    cd ${REMITDIR}
+    echo "\ncleanup ${REMITDIR} Eligible files..."
+    find ${REMITDIR}/*Eligible -mtime +1 -type f -exec rm -vf {} \;
+  fi
+  LIVEACCTS=$(${MISBIN}/accts live)
+  echo -e "\ncleanups: LIVEACCTS=${LIVEACCTS}"
+  for ACCT in $LIVEACCTS; do
+    echo -e "\ncleanup ${ACCT}..."
+    if [ -d ${WWW}/${ACCT}/billing ]; then
+      cd ${WWW}/${ACCT}/billing
+      echo "cleanup ${ACCT}/billing...pwd=$(pwd)"
+      find . -mtime +30 -type f -exec rm -vf {} \;
+    fi
+    if [ -d ${WWW}/${ACCT}/reports1 ]; then
+      cd ${WWW}/${ACCT}/reports1
+      echo "cleanup ${ACCT}/reports1...pwd=$(pwd)"
+      find . -mtime +14 -type f -exec rm -vf {} \;
+    fi
+    if [ -d ${WWW}/${ACCT}/reports2 ]; then
+      cd ${WWW}/${ACCT}/reports2
+      echo "cleanup ${ACCT}/reports2...pwd=$(pwd)"
+      find . -mtime +40 -type f -exec rm -vf {} \;
+    fi
+    if [ -d ${WWW}/${ACCT}/reports3 ]; then
+      cd ${WWW}/${ACCT}/reports3
+      echo "cleanup ${ACCT}/reports3...pwd=$(pwd)"
+      find . -mtime +80 -type f -exec rm -vf {} \;
+    fi
+    if [ -d ${WWW}/${ACCT}/reports4 ]; then
+      cd ${WWW}/${ACCT}/reports4
+      echo "cleanup ${ACCT}/reports4...pwd=$(pwd)"
+      find . -mtime +120 -type f -exec rm -vf {} \;
+    fi
+    if [ -d ${WWW}/${ACCT}/Provider/EFiles/837 ]; then
+      cd ${WWW}/${ACCT}/Provider/EFiles/837
+      echo "cleanup ${ACCT}/Provider/EFiles/837...pwd=$(pwd)"
+#     cleanup 2160 minutes or 1.5 days...
+      find . -mmin +2160 -type f -exec rm -vf {} \;
+    fi
+  done
+  # ------------------------------------
+  TESTACCTS=$(${MISBIN}/accts test)
+  echo -e "\ncleanups: TESTACCTS=${TESTACCTS}"
+  for ACCT in $TESTACCTS; do
+    echo -e "cleanup develop files..."
+    rm -rvf ${BACKDIR}/835/${ACCT}/*
+    rm -rvf ${WWW}/${ACCT}/backup/*
+    rm -rvf ${WWW}/${ACCT}/billing/*
+    rm -rvf ${WWW}/${ACCT}/Client/*
+    rm -rvf ${WWW}/${ACCT}/payroll/*
+    rm -rvf ${WWW}/${ACCT}/Provider/*
+    rm -rvf ${WWW}/${ACCT}/reports[1-4]/*
+    rm -rvf ${WWW}/${ACCT}/tmp/*
+    echo "okmis_${ACCT}: delete from Login" 
+    echo "delete from Login" | ${DBBIN}/mysql okmis_${ACCT}
+  done
+  # ------------------------------------
+  LIVEDBS=$(${MISBIN}/dbs live)
+  echo -e "\ncleanups: LIVEDBS=${LIVEDBS}"
+  for DBNAME in $LIVEDBS; do
+    if [ ${DBNAME} = "okmis_client" ]; then continue; fi
+    echo -e "\ncleanup MySQL tables ${DBNAME}..."
+    echo "  delete from UpdDone " 
+    echo "delete from UpdDone" | ${DBBIN}/mysql ${DBNAME}
+    echo "  delete from ClientProblems where UUID is null and Comments is null"
+    echo "delete from ClientProblems where UUID is null and Comments is null" | ${DBBIN}/mysql ${DBNAME}
+    echo "  delete from Eligible where FromDate < DATE_SUB(NOW(),INTERVAL 2 YEAR) "
+    echo "delete from Eligible where FromDate < DATE_SUB(NOW(),INTERVAL 2 YEAR)" | ${DBBIN}/mysql ${DBNAME}
+
+    if [ ${DBNAME} = "okmis_mms" ]; then continue; fi
+
+    echo "${DBNAME}: delete from ProviderPrivs where Type='AdminTables'" 
+    echo "delete from ProviderPrivs where Type='AdminTables'" | ${DBBIN}/mysql ${DBNAME}
+    echo "${DBNAME}: delete from ProviderPrivs where Type='SiteAdmin'" 
+    echo "delete from ProviderPrivs where Type='SiteAdmin'" | ${DBBIN}/mysql ${DBNAME}
+  done
+
+  echo -e "\n${CMD} Complete: $(date)"
+  echo -e "======================================\n"
+#) | tee -a ${LogFile} 2>&1
+# ------------------------------------

@@ -1,0 +1,70 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use DBA;
+use DBUtil;
+use Time::Local;
+$DT = localtime();
+############################################################################
+# usage: ListProviderTraining ForProvID=id
+############################################################################
+my $form = DBForm->new();
+$form = DBUtil->setDates($form);
+my $DateRange = qq|from $form->{FromDateD} thru $form->{ToDateD}|;
+#warn qq|$form->{FromDate}, $form->{ToDate}\n|;
+my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+
+my $dbh = $form->dbconnect();
+############################################################################
+my $ProviderSelection = DBA->getProviderSelection($form,$ForProvID,'Provider.ProvID','where');
+$ProviderSelection .= qq| and Provider.Active=1| if ( $form->{Active} );
+
+print qq|${DT}\nProvider Training Report\t${DateRange}\n|;
+
+# report section 1 from Training table
+print qq|Section 1 Provider Training\n|;
+print qq|LName\tFName\tProvID\tActive\tJobTitle\tHireDate\tDate\tDescription\tTitle\tType\n|;
+my $sTraining=$dbh->prepare("
+select Provider.LName, Provider.FName, Provider.ProvID, Provider.Active, Provider.JobTitle
+      ,EmplInfo.HireDate, Training.Date, Training.Descr 
+  from Training 
+    left join Provider on Provider.ProvID=Training.ProvID 
+    left join EmplInfo on EmplInfo.ProvID=Training.ProvID 
+  ${ProviderSelection} 
+    and Training.CreateDate>='$form->{FromDate}' and Training.CreateDate<='$form->{ToDate}'
+  order by Provider.LName, Provider.FName, Training.Date
+");
+$sTraining->execute();
+while ( my $rTraining = $sTraining->fetchrow_hashref )
+{
+  print qq|$rTraining->{LName}\t$rTraining->{FName}\t$rTraining->{ProvID}\t$rTraining->{Active}\t$rTraining->{JobTitle}\t$rTraining->{HireDate}\t$rTraining->{Date}\t$rTraining->{Descr}\n|;
+}
+$sTraining->finish();
+
+# report section 2 from ProviderEDocs table
+print qq|Section 2 Provider Electronic Documents Training\n|;
+print qq|LName\tFName\tProvID\tActive\tJobTitle\tHireDate\tDate\tDescription\tTitle\tType\n|;
+my $ProviderSelection = DBA->getProviderSelection($form,$ForProvID,'Provider.ProvID','where');
+my $sProviderEDocs=$dbh->prepare("
+select Provider.LName, Provider.FName, Provider.ProvID, Provider.Active, Provider.JobTitle
+      ,EmplInfo.HireDate, ProviderEDocs.CreateDate, ProviderEDocs.Descr, ProviderEDocs.Title, xEDocType.Descr as Type 
+  from ProviderEDocs 
+    left join Provider on Provider.ProvID=ProviderEDocs.ProvID 
+    left join EmplInfo on EmplInfo.ProvID=ProviderEDocs.ProvID 
+    left join okmis_config.xEDocType on xEDocType.ID=ProviderEDocs.Type 
+  ${ProviderSelection} 
+    and xEDocType.Descr LIKE '%training%'
+    and ProviderEDocs.CreateDate>='$form->{FromDate}' and ProviderEDocs.CreateDate<='$form->{ToDate}'
+  order by Provider.LName, Provider.FName, ProviderEDocs.CreateDate
+");
+$sProviderEDocs->execute();
+while ( my $rProviderEDocs = $sProviderEDocs->fetchrow_hashref )
+{
+  print qq|$rProviderEDocs->{LName}\t$rProviderEDocs->{FName}\t$rProviderEDocs->{ProvID}\t$rProviderEDocs->{Active}\t$rProviderEDocs->{JobTitle}\t$rProviderEDocs->{HireDate}\t$rProviderEDocs->{CreateDate}\t$rProviderEDocs->{Descr}\t$rProviderEDocs->{Title}\t$rProviderEDocs->{Type}\n|;
+}
+$sProviderEDocs->finish();
+
+$form->complete();
+exit;
+############################################################################

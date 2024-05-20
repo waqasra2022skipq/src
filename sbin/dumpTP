@@ -1,0 +1,24 @@
+#!/bin/bash
+#--------------------
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   echo -e "\nServices not installed!"
+   exit 1
+fi
+#--------------------
+DB=$1
+TrPlanID=$2
+#--------------------
+if [ -n "${TrPlanID}" ]; then
+  mysqldump --complete-insert --no-create-info --where "ID=${TrPlanID}" ${DB} ClientTrPlan | grep INSERT
+  mysqldump --complete-insert --no-create-info --where "TrPlanID=${TrPlanID}" ${DB} ClientTrPlanPG | grep INSERT
+  mysqldump --complete-insert --no-create-info --where "TrPlanPGID=32194" ${DB} ClientTrPlanOBJ | grep INSERT
+  mysqldump --complete-insert --no-create-info --where "TrPlanPGID=32195" ${DB} ClientTrPlanOBJ | grep INSERT
+  mysqldump --complete-insert --no-create-info --where "TrPlanPGID=32196" ${DB} ClientTrPlanOBJ | grep INSERT
+  mysqldump --complete-insert --no-create-info --where "TrPlanPGID=32197" ${DB} ClientTrPlanOBJ | grep INSERT
+  mysqldump --complete-insert --no-create-info --where "TrPlanPGID=32198" ${DB} ClientTrPlanOBJ | grep INSERT
+  mysqldump --complete-insert --no-create-info --where "TrPlanPGID=32199" ${DB} ClientTrPlanOBJ | grep INSERT
+  mysqldump --complete-insert --no-create-info --where "TrPlanPGID=32200" ${DB} ClientTrPlanOBJ | grep INSERT
+fi
+#--------------------

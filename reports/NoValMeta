@@ -1,0 +1,133 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use DBA;
+use DBUtil;
+use Time::Local;
+my $DT = localtime();
+############################################################################
+# usage:
+#   NoMeta ForProvID=id\\&Days=dd
+############################################################################
+my $form = DBForm->new();
+#foreach my $f ( sort keys %{$form} ) { print "form-$f=$form->{$f}\n"; }
+my $dbh = $form->dbconnect();
+
+my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+#my $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID');
+my $ClinicSelection = DBA->withSelection($form,'and','Client.clinicClinicID','','','');
+$ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+my $sProvider = $dbh->prepare("select LName, FName from Provider where ProvID=?");
+
+my $sClientVitalSigns = $dbh->prepare("select * from ClientVitalSigns where ClientID=? and (BMI>0 || HbA1c is not null ) order by VDate desc");
+
+my $qClientProblemsTest1 = qq|
+select ClientProblems.ClientID,ClientProblems.Priority,misICD10.ICD10,misICD10.sctName
+ from ClientProblems 
+  left join okmis_config.misICD10 on misICD10.ID=ClientProblems.UUID
+ where ClientProblems.ClientID=? and misICD10.ICD10='73.03'
+|;
+my $sClientProblemsTest1 = $dbh->prepare($qClientProblemsTest1);
+my $qClientProblemsTest2 = qq|
+select ClientProblems.ClientID,ClientProblems.Priority,misICD10.ICD10,misICD10.sctName
+ from ClientProblems 
+  left join okmis_config.misICD10 on misICD10.ID=ClientProblems.UUID
+ where ClientProblems.ClientID=? and sctName LIKE "%Diabetes Mellitus%"
+|;
+my $sClientProblemsTest2 = $dbh->prepare($qClientProblemsTest2);
+my $qClientProblemsTest3 = qq|
+select ClientProblems.ClientID,ClientProblems.Priority,misICD10.ICD10,misICD10.sctName
+ from ClientProblems 
+  left join okmis_config.misICD10 on misICD10.ID=ClientProblems.UUID
+ where ClientProblems.ClientID=? and sctName LIKE "%Obesity%"
+|;
+my $sClientProblemsTest3 = $dbh->prepare($qClientProblemsTest3);
+
+my $sClient = $dbh->prepare("
+select Client.LName, Client.FName, Client.ClientID, Client.DOB, Client.ProvID, Client.Active
+      ,ClientVitalSigns.ID, ClientVitalSigns.VDate
+      ,ClientVitalSigns.HeightFeet, ClientVitalSigns.HeightInches, ClientVitalSigns.Weight
+      ,ClientVitalSigns.BMI, ClientVitalSigns.HbA1c
+  from Client 
+    left join ClientACL on ClientACL.ClientID=Client.ClientID
+    left join ClientVitalSigns on ClientVitalSigns.ClientID=Client.ClientID
+  where ClientACL.ProvID='${ForProvID}'
+    and ClientVitalSigns.ID is not null
+ and (ClientVitalSigns.BMI>0 || ClientVitalSigns.HbA1c is not null ) 
+  ${ClinicSelection}
+  group by Client.LName, Client.FName, Client.ClientID
+");
+print qq|${DT}\nMissing Metabolic Treatment Report.\nClients with Metabolic symtoms MISSING adequate problem listed.\n|;
+print qq|Client Name\tActive\tDOB\tAge\tTestDate\tHeight\tWeight\tBMI\tHbA1c\tProvider Name\tMessage\n|;
+#print qq|ClinicSelection=${ClinicSelection}\n|;
+#print qq|with=${with}\n|;
+$sClient->execute();
+while (my $rClient = $sClient->fetchrow_hashref)
+{ 
+#foreach my $f ( sort keys %{$rClient} ) { print "rClient-$f=$rClient->{$f}\n"; }
+  my $ClientID = $rClient->{'ClientID'};
+  my $ActiveFlag = $rClient->{'Active'} ? 'Yes' : 'No';;
+  my $ClientName = qq|$rClient->{'LName'}, $rClient->{'FName'} ($rClient->{'ClientID'})|;
+  my $Age = DBUtil->Date($rClient->{DOB}, 'age');
+  $sProvider->execute($rClient->{ProvID});
+  my ($ProvLName, $ProvFName) = $sProvider->fetchrow_array;
+  my $ProvName = qq|$ProvLName, $ProvFName ($rClient->{ProvID})|; 
+#print qq|\nClientID=${ClientID}, ClientName=${ClientName}, Age=${Age}\n|;
+  if ( $rClient->{ID} eq '' )
+  { null; }    # skip, should never happen because of 'is not null' in selection
+  else
+  {
+    my ($r,$msg) = main->getMeta($form,$ClientID);
+    my $LastHeight = qq|$r->{'HeightFeet'}ft $r->{'HeightInches'}in| 
+                   if ( $r->{'HeightFeet'} ne '' || $r->{'HeightInches'} ne '' );
+    my $LastWeight = qq|$r->{'Weight'}lbs| if ( $r->{'Weight'} ne '' );
+    print qq|${ClientName}\t${ActiveFlag}\t$rClient->{'DOB'}\t${Age}\t$r->{'VDate'}\t${LastHeight}\t${LastWeight}\t$r->{'BMI'}\t$r->{'HbA1c'}\t${ProvName}\t${msg}\n| if ( $msg ne '' );
+  }
+}
+
+$sProvider->finish();
+$sClientProblemsTest1->finish();
+$sClientProblemsTest2->finish();
+$sClientProblemsTest3->finish();
+$sClientVitalSigns->finish();
+$sClient->finish();
+$form->complete();
+exit;
+############################################################################
+sub getMeta
+{
+  my ($self,$form,$ClientID) = @_;
+  my $dbh = $form->dbconnect();
+  my ($rtnmsg,$dlm) = ('','');
+  my $YesHeight, $YesWeight, $YesDate;
+  my $NoHeight, $NoWeight;
+  # if=get last 1 (VDate desc), selection guarantees 1
+  $sClientVitalSigns->execute($ClientID);
+  my $rLastOne = $sClientVitalSigns->fetchrow_hashref;
+#print qq|getMeta: ClientID=${ClientID}, $rLastOne->{'BMI'}, $rLastOne->{'AbA1c'}\n|;
+#foreach my $f ( sort keys %{$rLastOne} ) { print "rLastOne-$f=$rLastOne->{$f}\n"; }
+  if ( 5.7 <= $rLastOne->{'HbA1c'} && $rLastOne->{'HbA1c'} <= 6.4 )
+  {
+#print qq|getMeta: Test1: ClientID=${ClientID}\n|;
+    $sClientProblemsTest1->execute($ClientID);
+    unless ( my $rClientProblemsTest1 = $sClientProblemsTest1->fetchrow_hashref )
+    { $rtnmsg .= $dlm.'PREDIABETES'; $dlm = '; '; }
+  }
+  if ( 6.5 < $rLastOne->{'HbA1c'} )
+  {
+#print qq|getMeta: Test2: ClientID=${ClientID}\n|;
+    $sClientProblemsTest2->execute($ClientID);
+    unless ( my $rClientProblemsTest2 = $sClientProblemsTest2->fetchrow_hashref )
+    { $rtnmsg .= $dlm.'DIABETES MELLITUS'; $dlm = '; '; }
+  }
+  if ( 30 < $rLastOne->{'BMI'} )
+  {
+#print qq|getMeta: Test3: ClientID=${ClientID}\n|;
+    $sClientProblemsTest3->execute($ClientID);
+    unless ( my $rClientProblemsTest3 = $sClientProblemsTest3->fetchrow_hashref )
+    { $rtnmsg .= $dlm.'OBESITY'; $dlm = '; '; }
+  }
+  $rtnmsg .= ' MISSING' if ( $rtnmsg ne '' );
+  return($rLastOne,$rtnmsg);
+}

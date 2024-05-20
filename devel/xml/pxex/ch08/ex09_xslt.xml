@@ -1,0 +1,24 @@
+<xsl:stylesheet
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  version="1.0">
+
+  <xsl:template match="html">
+    <xsl:text>Title: </xsl:text>
+    <xsl:value-of select="head/title"/>
+    <xsl:apply-templates select="body"/>
+  </xsl:template>
+
+  <xsl:template match="body">
+    <xsl:apply-templates/>
+  </xsl:template>
+
+  <xsl:template match="h1 | h2 | h3 | h4">
+    <xsl:text>Head: </xsl:text>
+    <xsl:value-of select="."/>
+  </xsl:template>
+
+  <xsl:template match="p | blockquote | li">
+    <xsl:text>Content: </xsl:text>
+    <xsl:value-of select="."/>
+  </xsl:template>
+</xsl:stylesheet>

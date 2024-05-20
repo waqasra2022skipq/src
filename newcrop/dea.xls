@@ -1,0 +1,6 @@
+Name	Addr1	Addr2	City	ST	Zip	Phone	Fax	TaxID	Contact	Trainer
+EXOSTAR DEA AUDIT Clinic	1 Government Place	NULL	Norman	OK	73072-0000	405-627-0276	888-753-8162	NULL	wade@okmis.com	Sandi Doyle
+ 
+Prescriber	FName	MName	Gend	Addr1	Addr2	City	ST	Zip	Phone	Cell	Fax	DOB	NPI	DEA	Clinician	Role	SupervisingPhysician	FName
+Applegate	Timothy	NULL	M	3816 Shadowridge Dr	NULL	Norman	OK	73072	405-627-0276	405-627-0276	888-753-8162	11/10/1937	1877324149	AA1447350	Y	Licensed Prescriber	NULL	NULL
+White	Perry	NULL	M	1 Government Place	NULL	Norman	OK	73072-0000	405-627-0276	405-627-0276	888-753-8162	09/11/1964	1750311247	DD9876543	Y	Licensed Prescriber	NULL	NULL

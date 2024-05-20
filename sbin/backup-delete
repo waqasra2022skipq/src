@@ -1,0 +1,22 @@
+#!/bin/sh
+###################################################
+date
+echo "Check for last run aborted..."
+if [ -e /var/run/rsync.pid ]; then
+  mypid=`cat /var/run/rsync.pid`;
+  if [ ! -e /proc/$mypid ]; then
+    echo "Stale lock file, removing";
+    rm /var/run/rsync.pid
+  fi
+fi
+
+echo "Check to see if already running..."
+if [ ! -e /var/run/rsync.pid ]; then
+  echo "Start backup..."
+  echo $$ > /var/run/rsync.pid
+  rsync --delete -v -a / /backup --exclude /server3_mis --exclude /root --exclude /sys --exclude /backup --exclude /old --exclude /proc --exclude /home/virtfs --exclude /var/lib --exclude /usr/local/cpanel/logs --exclude /usr/local/apache/domlogs --exclude /usr/local/apache/logs --exclude /home/databak --exclude /home/databak/okmis/mail --exclude /usr/tmpDSK --exclude /tmp --exclude /var/tmp
+  rm /var/run/rsync.pid
+  echo "backup complete..."
+fi
+date
+###################################################

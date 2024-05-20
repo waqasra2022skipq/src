@@ -1,0 +1,287 @@
+[class*='mis-grid'],
+[class*='mis-col-'],
+[class*='mis-mobile-'],
+.mis-grid:after {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;	
+}
+
+[class*='mis-col-'] {
+	float: left;
+  	min-height: 1px;
+	padding-right: 20px; /* column-space */
+}
+
+[class*='mis-col-'] [class*='mis-col-']:last-child {
+	padding-right: 0;
+}
+
+.mis-grid-content {
+                                background: #ccc;
+                                padding: 10px;
+                        }
+
+.mis-grid {
+	width: 100%;
+	max-width: 1140px;
+	min-width: 748px;   /* when using padded grid on ipad in portrait mode, */
+                            /* width should be viewport-width - padding = (768 - 20) = 748. */
+                            /* actually, it should be even smaller to allow for padding of grid containing element */
+	margin: 0 auto;
+	overflow: hidden;
+}
+
+.mis-grid:after {
+	content: "";
+	display: table;
+	clear: both;
+}
+
+.mis-grid-pad {
+	padding-top: 20px;
+	padding-left: 20px; /* grid-space to left */
+	padding-right: 0; /* grid-space to right: (grid-space-left - column-space) e.g. 20px-20px=0 */
+}
+
+.mis-push-right {
+	float: right;
+}
+
+/* Content Columns */
+
+.mis-col-1-1 {
+	width: 100%;
+}
+.mis-col-2-3, .mis-col-8-12 {
+	width: 66.66%;
+}
+
+.mis-col-1-2, .mis-col-6-12 {
+	width: 50%;
+}
+
+.mis-col-1-3, .mis-col-4-12 {
+	width: 33.33%;
+}
+
+.mis-col-1-4, .mis-col-3-12 {
+	width: 25%;
+}
+
+.mis-col-1-5 {
+	width: 20%;
+}
+
+.mis-col-1-6, .mis-col-2-12 {
+	width: 16.667%;
+}
+
+.mis-col-1-7 {
+	width: 14.28%;
+}
+
+.mis-col-1-8 {
+	width: 12.5%;
+}
+
+.mis-col-1-9 {
+	width: 11.1%;
+}
+
+.mis-col-1-10 {
+	width: 10%;
+}
+
+.mis-col-1-11 {
+	width: 9.09%;
+}
+
+.mis-col-1-12 {
+	width: 8.33%
+}
+
+/* Layout Columns */
+
+.mis-col-11-12 {
+	width: 91.66%
+}
+
+.mis-col-10-12 {
+	width: 83.333%;
+}
+
+.mis-col-9-12 {
+	width: 75%;
+}
+
+.mis-col-5-12 {
+	width: 41.66%;
+}
+
+.mis-col-7-12 {
+	width: 58.33%
+}
+
+/* Pushing blocks */
+
+.mis-push-2-3, .mis-push-8-12 {
+	margin-left: 66.66%;
+}
+
+.mis-push-1-2, .mis-push-6-12 {
+	margin-left: 50%;
+}
+
+.mis-push-1-3, .mis-push-4-12 {
+	margin-left: 33.33%;
+}
+
+.mis-push-1-4, .mis-push-3-12 {
+	margin-left: 25%;
+}
+
+.mis-push-1-5 {
+	margin-left: 20%;
+}
+
+.mis-push-1-6, .mis-push-2-12 {
+	margin-left: 16.667%;
+}
+
+.mis-push-1-7 {
+	margin-left: 14.28%;
+}
+
+.mis-push-1-8 {
+	margin-left: 12.5%;
+}
+
+.mis-push-1-9 {
+	margin-left: 11.1%;
+}
+
+.mis-push-1-10 {
+	margin-left: 10%;
+}
+
+.mis-push-1-11 {
+	margin-left: 9.09%;
+}
+
+.mis-push-1-12 {
+	margin-left: 8.33%
+}
+
+@media handheld, only screen and (max-width: 767px) {
+	.mis-grid {
+		width: 100%;
+		min-width: 0;
+		margin-left: 0;
+		margin-right: 0;
+		padding-left: 20px; /* grid-space to left */
+		padding-right: 10px; /* grid-space to right: (grid-space-left - column-space) e.g. 20px-10px=10px */
+	}
+
+	[class*='mis-col-'] {
+		width: auto;
+		float: none;
+		margin: 10px 0;
+		padding-left: 0;
+		padding-right: 10px; /* column-space */
+	}
+
+	[class*='mis-col-'] [class*='mis-col-'] {
+		padding-right: 0;
+	}
+
+	/* Mobile Layout */
+
+	[class*='mobile-col-'] {
+		float: left;
+		margin: 0 0 10px;
+		padding-left: 0;
+		padding-right: 10px; /* column-space */
+		padding-bottom: 0;
+	}
+
+	.mobile-col-1-1 {
+		width: 100%;
+	}
+	.mobile-col-2-3, .mobile-col-8-12 {
+		width: 66.66%;
+	}
+
+	.mobile-col-1-2, .mobile-col-6-12 {
+		width: 50%;
+	}
+
+	.mobile-col-1-3, .mobile-col-4-12 {
+		width: 33.33%;
+	}
+
+	.mobile-col-1-4, .mobile-col-3-12 {
+		width: 25%;
+	}
+
+	.mobile-col-1-5 {
+		width: 20%;
+	}
+
+	.mobile-col-1-6, .mobile-col-2-12 {
+		width: 16.667%;
+	}
+
+	.mobile-col-1-7 {
+		width: 14.28%;
+	}
+
+	.mobile-col-1-8 {
+		width: 12.5%;
+	}
+
+	.mobile-col-1-9 {
+		width: 11.1%;
+	}
+
+	.mobile-col-1-10 {
+		width: 10%;
+	}
+
+	.mobile-col-1-11 {
+		width: 9.09%;
+	}
+
+	.mobile-col-1-12 {
+		width: 8.33%
+	}
+
+	/* Layout Columns */
+
+	.mobile-col-11-12 {
+		width: 91.66%
+	}
+
+	.mobile-col-10-12 {
+		width: 83.333%;
+	}
+
+	.mobile-col-9-12 {
+		width: 75%;
+	}
+
+	.mobile-col-5-12 {
+		width: 41.66%;
+	}
+
+	.mobile-col-7-12 {
+		width: 58.33%
+	}
+
+	.hide-on-mobile {
+		display: none !important;
+		width: 0;
+		height: 0;
+	}
+}
+

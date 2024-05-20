@@ -1,0 +1,6 @@
+select *
+ from TrPlanIP 
+  left join TrPlan on TrPlan.TrPlanID=TrPlanIP.TrPlanID 
+ where TrPlan.TrPlanID is null
+;
+

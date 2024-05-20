@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE book
+  SYSTEM "/usr/local/prod/sgml/db.dtd"
+[
+  <!ENTITY thingy "hoo hah blah blah">
+]>
+
+<book id="mybook">
+<?print newpage?>
+  <title>GRXL in a Nutshell</title>
+  <chapter id="intro">
+    <title>What is GRXL?</title>
+<!-- need a better title -->
+    <para>
+Yet another acronym.  That was our attitude at first, but then we saw 
+the amazing uses of this new technology called
+<literal>GRXL</literal>.  Consider the following program:
+    </para>
+<?print newpage?>
+    <programlisting>AH aof -- %%%%
+{{{{{{ let x = 0 }}}}}}
+  print!  <lineannotation><literal>wow</literal></lineannotation>
+or not!</programlisting>
+<!-- what font should we use? -->
+    <para>
+What does it do?  Who cares?  It's just lovely to look at.  In fact,
+I'd have to say, "&thingy;".
+    </para>
+<?print newpage?>
+  </chapter>
+</book>

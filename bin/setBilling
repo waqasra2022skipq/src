@@ -1,0 +1,112 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use cBill;
+############################################################################
+# usage: setBilling DBNAME={dbname}&BillDate=2011-06-22
+############################################################################
+my $form = DBForm->new();
+my $dbh = $form->dbconnect();
+my $debug = $form->{'debug'};
+
+my ($BillDate,$NEXTBILLDATE) = cBill->getBillDate();
+$BillDate = $form->{BillDate} if ( $form->{BillDate} );
+print qq|setBilling: $BillDate\n|;
+############################################################################
+# delete for this BillDate...
+### for RERUN comment 3 delete lines
+$sDelete=$dbh->prepare("delete from Billing837 where BillDate='$BillDate'");
+$sDelete->execute() || $form->dberror("setBilling: delete $BillDate");
+$sDelete->finish();
+
+$sExist=$dbh->prepare("select * from Billing837 where ClinicID=? and ProvID=? and InsID=? and ClientID=? and ClaimKey=? and BillDate=?");
+$sUpdate=$dbh->prepare("update Billing837 set TransIDs=?, NoteCnt=? where ID=?");
+$sInsert=$dbh->prepare("insert into Billing837 (ClinicID,ProvID,InsID,ClientID,ClaimKey,BillDate,TransIDs,NoteCnt) values (?,?,?,?,?,?,?,?)");
+$sProviderControl=$dbh->prepare("select * from ProviderControl where ProvID=?");
+$sClientNoteProblems=$dbh->prepare("select ClientNoteProblems.UUID,ClientNoteProblems.Priority,misICD10.ICD10 from ClientNoteProblems left join okmis_config.misICD10 on misICD10.ID=ClientNoteProblems.UUID where ClientID=? and TrID=? order by ClientNoteProblems.Priority");
+
+############################################################################
+my $qNotes = qq|
+select NoteTrans.ID, NoteTrans.TrID, NoteTrans.SCID
+     , Treatment.ContLogDate, Treatment.ContLogBegTime, Treatment.ContLogEndTime
+     , Treatment.ClinicID, Treatment.ProvID, Treatment.ClientID, Treatment.POS
+     , xSC.InsID, xSC.SCNum
+  from NoteTrans
+    left join Treatment on Treatment.TrID=NoteTrans.TrID
+    left join xSC on xSC.SCID=NoteTrans.SCID
+  where NoteTrans.BillDate='$BillDate'
+    and NoteTrans.Code='BI'
+  order by NoteTrans.ProvID, NoteTrans.ClientID, NoteTrans.ContDate
+|;
+warn qq|qNotes=\n$qNotes\n| if ( $debug );
+$sNotes=$dbh->prepare($qNotes);
+$sNotes->execute() || $form->dberror($qNotes);
+while ( $rNotes = $sNotes->fetchrow_hashref )
+{
+warn qq|$rNotes->{ID},$rNotes->{TrID},$rNotes->{ClinicID},$rNotes->{ProvID},$rNotes->{ClientID},$BillDate\n| if ( $debug );
+  my $ClinicID = $rNotes->{ClinicID};
+  my ($code,$msg) = cBill->CheckNote($form,$rNotes->{TrID});
+  if ( $code && $msg )                 # FATAL
+  { print qq|CheckNote FATAL: skip $rNotes->{TrID} ($code:$msg)\n|; next; }
+###next if ( $rNotes->{'ContLogDate'} lt '2015-10-01' );   # RERUN 
+
+warn qq|TrID=$rNotes->{TrID}, ContLogDate=$rNotes->{ContLogDate}\n| if ( $debug );
+  $sProviderControl->execute($ClinicID)
+                 || $form->dberror("setBilling: select ProviderControl $ClinicID");
+  $rProviderControl = $sProviderControl->fetchrow_hashref;
+  my $rInsurance = cBill->getInsurance($form,$rNotes->{ClientID},$rNotes->{InsID},$rNotes->{ContLogDate});
+  my $rClientPrAuth = cBill->getAuth($form,$rNotes->{ClientID},$rNotes->{InsID},$rNotes->{ContLogDate});
+  my @Problems = ();
+  my $hci = $rNotes->{'ContLogDate'} lt '2015-10-01' ? 'B' : 'AB';
+  my $def = $rNotes->{'ContLogDate'} lt '2015-10-01' ? 'V7109' : 'Z0389';
+  $sClientNoteProblems->execute($rNotes->{'ClientID'},$rNotes->{'TrID'}) || $form->dberror("select ClientNoteProblems $rNotes->{'ClientID'},$rNotes->{'TrID'}");
+  while ( $rClientNoteProblems = $sClientNoteProblems->fetchrow_hashref )
+  { 
+    my $ICD10 = $rClientNoteProblems->{'ICD10'};
+warn qq|BEFORE: ICD10=${ICD10}, ContLogDate=$rNotes->{ContLogDate}\n| if ( $debug );
+    $ICD10 =~ s/\.//g;                          # trim period .
+    next unless ( $ICD10 =~ /^F/ );             # skip non-MH Diagnosis
+
+    push(@Problems,$ICD10); 
+  }
+
+warn qq|PASSED: $rNotes->{ProvID}, DesigProvID=$rNotes->{DesigProvID}, Problems=@Problems\n| if ( $debug );
+##
+# update or add to Billing837 file...
+  my $ID = $rNotes->{ID};
+  my $ProvID = $rInsurance->{DesigProvID} ? $rInsurance->{DesigProvID} : $rNotes->{ProvID};
+  my $ClientID = $rNotes->{ClientID};
+  my $InsID = $rInsurance->{InsID};
+  my $POS = DBA->getxref($form,'xPOS',$rNotes->{'POS'},'Federal'); $POS = '99' if ( $POS eq '' );
+  my $PROBLEMS = $Problems[0] eq '' ? qq|${hci}K:${def}| : qq|${hci}K:$Problems[0]|;
+  $PROBLEMS .= $Problems[1] eq '' ? '_' : qq|_${hci}F:$Problems[1]|;
+  $PROBLEMS .= $Problems[2] eq '' ? '_' : qq|_${hci}F:$Problems[2]|;
+  my $CLIA = $rNotes->{'SCNum'} =~ /QW$|81002/ ? $rProviderControl->{'CLIA'} : '';
+###$BillDate = '2015-10-09';    # RERUN 
+warn qq|PASSED: $rNotes->{'SCNum'}: CLIA=${CLIA}/$rProviderControl->{CLIA}\n| if ( $debug );
+warn qq|POS=$POS, $rNotes->{POS}, $ID, $rNotes->{TrID}\n| if ( $debug );
+# ClaimKey groups NoteTrans into THEIR OWN CLAIM by using the TrID.
+  my $ClaimKey = qq|$rInsurance->{InsIDNum}_$rNotes->{TrID}_${POS}_${PROBLEMS}_$rClientPrAuth->{'PAnumber'}_${CLIA}|;
+  $sExist->execute($ClinicID,$ProvID,$InsID,$ClientID,$ClaimKey,$BillDate) 
+          || $form->dberror("setBilling: find $ID");
+  if ( $rExist = $sExist->fetchrow_hashref ) 
+  {
+    my $TransIDs = $rExist->{TransIDs}.'_'.$ID;
+    my $NoteCnt =  $rExist->{NoteCnt}+1;
+    my $BID      = $rExist->{ID};
+    $sUpdate->execute($TransIDs,$NoteCnt,$BID) 
+             || $form->dberror("setBilling: insert $ID");
+  }
+  else
+  {
+    $sInsert->execute($ClinicID,$ProvID,$InsID,$ClientID,$ClaimKey,$BillDate,$ID,1)
+             || $form->dberror("setBilling: insert $ID");
+  }
+}
+$sExist->finish();
+$sUpdate->finish();
+$sInsert->finish();
+$sProviderControl->finish();
+exit;
+############################################################################

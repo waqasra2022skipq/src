@@ -1,0 +1,61 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use Time::Local;
+use myDBI;
+use myForm;
+use DBUtil;
+
+my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime();
+
+
+my $Y = $year+1900;
+my $M = $mon+1;
+$M = length($M) == 1 ? '0'.$M: $M;
+my $D = length($mday) == 1 ? '0'.$mday : $mday;
+my $curdate = "${Y}-${M}-${D}";
+
+# Get the last monday as we need to set Billings run last Monday to REBILL
+my $LastMonday = DBUtil->Date('',0,1-$wday);
+
+my $form = myForm->new();
+my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $AgencyID = $form->{'AgencyID'};
+
+
+$AgencyID_Check = '';
+
+if($AgencyID ne '') {
+  $AgencyID_Check = "AND Treatment.ProvID = ${AgencyID}";
+}
+
+############################################################################
+# rebill DBNAME={dbname}&AgencyID={AgencyID}
+############################################################################
+
+my $query = "UPDATE Treatment
+  SET
+    BillStatus = 1,
+    StatusDate = '${curdate}',
+    StatusMsg = 'Rebill Again Next Monday',
+    CIPDate = NULL,
+    DenDate = NULL,
+    DenCode = NULL
+  WHERE
+    Treatment.RecDate IS NULL
+    ${AgencyID_Check}
+    AND BillDate = '${LastMonday}'
+    AND BillStatus = 3
+    AND EXISTS (
+      SELECT 1
+      FROM xSC
+      WHERE xSC.SCID = Treatment.SCID
+        AND xSC.InsID = 100
+  )";
+
+my $sUpdTreatment = $dbh->prepare($query);
+$sUpdTreatment->execute();
+
+$sUpdTreatment->finish();
+
+exit;
+############################################################################

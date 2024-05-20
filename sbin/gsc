@@ -1,0 +1,29 @@
+#!/bin/bash
+#--------------------
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   echo -e "\nServices not installed!"
+   exit 1
+fi
+LogFile=${LOGDIR}/${CMD}
+#--------------------
+TmpFile=/tmp/$$
+DB=$1
+SCID=$2
+#-------------------------
+Usage()
+{
+   echo $1
+   echo
+   echo "Usage: ${CMD} database statement"
+   echo
+   exit
+}
+#-------------------------
+if [ -z "${SCID}" ]; then Usage "No SCID!"; fi
+if [ ! -d ${DBDIR}/${DB} ]; then Usage "Invalid database!"; fi
+  echo "select xSC.InsID, xInsurance.Name, xSC.SCID, xSC.SCNum, xSC.SCName, xSC.Type, xSCRates.ServiceRate, xSCRates.RVUPct, xSCRates.EffDate, xSCRates.ExpDate, xSCRates.HrsPerUnit as HPU, xSCRates.UnitLbl, xSCRates.ChangeDate from xSC left join xInsurance on xInsurance.ID=xSC.InsID left join xSCRates on xSCRates.SCID=xSC.SCID where xSC.SCID=$SCID order by xSCRates.EffDate" > ${TmpFile}.in
+  ${DBCMD} ${DB} < ${TmpFile}.in
+  rm ${TmpFile}.in
+

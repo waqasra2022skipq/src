@@ -1,0 +1,18 @@
+echo okmis.com
+dig +short @dns.interserver.net okmis.com
+echo 4un.okmis.com
+dig +short @dns.interserver.net 4un.okmis.com
+echo anv.okmis.com
+dig +short @dns.interserver.net anv.okmis.com
+echo elf.okmis.com
+dig +short @dns.interserver.net elf.okmis.com
+echo eti.okmis.com
+dig +short @dns.interserver.net eti.okmis.com
+echo mms.okmis.com
+dig +short @dns.interserver.net mms.okmis.com
+echo oays.okmis.com
+dig +short @dns.interserver.net oays.okmis.com
+echo okpsych.org
+dig +short @dns.interserver.net okpsych.org
+echo www.okpsych.org
+dig +short @dns.interserver.net www.okpsych.org

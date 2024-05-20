@@ -1,0 +1,24 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+
+use XML::LibXML;
+
+my $file = '1832.tcx';
+
+my $parser = XML::LibXML->new->parse_file($file);
+my $xml    = XML::LibXML::XPathContext->new;                # No argument here!
+$xml->registerNs('x', 'http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2');
+
+
+for my $key ($xml->findnodes('//x:Lap', $parser)) {         # Provide the $parser here.
+    my $string = $key->findvalue('@StartTime');             # No $parser needed, since attributes are namespaceless.
+    print "1\t$string\n";
+}
+
+my @X;
+for my $node ($xml->findnodes('//x:Trackpoint', $parser)) { # Again, $parser as argument.
+    my $time = $xml->findvalue('x:Time', $node);            # Context specified as argument.
+    push @X, $time;
+}
+print "@X\n";

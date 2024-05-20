@@ -1,0 +1,5 @@
+
+INSERT INTO `user` VALUES ('localhost','scheduler_kca','315a1da013836925','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','','','','',0,0,0,0,'',NULL);
+INSERT INTO `db` VALUES ('localhost','scheduler_kca','scheduler_kca','Y','Y','Y','Y','Y','Y','N','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y');
+
+FLUSH PRIVILEGES;

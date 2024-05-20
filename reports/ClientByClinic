@@ -1,0 +1,239 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use DBA;
+use DBUtil;
+use Time::Local;
+my $DT = localtime();
+############################################################################
+# usage:
+#   ClientByClinic ForProvID=id
+############################################################################
+my $form = DBForm->new();
+my $dbh = $form->dbconnect();
+my $multidel = chr(253);
+my $ShowAmountsFlag = SysAccess->chkPriv($form,'ShowAmounts');
+
+my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+$sProvider = $dbh->prepare("select * from Provider where ProvID=?");
+
+$s=$dbh->prepare("select * from xInsurance");
+  $s->execute();
+  while (my $r = $s->fetchrow_hashref) { $xInsurance->{$r->{ID}} = $r; }
+$s=$dbh->prepare("select * from Provider where Type=3");
+  $s->execute();
+  while (my $r = $s->fetchrow_hashref) { $xClinics->{$r->{ProvID}} = $r; }
+$s=$dbh->prepare("select * from okmis_config.xRaces");
+  $s->execute();
+  while (my $r = $s->fetchrow_hashref) { $xRace->{$r->{ID}} = $r; }
+  $xRace->{'N'}{Descr} = 'No Response';
+$s->finish();
+############################################################################
+my $qInsurance = qq|
+select * 
+  from Insurance 
+  where ClientID=? and Priority=?
+    and Insurance.InsNumEffDate<=curdate()
+    and (curdate()<=Insurance.InsNumExpDate or Insurance.InsNumExpDate is null)
+|;
+my $sInsurance = $dbh->prepare($qInsurance);
+my $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID','where');
+$ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+$query = qq|select Provider.Name as Clinic
+     ,Client.LName, Client.FName, Client.ClientID, Client.Active
+     ,Client.DOB, Client.Gend
+     ,SUBSTRING_INDEX(Client.Race,'${multidel}',1) as Race
+     ,Client.SSN
+     ,truncate((to_days(curdate()) - to_days(Client.DOB)) / 365,0) as Age
+     ,Client.Zip, Client.HmPh, Client.MobPh, Client.Email, Client.Addr1, Client.County
+     ,Client.ProvID as PrimaryProvID
+     ,Client.clinicClinicID
+     ,ClientIntake.IntDate, ClientReferrals.RefDate
+     ,ClientLegal.CustAgency
+     ,ClientReferrals.ReferredBy1NPI, ClientReferrals.ReferredBy2NPI
+     ,to_days(curdate()) - to_days(ClientReferrals.RefDate) as Days
+     ,ClientRelations.FacIDNPI
+     ,ClientSocial.ReligionName, ClientSocial.PreLang
+  from Client
+    left join ClientIntake on ClientIntake.ClientID=Client.ClientID
+    left join ClientLegal on ClientLegal.ClientID=Client.ClientID
+    left join ClientReferrals on ClientReferrals.ClientID=Client.ClientID
+    left join ClientRelations on ClientRelations.ClientID=Client.ClientID
+    left join Provider on Provider.ProvID=Client.clinicClinicID
+    left join ClientSocial on ClientSocial.ClientID=Client.ClientID
+  ${ClinicSelection}
+  order by Provider.Name, Client.LName, Client.FName
+|;
+my $sPrAuth = $dbh->prepare("select * from ClientPrAuth where ClientID=? order by ExpDate desc");
+#warn qq|q=\n$query\n|;
+############################################################################
+my $Stats = ();
+$Stats->{COUNT} = 0;
+$Stats->{AGE}->{CAT0} = 0;
+$Stats->{AGE}->{CAT1} = 0;
+$Stats->{AGE}->{CAT2} = 0;
+$Stats->{AGE}->{CAT3} = 0;
+$Stats->{AGE}->{CAT4} = 0;
+$Stats->{AGE}->{CAT5} = 0;
+$Stats->{AGE}->{CAT6} = 0;
+$Stats->{MALE} = 0;
+$Stats->{FEMALE} = 0;
+print qq|${DT}\nClient By Clinic Report\n|;
+print qq|Agency\tClinic\tLName\tFName\tID\tActive\tTreatment Level\tDOB\tGend\tRace\tSSN\tAge\tZip\tHomePh\tMobilePh\tEmail\tAddress\tCounty\tIntDate\tRefDate\tDays\tPrimary Referred By\tNPI\tSecondary Referred By\tNPI\tCustAgency\tProvider\tPrimary\tSecondary\tTertiary\tPlacement Location\tReligion\tLanguage\tAmtDue\n|;
+my $select = $dbh->prepare($query);
+$select->execute() || $form->dberror($query);
+while ( my $record = $select->fetchrow_hashref )
+{
+  $Stats->{COUNT}++;                                                   # Number of Clients
+  $Stats->{MALE}++ if ( $record->{Gend} eq 'M' );                      # Number of Males
+  $Stats->{FEMALE}++ if ( $record->{Gend} eq 'F' );                    # Number of Females
+
+  my $RefBy1 = 'No Response';
+  if ( $record->{'ReferredBy1NPI'} ne '' )
+  { $RefBy1 = DBA->selxref($form,'xNPI','NPI',$record->{'ReferredBy1NPI'},'ProvOrgName'); }
+  $Stats->{REFBY}->{$RefBy1}++;                                        # Number by RefBy1
+
+  my $RefBy2 = 'No Response';
+  if ( $record->{'ReferredBy2NPI'} ne '' )
+  { $RefBy2 = DBA->selxref($form,'xNPI','NPI',$record->{'ReferredBy2NPI'},'ProvOrgName'); }
+
+  my $Placement = 'No Response';
+  if ( $record->{'FacIDNPI'} ne '' )
+  { $Placement = DBA->selxref($form,'xNPI','NPI',$record->{'FacIDNPI'},'ProvOrgName'); }
+
+  $record->{CustAgency} = 'N' if ( $record->{CustAgency} eq '' );
+  my $CustAgency = DBA->getxref($form,'xCustAgency',$record->{'CustAgency'},'Descr');
+  $CustAgency = 'No Response' if ( $CustAgency eq '' );
+  $Stats->{CUSTAGENCY}->{$CustAgency}++;                               # Number by CustAgency
+  $Stats->{CLINIC}->{$xClinics->{$record->{clinicClinicID}}{Name}}++;  # Number by Clinics
+  $record->{Race} = 'N' if ( $record->{Race} eq '' );
+  $Stats->{RACE}->{$xRace->{$record->{Race}}{Descr}}++;                # Number by Races
+
+  $sPrAuth->execute($record->{ClientID});
+  my $rPrAuth = $sPrAuth->fetchrow_hashref;
+
+  my $Age = '';
+  if ( $record->{DOB} ne '' )
+  { $Age = DBUtil->Date($record->{DOB}, 'age'); }
+  if ( $Age eq '' ) { $Stats->{AGE}->{CAT0}++; }
+  elsif ( 0 <= $Age && $Age <= 3 ) { $Stats->{AGE}->{CAT1}++; }
+  elsif ( 4 <= $Age && $Age <= 7 ) { $Stats->{AGE}->{CAT2}++; }
+  elsif ( 8 <= $Age && $Age <= 11 ) { $Stats->{AGE}->{CAT3}++; }
+  elsif ( 12 <= $Age && $Age <= 15 ) { $Stats->{AGE}->{CAT4}++; }
+  elsif ( 16 <= $Age && $Age <= 19 ) { $Stats->{AGE}->{CAT5}++; }
+  else { $Stats->{AGE}->{CAT6}++; }
+
+  $sInsurance->execute($record->{ClientID},1);
+  my $rInsurance = $sInsurance->fetchrow_hashref;
+  my $PriIns = $xInsurance->{$rInsurance->{InsID}}{Name};
+  my $PriInsNum = $rInsurance->{InsIDNum};
+  $sInsurance->execute($record->{ClientID},2);
+  my $rInsurance = $sInsurance->fetchrow_hashref;
+  my $SecIns = $xInsurance->{$rInsurance->{InsID}}{Name};
+  my $SecInsNum = $rInsurance->{InsIDNum};
+  $sInsurance->execute($record->{ClientID},3);
+  my $rInsurance = $sInsurance->fetchrow_hashref;
+  my $TerIns = $xInsurance->{$rInsurance->{InsID}}{Name};
+  my $TerInsNum = $rInsurance->{InsIDNum};
+
+  my $Client = "$record->{LName}, $record->{FName} ($record->{ClientID})";
+  $sProvider->execute($record->{PrimaryProvID});
+  my $rProvider = $sProvider->fetchrow_hashref;
+  my $Primary = qq|$rProvider->{LName}, $rProvider->{FName} ($rProvider->{ProvID})|;
+  
+  my $AgencyID = MgrTree->getAgency($form,$record->{clinicClinicID});
+  $sProvider->execute($AgencyID);
+  my $rAgency = $sProvider->fetchrow_hashref;
+
+  my $Religion = 'None';
+  if ( $record->{'ReligionName'} eq '' ) { $Religion = 'No Response'; }
+  elsif ( $record->{'ReligionName'} eq '0000' ) { $Religion = 'DECLINED TO SPECIFY'; }
+  else { $Religion = DBA->getxref($form,'xReligiousAffiliation',$record->{'ReligionName'},'Descr'); }
+  my $Language = DBA->getxref($form,'xLanguages',$record->{PreLang},'English');
+
+  my $AmtDue = cBill->getAmtDue($form,$record->{ClientID});
+  my $AmtDueStr = $ShowAmountsFlag ? "AmtDue all Notes: \$${AmtDue}" : $AmtDue > 0 ? "Some Notes Unpaid" : "Notes Paid";
+  my $AmtDueVal = $ShowAmountsFlag ? $AmtDue : $AmtDue > 0 ? 'Yes' : 'No';
+
+  print qq|$rAgency->{Name}\t$record->{Clinic}\t$record->{LName}\t$record->{FName}\t$record->{ClientID}\t$record->{Active}\t$rPrAuth->{'PAgroup'} $rPrAuth->{'TL'} $rPrAuth->{'EffDate'}\t$record->{DOB}\t$record->{Gend}\t$xRace->{$record->{Race}}{Descr}\t$record->{SSN}\t$record->{Age}\t$record->{Zip}\t$record->{HmPh}\t$record->{MobPh}\t$record->{Email}\t$record->{Addr1}\t$record->{County}\t$record->{IntDate}\t$record->{RefDate}\t$record->{Days}\t${RefBy1}\t$record->{'ReferredBy1NPI'}\t${RefBy2}\t$record->{'ReferredBy2NPI'}\t${CustAgency}\t${Primary}\t${PriIns} ${PriInsNum}\t${SecIns} ${SecInsNum}\t${TerIns} ${TerInsNum}\t${Placement}\t${Religion}\t${Language}\t${AmtDueVal}\n|;
+}
+$select->finish();
+##
+# Section 1: RefBy
+##
+print qq|\n|;
+print qq|===================================\n|;
+print qq|Referred By\tNumber of Clients\n|;
+foreach my $RefBy ( sort keys %{$Stats->{REFBY}} )
+{
+  print qq|$RefBy\t$Stats->{REFBY}->{$RefBy}\n|;
+}
+print qq|Total Referrals\t$Stats->{COUNT}\n|;
+##
+# Section 2: CustAgency
+##
+print qq|\n|;
+print qq|===================================\n|;
+print qq|Custody Agency\tNumber of Clients\n|;
+foreach my $CustAgency ( sort keys %{$Stats->{CUSTAGENCY}} )
+{
+  print qq|$CustAgency\t$Stats->{CUSTAGENCY}->{$CustAgency}\n|;
+}
+print qq|Total Agencys\t$Stats->{COUNT}\n|;
+##
+# Section 3: Clinic
+##
+print qq|\n|;
+print qq|===================================\n|;
+print qq|Referrals by Clinic\tNumber of Clients\n|;
+foreach my $Clinic ( sort keys %{$Stats->{CLINIC}} )
+{
+  print qq|$Clinic\t$Stats->{CLINIC}->{$Clinic}\n|;
+}
+print qq|Total Referrals\t$Stats->{COUNT}\n|;
+##
+# Section 4: Race
+##
+print qq|\n|;
+print qq|===================================\n|;
+print qq|Clients by Race\tNumber of Clients\n|;
+foreach my $Race ( sort keys %{$Stats->{RACE}} )
+{
+  print qq|$Race\t$Stats->{RACE}->{$Race}\n|;
+}
+print qq|Total Clients\t$Stats->{COUNT}\n|;
+##
+# Section 5: Age
+##
+print qq|\n|;
+print qq|===================================\n|;
+print qq|Clients by Age\tNumber of Clients\n|;
+print qq|Not Reported\t$Stats->{AGE}->{CAT0}\n|;
+print qq|0 to 3\t$Stats->{AGE}->{CAT1}\n|;
+print qq|4 to 7\t$Stats->{AGE}->{CAT2}\n|;
+print qq|8 to 11\t$Stats->{AGE}->{CAT3}\n|;
+print qq|12 to 15\t$Stats->{AGE}->{CAT4}\n|;
+print qq|16 to 19\t$Stats->{AGE}->{CAT5}\n|;
+print qq|20+\t$Stats->{AGE}->{CAT6}\n|;
+print qq|\n|;
+print qq|Total Clients\t$Stats->{COUNT}\n|;
+##
+# Section 6: Gender
+##
+print qq|\n|;
+print qq|===================================\n|;
+print qq|Clients by Gender\tNumber of Clients\n|;
+print qq|Male\t$Stats->{MALE}\n|;
+print qq|Female\t$Stats->{FEMALE}\n|;
+print qq|\n|;
+print qq|Total Clients\t$Stats->{COUNT}\n|;
+print qq|===================================\n|;
+print qq|\n|;
+
+$sInsurance->finish();
+$sPrAuth->finish();
+$sProvider->finish();
+$form->complete();
+exit;
+############################################################################

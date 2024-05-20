@@ -1,0 +1,5 @@
+select distinct ClientAccess.ClientID,Client.LName,FName 
+ from ClientAccess
+  left join Client on Client.ClientID=ClientAccess.ClientID 
+ where (ClientAccess.ProvID=101 or Client.ProvID=101) and Client.Active=1
+ order by Client.LName, Client.FName

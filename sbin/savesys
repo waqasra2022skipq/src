@@ -1,0 +1,55 @@
+#!/bin/bash
+# kls, daily 2/2/98, 11/26/2001
+# ------------------------------------
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   print "\nServices not installed!"
+   exit 1
+fi
+# ------------------------------------
+#LogFile=${LOGDIR}/${CMD}
+dDir=${BACKDIR}/daily/${DOW}
+if [ ! -d ${dDir} ]; then
+  print "\nMaking ${dDir}..."
+  mkdir -p ${dDir}
+fi
+#(
+  print "\n======================================"
+  print "${CMD} Started: $(date)"
+
+  print "Save Directory: ${dDir}\n"
+# ------------------------------------
+  cd /
+  print "Save tar of system: pwd=$(pwd)"
+  tar -vcf ${dDir}/system.tar root/.bashrc root/.ssh var/named var/spool/cron/root etc/config.csi etc/fstab etc/group etc/hosts etc/inittab etc/my.cnf etc/named.conf etc/passwd etc/profile etc/resolv.conf etc/nsswitch.conf etc/host.conf etc/valiases usr/local/apache/conf
+
+  cd /home
+  print "Save tar of okmis: pwd=$(pwd)"
+  tar -vcf ${dDir}/okmis.tar --exclude src --exclude tmp --exclude mail --exclude Client --exclude Provider --exclude reports* --exclude upload --exclude unload --exclude reload --exclude backups --exclude files --exclude logs okmis
+
+  cd /home/okmis/mis
+  print "Save tar of src: pwd=$(pwd)"
+  tar -vcf ${dDir}/src.tar src
+
+  print "compress files: dDir=${dDir}"
+  /usr/bin/gzip -f ${dDir}/system.tar ${dDir}/okmis.tar ${dDir}/src.tar
+  crontab -l > ${dDir}/crontab.sav
+# ------------------------------------
+# do monthly save.
+  if [ $DOM -eq "1" -o $DOM -eq "01" -o $DOM -eq "15" ]; then
+    # save a monthly...
+    mDir=${BACKDIR}/monthly/${YMD}
+    if [ ! -d ${mDir} ]; then
+      print "\nMaking ${mDir}..."
+      mkdir -p ${mDir}
+    fi
+    /bin/cp -vfap ${dDir}/* ${mDir}
+  fi
+# ------------------------------------
+  
+  print "\n${CMD} Complete: $(date)"
+  print "======================================\n"
+#) | tee ${LogFile} 2>&1
+#cat ${LogFile} | ${MISBIN}/email -a keith@okmis.com -s "${CMD} ${YMD}"
+# ------------------------------------

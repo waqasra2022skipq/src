@@ -1,0 +1,31 @@
+#!/bin/bash
+# kls, daily 11/4/08
+# ------------------------------------
+# runs BEFORE Process FTP to check files named .835
+# ------------------------------------
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   echo -e "\nServices not installed!"
+   exit 1
+fi
+# ------------------------------------
+echo -e "\n${CMD} Started: $(date)"
+if [ -d "${ADMINDIR}/835" ]; then
+  cd "${ADMINDIR}/835"
+  echo -e "\nSearch for 835 files... pwd=$(pwd)..."
+# ------------------------------------
+# rename to .rsp those files with only 1 line for ST segment
+#  so ProFTP will parse/process into multiple lines and ST segments
+  grep -l "ST\*835.*BPR\*" *.835 | while read file; do
+    echo -e "rename 835: file: $file\n"
+    mv -v ${file} ${file}.rsp
+  done
+  find . -type f -name "*.835" -exec chown okmis:okmis {} \; 2>/dev/null
+  find . -type f -name "*.rsp" -exec chown okmis:okmis {} \; 2>/dev/null
+else
+  echo -e "\n${ADMINDIR}/835 NOT FOUND!\n"
+fi
+# ------------------------------------
+echo -e "\n${CMD} Complete: $(date)\n"
+# ------------------------------------

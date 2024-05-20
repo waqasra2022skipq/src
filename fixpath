@@ -1,0 +1,19 @@
+#!/bin/bash
+# kls, daily 2/2/98, 11/26/2001
+# ------------------------------------
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   print "\nServices not installed!"
+   exit 1
+fi
+# ------------------------------------
+Dir=$1
+cd ${Dir}
+pwd
+grep -l -d skip "\/usr\/local\/mis" * |
+while read fn; do
+  echo "convert '/usr/local/mis' file: ${fn}"
+  sed "s;/usr/local/mis;/home/okmis/mis/src;" ${fn} > new
+  mv -v new ${fn}
+done

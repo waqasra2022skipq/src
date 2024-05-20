@@ -1,0 +1,15 @@
+select Client.LName,Client.FName,Client.ClientID,Provider.LName as PLName,Provider.FName as PFName
+      ,(ClientProblems.Priority DIV 10) as Priority,misICD10.ICD10
+      ,misICD10.icdName, misICD10.sctName, misICD10.SNOMEDID
+#      ,DATE_FORMAT(ClientProblems.InitiatedDate,'%m/%d/%Y') as InitiatedDate
+#      ,DATE_FORMAT(ClientProblems.ResolvedDate,'%m/%d/%Y') as ResolvedDate
+ from ClientProblems 
+  left join okmis_config.misICD10 on misICD10.ID=ClientProblems.UUID
+  left join Client on Client.ClientID=ClientProblems.ClientID
+  left join Provider on Provider.ProvID=Client.ProvID
+# where misICD10.ICD10 = 'F11.10'
+#    or misICD10.ICD10 = 'F11.20'
+#    or misICD10.ICD10 = 'F11.21'
+#    or misICD10.ICD10 = 'Z79.899'
+#    or misICD10.ICD10 = 'F11.93'
+ order by Client.LName, Client.FName,ClientProblems.Priority

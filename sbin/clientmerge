@@ -1,0 +1,180 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use DBA;
+
+$form = DBForm->new();
+$dbh = $form->dbconnect();
+
+# This code goes through all the client records to build a list to merge from.
+# It is intened to use for 'merging' the tables of old clients.
+
+$oldClientID=$form->{old};
+$newClientID=$form->{new};
+
+# record select statements.
+
+$sClient = $dbh->prepare("select * from Client where ClientID=?");
+$sClientIntake = $dbh->prepare("select * from ClientIntake where ClientID=?");
+$sInsurance = $dbh->prepare("select * from Insurance where ClientID=?");
+$sInsuranceType = $dbh->prepare("select * from Insurance where InsID=? and ClientID=?");
+#
+# Start the process.
+#
+  $sClient->execute($oldClientID);
+  $roldClient = $sClient->fetchrow_hashref;
+  $oldName = "$roldClient->{LName}, $roldClient->{FName}";
+  $oldGrdnID = $roldClient->{GrdnID};
+  $oldSSN = $roldClient->{SSN};
+  $sClient->execute($newClientID);
+  $rnewClient = $sClient->fetchrow_hashref;
+  $newName = "$rnewClient->{LName}, $rnewClient->{FName}";
+  $newSSN = $rnewClient->{SSN};
+  print "# $oldName ($oldClientID, $oldSSN)\n";
+  print "#    transfered to \n";
+  print "# $newName ($newClientID, $newSSN)\n";
+
+  $sClientIntake->execute($oldClientID);
+  $roldClientIntake = $sClientIntake->fetchrow_hashref;
+  $oldIntDate = $roldClientIntake->{IntDate};
+  $sClientIntake->execute($newClientID);
+  $rnewClientIntake = $sClientIntake->fetchrow_hashref;
+  $newIntDate = $rnewClientIntake->{IntDate};
+
+  $old = "where ClientID=$oldClientID";
+  $new = "ClientID=$newClientID where ClientID=$oldClientID";
+  print "delete from Client $old;\n";
+  print "delete from ClientAccess $old;\n";
+  print "delete from ClientACL $old;\n";
+  print "delete from GuardianHistory where GrdnID=$oldGrdnID;\n";
+  print "delete from ClientIntake $old;\n";
+  print "delete from ClientEmergency $old;\n";
+  print "delete from ClientIncome $old;\n";
+  print "delete from Hospital $old;\n";
+  print "delete from ClientLegalHx $old;\n";
+  print "delete from MedHx $old;\n";
+  print "delete from MentalStat $old;\n";
+  print "delete from SAbuse $old;\n";
+  print "delete from ClientDevl $old;\n";
+  print "delete from ClientHealth $old;\n";
+  print "delete from ClientMHProblems $old;\n";
+  print "delete from ClientSATobacco $old;\n";
+  print "delete from ClientSocial $old;\n";
+  print "delete from ClientSummary $old;\n";
+  print "delete from Appointments $old;\n";
+  print "delete from Gambling $old;\n";
+  print "delete from IES $old;\n";
+
+# find all the 'old' client insurances
+  $sInsurance->execute($oldClientID);
+  while ( $roldInsurance = $sInsurance->fetchrow_hashref )
+  {
+# find the 'new' clients same insurance
+    $sInsuranceType->execute($roldInsurance->{InsID},$newClientID);
+    if ( $rInsuranceType = $sInsuranceType->fetchrow_hashref )
+    {
+      print "update ClientPrAuth set InsuranceID=$rInsuranceType->{InsNumID}, ClientID=$newClientID where InsuranceID=$roldInsurance->{InsNumID};\n";
+      print "delete from Insurance where InsNumID=$roldInsurance->{InsNumID};\n";
+      print "delete from Guarantor where InsuranceID=$roldInsurance->{InsNumID};\n";
+    }
+  }
+  print "delete from ClientPrAuth $old and EffDate='' and ExpDate='';\n";
+  print "update ClientASAM set $new;\n";
+  print "update ClientASI set G1=${newClientID} where G1=${oldClientID};\n";
+  print "update ClientBasis32 set $new;\n";
+  print "update ClientCARSReview set $new;\n";
+  print "update ClientAdMeds set $new;\n";
+  print "update ClientAdmit set $new;\n";
+  print "update ClientAllergies set $new;\n";
+  print "update ClientAUDIT set $new;\n";
+  print "update ClientCATS set $new;\n";
+  print "update ClientCDCHA set $new;\n";
+  print "update ClientCRAFFT set $new;\n";
+  print "update ClientDCGD set $new;\n";
+  print "update ClientDischargeCDCSent set $new;\n";
+  print "update ClientDischargeCDC set $new;\n";
+  print "update ClientDischarge set $new;\n";
+  print "update ClientEDocsLog set $new;\n";
+  print "update ClientEDocs set $new;\n";
+  print "update ClientEducation set $new;\n";
+  print "update ClientFamily set $new;\n";
+  print "update ClientGAD7 set $new;\n";
+  print "update ClientGDS set $new;\n";
+  print "update ClientInsRemarksDetail set $new;\n";
+  print "update ClientInsRemarks set $new;\n";
+  print "update ClientJournals set $new;\n";
+  print "update ClientLabResultsOBX set $new;\n";
+  print "update ClientLabResults set $new;\n";
+  print "update ClientLabResults set $new;\n";
+  print "update ClientLabResults set $new;\n";
+  print "update ClientLabs set $new;\n";
+  print "update ClientMeds set $new;\n";
+  print "update ClientMHSF set $new;\n";
+  print "update ClientODAS set $new;\n";
+  print "update ClientPCL5 set $new;\n";
+  print "update ClientPCLC set $new;\n";
+  print "update ClientPHQ15 set $new;\n";
+  print "update ClientPHQ4 set $new;\n";
+  print "update ClientPHQ9 set $new;\n";
+  print "update ClientPHQBrief set $new;\n";
+  print "update ClientPHQSADS set $new;\n";
+  print "update ClientPHQ set $new;\n";
+  print "update ClientPrAuthCDCSent set $new;\n";
+  print "update ClientPrAuthCDC set $new;\n";
+  print "update ClientPrAuth set $new;\n";
+  print "update ClientProblems set $new;\n";
+  print "update ClientProcedures set $new;\n";
+  print "update ClientRelations set $new;\n";
+  print "update ClientResources set $new;\n";
+  print "update ClientRenewals set $new;\n";
+  print "update ClientReview set $new;\n";
+  print "update ClientSBIRT set $new;\n";
+  print "update ClientTCUDS set $new;\n";
+  print "update ClientTPHQ9 set $new;\n";
+  print "update ClientTPHQ9 set $new;\n";
+  print "update ClientTPHQ9 set $new;\n";
+  print "update ClientTrauma set $new;\n";
+  print "update ClientTrPlanOBJ set $new;\n";
+  print "update ClientTrPlanPG set $new;\n";
+  print "update ClientTrPlan set $new;\n";
+  print "update ClientTrPlanS set $new;\n";
+  print "update ClientVaccines set $new;\n";
+  print "update ClientVitalSigns set $new;\n";
+  print "update EligibleHist set $new;\n";
+  print "update Eligible set $new;\n";
+  print "update Guarantor set $new;\n";
+  print "update InsPaid set $new;\n";
+  print "update Insurance set InsNumActive=0, $new;\n";
+  print "update InvItems set $new;\n";
+  print "update Invoices set $new;\n";
+  print "update PALines set $new;\n";
+  print "update PDDiag set $new;\n";
+  print "update PDDom set DomActive=0, $new;\n";
+  print "update PDMed set MedActive=0, $new;\n";
+  print "update PDPsyStat set PSActive=0, $new;\n";
+  print "update PrAuthErr set $new;\n";
+  print "update PrAuthRVU set $new;\n";
+  print "update SOGSGSI set $new;\n";
+  print "update SOGS set $new;\n";
+  print "update Surveys set $new;\n";
+  print "update ClientTASI set $new;\n";
+  print "update TrPlanIP set $new;\n";
+  print "update TrPlan set $new;\n";
+  print "update TrPlanS set $new;\n";
+  print "update Treatment set $new;\n";
+  print "update ProgNotes set $new;\n";
+  print "update PhysNotes set $new;\n";
+  print "update ProgNotesLog set $new;\n";
+  print "update PhysNotesLog set $new;\n";
+  print "update NoteTrans set $new;\n";
+  print "update NoteMeds set $new;\n";
+  print "update NotePaid set $new;\n";
+  print "update ClientTherapyNotes set $new;\n";
+  print "update ClientNoteFamilyI set $new;\n";
+  print "update ClientNoteFamilyP set $new;\n";
+  print "update ClientNoteProblems set $new;\n";
+  print "update ClientNoteTrPlanPG set $new;\n";
+  print "update TFCNotes set $new;\n";
+  print "update TFCTimes set $new;\n";
+exit;

@@ -1,0 +1,3 @@
+update Client
+set County = trim(replace(county,"County",""))
+ where instr(county,'County') > 0 and active = 1 and CreateDate > '2020-05-15'

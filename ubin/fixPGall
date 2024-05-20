@@ -1,0 +1,35 @@
+./fixPG DBNAME=okmis_mms\&PAgroup=PG001
+./fixPG DBNAME=okmis_mms\&PAgroup=PG042
+./fixPG DBNAME=okmis_mms\&PAgroup=PG043
+./fixPG DBNAME=okmis_mms\&PAgroup=PG044
+./fixPG DBNAME=okmis_mms\&PAgroup=PG045
+./fixPG DBNAME=okmis_mms\&PAgroup=PG046
+./fixPG DBNAME=okmis_mms\&PAgroup=PG047
+./fixPG DBNAME=okmis_mms\&PAgroup=PG048
+./fixPG DBNAME=okmis_mms\&PAgroup=PG049
+./fixPG DBNAME=okmis_mms\&PAgroup=PG014
+./fixPG DBNAME=okmis_mms\&PAgroup=PG015
+./fixPG DBNAME=okmis_mms\&PAgroup=PG016
+./fixPG DBNAME=okmis_mms\&PAgroup=PG019
+./fixPG DBNAME=okmis_mms\&PAgroup=PG025
+./fixPG DBNAME=okmis_mms\&PAgroup=PG026
+./fixPG DBNAME=okmis_mms\&PAgroup=PG027
+./fixPG DBNAME=okmis_mms\&PAgroup=PG028
+./fixPG DBNAME=okmis_mms\&PAgroup=PG029
+./fixPG DBNAME=okmis_mms\&PAgroup=PG030
+./fixPG DBNAME=okmis_mms\&PAgroup=PG033
+./fixPG DBNAME=okmis_mms\&PAgroup=PG034
+./fixPG DBNAME=okmis_mms\&PAgroup=PG035
+./fixPG DBNAME=okmis_mms\&PAgroup=PG036
+./fixPG DBNAME=okmis_mms\&PAgroup=PG037
+./fixPG DBNAME=okmis_mms\&PAgroup=PG038
+./fixPG DBNAME=okmis_mms\&PAgroup=PG040
+./fixPG DBNAME=okmis_mms\&PAgroup=PG503
+./fixPG DBNAME=okmis_mms\&PAgroup=DH502
+./fixPG DBNAME=okmis_mms\&PAgroup=G9002
+./fixPG DBNAME=okmis_mms\&PAgroup=G9002 TN
+./fixPG DBNAME=okmis_mms\&PAgroup=G9005
+./fixPG DBNAME=okmis_mms\&PAgroup=G9009
+./fixPG DBNAME=okmis_mms\&PAgroup=G9009 TN
+./fixPG DBNAME=okmis_mms\&PAgroup=G9010
+./fixPG DBNAME=okmis_mms\&PAgroup=G9010 TN

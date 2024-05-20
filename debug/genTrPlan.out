@@ -1,0 +1,36 @@
+: form-Browser=Mozilla/5.0
+: form-DBNAME=okmis_dev
+: form-DOCBIN=/home/okmis/public_html/dev/cgi/bin
+: form-DOCPARENT=/home/okmis/public_html/
+: form-DOCROOT=/home/okmis/public_html/dev
+: form-FromDate=2000-01-01
+: form-FromDateD=Start
+: form-HTTPSERVER=https://dev.okmis.com
+: form-IDs=1880
+: form-LINKID=14680
+: form-LOGINACLID=
+: form-LOGINAGENCY=91
+: form-LOGINEMAIL=cobblestonecounselingllc@gmail.com
+: form-LOGINID=root
+: form-LOGINNAME=Cobblestone Counseling Services LLC
+: form-LOGINPROVID=91
+: form-LOGINTYPE=0
+: form-LOGINUSERDB=okmis_dev
+: form-LOGINUSERID=91
+: form-LOGINUSERNAME=  Cobblestone Counseling Services LLC 
+: form-LOGINUSERTYPE=1
+: form-NOW=23:30:25
+: form-TODAY=2024-05-02
+: form-TheDate=2024-05-02
+: form-ToDate=2024-05-02
+: form-ToDateD=05/02/2024
+: form-USERLOGINID=okmis_dev:91
+: form-action=ClientPrAuth
+: form-browser=Mozilla/5.0
+: form-mlt=nUsu84ULjIRK
+: form-page=
+: form-query=IDs=1880&mlt=nUsu84ULjIRK&action=ClientPrAuth&page=
+: form-updLINKIDnew=
+ClientID=163, ClinicID=103
+103: Cobblestone Counseling Clinic (Lana Baker)
+163	Baker	Lana

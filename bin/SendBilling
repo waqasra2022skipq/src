@@ -1,0 +1,110 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use myConfig;
+use myForm;
+use myDBI;
+use Cwd;
+use File::Copy;
+############################################################################
+# Send the weekly billing files to support
+# usage: command
+############################################################################
+# get the command name...
+my ($pw,$cmd) = $0 =~ m/(.*\/)(.*)$/;
+my ($Send,$Copy) = ('Yes',1);
+if ( $ARGV[0] eq 'no' ) { $Send = 'No'; $Copy = 0; shift; }
+my $MAINDIR = myConfig->cfg('MAINDIR');
+my $BILLDIR = myConfig->cfg('BILLDIR');
+my $ADMINDIR = myConfig->cfg('ADMINDIR');
+my $BIN = myConfig->cfg('BIN');
+##my $EMAIL = myConfig->cfg('EMAIL');
+my $EMAIL = qq|billing\@okmis.com|;
+chdir($BILLDIR);
+my $pwd=cwd();
+my $MAINDB = myConfig->cfg('MAINDB');
+my $form = myForm->new("DBNAME=${MAINDB}");
+my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+
+print qq|${cmd} Started: |.localtime().qq|\n\n|;
+print qq|Send ClearingHouse (${Send})...pwd=${pwd}\n|;
+############################################################################
+# first the ones with NO Claims.
+my $attfiles = '';
+# save and sort...
+my @files = glob("*.0.*.837");
+my $filessort = ();
+foreach $f ( @files ) { $filessort->{$f} = $f; }
+my $msg = "No Claim Billing files...\n";
+foreach my $f ( sort keys %$filessort )
+{
+  my $filenames = "${f} ${f}.txt ";
+  my $out = DBUtil->ReadFile("${f}.out");
+  $msg .= "----------\n${filenames}\n${out}\n";
+  ##$attfiles .= $filenames;            # don't send empty files anymore
+}
+print "${cmd}: No Claims: $attfiles\n";
+$msg .= "----------\n";
+my $subj = "837 Billing: No Claims ".localtime();
+##DBUtil->email($form,$EMAIL,$subj,$msg,$attfiles);
+@files = glob("*.0.*.837 *.0.*.837.out *.0.*.837.txt");
+unlink(@files);
+
+# wait for delete...
+sleep(3);       # 3 seconds.
+
+################################
+# now the ones with Claims.
+my $attfiles = ''; 
+
+#-------------------------------
+# first combine all 837s into one file...
+print "${cmd}: CombineX12 medicaid 837...\n";
+system("${BIN}/CombineX12 medicaid 837");
+print "${cmd}: parse medicaid 837...\n";
+@files = glob("medicaid.*.837");
+foreach $f ( @files )
+{
+  print qq|parse file=${f}\n|;
+  system("${BIN}/parse ${f} > ${f}.txt");
+  system("echo Combined medicaid 837 > ${f}.out");
+  my $filenames = "${f} ${f}.txt ";
+  ##$attfiles .= $filenames;              # used to attach in below loop.
+  my $EFile = "${ADMINDIR}/837/${f}";
+  print qq|  copy to ${EFile}...\n|;
+  copy($f,$EFile) or print "<<<ERROR>>>: Copy ${f} failed: $!";;
+}
+
+#-------------------------------
+# save and sort
+@files = glob("*.837");
+my $filessort = ();
+foreach $f ( @files ) { $filessort->{$f} = $f; }
+my $msg = "Billing files attached...\n";
+print qq|\n=== Send files to Clearing House (${Send}) ===\n|;
+my $sCH = $dbh->prepare("select Descr,ClearingHouse from xInsurance where Descr=? and ClearingHouse is not null");
+foreach my $f ( sort keys %$filessort )
+{
+  my ($db,$ins,$cnt,$stamp,$type) = split('\.',$f);
+  if ( $Copy )
+  {
+    $sCH->execute($ins);
+    if ( my ($Descr,$ClearingHouse) = $sCH->fetchrow_array )
+    { system("cp -v ${f} ${MAINDIR}/${ClearingHouse}/send\n"); }
+  }
+  my $filenames = "${f} ${f}.txt ";
+  my $out = DBUtil->ReadFile("${f}.out");
+  $msg .= "----------\n${filenames}\n${out}\n";
+  ##$attfiles .= $filenames;            # don't send all files anymore.
+}
+$sCH->finish();
+
+################################
+print qq|\n=== email files to support ===\n|;
+print "\n${cmd}: 837: $attfiles\n";
+$msg .= "----------\n\n";
+my $subj = "837 Billing: ".localtime();
+##DBUtil->email($form,$EMAIL,$subj,$msg,$attfiles);
+myDBI->cleanup();
+print qq|${cmd} Completed: |.localtime().qq|\n\n|;
+############################################################################
+exit;

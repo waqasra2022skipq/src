@@ -1,0 +1,4 @@
+./genBilling DBNAME=okmis_mms\&ProvIDs=1195\&Mark=1\&MarkDate=2023-06-12
+./setAddon DBNAME=okmis_mms\&ProvIDs=1195\&BillDate=2023-06-12
+./setBilling DBNAME=okmis_mms\&ProvIDs=1195\&BillDate=2023-06-12
+./gen837 DBNAME=okmis_mms\&ForProvID=1195\&InsDescr=medicaid\&BillDate=2023-06-12

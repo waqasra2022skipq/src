@@ -1,0 +1,37 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use Accounts;
+use DBI;
+use DBForm;
+use MgrTree;
+############################################################################
+# the accounts to work with
+my @DBS = $ARGV[0] eq 'test' ? Accounts->dbs('test') : scalar(@ARGV) ? @ARGV : Accounts->dbs('active'); 
+my $form;
+############################################################################
+foreach my $dbname ( @DBS )
+{
+  print qq|#Database: ${dbname}: |.localtime().qq|\n|;
+  $form = DBForm->new("DBNAME=$dbname");
+  my $dbh = $form->dbconnect();
+  my $sProvider = $dbh->prepare("select * from Provider where ProvID=?");
+
+  my $Cnt=0;
+  my $sUserLogin = $dbh->prepare("select UserLogin.*, Provider.LName,Provider.FName from UserLogin left join Provider on Provider.ProvID=UserLogin.UserID where Provider.Type=4 order by Provider.LName,Provider.FName");
+  $sUserLogin->execute();
+  while ( my $rUserLogin = $sUserLogin->fetchrow_hashref )
+  {
+    $Cnt++;
+    $AgencyID = MgrTree->getAgency($form,$rUserLogin->{UserID});
+    $sProvider->execute($AgencyID);
+    $rAgency = $sProvider->fetchrow_hashref;
+    print qq|#$rAgency->{Name}\t$rUserLogin->{FName} $rUserLogin->{LName}\t$rUserLogin->{loginid}\t$rUserLogin->{UserID}\t$rUserLogin->{Password}\t$rUserLogin->{renew}\n|;
+    print qq|update UserLogin set renew=1 where UserID=$rUserLogin->{UserID}; # $rAgency->{Name}, $rUserLogin->{FName} $rUserLogin->{LName}\n| if ( $rAgency->{Name} =~ /Tulsa/i );
+  }
+  $sUserLogin->finish();
+  $sProvider->finish();
+  print qq|#${dbname}: ${Cnt} Providers.\n\n|;
+  $form->complete();
+}
+############################################################################
+exit;

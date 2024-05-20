@@ -1,0 +1,11 @@
+select Provider.Name,xInsurance.Name,Treatment.TrID,Treatment.ClientID
+#      ,Client.LName,Client.FName,Client.clinicClinicID
+      ,Treatment.ContLogDate
+#      ,Treatment.BillDate,Treatment.RecDate
+ from Treatment
+  left join Client on Client.ClientID=Treatment.ClientID
+  left join xSC on xSC.SCID=Treatment.SCID
+  left join xInsurance on xInsurance.ID=xSC.InsID
+  left join Provider on Provider.ProvID=Client.clinicClinicID
+ where xSC.InsID IN (129,178,203,204)
+ order by Provider.Name,xInsurance.Name,Client.LName,Client.FName,Treatment.ContLogDate

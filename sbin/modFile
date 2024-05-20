@@ -1,0 +1,20 @@
+#!/bin/bash
+# kls, 1/29/98
+# ----------------------------------
+# ---------------------------------
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   echo "\nServices not installed!"
+   exit 1
+fi
+# ---------------------------------
+
+grep -l "CLASS=sbody ALIGN=right" * |
+while read InFile; do
+  OutFile=${InFile}.modorg
+  mv -f ${InFile} ${OutFile}
+  print "Processing: ${InFile}"
+  /bin/sed "s;CLASS=sbody ALIGN=right;CLASS=\"homesublink\";g" ${OutFile} > ${InFile}
+done
+# ----------------------------------

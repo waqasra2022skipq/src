@@ -1,0 +1,50 @@
+#!/usr/bin/perl -w
+use strict;
+use XML::Parser;
+my $p= new XML::Parser( Handlers =>
+                         { Start   => \&start1,
+                           End     => \&end1,
+                           Char    => \&char1,
+                           Default => \&default1
+                         },
+                      );
+$p->parsefile($ARGV[0]);
+exit;
+
+# by default print the UTF-8 encoded string received from the parser
+sub start1
+  { my $p= shift;
+    my $string= $p->current_element();
+    print "start1:\ncur=$string\n";
+    my $string= $p->recognized_string();
+    print "rec=$string\n";
+    my $string= $p->original_string();
+    print "org=$string\n";
+  }
+sub end1
+  { my $p= shift;
+    my $string= $p->current_element();
+    print "end1:\ncur=$string\n";
+    my $string= $p->recognized_string();
+    print "rec=$string\n";
+    my $string= $p->original_string();
+    print "org=$string\n";
+  }
+sub char1
+  { my $p= shift;
+    my $string= $p->current_element();
+    print "char1:\ncur=$string\n";
+    my $string= $p->recognized_string();
+    print "rec=$string\n";
+    my $string= $p->original_string();
+    print "org=$string\n";
+  }
+sub default1
+  { my $p= shift;
+    my $string= $p->current_element();
+    print "default1:\ncur=$string\n";
+    my $string= $p->recognized_string();
+    print "rec=$string\n";
+    my $string= $p->original_string();
+    print "org=$string\n";
+  }

@@ -1,0 +1,20 @@
+# rebill GCode notes
+select Treatment.TrID
+#      ,Treatment.ClinicID,Treatment.ClientID,Treatment.ContLogDate
+#      ,xSC.InsID,xSC.SCNum,xSC.SCName
+#      ,Treatment.BillStatus,Treatment.BillDate,Treatment.DenDate
+#      ,Treatment.ProvOKDate,Treatment.ProvOKTime,Treatment.RevStatus
+#      ,Treatment.MgrProvID,Treatment.MgrRevDate,Treatment.MgrRevTime
+ from Treatment
+  left join Client on Client.ClientID=Treatment.ClientID
+  left join xSC on xSC.SCID=Treatment.SCID
+  left join xInsurance on xInsurance.ID=xSC.InsID
+ where xSC.SCNum LIKE 'G%'          # GCodes
+   and (Treatment.ContLogDate >= '2019-01-01' and Treatment.ContLogDate<='2019-12-31')
+   and Treatment.BillStatus=0
+   and (  xInsurance.ID=212  )
+# where xSC.InsID=212                # Medicare
+#   and xSC.SCNum LIKE 'G%'          # GCodes
+#   and (Treatment.ContLogDate>='2019-01-01' and Treatment.ContLogDate<='2019-12-31')
+ order by Client.LName,Client.FName,Client.ClientID
+;

@@ -1,0 +1,44 @@
+#!/bin/bash
+# ---------------------------------
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   echo "\nServices not installed!"
+   exit 1
+fi
+# ---------------------------------
+Remove=no
+if [ "$1" = "-r" ]; then
+   Remove=yes
+   shift
+fi
+Files=$*
+for File in $Files; do
+   if [ -r ${File} ]; then
+      if [ `echo ${File} | cut -c1,1` = "/" ]; then
+         FilePath=${File}
+      else
+         FilePath=${CURPATH}/${File}
+      fi
+      FileDir=${KEEPDIR}${FilePath%/*}
+      FileName=${FilePath##*/}
+      if [ ! -d ${FileDir} ]; then
+         mkdir -p ${FileDir}
+         if [ ! -d ${FileDir} ]; then print "Abort: no ${FileDir}!"; exit; fi
+      fi
+#print "fp=$FilePath, fd=$FileDir, fn=$FileName"
+      if [ -f ${FileDir}/${FileName} ]; then
+         ToFile=${FileDir}/${FileName}.${YMDHM}
+      else
+         ToFile=${FileDir}/${FileName}
+      fi
+      print "${File} -> ${ToFile}"
+      /bin/cp -rfp ${File} ${ToFile}
+      if [ $? = 0 -a "${Remove}" = "yes" ]; then
+         /bin/rm -rf ${File}
+      fi
+   else
+      print "Not Found: ${File}"
+   fi
+# ------------------------------------
+done

@@ -1,0 +1,8 @@
+recipient: okmis-edge2015@directtest.interopengine.com
+sender: ett@directtest.interopengine.com
+From: ett@directtest.interopengine.com
+To: okmis-edge2015@directtest.interopengine.com
+Date: 7/6/17 1:20 pm
+Subject: Testing STARTTLS & PLAIN SASL AUTHENTICATION (Test Case 9,16,20)!
+Files:
+201707061320_XDM_LIM.ZIP

@@ -1,0 +1,135 @@
+<ul class="menuTemplate1 decor1_1" license="2c5o7">
+    <li><a href="#" class="arrow">EQUITY</a>
+        <div class="drop decor1_2" style="width: 500px;">
+            <div class="left">
+                <b>Clinic</b>
+                <div>
+<!-- <A HREF="javascript:callAjax('ClinicsByActiveClient','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>','graphs.pl');" >Clinics by Active Client</A> <BR /> -->
+<A HREF="javascript:callAjax('ClinicsByClient','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>','graphs.pl');" >Active Clients</A> <BR />
+<A HREF="javascript:callAjax('ClinicsByAdmission','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>','graphs.pl');" >Admissions</A> <BR />
+<A HREF="javascript:callAjax('ClinicsByDischargedClient','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>','graphs.pl');" >Discharges</A> <BR />
+<A HREF="javascript:callAjax('ClinicsByRace','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>','graphs.pl');" >Race</A> <BR />
+<A HREF="javascript:callAjax('ClinicsByEthnicity','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>','graphs.pl');" >Ethnicity</A> <BR />
+<A HREF="javascript:callAjax('ClinicsByGender','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>','graphs.pl');" >Gender</A> <BR />
+<A HREF="javascript:callAjax('ClinicsByIntDis','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>','graphs.pl');" >Intellectual Disability</A> <BR />
+<A HREF="javascript:callAjax('EducationStatus','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>','graphs.pl');" >Education - Status</A> <BR />
+<A HREF="javascript:callAjax('EducationGrade','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>','graphs.pl');" >Education - Grade</A> <BR />
+<A HREF="javascript:callAjax('AgeMis','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>','graphs.pl');" >Age - MIS</A> <BR />
+<A HREF="javascript:callAjax('AgeCARF','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>','graphs.pl');" >Age - CARF</A> <BR />
+<A HREF="javascript:callAjax('clientsByEmploymentStatus','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>','graphs.pl');" >Employment - Status</A> <BR />
+<A HREF="javascript:callAjax('clientsByEmploymentType','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>','graphs.pl');" >Employment - Type</A> <BR />
+                </div>
+            </div>
+        </div>
+    </li>
+    <li class="separator"></li>
+    <li>
+      <a href="#" class="arrow" style="text-transform:uppercase">Efficiency</a>
+      <div class="drop decor1_2" style="width: 500px">
+        <div class="left">
+          <b>Prior Authorization</b>
+          <div>
+            <a
+              href="javascript:callAjax('PAWait','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>','graphs.pl');"
+              >PAs Waiting</a
+            ><br />
+            <a
+              href="javascript:callAjax('PAReject','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>','graphs.pl');"
+              >PAs Pending/Rejected</a
+            ><br />
+            <a
+              href="javascript:callAjax('PAFinal','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>','graphs.pl');"
+              >PAs Approved</a
+            ><br />
+            <a
+              href="javascript:callAjax('PAFinal2','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>','graphs.pl');"
+              >PAs Approved (TL/PAGroup)</a
+            ><br />
+            <a
+              href="javascript:callAjax('DISWait','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>','graphs.pl');"
+              >Discharges Waiting</a
+            ><br />
+            <a
+              href="javascript:callAjax('DISReject','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>','graphs.pl');"
+              >Discharges Rejected</a
+            ><br />
+            <a
+              href="javascript:callAjax('PAExpire','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>','graphs.pl');"
+              >PA Expire</a
+            ><br />
+            <a
+              href="javascript:callAjax('Pachg','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>','graphs.pl');"
+              >Prior Auth change to NO REHAB</a
+            ><br />
+          </div>
+        </div>
+        <div class="left">
+          <b>Quality Assurance</b>
+          <div>
+            <a
+              href="javascript:callAjax('Over35','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>','graphs.pl');"
+              >Provider Over 35 Hours</a
+            ><br />
+          </div>
+        </div>
+      </div>
+    </li>
+    <li class="separator"></li>
+    <li><a href="#" class="arrow">EFFECTIVENESS</a>
+        <div class="drop decor1_2" style="width: 520px;">
+            <div class="left">
+                <b>Financials</b>
+                <div>
+<A HREF="javascript:callAjax('BilledvsIncome','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>','graphs.pl');" >Billed vs Income by Month</A> <BR />
+<A HREF="javascript:callAjax('BilledByStatus','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>','graphs.pl');" >Billed By Status</A> <BR />
+<A HREF="javascript:callAjax('AmtDueByProvider','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>','graphs.pl');" >Amount Due By Provider</A> <BR />
+<A HREF="javascript:callAjax('AmtDueByClient','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>','graphs.pl');" >Amount Due By Client</A> <BR />
+                </div>
+            </div>
+            <div class="left">
+                <b>Notes</b>
+                <div>
+<A HREF="javascript:callAjax('StuckInProcess','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>','graphs.pl');" >Stuck In Process</A> <BR />
+<A HREF="javascript:callAjax('SCClient','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>','graphs.pl');" >Services by Client</A> <BR />
+<A HREF="javascript:callAjax('SCNote','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>','graphs.pl');" >Service Codes by Note Count</A> <BR />
+<A HREF="javascript:callAjax('SCUnit','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>','graphs.pl');" >Service Codes by Unit Summary</A> <BR />
+<A HREF="javascript:callAjax('BillingErrors','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>','graphs.pl');" >Unbillable Notes</A> <BR />
+<A HREF="javascript:callAjax('ClientsConflictUnbilledWeek','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>','graphs.pl');" > Note conflict- Client Unbillable (This Week)</A> <BR />
+<A HREF="javascript:callAjax('ClientsConflictUnbilledAll','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>','graphs.pl');" > Note conflict- Client All (Everything)</A> <BR />
+<A HREF="javascript:callAjax('ProvidersConflictUnbilledWeek','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>','graphs.pl');" > Note conflict- Provider  Unbillable (This Week)</A> <BR />
+<A HREF="javascript:callAjax('ProvidersConflictUnbilledAll','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>','graphs.pl');" > Note conflict- Provider All (Everything)</A> <BR />
+                </div>
+            </div>
+            <div class="left">
+                <b>Scores</b>
+                <div>
+<A HREF="javascript:callAjax('CARSByClient','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>&Type=Trend','graphs.pl');" >CARS Trend by Client</A> <BR />
+<A HREF="javascript:callAjax('CARSByClient','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>&Type=Overall','graphs.pl');" >CARS Overall by Client</A> <BR />
+<A HREF="javascript:callAjax('CARSByClinic','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>&Type=Trend','graphs.pl');" >CARS Trend by Clinic</A> <BR />
+<A HREF="javascript:callAjax('CARSByClinic','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>&Type=Overall','graphs.pl');" >CARS Overall by Clinic</A> <BR />
+                </div>
+            </div>
+            <div class="left">
+                <b>Progress</b>
+                <div>
+<A HREF="javascript:callAjax('ProgressByDate','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>','graphs.pl');" >Progress - Count</A> <BR />
+<A HREF="javascript:callAjax('ProgressByDatePercent','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>','graphs.pl');" >Progress - Percentage</A> <BR />
+<A HREF="javascript:callAjax('ProgressByAverage','reset','grapharea','&mlt=<<mlt>>&sesid=<<sesid>>','graphs.pl');" >Progress - Statistics</A> <BR />
+                </div>
+            </div>
+        </div>
+    </li>
+    <li class="separator"></li>
+    <li><a href="#" class="arrow">OPTIONS</a>
+        <div class="drop decor1_2" style="width: 200px;">
+            <div class="left">
+                <div>
+<A HREF="javascript:callAjax('ClinicIDs','','optionsarea','&mlt=<<mlt>>&sesid=<<sesid>>','op.pl');" >Clinic</A> <BR />
+<A HREF="javascript:callAjax('ProvIDs','','optionsarea','&mlt=<<mlt>>&sesid=<<sesid>>','op.pl');" >Provider</A> <BR />
+<A HREF="javascript:callAjax('InsIDs','','optionsarea','&mlt=<<mlt>>&sesid=<<sesid>>','op.pl');" >Insurance</A> <BR />
+<A HREF="javascript:callAjax('daterange','','optionsarea','&mlt=<<mlt>>&sesid=<<sesid>>','op.pl');" >Date Range</A> <BR />
+                </div>
+            </div>
+        </div>
+    </li>
+</ul>

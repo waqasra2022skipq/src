@@ -1,0 +1,679 @@
+<NewDataSet>
+  <Table>
+    <AccountGuid>346a2bac-7240-4f6b-94e5-9de8575231f6</AccountGuid>
+    <AccountName>Millennium Community Services, LLC</AccountName>
+    <ExternalAccountID>okmis_mms-1195</ExternalAccountID>
+    <SiteID>okmis_mms</SiteID>
+    <PatientGUID>043f5d61-da4e-4e6f-86e3-14817294d56e</PatientGUID>
+    <FullName> Gary  Harner </FullName>
+    <ExternalPatientID>okmis_mms-44705</ExternalPatientID>
+    <PrescriptionDate>2015-03-10T12:00:00-05:00</PrescriptionDate>
+    <DrugID>171884</DrugID>
+    <DrugTypeID>F</DrugTypeID>
+    <DrugName>lisinopril-hydrochlorothiazide</DrugName>
+    <DrugInfo>lisinopril 20 mg-hydrochlorothiazide 12.5 mg tablet</DrugInfo>
+    <Strength>20-12.5</Strength>
+    <StrengthUOM>mg</StrengthUOM>
+    <DosageNumberDescription>1</DosageNumberDescription>
+    <DosageForm>tablet</DosageForm>
+    <Route>by mouth</Route>
+    <DosageFrequencyDescription>DAILY</DosageFrequencyDescription>
+    <Dispense>90</Dispense>
+    <TakeAsNeeded>N</TakeAsNeeded>
+    <DispenseAsWritten>Y</DispenseAsWritten>
+    <Refills>0</Refills>
+    <Status>C</Status>
+    <SubStatus>S</SubStatus>
+    <Archive>N</Archive>
+    <PrescriptionGuid>1cecd1e0-ee8f-4f20-bdc0-d1583685a2b3</PrescriptionGuid>
+    <OrderGUID>00000000-0000-0000-0000-000000000000</OrderGUID>
+    <PrescriptionNotes />
+    <PharmacistNotes />
+    <ExternalPhysicianID />
+    <PhysicianName>Cheryl Hooper ARNP</PhysicianName>
+    <DateMovedToPreviousMedications xml:space="preserve"> </DateMovedToPreviousMedications>
+    <FormularyTypeID>S</FormularyTypeID>
+    <ModifiedSig>false</ModifiedSig>
+    <ExternalPrescriptionID />
+    <EpisodeIdentifier />
+    <EncounterIdentifier>102</EncounterIdentifier>
+    <ExternalSource>O</ExternalSource>
+    <DosageNumberTypeID>2</DosageNumberTypeID>
+    <DosageFormTypeId>12</DosageFormTypeId>
+    <DosageRouteTypeId>2</DosageRouteTypeId>
+    <DosageFrequencyTypeID>2</DosageFrequencyTypeID>
+    <DaysSupply>0</DaysSupply>
+    <PrescriptionTimestamp>2015-03-22T22:39:14.55-05:00</PrescriptionTimestamp>
+    <OriginalPrescriptionGuid>1cecd1e0-ee8f-4f20-bdc0-d1583685a2b3</OriginalPrescriptionGuid>
+    <ExternalUserID>okmis_mms-1205</ExternalUserID>
+    <ExternalUserType />
+    <DeaGenericNamedCode>1</DeaGenericNamedCode>
+    <Diagnosis />
+    <DiagnosisSource>ICD9CM</DiagnosisSource>
+    <DiagnosisName />
+    <DispenseNumberQualifier>U2</DispenseNumberQualifier>
+    <DispenseNumberQualifierDescription>Tablet</DispenseNumberQualifierDescription>
+    <LocationName>MCS Talihina Clinic</LocationName>
+    <GenericName />
+    <PatientFriendlySIG>1 tablet by mouth daily</PatientFriendlySIG>
+    <PrintLeaflet>F</PrintLeaflet>
+    <DeaClassCode>0</DeaClassCode>
+    <PharmacyType>0</PharmacyType>
+    <PharmacyDetailType>0</PharmacyDetailType>
+    <FinalDestinationType>0</FinalDestinationType>
+    <FinalStatusType>0</FinalStatusType>
+    <PharmacyNCPDP />
+    <PharmacyFullInfo />
+    <SourcePrescriptionGuid>00000000-0000-0000-0000-000000000000</SourcePrescriptionGuid>
+    <DeaLegendDescription>Rx</DeaLegendDescription>
+    <ExternalMidLevelID />
+    <DrugSubID1>388</DrugSubID1>
+    <FormularyChecked>true</FormularyChecked>
+    <StrengthUnknown>N</StrengthUnknown>
+    <PatientID>okmis_mms-44705</PatientID>
+    <PatientIDType />
+    <rxcui>197886</rxcui>
+  </Table>
+  <Table>
+    <AccountGuid>346a2bac-7240-4f6b-94e5-9de8575231f6</AccountGuid>
+    <AccountName>Millennium Community Services, LLC</AccountName>
+    <ExternalAccountID>okmis_mms-1195</ExternalAccountID>
+    <SiteID>okmis_mms</SiteID>
+    <PatientGUID>043f5d61-da4e-4e6f-86e3-14817294d56e</PatientGUID>
+    <FullName> Gary  Harner </FullName>
+    <ExternalPatientID>okmis_mms-44705</ExternalPatientID>
+    <PrescriptionDate>2015-03-10T12:00:00-05:00</PrescriptionDate>
+    <DrugID>545839</DrugID>
+    <DrugTypeID>F</DrugTypeID>
+    <DrugName>ProAir HFA</DrugName>
+    <DrugInfo>ProAir HFA 90 mcg/actuation aerosol inhaler</DrugInfo>
+    <Strength>90</Strength>
+    <StrengthUOM>mcg/actuation</StrengthUOM>
+    <DosageNumberDescription>2</DosageNumberDescription>
+    <DosageForm>puff</DosageForm>
+    <Route>inhale</Route>
+    <DosageFrequencyDescription>Q4h</DosageFrequencyDescription>
+    <Dispense>1</Dispense>
+    <TakeAsNeeded>N</TakeAsNeeded>
+    <DispenseAsWritten>N</DispenseAsWritten>
+    <Refills>0</Refills>
+    <Status>C</Status>
+    <SubStatus>S</SubStatus>
+    <Archive>N</Archive>
+    <PrescriptionGuid>fec26e8b-dbcf-4157-b799-de43f6220037</PrescriptionGuid>
+    <OrderGUID>00000000-0000-0000-0000-000000000000</OrderGUID>
+    <PrescriptionNotes />
+    <PharmacistNotes />
+    <ExternalPhysicianID />
+    <PhysicianName>Cheryl Hooper ARNP</PhysicianName>
+    <DateMovedToPreviousMedications xml:space="preserve"> </DateMovedToPreviousMedications>
+    <FormularyTypeID>S</FormularyTypeID>
+    <ModifiedSig>false</ModifiedSig>
+    <ExternalPrescriptionID />
+    <EpisodeIdentifier />
+    <EncounterIdentifier>102</EncounterIdentifier>
+    <ExternalSource>O</ExternalSource>
+    <DosageNumberTypeID>6</DosageNumberTypeID>
+    <DosageFormTypeId>9</DosageFormTypeId>
+    <DosageRouteTypeId>11</DosageRouteTypeId>
+    <DosageFrequencyTypeID>8</DosageFrequencyTypeID>
+    <DaysSupply>0</DaysSupply>
+    <PrescriptionTimestamp>2015-03-22T22:39:31.19-05:00</PrescriptionTimestamp>
+    <OriginalPrescriptionGuid>fec26e8b-dbcf-4157-b799-de43f6220037</OriginalPrescriptionGuid>
+    <ExternalUserID>okmis_mms-1205</ExternalUserID>
+    <ExternalUserType />
+    <DeaGenericNamedCode>2</DeaGenericNamedCode>
+    <Diagnosis />
+    <DiagnosisSource>ICD9CM</DiagnosisSource>
+    <DiagnosisName />
+    <DispenseNumberQualifier>IH</DispenseNumberQualifier>
+    <DispenseNumberQualifierDescription>Inhaler</DispenseNumberQualifierDescription>
+    <LocationName>MCS Talihina Clinic</LocationName>
+    <GenericName>albuterol sulfate</GenericName>
+    <PatientFriendlySIG>2 puffs inhale every 4 hours</PatientFriendlySIG>
+    <PrintLeaflet>F</PrintLeaflet>
+    <DeaClassCode>0</DeaClassCode>
+    <PharmacyType>0</PharmacyType>
+    <PharmacyDetailType>0</PharmacyDetailType>
+    <FinalDestinationType>0</FinalDestinationType>
+    <FinalStatusType>0</FinalStatusType>
+    <PharmacyNCPDP />
+    <PharmacyFullInfo />
+    <SourcePrescriptionGuid>00000000-0000-0000-0000-000000000000</SourcePrescriptionGuid>
+    <DeaLegendDescription>Rx</DeaLegendDescription>
+    <ExternalMidLevelID />
+    <DrugSubID1>28090</DrugSubID1>
+    <FormularyChecked>true</FormularyChecked>
+    <StrengthUnknown>N</StrengthUnknown>
+    <PatientID>okmis_mms-44705</PatientID>
+    <PatientIDType />
+    <rxcui>745752</rxcui>
+  </Table>
+  <Table>
+    <AccountGuid>346a2bac-7240-4f6b-94e5-9de8575231f6</AccountGuid>
+    <AccountName>Millennium Community Services, LLC</AccountName>
+    <ExternalAccountID>okmis_mms-1195</ExternalAccountID>
+    <SiteID>okmis_mms</SiteID>
+    <PatientGUID>043f5d61-da4e-4e6f-86e3-14817294d56e</PatientGUID>
+    <FullName> Gary  Harner </FullName>
+    <ExternalPatientID>okmis_mms-44705</ExternalPatientID>
+    <PrescriptionDate>2015-03-10T12:00:00-05:00</PrescriptionDate>
+    <DrugID>244370</DrugID>
+    <DrugTypeID>F</DrugTypeID>
+    <DrugName>Flovent</DrugName>
+    <DrugInfo>Flovent 220 mcg/actuation aerosol inhaler</DrugInfo>
+    <Strength>220</Strength>
+    <StrengthUOM>mcg/actuation</StrengthUOM>
+    <DosageNumberDescription>2</DosageNumberDescription>
+    <DosageForm>puff</DosageForm>
+    <Route>inhale</Route>
+    <DosageFrequencyDescription>BID</DosageFrequencyDescription>
+    <Dispense>1</Dispense>
+    <TakeAsNeeded>N</TakeAsNeeded>
+    <DispenseAsWritten>N</DispenseAsWritten>
+    <Refills>0</Refills>
+    <Status>C</Status>
+    <SubStatus>S</SubStatus>
+    <Archive>N</Archive>
+    <PrescriptionGuid>ffdb09a4-447c-4157-b971-1ba3cc13a706</PrescriptionGuid>
+    <OrderGUID>00000000-0000-0000-0000-000000000000</OrderGUID>
+    <PrescriptionNotes />
+    <PharmacistNotes />
+    <ExternalPhysicianID />
+    <PhysicianName>Cheryl Hooper ARNP</PhysicianName>
+    <DateMovedToPreviousMedications xml:space="preserve"> </DateMovedToPreviousMedications>
+    <FormularyTypeID>S</FormularyTypeID>
+    <ModifiedSig>false</ModifiedSig>
+    <ExternalPrescriptionID />
+    <EpisodeIdentifier />
+    <EncounterIdentifier>102</EncounterIdentifier>
+    <ExternalSource>O</ExternalSource>
+    <DosageNumberTypeID>6</DosageNumberTypeID>
+    <DosageFormTypeId>9</DosageFormTypeId>
+    <DosageRouteTypeId>11</DosageRouteTypeId>
+    <DosageFrequencyTypeID>5</DosageFrequencyTypeID>
+    <DaysSupply>0</DaysSupply>
+    <PrescriptionTimestamp>2015-03-22T22:40:39.73-05:00</PrescriptionTimestamp>
+    <OriginalPrescriptionGuid>ffdb09a4-447c-4157-b971-1ba3cc13a706</OriginalPrescriptionGuid>
+    <ExternalUserID>okmis_mms-1205</ExternalUserID>
+    <ExternalUserType />
+    <DeaGenericNamedCode>2</DeaGenericNamedCode>
+    <Diagnosis />
+    <DiagnosisSource>ICD9CM</DiagnosisSource>
+    <DiagnosisName />
+    <DispenseNumberQualifier>IH</DispenseNumberQualifier>
+    <DispenseNumberQualifierDescription>Inhaler</DispenseNumberQualifierDescription>
+    <LocationName>MCS Talihina Clinic</LocationName>
+    <GenericName>fluticasone</GenericName>
+    <PatientFriendlySIG>2 puffs inhale twice a day</PatientFriendlySIG>
+    <PrintLeaflet>F</PrintLeaflet>
+    <DeaClassCode>0</DeaClassCode>
+    <PharmacyType>0</PharmacyType>
+    <PharmacyDetailType>0</PharmacyDetailType>
+    <FinalDestinationType>0</FinalDestinationType>
+    <FinalStatusType>0</FinalStatusType>
+    <PharmacyNCPDP />
+    <PharmacyFullInfo />
+    <SourcePrescriptionGuid>00000000-0000-0000-0000-000000000000</SourcePrescriptionGuid>
+    <DeaLegendDescription>Rx</DeaLegendDescription>
+    <ExternalMidLevelID />
+    <DrugSubID1>21483</DrugSubID1>
+    <FormularyChecked>true</FormularyChecked>
+    <StrengthUnknown>N</StrengthUnknown>
+    <PatientID>okmis_mms-44705</PatientID>
+    <PatientIDType />
+  </Table>
+  <Table>
+    <AccountGuid>346a2bac-7240-4f6b-94e5-9de8575231f6</AccountGuid>
+    <AccountName>Millennium Community Services, LLC</AccountName>
+    <ExternalAccountID>okmis_mms-1195</ExternalAccountID>
+    <SiteID>okmis_mms</SiteID>
+    <PatientGUID>043f5d61-da4e-4e6f-86e3-14817294d56e</PatientGUID>
+    <FullName> Gary  Harner </FullName>
+    <ExternalPatientID>okmis_mms-44705</ExternalPatientID>
+    <PrescriptionDate>2015-04-01T10:39:54.383-05:00</PrescriptionDate>
+    <DrugID>181430</DrugID>
+    <DrugTypeID>F</DrugTypeID>
+    <DrugName>BuSpar</DrugName>
+    <DrugInfo>BuSpar 10 mg tablet</DrugInfo>
+    <Strength>10</Strength>
+    <StrengthUOM>mg</StrengthUOM>
+    <DosageNumberDescription>1</DosageNumberDescription>
+    <DosageForm>tablet</DosageForm>
+    <Route>by mouth</Route>
+    <DosageFrequencyDescription>BID</DosageFrequencyDescription>
+    <Dispense>60</Dispense>
+    <TakeAsNeeded>N</TakeAsNeeded>
+    <DispenseAsWritten>N</DispenseAsWritten>
+    <Refills>1</Refills>
+    <Status>C</Status>
+    <SubStatus>S</SubStatus>
+    <Archive>N</Archive>
+    <PrescriptionGuid>6acdfc01-4880-4edd-b18c-ef852e2bd288</PrescriptionGuid>
+    <OrderGUID>0a4d1d35-73c5-465c-ba0c-a8bd7e510246</OrderGUID>
+    <PrescriptionNotes />
+    <PharmacistNotes />
+    <ExternalPhysicianID>okmis_mms-2238</ExternalPhysicianID>
+    <PhysicianName> Cheryl  Hooper   </PhysicianName>
+    <DateMovedToPreviousMedications xml:space="preserve"> </DateMovedToPreviousMedications>
+    <FormularyTypeID>S</FormularyTypeID>
+    <ModifiedSig>false</ModifiedSig>
+    <ExternalPrescriptionID />
+    <EpisodeIdentifier />
+    <EncounterIdentifier>102</EncounterIdentifier>
+    <DosageNumberTypeID>2</DosageNumberTypeID>
+    <DosageFormTypeId>12</DosageFormTypeId>
+    <DosageRouteTypeId>2</DosageRouteTypeId>
+    <DosageFrequencyTypeID>5</DosageFrequencyTypeID>
+    <DaysSupply>30</DaysSupply>
+    <PrescriptionTimestamp>2015-04-01T10:39:48.45-05:00</PrescriptionTimestamp>
+    <OriginalPrescriptionGuid>6acdfc01-4880-4edd-b18c-ef852e2bd288</OriginalPrescriptionGuid>
+    <ExternalUserID>okmis_mms-2238</ExternalUserID>
+    <ExternalUserType />
+    <DeaGenericNamedCode>2</DeaGenericNamedCode>
+    <Diagnosis />
+    <DiagnosisSource>ICD9CM</DiagnosisSource>
+    <DiagnosisName />
+    <DispenseNumberQualifier>U2</DispenseNumberQualifier>
+    <DispenseNumberQualifierDescription>Tablet</DispenseNumberQualifierDescription>
+    <LocationName>MCS Talihina Clinic</LocationName>
+    <GenericName>buspirone</GenericName>
+    <PatientFriendlySIG>1 tablet by mouth twice a day</PatientFriendlySIG>
+    <PrintLeaflet>F</PrintLeaflet>
+    <DeaClassCode>0</DeaClassCode>
+    <PharmacyType>1</PharmacyType>
+    <PharmacyDetailType>1</PharmacyDetailType>
+    <FinalDestinationType>2</FinalDestinationType>
+    <FinalStatusType>1</FinalStatusType>
+    <PharmacyNCPDP>3709865</PharmacyNCPDP>
+    <PharmacyFullInfo>LAWSON PHARMACY  Phone: 9185673111 301 2ND STREET TALIHINA</PharmacyFullInfo>
+    <SourcePrescriptionGuid>91fb1ceb-d7e4-4473-a711-21ce9a4b1013</SourcePrescriptionGuid>
+    <DeaLegendDescription>Rx</DeaLegendDescription>
+    <ExternalMidLevelID />
+    <DrugSubID1>3781</DrugSubID1>
+    <FormularyChecked>true</FormularyChecked>
+    <StrengthUnknown>N</StrengthUnknown>
+    <PatientID>okmis_mms-44705</PatientID>
+    <PatientIDType />
+    <rxcui>866086</rxcui>
+  </Table>
+  <Table>
+    <AccountGuid>346a2bac-7240-4f6b-94e5-9de8575231f6</AccountGuid>
+    <AccountName>Millennium Community Services, LLC</AccountName>
+    <ExternalAccountID>okmis_mms-1195</ExternalAccountID>
+    <SiteID>okmis_mms</SiteID>
+    <PatientGUID>043f5d61-da4e-4e6f-86e3-14817294d56e</PatientGUID>
+    <FullName> Gary  Harner </FullName>
+    <ExternalPatientID>okmis_mms-44705</ExternalPatientID>
+    <PrescriptionDate>2015-04-01T10:39:54.26-05:00</PrescriptionDate>
+    <DrugID>176033</DrugID>
+    <DrugTypeID>F</DrugTypeID>
+    <DrugName>doxepin</DrugName>
+    <DrugInfo>doxepin 25 mg capsule</DrugInfo>
+    <Strength>25</Strength>
+    <StrengthUOM>mg</StrengthUOM>
+    <DosageNumberDescription>1</DosageNumberDescription>
+    <DosageForm>capsule</DosageForm>
+    <Route>by mouth</Route>
+    <DosageFrequencyDescription>QHS</DosageFrequencyDescription>
+    <Dispense>30</Dispense>
+    <TakeAsNeeded>N</TakeAsNeeded>
+    <DispenseAsWritten>N</DispenseAsWritten>
+    <Refills>0</Refills>
+    <Status>C</Status>
+    <SubStatus>S</SubStatus>
+    <Archive>N</Archive>
+    <PrescriptionGuid>82684654-a768-4bb4-8b8c-b3717b51a62b</PrescriptionGuid>
+    <OrderGUID>0a4d1d35-73c5-465c-ba0c-a8bd7e510246</OrderGUID>
+    <PrescriptionNotes />
+    <PharmacistNotes />
+    <ExternalPhysicianID>okmis_mms-2238</ExternalPhysicianID>
+    <PhysicianName> Cheryl  Hooper   </PhysicianName>
+    <DateMovedToPreviousMedications xml:space="preserve"> </DateMovedToPreviousMedications>
+    <FormularyTypeID>S</FormularyTypeID>
+    <ModifiedSig>false</ModifiedSig>
+    <ExternalPrescriptionID />
+    <EpisodeIdentifier />
+    <EncounterIdentifier>102</EncounterIdentifier>
+    <DosageNumberTypeID>2</DosageNumberTypeID>
+    <DosageFormTypeId>2</DosageFormTypeId>
+    <DosageRouteTypeId>2</DosageRouteTypeId>
+    <DosageFrequencyTypeID>19</DosageFrequencyTypeID>
+    <DaysSupply>0</DaysSupply>
+    <PrescriptionTimestamp>2015-04-01T10:39:48.91-05:00</PrescriptionTimestamp>
+    <OriginalPrescriptionGuid>82684654-a768-4bb4-8b8c-b3717b51a62b</OriginalPrescriptionGuid>
+    <ExternalUserID>okmis_mms-2238</ExternalUserID>
+    <ExternalUserType />
+    <DeaGenericNamedCode>1</DeaGenericNamedCode>
+    <Diagnosis />
+    <DiagnosisSource>ICD9CM</DiagnosisSource>
+    <DiagnosisName />
+    <DispenseNumberQualifier>AV</DispenseNumberQualifier>
+    <DispenseNumberQualifierDescription>Capsule</DispenseNumberQualifierDescription>
+    <LocationName>MCS Talihina Clinic</LocationName>
+    <GenericName />
+    <PatientFriendlySIG>1 capsule by mouth at bedtime</PatientFriendlySIG>
+    <PrintLeaflet>F</PrintLeaflet>
+    <DeaClassCode>0</DeaClassCode>
+    <PharmacyType>1</PharmacyType>
+    <PharmacyDetailType>1</PharmacyDetailType>
+    <FinalDestinationType>2</FinalDestinationType>
+    <FinalStatusType>1</FinalStatusType>
+    <PharmacyNCPDP>3709865</PharmacyNCPDP>
+    <PharmacyFullInfo>LAWSON PHARMACY  Phone: 9185673111 301 2ND STREET TALIHINA</PharmacyFullInfo>
+    <SourcePrescriptionGuid>4ff7c751-da0a-4884-b4fa-f43b1a5f3fc8</SourcePrescriptionGuid>
+    <DeaLegendDescription>Rx</DeaLegendDescription>
+    <ExternalMidLevelID />
+    <DrugSubID1>46089</DrugSubID1>
+    <FormularyChecked>true</FormularyChecked>
+    <StrengthUnknown>N</StrengthUnknown>
+    <PatientID>okmis_mms-44705</PatientID>
+    <PatientIDType />
+    <rxcui>1000070</rxcui>
+  </Table>
+  <Table>
+    <AccountGuid>346a2bac-7240-4f6b-94e5-9de8575231f6</AccountGuid>
+    <AccountName>Millennium Community Services, LLC</AccountName>
+    <ExternalAccountID>okmis_mms-1195</ExternalAccountID>
+    <SiteID>okmis_mms</SiteID>
+    <PatientGUID>043f5d61-da4e-4e6f-86e3-14817294d56e</PatientGUID>
+    <FullName> Gary  Harner </FullName>
+    <ExternalPatientID>okmis_mms-44705</ExternalPatientID>
+    <PrescriptionDate>2015-04-01T10:39:54.137-05:00</PrescriptionDate>
+    <DrugID>187550</DrugID>
+    <DrugTypeID>F</DrugTypeID>
+    <DrugName>sertraline</DrugName>
+    <DrugInfo>sertraline 100 mg tablet</DrugInfo>
+    <Strength>100</Strength>
+    <StrengthUOM>mg</StrengthUOM>
+    <DosageNumberDescription>2</DosageNumberDescription>
+    <DosageForm>tablet</DosageForm>
+    <Route>by mouth</Route>
+    <DosageFrequencyDescription>DAILY</DosageFrequencyDescription>
+    <Dispense>60</Dispense>
+    <TakeAsNeeded>N</TakeAsNeeded>
+    <DispenseAsWritten>N</DispenseAsWritten>
+    <Refills>0</Refills>
+    <Status>C</Status>
+    <SubStatus>S</SubStatus>
+    <Archive>N</Archive>
+    <PrescriptionGuid>fff041aa-7699-4791-b0b8-359e54e43a3b</PrescriptionGuid>
+    <OrderGUID>0a4d1d35-73c5-465c-ba0c-a8bd7e510246</OrderGUID>
+    <PrescriptionNotes />
+    <PharmacistNotes />
+    <ExternalPhysicianID>okmis_mms-2238</ExternalPhysicianID>
+    <PhysicianName> Cheryl  Hooper   </PhysicianName>
+    <DateMovedToPreviousMedications xml:space="preserve"> </DateMovedToPreviousMedications>
+    <FormularyTypeID>S</FormularyTypeID>
+    <ModifiedSig>false</ModifiedSig>
+    <ExternalPrescriptionID />
+    <EpisodeIdentifier />
+    <EncounterIdentifier>102</EncounterIdentifier>
+    <DosageNumberTypeID>6</DosageNumberTypeID>
+    <DosageFormTypeId>12</DosageFormTypeId>
+    <DosageRouteTypeId>2</DosageRouteTypeId>
+    <DosageFrequencyTypeID>2</DosageFrequencyTypeID>
+    <DaysSupply>0</DaysSupply>
+    <PrescriptionTimestamp>2015-04-01T10:39:49.4-05:00</PrescriptionTimestamp>
+    <OriginalPrescriptionGuid>fff041aa-7699-4791-b0b8-359e54e43a3b</OriginalPrescriptionGuid>
+    <ExternalUserID>okmis_mms-2238</ExternalUserID>
+    <ExternalUserType />
+    <DeaGenericNamedCode>1</DeaGenericNamedCode>
+    <Diagnosis />
+    <DiagnosisSource>ICD9CM</DiagnosisSource>
+    <DiagnosisName />
+    <DispenseNumberQualifier>U2</DispenseNumberQualifier>
+    <DispenseNumberQualifierDescription>Tablet</DispenseNumberQualifierDescription>
+    <LocationName>MCS Talihina Clinic</LocationName>
+    <GenericName />
+    <PatientFriendlySIG>2 tablets by mouth daily</PatientFriendlySIG>
+    <PrintLeaflet>F</PrintLeaflet>
+    <DeaClassCode>0</DeaClassCode>
+    <PharmacyType>1</PharmacyType>
+    <PharmacyDetailType>1</PharmacyDetailType>
+    <FinalDestinationType>2</FinalDestinationType>
+    <FinalStatusType>1</FinalStatusType>
+    <PharmacyNCPDP>3709865</PharmacyNCPDP>
+    <PharmacyFullInfo>LAWSON PHARMACY  Phone: 9185673111 301 2ND STREET TALIHINA</PharmacyFullInfo>
+    <SourcePrescriptionGuid>517218c0-520f-4383-989e-0f3eeb497dcb</SourcePrescriptionGuid>
+    <DeaLegendDescription>Rx</DeaLegendDescription>
+    <ExternalMidLevelID />
+    <DrugSubID1>46229</DrugSubID1>
+    <FormularyChecked>true</FormularyChecked>
+    <StrengthUnknown>N</StrengthUnknown>
+    <PatientID>okmis_mms-44705</PatientID>
+    <PatientIDType />
+    <rxcui>312938</rxcui>
+  </Table>
+  <Table>
+    <AccountGuid>346a2bac-7240-4f6b-94e5-9de8575231f6</AccountGuid>
+    <AccountName>Millennium Community Services, LLC</AccountName>
+    <ExternalAccountID>okmis_mms-1195</ExternalAccountID>
+    <SiteID>okmis_mms</SiteID>
+    <PatientGUID>043f5d61-da4e-4e6f-86e3-14817294d56e</PatientGUID>
+    <FullName> Gary  Harner </FullName>
+    <ExternalPatientID>okmis_mms-44705</ExternalPatientID>
+    <PrescriptionDate>2015-04-21T09:25:51.837-05:00</PrescriptionDate>
+    <DrugID>187550</DrugID>
+    <DrugTypeID>F</DrugTypeID>
+    <DrugName>sertraline</DrugName>
+    <DrugInfo>sertraline 100 mg tablet</DrugInfo>
+    <Strength>100</Strength>
+    <StrengthUOM>mg</StrengthUOM>
+    <DosageNumberDescription>2</DosageNumberDescription>
+    <DosageForm>tablet</DosageForm>
+    <Route>by mouth</Route>
+    <DosageFrequencyDescription>DAILY</DosageFrequencyDescription>
+    <Dispense>60</Dispense>
+    <TakeAsNeeded>N</TakeAsNeeded>
+    <DispenseAsWritten>N</DispenseAsWritten>
+    <Refills>1</Refills>
+    <Status>C</Status>
+    <SubStatus>S</SubStatus>
+    <Archive>N</Archive>
+    <PrescriptionGuid>f74efa76-4004-4b61-9064-8b68fcdf4ef7</PrescriptionGuid>
+    <OrderGUID>52870fa2-7b00-48a4-a5b5-405225e4fa79</OrderGUID>
+    <PrescriptionNotes />
+    <PharmacistNotes />
+    <ExternalPhysicianID>okmis_mms-2238</ExternalPhysicianID>
+    <PhysicianName> Cheryl  Hooper   </PhysicianName>
+    <DateMovedToPreviousMedications xml:space="preserve"> </DateMovedToPreviousMedications>
+    <FormularyType />
+    <FormularyTypeID>S</FormularyTypeID>
+    <FormularyMember />
+    <FormularyId>2116</FormularyId>
+    <FormularyStatus />
+    <ModifiedSig>false</ModifiedSig>
+    <ExternalPrescriptionID />
+    <EpisodeIdentifier />
+    <EncounterIdentifier>102</EncounterIdentifier>
+    <DosageNumberTypeID>6</DosageNumberTypeID>
+    <DosageFormTypeId>12</DosageFormTypeId>
+    <DosageRouteTypeId>2</DosageRouteTypeId>
+    <DosageFrequencyTypeID>2</DosageFrequencyTypeID>
+    <DaysSupply>30</DaysSupply>
+    <PrescriptionTimestamp>2015-04-21T09:23:56.313-05:00</PrescriptionTimestamp>
+    <OriginalPrescriptionGuid>f74efa76-4004-4b61-9064-8b68fcdf4ef7</OriginalPrescriptionGuid>
+    <ExternalUserID>okmis_mms-2238</ExternalUserID>
+    <ExternalUserType />
+    <DeaGenericNamedCode>1</DeaGenericNamedCode>
+    <Diagnosis />
+    <DiagnosisSource>ICD9CM</DiagnosisSource>
+    <DiagnosisName />
+    <DispenseNumberQualifier>U2</DispenseNumberQualifier>
+    <DispenseNumberQualifierDescription>Tablet</DispenseNumberQualifierDescription>
+    <LocationName>MCS Talihina Clinic</LocationName>
+    <GenericName />
+    <PatientFriendlySIG>2 tablets by mouth daily</PatientFriendlySIG>
+    <PrintLeaflet>F</PrintLeaflet>
+    <DeaClassCode>0</DeaClassCode>
+    <PharmacyType>1</PharmacyType>
+    <PharmacyDetailType>1</PharmacyDetailType>
+    <FinalDestinationType>2</FinalDestinationType>
+    <FinalStatusType>1</FinalStatusType>
+    <PharmacyNCPDP>3709865</PharmacyNCPDP>
+    <PharmacyFullInfo>LAWSON PHARMACY  Phone: 9185673111 301 2ND STREET TALIHINA</PharmacyFullInfo>
+    <SourcePrescriptionGuid>00000000-0000-0000-0000-000000000000</SourcePrescriptionGuid>
+    <DeaLegendDescription>Rx</DeaLegendDescription>
+    <ExternalMidLevelID />
+    <DrugSubID1>46229</DrugSubID1>
+    <FormularyChecked>true</FormularyChecked>
+    <StrengthUnknown>N</StrengthUnknown>
+    <PatientID>okmis_mms-44705</PatientID>
+    <PatientIDType />
+    <rxcui>312938</rxcui>
+  </Table>
+  <Table>
+    <AccountGuid>346a2bac-7240-4f6b-94e5-9de8575231f6</AccountGuid>
+    <AccountName>Millennium Community Services, LLC</AccountName>
+    <ExternalAccountID>okmis_mms-1195</ExternalAccountID>
+    <SiteID>okmis_mms</SiteID>
+    <PatientGUID>043f5d61-da4e-4e6f-86e3-14817294d56e</PatientGUID>
+    <FullName> Gary  Harner </FullName>
+    <ExternalPatientID>okmis_mms-44705</ExternalPatientID>
+    <PrescriptionDate>2015-04-21T09:25:51.723-05:00</PrescriptionDate>
+    <DrugID>176033</DrugID>
+    <DrugTypeID>F</DrugTypeID>
+    <DrugName>doxepin</DrugName>
+    <DrugInfo>doxepin 25 mg capsule</DrugInfo>
+    <Strength>25</Strength>
+    <StrengthUOM>mg</StrengthUOM>
+    <DosageNumberDescription>1</DosageNumberDescription>
+    <DosageForm>capsule</DosageForm>
+    <Route>by mouth</Route>
+    <DosageFrequencyDescription>QHS</DosageFrequencyDescription>
+    <Dispense>30</Dispense>
+    <TakeAsNeeded>N</TakeAsNeeded>
+    <DispenseAsWritten>N</DispenseAsWritten>
+    <Refills>1</Refills>
+    <Status>C</Status>
+    <SubStatus>S</SubStatus>
+    <Archive>N</Archive>
+    <PrescriptionGuid>190aacdf-e574-4dd9-bee7-8ca430919034</PrescriptionGuid>
+    <OrderGUID>52870fa2-7b00-48a4-a5b5-405225e4fa79</OrderGUID>
+    <PrescriptionNotes />
+    <PharmacistNotes />
+    <ExternalPhysicianID>okmis_mms-2238</ExternalPhysicianID>
+    <PhysicianName> Cheryl  Hooper   </PhysicianName>
+    <DateMovedToPreviousMedications xml:space="preserve"> </DateMovedToPreviousMedications>
+    <FormularyType />
+    <FormularyTypeID>S</FormularyTypeID>
+    <FormularyMember />
+    <FormularyId>2116</FormularyId>
+    <FormularyStatus />
+    <ModifiedSig>false</ModifiedSig>
+    <ExternalPrescriptionID />
+    <EpisodeIdentifier />
+    <EncounterIdentifier>102</EncounterIdentifier>
+    <DosageNumberTypeID>2</DosageNumberTypeID>
+    <DosageFormTypeId>2</DosageFormTypeId>
+    <DosageRouteTypeId>2</DosageRouteTypeId>
+    <DosageFrequencyTypeID>19</DosageFrequencyTypeID>
+    <DaysSupply>30</DaysSupply>
+    <PrescriptionTimestamp>2015-04-21T09:23:56.707-05:00</PrescriptionTimestamp>
+    <OriginalPrescriptionGuid>190aacdf-e574-4dd9-bee7-8ca430919034</OriginalPrescriptionGuid>
+    <ExternalUserID>okmis_mms-2238</ExternalUserID>
+    <ExternalUserType />
+    <DeaGenericNamedCode>1</DeaGenericNamedCode>
+    <Diagnosis />
+    <DiagnosisSource>ICD9CM</DiagnosisSource>
+    <DiagnosisName />
+    <DispenseNumberQualifier>AV</DispenseNumberQualifier>
+    <DispenseNumberQualifierDescription>Capsule</DispenseNumberQualifierDescription>
+    <LocationName>MCS Talihina Clinic</LocationName>
+    <GenericName />
+    <PatientFriendlySIG>1 capsule by mouth at bedtime</PatientFriendlySIG>
+    <PrintLeaflet>F</PrintLeaflet>
+    <DeaClassCode>0</DeaClassCode>
+    <PharmacyType>1</PharmacyType>
+    <PharmacyDetailType>1</PharmacyDetailType>
+    <FinalDestinationType>2</FinalDestinationType>
+    <FinalStatusType>1</FinalStatusType>
+    <PharmacyNCPDP>3709865</PharmacyNCPDP>
+    <PharmacyFullInfo>LAWSON PHARMACY  Phone: 9185673111 301 2ND STREET TALIHINA</PharmacyFullInfo>
+    <SourcePrescriptionGuid>00000000-0000-0000-0000-000000000000</SourcePrescriptionGuid>
+    <DeaLegendDescription>Rx</DeaLegendDescription>
+    <ExternalMidLevelID />
+    <DrugSubID1>46089</DrugSubID1>
+    <FormularyChecked>true</FormularyChecked>
+    <StrengthUnknown>N</StrengthUnknown>
+    <PatientID>okmis_mms-44705</PatientID>
+    <PatientIDType />
+    <rxcui>1000070</rxcui>
+  </Table>
+  <Table>
+    <AccountGuid>346a2bac-7240-4f6b-94e5-9de8575231f6</AccountGuid>
+    <AccountName>Millennium Community Services, LLC</AccountName>
+    <ExternalAccountID>okmis_mms-1195</ExternalAccountID>
+    <SiteID>okmis_mms</SiteID>
+    <PatientGUID>043f5d61-da4e-4e6f-86e3-14817294d56e</PatientGUID>
+    <FullName> Gary  Harner </FullName>
+    <ExternalPatientID>okmis_mms-44705</ExternalPatientID>
+    <PrescriptionDate>2015-04-21T09:25:51.61-05:00</PrescriptionDate>
+    <DrugID>236531</DrugID>
+    <DrugTypeID>F</DrugTypeID>
+    <DrugName>Lamictal</DrugName>
+    <DrugInfo>Lamictal 25 mg tablet</DrugInfo>
+    <Strength>25</Strength>
+    <StrengthUOM>mg</StrengthUOM>
+    <DosageNumberDescription>1</DosageNumberDescription>
+    <DosageForm>tablet</DosageForm>
+    <Route>by mouth</Route>
+    <DosageFrequencyDescription>DAILY</DosageFrequencyDescription>
+    <Dispense>30</Dispense>
+    <TakeAsNeeded>N</TakeAsNeeded>
+    <DispenseAsWritten>N</DispenseAsWritten>
+    <Refills>0</Refills>
+    <Status>C</Status>
+    <SubStatus>S</SubStatus>
+    <Archive>N</Archive>
+    <PrescriptionGuid>b79502ec-a9b3-425c-91ec-67b4519661cd</PrescriptionGuid>
+    <OrderGUID>52870fa2-7b00-48a4-a5b5-405225e4fa79</OrderGUID>
+    <PrescriptionNotes />
+    <PharmacistNotes />
+    <ExternalPhysicianID>okmis_mms-2238</ExternalPhysicianID>
+    <PhysicianName> Cheryl  Hooper   </PhysicianName>
+    <DateMovedToPreviousMedications xml:space="preserve"> </DateMovedToPreviousMedications>
+    <FormularyTypeID>S</FormularyTypeID>
+    <ModifiedSig>false</ModifiedSig>
+    <ExternalPrescriptionID />
+    <EpisodeIdentifier />
+    <EncounterIdentifier>102</EncounterIdentifier>
+    <ExternalSource />
+    <DosageNumberTypeID>2</DosageNumberTypeID>
+    <DosageFormTypeId>12</DosageFormTypeId>
+    <DosageRouteTypeId>2</DosageRouteTypeId>
+    <DosageFrequencyTypeID>2</DosageFrequencyTypeID>
+    <DaysSupply>30</DaysSupply>
+    <PrescriptionTimestamp>2015-04-21T09:24:15.82-05:00</PrescriptionTimestamp>
+    <OriginalPrescriptionGuid>b79502ec-a9b3-425c-91ec-67b4519661cd</OriginalPrescriptionGuid>
+    <ExternalUserID>okmis_mms-2238</ExternalUserID>
+    <ExternalUserType />
+    <DeaGenericNamedCode>2</DeaGenericNamedCode>
+    <Diagnosis />
+    <DiagnosisSource>ICD9CM</DiagnosisSource>
+    <DiagnosisName />
+    <DispenseNumberQualifier>U2</DispenseNumberQualifier>
+    <DispenseNumberQualifierDescription>Tablet</DispenseNumberQualifierDescription>
+    <LocationName>MCS Talihina Clinic</LocationName>
+    <GenericName>lamotrigine</GenericName>
+    <PatientFriendlySIG>1 tablet by mouth daily</PatientFriendlySIG>
+    <PrintLeaflet>F</PrintLeaflet>
+    <DeaClassCode>0</DeaClassCode>
+    <PharmacyType>1</PharmacyType>
+    <PharmacyDetailType>1</PharmacyDetailType>
+    <FinalDestinationType>2</FinalDestinationType>
+    <FinalStatusType>1</FinalStatusType>
+    <PharmacyNCPDP>3709865</PharmacyNCPDP>
+    <PharmacyFullInfo>LAWSON PHARMACY  Phone: 9185673111 301 2ND STREET TALIHINA</PharmacyFullInfo>
+    <SourcePrescriptionGuid>00000000-0000-0000-0000-000000000000</SourcePrescriptionGuid>
+    <DeaLegendDescription>Rx</DeaLegendDescription>
+    <ExternalMidLevelID />
+    <DrugSubID1>17872</DrugSubID1>
+    <FormularyChecked>true</FormularyChecked>
+    <StrengthUnknown>N</StrengthUnknown>
+    <PatientID>okmis_mms-44705</PatientID>
+    <PatientIDType />
+    <rxcui>105019</rxcui>
+  </Table>
+</NewDataSet>

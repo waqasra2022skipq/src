@@ -1,0 +1,102 @@
+A:link    { color: blue; }
+A:visited { color: blue; }
+A:active  { color: blue; }
+BODY { 
+    color: white;
+    background: black;
+    text-align: left;
+    font-family: "Verdana";
+    font-size: large; 
+    width: 100%;
+     }
+BLOCKQUOTE {
+    margin-left: .5in;
+    margin-right: .5in;
+           }
+.default { 
+    background: silver;
+    border-style: none;
+    padding-left: 3pt;
+    padding-right: 3pt;
+    color: black; 
+    font-family: Verdana "Times New Roman" "Times Roman" serif;
+    font-size: medium;
+    font-weight: normal;
+    width: 100%;
+         }
+.header { 
+    background: black;
+    border-style: none;
+    color: white; 
+    font-family: Verdana "Times New Roman" "Times Roman" serif;
+    font-size: x-large;
+    font-weight: bold;
+    width: 100%;
+        }
+.subheader { 
+    background: black;
+    border-style: none;
+    color: white; 
+    font-family: Verdana "Times New Roman" "Times Roman" serif;
+    font-size: large;
+    font-weight: normal;
+    width: 100%;
+           }
+.title { 
+    background: black;
+    border-style: none;
+    color: white; 
+    font-family: Verdana "Times New Roman" "Times Roman" serif;
+    font-size: medium;
+    font-weight: normal;
+    width: 100%;
+       }
+.subtitle { 
+    background: black;
+    border-style: none;
+    color: white; 
+    font-family: Verdana "Times New Roman" "Times Roman" serif;
+    font-size: small;
+    font-weight: normal;
+    width: 100%;
+          }
+.letter { 
+    background: white;
+    border-style: none;
+    color: black; 
+    font-family: Verdana "Times New Roman" "Times Roman" serif;
+    font-size: medium;
+    font-weight: normal;
+    width: 100%;
+        }
+.memo { 
+    background-color: white; 
+    border: 0;
+    border-style: none;
+    color: black; 
+    font-family: Verdana "Times New Roman" "Times Roman" serif;
+    font-size: small; 
+    font-weight: normal;
+    vertical-align: top; 
+    width: 100%;
+       }
+.guidehdr { 
+    background-color: silver; 
+    border-style: none;
+    color: black; 
+    font-family: Verdana "Times New Roman" "Times Roman" serif;
+    font-size: small; 
+    font-weight: normal;
+    vertical-align: top; 
+    width: 100%;
+       }
+.guide { 
+    background-color: silver; 
+    border-style: none;
+    color: black; 
+    font-family: Verdana "Times New Roman" "Times Roman" serif;
+    font-size: x-small; 
+    font-weight: normal;
+    vertical-align: top; 
+    width: 100%;
+       }

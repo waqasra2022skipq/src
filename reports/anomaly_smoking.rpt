@@ -1,0 +1,5 @@
+select Client.LName,Client.FName,SAbuse.ClientID,Drug,MedHx.DailyTobaccoUse
+ from SAbuse
+  left join Client on Client.ClientID=SAbuse.ClientID
+  left join MedHx on MedHx.ClientID=SAbuse.ClientID
+ where Drug=22 and (MedHx.DailyTobaccoUse is not null and MedHx.DailyTobaccoUse>0);

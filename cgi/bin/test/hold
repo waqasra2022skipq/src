@@ -1,0 +1,86 @@
+my $x_table = 55;
+my $tablewidth = 475;
+
+my $fontsize = 10;
+
+my $fontname= "{New Times Roman}";
+my $basefontoptions = "";
+my $optlist2;
+
+my @headers = ( "ICD10", "NAME", "INITIATED", "RESOLVED");
+my @alignments = ( "center", "left", "center", "center");
+
+        $basefontoptions = "fontname=" . $fontname . " fontsize=" . 
+            $fontsize . " embedding encoding=unicode";
+
+        # -----------------------------------
+        # Create and place table with article list
+        # -----------------------------------
+        
+        # ---------- Header row 
+        my $row = 1;
+        my $col = 1;
+        my $tbl = -1; 
+        my $buf;
+
+        for ($col=1; $col <= $#headers+1; $col++)
+        {
+            $optlist2 =  "fittextline={position={" . $alignments[$col-1] . 
+                " center} " . $basefontoptions . "} margin=2";
+            $tbl = $p->add_table_cell($tbl, $col, $row, $headers[$col-1], 
+            $optlist2);
+        }
+        $row++;
+
+        # ---------- Data rows: one for each article 
+        my $total = 0;
+
+  ##      for (my $i = 0; $i <  $#data+1; $i++) {
+  $sClientNoteProblems->execute($TrID);
+  while (my $rClientNoteProblems = $sClientNoteProblems->fetchrow_hashref) 
+  {
+            $col = 1;
+
+            # column 1: ICD10 
+            #$buf = sprintf("%d", $i + 1);
+            $buf = $rClientNoteProblems->{'ICD10'};
+            $optlist2 = "fittextline={position={" . $alignments[$col-1] . 
+                " center} " . $basefontoptions . "} margin=2";
+            $tbl = $p->add_table_cell($tbl, $col++, $row, $buf, $optlist2);
+
+            # column 2: NAME 
+            $buf = $rClientNoteProblems->{'icdName'};
+            $optlist2 = "fittextline={position={" . $alignments[$col-1] . 
+                " center} " . $basefontoptions . "} colwidth=50% margin=2";
+            $tbl = $p->add_table_cell($tbl, $col++, $row, $buf, $optlist2);
+
+            # column 3: INITIATE DATE 
+            $buf = DBUtil->Date($rClientNoteProblems->{'InitiatedDate'},'fmt','MM/DD/YYYY');
+            $optlist2 = "fittextline={position={" . $alignments[$col-1] . 
+                " center} " . $basefontoptions . "} margin=2";
+            $tbl = $p->add_table_cell($tbl, $col++, $row, $buf, $optlist2);
+
+            # column 4: INITIATE DATE 
+            $buf = DBUtil->Date($rClientNoteProblems->{'ResolvedDate'},'fmt','MM/DD/YYYY');
+            $optlist2 = "fittextline={position={" . $alignments[$col-1] . 
+                " center} " . $basefontoptions . "} margin=2";
+            $tbl = $p->add_table_cell($tbl, $col++, $row, $buf, $optlist2);
+
+            $row++;
+        }
+
+
+            my $top = 300;
+
+            # Place the table on the page; Shade every other row. 
+            $optlist2 =  "header=1 fill={{area=rowodd fillcolor={gray 0.9}}} ";
+
+            my $result = $p->fit_table($tbl,
+                    $x_table, $top, $x_table+$tablewidth, 20, $optlist2);
+
+            if ($result eq "_error") {
+                throw new Exception("Couldn't place table: "
+                    . $p->get_errmsg());
+            }
+
+        $p->delete_table($tbl, "");

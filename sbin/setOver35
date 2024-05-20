@@ -1,0 +1,229 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use DBA;
+use DBUtil;
+use Time::Local;
+use POSIX qw(strftime);
+############################################################################
+# usage: setOver35 DBNAME=db&Year=[all|YYYY]
+#        reports start 10/1/2014 (week 40 beginning 9/28/2014)
+############################################################################
+# get the command name...
+my ($pw,$cmd) = $0 =~ m/(.*\/)(.*)$/;
+print qq|#${cmd}: Started |.localtime().qq|\n|;
+my $form = DBForm->new();
+my $dbh = $form->dbconnect();
+warn qq|#Year=$form->{'Year'}\n| if ( $debug );
+my $debug = $form->{'debug'};
+my $ForProvID = $form->{'ForProvID'};
+my $with = $ForProvID ? qq| and ProvID=${ForProvID} | : '';
+
+my $sR = $dbh->prepare("select * from Over35 where ProvID=? and InsID=? and Year=? and Week=?");
+my $sU = $dbh->prepare("update Over35 set Hours=? where ProvID=? and InsID=? and Year=? and Week=?");
+my $sI = $dbh->prepare("insert into Over35 (ProvID,InsID,Year,Sunday,Week,Hours) values (?,?,?,?,?,?)");
+my $sU2 = $dbh->prepare("update Over35 set Last4=?,Over=? where ProvID=? and InsID=? and Year=? and Week=?");
+my ($cyear,$cmonth,$cday) = split( '-',$form->{'TODAY'});
+my $cepoch = timelocal(0,0,0,$cday,$cmonth-1,$cyear-1900 );
+my $cWeek  = strftime("%U",localtime($cepoch));
+$cWeek++;
+warn qq|#cyear=$cyear,cmonth=$cmonth,cday=$cday\n| if ( $debug );
+warn qq|#cepoch=$cepoch,cWeek=$cWeek\n| if ( $debug );
+my @Years = main->getYears($form,$form->{Year});
+print "Start: Years=@Years\n";
+foreach my $Year ( @Years )
+{
+  print "Loop: Year=$Year\n";
+  main->delNotes($form,$Year);
+  main->addZero($form,$Year);
+  main->rollupNotes($form,$Year);
+}
+main->setLast4($form);
+$sR->finish();
+$sU->finish();
+$sI->finish();
+$form->complete();
+exit;
+###########################################################################################
+sub getYears
+{
+  my ($self,$form,$years) = @_;
+  my $dbh = $form->dbconnect();
+  my @list = ();
+  if ( $years eq 'all' || $years eq '' )
+  { $q = qq|select YEAR(ContLogDate) from Treatment where ContLogDate>'2014-09-28' group by YEAR(ContLogDate)|; }
+  else
+  { $q = qq|select YEAR(ContLogDate) from Treatment where YEAR(ContLogDate)='${years}' group by YEAR(ContLogDate)|; }
+warn qq|q=\n$q\n|;
+  my $s = $dbh->prepare($q);
+  $s->execute() || $form->dberror($q);
+  while ( my ($Year) = $s->fetchrow_array ) { push(@list,$Year); }
+  $s->finish();
+  return(@list);
+}
+##
+# delete/clear everything...for BillDate in Over35
+##
+sub delNotes
+{
+  my ($self,$form,$Year) = @_;
+  my $dbh = $form->dbconnect();
+warn "delete from Over35 where Year = '$Year' ${with}\n" if ( $debug );
+  $sDelete = $dbh->prepare("delete from Over35 where Year='$Year' ${with}");
+  $sDelete->execute() || $form->dberror("delete from Over35 where Year='$Year' ${with}");
+  $sDelete->finish();
+  return();
+}
+sub addZero
+{
+  my ($self,$form,$Year) = @_;
+  my $s = $Year == 2014 ? 40 : 1;
+  my $e = $Year == $cyear ? $cWeek : 53;
+warn qq|#s=$s,e=$e\n| if ( $debug );
+  my $dbh = $form->dbconnect();
+  $qTreatment = qq|
+  select Treatment.*
+        ,xSC.SCNum,xSC.SCName
+        ,xInsurance.Name as InsName, xInsurance.ID as InsID
+    from Treatment 
+      left join xSC on xSC.SCID=Treatment.SCID
+      left join xInsurance on xInsurance.ID=xSC.InsID
+    where YEAR(Treatment.ContLogDate) = '${Year}'
+      and Treatment.ContLogDate >= '2014-09-28'
+      and xSC.InsID = 100
+      and (xSC.SCNum NOT LIKE 'H0031%' and xSC.SCNum NOT LIKE 'H0032%')
+      and xSC.SCNum NOT IN ('96101','96101 HL','96118','96118 HL')
+      and xSC.Type != 'CI'
+      ${with}
+    group by Treatment.ProvID
+|;
+warn qq|addZero: qTreatment=$qTreatment\n| if ( $debug );
+  $sTreatment = $dbh->prepare($qTreatment);
+  $sTreatment->execute() || $form->dberror($qTreatment);
+  while ( my $rTreatment = $sTreatment->fetchrow_hashref )
+  {
+    my $ProvID = $rTreatment->{ProvID};
+    my $InsID = 100;
+    for ($w=$s; $w<=$e; $w++)
+    {
+warn qq|ProvID=$ProvID,InsID=$InsID,Year=$Year,w=$w\n| if ( $debug );
+warn qq|sI->execute($ProvID,$InsID,$Year,$w,0)\n| if ( $debug );
+      my $Sunday = DBUtil->SundayOfWeek($Year,$w);
+      $sI->execute($ProvID,$InsID,$Year,$Sunday,$w,0) || $form->dberror("fail on insert!");
+    }
+  }
+  $sTreatment->finish();
+  return();
+}
+sub rollupNotes
+{
+  my ($self,$form,$Year) = @_;
+  my $dbh = $form->dbconnect();
+  $qTreatment = qq|
+  select Treatment.*,ProgNotes.GrpSize
+        ,xSC.SCNum,xSC.SCName,xSC.Type as SCType
+        ,xSCRates.HrsPerUnit
+        ,xInsurance.Name as InsName, xInsurance.ID as InsID
+    from Treatment 
+      left join ProgNotes on ProgNotes.NoteID=Treatment.TrID
+      left join xSC on xSC.SCID=Treatment.SCID
+      left join xSCRates on xSCRates.SCID=xSC.SCID
+      left join xInsurance on xInsurance.ID=xSC.InsID
+    where YEAR(Treatment.ContLogDate) = '${Year}'
+      and Treatment.ContLogDate >= '2014-09-28'
+      and xSCRates.EffDate <= Treatment.ContLogDate and ( Treatment.ContLogDate <= xSCRates.ExpDate or xSCRates.ExpDate is null)
+      and xSC.InsID = 100
+      and (xSC.SCNum NOT LIKE 'H0031%' and xSC.SCNum NOT LIKE 'H0032%')
+      and xSC.SCNum NOT IN ('96101','96101 HL','96118','96118 HL')
+      and xSC.Type != 'CI'
+      ${with}
+    order by Treatment.ProvID,Treatment.ContLogDate,xInsurance.Name
+|;
+warn qq|rollup: qTreatment=$qTreatment\n| if ( $debug );
+  $sTreatment = $dbh->prepare($qTreatment);
+  $sTreatment->execute() || $form->dberror($qTreatment);
+  while ( my $rTreatment = $sTreatment->fetchrow_hashref )
+  {
+    my $ProvID = $rTreatment->{ProvID};
+    my $InsID = $rTreatment->{InsID};
+    my $ContDate = $rTreatment->{ContLogDate};
+    my ($year,$month,$day) = split( '-',$ContDate);
+    my $epoch = timelocal(0,0,0,$day,$month-1,$year-1900 );
+    my $Week  = strftime("%U",localtime($epoch));
+    $Week++;
+    my $Duration = DBUtil->getDuration($rTreatment->{ContLogBegTime},$rTreatment->{ContLogEndTime});
+    my $Hrs = sprintf("%.2f",$Duration / 3600);
+    my $UnitHrs = sprintf("%.2f",$rTreatment->{'Units'} * $rTreatment->{'HrsPerUnit'});
+    if ( $rTreatment->{'SCType'} eq 'GC' && $rTreatment->{'GrpSize'} > 1 )
+    { $Hrs = $Hrs / $rTreatment->{'GrpSize'}; }          # divide by the number in the group
+    if ( $rTreatment->{'SCType'} eq 'GC' && $rTreatment->{'GrpSize'} > 1 )
+    { $UnitHrs = $UnitHrs / $rTreatment->{'GrpSize'}; }          # divide by the number in the group
+warn qq|ProvID=$ProvID,InsID=$InsID,SCNum=$rTreatment->{SCNum},SCName=$rTreatment->{SCName}\n| if ( $debug );
+warn qq|ContDate=$ContDate,year=$year,Week=$Week\n| if ( $debug );
+warn qq|Beg=$rTreatment->{ContLogBegTime},End=$rTreatment->{ContLogEndTime},Duration=$Duration,Hrs=$Hrs\n| if ( $debug );
+warn qq|Units=$rTreatment->{Units},HrsPerUnit=$rTreatment->{HrsPerUnit},UnitHrs=${UnitHrs}\n| if ( $debug );
+#warn qq|HOURS ARE DIFFERENT: $rTreatment->{'TrID'}: Hrs=${Hrs}/${UnitHrs}\n| if ( $Hrs != $UnitHrs );
+
+    $sR->execute($ProvID,$InsID,$year,$Week) || $form->dberror("fail on Over35 select!");
+    if ( my $r = $sR->fetchrow_hashref )
+    { 
+      my $Hours = $r->{'Hours'} + $UnitHrs;
+warn qq|sU->execute($Hours,$ProvID,$InsID,$year,$Week)\n| if ( $debug );
+      $sU->execute($Hours,$ProvID,$InsID,$year,$Week) || $form->dberror("fail on update!");
+    }
+    else
+    {
+warn qq|sI->execute($ProvID,$InsID,$year,$Week,$UnitHrs)\n| if ( $debug );
+      my $Sunday = DBUtil->SundayOfWeek($year,$Week);
+      $sI->execute($ProvID,$InsID,$year,$Sunday,$Week,$UnitHrs) || $form->dberror("fail on insert!");
+    }
+  }
+  $sTreatment->finish();
+  return();
+}
+sub setLast4
+{
+  my ($self,$form) = @_;
+  my $dbh = $form->dbconnect();
+  my ($PrevProvID,$PrevInsID,$PrevYear,$PrevWeek) = ('','','','');
+  my ($Week1,$Week2,$Week3,$Week4) = (0,0,0,0);
+  $qOver35 = qq|select * from Over35 where ProvID is not null ${with} order by ProvID,InsID,Year,Week |;
+warn qq|qOver35=$qOver35\n| if ( $debug );
+  $sOver35 = $dbh->prepare($qOver35);
+  $sOver35->execute() || $form->dberror($qOver35);
+  while ( my $rOver35 = $sOver35->fetchrow_hashref )
+  {
+    my $ProvID = $rOver35->{ProvID};
+    my $InsID = $rOver35->{InsID};
+    my $Year =  $rOver35->{'Year'};
+    my $Week =  $rOver35->{'Week'};
+    my $Hours =  $rOver35->{'Hours'};
+    if ( $ProvID ne $PrevProvID
+      || $InsID ne $PrevInsID )
+    {
+warn qq|ProvID=$PrevProvID,InsID=$PrevInsID,Year=$PrevYear\n| if ( $debug );
+warn qq|ProvID=$ProvID,InsID=$InsID,Year=$Year\n| if ( $debug );
+      $Week1 = 0;
+      $Week2 = 0;
+      $Week3 = 0;
+      $Week4 = 0;
+    }
+    $Week1 = $Week2;
+    $Week2 = $Week3;
+    $Week3 = $Week4;
+    $Week4 = $Hours;
+    my $Last4 = $Week1+$Week2+$Week3+$Week4;
+    my $flag = $Last4 > 140 ? 'Yes' : 'No';
+warn qq|Last4=$Last4  ($Week1+$Week2+$Week3+$Week4)\n| if ( $debug );
+warn qq|sU2->execute($Last4,$ProvID,$InsID,$Year,$Week)\n| if ( $debug );
+    $sU2->execute($Last4,$flag,$ProvID,$InsID,$Year,$Week) ||
+                  $form->dberror("fail on Last4 update!");
+    $PrevProvID=$ProvID;
+    $PrevInsID=$InsID;
+    $PrevYear=$Year;
+    $PrevWeek=$Week;
+  }
+  $sOver35->finish();
+  return();
+}

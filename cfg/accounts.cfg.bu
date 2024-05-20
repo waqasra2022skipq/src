@@ -1,0 +1,66 @@
+############################################################################
+# Active = currently being used (ie: reports needed)
+# Live = database needs updates to stay current
+# Test = testing account only (ie: all data can be cleared)
+our %DATABASES = 
+(
+   'okmis_adv'       => { Active => 1, Live => 1, Test => 0 },
+   'okmis_anv'       => { Active => 1, Live => 1, Test => 0 },
+   'okmis_anw'       => { Active => 1, Live => 1, Test => 0 },
+   'okmis_base'      => { Active => 0, Live => 1, Test => 0 },
+   'okmis_ccc'       => { Active => 1, Live => 1, Test => 0 },
+   'okmis_ccs'       => { Active => 1, Live => 1, Test => 0 },
+   'okmis_csl'       => { Active => 1, Live => 1, Test => 0 },
+   'okmis_cti'       => { Active => 1, Live => 1, Test => 0 },
+   'okmis_client'    => { Active => 0, Live => 0, Test => 0 },
+   'okmis_demo'      => { Active => 0, Live => 1, Test => 0 },
+   'okmis_dev'       => { Active => 0, Live => 0, Test => 1 },
+   'okmis_elf'       => { Active => 1, Live => 1, Test => 0 },
+   'okmis_fho'       => { Active => 1, Live => 1, Test => 0 },
+   'okmis_foh'       => { Active => 1, Live => 1, Test => 0 },
+   'okmis_gcs'       => { Active => 1, Live => 1, Test => 0 },
+   'okmis_gpr'       => { Active => 1, Live => 1, Test => 0 },
+   'okmis_ibf'       => { Active => 1, Live => 1, Test => 0 },
+   'okmis_ipi'       => { Active => 1, Live => 1, Test => 0 },
+   'okmis_lbhp'      => { Active => 1, Live => 1, Test => 0 },
+   'okmis_lkt'       => { Active => 1, Live => 1, Test => 0 },
+   'okmis_mms'       => { Active => 1, Live => 1, Test => 0 },
+   'okmis_oays'      => { Active => 1, Live => 1, Test => 0 },
+   'okmis_opa'       => { Active => 1, Live => 1, Test => 0 },
+   'okmis_pcd'       => { Active => 1, Live => 1, Test => 0 },
+   'okmis_scs'       => { Active => 1, Live => 1, Test => 0 },
+   'okmis_tccp'      => { Active => 1, Live => 1, Test => 0 },
+   'okmis_tsi'       => { Active => 1, Live => 1, Test => 0 },
+);
+@ALL_DBS = ();
+@ACTIVE_DBS = ();
+@TEST_DBS = ();
+@LIVE_DBS = ();
+@ALL_ACCTS = ();
+@ACTIVE_ACCTS = ();
+@TEST_ACCTS = ();
+@LIVE_ACCTS = ();
+foreach my $database ( sort keys %DATABASES )
+{
+  next if ( $database eq 'okmis_client' );     # SKIP
+  my ($domain,$subdomain) = split('_',$database);
+  push(@ALL_DBS,$database);
+  push(@ALL_ACCTS,$subdomain);
+  if ( $DATABASES{$database}{'Active'} ) 
+  { 
+    push(@ACTIVE_DBS,$database); 
+    push(@ACTIVE_ACCTS,$subdomain);
+  }
+  if ( $DATABASES{$database}{'Live'} ) 
+  {
+    push(@LIVE_DBS,$database); 
+    push(@LIVE_ACCTS,$subdomain); 
+  }
+  if ( $DATABASES{$database}{'Test'} ) 
+  { 
+    push(@TEST_DBS,$database);
+    push(@TEST_ACCTS,$subdomain);
+  }
+}
+############################################################################
+1;

@@ -1,0 +1,68 @@
+[[myHTML->newPage(%form+Electonic Documents)]]
+
+<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/NoEnter.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vProviderEDocs.js"> </SCRIPT>
+
+<FORM NAME="ProviderEDocs" METHOD=POST ACTION="/cgi/bin/mis.cgi" > 
+<TABLE CLASS="main fullsize" >
+  <TR >
+    <TD CLASS="strcol" >
+      <<<Provider_FName_1>>> <<<Provider_MName_1>>> <<<Provider_LName_1>>> 
+      <BR>
+      Provider Electronic Document
+    </TD>
+    <TD CLASS="numcol" >[[gHTML->setLINKS(%form+back)]]</TD>
+  </TR>
+</TABLE>
+<TABLE CLASS="home fullsize" >
+  <TR >
+    <TD CLASS="port numcol" COLSPAN="2" >
+      <A HREF="javascript:ReportWindow([[DBUtil->quoteSTR(%form+<<<ProviderEDocs_Path_1>>>)]],'ViewDocument')" ONMOUSEOVER="window.status='click here to view attached document'; return true;" ONMOUSEOUT="window.status=''" ><IMG BORDER="0" SRC="/images/view_document.gif">View Document</A>
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" WIDTH="30%" >Title</TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="TEXT" NAME="ProviderEDocs_Title_1" VALUE="<<ProviderEDocs_Title_1>>" ONFOCUS="select()" SIZE=35>
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" WIDTH="30%" >Description</TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="TEXT" NAME="ProviderEDocs_Descr_1" VALUE="<<ProviderEDocs_Descr_1>>" ONFOCUS="select()" SIZE=70>
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" WIDTH="30%" >Type</TD>
+    <TD CLASS="strcol" >
+      <SELECT NAME="ProviderEDocs_Type_1" >
+        [[DBA->selxTable(%form+xEDocType+<<ProviderEDocs_Type_1>>+Descr)]]
+      </SELECT>
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" WIDTH="30%" >Show on Available Forms screen</TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="checkbox" NAME="ProviderEDocs_Public_1" VALUE=1 <<ProviderEDocs_Public_1=checkbox>> >
+    </TD>
+  </TR>
+  <TR > <TD CLASS="strcol" COLSPAN="2" >(if you put DELETE in both the Title AND Description it will remove/delete this document tonight.)</TD> </TR>
+</TABLE>
+<TABLE CLASS="main fullsize" >
+  <TR >
+    <TD CLASS="numcol" >
+[[SysAccess->verify(%form+Privilege=DeleteEDocs) <INPUT TYPE="submit" ONCLICK="return vDELETE('Are you sure you want to delete this Electronic Document record and the associated saved Document?')" NAME="ProviderEDocs_DELETE_1=1&UpdateTables=all&misPOP=1" VALUE="Delete Document"> ]]
+      <INPUT TYPE="submit" ONCLICK="return validate(this.form);" NAME="UpdateTables=all&misPOP=1" VALUE="Add/Update">
+    </TD>
+  </TR>
+</TABLE>
+
+<INPUT TYPE="hidden" NAME="post_update" VALUE="PostUpd->updEDocs(%form+ProviderEDocs+<<<ProviderEDocs_ID_1>>>)" >
+</LOADHIDDEN>
+</FORM>
+<SCRIPT LANGUAGE="JavaScript">
+document.ProviderEDocs.elements[0].focus();
+</SCRIPT>
+
+[[myHTML->rightpane(%form+search)]]

@@ -1,0 +1,85 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use DBA;
+use DBUtil;
+use Accounts;
+use myConfig;
+my $debug=1;
+############################################################################
+# importFile DBNAME=okmis_xxx&file=xxx&upddb=okmis_yyy\&table=ttt
+#   DBNAME is a valid login db like okmis_dev (never okmis_config)
+#   file is the input file (cut/paste from xls spreadsheet into 'file')
+#   upddb is db to WRITE to where table is
+#   table is the WRITTEN to (table is ALWAYS inserted [genInsert])
+#     table MUST exist (in upddb)
+############################################################################
+my $form = DBForm->new();
+my $dbh = $form->dbconnect();
+my $file   = $form->{file};
+my $table  = $form->{table};
+my $upddb  = $form->{upddb} eq '' ? $form->{'DBNAME'} : $form->{'upddb'};
+my $upddbh = $dbh;
+# MUST have table.
+if ( $table eq '')
+{
+  print qq|\n>>>ERROR: table CANNOT be NULL!\n\n|;
+  print qq|\nimportFile DBNAME=okmis_xxx&file=xxx&upddb=okmis_yyy\&table=ttt\n|;
+  $form->complete();
+  exit;
+}
+
+# which database?
+if ( $upddb ne $form->{'DBNAME'} )
+{ $upddbh = $form->connectdb($upddb); }
+print qq|file=${file}\n| if ( $debug );
+print qq|table=${table}\n| if ( $debug );
+print qq|upddb=${upddb}\n| if ( $debug );
+
+my @Fields;
+
+# table MUST exist.
+my $s=$upddbh->prepare("show tables where Tables_in_${upddb}='${table}'");
+$s->execute() || $form->dberror("select ${table} FAILED!");
+if ( $rTest = $s->fetchrow_hashref )
+{
+  print qq|\nopen file: ${file}\n|;
+  if ( open(FILE,$file) ) 
+  {
+    my ($out,$cnt) = ('',0);
+    while ( $in = <FILE> )
+    {
+      foreach my $line ( split(/[\r\n]+/,$in) )
+      {
+        $cnt++;
+        #$line =~ s/\r?\n$//;
+print qq|: line=$line\n| if ( $debug );
+        if ( $cnt == 1 )
+        {
+          foreach my $f ( split("\t",$line) ) { push(@Fields,$f); }
+if ( $debug ) { foreach my $f ( @Fields ) { print qq|  : Fields=$f\n|; } }
+        }
+        else
+        {
+          my $r = (); $i = 0;
+          foreach my $f ( split("\t",$line) ) { ($r->{$Fields[$i]} = $f) =~ s/"//g; $i++; }
+#$r->{'ID'} = "$r->{'CountyDistrictCode'}_$r->{'SiteCode'}";
+if ( $debug ) { foreach my $f ( sort keys %{$r} ) { print "r-$f=$r->{$f}\n"; } }
+          my $query = DBA->genInsert($form,$table,$r);
+print qq|importFile: query=${query}\n| if ( $debug );
+          my $sInsert = $upddbh->prepare($query);
+          $sInsert->execute() || $form->dberror($query);
+          $sInsert->finish();
+        }
+      }
+#last if ( $cnt == 10 );
+    }
+    close(FILE);
+  } else { print qq|\n>>>ERROR: open ${file} $!\n\n|; }
+} else { print qq|\n>>>ERROR: select ${table} NOT FOUND!\n\n|; }
+$s->finish();
+$upddbh->disconnect();
+$form->complete();
+exit;
+################################################################

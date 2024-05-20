@@ -1,0 +1,52 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use DBA;
+use DBUtil;
+use MgrTree;
+############################################################################
+my $form = DBForm->new();
+my $dbh = $form->dbconnect();
+my $sProviderClients = $dbh->prepare("select Client.ClientID,Provider.ProvID,Provider.LName,Provider.FName,Provider.Email from Client left join Provider on Provider.ProvID=Client.ProvID where Client.Active=1 and Provider.Active=1 and Provider.Email IS NOT NULL and Provider.NoMail=0 order by Provider.LName, Provider.FName, Client.LName, Client.FName");
+my $sClientPrAuth = $dbh->prepare("select * from ClientPrAuth where ClientID=? and (curdate() between EffDate and ExpDate) order by ID desc");
+my $sProvider = $dbh->prepare("select * from Provider where ProvID=?");
+my $cnt=0;
+$sProviderClients->execute();
+while ( my $rProviderClients = $sProviderClients->fetchrow_hashref )
+{
+  $sClientPrAuth->execute($rProviderClients->{ClientID});
+  if ( my $rClientPrAuth = $sClientPrAuth->fetchrow_hashref )
+  {
+    my $RemDays = DBUtil->Date($rClientPrAuth->{ExpDate},'diff');
+    if ( $RemDays == 15 || $RemDays == 10 )
+    { 
+      $cnt++;
+      $PAExpDate = DBUtil->Date($rClientPrAuth->{ExpDate},'fmt','MM/DD/YYYY');
+
+      my $AgencyID = MgrTree->getAgency($form,$rProviderClients->{ProvID});
+      $sProvider->execute($AgencyID);
+      my $rAgency = $sProvider->fetchrow_hashref;
+      my $Addrs = $rProviderClients->{Email};
+      my $Subject = qq|PA Expires for Client ID: $rProviderClients->{ClientID}|;
+      my $Message = qq|
+Agency: $rAgency->{Name}
+
+Provider: $rProviderClients->{FName} $rProviderClients->{LName},
+
+Prior Auth expires in ${RemDays} days on ${PAExpDate}.
+
+(Do not reply to this automated message.)
+|;
+      DBUtil->email($form,$Addrs,$Subject,$Message,'',1);
+      print qq|${Addrs},${Subject}\n${Message}\n|;
+    }
+  }
+}
+$sProviderClients->finish();
+$sClientPrAuth->finish();
+$sProvider->finish();
+$form->complete();
+print qq|complete: cnt=${cnt}\n|;
+############################################################################
+exit;

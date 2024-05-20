@@ -1,0 +1,5 @@
+#./genBilling DBNAME=okmis_mms\&Mark=1\&MarkDate=2020-02-25\&ClinicIDs=101
+#./setAddon DBNAME=okmis_mms\&BillDate=2020-02-25
+#./setBilling DBNAME=okmis_mms\&BillDate=2020-02-25
+./gen837 DBNAME=okmis_mms\&InsDescr=longevity\&BillDate=2020-03-16
+#cp -pv /home/okmis/mis/billing/okmis_ipi*.837 /home/okmis/www/mms/admin/837

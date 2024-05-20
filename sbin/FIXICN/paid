@@ -1,0 +1,18 @@
+#!/bin/bash
+#--------------------
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   echo -e "\nServices not installed!"
+   exit 1
+fi
+#--------------------
+# run on dev database (restored database)
+DB=$1
+TrID=$2
+TransID=$3
+#--------------------
+echo "# fix PaidAmt and AmtDue..."
+mysqldump --complete-insert --no-create-info --where "ID=${TransID}" ${DB} NoteTrans | grep INSERT | /bin/sed "s;(${TransID},;(NULL,;" 
+echo update Treatment set BillStatus=5,RecDate='2017-03-01',StatusDate='2017-03-01',AmtDue='00.00' where TrID=${TrID}\;
+#--------------------

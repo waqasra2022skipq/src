@@ -1,0 +1,515 @@
+-- MySQL dump 10.13  Distrib 5.6.38, for Linux (x86_64)
+--
+-- Host: localhost    Database: okmis_mms
+-- ------------------------------------------------------
+-- Server version	5.6.38
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `ClientPHQ`
+--
+
+DROP TABLE IF EXISTS `ClientPHQ`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ClientPHQ` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `ClientID` int(11) NOT NULL DEFAULT '0',
+  `CreateProvID` int(11) DEFAULT NULL,
+  `CreateDate` date DEFAULT NULL,
+  `ChangeProvID` int(11) DEFAULT NULL,
+  `ChangeDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `FormID` varchar(12) DEFAULT NULL,
+  `Locked` char(1) DEFAULT NULL,
+  `TestDate` date DEFAULT NULL,
+  `q1a` char(1) DEFAULT NULL,
+  `q1b` char(1) DEFAULT NULL,
+  `q1c` char(1) DEFAULT NULL,
+  `q1d` char(1) DEFAULT NULL,
+  `q1e` char(1) DEFAULT NULL,
+  `q1f` char(1) DEFAULT NULL,
+  `q1g` char(1) DEFAULT NULL,
+  `q1h` char(1) DEFAULT NULL,
+  `q1i` char(1) DEFAULT NULL,
+  `q1j` char(1) DEFAULT NULL,
+  `q1k` char(1) DEFAULT NULL,
+  `q1l` char(1) DEFAULT NULL,
+  `q1m` char(1) DEFAULT NULL,
+  `q2a` char(1) DEFAULT NULL,
+  `q2b` char(1) DEFAULT NULL,
+  `q2c` char(1) DEFAULT NULL,
+  `q2d` char(1) DEFAULT NULL,
+  `q2e` char(1) DEFAULT NULL,
+  `q2f` char(1) DEFAULT NULL,
+  `q2g` char(1) DEFAULT NULL,
+  `q2h` char(1) DEFAULT NULL,
+  `q2i` char(1) DEFAULT NULL,
+  `q3a` char(1) DEFAULT NULL,
+  `q3b` char(1) DEFAULT NULL,
+  `q3c` char(1) DEFAULT NULL,
+  `q3d` char(1) DEFAULT NULL,
+  `q4a` char(1) DEFAULT NULL,
+  `q4b` char(1) DEFAULT NULL,
+  `q4c` char(1) DEFAULT NULL,
+  `q4d` char(1) DEFAULT NULL,
+  `q4e` char(1) DEFAULT NULL,
+  `q4f` char(1) DEFAULT NULL,
+  `q4g` char(1) DEFAULT NULL,
+  `q4h` char(1) DEFAULT NULL,
+  `q4i` char(1) DEFAULT NULL,
+  `q4j` char(1) DEFAULT NULL,
+  `q4k` char(1) DEFAULT NULL,
+  `q5a` char(1) DEFAULT NULL,
+  `q5b` char(1) DEFAULT NULL,
+  `q5c` char(1) DEFAULT NULL,
+  `q5d` char(1) DEFAULT NULL,
+  `q5e` char(1) DEFAULT NULL,
+  `q5f` char(1) DEFAULT NULL,
+  `q5g` char(1) DEFAULT NULL,
+  `q6a` char(1) DEFAULT NULL,
+  `q6b` char(1) DEFAULT NULL,
+  `q6c` char(1) DEFAULT NULL,
+  `q7a` char(1) DEFAULT NULL,
+  `q7b` char(1) DEFAULT NULL,
+  `q7c` char(1) DEFAULT NULL,
+  `q7d` char(1) DEFAULT NULL,
+  `q8` char(1) DEFAULT NULL,
+  `q9` char(1) DEFAULT NULL,
+  `q10a` char(1) DEFAULT NULL,
+  `q10b` char(1) DEFAULT NULL,
+  `q10c` char(1) DEFAULT NULL,
+  `q10d` char(1) DEFAULT NULL,
+  `q10e` char(1) DEFAULT NULL,
+  `q11` char(1) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `ClientID` (`ClientID`)
+) ENGINE=MyISAM AUTO_INCREMENT=64 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2018-04-25 12:16:45
+-- MySQL dump 10.13  Distrib 5.6.38, for Linux (x86_64)
+--
+-- Host: localhost    Database: okmis_mms
+-- ------------------------------------------------------
+-- Server version	5.6.38
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `ClientPHQ15`
+--
+
+DROP TABLE IF EXISTS `ClientPHQ15`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ClientPHQ15` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `ClientID` int(11) NOT NULL DEFAULT '0',
+  `CreateProvID` int(11) DEFAULT NULL,
+  `CreateDate` date DEFAULT NULL,
+  `ChangeProvID` int(11) DEFAULT NULL,
+  `ChangeDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `FormID` varchar(12) DEFAULT NULL,
+  `Locked` char(1) DEFAULT NULL,
+  `TestDate` date DEFAULT NULL,
+  `q1` char(1) DEFAULT NULL,
+  `q2` char(1) DEFAULT NULL,
+  `q3` char(1) DEFAULT NULL,
+  `q4` char(1) DEFAULT NULL,
+  `q5` char(1) DEFAULT NULL,
+  `q6` char(1) DEFAULT NULL,
+  `q7` char(1) DEFAULT NULL,
+  `q8` char(1) DEFAULT NULL,
+  `q9` char(1) DEFAULT NULL,
+  `q10` char(1) DEFAULT NULL,
+  `q11` char(1) DEFAULT NULL,
+  `q12` char(1) DEFAULT NULL,
+  `q13` char(1) DEFAULT NULL,
+  `q14` char(1) DEFAULT NULL,
+  `q15` char(1) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `ClientID` (`ClientID`)
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2018-04-25 12:16:45
+-- MySQL dump 10.13  Distrib 5.6.38, for Linux (x86_64)
+--
+-- Host: localhost    Database: okmis_mms
+-- ------------------------------------------------------
+-- Server version	5.6.38
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `ClientPHQ4`
+--
+
+DROP TABLE IF EXISTS `ClientPHQ4`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ClientPHQ4` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `ClientID` int(11) NOT NULL DEFAULT '0',
+  `CreateProvID` int(11) DEFAULT NULL,
+  `CreateDate` date DEFAULT NULL,
+  `ChangeProvID` int(11) DEFAULT NULL,
+  `ChangeDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `FormID` varchar(12) DEFAULT NULL,
+  `Locked` char(1) DEFAULT NULL,
+  `TestDate` date DEFAULT NULL,
+  `q1` char(1) DEFAULT NULL,
+  `q2` char(1) DEFAULT NULL,
+  `q3` char(1) DEFAULT NULL,
+  `q4` char(1) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `ClientID` (`ClientID`)
+) ENGINE=MyISAM AUTO_INCREMENT=10 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2018-04-25 12:16:45
+-- MySQL dump 10.13  Distrib 5.6.38, for Linux (x86_64)
+--
+-- Host: localhost    Database: okmis_mms
+-- ------------------------------------------------------
+-- Server version	5.6.38
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `ClientPHQ9`
+--
+
+DROP TABLE IF EXISTS `ClientPHQ9`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ClientPHQ9` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `ClientID` int(11) NOT NULL DEFAULT '0',
+  `CreateProvID` int(11) DEFAULT NULL,
+  `CreateDate` date DEFAULT NULL,
+  `ChangeProvID` int(11) DEFAULT NULL,
+  `ChangeDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `FormID` varchar(12) DEFAULT NULL,
+  `Locked` char(1) DEFAULT NULL,
+  `TestDate` date DEFAULT NULL,
+  `q1` char(1) DEFAULT NULL,
+  `q2` char(1) DEFAULT NULL,
+  `q3` char(1) DEFAULT NULL,
+  `q4` char(1) DEFAULT NULL,
+  `q5` char(1) DEFAULT NULL,
+  `q6` char(1) DEFAULT NULL,
+  `q7` char(1) DEFAULT NULL,
+  `q8` char(1) DEFAULT NULL,
+  `q9` char(1) DEFAULT NULL,
+  `q10` char(1) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `ClientID` (`ClientID`)
+) ENGINE=MyISAM AUTO_INCREMENT=1156 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2018-04-25 12:16:45
+-- MySQL dump 10.13  Distrib 5.6.38, for Linux (x86_64)
+--
+-- Host: localhost    Database: okmis_mms
+-- ------------------------------------------------------
+-- Server version	5.6.38
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `ClientPHQBrief`
+--
+
+DROP TABLE IF EXISTS `ClientPHQBrief`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ClientPHQBrief` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `ClientID` int(11) NOT NULL DEFAULT '0',
+  `CreateProvID` int(11) DEFAULT NULL,
+  `CreateDate` date DEFAULT NULL,
+  `ChangeProvID` int(11) DEFAULT NULL,
+  `ChangeDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `FormID` varchar(12) DEFAULT NULL,
+  `Locked` char(1) DEFAULT NULL,
+  `TestDate` date DEFAULT NULL,
+  `q1a` char(1) DEFAULT NULL,
+  `q1b` char(1) DEFAULT NULL,
+  `q1c` char(1) DEFAULT NULL,
+  `q1d` char(1) DEFAULT NULL,
+  `q1e` char(1) DEFAULT NULL,
+  `q1f` char(1) DEFAULT NULL,
+  `q1g` char(1) DEFAULT NULL,
+  `q1h` char(1) DEFAULT NULL,
+  `q1i` char(1) DEFAULT NULL,
+  `q2a` char(1) DEFAULT NULL,
+  `q2b` char(1) DEFAULT NULL,
+  `q2c` char(1) DEFAULT NULL,
+  `q2d` char(1) DEFAULT NULL,
+  `q2e` char(1) DEFAULT NULL,
+  `q3` char(1) DEFAULT NULL,
+  `q4a` char(1) DEFAULT NULL,
+  `q4b` char(1) DEFAULT NULL,
+  `q4c` char(1) DEFAULT NULL,
+  `q4d` char(1) DEFAULT NULL,
+  `q4e` char(1) DEFAULT NULL,
+  `q4f` char(1) DEFAULT NULL,
+  `q4g` char(1) DEFAULT NULL,
+  `q4h` char(1) DEFAULT NULL,
+  `q4i` char(1) DEFAULT NULL,
+  `q4j` char(1) DEFAULT NULL,
+  `q5` char(1) DEFAULT NULL,
+  `q6` text,
+  `q7` char(1) DEFAULT NULL,
+  `q8a` char(1) DEFAULT NULL,
+  `q8b` char(1) DEFAULT NULL,
+  `q8c` char(1) DEFAULT NULL,
+  `q8d` char(1) DEFAULT NULL,
+  `q8e` char(1) DEFAULT NULL,
+  `q8f` char(1) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `ClientID` (`ClientID`)
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2018-04-25 12:16:45
+-- MySQL dump 10.13  Distrib 5.6.38, for Linux (x86_64)
+--
+-- Host: localhost    Database: okmis_mms
+-- ------------------------------------------------------
+-- Server version	5.6.38
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `ClientPHQSADS`
+--
+
+DROP TABLE IF EXISTS `ClientPHQSADS`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ClientPHQSADS` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `ClientID` int(11) NOT NULL DEFAULT '0',
+  `CreateProvID` int(11) DEFAULT NULL,
+  `CreateDate` date DEFAULT NULL,
+  `ChangeProvID` int(11) DEFAULT NULL,
+  `ChangeDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `FormID` varchar(12) DEFAULT NULL,
+  `Locked` char(1) DEFAULT NULL,
+  `TestDate` date DEFAULT NULL,
+  `qA1` char(1) DEFAULT NULL,
+  `qA2` char(1) DEFAULT NULL,
+  `qA3` char(1) DEFAULT NULL,
+  `qA4` char(1) DEFAULT NULL,
+  `qA5` char(1) DEFAULT NULL,
+  `qA6` char(1) DEFAULT NULL,
+  `qA7` char(1) DEFAULT NULL,
+  `qA8` char(1) DEFAULT NULL,
+  `qA9` char(1) DEFAULT NULL,
+  `qA10` char(1) DEFAULT NULL,
+  `qA11` char(1) DEFAULT NULL,
+  `qA12` char(1) DEFAULT NULL,
+  `qA13` char(1) DEFAULT NULL,
+  `qA14` char(1) DEFAULT NULL,
+  `qA15` char(1) DEFAULT NULL,
+  `qB1` char(1) DEFAULT NULL,
+  `qB2` char(1) DEFAULT NULL,
+  `qB3` char(1) DEFAULT NULL,
+  `qB4` char(1) DEFAULT NULL,
+  `qB5` char(1) DEFAULT NULL,
+  `qB6` char(1) DEFAULT NULL,
+  `qB7` char(1) DEFAULT NULL,
+  `qC1` char(1) DEFAULT NULL,
+  `qC2` char(1) DEFAULT NULL,
+  `qC3` char(1) DEFAULT NULL,
+  `qC4` char(1) DEFAULT NULL,
+  `qC5` char(1) DEFAULT NULL,
+  `qD1` char(1) DEFAULT NULL,
+  `qD2` char(1) DEFAULT NULL,
+  `qD3` char(1) DEFAULT NULL,
+  `qD4` char(1) DEFAULT NULL,
+  `qD5` char(1) DEFAULT NULL,
+  `qD6` char(1) DEFAULT NULL,
+  `qD7` char(1) DEFAULT NULL,
+  `qD8` char(1) DEFAULT NULL,
+  `qD9` char(1) DEFAULT NULL,
+  `qE` char(1) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `ClientID` (`ClientID`)
+) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2018-04-25 12:16:45
+-- MySQL dump 10.13  Distrib 5.6.38, for Linux (x86_64)
+--
+-- Host: localhost    Database: okmis_mms
+-- ------------------------------------------------------
+-- Server version	5.6.38
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `ClientTPHQ9`
+--
+
+DROP TABLE IF EXISTS `ClientTPHQ9`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ClientTPHQ9` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `ClientID` int(11) NOT NULL DEFAULT '0',
+  `CreateProvID` int(11) DEFAULT NULL,
+  `CreateDate` date DEFAULT NULL,
+  `ChangeProvID` int(11) DEFAULT NULL,
+  `ChangeDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `FormID` varchar(12) DEFAULT NULL,
+  `Locked` char(1) DEFAULT NULL,
+  `TestDate` date DEFAULT NULL,
+  `q1` char(1) DEFAULT NULL,
+  `q2` char(1) DEFAULT NULL,
+  `q3` char(1) DEFAULT NULL,
+  `q4` char(1) DEFAULT NULL,
+  `q5` char(1) DEFAULT NULL,
+  `q6` char(1) DEFAULT NULL,
+  `q7` char(1) DEFAULT NULL,
+  `q8` char(1) DEFAULT NULL,
+  `q9` char(1) DEFAULT NULL,
+  `q10` char(1) DEFAULT NULL,
+  `q11` char(1) DEFAULT NULL,
+  `q12` char(1) DEFAULT NULL,
+  `q13` char(1) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `ClientID` (`ClientID`)
+) ENGINE=MyISAM AUTO_INCREMENT=86 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2018-04-25 12:16:45

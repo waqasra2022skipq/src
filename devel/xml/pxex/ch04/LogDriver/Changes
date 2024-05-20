@@ -1,0 +1,6 @@
+Revision history for Perl extension LogDriver.
+
+0.01  Fri Jan 11 10:11:19 2002
+	- original version; created by h2xs 1.1.1.4 with options
+		-AX -n LogDriver
+

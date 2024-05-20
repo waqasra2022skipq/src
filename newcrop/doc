@@ -1,0 +1,35 @@
+New Crop setup for Accounts and Clinics are:
+i.e.:
+Name                                   AccountID
+Millennium Community Services, LLC     okmis_mms-1195
+                                       * which are database-AgencyID
+
+Name                                   LocationID
+MMS Norman Clinic                      okmis_mms-1195-1204
+MCS Poteau Clinic                      okmis_mms-1195-2304
+                                       * which are database-AgencyID-ClinicID
+
+For each doctor under Administration->Employee Information set the Role/Supervising Physician.
+
+The doctors just need to hit NewCrop screens to be added to the NewCrop database. Same with clients.
+
+New Crop Training Videos: 
+https://www.youtube.com/playlist?list=PLC2E55B597A88C7F9&feature=viewall
+
+New Crop Support Team:
+Brian Farley
+NewCrop Support
+Phone: 888-236-1013, ext. 2
+Email: technicalsupport@newcroprx.com
+Self Service Portal: http://Tinyurl.com/NewCropSelfServe
+
+John Lewis           
+Director of Information Technology
+Phone: (888) 236-1013, ext 2
+Email: technicalsupport@newcroprx.com
+
+Wendy Samford
+Director of Customer Support
+Phone: 1-888-236-1013 ext 1
+Fax: 832-553-1889
+Email: wsamford@NEWCROPRX.COM

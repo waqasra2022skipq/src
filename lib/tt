@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+ 
+use URI::Escape;
+ 
+my $string = "Hello world!";
+my $udi = "+B066000325011NS1/$$420020216LOT123456789012345/SXYZ456789012345678/16D20130202C1";
+my $encoded_udi = uri_escape($udi);
+my $url = "https://accessgudid.nlm.nih.gov/api/v1/parse_udi.json?udi=${encodeudi}";
+ 
+print "Original udi: $udi\n";
+print "URL Encoded string: $udi\n";
+print "url: $url\n\n";
+
+
+my $c = chr(253);
+print "=${c}=\n";

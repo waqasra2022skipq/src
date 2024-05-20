@@ -1,0 +1,8 @@
+select Treatment.TrID, Treatment.BillDate, Treatment.BillStatus, Treatment.StatusDate, Treatment.RevStatus
+     , NoteTrans.RecDate, NoteTrans.Code, NoteTrans.SRC
+from Treatment
+  left join NoteTrans on NoteTrans.TrID=Treatment.TrID
+where Treatment.BillStatus > 3
+  and Treatment.RevStatus < 3
+order by Treatment.BillDate, Treatment.TrID
+;

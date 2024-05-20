@@ -1,0 +1,42 @@
+<html style="background-color: buttonface; color: buttontext;">
+
+<head>
+
+<title>Simple calendar setups [popup calendar]</title>
+
+  <!-- calendar stylesheet -->
+  <link rel="stylesheet" type="text/css" media="all" href="/cgi/jcal/calendar-forest.css" title="win2k-cold-1" />
+
+  <!-- main calendar program -->
+  <script type="text/javascript" src="/cgi/jcal/calendar.js"></script>
+
+  <!-- language for the calendar -->
+  <script type="text/javascript" src="/cgi/jcal/calendar-en.js"></script>
+
+  <!-- the following script defines the Calendar.setup helper function, which makes
+       adding a calendar a matter of 1 or 2 lines of code. -->
+  <script type="text/javascript" src="/cgi/jcal/calendar-setup.js"></script>
+
+</head>
+
+<body>
+
+<p><b>Input field with a trigger button.</b> Clicking the button activates
+the calendar.  Note that this one needs double-click (singleClick parameter
+is explicitely set to false).  Also demonstrates the "step" parameter
+introduced in 0.9.6 (show all years in drop-down boxes, instead of every
+other year as default).</p>
+
+<form action="#" method="get">
+<input type="text" name="Treatment_ContLogDate_1" id="Treatment_ContLogDate_1" /><button type="reset" id="Treatment_ContLogDate_1B">calendar</button>
+</form>
+
+<script type="text/javascript">
+    Calendar.setup({
+        inputField     :    "Treatment_ContLogDate_1",      // id of the input field
+        button         :    "Treatment_ContLogDate_1B"   // trigger for the calendar (button ID)
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,72 @@
+Content-Type: text/html; charset=ISO-8859-1
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+<HTML lang="en" >
+<HEAD> <TITLE>Renew</TITLE> </HEAD>
+<STYLE>
+ .{ font-family: Verdana, Arial, Helvetica; }
+ BODY  { background: #5a7d9b; color: black; }
+ H1    { font-size: 18pt; color: orange; }
+ TABLE { background-color: #FBFFE7; padding: 20px; }
+</STYLE>
+<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" >
+function vLogin(form)
+{ return vEntry("notnull",form.newpass,form.verpass); }
+</SCRIPT>
+
+<BODY >
+<CENTER>
+<BR>
+<H1>Millennium Information Services</H1>
+<BR>
+<TABLE BORDER="3" CELLPADDING="20" >
+  <TR>
+    <TD >
+    <IMG BORDER="0" SRC="{LOGO}" >
+    <H2 >{SITENAME}</H2>
+    <H2 >RENEW PASSWORD ENTRY</H2>
+<P>
+<FORM NAME="login" METHOD="post" ACTION="/cgi/bin/mis.cgi" >
+      <TABLE WIDTH="100%" >
+        <TR>
+          <TD ALIGN="center" >
+            <TABLE>
+              <TR> <TD ALIGN="center" >Passwords must be at least 6 characters in length,</TD> </TR> 
+              <TR> <TD ALIGN="center" >contain 1 capital letter, 1 lower-case letter, 1 digit (0-9) and </TD> </TR> 
+              <TR> <TD ALIGN="center" >1 of the following special characters @#%=-+:.!_</TD> </TR> 
+            </TABLE>
+            <TABLE>
+              <TR>
+                <TH ALIGN="center" COLSPAN="2" ><FONT COLOR=red>{XX}. {MSG}</FONT></TH>
+              </TR> 
+              <TR>
+                <TH ALIGN="center" COLSPAN="2" >PASSWORD CHANGE - enter the same new password twice to verify.</TH>
+              </TR> 
+              <TR>
+                <TH ALIGN=right>Password</TH>
+                <TD><INPUT TYPE="password" NAME="newpass" SIZE="30" ></TD>
+              </TR>
+              <TR>
+                <TH ALIGN="right" >reenter Password</TH>
+                <TD><INPUT TYPE="password" NAME="verpass" SIZE="30" ></TD>
+              </TR>
+            </TABLE>
+            <BR>
+            <INPUT TYPE="submit" NAME="Login" VALUE="submit" ONCLICK="return vLogin(this.form);" >
+          </TD>
+        </TR>
+      </TABLE>
+<INPUT TYPE="hidden" NAME="xx" VALUE="{XX}">
+<INPUT TYPE="hidden" NAME="user" VALUE="{USER}">
+<INPUT TYPE="hidden" NAME="pass" VALUE="{PASS}">
+</FORM>
+    </TD>
+  </TR>
+</TABLE>
+<H1>{MSG}</H1>
+<SCRIPT LANGUAGE="JavaScript">
+document.login.elements[0].focus();
+</SCRIPT>
+</BODY>
+</HTML>

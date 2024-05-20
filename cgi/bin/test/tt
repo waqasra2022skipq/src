@@ -1,0 +1,37 @@
+sub getVitals
+{
+  my ($self,$p,$rTreatment) = @_;
+  my $ClientID = $rTreatment->{'ClientID'};
+  my $out = '';
+  my $row = 0;
+  $sClientVitalSigns->execute($ClientID,$rTreatment->{ContLogDate}) 
+                      || myDBI->dberror("getVitals: select ClientVitalSigns ${ClientID}");
+  while ( my $r = $sClientVitalSigns->fetchrow_hashref )
+  {
+    $row++;
+    my $Height = $r->{'HeightFeet'} eq '' ? '' : qq|$r->{'HeightFeet'} ft.|;
+    $Height .= $r->{'HeightInches'} eq '' ? '' : qq| $r->{'HeightInches'} in.|;
+    my $Weight = $r->{'Weight'} eq '' ? '' : qq|$r->{'Weight'} lbs.|;
+    my $Waist = $r->{'Waist'} eq '' ? '' : qq|$r->{'Waist'} in.|;
+    my $Temp = $r->{'Temperature'} eq '' ? '' : qq|$r->{'Temperature'} F|;
+    my $BP = qq|$r->{'BPSystolic'} / $r->{'BPDiastolic'}|;
+    $out .= qq|<responsefont>$r->{VDate}\t${Height}\t$r->{Weight}\t$r->{Waist}\t${Temp}\t${BP}\t$r->{Pulse}\t$r->{Oximetry}\t$r->{BloodSugar}\t$r->{Respiration}\n|;
+  }
+  return($out);
+}
+
+sub getMeds
+{
+  my ($self,$p,$rTreatment) = @_;
+  my $TrID = $rTreatment->{'TrID'};
+  my $out = '';
+  my $row = 0;
+  $sClientNoteMeds->execute($r->{TrID}) || $form->dberror("PrintNotes: select ClientNoteMeds");
+  while ( my $rClientNoteMeds = $sClientNoteMeds->fetchrow_hashref )
+  {
+    $out .= qq|$rClientNoteMeds->{DrugID}\t$rClientNoteMeds->{DrugInfo}\t$rClientNoteMeds->{DosageFrequencyDescription}\t$rClientNoteMeds->{Route}\t$rClientNoteMeds->{ExternalDrugSchedule}\t$rClientNoteMeds->{PrescriptionDate}\t$rClientNoteMeds->{Refills}\n|;
+#    $rNote->{Text}
+  }
+  return($out);
+}
+

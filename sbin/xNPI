@@ -1,0 +1,39 @@
+#!/bin/bash
+#--------------------
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   echo -e "\nServices not installed!"
+   exit 1
+fi
+LogFile=${LOGDIR}/${CMD}
+#--------------------
+TmpFile=/tmp/$$
+NPI=$1
+#-------------------------
+Usage()
+{
+   echo $1
+   echo
+   echo "Usage: ${CMD} database statement"
+   echo
+   exit
+}
+#-------------------------
+if [ -z "${NPI}" ]; then Usage "No NPI!"; fi
+  echo "select 
+  EntityTypeCode,
+  ProvOrgName,
+  ProvPrefix,
+  ProvFirstName,
+  ProvLastName,
+  Addr1,
+  Addr2,
+  City,
+  ST,
+  Zip,
+  WkPh,
+  Fax
+from xNPI where xNPI.NPI=$NPI;" > ${TmpFile}.in
+  ${DBCMD} okmisorg_devoays < ${TmpFile}.in
+  rm ${TmpFile}.in

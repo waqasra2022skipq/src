@@ -1,0 +1,4 @@
+<?php
+/* this file will be included in the admin footer */
+?>
+Powered by our <a href="http://www.yoursite.com">appointment scheduling</a> solution

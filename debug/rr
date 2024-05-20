@@ -1,0 +1,10 @@
+select xSC.SCNum as MyKey, DATE_FORMAT(Treatment.ContLogDate,'%Y-%m') as MyX, COUNT(Treatment.TrID) as MyY
+ from Client
+  left join ClientACL on ClientACL.ClientID=Client.ClientID
+  left join Treatment on Treatment.ClientID=Client.ClientID
+  left join Provider as Clinic on Clinic.ProvID=Client.clinicClinicID
+  left join xSC on xSC.SCID=Treatment.SCID
+  left join xInsurance on xInsurance.ID=xSC.InsID
+ where Treatment.ContLogDate>="2016-11-01" and Treatment.ContLogDate<="2016-11-30"
+   and  ClientACL.ProvID='91'
+ group by MyKey, MyX

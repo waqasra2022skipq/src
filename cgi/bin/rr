@@ -1,0 +1,17 @@
+#select Treatment.*, xBillStatus.Descr as BillStatusDescr
+#       , Client.LName, Client.FName, Client.Suffix, Client.SSN
+#       , Clinic.Name as ClinicName
+#       , Counselor.FName as ProviderFName, Counselor.LName as ProviderLName, Counselor.ScreenName as ProviderScreenName
+#       , Reviewer.FName as ReviewerFName, Reviewer.LName as ReviewerLName, Reviewer.ScreenName as ReviewerScreenName
+#       , xSC.SCNum
+select Treatment.TrID,Treatment.ClientID,Treatment.ProvID
+     from Treatment
+     left join ClientACL on ClientACL.ClientID=Treatment.ClientID
+     left join Client on Client.ClientID=Treatment.ClientID
+     left join Provider as Clinic on Clinic.ProvID=Treatment.ClinicID
+     left join Provider as Counselor on Counselor.ProvID=Treatment.ProvID
+     left join Provider as Reviewer on Reviewer.ProvID=Treatment.MgrProvID
+     left join xSC on xSC.SCID=Treatment.SCID
+     left join xBillStatus on xBillStatus.ID=Treatment.BillStatus
+     where Treatment.ProvID='129' 
+   and Treatment.BillStatus < 3   and  ClientACL.ProvID='122'   order by Treatment.ContLogDate,Treatment.ContLogBegTime,Treatment.ContLogEndTime

@@ -1,0 +1,1 @@
+ALTER TABLE `NoteTrans` CHANGE `Code` `Code` VARCHAR(10) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;

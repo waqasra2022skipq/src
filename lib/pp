@@ -1,0 +1,204 @@
+*************************** 1. row ***************************
+                                ID: 1
+                          ClientID: 53159
+                      CreateProvID: 91
+                        CreateDate: 2017-01-12
+                      ChangeProvID: 91
+                        ChangeDate: 2017-06-30 10:27:23
+                            FormID: 3002984_1
+                       ProcedureID: 175135009
+                            Status: NULL
+                         StartDate: 2011-10-05
+                           EndDate: 2011-10-05
+                            Active: NULL
+                          TargetID: 1
+                      PerformerNPI: 0000100999
+                           udicopy: NULL
+                               udi: (01)10884521062856(11)141231(17)150707(10)A213B1(21)1234
+                                di: 10884521062856
+                       donation_id: NULL
+                   expiration_date: 2015-07-07
+          expiration_date_original: 150707
+   expiration_date_original_format: YYMMDD
+                    issuing_agency: GS1
+                        lot_number: A213B1
+                manufacturing_date: 2014-12-31
+       manufacturing_date_original: 141231
+manufacturing_date_original_format: YYMMDD
+                     serial_number: 1234
+                 devicePublishDate: 2015-08-31
+                     catalogNumber: 88863380-82
+                        deviceHCTP: false
+                        gmdnPTName: Polyester suture
+                  gmdnPTDefinition: A sterile, multiple-strand (multifilament), synthetic, non-bioab
+                         brandName: Ti-Cron
+                versionModelNumber: 88863380-82
+                       companyName: Covidien LP
+                   MRISafetyStatus: Labeling does not contain MRI Safety Information
+                labeledContainsNRL: false
+                      labeledNoNRL: false
+                             error: NULL
+                          Rejected: NULL
+                              TrID: NULL
+                       ConceptCode: 175135009
+                       ConceptName: Introduction of cardiac pacemaker system via vein (procedure)
+              PreferredConceptName: 
+            PreferredAlternateCode: 
+                     CodeSystemOID: 2.16.840.1.113883.6.96
+                    CodeSystemName: SNOMEDCT
+                    CodeSystemCode: 
+                 CodeSystemVersion: 2017-03
+                               TTY: FN
+                                ID: 1
+                       ConceptCode: 9454009
+                       ConceptName: Structure of subclavian vein
+              PreferredConceptName: 
+            PreferredAlternateCode: 
+                     CodeSystemOID: 
+                    CodeSystemName: SNOMED-CT
+                    CodeSystemCode: 
+                 CodeSystemVersion: 
+                           HL7Code: 
+                      ValueSetCode: 
+                   ValueSetVersion: 
+                            Active: 1
+                     ProcedureCode: 175135009
+                     ProcedureName: Introduction of cardiac pacemaker system via vein (procedure)
+                        TargetCode: 9454009
+                        TargetName: Structure of subclavian vein
+*************************** 2. row ***************************
+                                ID: 2
+                          ClientID: 53159
+                      CreateProvID: 91
+                        CreateDate: 2017-01-12
+                      ChangeProvID: 91
+                        ChangeDate: 2017-06-30 10:29:24
+                            FormID: 3003025_1
+                       ProcedureID: 56251003
+                            Status: NULL
+                         StartDate: 2011-10-05
+                           EndDate: 2011-10-05
+                            Active: NULL
+                          TargetID: 2
+                      PerformerNPI: 0000100999
+                           udicopy: NULL
+                               udi: =/W4146EB0010T0475=,000025=A99971312345600=>014032=}013032&,1000000000000XYZ123
+                                di: W4146EB0010T0475
+                       donation_id: A999713123456
+                   expiration_date: 2014-02-01
+          expiration_date_original: 014032
+   expiration_date_original_format: YYYJJJ
+                    issuing_agency: ICCBBA
+                        lot_number: 000000000000XYZ123
+                manufacturing_date: 2013-02-01
+       manufacturing_date_original: 013032
+manufacturing_date_original_format: YYYJJJ
+                     serial_number: 000025
+                 devicePublishDate: 2016-01-28
+                     catalogNumber: 130703-10
+                        deviceHCTP: true
+                        gmdnPTName: Cadaveric-donor/synthetic mineral bone graft
+                  gmdnPTDefinition: A sterile implantable device consisting of demineralized bone ma
+                         brandName: TrabexusÂ® EB
+                versionModelNumber: 10 cc
+                       companyName: Vivorte, Inc
+                   MRISafetyStatus: Labeling does not contain MRI Safety Information
+                labeledContainsNRL: false
+                      labeledNoNRL: false
+                             error: NULL
+                          Rejected: NULL
+                              TrID: NULL
+                       ConceptCode: 56251003
+                       ConceptName: Nebulizer therapy (procedure)
+              PreferredConceptName: 
+            PreferredAlternateCode: 
+                     CodeSystemOID: 2.16.840.1.113883.6.96
+                    CodeSystemName: SNOMEDCT
+                    CodeSystemCode: 
+                 CodeSystemVersion: 2017-03
+                               TTY: FN
+                                ID: 2
+                       ConceptCode: 82094008
+                       ConceptName: Lower Respiratory Tract Structure
+              PreferredConceptName: 
+            PreferredAlternateCode: 
+                     CodeSystemOID: 
+                    CodeSystemName: SNOMED-CT
+                    CodeSystemCode: 
+                 CodeSystemVersion: 
+                           HL7Code: 
+                      ValueSetCode: 
+                   ValueSetVersion: 
+                            Active: 1
+                     ProcedureCode: 56251003
+                     ProcedureName: Nebulizer therapy (procedure)
+                        TargetCode: 82094008
+                        TargetName: Lower Respiratory Tract Structure
+*************************** 3. row ***************************
+                                ID: 20
+                          ClientID: 53159
+                      CreateProvID: 91
+                        CreateDate: 2019-02-26
+                      ChangeProvID: 2502
+                        ChangeDate: 2019-11-05 10:15:04
+                            FormID: NULL
+                       ProcedureID: 428191000124101
+                            Status: NULL
+                         StartDate: 2015-06-22
+                           EndDate: 2015-06-22
+                            Active: 1
+                          TargetID: NULL
+                      PerformerNPI: 0000100999
+                           udicopy: NULL
+                               udi: (01)00643169007222(17)160128(21)BLC200461H
+                                di: 00643169007222
+                       donation_id: NULL
+                   expiration_date: 2016-01-28
+          expiration_date_original: 160128
+   expiration_date_original_format: YYMMDD
+                    issuing_agency: GS1
+                        lot_number: NULL
+                manufacturing_date: NULL
+       manufacturing_date_original: NULL
+manufacturing_date_original_format: NULL
+                     serial_number: BLC200461H
+                 devicePublishDate: 2014-09-23
+                     catalogNumber: NULL
+                        deviceHCTP: false
+                        gmdnPTName: Cardiac resynchronization therapy implantable defibrillator
+                  gmdnPTDefinition: A sterile, implantable, battery-powered device consisting of a hermetically-sealed pacing pulse gene
+                         brandName: Vivaâ„¢ Quad XT CRT-D
+                versionModelNumber: DTBA1QQ
+                       companyName: MEDTRONIC, INC.
+                   MRISafetyStatus: Labeling does not contain MRI Safety Information
+                labeledContainsNRL: false
+                      labeledNoNRL: false
+                             error: NULL
+                          Rejected: SNOMEDCT_397745006
+                              TrID: 691596
+                       ConceptCode: 428191000124101
+                       ConceptName: Documentation of current medications (procedure)
+              PreferredConceptName: 
+            PreferredAlternateCode: 
+                     CodeSystemOID: 2.16.840.1.113883.6.96
+                    CodeSystemName: SNOMEDCT
+                    CodeSystemCode: 
+                 CodeSystemVersion: 2017-03
+                               TTY: FN
+                                ID: NULL
+                       ConceptCode: NULL
+                       ConceptName: NULL
+              PreferredConceptName: NULL
+            PreferredAlternateCode: NULL
+                     CodeSystemOID: NULL
+                    CodeSystemName: NULL
+                    CodeSystemCode: NULL
+                 CodeSystemVersion: NULL
+                           HL7Code: NULL
+                      ValueSetCode: NULL
+                   ValueSetVersion: NULL
+                            Active: NULL
+                     ProcedureCode: 428191000124101
+                     ProcedureName: Documentation of current medications (procedure)
+                        TargetCode: NULL
+                        TargetName: NULL

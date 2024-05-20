@@ -1,0 +1,2 @@
+select ClientID,DOB,CreateDate from Client where DOB = '0000-00-00' or DOB is null;
+select ClientID,TrID,ContLogDate,ChartEntryDate from Treatment where ContLogDate = '0000-00-00' or ContLogDate is null;

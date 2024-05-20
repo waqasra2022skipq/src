@@ -1,0 +1,26 @@
+Billed Amount reports
+---------------------
+Use Original Billed date for complete results
+  only way to see every transaction on a note.
+Transaction reports only shows the transactions for a give time, not all the transactions for a note
+  if a note was denied and paid later then won't show up unless the paiddate is used
+BillAmt reports summarizes by BillDate using transactions and pushing them
+  into the BillDate, changed OusStanding to AmtDue (5/2010) because
+  notes which had been changed from one service to another insurance
+  looked as if they were denied under the old insurance and outstanding
+  (researched 5/2010 for chris)
+  difference between Count on Original Billed report and BillAmt 
+    is because of notes changed from one service to another 
+    shows up on transaction reports but not note reports.
+
+
+
+
+Stats
+-------------
+Referrals:
+  JSUC, JBDC, DHS are 'XPHONE' only and within 5 days
+  ALL others are 'any service' and with 15 days
+
+Notes:
+  Hours are only calculated on Billable notes.

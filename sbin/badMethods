@@ -1,0 +1,6 @@
+select Treatment.TrID, Treatment.ContLogDate, ProgNotes.Methods, Provider.FName, Provider.LName
+  from ProgNotes 
+    left join Treatment on Treatment.TrID=ProgNotes.NoteID
+    left join Provider on Provider.ProvID=Treatment.ProvID
+  where Methods like '%99M%'
+;

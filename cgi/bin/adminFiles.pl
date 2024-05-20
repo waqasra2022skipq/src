@@ -1,0 +1,133 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use myForm;
+use myDBI;
+use SysAccess;
+use myConfig;
+use myHTML;
+use File::stat;
+
+############################################################################
+my $form = myForm->new();
+my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $type = $form->{'type'};
+
+unless ( SysAccess->chkPriv($form,'Agent') )
+{ myDBI->error("Access Denied! (List ${type} Electronic Files)"); }
+
+my $typename = $type eq '837' ? 'Billing'
+             : $type eq '835' ? 'Remittances'
+             : $type eq '271' ? 'Eligibility'
+             : 'Unknown';
+my $wildcard = $type eq '837' ? '*.837 *.999.rsp'
+             : $type eq '835' ? '*.rsp *.835'
+             : $type eq '271' ? '*.270 *999..rsp *.271'
+             : 'Unknown';
+my $desc = $type eq '837' ? qq|Download '837' to send and Upload '999' files to process from previous screen.|
+         : $type eq '835' ? qq|Upload '835' files to process but NO need to Download files.|
+         : $type eq '271' ? qq|Download '270' files to send and Upload '999' and '271' files to process from previous screen.|
+         : 'Unknown';
+             
+############################################################################
+my $CloseButton = qq|<INPUT TYPE="button" NAME="close" VALUE="close" ONCLICK="javascript: window.close()" >|;
+my $UploadButton = $type =~ /837|835|271/ ? qq|       <INPUT TYPE="submit" ONMOUSEOVER="window.status='upload button'; return true;" ONMOUSEOUT="window.status=''" NAME="view=UPLOAD.cgi&NONAVIGATION=1&pushID=$form->{LINKID}&DocType=${type}" VALUE="upload" >| : '';
+
+my $html = myHTML->newHTML($form,'Upload Panel','CheckPopupWindow noclock countdown_10') . qq|
+<P>
+<P>
+<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/novalidate.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/tablesort.js"> </SCRIPT>
+<LINK HREF="/cgi/css/tablesort.css" REL="stylesheet" TYPE="text/css">
+<DIV CLASS="home title hdrcol" >
+${desc}
+</DIV>
+<FORM NAME="adminFiles" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+${UploadButton}
+| 
+. main->listFiles($type,$wildcard)
+. qq|
+<INPUT TYPE="hidden" NAME="mlt" VALUE="$form->{mlt}" >
+<INPUT TYPE="hidden" NAME="misLINKS" VALUE="$form->{misLINKS}" >
+<INPUT TYPE="hidden" NAME="LINKID" VALUE="$form->{LINKID}" >
+</FORM>
+
+</BODY>
+</HTML>
+|;
+
+myDBI->cleanup();
+print $html;
+exit;
+############################################################################
+sub listFiles
+{
+  my ($self,$dir,$wildcards) = @_;
+#warn qq|dir=${dir}\n|;
+  my $ADMINDIR = myConfig->cfg('ADMINDIR');
+  my ($adminpath, $admindir) = $ADMINDIR =~ m/(.*\/)(.*)$/;
+#warn qq|ADMINDIR=${ADMINDIR}\n|;
+#warn qq|adminpath=${adminpath}\n|;
+#warn qq|admindir=${admindir}\n|;
+  my $dirpath = qq|/${admindir}/${dir}|;
+#warn qq|dirpath=${dirpath}\n|;
+  my $html = '';
+
+  foreach my $wildcard ( split(' ',$wildcards) )
+  {
+    my $count = 0;
+    $html .= qq|
+<P>
+<TABLE CLASS="home" >
+  <TR > <TD CLASS="hdrtxt title" COLSPAN="2" >${typename} ${wildcard} available files.</TD> </TR>
+</TABLE>
+<TABLE CLASS="chartsort table-autosort table-stripeclass:alternate">
+<THEAD>
+  <TR >
+    <TH class="table-sortable:default" >file</TH>
+    <TH class="table-sortable:alphanumeric" >date/time</TH>
+    <TH >download</TH>
+  </TR>
+</THEAD>
+<TBODY>
+|;
+    foreach my $filepath  ( main->getFiles("${ADMINDIR}/${dir}/${wildcard}") )
+    {
+#warn qq|\nfilepath=$filepath\n|;
+      $count++;
+      my $even = int($count/2) == $count/2 ? '1' : '0';
+      my $class = $even ? qq|CLASS="alternate"| : '';
+      my ($path,$file) = $filepath =~ /(.*\/)?(.+)/s;
+      my $fs = stat($filepath);
+      my $modtime=scalar(localtime($fs->mtime));
+      $html .= qq|
+  <TR ${class} >
+    <TD >${file}</TD>
+    <TD >${modtime}</TD>
+    <TD ><A HREF="${dirpath}/${file}" download >click here</A></TD>
+  </TR>
+|;
+}
+  my $result = $count ? '' : qq|<TR><TD CLASS="hdrcol" COLSPAN="2" >No files to list.</TD></TR>|;
+  $html .= qq|${result}
+</TBODY>
+</TABLE>
+<P>
+|;
+  }
+  return($html);
+}
+sub getFiles()
+{
+  my ($self,$Dir) = @_;
+#warn qq|Dir=$Dir\n|;
+  my @TmpFiles = glob($Dir);
+  my @Files = ();
+  my @FilesByDate = ();
+  foreach my $filepath ( @TmpFiles )
+  { push(@Files,$filepath); }
+  for my $file ( sort { my $a_stat = stat($a); my $b_stat = stat($b); $a_stat->ctime <=> $b_stat->ctime; }  @Files )
+  { push(@FilesByDate,$file); }
+  return(@FilesByDate);
+}
+#####################################################################

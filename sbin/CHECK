@@ -1,0 +1,1 @@
+select ProviderID, ManagerID, Provider.ChangeDate, Active , LName, FName from Manager left join Provider on Provider.ProvID=Manager.ProviderID where ManagerID is null and ProviderID!=91 order by Active, LName, FName

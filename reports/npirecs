@@ -1,0 +1,12 @@
+select Contracts.PIN,Contracts.OrgID,ProviderControl.NPI,Provider.Name
+      ,xInsurance.Descr,xInsurance.RecID,xInsurance.SubID
+ from Contracts
+  left join xInsurance on xInsurance.ID=Contracts.InsID
+  left join Provider on Provider.ProvID=Contracts.ProvID
+  left join ProviderControl on ProviderControl.ProvID=Contracts.ProvID
+ where Provider.Active=1
+   and ProviderControl.NPI is not null
+   and Contracts.PIN is not null
+   and xInsurance.RecID is not null
+   and xInsurance.SubID is not null
+ order by ProviderControl.NPI, xInsurance.Descr desc

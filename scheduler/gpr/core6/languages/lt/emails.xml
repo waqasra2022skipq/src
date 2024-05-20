@@ -1,0 +1,400 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<emails>
+
+<message>
+<key>appointment-require_approval-customer</key>
+<subject>Jusu registracija apsilankymui laukia patvirtinimo</subject>
+<body>
+Dekojame uz pateikta registracija.
+Maloniai prasome palaukti, kol registracija bus patvirtinta administratores.
+
+Jusu registracijos duomenys:
+{APPOINTMENT.-ALL-}
+</body>
+</message>
+
+<message>
+<key>appointment-approve-customer</key>
+<subject>Registracija patvirtinta</subject>
+<body>
+Jusu registracija patvirtinta.
+
+Your Appointment Details:
+{APPOINTMENT.-ALL-}
+</body>
+</message>
+
+<message>
+<key>appointment-reject-customer</key>
+<subject>Registracija atsaukta</subject>
+<body>
+Jusu registracija buvo atsaukta.
+
+Priezastis:
+{APPOINTMENT.REJECT_REASON}
+
+Jusu registracijos duomenys:
+{APPOINTMENT.-ALL-}
+</body>
+</message>
+
+<message>
+<key>appointment-noshow-customer</key>
+<subject>Jusu registracija nera rodoma</subject>
+<body>
+Atsiprasome, taciau Jusu registracija yra pazymeta kaip nerodoma.
+
+Your appointment details:
+{APPOINTMENT.-ALL-}
+</body>
+</message>
+
+<message>
+<key>appointment-showup-customer</key>
+<subject>Jusu registracija vel rodoma</subject>
+<body>
+Jusu registracija vel rodoma.
+
+Registracijos duomenys:
+{APPOINTMENT.-ALL-}
+</body>
+</message>
+
+<message>
+<key>appointment-complete-customer</key>
+<subject>Registracija baigta</subject>
+<body>
+Dekojame, Jusu registracija sekmingai baigta.
+
+Registracijos duomenys:
+{APPOINTMENT.-ALL-}
+</body>
+</message>
+
+<message>
+<key>appointment-request-customer</key>
+<subject>Jusu registracijos uzklausa</subject>
+<body>
+Dekojame uz pateikta registracijos uzklausa. Registracija buvo patvirtinta.
+
+Registracijos duomenys:
+{APPOINTMENT.-ALL-}
+</body>
+</message>
+
+<message>
+<key>appointment-cancel-customer</key>
+<subject>Registracija atsaukta</subject>
+<body>
+Jusu registracija buvo atsaukta.
+
+Priezastis:
+{APPOINTMENT.CANCEL_REASON}
+
+Registracijos duomenys:
+{APPOINTMENT.-ALL-}
+</body>
+</message>
+
+<message>
+<key>appointment-change-customer</key>
+<subject>Apsilankymo registracijos duomenys pasikeite</subject>
+<body>
+Jusu registracijos apsilankymui duomenys pasikeite. Nauji duomenys:
+{APPOINTMENT.-ALL-}
+</body>
+</message>
+
+
+<message>
+<key>appointment-require_approval-provider</key>
+<subject>Nauja registracijos uzklausa laukia patvirtinimo</subject>
+<body>
+Gavote nauja registracijos uzklausa.
+
+Registracijos duomenys:
+{APPOINTMENT.-ALL-}
+
+Kliento duomenys:
+{APPOINTMENT.CUSTOMER.-ALL-}
+
+Greitosios nuorodos:
+{APPOINTMENT.QUICK_LINK_APPROVE} {APPOINTMENT.QUICK_LINK_REJECT}
+</body>
+</message>
+
+<message>
+<key>appointment-request-provider</key>
+<subject>Nauja registracijos uzklausa</subject>
+<body>
+Gavote nauja registracijos uzklausa. Ji buvo automatiskai patvirtinta.
+
+Registracijos duomenys:
+{APPOINTMENT.-ALL-}
+
+Kliento duomenys:
+{APPOINTMENT.CUSTOMER.-ALL-}
+</body>
+</message>
+
+<message>
+<key>appointment-cancel-provider</key>
+<subject>Klientas atsauke registracija</subject>
+<body>
+Klientas atsauke registracija.
+
+Priezastis:
+{APPOINTMENT.CANCEL_REASON}
+
+Registracijos duomenys:
+{APPOINTMENT.-ALL-}
+
+Kliento duomenys:
+{APPOINTMENT.CUSTOMER.-ALL-}
+</body>
+</message>
+
+<message>
+<key>appointment-reject-provider</key>
+<subject>Jusu registracija buvo atmesta</subject>
+<body>
+Registracija buvo atmesta.
+
+Priezastis:
+{APPOINTMENT.REJECT_REASON}
+
+Registracijos  duomenys:
+{APPOINTMENT.-ALL-}
+
+Kliento duomenys:
+{APPOINTMENT.CUSTOMER.-ALL-}
+</body>
+</message>
+
+<message>
+<key>appointment-noshow-provider</key>
+<subject>Jusu registracija pazymeta kaip nerodoma</subject>
+<body>
+Jusu registracija pazymeta kaip nerodom.
+
+Registracijos duomenys:
+{APPOINTMENT.-ALL-}
+
+Kliento duomenys:
+{APPOINTMENT.CUSTOMER.-ALL-}
+</body>
+</message>
+
+<message>
+<key>appointment-showup-provider</key>
+<subject>Jusu registracija vel rodoma</subject>
+<body>
+Jusu registracija pazymeta kaip rodoma.
+
+Registracijos duomenys:
+{APPOINTMENT.-ALL-}
+
+Kliento duomenys:
+{APPOINTMENT.CUSTOMER.-ALL-}
+</body>
+</message>
+
+<message>
+<key>appointment-complete-provider</key>
+<subject>Registracija baigta</subject>
+<body>
+Jusu registracija sekmingai baigta.
+
+Registracijos duomenys:
+{APPOINTMENT.-ALL-}
+
+Kliento duomenys:
+{APPOINTMENT.CUSTOMER.-ALL-}
+</body>
+</message>
+
+<message>
+<key>appointment-approve-provider</key>
+<subject>Registracija patvirtinta</subject>
+<body>
+Jusu registracija patvirtinta.
+
+Registracijos duomenys:
+{APPOINTMENT.-ALL-}
+
+Kliento duomenys:
+{APPOINTMENT.CUSTOMER.-ALL-}
+</body>
+</message>
+
+<message>
+<key>appointment-change-provider</key>
+<subject>Registracija pakeista</subject>
+<body>
+Jusu registracijos duomenys pasikeite. Nauji duomenys:
+{APPOINTMENT.-ALL-}
+
+Kliento duomenys:
+{APPOINTMENT.CUSTOMER.-ALL-}
+</body>
+</message>
+
+<message>
+<key>appointment-reassign_from-provider</key>
+<subject>Your Appointment Reassigned From You</subject>
+<body>
+Your appointment has been reassigned from you:
+{APPOINTMENT.-ALL-}
+
+Customer details:
+{APPOINTMENT.CUSTOMER.-ALL-}
+</body>
+</message>
+
+<message>
+<key>appointment-reassign_to-provider</key>
+<subject>New Appointment Reassigned To You</subject>
+<body>
+New appointment has been reassigned to you:
+{APPOINTMENT.-ALL-}
+
+Customer details:
+{APPOINTMENT.CUSTOMER.-ALL-}
+</body>
+</message>
+
+
+<message>
+<key>user-require_email_confirmation-user</key>
+<subject>Prasome patvirtinti el. pasto adresa</subject>
+<body>
+Dekojame uz registracija. Prasome patvirtinti savo el. pasto adresa.
+
+{USER.CONFIRMATION_LINK}
+</body>
+</message>
+
+<message>
+<key>user-require_approval-user</key>
+<subject>Jusu paskyra laukia patvirtinimo</subject>
+<body>
+Dekojame uz registracija!
+Dabar prasome truputi palaukti, kol musu darbuotojai patvirtins Jusu paskyra.
+</body>
+</message>
+
+<message>
+<key>user-require_approval-admin</key>
+<subject>Uzregistruotas naujas klientas</subject>
+<body>
+Jusu registracijos apsilankymams sistemoje uzregistruotas naujas klientas.
+
+Naujo kliento duomenys:
+{USER.-ALL-}
+</body>
+</message>
+
+<message>
+<key>user-activate-user</key>
+<subject>Jusu paskyra yra aktyvi</subject>
+<body>
+Sveikiname!
+Jusu paskyra aktyvuota. Paskyros duomenys:
+
+Vartotojo vardas: {USER.USERNAME}
+Slaptazodis: {USER.PASSWORD}
+</body>
+</message>
+
+<message>
+<key>user-activate-admin</key>
+<subject>Naujo kliento paskyra aktyvi</subject>
+<body>
+Naujo kliento paskyra registracijos apsilankymams sistemoje yra aktyvi.
+
+Naujo kliento duomenys:
+{USER.-ALL-}
+</body>
+</message>
+
+<message>
+<key>user-reset_password-user</key>
+<subject>Slaptazodzio keitimas</subject>
+<body>
+Jus pageidaujant, pakeistas paskyros slaptazodis. Nauji duomenys:
+
+Vartotojo vardas: {USER.USERNAME}
+Slaptazodis: {USER.PASSWORD}
+</body>
+</message>
+
+<message>
+<key>appointment-remind-customer</key>
+<subject>Apsilankymo priminimas</subject>
+<body>
+Tai yra priminimas apie apsilankyma.
+
+Jusu registracijos duomenyss:
+{APPOINTMENT.-ALL-}
+</body>
+</message>
+
+<message>
+<key>appointment-remind-provider</key>
+<subject>Apsilankymo priminimas</subject>
+<body>
+Tai yra priminimas apie apsilankyma.
+
+Registracijos duomenys:
+{APPOINTMENT.-ALL-}
+</body>
+</message>
+
+<message>
+<key>order-request-customer</key>
+<subject>Paslaugu paketo pirkimas</subject>
+<body>
+Dekojame uz isigyta paslaugu paketa.
+
+Paslaugu paketo duomenys:
+{ORDER.TITLE}
+</body>
+</message>
+
+<message>
+<key>order-request-admin</key>
+<subject>Paslaugu paketo pirkimas</subject>
+<body>
+Klientas isigijo paslaugu paketa.
+
+Paketo duomenys:
+{ORDER.TITLE}
+
+Kliento duomenys:
+{ORDER.CUSTOMER.-ALL-}
+</body>
+</message>
+
+<message>
+<key>appointment-acknowledge-customer</key>
+<subject>Informavimas apie sekminga apsilankyma</subject>
+<body>
+Dekojame uz apsilankyma.
+
+APsilankymo duomenys:
+{APPOINTMENT.-ALL-}
+</body>
+</message>
+
+<message>
+<key>appointment-acknowledge-provider</key>
+<subject>Klientas informuotas apie apsilankyma</subject>
+<body>
+Klientas informuotas apie apsilankyma.
+
+Apsilankymo duomenys:
+{APPOINTMENT.-ALL-}
+</body>
+</message>
+
+</emails>

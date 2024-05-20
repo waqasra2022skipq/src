@@ -1,0 +1,14 @@
+.ui-autocomplete {
+  text-align: left;
+}
+.ui-autocomplete td, .ui-autocomplete th {
+  border: 1px solid #aaaaaa;
+  text-align: left;
+  padding: 4px;
+}
+.ui-autocomplete th {
+  background-color: #ccccff;
+}
+.ui-autocomplete tr:nth-child(even) {
+  background-color: #90EE90;
+}

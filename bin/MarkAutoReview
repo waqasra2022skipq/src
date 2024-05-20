@@ -1,0 +1,36 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use  DBI;
+use  DBForm;
+use  DBA;
+
+############################################################################
+# This routine marks Reviewed for certain DBs
+############################################################################
+my $form = DBForm->new();
+my $dbh = $form->dbconnect();
+my $sMark = $dbh->prepare("update Treatment set RevStatus=3, MgrProvID=?, MgrRevDate=curdate(), MgrRevTime=curtime() where ProvID=? and MgrProvID is null");
+my %Providers = (
+  okmis_mms  => [946,193,1205,2356,965,2540,958,2686,2118,2467,2388,2549,2271,2824,2583,2448,2827,2477,2550],       # Tonya, Wasiq, Hartman, Wade2[1205]
+  okmis_opa  => [126]                   # Dr. William Shaw
+);
+#  okmis_bpl  => [147],                   # Paul Bowerman
+#  okmis_cti  => [107],                   # Kathleen Long
+#  okmis_lbhp => [157];                   # Marissa Carpenter
+#  okmis_lbhp => [170];                   # Jennifer Sellers
+#  okmis_lbhp => [166];                   # Donna Boswell
+
+print qq|DBNAME=$form->{'DBNAME'}\n|;
+foreach my $p ( @{$Providers{$form->{'DBNAME'}}} )
+{ main->ProviderReview($p); }
+exit;
+############################################################################
+sub ProviderReview
+{
+  my ($self,$ProvID) = @_;
+  print qq|Mark Notes Reviewed: ${ProvID}\n|;
+  $sMark->execute($ProvID,$ProvID) || $form->dberror("ProviderReview: $ProvID");
+  $sMark->finish();
+  return(1);
+}
+############################################################################

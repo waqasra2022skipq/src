@@ -1,0 +1,1157 @@
+#!/usr/bin/perl
+############################################################################
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use myForm;
+use myDBI;
+use myConfig;
+use DBA;
+use DBUtil;
+use uBill;
+use File::Copy;
+use Time::Local;
+
+############################################################################
+########## CHECK THESE LOOPs for ACCURACY
+# The first will be a change to the CLP02 segment which will return a "1", "2", or "3" value 
+#  to show whether the OHCA is a Primary, Secondary, or Tertiary payer on a Paid claim.  
+#  The value of "4" will continue to be used for Denied status and "22" for a Reversal.
+#
+# The second change is adding a REF segment to return the Provider ID and service location 
+#  in the Loop 1000B (Payee Loop) as has been requested by billing agents.
+##########
+#
+# CLP 22 REVERSAL
+# CLP  4 DENIED
+# CLP  3 TERTIERY  (mostly)
+# Crossover Carriers:
+#   PR AETNA (multiples)  figure out what to do.
+#   TT  figure it out
+#
+# NoteTrans Codes:
+#  ER   = used Transaction ID to find billed transaction (Electronic Reconcile).
+#  ER-I = used Transaction ID to find billed transaction but it was reconciled already (Electronic Reconcile - Insert).
+#  ER-T = used ClientID, ContDate, SCNum to find billed transaction (Electronic Reconcile - Transaction).
+#  ER-C = used Transaction ID to find ICN billed transaction but it was reconciled already (Electronic Reconcile - ICN).
+#  ER-R = used ClientID, ContDate, SCNum to find billed and reconciled transaction 
+#                                                         (Electronic Reconcile - Reconciled Transaction).
+#  ER-N = used ClientID, ContDate, SCNum, InsCode to find entered note (Electronic Reconcile - Note).
+#  TT   = created transaction using ClientID, Billed, Paid (TT=TransferedTo from Pri->Sec)
+#  PR   = Patient Responsibility
+#
+#  ID-B = used TrID to find transaction billed record to create record
+#  ID-R = used TrID to find transaction reconciled record to create record
+#  ID-N = used TrID but no transaction record found to create record (new)
+#  FI-B = used ClientID to find transaction billed record to create record (FI=ForeignInput)
+#  FI-R = used ClientID to find transaction reconciled record to create record
+#  FI-N = used ClientID but no transaction record found to create record (new)
+#  SR   = Scholarship Reconcile used to write-off the remaining amount of the note.
+#  IR   = Insurance Reconcile used in cgi/bin/Reconcile.cgi to match up Insurance Payments to TrID
+############################################################################
+# ISA08 has the Receiver ID but we don't use it
+# GS03 has the SenderID (ie from Insurance) and we put that in the RecID
+# N1 has the Payer information
+# setting the RecID we first set from GS03, then REF*2U
+# the MAINREF: REF*2U contains the PayerID/RecID
+# MAYBE WE CAN CHANGE FROM USING RecID TO USING PayID BUT SOMETIMES THESE ARE 
+#   DIFFERENT IN xInsurance
+#   Availity I think did funny things.
+#   Watch the switch from Availity to OfficeAlly for BCBS because OfficeAlly 
+#     might only use REF*2U*00840 NOT REF*2U*G00840
+############################################################################
+my $form = myForm->new();
+my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $debug = $form->{'debug'};
+my $archive = $form->{'archive'}; 
+if ( $debug ) { foreach my $f ( sort keys %{$form} ) { print "pro835: form-$f=$form->{$f}\n"; } }
+
+print qq|ENTER: pro835, DBNAME=$form->{'DBNAME'}, filepath=$form->{'filepath'}\n| if ( $debug );
+
+my $filepath = $form->{'filepath'};
+my $Test = $form->{'test'};
+my ($rptDir,$rptFile,$rptPath) = ("$form->{DOCROOT}/reports4","","");
+if ( ${Test} ) { print qq|TEST RUN ONLY!\n|; }
+my $TransDate = $form->{'TODAY'};
+my $TheDate = $form->{'TODAY'};
+my $ThePayer = 'UNK';
+my $ThePayerName = 'UNKNOWN';
+my $ThePayeeName = 'UNKNOWN';
+my $TheAmount = 0;
+my $TheMethod = 'UNK';
+my $TheRemitFile = 'UNK';
+my $TheCheckNumber = 'UNK';
+my $TheCompanyNumber = 'UNK';
+my $RecID = 'UNK';
+my $CONTRACT = ();
+my $CLP = ();
+my $SVC = ();
+my $SVCdone = 0;
+my $errors = ();
+my $rTab = '';
+my $claimtext = '';
+my $lCnt = 0;
+my $HDR = '';
+my $SE = '';
+my @final_array=(['','','']);
+
+my $sEFT=$dbh->prepare("select * from EFT where CheckNo=? and RemitFile=?");
+#### my $sContract=$dbh->prepare("select Contracts.PIN,Contracts.InsID,Provider.ProvID,Provider.Name as ClinicName,ProviderControl.NPI,xInsurance.Name as InsName from Contracts left join Provider on Provider.ProvID=Contracts.ProvID left join ProviderControl on ProviderControl.ProvID=Contracts.ProvID left join xInsurance on xInsurance.ID=Contracts.InsID where xInsurance.RecID=? and ProviderControl.NPI=? and Contracts.PIN is not null");
+my $sContract=$dbh->prepare("
+select Contracts.InsID,Contracts.PIN,Contracts.TaxID
+      ,Provider.ProvID,Provider.Name as ClinicName
+      ,ProviderControl.NPI
+      ,xInsurance.Name as InsName
+ from Contracts
+  left join Provider on Provider.ProvID=Contracts.ProvID
+  left join ProviderControl on ProviderControl.ProvID=Contracts.ProvID
+  left join xInsurance on xInsurance.ID=Contracts.InsID
+ where xInsurance.RecID=? 
+   and (replace(ProviderControl.NPI,'-','')=? or replace(Contracts.TaxID,'-','')=?)
+   and Contracts.PIN is not null
+   and Contracts.TaxID is not null
+   and ProviderControl.NPI is not null
+");
+my $sClient=$dbh->prepare("select * from Client where BINARY ClientID=?");
+my $sInsurance=$dbh->prepare("select * from Insurance left join Client on Client.ClientID=Insurance.ClientID where Insurance.InsIDNum=? and Client.FName=? and Client.LName=?");
+my $sNoteErr=$dbh->prepare("insert into NoteErr (PIN,Date,FName,LName,ContDate,SCNum,Billed,Paid,UnitsBilled,UnitsPaid,DenCode,msg,PayerCN,InsGrpNum,CreateProvID,CreateDate) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,'91','$form->{TODAY}')");
+############################################################################
+print localtime()."\n";
+print qq|open: ${filepath}\n| if ( $debug );
+
+exit if ( $debug == 2 );
+
+open(FILE, $filepath) || die "Couldn't open file: ${filepath}: $!";
+my ($in,$RecType,$rest,$LineCount) = ('','','',0);
+while ( $in = <FILE> )
+{ 
+  print qq|main: in=$in\n| if ( $debug );
+  chomp($in); $LineCnt+=1; 
+  while ( $in )
+  {
+    ($RecType,$rest) = split('\*',$in,2);
+    if ( $RecType eq 'ISA' )
+    { $in = main->Process_ISA($RecType,$rest); }
+    else
+    { 
+      ($tst = $in) =~ s/ //g;     # handle blank lines at end of file.
+      print qq|>>> ERROR: Main: UNRECOGNIZED! ${in}\n| if ( $tst ne '' );
+      $in='';
+    }
+  }
+}
+close(FILE);
+
+my ($directory,$filename) = $filepath =~ m#((?:[^/]*/)*)(.*)#;
+my $BACKDIR = myConfig->cfg('BACKDIR');
+my $bakfile = "${BACKDIR}/835/${filename}";
+print qq|  move ${filename} to ${bakfile}...\n|;
+move($filepath,$bakfile) or print "<<<ERROR>>>: move failed: $!";;
+
+if ( $debug ) { foreach $w ( sort keys %{$errors} ) { print qq|errors: $w: $errors->{$w}\n|; } }
+
+$sEFT->finish();
+$sContract->finish();
+$sClient->finish();
+$sInsurance->finish();
+$sNoteErr->finish();
+print localtime()."\n\n";
+
+myDBI->cleanup();
+exit;
+################################################################
+##
+# got here with an 'ISA' RecType
+sub Process_ISA
+{
+  my ($self,$Type,$str) = @_;
+
+  $HDR = "ISA*" . $str . "\n";
+# ISA07=ISA_ReceiverIDQual ISA08=ISA_ReceiverID
+  my ($ISA_AuthInfoID,$ISA_AuthInfo,$ISA_SecInfoID,$ISA_SecInfo,$ISA_SenderIDQual,$ISA_SenderID,$rest) = split('\*',$str,7);
+  print "Process_ISA: ENTER: SenderID=$ISA_SenderID=$str\n" if ( $debug );
+  while ( my $isa = <FILE> )
+  { 
+    $SE .= $isa;              # save entire SE segment.
+    chomp($isa); $LineCnt+=1; 
+    while ( $isa )
+    {
+      print "Process_ISA: isa=$isa\n" if ( $debug );
+      my ($RecType,$rest) = split('\*',$isa,2);
+      if ( $RecType eq 'GS' )
+      { $isa = main->Process_GS($RecType,$rest); }
+      elsif ( $RecType eq 'ST' )
+      { $isa = main->Process_ST($RecType,$rest); }
+      elsif ( $RecType eq 'BPR' )
+      { $isa = main->Process_BPR($RecType,$rest); }
+      elsif ( $RecType eq 'TRN' )
+      { $isa = main->Process_TRN($RecType,$rest); }
+      elsif ( $RecType eq 'REF' )
+      { $isa = main->Process_MAINREF($RecType,$rest); }
+      elsif ( $RecType eq 'DTM' ) { $isa=''; }   # use DTM02 date for Batch ID.
+      elsif ( $RecType eq 'N1' )
+      { $isa = main->Process_N1($RecType,$rest); }
+      elsif ( $RecType eq 'N3' ) { $isa=''; }
+      elsif ( $RecType eq 'N4' ) { $isa=''; }
+      elsif ( $RecType eq 'PER' ) { $isa=''; }
+      elsif ( $RecType eq 'N1' ) { $isa=''; }
+      elsif ( $RecType eq 'LX' )
+      { $isa = main->Process_LX($RecType,$rest); }
+      elsif ( $RecType eq 'PLB' )
+      { $isa = main->Process_PLB($RecType,$rest); }
+      elsif ( $RecType eq 'SE' )
+      { $isa = main->Process_SE($RecType,$rest); }
+      elsif ( $RecType eq 'GE' ) { $isa=''; }
+      elsif ( $RecType eq 'IEA' ) { $isa=''; return(''); }
+      else
+      {
+        print qq|>>> ERROR: Process_ISA: UNRECOGNIZED! ${isa}\n|;
+        $isa='';
+      }
+    }
+  }
+  print qq|>>> ERROR: Process_ISA: ERROR! PREMATURE END! ${isa}\n|;
+
+  return(1);
+}
+################################################################
+##
+# got here with an 'GS' RecType
+sub Process_GS
+{
+  my ($self, $Type, $str) = @_;
+
+  $HDR .= "GS*" . $str . "\n";
+  my ($GS_Code,$GS_SenderID,$GS_ReceiverID,$GS_Date,$GS_Time,$rest) = split('\*',$str,6);
+  ($RecID = $GS_SenderID) =~ s/^\s*(.*?)\s*$/$1/g;  # trim spaces.
+  print "Process_GS: str=$str, $GS_Code, $GS_SenderID, $GS_ReceiverID\nProcess_GS: RecID is=$RecID\n" if ( $debug );
+  return('');
+}
+# got here with an 'ST' RecType
+sub Process_ST
+{
+  my ($self,$Type,$str) = @_;
+  my ($ST_Code,$ST_Count,$ST_File,$rest) = split('\*',$str,4);
+  $TheRemitFile = $ST_File;     # set the original file from Insurance for EFT
+  return('');
+}
+# got here with an 'BPR' RecType
+sub Process_BPR
+{
+  my ($self,$Type,$str) = @_;
+  my ($BPR_Code,$BPR_Amount,$BPR_CDFlag,$BPR_PayMethod,$BPR_Format,$BPR_DFDIQual,$BPR_DFDINum,$BPR_AcctQual,$BPR_AcctNum,$BPR_OrigCOID,$BPR_OrigCOCd,$BPR_DFDIQual2,$BPR_DFDINum2,$BPR_AcctQual2,$BPR_AcctNum2,$BPR_Date,$rest) = split('\*',$str,16);
+  print "Process_BPR: ENTER: str=$str, $BPR_Code, $BPR_Amount, $BPR_PayMethod\n" if ( $debug );
+  ($TransDate = ${BPR_Date}) =~ s/(\d{4}?)(\d{2}?)(\d{2}?)/$1\-$2\-$3/;
+  $TheDate = $BPR_Date;
+  $TheAmount = $BPR_Amount;
+  $TheMethod = $BPR_PayMethod;
+  return('');
+}
+# got here with an 'TRN' RecType
+sub Process_TRN
+{
+  my ($self,$Type,$str) = @_;
+  my ($TRN_Code,$TRN_RefID,$TRN_COID,$rest) = split('\*',$str,4);
+  print "Process_TRN: ENTER: str=$str, $TRN_Code, $TRN_RefID, $TRN_COID\n" if ( $debug );
+  $TheCheckNumber = $TRN_RefID;             # used as RefID in Transaction
+  $TheCompanyNumber = $TRN_COID;
+  $sEFT->execute($TheCheckNumber,$TheRemitFile)
+          || myDBI->dberror("Process_TRN: ${TheCheckNumber},${TheRemitFile}");
+  if ( my $rEFT = $sEFT->fetchrow_hashref )
+  { 
+    print qq|>>>FILE ALREADY PROCESSED<<<: ${filepath}! ($rEFT->{ID}, ${TheCheckNumber})\n|; 
+    my ($directory,$filename) = $filepath =~ m#((?:[^/]*/)*)(.*)#;
+    my $bakfile = "done/${filename}";
+    print qq|  move ${filename} to ${bakfile}...\n|;
+    move($filepath,$bakfile) or print "<<<ERROR>>>: move failed: $!";;
+
+    my $subj = qq|pro835: DUPLICATE 'ST' IN FILE! $form->{'DBNAME'}|;
+    my $msg = qq|${TheCheckNumber} ${TheAmount} ${TransDate} ${TheRemitFile}
+(${filepath}, $rEFT->{ID})
+|; 
+    DBUtil->email($form,'support@okmis.com',$subj,$msg);
+    exit; 
+  }
+  return('');
+}
+# got here with an 'N1' RecType
+sub Process_N1
+{
+  my ($self,$Type,$str) = @_;
+  my $rtnstr = '';
+  my ($N1_Code,$N1_Name,$N1_Qual,$N1_ID,$rest) = split('\*',$str,5);
+  print "Process_N1: ENTER: str=$str, $N1_Code, $N1_Name, $N1_Qual, $N1_ID\n" if ( $debug );
+  if ( $N1_Code eq 'PR' ) { $ThePayerName = $N1_Name; }
+  if ( $N1_Code eq 'PE' )
+  {
+    $ThePayeeName = $N1_Name;
+    if ( $N1_Qual eq 'XX' )       # set using NPI.
+    { $rtnstr = main->setContract($N1_ID); }
+    elsif ( $N1_Qual eq 'FI' )    # set using TaxID.
+    { $rtnstr = main->setContract($N1_ID); }
+  }
+  return($rtnstr);
+}
+################################################################
+##
+# got here with an 'MAINREF' RecType
+# REWRITE THIS TO BE LOOP 1000A (Payee) and 1000B (Payer) as on pg 39.
+sub Process_MAINREF
+{
+  my ($self, $Type, $str) = @_;
+
+  my $rtnstr = '';
+  my ($REFQual,$REFID,$rest) = split('\*',$str,3);
+  print "Process_MAINREF: ENTER: str=$str (REFID=$REFID)\n" if ( $debug );
+  if ( $REFQual eq 'EV' )                    # Receiver Identification pg 57
+  { $ThePayee = $REFID; }                       # used by medicaid, sometimes, is OfficeAlly number.
+  elsif ( $REFQual eq '2U' )                 # Additional Payer Identification pg 67
+  { ($RecID = $REFID) =~ s/^\s*(.*?)\s*$/$1/g; }  # trim spaces.
+  elsif ( $REFQual eq 'EO' )                 # Additional Payer Identification pg 67
+  { $ThePayer = $REFID; }
+  elsif ( $REFQual eq 'HI' )                 # Additional Payer Identification pg 67
+  { $ThePayer = $REFID; }
+  elsif ( $REFQual eq 'NF' )                 # Additional Payer Identification pg 67
+  { $ThePayer = $REFID; }
+  elsif ( $REFQual eq 'F2' )                 # Version Identification pg 58
+  { $Version_Num = $REFID; }
+  elsif ( $REFQual eq '0B' )                 # State License Number
+  { $trash = $REFID; }
+  elsif ( $REFQual eq '1A' )                 # NOT ADVISED pg 77
+  { $trash = $REFID; }
+  elsif ( $REFQual eq '1B' )                 # NOT ADVISED pg 77
+  { $trash = $REFID; }
+# was medicare old way to use PIN(REFQual), now NPI in setContract from GS
+  elsif ( $REFQual eq '1C' )                 # NOT ADVISED pg 77
+  { $trash = $REFID; }
+# was medicaid old way to use PIN(REFQual), now NPI in setContract from GS
+  elsif ( $REFQual eq '1D' )                 # NOT ADVISED pg 77
+  { $trash = $REFID; }
+  elsif ( $REFQual eq '1E' )                 # NOT ADVISED pg 77
+  { $trash = $REFID; }
+  elsif ( $REFQual eq '1F' )                 # NOT ADVISED pg 77
+  { $trash = $REFID; }
+  elsif ( $REFQual eq '1G' )                 # UPIN NUmber
+  { $trash = $REFID; }
+  elsif ( $REFQual eq '1H' )                 # NOT ADVISED pg 77
+  { $trash = $REFID; }
+  elsif ( $REFQual eq 'D3' )                 # Pharmacy Number
+  { $trash = $REFID; }
+  elsif ( $REFQual eq 'G2' )                 # NOT ADVISED pg 77
+  { $trash = $REFID; }
+  elsif ( $REFQual eq 'N5' )                 # NOT ADVISED pg 77
+  { $trash = $REFID; }
+# medicaid started using 1/1/2012 until NPI
+  elsif ( $REFQual eq 'PQ' )                 # Payee ID
+  { $trash = $REFID; }
+  elsif ( $REFQual eq 'TJ' )                 # Federal Taxpayer ID
+  { $trash = $REFID; }
+  else
+  {
+    print qq|>>> ERROR: Process_MAINREF: ERROR! UNRECOGNIZED Qualifier! ${str}\n|;
+    return('ERROR');
+  }
+  return($rtnstr);
+}
+##
+# got here with an 'PLB' RecType
+sub Process_PLB
+{
+  my ($self, $Type, $str) = @_;
+
+  my ($PLB_PIN,$PLB_Date,$PLB_ADJID_1,$PLB_AMT_1,$PLB_ADJID_2,$PLB_AMT_2,$PLB_ADJID_3,$PLB_AMT_3,$PLB_ADJID_4,$PLB_AMT_4,$PLB_ADJID_5,$PLB_AMT_5,$PLB_ADJID_6,$PLB_AMT_6,$rest) = split('\*',$str,15);
+  print "Process_PLB: ENTER: str=$str, $PLB_PIN, $PLB_Date, $PLB_AMT_1\n" if ( $debug );
+  (my $Date = ${$PLB_Date}) =~ s/(\d{4}?)(\d{2}?)(\d{2}?)/$2\/$3\/$1/;
+  my ($AdjCode,$AdjID) = split(':',$PLB_ADJID_1);
+  my $Amt = -($PLB_AMT_1);
+  print REMIT qq|Adjustment\t${PLB_PIN}\t\t\t\t\t\t\t\t${Date}\t\t${Amt}\t\t${AdjCode}\t${AdjID}\t\n|; $lCnt++;
+  ($AdjCode,$AdjID) = split(':',$PLB_ADJID_2);
+  $Amt = -($PLB_AMT_2);
+  if ( $AdjCode )
+  { print REMIT qq|Adjustment\t${PLB_PIN}\t\t\t\t\t\t\t\t${Date}\t\t${Amt}\t\t${AdjCode}\t${AdjID}\t\n|; $lCnt++; }
+  ($AdjCode,$AdjID) = split(':',$PLB_ADJID_3);
+  $Amt = -($PLB_AMT_3);
+  if ( $AdjCode )
+  { print REMIT qq|Adjustment\t${PLB_PIN}\t\t\t\t\t\t\t\t${Date}\t\t${Amt}\t\t${AdjCode}\t${AdjID}\t\n|; $lCnt++; }
+  ($AdjCode,$AdjID) = split(':',$PLB_ADJID_4);
+  $Amt = -($PLB_AMT_4);
+  if ( $AdjCode )
+  { print REMIT qq|Adjustment\t${PLB_PIN}\t\t\t\t\t\t\t\t${Date}\t\t${Amt}\t\t${AdjCode}\t${AdjID}\t\n|; $lCnt++; }
+  ($AdjCode,$AdjID) = split(':',$PLB_ADJID_5);
+  $Amt = -($PLB_AMT_5);
+  if ( $AdjCode )
+  { print REMIT qq|Adjustment\t${PLB_PIN}\t\t\t\t\t\t\t\t${Date}\t\t${Amt}\t\t${AdjCode}\t${AdjID}\t\n|; $lCnt++; }
+  ($AdjCode,$AdjID) = split(':',$PLB_ADJID_6);
+  $Amt = -($PLB_AMT_6);
+  if ( $AdjCode )
+  { print REMIT qq|Adjustment\t${PLB_PIN}\t\t\t\t\t\t\t\t${Date}\t\t${Amt}\t\t${AdjCode}\t${AdjID}\t\n|; $lCnt++; }
+  return('');
+}
+##
+# got here with an 'SE' RecType
+sub Process_SE
+{
+  my ($self, $Type, $str) = @_;
+
+  my ($SE_Segments,$SE_TSCN,$rest) = split('\*',$str,3);
+  print "Process_SE: ENTER: str=$str, $SE_Segments, $SE_TSCN\n" if ( $debug );
+  (my $Date = $TheDate) =~ s/(\d{4}?)(\d{2}?)(\d{2}?)/$2\/$3\/$1/;
+##
+# Even though this is processed last...the Update checks for valid receiver.
+##
+  my $ErrMsg = '';
+  if ( $CONTRACT->{PIN} eq '' ) { $ErrMsg = qq|PIN: NOT ON FILE! NOT PROCESSED!|; }
+  else
+  {
+    $rEFT = ();
+    $rEFT->{'Payer'} = $TheCompanyNumber;
+    $rEFT->{'Name'} = $ThePayerName;
+    $rEFT->{'CheckNo'} = $TheCheckNumber;
+    $rEFT->{'RemitFile'} = $TheRemitFile;
+    $rEFT->{'Amount'} = $TheAmount;
+    $rEFT->{'TransDate'} = $TransDate;
+    $rEFT->{'PayTo'} = $CONTRACT->{PIN};
+    $rEFT->{'CreateProvID'} = '101';
+    $rEFT->{'ChangeProvID'} = '101';
+    $rEFT->{'CreateDate'} = $form->{TODAY};
+    DBA->xSQL($form,'insert','EFT',$rEFT) unless ( ${Test} );
+    if ( $lCnt )
+    {
+      print REMIT qq|Check#\t${TheCheckNumber}\t\t=sum(D3:D${lCnt})\t=sum(E3:E${lCnt})\t\t\t\t\t\t=sum(K3:K${lCnt})\t=sum(L3:L${lCnt})\n|;
+      print REMIT qq|Check\$\t${TheAmount}\n|;
+      close(REMIT);
+      my $tcnt = $lCnt-2;
+      (my $cntPath = $rptPath) =~ s/_xxx_/_${tcnt}_/;
+      move($rptPath,$cntPath) or print ">>> ERROR: Move ${rptPath} failed: $!";
+    }
+  }
+  print qq|Remittance Information: $form->{DBNAME} ${ErrMsg}\n| if ( $debug );
+  print qq|   Payer:  ${ThePayerName}\n| if ( $debug );
+  print qq|   Payee:  $CONTRACT->{PIN} $CONTRACT->{ClinicName}\n| if ( $debug );
+  print qq|$CONTRACT->{ClinicName} RecID=$CONTRACT->{RecID}, PIN=$CONTRACT->{PIN} NPI=$CONTRACT->{NPI}\n| if ( $debug );
+
+  print qq|Check#\tAmount\tDate\tMethod\tPayer\tClinic\tPIN\tRecID\tNPI\tAccount\tError Message\n|;
+  print qq|${TheCheckNumber}\t\$${TheAmount}\t${Date}\t${TheMethod}\t${ThePayerName}\t$CONTRACT->{ClinicName}\t$CONTRACT->{PIN}\t$CONTRACT->{RecID}\t$CONTRACT->{NPI}\t$form->{DBNAME}\t${ErrMsg}\n|;
+  print qq|\n|;
+  $SE = '';
+  return('');
+}
+################################################################
+##
+# got here with an 'LX' RecType
+sub Process_LX
+{
+  my ($self, $Type, $str) = @_;
+  print "Process_LX: ENTER: str=$str\n" if ( $debug );
+  while ( my $lx = <FILE> )
+  { 
+    chomp($lx); $LineCnt+=1; 
+    while ( $lx )
+    {
+      print "Process_LX: lx=$lx\n" if ( $debug );
+      my ($RecType,$rest) = split('\*',$lx,2);
+      if ( $RecType eq 'TS3' ) { $lx=''; }        # Total Summary Claim information
+      elsif ( $RecType eq 'CLP' )
+      { $lx = main->Process_CLP($RecType,$rest); }
+      else { return($lx); }
+      return('ERROR') if ( $lx eq 'ERROR' );
+    }
+  }
+  print qq|>>> ERROR: Process_LX: ERROR! PREMATURE END! ${lx}\n|;
+  return('ERROR');
+}
+################################################################
+################################################################
+# got here with an 'CLP' RecType
+sub Process_CLP
+{
+	my $final_array=();
+  my ($self, $Type, $str) = @_;
+  print "Process_CLP: ENTER: str=$str\n" if ( $debug );
+  $CLP = ();
+  $SVC = ();
+  my ($CLPPCN,$CLPStatus,$CLPTotAmt,$CLPPayAmt,$CLPPatAmt,$CLPInsCode,$CLPPayerCN,$CLPPOS,$rest) = 
+   split('\*',$str,9);
+##$CLPPCN+=40145;    # mcs->mms # bump for db_merge, activate ONLY when processing trans after a db_merge.
+  $CLP->{ClientID} = $CLPPCN;
+  $CLP->{OrgClientID} = $CLPPCN;          # could change in CheckClient
+  $CLP->{ClaimStatus} = $CLPStatus;
+  $CLP->{ChargeAmt} = $CLPTotAmt;
+  $CLP->{PaidAmt} = $CLPPayAmt;
+  $CLP->{AmtLeft} = $CLP->{PaidAmt};      # used for secondary payment claim.
+  $CLP->{PatientAmt} = $CLPPatAmt;
+  $CLP->{InsCode} = $CLPInsCode;
+  $CLP->{PayerCN} = $CLPPayerCN;
+  $SVCdone = 0;
+  while ( my $clp = <FILE> )
+  { 
+    $SE .= $clp;          # save the entire SE segment.
+    chomp($clp); $LineCnt+=1; 
+    while ( $clp )
+    {
+      print "Process_CLP: clp=$clp\n" if ( $debug );
+      my ($RecType,$rest) = split('\*',$clp,2);
+      if ( $RecType eq 'CAS' )
+      { $clp = main->Process_CLPCAS($RecType,$rest); }
+      elsif ( $RecType eq 'NM1' )
+      { $clp = main->Process_NM1($RecType,$rest); }
+      elsif ( $RecType eq 'MIA' ) { $clp = ''; }
+      elsif ( $RecType eq 'MOA' )
+      { $clp = main->Process_MOA($RecType,$rest); }
+      elsif ( $RecType eq 'REF' ) { $clp = ''; }
+      elsif ( $RecType eq 'DTM' )
+      { $clp = main->Process_CLPDTM($RecType,$rest); }
+      elsif ( $RecType eq 'PER' ) { $clp = ''; }
+      elsif ( $RecType eq 'AMT' ) { $clp = ''; }
+      elsif ( $RecType eq 'QTY' ) { $clp = ''; }
+      elsif ( $RecType eq 'SVC' )
+      { $clp = main->Process_SVC($RecType,$rest); }
+      else
+      {
+        print qq|Process_CLP: SVCdone=$SVCdone, CLPAmtLeft=$CLP->{AmtLeft}\n| if ( $debug );
+        unless ( $SVCdone )                     # we never processed a SVC line.
+        {
+          my $claiminfo = '';
+## changed 11/6/2018          if ( $CLP->{'AmtLeft'} > 0 )          # don't post negative values
+          if ( $CLP->{'AmtLeft'} != 0 )         # post negative values for recoupments
+          {
+            if ( main->CheckClient() )
+            {
+              my $rInsPaid = ();
+              $rInsPaid->{'ClientID'} = $CLP->{'ClientID'};
+              $rInsPaid->{'InsCode'} = $CLP->{'InsCode'};
+              $rInsPaid->{'RefID'} = $TheCheckNumber;
+              $rInsPaid->{'TransDate'} = $TransDate;
+              $rInsPaid->{'StartDate'} = $CLP->{'StartDate'};
+              $rInsPaid->{'EndDate'} = $CLP->{'EndDate'};
+              $rInsPaid->{'BillAmt'} = $CLP->{'ChargeAmt'};   # ok, this is Billed
+              $rInsPaid->{'PaidAmt'} = $CLP->{'AmtLeft'};     # ok, this is Paid
+              $rInsPaid->{'DenCode'} = '';                    # not denied if paid
+              $rInsPaid->{'ICN'} = $CLP->{PayerCN};
+              $rInsPaid->{'Type'} = 'Electronic';             # others are Client Paid Types
+              $rInsPaid->{'PayerID'} = $RecID;
+              my $UID = DBA->doUpdate($form,'InsPaid',$rInsPaid) unless ( $Test );
+              $claiminfo = qq|Insurance Payment\t$SVC->{TrID}\t$SVC->{ContDate}\t${TransDate}\t$CLP->{ChargeAmt}\t$CLP->{AmtLeft}\t$SVC->{SCNum}\t$CLP->{ReasonCode}\t$CLP->{PayerCN}\tNo Transaction General Payment\t|;
+            }
+            else
+            { $claiminfo = qq|CLIENT ERROR\t$SVC->{TrID}\t$SVC->{ContDate}\t${TransDate}\t$CLP->{ChargeAmt}\t$CLP->{AmtLeft}\t$SVC->{SCNum}\t$CLP->{ReasonCode}\t$CLP->{PayerCN}\tClient Mismatch=$CLP->{'ClientID'} or $CLP->{'InsGrpNum'}/(firstlastname) NOT FOUND (CLP) see 835 Audit\t|; }
+            $CLP->{'AmtLeft'} = 0.0;                        # ok, we posted what was left
+          }
+          else
+          { $claiminfo = qq|Zero Skipped\t$SVC->{TrID}\t$SVC->{ContDate}\t${TransDate}\t$CLP->{ChargeAmt}\t$CLP->{AmtLeft}\t$SVC->{SCNum}\t$CLP->{ReasonCode}\t$CLP->{PayerCN}\tZero payments are ignored\t|; }
+          print qq|Process_CLP: claiminfo=${claiminfo}\n| if ( $debug );
+          print REMIT qq|${claimtext}\t${claiminfo}\n|; $lCnt++;
+        }
+        return($clp);
+      }
+      return('ERROR') if ( $clp eq 'ERROR' );
+    }
+  }
+  print qq|>>> ERROR: Process_CLP: ERROR! PREMATURE END! ${str}\n|;
+  return('ERROR');
+}
+################################################################
+##
+# got here with an 'CLPCAS' RecType
+sub Process_CLPCAS
+{
+		my @adjArray = ();
+  my ($self, $Type, $str) = @_;
+  print "Process_CLPCAS: ENTER: str=$str\n" if ( $debug );
+  
+  my ($CASGroup,$CASReason,$CASAmt,$CASQty,$CASReason1,$CASAmt1,$CASQty1,$CASReason2,$CASAmt2,$CASQty2,$CASReason3,$CASAmt3,$CASQty3,$CASReason4,$CASAmt4,$CASQty4,$CASReason5,$CASAmt5,$CASQty5,$rest) = split('\*',$str,20);
+  @adjArray= ([$CASReason,$CASAmt,$CASQty],[$CASReason1,$CASAmt1,$CASQty1],[$CASReason2,$CASAmt2,$CASQty2],[$CASReason3,$CASAmt3,$CASQty3],[$CASReason4,$CASAmt4,$CASQty4],[$CASReason5,$CASAmt5,$CASQty5]);
+   
+  push(@final_array, @adjArray); 
+  
+   my $lenTmp = length(@adjArray);
+   my $finalLenTmp = length(@final_array);
+   print "CLPCAS::adjArrLen: $lenTmp :  finalLenTmp: $finalLenTmp\n" if ( $debug );
+  
+  print "Process_CLPCAS: ReasonCode=$CLP->{ReasonCode}, CASReason=$CASReason\n" if ( $debug );
+  if ( $CASGroup eq 'CO' )                  # Contractual Obligations
+  { $CLP->{ReasonCode}=$CLP->{ReasonCode} ? $CLP->{ReasonCode}.'/'.$CASReason : $CASReason; }
+  elsif ( $CASGroup eq 'CR' )               # Correction and Reversals
+  { $CLP->{ReasonCode}=$CLP->{ReasonCode} ? $CLP->{ReasonCode}.'/'.$CASReason : $CASReason; }
+  elsif ( $CASGroup eq 'OA' )               # Other Adjustments
+  { $CLP->{ReasonCode}=$CLP->{ReasonCode} ? $CLP->{ReasonCode}.'/'.$CASReason : $CASReason; }
+  elsif ( $CASGroup eq 'PI' )               # Payor Initiated Reductions
+  { $CLP->{ReasonCode}=$CLP->{ReasonCode} ? $CLP->{ReasonCode}.'/'.$CASReason : $CASReason; }
+  elsif ( $CASGroup eq 'PR' )               # Patient Responsibility
+  { $CLP->{ReasonCode}=$CLP->{ReasonCode} ? $CLP->{ReasonCode}.'/'.$CASReason : $CASReason; }
+  else
+  {
+    print qq|>>> ERROR: Process_CLPCAS: ERROR! UNRECOGNIZED Group! ${str}\n|;
+    return('ERROR');
+  }
+         
+  return('');
+}
+#######
+##
+# got here with an 'NM1' RecType
+sub Process_NM1
+{
+  my ($self, $Type, $str) = @_;
+  print "Process_NM1: ENTER: str=$str\n" if ( $debug );
+  my ($NM1EID,$NM1EQL,$NM1LName,$NM1FName,$NM1MName,$NM1Pfx,$NM1Sfx,$NM1InsQL,$NM1InsGrpNum,$rest) = split('\*',$str,10);
+  if ( $NM1EID eq 'QC' )                              # Patient Name
+  { 
+    $CLP->{LNAME} = $NM1LName;
+    $CLP->{FNAME} = $NM1FName;
+    $CLP->{InsGrpNum} = $NM1InsGrpNum;
+    $claimtext = qq|$CLP->{FNAME}\t$CLP->{LNAME}\t$CLP->{ClientID}\t$CLP->{ChargeAmt}\t$CLP->{PaidAmt}\t$CLP->{PatientAmt}|;
+  }
+  elsif ( $NM1EID == 'IL' )                           # Insured Name
+  { 
+    $errors->{"${NM1FName} ${NM1LName}"} = qq|Found Insured Name: ${NM1InsQL} ${NM1InsGrpNum}|;
+  }
+  elsif ( $NM1EID == 74 )                             # Corrected Patient/Insured Name
+  { 
+    $errors->{"${NM1FName} ${NM1LName}"} = qq|New InsGrpNum: ${NM1InsQL} ${NM1InsGrpNum}|;
+  }
+  elsif ( $NM1EID == 82 )                             # Service Provider (Rendering)
+  { 
+    $errors->{"${NM1FName} ${NM1LName}"} = qq|Rendering Provider: ${NM1InsQL} ${NM1InsGrpNum}|;
+  }
+  elsif ( $NM1EID == 'TT' )                           # Transfer To
+  { 
+    $errors->{"${NM1FName} ${NM1LName}"} = qq|Crossover Carrier Name: ${NM1InsQL} ${NM1InsGrpNum}|;
+  }
+  elsif ( $NM1EID == 'PR' )                           # Payer
+  { 
+    $errors->{"${NM1FName} ${NM1LName}"} = qq|Crossover Carrier Name: ${NM1InsQL} ${NM1InsGrpNum}|;
+  }
+  else
+  {
+    print qq|>>> ERROR: Process_NM1: ERROR! UNRECOGNIZED TraceCode! ${TraceCode} ${str}\n|;
+    return('ERROR');
+  }
+  return('');
+}
+#######
+# got here with an 'MOA' RecType
+#   Medicare Outpatient Adjudication
+sub Process_MOA
+{
+  my ($self, $Type, $str) = @_;
+  print "Process_MOA: ENTER: str=$str\n" if ( $debug );
+  my ($MOAPercent,$MOAAmount,$MOARefID1,$MOARefID2,$MOARefID3,$MOARefID4,$MOARefID5,$rest)
+     = split('\*',$str,8);
+
+  print "Process_MOA: ReasonCode=$CLP->{ReasonCode}, MOARefID1=$MOARefID1\n" if ( $debug );
+  print "Process_MOA: MOARefID2=$MOARefID2, MOARefID3=$MOARefID3\n" if ( $debug );
+  print "Process_MOA: MOARefID4=$MOARefID4, MOARefID5=$MOARefID5\n" if ( $debug );
+
+  $CLP->{ReasonCode} = $CLP->{ReasonCode} ? $CLP->{ReasonCode}.'/'.$MOARefID1 : $MOARefID1;
+  $CLP->{ReasonCode} .= '/'.$MOARefID2 unless ( $MOARefID2 eq '' );
+  $CLP->{ReasonCode} .= '/'.$MOARefID3 unless ( $MOARefID3 eq '' );
+  $CLP->{ReasonCode} .= '/'.$MOARefID4 unless ( $MOARefID4 eq '' );
+  $CLP->{ReasonCode} .= '/'.$MOARefID5 unless ( $MOARefID5 eq '' );
+  return('');
+}
+#######
+# got here with an 'DTM' RecType
+sub Process_CLPDTM
+{
+  my ($self, $Type, $str) = @_;
+  print "Process_CLPDTM: ENTER: str=$str\n" if ( $debug );
+  my ($DTMQual,$DTMDate,$rest) = split('\*',$str,3);
+  my $yy = substr($DTMDate,0,4);
+  my $mm = substr($DTMDate,4,2);
+  my $dd = substr($DTMDate,6,2);
+  if ( $DTMQual eq '036' )                       # Expiration Date for Claim
+  { $CLP->{Expiration} = $DTMDate; }
+  elsif ( $DTMQual eq '050' )                    # Received Date for Claim
+  { $CLP->{Received} = $DTMDate; }
+  elsif ( $DTMQual eq '232' )                    # Start Claim Date for Claim
+  { $CLP->{StartDate} = $yy . '-' . $mm . '-' . $dd; }
+  elsif ( $DTMQual eq '233' )                    # End Claim Date for Claim
+  { $CLP->{EndDate} = $yy . '-' . $mm . '-' . $dd; }
+  else
+  {
+    print qq|>>> ERROR: Process_CLPDTM: ERROR! UNRECOGNIZED Qualifier! ${str}\n|;
+    return('ERROR');
+  }
+  return('');
+}
+################################################################
+################################################################
+# got here with an 'SVC' RecType
+sub Process_SVC
+{
+	  my ($self, $Type, $str) = @_;
+  my $UpdateFlag = 0;
+  $SVC = ();
+  my ($SVCProcedure,$SVCCharge,$SVCPaid,$SVCRevCode,$SVCUnitsPaid,$SVCProcCode,$SVCUnitsBilled,$rest) = split('\*',$str,8);
+  print "Process_SVC: ENTER: str=$str, $SVCCharge, $SVCPaid\n" if ( $debug );
+  my ($SCQual,$SCNumb) = split(':|>',$SVCProcedure,2);
+  ($SVC->{SCNum} = $SCNumb) =~ s/:/ /g;
+  $SVC->{Billed} = $SVCCharge;
+  $SVC->{Paid} = $SVCPaid;
+  $SVC->{UnitsPaid} = $SVCUnitsPaid;
+# Units Billed is given only if it is less than Units Paid.
+  $SVCUnitsBilled = $SVCUnitsPaid if ( $SVCUnitsBilled eq '' );
+  $SVC->{UnitsBilled} = $SVCUnitsBilled;
+  while ( my $svc = <FILE> )
+  { 
+    $SE .= $svc;          # save the entire SE segment.
+    chomp($svc); $LineCnt+=1; 
+    while ( $svc )
+    {
+      print "Process_SVC: svc=$svc\n" if ( $debug );
+      my ($RecType,$rest) = split('\*',$svc,2);
+      if ( $RecType eq 'DTM' )
+      { $svc = main->Process_SVCDTM($RecType,$rest); $UpdateFlag=1; }
+      elsif ( $RecType eq 'CAS' )
+      { $svc = main->Process_SVCCAS($RecType,$rest); $UpdateFlag=1; }
+      elsif ( $RecType eq 'AMT' ) { $svc=''; $UpdateFlag=1; }
+      elsif ( $RecType eq 'REF' )
+      { $svc = main->Process_SVCREF($RecType,$rest); $UpdateFlag=1; }
+      elsif ( $RecType eq 'LQ' )
+      { $svc = main->Process_LQ($RecType,$rest); $UpdateFlag=1; }
+      else
+      { 
+        main->POSTCLAIM() if ( $UpdateFlag );
+        return($svc);
+      }
+      return('ERROR') if ( $svc eq 'ERROR' );
+    }
+  }
+  print qq|>>> ERROR: Process_SVC: ERROR! PREMATURE END! ${str}\n|;
+  return('ERROR');
+}
+################################################################
+##
+# got here with an 'DTM' RecType
+sub Process_SVCDTM
+{
+  my ($self, $Type, $str) = @_;
+  print "Process_SVCDTM: ENTER: str=$str\n" if ( $debug );
+  my ($DTMQual,$DTMDate,$rest) = split('\*',$str,3);
+  my $yy = substr($DTMDate,0,4);
+  my $mm = substr($DTMDate,4,2);
+  my $dd = substr($DTMDate,6,2);
+  if ( $DTMQual eq '150' )                       # Start Service Date
+  { $SVC->{StartDate} = $yy . '-' . $mm . '-' . $dd; }
+  elsif ( $DTMQual eq '151' )                    # End Service Date
+  { $SVC->{EndDate} = $yy . '-' . $mm . '-' . $dd; }
+  elsif ( $DTMQual eq '472' )                    # Service Date
+  { $SVC->{ContDate} = $yy . '-' . $mm . '-' . $dd; }
+  else
+  {
+    print qq|>>> ERROR: Process_SVCDTM: ERROR! UNRECOGNIZED Qualifier! ${str}\n|;
+    return('ERROR');
+  }
+  return('');
+}
+################################################################
+##
+# got here with an 'SVCREF' RecType
+sub Process_SVCREF
+{
+  my ($self, $Type, $str) = @_;
+  print "Process_SVCREF: ENTER: str=$str\n" if ( $debug );
+  my ($REFQual,$REFID,$rest) = split('\*',$str,3);
+  if ( $REFQual eq '6R' )               # Service Identification pg 154
+  { $SVC->{RefID} = $REFID; }
+  elsif ( $REFQual eq '1S' )
+  { $APG_Num = $REFID; }
+  elsif ( $REFQual eq 'BB' )              # pg 126/154
+  { $Authorization_Num = $REFID; }
+  elsif ( $REFQual eq 'E9' )
+  { $Attachment_Code = $REFID; }
+  elsif ( $REFQual eq 'G1' )              # pg 126/154
+  { $PriorAuth_Num = $REFID; }
+  elsif ( $REFQual eq 'G3' )              # pg 126/154
+  { $Benefits_ID = $REFID; }
+  elsif ( $REFQual eq 'LU' )
+  { $Location_Num = $REFID; }
+  elsif ( $REFQual eq 'RB' )
+  { $SVC->{'RB'} = $REFID; }
+  elsif ( $REFQual eq '1A' )            # Rendering Provider pg 128 & 156
+  { $BlueCross_PIN = $REFID; }
+  elsif ( $REFQual eq '1B' )              # pg 128/156
+  { $BlueShield_PIN = $REFID; }
+  elsif ( $REFQual eq '1C' )              # pg 128/156
+  { $Medicare_PIN = $REFID; }
+  elsif ( $REFQual eq '1D' )              # pg 128/156
+  { $Medicaid_PIN = $REFID; }
+  elsif ( $REFQual eq '1G' )              # pg 128/156
+  { $UPIN = $REFID; }
+  elsif ( $REFQual eq '1H' )              # pg 128/156
+  { $CHAMPUS_ID = $REFID; }
+  elsif ( $REFQual eq 'D3' )              # pg 128
+  { $Pharmacy_Num = $REFID; }
+  elsif ( $REFQual eq 'G2' )              # pg 128
+  { $Commercial_Num = $REFID; }
+  elsif ( $REFQual eq '1J' )              # pg 156
+  { $Facility_ID = $REFID; }
+  elsif ( $REFQual eq 'HPI' )             # pg 156
+  { $SVC->{'HPI'} = $REFID; }
+  elsif ( $REFQual eq 'SY' )              # pg 156
+  { $SocSec_Num = $REFID; }
+  elsif ( $REFQual eq 'TJ' )              # pg 156
+  { $FedTax_ID = $REFID; }
+  elsif ( $REFQual eq '1L' )            # Other related pg 126
+  { $Group_Num = $REFID; }
+  elsif ( $REFQual eq '1W' )
+  { $Member_ID = $REFID; }
+  elsif ( $REFQual eq '9A' )
+  { $Repriced_Num = $REFID; }
+  elsif ( $REFQual eq '9C' )
+  { $Adjusted_Num = $REFID; }
+  elsif ( $REFQual eq 'A6' )
+  { $Employee_ID = $REFID; }
+  elsif ( $REFQual eq 'CE' )
+  { $Contract_Class = $REFID; }
+  elsif ( $REFQual eq 'EA' )
+  { $MedicalRecord_ID = $REFID; }
+  elsif ( $REFQual eq 'F8' )
+  { $Original_RefNum = $REFID; }
+  elsif ( $REFQual eq 'IG' )
+  { $Insurance_Num = $REFID; }
+  elsif ( $REFQual eq '0K' )
+  { $Insurance_Num = $REFID; }
+  else
+  {
+    print qq|>>> ERROR: Process_SVCREF: ERROR! UNRECOGNIZED Qualifier! ${str}\n|;
+    return('ERROR');
+  }
+  return('');
+}
+################################################################
+##
+# got here with an 'CAS' RecType
+sub Process_SVCCAS
+{
+	my @adjArray = ();
+  my ($self, $Type, $str) = @_;
+  print "Process_SVCCAS: ENTER: str=$str\n" if ( $debug );
+  my ($CASGroup,$CASReason,$CASAmt,$CASQty,$rest) = split('\*',$str,5);
+  print "Process_SVCCAS: ReasonCode=$SVC->{ReasonCode}, CASReason=$CASReason\n" if ( $debug );
+  
+    my ($CASGroup,$CASReason,$CASAmt,$CASQty,$CASReason1,$CASAmt1,$CASQty1,$CASReason2,$CASAmt2,$CASQty2,$CASReason3,$CASAmt3,$CASQty3,$CASReason4,$CASAmt4,$CASQty4,$CASReason5,$CASAmt5,$CASQty5,$rest) = split('\*',$str,20);
+  @adjArray= ([$CASReason,$CASAmt,$CASQty],[$CASReason1,$CASAmt1,$CASQty1],[$CASReason2,$CASAmt2,$CASQty2],[$CASReason3,$CASAmt3,$CASQty3],[$CASReason4,$CASAmt4,$CASQty4],[$CASReason5,$CASAmt5,$CASQty5]);
+  push(@final_array, @adjArray); 
+  
+     my $lenTmp = length(@adjArray);
+   my $finalLenTmp = length(@final_array);
+   print "SVCCAS::adjArrLen: $lenTmp :  finalLenTmp: $finalLenTmp\n" if ( $debug );
+  
+  if ( $CASGroup eq 'CO' )                  # Contractual Obligations
+  { $SVC->{ReasonCode}=$SVC->{ReasonCode} ? $SVC->{ReasonCode}.'/'.$CASReason : $CASReason; }
+  elsif ( $CASGroup eq 'CR' )               # Correction and Reversals
+  { $SVC->{ReasonCode}=$SVC->{ReasonCode} ? $SVC->{ReasonCode}.'/'.$CASReason : $CASReason; }
+  elsif ( $CASGroup eq 'OA' )               # Other Adjustments
+  { $SVC->{ReasonCode}=$SVC->{ReasonCode} ? $SVC->{ReasonCode}.'/'.$CASReason : $CASReason; }
+  elsif ( $CASGroup eq 'PI' )               # Payor Initiated Reductions
+  { $SVC->{ReasonCode}=$SVC->{ReasonCode} ? $SVC->{ReasonCode}.'/'.$CASReason : $CASReason; }
+  elsif ( $CASGroup eq 'PR' )               # Patient Responsibility
+  { $SVC->{ReasonCode}=$SVC->{ReasonCode} ? $SVC->{ReasonCode}.'/'.$CASReason : $CASReason; }
+  else
+  {
+    print qq|>>> ERROR: Process_SVCCAS: ERROR! UNRECOGNIZED Group! ${str}\n|;
+    return('ERROR');
+  }
+  return('');
+}
+################################################################
+##
+# got here with an 'LQ' RecType
+sub Process_LQ
+{
+  my ($self, $Type, $str) = @_;
+  print "Process_LQ: ENTER: str=$str\n" if ( $debug );
+  my ($LQQual,$LQCode,$rest) = split('\*',$str,3);
+  print "Process_LQ: ReasonCode=$SVC->{ReasonCode}, LQCode=$LQCode\n" if ( $debug );
+  if ( $LQQual eq 'HE' )
+  { $SVC->{RemarkCode} = $SVC->{RemarkCode} ? $SVC->{RemarkCode}.'/'.$LQCode : $LQCode; }
+  else
+  {
+    print qq|>>> ERROR: Process_LQ: ERROR! UNRECOGNIZED Qualifier! ${str}\n|;
+    return('ERROR');
+  }
+  return('');
+}
+################################################################
+sub POSTCLAIM
+{
+  my ($self) = @_;
+  print qq|POSTCLAIM: ENTER: PIN=$CONTRACT->{PIN}\n| if ( $debug );
+if ( $debug ) { foreach my $f ( sort keys %{$CLP} ) { print "CLP: $f=$CLP->{$f}\n"; } foreach my $f ( sort keys %{$SVC} ) { print "SVC: $f=$SVC->{$f}\n"; } }
+  main->setDenCode();
+  my $claiminfo = '';
+  if ( $CONTRACT->{PIN} eq '' )
+  {
+    $claiminfo = qq|Not Processed\t$SVC->{TrID}\t$SVC->{ContDate}\t${TransDate}\t$SVC->{Billed}\t$SVC->{Paid}\t$SVC->{SCNum}\t$SVC->{DenCode}\t$CLP->{PayerCN}\tContract PIN is null\t|;
+    print qq| >>> ERROR: POSTCLAIM: ${claiminfo}\n|;
+  }
+  else
+  {
+    if ( main->CheckClient() )
+    {
+
+$string_len = length(@final_array); 
+		print "array length: , $string_len\n";
+		
+	#	  $final_array = main->cleanArray();
+#	  for (my $f = 0 ; $f < $final_array ; $f++) {
+#		$string_len = length($final_array[$f][0]); 
+#		print "adjCode: , $string_len\n";
+#		print "$f\n";
+#		splice($final_array,$f, 1) if ( $string_len==0); 
+#
+#		}
+		print "final_array: @final_array";
+		$string_len = length(@final_array); 
+   print "lenArray: , $string_len\n";
+	my $adjAmtTotal =0;
+	  for (my $f = 0 ; $f < @final_array ; $f++) { 
+
+	if($final_array[$f][0] != NULL && $final_array[$f][0] ne '') {
+      my $r835 = ();
+      $r835->{'TransID'}    = substr($SVC->{'RefID'},0,1) eq 'T' 
+                            ? substr($SVC->{'RefID'},1) : '';
+      $r835->{'ClientID'}   = $CLP->{'ClientID'};
+      $r835->{'ContDate'}   = $SVC->{'ContDate'};
+      $r835->{'ServCode'}   = $SVC->{'SCNum'};
+      $r835->{'RecDate'}    = $TransDate;
+      $r835->{'RefID'}      = $TheCheckNumber;
+      $r835->{'ICN'}        = $CLP->{'PayerCN'};
+      $r835->{'InsCode'}    = $CLP->{'InsCode'};
+#      Adjustments do not have paid amount
+	  if($final_array[$f][0] != 2) {
+			$r835->{'PaidAmt'}    = $final_array[$f][1];
+	  } else {
+		  $r835->{'PaidAmt'}    = 0;
+	  }
+      $r835->{'Units'}      = $SVC->{'UnitsBilled'};
+      # this resets our BilledAmt in Treatment-see uBill-setBilledAmt
+	  
+      $r835->{'BillAmt'}    = $SVC->{'Billed'};    # ok, first Trans? or zero?
+#	  $r835->{'DenCode'}    = $SVC->{'DenCode'};
+      $r835->{'ReasonCode'} = $final_array[$f][0];
+	  	  if($final_array[$f][0] != 2) {
+			$r835->{'AdjAmt'}    = 0;
+	  } else {
+		  $r835->{'AdjAmt'}    = $final_array[$f][1];
+	  }
+	  
+      $r835->{'PayerID'}    = $RecID;
+	  
+	  if($final_array[$f][0] != 2) {
+			$adjAmtTotal += $final_array[$f][1];
+	  }
+	  
+      my ($TrID,$SCID,$code,$type) = uBill->postClaim($form,$r835,'ER') if ( length($final_array[$f][0]) >0 );
+
+      print qq|POSTCLAIM: TrID=$SVC->{TrID}, SCID=$SVC->{SCID}\n| if ( $debug );
+      print qq|POSTCLAIM: TrID=${TrID}, SCID=${SCID}\n| if ( $debug );
+      print qq|POSTCLAIM: code=${code}, type=${type}\n| if ( $debug );
+	  print qq|POSTCLAIM: code=$final_array[$f][0], amt=$final_array[$f][1]\n| if ( $debug );
+	}
+	  
+	  }	
+	  
+	  print qq|adjAmtTotal: $adjAmtTotal\n| if ( $debug );
+	  
+		@final_array =();
+      my $r835 = ();
+      $r835->{'TransID'}    = substr($SVC->{'RefID'},0,1) eq 'T' 
+                            ? substr($SVC->{'RefID'},1) : '';
+      $r835->{'ClientID'}   = $CLP->{'ClientID'};
+      $r835->{'ContDate'}   = $SVC->{'ContDate'};
+      $r835->{'ServCode'}   = $SVC->{'SCNum'};
+      $r835->{'RecDate'}    = $TransDate;
+      $r835->{'RefID'}      = $TheCheckNumber;
+      $r835->{'ICN'}        = $CLP->{'PayerCN'};
+      $r835->{'InsCode'}    = $CLP->{'InsCode'};
+      $r835->{'PaidAmt'}    = $SVC->{'Paid'};
+      $r835->{'Units'}      = $SVC->{'UnitsBilled'};
+      # this resets our BilledAmt in Treatment-see uBill-setBilledAmt
+      $r835->{'BillAmt'}    = $SVC->{'Billed'};    # ok, first Trans? or zero?
+      $r835->{'DenCode'}    = $SVC->{'DenCode'};
+	  $r835->{'ReasonCode'} = $CLP->{'ReasonCode'};
+#      $r835->{'ReasonCode'} = $SVC->{'ReasonCode'} eq '' ? $CLP->{'ReasonCode'};
+#                            : $CLP->{'ReasonCode'} eq '' ? $SVC->{'ReasonCode'};
+#                            : $CLP->{'ReasonCode'}.'/'.$SVC->{'ReasonCode'};
+	  $r835->{'AdjAmt'} 	= 0;
+      $r835->{'PayerID'}    = $RecID;
+      my ($TrID,$SCID,$code,$type) = uBill->postClaim($form,$r835,'ER');
+
+      print qq|POSTCLAIM: TrID=$SVC->{TrID}, SCID=$SVC->{SCID}\n| if ( $debug );
+      print qq|POSTCLAIM: TrID=${TrID}, SCID=${SCID}\n| if ( $debug );
+      print qq|POSTCLAIM: code=${code}, type=${type}\n| if ( $debug );
+	  
+     if ( $TrID )                   # set these for messages...
+      {
+        print qq|POSTCLAIM: GOOD: TrID=${TrID}\n| if ( $debug );
+        print qq|POSTCLAIM: GOOD: CLPAmtLeft=$CLP->{AmtLeft}, Paid=$SVC->{Paid}, TotalAdj=$adjAmtTotal\n| if ( $debug );
+
+        $SVC->{'TrID'} = $TrID;
+        $SVC->{'SCID'} = $SCID;
+        my $Message = $CLP->{'OrgClientID'} eq $CLP->{'ClientID'}
+                    ? '' : qq|Client: $CLP->{'ClientID'}|;
+        $claiminfo = qq|${type}\t$SVC->{TrID}\t$SVC->{ContDate}\t${TransDate}\t$SVC->{Billed}\t$SVC->{Paid}\t$SVC->{SCNum}\t$SVC->{DenCode}\t$CLP->{PayerCN}\t${Message}\t${code}|;
+        $CLP->{'AmtLeft'} = sprintf("%.2f",$CLP->{'AmtLeft'}-($SVC->{'Paid'}+$adjAmtTotal));
+        print qq|POSTCLAIM: GOOD: CLPAmtLeft=$CLP->{AmtLeft}\n| if ( $debug );
+	  }
+	  
+      else                           # Transaction NOT FOUND, add to InsPaid table?
+     {
+        print qq|POSTCLAIM: before: CLPAmtLeft=$CLP->{AmtLeft}, Paid=$SVC->{Paid}\n| if ( $debug );
+        print qq|POSTCLAIM:  after: CLPAmtLeft=$CLP->{AmtLeft}\n| if ( $debug );
+
+        if ( $SVC->{'Paid'} > 0 )    # don't post negative values
+        {                            #   maybe later for recoupments
+          my $rInsPaid = ();
+          $rInsPaid->{'ClientID'} = $CLP->{'ClientID'};
+          $rInsPaid->{'InsCode'} = $CLP->{'InsCode'};
+          $rInsPaid->{'RefID'} = $TheCheckNumber;
+          $rInsPaid->{'TransDate'} = $TransDate;
+          $rInsPaid->{'StartDate'} = $CLP->{'StartDate'};
+          $rInsPaid->{'EndDate'} = $CLP->{'EndDate'};
+          $rInsPaid->{'BillAmt'} = $SVC->{'Paid'};        # ok, this is Billed
+          $rInsPaid->{'PaidAmt'} = $SVC->{'Paid'};        # ok, this is Paid
+          $rInsPaid->{'DenCode'} = '';                    # not denied if paid
+          $rInsPaid->{'ICN'} = $CLP->{PayerCN};
+          $rInsPaid->{'Type'} = 'Electronic';             # others are Client Paid Types
+          $rInsPaid->{'PayerID'} = $RecID;
+          my $UID = DBA->doUpdate($form,'InsPaid',$rInsPaid) unless ( $Test );
+          $claiminfo = qq|Insurance Payment\t$SVC->{TrID}\t$SVC->{ContDate}\t${TransDate}\t$SVC->{Billed}\t$SVC->{Paid}\t$SVC->{SCNum}\t$SVC->{DenCode}\t$CLP->{PayerCN}\tNo Transaction Client: $CLP->{'ClientID'}\t${code}|;
+          $CLP->{'AmtLeft'} = sprintf("%.2f",$CLP->{'AmtLeft'}-$SVC->{'Paid'});
+        }
+        else
+        { $claiminfo = qq|Skipped - No Payment\t$SVC->{TrID}\t$SVC->{ContDate}\t${TransDate}\t$SVC->{Billed}\t$SVC->{Paid}\t$SVC->{SCNum}\t$SVC->{DenCode}\t$CLP->{PayerCN}\tNo Transaction Client: $CLP->{'ClientID'} HPI: $SVC->{'HPI'}\t${code}|; }
+      }
+    }
+    else
+    { $claiminfo = qq|CLIENT ERROR\t$SVC->{TrID}\t$SVC->{ContDate}\t${TransDate}\t$SVC->{Billed}\t$SVC->{Paid}\t$SVC->{SCNum}\t$SVC->{DenCode}\t$CLP->{PayerCN}\tClient Mismatch=$CLP->{'ClientID'} or $CLP->{'InsGrpNum'}/(firstlastname) NOT FOUND (SVC) see 835 Audit\t${code}|; }
+  }
+  print qq|POSTCLAIM: claiminfo=${claiminfo}\n| if ( $debug );
+  my $claimstr = $SVCdone ? qq|\t\t\t\t\t| : $claimtext;
+  print REMIT qq|${claimstr}\t${claiminfo}\n|; $lCnt++;
+  $SVCdone = 1;
+  print qq|POSTCLAIM: return\n| if ( $debug );
+  return(1);
+}
+sub setDenCode
+{
+  my ($self) = @_;
+
+  my $DenCode = '';
+  print qq|setDenCode: ENTER: Paid=$SVC->{Paid}, s=$SVC->{ReasonCode}, c=$CLP->{ReasonCode}\n| if ( $debug );
+  if ( $SVC->{Paid} <= 0 )      # ignore Denials if Paid
+  {
+    if ( $SVC->{ReasonCode} )
+    { ($DenCode,$junk) = split('/',$SVC->{ReasonCode},2); }
+    elsif ( $CLP->{ReasonCode} )
+    { ($DenCode,$junk) = split('/',$CLP->{ReasonCode},2); }
+    if ( $DenCode ne '' )
+    {
+      $DenCode = '0' . $DenCode if ( ${DenCode} !~ /([A-Z].*)/ && length($DenCode) < 3 );
+      $DenCode = '0' . $DenCode if ( ${DenCode} !~ /([A-Z].*)/ && length($DenCode) < 3 );
+    }
+  }
+  $SVC->{DenCode} = $DenCode;
+  return(1);
+}
+############################################################################
+sub CheckClient
+{
+  my ($self) = @_;
+  print "CheckClient: ENTER: ClientID=$CLP->{ClientID}, LNAME=$CLP->{LNAME}, FNAME=$CLP->{FNAME}\n" if ( $debug );
+# Check for ClientID...
+  $sClient->execute($CLP->{ClientID}) || myDBI->dberror("CheckClient: $CLP->{'ClientID'}");
+  if ( my $rClient = $sClient->fetchrow_hashref )
+  {
+    $CLP->{LName} = $rClient->{LName};
+    $CLP->{FName} = $rClient->{FName};
+    $CLP->{ClinicID} = $rClient->{clinicClinicID};
+    return(1);
+  }
+  print "CheckClient: InsGrpNum=$CLP->{InsGrpNum}\n" if ( $debug );
+# Check for Insurance ID Number...
+  $sInsurance->execute($CLP->{InsGrpNum},$CLP->{FNAME},$CLP->{LNAME})
+        || myDBI->dberror("CheckClient: $CLP->{InsGrpNum},$CLP->{FNAME},$CLP->{LNAME}");
+  if ( my $rInsurance = $sInsurance->fetchrow_hashref )
+  {
+    $CLP->{ClientID} = $rInsurance->{ClientID};
+    $CLP->{LName} = $rInsurance->{LName};
+    $CLP->{FName} = $rInsurance->{FName};
+    $CLP->{ClinicID} = $rClient->{clinicClinicID};
+    return(1);
+  }
+# Otherwise not on file...
+  print "CheckClient: NOT FOUND: ClientID=$CLP->{ClientID}, LName=$CLP->{LName}, FName=$CLP->{FName}, ClinicID=$CLP->{ClinicID}\n" if ( $debug );
+  return(0) if ( $Test );
+  my $BillAmt = $SVC->{'Billed'} eq '' ? $CLP->{'ChargeAmt'} : $SVC->{'Billed'};
+  my $PaidAmt = $SVC->{'Paid'} eq '' ? $CLP->{'PaidAmt'} : $SVC->{'Paid'};
+  $sNoteErr->execute($CONTRACT->{PIN},$TransDate,$CLP->{FNAME},$CLP->{LNAME},$SVC->{ContDate},$SVC->{SCNum},$BillAmt,$PaidAmt,$SVC->{UnitsBilled},$SVC->{UnitsPaid},$SVC->{DenCode},"Client ID not found",$CLP->{PayerCN},$CLP->{InsGrpNum})
+   || myDBI->dberror("CheckClient: insert NoteErr");
+  return(0);
+}
+# use NPI or NPI could be TaxID?
+sub setContract
+{
+  my ($self,$NPI) = @_;
+  my $rtnstr = '';
+  print qq|setContract: RecID=${RecID}=, NPI=${NPI}=\n| if ( $debug );
+  #$sContract->execute($RecID,$NPI) || myDBI->dberror("setContract: ${RecID}/${NPI}");
+  $sContract->execute($RecID,$NPI,$NPI) || myDBI->dberror("setContract: ${RecID}/${NPI}");
+  if ( my $r = $sContract->fetchrow_hashref )
+  {
+    $CONTRACT = $r;
+    $CONTRACT->{'RecID'} = $RecID;
+    print qq|$CONTRACT->{ClinicName} PIN=$CONTRACT->{PIN} NPI=$CONTRACT->{NPI}\n| if ( $debug );
+    (my $date = $TransDate) =~ s/-//g;
+    $rptFile = qq|EBT_remit_$CONTRACT->{ProvID}_$CONTRACT->{InsID}_${date}-${date}_xxx_| . DBUtil->Date('','stamp') . '_' . DBUtil->genToken() . '.xls';
+    $rptPath = "${rptDir}/${rptFile}";
+    print qq|rptFile=${rptFile} rptPath=${rptPath}\n| if ( $debug );
+    open REMIT, ">${rptPath}" || die "Couldn't open REMIT file ${rptFile}: $!";
+    print REMIT qq|$CONTRACT->{'InsName'} $CONTRACT->{'ClinicName'} $CONTRACT->{'PIN'} $CONTRACT->{'NPI'}\n|;
+    print REMIT qq|FName\tLName\tClientID\tCharged\tPaid\tPatient\tType\tTrID\tContDate\tTransDate\tBilled\tPaid\tServiceCode\tDenCode\tICN\tMessage\tCode\n|;
+    $lCnt = 2;
+  }
+  else
+  {
+    print qq| >>> ERROR: setContract: NOT FOUND: ${RecID} / ${NPI} \n|;
+    $rtnstr = main->dumpSE();
+  }
+  return($rtnstr);
+}
+sub dumpSE
+{
+  my ($self) = @_;
+  my $out = $HDR . $SE;
+  while ( my $dump = <FILE> )
+  {
+    $out .= $dump;
+    my ($RecType,$rest) = split('\*',$dump,2);
+    if ( $RecType eq 'SE' )
+    {
+      $out .= qq|GE*DUMP\nIEA*DUMP\n|;      # finish it with dummies.
+      my $stamp = DBUtil->Date('','stamp');
+      open DUMP, ">pro835.dump.${stamp}" || die "Couldn't open DUMP file pro835.dump.${stamp}: $!";
+      print DUMP $out;
+      close(DUMP);
+      print qq| >>> DUMP: pro835.dump.${stamp}\n>>>CHECK FILE!\n\n|;
+      last;
+    }
+  }
+  $SE = '';
+  return($dump);
+}
+sub cleanArray
+{
+print "Entering cleanArray\n";
+for (my $f = 0 ; $f < $final_array ; $f++) {
+   $string_len = length($final_array[$f][0]); 
+   print "adjCode: , $string_len\n";
+   print "$f\n";
+   splice($final_array,$f, 1) if ( $string_len==0); 
+
+}
+	
+  return($final_array);
+}

@@ -1,0 +1,113 @@
+#!/usr/bin/perl
+############################################################################
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use myForm;
+use myDBI;
+use Accounts;
+use myLogin;
+use myConfig;
+use Cwd;
+
+############################################################################
+# usage: Pro271 
+#   processes the 271 Eligibility files.
+############################################################################
+my $form = myForm->new();
+my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+#foreach my $f ( sort keys %{$form} ) { warn "Pro271: form-$f=$form->{$f}\n"; }
+my $LOGINID = $form->{'LOGINID'};
+my $LOGINUSERID = $form->{'LOGINUSERID'};
+my $mlt = $form->{'mlt'};
+
+unless ( SysAccess->chkPriv($form,'Agent') )
+{ myDBI->error("Access Denied! (Process 271 Electronic Files)"); }
+
+# get the command name...
+my ($pw,$cmd) = $0 =~ m/(.*\/)(.*)$/;
+
+# setup the configuration...
+my $SRCBIN = myConfig->cfg('SRCBIN');
+my $BACKDIR = myConfig->cfg('BACKDIR');
+my $ADMINDIR = myConfig->cfg('ADMINDIR');
+my $dirpath = qq|${ADMINDIR}/271|;
+
+############################################################################
+warn qq|${cmd} Started: |.localtime().qq|\n\n|;
+warn qq|======================================\n\n|;
+if ( chdir($dirpath) )
+{
+  my $pwd=cwd();
+#warn qq|Pro271: pwd=${pwd}\n|;
+  
+  my $dumped = ();
+  my $setup = ();
+  
+  if ( -f "daterange.out" )
+  {
+    warn qq|\n--------------------------------------\n|;
+    warn qq|\n  First Process FTP to expand file...\n|;
+    system("${SRCBIN}/ProFTP DBNAME=$form->{'DBNAME'}\\&type=271\\&mlt=${mlt}");
+
+    warn qq|\n--------------------------------------\n|;
+    warn qq|\n  Next Process 271 files...\n|;
+    my $cnt = 0;
+    my @Files = glob("*.271");
+    foreach $file ( @Files )
+    {
+      $cnt++;
+      warn qq|\n--------------------------------------\n|;
+      warn qq|\n  Process file: ${file}\n|;
+      if ( -f "${BACKDIR}/271/${file}" )
+      { warn qq|>>>ERROR: ${file} ALREADY PROCESSED!\n|; next; }
+  
+      my ($dbname,$npi,$ins,$dt,$stamp,$sfx) = split('\.',$file);
+  #warn qq|dbname=${dbname}\n|;
+  #warn qq|npi=${npi}\n|;
+  #warn qq|ins=${ins}\n|;
+  #warn qq|dt=${dt}\n|;
+  #warn qq|stamp=${stamp}\n|;
+  #warn qq|sfx=${sfx}\n|;
+  
+      if ( !$dumped->{$dbname} )
+      {
+        warn qq|\n  Dump/Save ${dbname}...\n|;
+        my $u = myConfig->dbu($dbname);
+        my $p = myConfig->dbp($dbname);
+        system("mysqldump -u ${u} -p${p} ${dbname} Eligible > ${dbname}.Eligible.sqldump 2>/dev/null ");
+        $dumped->{$dbname} = 1;
+      }
+  
+      # set the login for this dbname...simulate '91:root'
+      #   otherwise we'd have to create '89:admin' for all DBs
+      myLogin->SysAdmin($dbname,$mlt,'91','root');
+
+      # clear the month...
+      if ( !$setup->{$dbname} )
+      {
+        warn qq|\n  Clear ${dbname}...\n|;
+        #warn qq|system("${SRCBIN}/pro271 DBNAME=${dbname}\\&clear=1\\&mlt=${mlt}");\n|;
+        system("${SRCBIN}/pro271 DBNAME=${dbname}\\&clear=1\\&mlt=${mlt}");
+        $setup->{$dbname} = 1;
+      }
+  
+      #warn qq|system("${SRCBIN}/pro271 DBNAME=${dbname}\\&filepath=${file}\\&mlt=${mlt}");\n|;
+      warn qq|\n|;
+      system("${SRCBIN}/pro271 DBNAME=${dbname}\\&filepath=${file}\\&mlt=${mlt}");
+    }
+    warn qq|\n\n${cnt} files processed.\n|;
+  }
+  else
+  {
+    warn qq|\n--------------------------------------\n|;
+    warn qq|>>>ERROR: NO daterange.out FILE!|;
+    warn qq|\n--------------------------------------\n|;
+  }
+}
+else { warn "Can't chdir to ${dirpath} $!"; }
+warn qq|\n\n======================================\n|;
+warn qq|${cmd} Completed: |.localtime().qq|\n|;
+  
+myDBI->cleanup();
+exit;
+############################################################################

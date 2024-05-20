@@ -1,0 +1,38 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+############################################################################
+# get the command name...
+my ($pw,$cmd) = $0 =~ m/(.*\/)(.*)$/;
+print qq|#${cmd}: Started |.localtime().qq|\n|;
+my $form = DBForm->new();
+my $dbh = $form->dbconnect();
+##
+# copy to LinksLog...
+my $s = $dbh->prepare("insert into LinksLog select null,ProvID,ip,count(*) as Count,DATE_FORMAT(Access,'%Y-%m-%d') as Date,null from Links group by ProvID,ip,DATE_FORMAT(Access,'%Y-%m-%d')");
+$s->execute() || $form->dberror("insert / select to LinksLog");
+$s->finish();
+##
+# recreate Links table (for ID restart)...
+$sDrop=$dbh->prepare("drop table if exists Links");
+$sDrop->execute();
+$sDrop->finish();
+$sCreate=$dbh->prepare("
+CREATE TABLE `Links` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `ProvID` int(11) DEFAULT NULL,
+  `pgm` varchar(20) DEFAULT NULL,
+  `url` text,
+  `browser` varchar(20) DEFAULT NULL,
+  `ip` varchar(20) DEFAULT NULL,
+  `Access` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;");
+$sCreate->execute();
+$sCreate->finish();
+
+print qq|#${cmd}: Completed |.localtime().qq|\n|;
+$form->complete();
+exit;
+############################################################################

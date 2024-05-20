@@ -1,0 +1,27 @@
+#!/usr/bin/perl
+# A Simple cookie test to indicate if the clients browser supports cookies.
+# Distributed through Cookie Central. http://www.cookiecentral.com.
+# 
+$myLoc = 'http://www.your-server.com/cgi-bin/ct.cgi?TEST';
+
+if($ENV{'QUERY_STRING'} eq 'TEST')
+{
+   if($ENV{'HTTP_COOKIE'} =~ /Cookie=Test/)
+   {
+      $reply = "<HTML><TITLE>Good Cookie!</TITLE><BODY>Your browser supports
+      the Netscape HTTP Cookie Specification as set by including a Set-Cookie 
+      HTTP Header!</BODY></HTML>";
+   }
+   else
+   {
+      $reply = "<HTML><TITLE>Bad Cookie</TITLE><BODY>Sorry, Your browser
+      doesn't appear to support the cookie protocol. If you believe you have 
+      gotten this message in error... Don't eat cookies</BODY></HTML>";
+   }
+   print $reply;
+}
+else
+{
+   print "HTTP/1.0 302 Moved Temporarily\n\r Location: $myLoc\n\rSet-Cookie: Cookie=Test\n\r\n\r
+   <HTML><BODY>BYE-BYE</BODY></HTML>";
+} 

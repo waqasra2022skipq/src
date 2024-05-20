@@ -1,0 +1,31 @@
+#!/usr/bin/perl
+use lib '/usr/local/mis/lib';
+#
+# This program capitalizes all the customer names in an XML document
+# made by WarbleSoft Spam.
+
+# Import the XML::Simple module
+use XML::Simple;
+
+# Turn the file into a hash reference, using XML::Simple's "XMLin"
+# subroutine.
+# We'll also turn on the 'forcearray' option, so that all elements
+# contain arrayrefs.
+my $cust_xml = XMLin('./xSimple.xml', forcearray=>1);
+print XMLout($cust_xml);
+print "\n";
+
+# Loop over each customer sub-hash, which are all stored as in an
+# anonymous list under the 'customer' key
+for my $customer (@{$cust_xml->{customer}}) {
+  # Capitalize the contents of the 'first-name' and 'surname' elements
+  # by running Perl's built-in uc() function on them
+  foreach (qw(TransmittingAgency TransmissionType)) {
+    $customer->{$_}->[0] = uc($customer->{$_}->[0]);
+  }
+}
+
+# print out the hash as an XML document again, with a trailing newline
+# for good measure
+print XMLout($cust_xml);
+print "\n";

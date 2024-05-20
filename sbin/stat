@@ -1,0 +1,3 @@
+date
+uptime
+ps axf | grep rsync | grep -v "grep rsync"

@@ -1,0 +1,23 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+
+############################################################################
+use  DBI;
+use  DBForm;
+use  DBA;
+
+$form = DBForm->new;
+$ProvID=$form->{ProvID};
+#foreach my $f ( sort keys %{$form} ) { warn "form-$f=$form->{$f}\n"; }
+############################################################################
+my $dbh = $form->dbconnect;
+my $qProvider = qq|select * from Provider where $ARGV[0]|;
+my $sProvider = $dbh->prepare($qProvider);
+$sProvider->execute || $form->dberror($qProvider);
+while ( my $rProvider = $sProvider->fetchrow_hashref )
+{ 
+  $ProvID = $rProvider->{ProvID};
+  print $rProvider->{FName} . "\t" . $rProvider->{LName} . "\t" . $ProvID . "\n";
+}
+$sProvider->finish;
+############################################################################

@@ -1,0 +1,97 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use DBA;
+use MgrTree;
+use uCalc;
+use Time::Local;
+my $DT = localtime();
+my $multidel = chr(253);
+############################################################################
+my $form = DBForm->new();
+my $dbh = $form->dbconnect();
+my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+# join xInsurance needed for withSelection
+my $ClinicSelection = DBA->withSelection($form,'and','Client.clinicClinicID','','','');
+my $Header = DBA->withSelectionHeader($form);
+$ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+my $sProvider = $dbh->prepare("select * from Provider where ProvID=?");
+print qq|${DT}\n${table} ${Header}Depression Report\n|;
+print qq|Agency\tClinic\tClientID\tActive\tFName\tLName\tAddr1\tAddr2\tCity\tST\tZip\tHomePhone\tWorkPhone\tAlert\tDOB\tGend\tRace\tSSN\tAge\tPrimary Provider\tDepression\tConsider Disorder\tTrID\n|;
+main->rptit($form,'ClientPHQ9',1,9,5,10,15,20);
+$sProvider->finish();
+$form->complete();
+exit;
+############################################################################
+sub rptit
+{
+  my ($self,$form,$table,$beg,$end,$min,$med,$max,$severe) = @_;
+  my $dbh = $form->dbconnect();
+  my $pfx = 'q';
+  my $isok = '';
+  my $qPHQ = "
+  select ${table}.*
+        ,Provider.Name as Clinic
+        ,Client.ClientID
+        ,Client.LName, Client.FName, Client.ClientID, Client.Active
+        ,Client.Addr1, Client.Addr2, Client.City, Client.ST, Client.Zip
+        ,Client.HmPh, Client.WkPh
+        ,Client.DOB, Client.Gend, xRaces.Descr as Race, Client.SSN
+        ,truncate((to_days(curdate()) - to_days(Client.DOB)) / 365,0) as Age
+        ,Client.ProvID as PrimaryProvID
+        ,Client.clinicClinicID
+  from ${table}
+    left join Client on Client.ClientID=${table}.ClientID
+    left join ClientACL on ClientACL.ClientID=Client.ClientID
+    left join Provider on Provider.ProvID=Client.clinicClinicID
+    left join okmis_config.xRaces on xRaces.ID=SUBSTRING_INDEX(Client.Race,'${multidel}',1)
+    left join ClientPrAuth on ClientPrAuth.ClientID=Client.ClientID
+    left join ClientPrAuthCDC on ClientPrAuthCDC.ClientPrAuthID=ClientPrAuth.ID
+    left join Insurance on Insurance.InsNumID=ClientPrAuth.InsuranceID
+    left join xInsurance on xInsurance.ID=Insurance.InsID
+  where ClientACL.ProvID='${ForProvID}'
+    ${ClinicSelection}
+    and ClientPrAuth.PAnumber is not null
+    and curdate() between ClientPrAuth.EffDate and ClientPrAuth.ExpDate
+    and (ClientPrAuthCDC.TransType=23 || ClientPrAuthCDC.TransType=42)
+  order by Provider.Name, Client.LName, Client.FName, ${table}.TestDate desc
+";
+warn qq|qPHQ=\n${qPHQ}|;
+  my $sPHQ = $dbh->prepare($qPHQ);
+  $sPHQ->execute() || $form->dberror("fixPHQ:: select ${table}");
+  while ( my $rPHQ = $sPHQ->fetchrow_hashref )
+  {
+    my $Client = "$rPHQ->{LName}, $rPHQ->{FName} ($rPHQ->{ClientID})";
+    my $Active = $rPHQ->{'Active'} == 1 ? 'yes' : 'no';
+    $sProvider->execute($rPHQ->{PrimaryProvID});
+    my $rProvider = $sProvider->fetchrow_hashref;
+    my $Primary = qq|$rProvider->{LName}, $rProvider->{FName} ($rProvider->{ProvID})|;
+  
+    my $AgencyID = MgrTree->getAgency($form,$rPHQ->{clinicClinicID});
+    $sProvider->execute($AgencyID);
+    my $rAgency = $sProvider->fetchrow_hashref;
+
+    my $ClientID = $rPHQ->{'ClientID'};
+    my $TestDate = $rPHQ->{'TestDate'};
+#    print qq|ClientID=$ClientID, TestDate=${TestDate}...\n|;
+    my $total = uCalc->calcTotal($form,$rPHQ,$pfx,$beg,$end);
+#warn qq|total=${total}|;
+    my $depression = $total >= $severe ? 'Severe<BR>mmediate initiation of pharmacotherapy and, if severe impairment or poor response to therapy, expedited referral to a mental health specialist for psychotherapy and/or collaborative management'
+                   : $total >= $max ? 'Moderately severe<BR>Active treatment with pharmacotherapy and/or psychotherapy'
+                   : $total >= $med ? 'Moderate<BR>Treatment plan, considering counseling, follow-up and/or pharmacotherapy'
+                   : $total >= $min ? 'Mild<BR>Watchful waiting; repeat PHQ-9 at follow-up'
+                   : $total >= 1 ? 'Minimal'
+                   : 'None';
+    my $count = uCalc->calcCount($form,$rPHQ,$pfx,$beg,$end,$isok);
+#warn qq|count=${count}|;
+    my $disorder = $count >= 5 ? 'Major Depressive'
+                 : $count >= 2 ? 'Other Depressive'
+                 : $count >= 1 ? 'Minimal'
+                 : 'None';
+    print qq|$rAgency->{'Name'}\t$rPHQ->{'Clinic'}\t$rPHQ->{'ClientID'}\t${Active}\t$rPHQ->{'FName'}\t$rPHQ->{'LName'}\t$rPHQ->{'Addr1'}\t$rPHQ->{'Addr2'}\t$rPHQ->{'City'}\t$rPHQ->{'ST'}\t$rPHQ->{'Zip'}\t$rPHQ->{'HmPh'}\t$rPHQ->{'WkPh'}\t$rPHQ->{'Alert'}\t$rPHQ->{'DOB'}\t$rPHQ->{'Gend'}\t$rPHQ->{'Race'}\t$rPHQ->{'SSN'}\t$rPHrPHQ->{'Age'}\t${Primary}\t${depression}\t${disorder}\t$rPHQ->{'TrID'} \n|;
+  }
+  $sPHQ->finish();
+  return()
+}
+############################################################################

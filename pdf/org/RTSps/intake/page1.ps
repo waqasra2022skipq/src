@@ -1,0 +1,200 @@
+% title box
+LM TMy 7.5 inches 40 box
+Header setfont
+TMy 20 sub (INTEGRIS BEHAVIORAL HEATH) cshow
+SubHeader setfont
+TMy 20 sub 14 sub (OAYS PROVIDER NETWORK) cshow
+
+(--- interviewer box ---) =
+LM TMy 54 sub 7.5 inches 52 box
+BodyCaps setfont
+
+LM 6 add TMy 54 sub 18 sub moveto
+(INTERVIEWER: ) =show
+0 -2 rmoveto 198 0 rlineto currentpoint stroke 2 add moveto
+(  FIRST APPOINTMENT DATE: ) show (DATEmo: ) =only currentpoint exch =space =
+24 uline
+(-) show (DATEday: ) =only currentpoint exch =space =
+24 uline
+(-) show (DATEyear: ) =only currentpoint exch =space =
+uline-eol
+
+LM 6 add TMy 54 sub 18 2 mul sub moveto
+(TIME: ) =show
+72 uline
+(  FACILITY / LOCATION: ) =show
+uline-eol
+
+(--- client info box ---) =
+LM TMy 120 sub 7.5 inches 162 box
+LM TMy 120 sub 24 sub moveto 7.5 inches 0 rlineto stroke
+Header setfont
+TMy 120 sub 18 sub (CLIENT INFORMATION) cshow
+BodyCaps setfont
+
+LM 6 add TMy 120 sub 42 sub moveto
+(PATIENT LAST NAME: ) =show
+134 uline
+(  FIRST NAME: ) =show
+118 uline
+(  MI: ) =show
+uline-eol
+
+TMy 120 sub 42 sub 15 sub
+(MALE) LM 6 add 2 index CBSize =boxOnLineR
+(FEMALE) LM 80 add 2 index CBSize =boxOnLineR
+LM 170 add 1 index moveto
+(SSN: ) =show
+48 uline
+(-) =show
+36 uline
+(-) =show
+48 uline
+LM 360 add 1 index moveto
+(DATE OF BIRTH: ) =show
+24 uline
+(-) =show
+24 uline
+(-) =show
+uline-eol
+
+/nl {
+  15 sub
+  LM 6 add 1 index moveto
+} bind def
+
+nl
+(ADDRESS: ) =show
+258 uline
+(  HOME PHONE: ) =show
+uline-eol
+
+nl
+(CITY: ) =show
+234 uline
+(  STATE: ) =show
+48 uline
+(  ZIP CODE: ) =show
+uline-eol
+
+nl
+(EMPLOYER: ) =show
+248 uline
+(  WORK PHONE: ) =show
+uline-eol
+
+nl
+(INSURANCE: ) =show
+150 uline
+(  INSURANCE NUMBER: ) =show
+uline-eol
+
+nl
+(REFERRAL SOURCE: ) =show
+uline-eol
+
+Body setfont
+15 sub
+LM 6 add exch moveto
+(What is the reason for contacting INTEGRIS Behavioral Health? ) =show
+uline-eol
+
+(--- primary insurance box ---) =
+TMy 296 sub
+LM 1 index 7.5 inches 162 box
+LM 1 index 24 sub moveto 7.5 inches 0 rlineto stroke
+Header setfont
+dup 18 sub
+(PRIMARY INSURANCE POLICY HOLDER) cshow
+Body setfont
+
+42 sub
+LM 6 add 1 index moveto
+(Same As Client) dup show =only (: ) =only
+CurrentX 12 add dup =space dup 2 index dup = CBSize boxOnLine
+20 add 1 index moveto
+BodyItalic setfont
+(\(If Different, Please Provide the Information Requested below\)) show
+Body setfont
+
+/insurance-box {
+nl
+(Last Name: ) =show
+206 uline
+(  First Name: ) =show
+142 uline
+(  MI: ) =show
+uline-eol
+
+nl
+(Male: ) =only
+LM 6 add dup =space 1 index dup = CBSize boxOnLine
+LM 6 8 6 add add add 1 index moveto (Male) show
+(Female: ) =only
+LM 86 add dup =space 1 index dup = CBSize boxOnLine
+LM 86 8 6 add add add 1 index moveto (Female) show
+LM 176 add 1 index moveto
+(SSN: ) =show
+48 uline
+(-) =show
+36 uline
+(-) =show
+48 uline
+LM 386 add 1 index moveto
+(Date of Birth: ) =show
+24 uline
+(-) =show
+24 uline
+(-) =show
+uline-eol
+
+nl
+LM 6 add 1 index moveto (Relationship To Client:) show
+(Parent) LM 134 add 2 index CBSize =boxOnLineR
+(Spouse) LM 212 add 2 index CBSize =boxOnLineR
+(Other:) LM 290 add 2 index CBSize =boxOnLineR
+LM 334 add 1 index moveto uline-eol
+
+nl
+LM 6 add 1 index moveto (Marital Status:) show
+(Single) LM 90 add 2 index CBSize =boxOnLineR
+(Married) LM 172 add 2 index CBSize =boxOnLineR
+(Divorced) LM 262 add 2 index CBSize =boxOnLineR
+(Widowed) LM 352 add 2 index CBSize =boxOnLineR
+
+nl
+LM 6 add 1 index moveto (Address: ) =show 290 uline
+(  Home Phone: ) =show uline-eol
+
+nl
+LM 6 add 1 index moveto (City: ) =show 260 uline
+(  State: ) =show 48 uline
+(  Zip Code: ) =show uline-eol
+
+nl
+LM 6 add exch moveto (Employer: ) =show 284 uline
+(  Work Phone: ) =show uline-eol
+} bind def
+
+insurance-box
+
+(--- secondary insurance box ---) =
+TMy 474 sub
+LM 1 index 7.5 inches 162 box
+LM 1 index 24 sub moveto 7.5 inches 0 rlineto stroke
+Header setfont
+dup 18 sub
+(SECONDARY INSURANCE POLICY HOLDER) cshow
+Body setfont
+
+42 sub
+LM 6 add 1 index moveto (Same As:) dup show =
+(Client) LM 68 add 2 index CBSize =boxOnLineR
+(Primary Policy Holder) LM 132 add 2 index CBSize =boxOnLineR
+LM 268 add 1 index moveto BodyItalic setfont
+(\(If Different, Please Provide the following Information\)) show
+Body setfont
+
+insurance-box
+
+showpage

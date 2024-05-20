@@ -1,0 +1,286 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use myForm;
+use myDBI;
+use DBA;
+use DBUtil;
+use Time::Local;
+my $DT = localtime();
+############################################################################
+# usage:
+#   MIPS226
+############################################################################
+my $form = myForm->new();
+my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $debug = $form->{'LOGINPROVID'} == 91 ? 0 : 0;
+if ( $debug ) { foreach my $f ( sort keys %{$form} ) { print "form-$f=$form->{$f}\n"; } }
+my $Type = $form->{'Type'};
+my $function_name = $Type =~ /yes/i ? 'TestYes'
+                  : $Type =~ /no/i ? 'TestNo'
+                  : $Type =~ /null/i ? 'TestNull'
+                  : myDBI->error("BAD FUNCTION Type: ${Type}");
+$form->{'FromDate'} = '2019-01-01';
+$form->{'ToDate'} = '2019-12-31';
+$form = DBUtil->setDates($form);
+my $DateRange = qq|from $form->{FromDateD} thru $form->{ToDateD}|;
+
+my $multidel = chr(253);
+my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+# join xInsurance needed for withSelection
+my $withSelection = DBA->withSelection($form,'and','Client.clinicClinicID','Treatment.ProvID','Treatment.ClientID','Treatment.TrID');
+my $Header = DBA->withSelectionHeader($form);
+print qq|Header: ${Header}\n| if ( $debug );
+$withSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+  $QID = qq|QID226|;
+  $TITLE = qq|Preventive Care and Screening: Tobacco Use: Screening and Cessation Intervention - National Quality Strategy Domain: Community/Population Health - Meaningful Measure Area: Prevention and Treatment of Opiod and Substance|;
+  $CTYPE = qq|MIPS CLINICAL QUALITY MEASURES (CQMS)|;
+  $MTYPE = qq|Process|;
+  $DESC = qq|Percentage of patients aged 18 years and older who were screened for tobacco use one or more times within 24 months AND who received tobacco cessation intervention if identified as a tobacco user|;
+  $INST = qq|This measure is to be submitted a minimum of once per performance period for patients seen during the performance period. This measure is intended to reflect the quality of services provided for preventive screening for tobacco use. For the purposes of the measure, the most recent denominator eligible encounter should be used to determine if the numerator action for each of the submission criteria was performed within the 24 month look back period from the date of the most recent denominator eligible encounter. It is anticipated that Merit-based Incentive Payment System (MIPS) eligible clinicians who perform the quality actions described in the measure based on the services provided will submit this measure.|;
+  my @FLDS = ('ClinicName:ClinicName','LName:LastName','FName:FirstName','ClientID:ClientID','DOB:DateOfBirth','Age:Age','Race:Race','pcount:ProbAddr','PrimaryProvider:PrimaryProvider');
+  my $numFLDS = scalar(@FLDS)-2;
+print qq|numFLDS=${numFLDS}\n| if ( $debug );
+# Wade emailed 12 years old 3/3 9:04 am, not 18
+  my $qrecord = qq|
+select Treatment.TrID,Treatment.ContLogDate,xSC.SCNum
+      ,Client.LName,Client.FName,Client.ClientID
+      ,Clinic.Name as ClinicName
+      ,CONCAT(Counselor.LName,', ',Counselor.FName) as PrimaryProvider
+      ,Client.DOB,TIMESTAMPDIFF(YEAR, Client.DOB, CURDATE()) AS Age
+      ,xRaces.Descr as Race
+      ,misICD10.ICD10
+      ,count(*) as pcount
+ from Treatment 
+  left join Client on Client.ClientID=Treatment.ClientID
+  left join Provider as Clinic on Clinic.ProvID=Client.clinicClinicID
+  left join Provider as Counselor on Counselor.ProvID=Client.ProvID
+  left join okmis_config.xRaces on xRaces.ID=SUBSTRING_INDEX(Client.Race,'${multidel}',1)
+  left join xSC on xSC.SCID=Treatment.SCID
+  left join xInsurance on xInsurance.ID=xSC.InsID
+  left join ClientNoteProblems on ClientNoteProblems.TrID=Treatment.TrID
+  left join okmis_config.misICD10 on misICD10.ID=ClientNoteProblems.UUID
+ where (Treatment.ContLogDate >= '$form->{FromDate}' and Treatment.ContLogDate<='$form->{ToDate}')
+   and (TIMESTAMPDIFF(YEAR, Client.DOB, Treatment.ContLogDate) > 12)
+#   and (xSC.SCNum='90791'
+#        or xSC.SCNum='90792'
+#        or xSC.SCNum='90832'
+#        or xSC.SCNum='90834'
+#        or xSC.SCNum='90837'
+#        or xSC.SCNum='90845'
+#        or xSC.SCNum='92002'
+#        or xSC.SCNum='92004'
+#        or xSC.SCNum='92012'
+#        or xSC.SCNum='92014'
+#        or xSC.SCNum='92521'
+#        or xSC.SCNum='92522'
+#        or xSC.SCNum='92523'
+#        or xSC.SCNum='92524'
+#        or xSC.SCNum='92540'
+#        or xSC.SCNum='92557'
+#        or xSC.SCNum='92625'
+#        or xSC.SCNum='96150'
+#        or xSC.SCNum='96151'
+#        or xSC.SCNum='96152'
+#        or xSC.SCNum='97165'
+#        or xSC.SCNum='97166'
+#        or xSC.SCNum='97167'
+#        or xSC.SCNum='97168'
+#        or xSC.SCNum='99201'
+#        or xSC.SCNum='99202'
+#        or xSC.SCNum='99203'
+#        or xSC.SCNum='99204'
+#        or xSC.SCNum='99205'
+#        or xSC.SCNum='99212'
+#        or xSC.SCNum='99213'
+#        or xSC.SCNum='99214'
+#        or xSC.SCNum='99215'
+#        or xSC.SCNum='99341'
+#        or xSC.SCNum='99342'
+#        or xSC.SCNum='99343'
+#        or xSC.SCNum='99344'
+#        or xSC.SCNum='99345'
+#        or xSC.SCNum='99347'
+#        or xSC.SCNum='99348'
+#        or xSC.SCNum='99349'
+#        or xSC.SCNum='99350'
+#
+#        or xSC.SCNum LIKE '99385%'
+#        or xSC.SCNum LIKE '99386%'
+#        or xSC.SCNum LIKE '99387%'
+#        or xSC.SCNum LIKE '99395%'
+#        or xSC.SCNum LIKE '99396%'
+#        or xSC.SCNum LIKE '99397%'
+#        or xSC.SCNum LIKE '99401%'
+#        or xSC.SCNum LIKE '99402%'
+#        or xSC.SCNum LIKE '99403%'
+#        or xSC.SCNum LIKE '99404%'
+#        or xSC.SCNum LIKE '99411%'
+#        or xSC.SCNum LIKE '99412%'
+#        or xSC.SCNum LIKE '99429%'
+#        or xSC.SCNum = 'G0438'
+#        or xSC.SCNum = 'G0439'
+#       )
+  ${withSelection}
+#   and Client.ClientID=43009
+ group by Client.LName,Client.FName,Client.ClientID
+|;
+# group by Client.LName,Client.FName,Client.ClientID,xSC.SCNum,misICD10.ICD10
+# KLS
+print qq|qrecord=\n${qrecord}\n| if ( $debug );
+my $sGCode1 = $dbh->prepare("
+select Treatment.TrID,count(*) as count 
+ from Treatment 
+  left join xSC on xSC.SCID=Treatment.SCID 
+ where Treatment.ClientID=? 
+   and xSC.SCNum IN ('90791','90792','90832','90834','90837','90845','92002','92004','92012','92014','92521','92522','92523','92524','92540','92557','92625','96150','96151','96152','97165','97166','97167','97168','99201','99202','99203','99204','99205','99212','99213','99214','99215','99341','99342','99343','99344','99345','99347','99348','99349','99350')
+ group by Treatment.ClientID
+");
+my $sGCode2 = $dbh->prepare("
+select Treatment.TrID,count(*) as count 
+ from Treatment 
+  left join xSC on xSC.SCID=Treatment.SCID 
+ where Treatment.ClientID=? 
+   and (xSC.SCNum LIKE '99385%'
+        or xSC.SCNum LIKE '99386%'
+        or xSC.SCNum LIKE '99387%'
+        or xSC.SCNum LIKE '99395%'
+        or xSC.SCNum LIKE '99396%'
+        or xSC.SCNum LIKE '99397%'
+        or xSC.SCNum LIKE '99401%'
+        or xSC.SCNum LIKE '99402%'
+        or xSC.SCNum LIKE '99403%'
+        or xSC.SCNum LIKE '99404%'
+        or xSC.SCNum LIKE '99411%'
+        or xSC.SCNum LIKE '99412%'
+        or xSC.SCNum LIKE '99429%'
+        or xSC.SCNum = 'G0438'
+        or xSC.SCNum = 'G0439'
+       )
+ group by Treatment.ClientID
+");
+my $sSmokingStatus = $dbh->prepare("select SmokingStatus from ClientSATobacco where ClientID=?");
+my $sRiskAssessment = $dbh->prepare("select Assessment from ClientRiskAssessment where ClientID=?");
+my $sClientPrAuthCDC = $dbh->prepare("select TobaccoUse 
+ from ClientPrAuthCDC 
+  where ClientID=?
+    and (TransDate >= '$form->{FromDate}' and TransDate<='$form->{ToDate}')
+");
+my ($rcount,$total) = (0,0);
+print qq|${DT}\n${QID} ${TITLE} ${DateRange} Type=${Type} ${Header}\n|;
+foreach my $f ( @FLDS ) { my ($fld,$hdr) = split(':',$f); print qq|${hdr}\t|; }
+print qq|SmokingStatus\tRiskAssessment\tTobaccoUse\t|;
+print qq|\n|;
+my $srecord = $dbh->prepare($qrecord);
+$srecord->execute();
+while (my $rrecord = $srecord->fetchrow_hashref)
+{ 
+#  $sGCode1->execute($rrecord->{'ClientID'});
+#  my $rGCode1 = $sGCode1->fetchrow_hashref;
+#  $sGCode2->execute($rrecord->{'ClientID'});
+#  my $rGCode2 = $sGCode2->fetchrow_hashref;
+#print qq|\nFOUND: $rrecord->{'ClientID'}, count=$rGCode1->{'count'}/$rGCode2->{'count'}\n|;
+#  next unless ( $rGCode1->{'count'} > 1 || $rGCode2->{'count'} > 0 );       # must have at least 2 encounters.
+#print qq|PASSED: $rrecord->{'ClientID'}, count=$rGCode1->{'count'}/$rGCode2->{'count'}\n|;
+  $sSmokingStatus->execute($rrecord->{'ClientID'});
+  my $rSmokingStatus = $sSmokingStatus->fetchrow_hashref;
+  $sRiskAssessment->execute($rrecord->{'ClientID'});
+  my $rRiskAssessment = $sRiskAssessment->fetchrow_hashref;
+  $sClientPrAuthCDC->execute($rrecord->{'ClientID'});
+  my $rClientPrAuthCDC = $sClientPrAuthCDC->fetchrow_hashref;
+print qq|STATUS: $rSmokingStatus->{'SmokingStatus'}\n| if ( $debug );
+print qq|ASSESSMENT: $rRiskAssessment->{'Assessment'}\n| if ( $debug );
+print qq|USE: $rrClientPrAuthCDC->{'TobaccoUse'}\n| if ( $debug );
+  if ( main->$function_name($rSmokingStatus,$rRiskAssessment,$rClientPrAuthCDC) )
+  { 
+    $rcount++;
+    foreach my $f ( @FLDS ) { my ($fld,$hdr) = split(':',$f); print qq|$rrecord->{$fld}\t|; }
+    print DBA->getxref($form,'xSmokingStatus',$rSmokingStatus->{'SmokingStatus'},'Descr')."\t";
+    print DBA->getxref($form,'xRiskAssessment',$rRiskAssessment->{'Assessment'},'ConceptCode ConceptName')."\t";
+    print $rClientPrAuthCDC->{'TobaccoUse'}."\t";
+
+    print qq|\n|;
+    $total += $rrecord->{'pcount'};
+  }
+}
+print qq|${rcount}|."\t" x $numFLDS.qq|${total}\n|;
+$srecord->finish();
+$sGCode1->finish();
+$sGCode2->finish();
+$sSmokingStatus->finish();
+$sRiskAssessment->finish();
+$sClientPrAuthCDC->finish();
+
+myDBI->cleanup();
+exit;
+############################################################################
+# ClientSATobacco-SmokingStatus
+# 1             Current every day smoker.
+# 2             Current some day smoker.
+# 3             Former smoker.
+# 4             Never smoker.
+# 5             Smoker, current status unknown.
+# 6             Unknown if ever smoked.
+# 7             Heavy tobacco smoker.
+# 8             Light tobacco smoker.
+# RiskAssessment-Assessment
+# LOINC_39240-7 Tobacco use CPHS
+# LOINC_68535-4 Have you used tobacco in the last 30 days [SAMHSA]
+# LOINC_68536-2 Have you used smokeless tobacco product in the last 30 days [SAMHSA]
+# LOINC_72166-2 Tobacco smoking status NHIS
+# LOINC_73831-0 Adolescent depression screening assessment
+# LOINC_73832-8 Adult depression screening assessment
+sub TestYes
+{
+  my ($self,$rTobacco,$rRisk,$rCDC) = @_;
+  if ( $rTobacco->{'SmokingStatus'} eq '1'                   # Current every day smoker. Yes
+    || $rTobacco->{'SmokingStatus'} eq '2'                   # Current some day smoker. Yes
+    || $rTobacco->{'SmokingStatus'} eq '3'                   # Former smoker. Yes
+    || $rTobacco->{'SmokingStatus'} eq '7'                   # Heavy tobacco smoker. Yes
+    || $rTobacco->{'SmokingStatus'} eq '8'                   # Light tobacco smoker. Yes
+     )
+  { return(1); }
+  if ( $rRisk->{'Assessment'} eq 'LOINC_39240-7'             # Tobacco use CPHS Yes
+    || $rRisk->{'Assessment'} eq 'LOINC_68535-4'             # Have you used tobacco in the last 30 days [SAMHSA] Yes
+    || $rRisk->{'Assessment'} eq 'LOINC_68536-2'             # Have you used smokeless tobacco product in the last 30 days [SAMHSA] Yes
+    || $rRisk->{'Assessment'} eq 'LOINC_72166-2'             # Tobacco smoking status NHIS Yes
+     )
+  { return(1); }
+  if ( $rCDC->{'TobaccoUse'} > 0 )                           # How many times per day do you use nicotine?  
+  { return(1); }
+  return(0);
+}
+sub TestNo
+{
+  my ($self,$rTobacco,$rRisk,$rCDC) = @_;
+print qq|\nENTER TestNo\n| if ( $debug );
+print qq|SmokingStatus=$rTobacco->{SmokingStatus}\n| if ( $debug );
+  if ( $rTobacco->{'SmokingStatus'} eq '4'                   # Never smoker. No
+     )
+  { return(1); }
+print qq|return?:\n| if ( $debug );
+#  if ( $rRisk->{'Assessment'} eq ''                         # all values Yes or Null
+print qq|TobaccoUse=$rCDC->{TobaccoUse}\n| if ( $debug );
+print qq|returns a 1:\n | if ( $rCDC->{'TobaccoUse'} eq '0' );
+  if ( $rCDC->{'TobaccoUse'} eq '00' )                          # How many times per day do you use nicotine?  
+  { return(1); }
+print qq|return0:\n| if ( $debug );
+  return(0);
+}
+sub TestNull
+{
+  my ($self,$rTobacco,$rRisk,$rCDC) = @_;
+  if ( $rTobacco->{'SmokingStatus'} eq '' && $rRisk->{'Assessment'} eq '' && $rCDC->{'TobaccoUse'} eq '' )
+  { return(1); }
+  if ( $rTobacco->{'SmokingStatus'} eq '5'                   # Smoker, current status unknown. Null
+    || $rTobacco->{'SmokingStatus'} eq '6'                   # Unknown if ever smoked. Null
+     )
+  { return(1); }
+  if ( $rRisk->{'Assessment'} eq 'LOINC_73831-0'             # Adolescent depression screening assessment Null
+    || $rRisk->{'Assessment'} eq 'LOINC_73832-8'             # Adult depression screening assessment Null
+     )
+  { return(1); }
+  if ( $rCDC->{'TobaccoUse'} eq '00' )
+  { return(1); }
+  return(0);
+}

@@ -1,0 +1,1 @@
+find ../../core6 -type f -newer copied -exec ls -la {} \;

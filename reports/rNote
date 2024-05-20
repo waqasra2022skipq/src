@@ -1,0 +1,11 @@
+#select count(*),xSC.SCNum,xSC.SCName
+select Treatment.ClientID,Treatment.TrID,xSC.SCNum,xSC.SCName,ClientVitalSigns.BMI
+#select Treatment.ClientID
+ from Treatment 
+  left join xSC on xSC.SCID=Treatment.SCID
+  left join ClientVitalSigns on ClientVitalSigns.ClientID=Treatment.ClientID and ClientVitalSigns.VDate=Treatment.ContLogDate
+# where xSC.SCNum='G0444'
+ where xSC.SCNum like 'G%' 
+ and ClientVitalSigns.BMI is not null
+# group by Treatment.ClientID
+# group by xSC.SCNum,xSC.SCID

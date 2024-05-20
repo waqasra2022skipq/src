@@ -1,0 +1,9 @@
+  # Get all TrPlan records with this clientid.
+  $sTrPlan = &DBIUtils::prepsth("select * from TrPlan where ClientID=?");
+  $sTrPlan->execute($ClientID);
+  while ($rTrPlan = $sTrPlan->fetchrow_hashref)
+  {
+    $TrPlanID = $rTrPlan->{TrPlanID};
+    $EffDate=$rTrPlan->{TrPlanEffDate};
+    $ExpDate=$rTrPlan->{TrPlanExpDate};
+  }

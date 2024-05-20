@@ -1,0 +1,38 @@
+#!/bin/bash
+# kls, daily 11/4/08
+# ------------------------------------
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   print "\nServices not installed!"
+   exit 1
+fi
+# ------------------------------------
+usage()
+{
+  echo ""
+  echo "Usage: $0 sql_file_to_execute"
+  echo ""
+  exit
+}
+if [ $# -eq 0 ]; then usage; fi
+# ------------------------------------
+sqlfile=$1; shift;
+if [ ! -f ${sqlfile} ]; then
+   print "\nexecue file '${sqlfile}' not found!\n"
+   exit 1
+fi
+# ------------------------------------
+DBS=$(${MISBIN}/dbs live)
+  print "\n======================================"
+  print "${CMD} Started: $(date)"
+# ------------------------------------
+# save ALL sql files
+  for DBNAME in $DBS; do
+    print "Load SQL ${DBNAME} db pwd=$(pwd)..."
+    ${DBBIN}/mysql ${DBNAME} < ${sqlfile}
+  done
+# ------------------------------------
+  print "\n${CMD} Complete: $(date)"
+  print "======================================\n"
+# ------------------------------------

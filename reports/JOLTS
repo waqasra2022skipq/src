@@ -1,0 +1,64 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use  DBI;
+use  DBForm;
+use  DBA;
+use Time::Local;
+my $DT = localtime();
+
+############################################################################
+my $form = DBForm->new;
+my $dbh = $form->dbconnect;
+#foreach my $f ( sort keys %{$form} ) { warn "form-$f=$form->{$f}\n"; }
+my $xref='Clinics';
+  $s=$dbh->prepare("select * from Provider where Type=3");
+  $s->execute();
+  while (my $r = $s->fetchrow_hashref) { $$xref{$r->{ProvID}} = $r; }
+$xref='xInsurance';
+  $s=$dbh->prepare("select * from ${xref}");
+  $s->execute();
+  while (my $r = $s->fetchrow_hashref) { $$xref{$r->{ID}} = $r; }
+$s->finish;
+
+############################################################################
+my $sClientLegal = $dbh->prepare("select * from ClientLegal where ClientID=? ");
+my $sInsurance = $dbh->prepare("select * from Insurance where ClientID=? and Priority=1 order by InsNumEffDate desc");
+my $sInsurance2 = $dbh->prepare("select * from Insurance where ClientID=? and Priority=2 order by InsNumEffDate desc");
+
+############################################################################
+print qq|${DT}\nClient with JOLTS Number Report\n|;
+print "ClinicName\tClient\tJOLTS\tPrimary Insurance\tSecondary Insurance\n";
+my $ProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+$ClinicSelection = DBA->getClinicSelection($form,$ProvID,'Client.clinicClinicID');
+my $qClient = qq|
+select Client.* from Client 
+    left join Provider on Provider.ProvID=Client.clinicClinicID
+  where Client.Active=1 ${ClinicSelection} 
+  order by Provider.Name, Client.LName, Client.FName
+|;
+#warn qq|qClient=$qClient\n|;
+my $sClient = $dbh->prepare($qClient);
+$sClient->execute() || $form->dberror($qClient);
+while ( my $rClient = $sClient->fetchrow_hashref )
+{
+
+  $sClientLegal->execute($rClient->{ClientID}) || $form->dberror("select ClientLegal");
+  my $rClientLegal = $sClientLegal->fetchrow_hashref;
+  if ( $rClientLegal->{'JOLTS'} ne '' )
+  {
+    my $ClinicName = $Clinics{$rClient->{clinicClinicID}}{Name};
+    my ($InsID, $InsID2) = ('NONE','NONE');
+    $sInsurance->execute($rClient->{ClientID}) || $form->dberror("select Insurance");
+    if ( $rInsurance = $sInsurance->fetchrow_hashref ) 
+    { $InsID = $xInsurance{$rInsurance->{InsID}}{Name}; }
+    $sInsurance2->execute($rClient->{ClientID}) || $form->dberror("select Insurance 2");
+    if ( $rInsurance2 = $sInsurance2->fetchrow_hashref ) 
+    { $InsID2 = $xInsurance{$rInsurance2->{InsID}}{Name}; }
+    print qq|${ClinicName}\t$rClient->{FName} $rClient->{LName} ($rClient->{ClientID})\t$rClientLegal->{'JOLTS'}\t$InsID\t$InsID2\n|;
+  }
+}
+$sInsurance2->finish();
+$sInsurance->finish();
+$sClientLegal->finish();
+$sClient->finish();
+############################################################################

@@ -1,0 +1,24 @@
+#!/bin/bash
+DB=$1
+if [ -d /var/lib/mysql/${DB} ]; then
+  cd /var/lib/mysql/${DB}
+  pwd
+else
+  echo "unknown database"
+  exit
+fi
+mode=$2
+File=$3
+if [ "${mode}" = "check" ]; then
+  echo "check ${DB}..."
+  myisamchk --silent --fast *.MYI
+elif [ "${mode}" = "fix" ]; then
+  echo "repair ${File}..."
+  if [ -f ${File} ]; then
+    myisamchk --recover ${File}
+  else
+    echo "unknown file"
+  fi
+else
+  echo "unknown command"
+fi

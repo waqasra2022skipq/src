@@ -1,0 +1,221 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use myForm;
+use myDBI;
+use DBA;
+use DBUtil;
+use Time::Local;
+my $DT = localtime();
+############################################################################
+# usage:
+#   MIPS 
+############################################################################
+my $form = myForm->new();
+my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $debug = $form->{'LOGINPROVID'} == 91 ? 0 : 0;
+if ( $debug ) { foreach my $f ( sort keys %{$form} ) { print "form-$f=$form->{$f}\n"; } }
+my $Type = $form->{'Type'};
+$form->{'FromDate'} = '2019-01-01';
+$form->{'ToDate'} = '2019-12-31';
+$form = DBUtil->setDates($form);
+my $DateRange = qq|from $form->{FromDateD} thru $form->{ToDateD}|;
+
+my $multidel = chr(253);
+my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+# join xInsurance needed for withSelection
+my $withSelection = DBA->withSelection($form,'and','Treatment.ClinicID','Treatment.ProvID','Treatment.ClientID','Treatment.TrID');
+my $Header = DBA->withSelectionHeader($form);
+#warn qq|Header: ${Header}\n|;
+$withSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+  $QID = qq|QID130|;
+  $TITLE = qq|Documentation of Current Medications in the Medical Record - National Quality Strategy Domain: Patient Safety - Meaningful Measure Area: Medication Management|;
+  $CTYPE = qq|MIPS CLINICAL QUALITY MEASURES (CQMS)|;
+  $MTYPE = qq|Process - High Priority|;
+  $DESC = qq|Percentage of visits for patients aged 18 years and older for which the MIPS eligible professional or MIPS eligible clinician attests to documenting a list of current medications using all immediate resources available on the date of the encounter. This list must include ALL known prescriptions, over-the-counters, herbals, and vitamin/mineral/dietary (nutritional) supplements AND must contain the medications name, dosage, frequency and route of administration|;
+  $INST = qq|This measure is to be submitted at each denominator eligible visit during the 12 month performance period. Merit-based Incentive Payment System (MIPS) eligible clinicians meet the intent of this measure by making their best effort to document a current, complete and accurate medication list during each encounter. There is no diagnosis associated with this measure. This measure may be submitted by MIPS eligible clinicians who perform the quality actions described in the measure based on the services provided and the measure-specific denominator coding.|;
+  my @FLDS = ('ClinicName:ClinicName','LName:LastName','FName:FirstName','ClientID:ClientID','DOB:DateOfBirth','Age:Age','Race:Race','pcount:ProbAddr','PrimaryProvider:PrimaryProvider');
+  my $numFLDS = scalar(@FLDS)-3;
+print qq|numFLDS=${numFLDS}\n| if ( $debug );
+  my $qrecord = qq|
+select Treatment.TrID,Treatment.ContLogDate,Treatment.ClinicID,xSC.SCNum
+      ,Client.LName,Client.FName,Client.ClientID
+      ,Clinic.Name as ClinicName
+      ,CONCAT(Counselor.LName,', ',Counselor.FName) as PrimaryProvider
+      ,Client.DOB,TIMESTAMPDIFF(YEAR, Client.DOB, CURDATE()) AS Age
+      ,xRaces.Descr as Race
+      ,misICD10.ICD10
+      ,count(*) as pcount
+ from Treatment 
+  left join Client on Client.ClientID=Treatment.ClientID
+  left join Provider as Clinic on Clinic.ProvID=Client.clinicClinicID
+  left join Provider as Counselor on Counselor.ProvID=Client.ProvID
+  left join okmis_config.xRaces on xRaces.ID=SUBSTRING_INDEX(Client.Race,'${multidel}',1)
+  left join xSC on xSC.SCID=Treatment.SCID
+  left join xInsurance on xInsurance.ID=xSC.InsID
+  left join ClientNoteProblems on ClientNoteProblems.TrID=Treatment.TrID
+  left join okmis_config.misICD10 on misICD10.ID=ClientNoteProblems.UUID
+ where Client.ClientID>100
+   and (Treatment.ContLogDate >= '$form->{FromDate}' and Treatment.ContLogDate<='$form->{ToDate}')
+   and (TIMESTAMPDIFF(YEAR, Client.DOB, Treatment.ContLogDate) >= 18)
+   and (xSC.SCNum='59400'
+        or xSC.SCNum='59510'
+        or xSC.SCNum='59610'
+        or xSC.SCNum='59618'
+        or xSC.SCNum='90791'
+        or xSC.SCNum='90792'
+        or xSC.SCNum='90832'
+        or xSC.SCNum='90834'
+        or xSC.SCNum='90837'
+        or xSC.SCNum='90839'
+        or xSC.SCNum='92002'
+        or xSC.SCNum='92004'
+        or xSC.SCNum='92012'
+        or xSC.SCNum='92014'
+        or xSC.SCNum='92507'
+        or xSC.SCNum='92508'
+        or xSC.SCNum='92526'
+        or xSC.SCNum='92537'
+        or xSC.SCNum='92538'
+        or xSC.SCNum='92540'
+        or xSC.SCNum='92541'
+        or xSC.SCNum='92542'
+        or xSC.SCNum='92544'
+        or xSC.SCNum='92545'
+        or xSC.SCNum='92547'
+        or xSC.SCNum='92548'
+        or xSC.SCNum='92550'
+        or xSC.SCNum='92557'
+        or xSC.SCNum='92567'
+        or xSC.SCNum='92568'
+        or xSC.SCNum='92570'
+        or xSC.SCNum='92585'
+        or xSC.SCNum='92588'
+        or xSC.SCNum='92626'
+        or xSC.SCNum='96116'
+        or xSC.SCNum='96121'
+        or xSC.SCNum='96130'
+        or xSC.SCNum='96131'
+        or xSC.SCNum='96132'
+        or xSC.SCNum='96133'
+        or xSC.SCNum='96136'
+        or xSC.SCNum='96137'
+        or xSC.SCNum='96138'
+        or xSC.SCNum='96139'
+        or xSC.SCNum='96146'
+        or xSC.SCNum='96150'
+        or xSC.SCNum='96151'
+        or xSC.SCNum='96152'
+        or xSC.SCNum LIKE '97127%'
+        or xSC.SCNum='97161'
+        or xSC.SCNum='97162'
+        or xSC.SCNum='97163'
+        or xSC.SCNum='97164'
+        or xSC.SCNum='97165'
+        or xSC.SCNum='97166'
+        or xSC.SCNum='97167'
+        or xSC.SCNum='97168'
+        or xSC.SCNum='97802'
+        or xSC.SCNum='97803'
+        or xSC.SCNum='97804'
+        or xSC.SCNum='98960'
+        or xSC.SCNum='98961'
+        or xSC.SCNum='98962'
+        or xSC.SCNum='99201'
+        or xSC.SCNum='99202'
+        or xSC.SCNum='99203'
+        or xSC.SCNum='99204'
+        or xSC.SCNum='99205'
+        or xSC.SCNum='99212'
+        or xSC.SCNum='99213'
+        or xSC.SCNum='99214'
+        or xSC.SCNum='99215'
+        or xSC.SCNum='99221'
+        or xSC.SCNum='99222'
+        or xSC.SCNum='99223'
+        or xSC.SCNum='99236'
+        or xSC.SCNum='99304'
+        or xSC.SCNum='99305'
+        or xSC.SCNum='99306'
+        or xSC.SCNum='99307'
+        or xSC.SCNum='99308'
+        or xSC.SCNum='99309'
+        or xSC.SCNum='99310'
+        or xSC.SCNum='99315'
+        or xSC.SCNum='99316'
+        or xSC.SCNum='99318'
+        or xSC.SCNum='99324'
+        or xSC.SCNum='99325'
+        or xSC.SCNum='99326'
+        or xSC.SCNum='99327'
+        or xSC.SCNum='99328'
+        or xSC.SCNum='99334'
+        or xSC.SCNum='99335'
+        or xSC.SCNum='99336'
+        or xSC.SCNum='99337'
+        or xSC.SCNum='99339'
+        or xSC.SCNum='99340'
+        or xSC.SCNum='99341'
+        or xSC.SCNum='99342'
+        or xSC.SCNum='99343'
+        or xSC.SCNum='99344'
+        or xSC.SCNum='99345'
+        or xSC.SCNum='99347'
+        or xSC.SCNum='99348'
+        or xSC.SCNum='99349'
+        or xSC.SCNum='99350'
+        or xSC.SCNum='99495'
+        or xSC.SCNum='99496'
+        or xSC.SCNum='99281'
+        or xSC.SCNum='99282'
+        or xSC.SCNum='99283'
+        or xSC.SCNum='99284'
+        or xSC.SCNum='99285'
+        or xSC.SCNum LIKE '99385%'
+        or xSC.SCNum LIKE '99386%'
+        or xSC.SCNum LIKE '99387%'
+        or xSC.SCNum LIKE '99395%'
+        or xSC.SCNum LIKE '99396%'
+        or xSC.SCNum LIKE '99397%'
+        or xSC.SCNum='G0101'
+        or xSC.SCNum='G0108'
+        or xSC.SCNum='G0270'
+        or xSC.SCNum='G0402'
+        or xSC.SCNum='G0438'
+        or xSC.SCNum='G0439'
+        or xSC.SCNum='G0515'
+       )
+  ${withSelection}
+ group by Client.LName,Client.FName,Client.ClientID
+|;
+# group by Client.LName,Client.FName,Client.ClientID,xSC.SCNum,misICD10.ICD10
+#warn qq|qrecord=\n${qrecord}\n|;
+my ($Denominator,$Numerator,$total) = (0,0,0);
+print qq|${DT}\n${QID} ${TITLE} ${DateRange} ${Header}\n|;
+foreach my $f ( @FLDS ) { my ($fld,$hdr) = split(':',$f); print qq|${hdr}\t|; }
+print qq|\n|;
+my $sGCode = $dbh->prepare("select TrID 
+ from Treatment left join xSC on xSC.SCID=Treatment.SCID 
+ where Treatment.ClientID=? 
+   and (Treatment.ContLogDate >= '$form->{FromDate}' and Treatment.ContLogDate<='$form->{ToDate}')
+and xSC.SCNum IN ('G8427','G8428','G8430')");
+my $srecord = $dbh->prepare($qrecord);
+$srecord->execute();
+while (my $rrecord = $srecord->fetchrow_hashref)
+{ 
+  $Denominator++;
+  $sGCode->execute($rrecord->{'ClientID'});
+  if (my $rGCode = $sGCode->fetchrow_hashref)
+  { $Numerator++; }
+  foreach my $f ( @FLDS ) { my ($fld,$hdr) = split(':',$f); print qq|$rrecord->{$fld}\t|; }
+  print qq|\n|;
+  $total += $rrecord->{'pcount'};
+}
+print qq|Numerator\t${Numerator}|."\t" x $numFLDS.qq|${total}\n|;
+print qq|Denominator\t${Denominator}\n|;
+$srecord->finish();
+$sGCode->finish();
+
+myDBI->cleanup();
+exit;
+############################################################################

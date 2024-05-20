@@ -1,0 +1,44 @@
+#!/bin/bash
+# ------------------------------------
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   echo 
+   echo Services not installed!
+   echo 
+   exit 1
+fi
+# ------------------------------------
+Usage()
+{
+   echo $*
+   echo
+   echo "Usage: ${CMD} database table id1 id2"
+   echo
+   exit
+}
+# ------------------------------------
+DB=$1; shift;
+if [ -z "${DB}" ]; then Usage "No database or DBNAME!"; fi
+table=$1; shift;
+if [ -z "${table}" ]; then Usage "No table!"; fi
+id1=$1; shift;
+if [ -z "${id1}" ]; then Usage "No id1!"; fi
+id2=$1; shift;
+if [ -z "${id2}" ]; then Usage "No id2!"; fi
+kID=$1; shift;
+if [ -z "${kID}" ]; then kID=ID; fi
+if [ -z "${kID}" ]; then Usage "MISSING kID!"; fi
+
+  echo 
+  echo "======================================"
+  echo "${CMD} Started: $(date)"
+  echo "database=${DB}"
+  ${SRCSBIN}/db ${DB} select \* from ${table} where ${kID}=${id1} \\G > t1
+  ${SRCSBIN}/db ${DB} select \* from ${table} where ${kID}=${id2} \\G > t2
+  /usr/bin/sdiff t1 t2 | grep "|" | grep -v "FormID:"
+  /usr/bin/rm t1 t2
+  echo "${CMD} Complete: $(date)"
+  echo "======================================"
+
+exit

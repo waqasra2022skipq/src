@@ -1,0 +1,195 @@
+
+/* Overall window */
+.winBox {
+	position:absolute;
+	width: 18em;
+	height:auto;
+	font-size:90%;
+	color:#000;
+	visibility:hidden;
+	cursor:default;
+}
+.winDynamicBox {
+	position:absolute;
+	font-size:90%;
+	color:#000;
+	visibility:hidden;
+	cursor:default;
+	height:auto;
+}
+/* Title Bar */
+.winBar {
+	font-size: 95%;
+	font-weight:bold;
+	color:#FFF;
+	background-color:#310000; 
+/* RT/RCG colours */  
+/* background-color:#718FC5; 
+/* AY colours */
+	padding: 0.25em 15px 0.25em 0.25em;  
+/* border: 1px solid #FFF; 
+/* AY Colours */
+	margin: 0;
+	cursor:move;
+}
+/* News page renders */
+body#news .winBar { background-color: #003366; }
+/* Navigation */
+.winFooterBar {
+	font-size:100%;
+	font-weight:bold;
+	color:#FFF;
+	background-color:#FFF;
+}
+.winDynamicFooterBar {
+	font-size:100%;
+	font-weight:bold;
+	color:#FFF;
+	background-color:#AAA;
+	margin: 0;
+	padding: 2px 0 0 0;
+	text-align:right;  
+/* border: 1px solid #FFF; 
+/* AY Colours */
+}
+/* Content Window */
+.winContent {
+	font-size: 95%;
+	padding: 4px;
+	background-color: #FFFFEB; 
+/* RT/RCG Colours */
+	border: 1px solid #310000; 
+/* RT/RCG Colours */  
+/* background-color: #F0F5FA; 
+/* AY Colours */  
+/* border: 1px solid #718FC5; 
+/* AY Colours */
+	border-top: none;
+	filter:alpha(opacity=98);
+	-moz-opacity:.98;
+	opacity:.98; 
+/* translucency effect (98%) */
+	overflow:auto;
+	max-height:125px;
+	_height:125px;
+}
+/* Dynamic Content Window */
+.winDynamicContent {
+	font-size: 95%;
+	padding: 4px;
+	background-color: #FFFFEB;  /* RT/RCG Colours */
+	border: 1px solid #310000;  /* RT/RCG Colours */  
+/* background-color: #F0F5FA;  /* AY Colours */  
+/* border: 1px solid #718FC5;  /* AY Colours */
+	border-top: none;
+	filter:alpha(opacity=98);
+	-moz-opacity:.98;
+	opacity:.98;  /* translucency effect (98%) */
+	overflow:auto;
+}
+/* News page Renders */
+body#news .winDynamicContent { background-color: #fafdfe; border: 1px solid #003366; }
+/* Close Button */
+.winBtn {
+	float: right;
+	margin: 4px 4px 0 0;
+	padding: 0 2px 0.5px 2px;
+	border: 1px solid #FFF;
+	color: #FFF;
+	font-size: 95%;
+	line-height:normal;  
+/* background-color: #718FC5; 
+/* AY Colours */
+	background-color: #444; 
+/* RCG/RT Colours */
+}
+.winBtn:hover {
+	color: #000;
+	background-color: #F0F5FA;
+}
+/* Nav Buttons */
+.slicknav {
+	padding: 0 0 0 28px;
+	margin: 0;
+	background-color: #FFFFEB; 
+/* RCG/RT Colours */
+	border-right: 1px solid #444; 
+/* RCG/RT Colours */
+	border-left: 1px solid #444; 
+/* RCG/RT Colours */	
+/* background-color: #F0F5FA; 
+/* AY Colours */	
+/* border-right: 1px solid #718FC5; 
+/* AY Colours */	
+/* border-left: 1px solid #718FC5; 
+/* AY Colours */
+}
+.winBtnInvert {
+	display: inline;
+	font-size: 60%;
+	color:#AAA;
+	background:#FFF;
+	padding: 0 10px;
+	margin: -1px 0 0 3px;
+	border: 1px solid #DDD;
+	cursor:pointer;
+}
+.winBtnInvert:hover {
+	color:#FFF;
+	border:1px solid #FFF;
+	background:#310000;
+}
+.winIMGContent {
+	padding: 4px;
+	padding-right: 0;
+	margin-right: 4px;
+}
+.winContent p {
+	padding: 2px 6px 4px 4px;
+}
+img {
+	border: 0;
+}
+/* IMAGE */
+.winIMGContent p {
+	clear: left;
+	padding: 4px 10px 0 0px;
+	line-height:1.5em;
+	font-size: 85%;
+}
+.winIMGContent .source {
+	font-size: 85%;
+	font-style: italic;
+	line-height: normal;
+}
+.winIMGBox {
+	position:absolute;
+	width:fixed;
+	visibility:hidden;
+	filter:alpha(opacity=98);
+	-moz-opacity:.98;
+	opacity:.98; 
+/* translucency effect (98%) */
+	background-color: #FFFFEB; 
+/* RT/RCG Colours */
+	border: 1px solid #310000; 
+/* RT/RCG Colours */  
+/* background-color: #F0F5FA; 
+/* AY Colours */  
+/* border: 1px solid #718FC5; 
+/* AY Colours */
+	cursor:default;
+}
+/* UNUSED IN CURRENT IMPLEMENTATION */
+.winBtnResize {
+	float: right;
+	margin: 0 1px 0 0;
+	padding: 0 6px 0 6px;
+	font-size: 95%;
+	line-height:normal;
+	border: 1px solid #FFF;
+	color:#FFF;
+	background-color:#AAA;
+	cursor:se-resize;
+}
+

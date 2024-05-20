@@ -1,0 +1,40 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use Cwd;
+use DBI;
+use DBForm;
+use myConfig;
+use utils;
+#####################################################################
+# delete downloaded files with no pointer in EDocs.
+# usage: delEDocfiles [0|1|99] okmis_oays okmis_mms ...
+# where: 0 = only warn of missing data/files
+#        1 = warn of everything
+#       99 = warn and remove missing data/files
+#####################################################################
+my $drop = shift @ARGV;
+my $form;
+my $WWW = myConfig->cfg('WWW');
+my $dbh;
+my $ProvID = '*';
+#my $with = qq|where ProvID='90'|;
+foreach my $dbname ( @ARGV )
+{
+  my ($domain,$subdomain) = split('_',$dbname);
+  my $ACCTPATH = $WWW.'/'.$subdomain;
+  chdir($ACCTPATH);
+  $form = DBForm->new("DBNAME=${dbname}");
+  $dbh = $form->dbconnect();
+  $pwd=cwd();
+#print "\nchkNoSQL: drop=$drop, dbname=$dbname, pwd=$pwd\n";
+  utils->chkNoSQL($form,$drop,"Provider/EDocs/${ProvID}/*","ProviderEDocs");
+  utils->chkNoSQL($form,$drop,"Client/EDocs/*/*","ClientEDocs");
+  utils->chkNoSQL($form,$drop,"Client/Notes/*/*","Treatment");
+#print "\nchkNoFile: drop=$drop, dbname=$dbname, pwd=$pwd\n";
+  utils->chkNoFile($form,$drop,"Provider/EDocs/${ProvID}/*","ProviderEDocs","where Path is not null");
+  utils->chkNoFile($form,$drop,"Client/EDocs/*/*","ClientEDocs");
+  utils->chkNoFile($form,$drop,"Client/Notes/*/*","Treatment"," where Path is not null");
+}
+print qq|completed.\n|;
+exit;
+#####################################################################

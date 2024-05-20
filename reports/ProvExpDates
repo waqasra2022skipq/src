@@ -1,0 +1,99 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use DBA;
+use DBUtil;
+use Time::Local;
+$DT = localtime();
+############################################################################
+# usage: ProvExpDates ForProvID=id
+############################################################################
+my $form = DBForm->new();
+$form = DBUtil->setDates($form);
+my $DateRange = qq|from $form->{FromDateD} thru $form->{ToDateD}|;
+#warn qq|$form->{FromDate}, $form->{ToDate}\n|;
+
+############################################################################
+print "${DT}\nProvider Expiration Dates Report\t${DateRange}\n";
+print "Provider\tDate\tMessage\n";
+
+my $dbh = $form->dbconnect();
+my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+my $ProviderSelection = DBA->getProviderSelection($form,$ForProvID,'Provider.ProvID','where');
+$ProviderSelection .= qq| and Provider.Active=1| if ( $form->{Active} );
+my $sProvider=$dbh->prepare("
+  select * from Provider
+    left join EmplInfo on EmplInfo.ProvID=Provider.ProvID
+     ${ProviderSelection}
+   order by Provider.LName, Provider.FName
+");
+$sProvider->execute();
+
+while ( my $rProvider = $sProvider->fetchrow_hashref )
+{
+if ( $rProvider->{OHCAExpDate} ge $form->{FromDate} &&
+       $rProvider->{OHCAExpDate} le $form->{ToDate} )
+  { print qq|$rProvider->{FName} $rProvider->{LName}\t$rProvider->{OHCAExpDate}\tOHCA Contract Expires $rProvider->{OHCAExpDate}\n|; }
+if ( $rProvider->{MedLicExpDate} ge $form->{FromDate} &&
+       $rProvider->{MedLicExpDate} le $form->{ToDate} )
+  { print qq|$rProvider->{FName} $rProvider->{LName}\t$rProvider->{MedLicExpDate}\tMedical License Expires $rProvider->{MedLicExpDate}\n|; }
+  if ( $rProvider->{PolicyNumExpDate} ge $form->{FromDate} &&
+       $rProvider->{PolicyNumExpDate} le $form->{ToDate} )
+  { print qq|$rProvider->{FName} $rProvider->{LName}\t$rProvider->{PolicyNumExpDate}\tProfessional Liability Expires $rProvider->{PolicyNumExpDate}\n|; }
+  if ( $rProvider->{CPRAdultExpDate} ge $form->{FromDate} &&
+       $rProvider->{CPRAdultExpDate} le $form->{ToDate} )
+  { print qq|$rProvider->{FName} $rProvider->{LName}\t$rProvider->{CPRAdultExpDate}\tCPR Adult License Expires $rProvider->{CPRAdultExpDate}\n|; }
+  if ( $rProvider->{CPRChildExpDate} ge $form->{FromDate} &&
+       $rProvider->{CPRChildExpDate} le $form->{ToDate} )
+  { print qq|$rProvider->{FName} $rProvider->{LName}\t$rProvider->{CPRChildExpDate}\tCPR Child License Expires $rProvider->{CPRChildExpDate}\n|; }
+  if ( $rProvider->{FirstAidExpDate} ge $form->{FromDate} &&
+       $rProvider->{FirstAidExpDate} le $form->{ToDate} )
+  { print qq|$rProvider->{FName} $rProvider->{LName}\t$rProvider->{FirstAidExpDate}\tFirst Aid Expires $rProvider->{FirstAidExpDate}\n|; }
+  if ( $rProvider->{DLExpDate} ge $form->{FromDate} &&
+       $rProvider->{DLExpDate} le $form->{ToDate} )
+  { print qq|$rProvider->{FName} $rProvider->{LName}\t$rProvider->{DLExpDate}\tDrivers License Expires $rProvider->{DLExpDate}\n|; }
+  if ( $rProvider->{MandtExpDate} ge $form->{FromDate} &&
+       $rProvider->{MandtExpDate} le $form->{ToDate} )
+  { print qq|$rProvider->{FName} $rProvider->{LName}\t$rProvider->{MandtExpDate}\tMandt License Expires $rProvider->{MandtExpDate}\n|; }
+  if ( $rProvider->{AutoExpDate} ge $form->{FromDate} &&
+       $rProvider->{AutoExpDate} le $form->{ToDate} )
+  { print qq|$rProvider->{FName} $rProvider->{LName}\t$rProvider->{AutoExpDate}\tAuto Insurance Expires $rProvider->{AutoExpDate}\n|; }
+  if ( $rProvider->{CapeExpDate} ge $form->{FromDate} &&
+       $rProvider->{CapeExpDate} le $form->{ToDate} )
+  { print qq|$rProvider->{FName} $rProvider->{LName}\t$rProvider->{CapeExpDate}\tCape Expires $rProvider->{CapeExpDate}\n|; }
+}
+$sProvider->finish();
+
+#print "Provider\tState\tEffDate\tExpDate\tType\tNumber\tUPIN\tDEA\tCAQH\tComments\n";
+my $sProvider=$dbh->prepare("
+  select * from Provider
+    left join ProviderLicenses on ProviderLicenses.ProvID=Provider.ProvID
+     ${ProviderSelection}
+     and (ProviderLicenses.LicExpDate >= '$form->{FromDate}'
+     and ProviderLicenses.LicExpDate <= '$form->{ToDate}')
+   order by Provider.LName, Provider.FName
+");
+$sProvider->execute();
+
+print "Licenses Expiration Dates\n";
+#print "Provider\tState\tEffDate\tExpDate\tType\tNumber\tUPIN\tDEA\tCAQH\tComments\n";
+my $sProvider=$dbh->prepare("
+  select * from Provider
+    left join ProviderLicenses on ProviderLicenses.ProvID=Provider.ProvID
+     ${ProviderSelection}
+     and (ProviderLicenses.LicExpDate >= '$form->{FromDate}'
+     and ProviderLicenses.LicExpDate <= '$form->{ToDate}')
+   order by Provider.LName, Provider.FName
+");
+$sProvider->execute();
+while ( my $rProvider = $sProvider->fetchrow_hashref )
+{
+#  print qq|$rProvider->{FName} $rProvider->{LName}\t$rProvider->{State}\t$rProvider->{LicEffDate}\t$rProvider->{LicExpDate}\t$rProvider->{LicType}\t$rProvider->{LicNumber}\t$rProvider->{UPIN}\t$rProvider->{DEA}\t$rProvider->{CAQH}\t$rProvider->{Comments}\n|;
+  print qq|$rProvider->{FName} $rProvider->{LName}\t$rProvider->{LicExpDate}\t$rProvider->{LicType} $rProvider->{LicNumber} $rProvider->{UPIN} $rProvider->{DEA} $rProvider->{CAQH} $rProvider->{Comments}\n|;
+}
+$sProvider->finish();
+
+$form->complete();
+exit;
+############################################################################

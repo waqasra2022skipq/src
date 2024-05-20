@@ -1,0 +1,102 @@
++--------+---------------+-----------+---------------+---------+------+------------------------------+------------------------------------------------------------------------------------------------------+
+| Id     | User          | Host      | db            | Command | Time | State                        | Info                                                                                                 |
++--------+---------------+-----------+---------------+---------+------+------------------------------+------------------------------------------------------------------------------------------------------+
+| 947445 | okmis         | localhost | okmis_mms     | Query   | 396  | Sending data                 | select NoteTrans.*, NoteTrans.RecDate as DenDate
+        ,NoteTrans.PaidDate as NotePaidDate
+        |
+| 947715 | okmis         | localhost | okmis_mms     | Query   | 332  | Waiting for table level lock | update Treatment set ProvOKDate='2018-09-18', ProvOKTime='10:20:34' where TrID='965197'              |
+| 947730 | okmis         | localhost | okmis_mms     | Query   | 324  | Waiting for table level lock | select Treatment.*, xBillStatus.Descr as BillStatusDescr
+      , Client.LName, Client.FName, Client. |
+| 947740 | okmis         | localhost | okmis_mms     | Query   | 318  | Waiting for table level lock | select Treatment.*, xBillStatus.Descr as BillStatusDescr
+      , Client.LName, Client.FName, Client. |
+| 947748 | okmis         | localhost | okmis_mms     | Query   | 315  | Waiting for table level lock | select AmtDue from Treatment where AmtDue > 0  and ClientID=55592  order by ContLogDate              |
+| 947760 | okmis         | localhost | okmis_mms     | Query   | 311  | Waiting for table level lock | select Treatment.*, xBillStatus.Descr as BillStatusDescr
+      , Client.LName, Client.FName, Client. |
+| 947766 | okmis         | localhost | okmis_mms     | Query   | 307  | Waiting for table level lock | select AmtDue from Treatment where AmtDue > 0  and ClientID=55592  order by ContLogDate              |
+| 947811 | okmis         | localhost | okmis_mms     | Query   | 301  | Waiting for table level lock | select AmtDue from Treatment where AmtDue > 0  and ClientID=55592  order by ContLogDate              |
+| 947972 | okmis         | localhost | okmis_mms     | Query   | 287  | Waiting for table level lock | select Treatment.ClientID, Treatment.ProvID, Treatment.TrID, Treatment.SCID
+     , Treatment.ContLog |
+| 948060 | okmis         | localhost | okmis_mms     | Query   | 281  | Waiting for table level lock | select AmtDue from Treatment where AmtDue > 0  and ClientID=55592  order by ContLogDate              |
+| 948065 | okmis         | localhost | okmis_mms     | Query   | 280  | Waiting for table level lock | select Treatment.*, xBillStatus.Descr as BillStatusDescr
+      , Client.LName, Client.FName, Client. |
+| 948116 | okmis         | localhost | okmis_mms     | Query   | 268  | Waiting for table level lock | select Treatment.ClientID, Treatment.ProvID, Treatment.TrID, Treatment.SCID
+     , Treatment.ContLog |
+| 948625 | okmis         | localhost | okmis_mms     | Query   | 246  | Waiting for table level lock | select Treatment.*, xBillStatus.Descr as BillStatusDescr
+      , Client.LName, Client.FName, Client. |
+| 948882 | okmis         | localhost | okmis_mms     | Query   | 221  | Waiting for table level lock | select Treatment.*, xBillStatus.Descr as BillStatusDescr
+      , Client.LName, Client.FName, Client. |
+| 948998 | okmis         | localhost | okmis_mms     | Query   | 211  | Waiting for table level lock | select Treatment.*, xBillStatus.Descr as BillStatusDescr
+      , Client.LName, Client.FName, Client. |
+| 949103 | okmis         | localhost | okmis_mms     | Query   | 208  | Waiting for table level lock | select Treatment.*, xBillStatus.Descr as BillStatusDescr
+      , Client.LName, Client.FName, Client. |
+| 949143 | okmis         | localhost | okmis_mms     | Query   | 205  | Waiting for table level lock | select Treatment.*, xBillStatus.Descr as BillStatusDescr
+      , Client.LName, Client.FName, Client. |
+| 949151 | okmis         | localhost | okmis_mms     | Query   | 205  | Waiting for table level lock | select Treatment.ClientID, Treatment.ProvID, Treatment.TrID, Treatment.SCID
+     , Treatment.ContLog |
+| 949220 | okmis         | localhost | okmis_mms     | Query   | 198  | Waiting for table level lock | select Treatment.ClientID, Treatment.ProvID, Treatment.TrID, Treatment.SCID
+     , Treatment.ContLog |
+| 949242 | okmis         | localhost | okmis_mms     | Query   | 195  | Waiting for table level lock | select Treatment.ClientID, Treatment.ProvID, Treatment.TrID, Treatment.SCID
+     , Treatment.ContLog |
+| 949276 | okmis         | localhost | okmis_mms     | Query   | 191  | Waiting for table level lock | select Treatment.ClientID, Treatment.ProvID, Treatment.TrID, Treatment.SCID
+     , Treatment.ContLog |
+| 949286 | okmis         | localhost | okmis_mms     | Query   | 191  | Waiting for table level lock | select Treatment.ClientID, Treatment.ProvID, Treatment.TrID, Treatment.SCID
+     , Treatment.ContLog |
+| 949296 | okmis         | localhost | okmis_mms     | Query   | 190  | Waiting for table level lock | select Treatment.ClientID, Treatment.ProvID, Treatment.TrID, Treatment.SCID
+     , Treatment.ContLog |
+| 949307 | okmis         | localhost | okmis_mms     | Query   | 189  | Waiting for table level lock | select Treatment.ClientID, Treatment.ProvID, Treatment.TrID, Treatment.SCID
+     , Treatment.ContLog |
+| 949706 | okmis         | localhost | okmis_mms     | Query   | 164  | Waiting for table level lock | select Treatment.ClientID, Treatment.ProvID, Treatment.TrID, Treatment.SCID
+     , Treatment.ContLog |
+| 949794 | okmis         | localhost | okmis_mms     | Query   | 153  | Waiting for table level lock | select Treatment.*, xBillStatus.Descr as BillStatusDescr
+      , Client.LName, Client.FName, Client. |
+| 949797 | okmis         | localhost | okmis_mms     | Query   | 151  | Waiting for table level lock | select Treatment.*, xBillStatus.Descr as BillStatusDescr
+      , Client.LName, Client.FName, Client. |
+| 949800 | okmis         | localhost | okmis_mms     | Query   | 151  | Waiting for table level lock | select Treatment.*, xBillStatus.Descr as BillStatusDescr
+      , Client.LName, Client.FName, Client. |
+| 949803 | okmis         | localhost | okmis_mms     | Query   | 150  | Waiting for table level lock | select Treatment.ClientID, Treatment.ProvID, Treatment.TrID, Treatment.SCID
+     , Treatment.ContLog |
+| 949811 | okmis         | localhost | okmis_mms     | Query   | 149  | Waiting for table level lock | select Treatment.ClientID, Treatment.ProvID, Treatment.TrID, Treatment.SCID
+     , Treatment.ContLog |
+| 949818 | okmis         | localhost | okmis_mms     | Query   | 148  | Waiting for table level lock | select Treatment.ClientID, Treatment.ProvID, Treatment.TrID, Treatment.SCID
+     , Treatment.ContLog |
+| 949835 | okmis         | localhost | okmis_mms     | Query   | 147  | Waiting for table level lock | select Treatment.*, xBillStatus.Descr as BillStatusDescr
+      , Client.LName, Client.FName, Client. |
+| 949840 | okmis         | localhost | okmis_mms     | Query   | 147  | Waiting for table level lock | select Treatment.*, xBillStatus.Descr as BillStatusDescr
+      , Client.LName, Client.FName, Client. |
+| 950000 | okmis         | localhost | okmis_mms     | Query   | 116  | Waiting for table level lock | select Treatment.*, xBillStatus.Descr as BillStatusDescr
+      , Client.LName, Client.FName, Client. |
+| 950005 | okmis         | localhost | okmis_mms     | Query   | 114  | Waiting for table level lock | select Treatment.*, xBillStatus.Descr as BillStatusDescr
+      , Client.LName, Client.FName, Client. |
+| 950008 | okmis         | localhost | okmis_mms     | Query   | 114  | Waiting for table level lock | select Treatment.*, xBillStatus.Descr as BillStatusDescr
+      , Client.LName, Client.FName, Client. |
+| 950018 | okmis         | localhost | okmis_mms     | Query   | 114  | Waiting for table level lock | select Treatment.*, xBillStatus.Descr as BillStatusDescr
+      , Client.LName, Client.FName, Client. |
+| 950203 | okmis         | localhost | okmis_mms     | Query   | 100  | Waiting for table level lock | select Treatment.*, xBillStatus.Descr as BillStatusDescr
+      , Client.LName, Client.FName, Client. |
+| 950207 | okmis         | localhost | okmis_mms     | Query   | 98   | Waiting for table level lock | select Treatment.*, xBillStatus.Descr as BillStatusDescr
+      , Client.LName, Client.FName, Client. |
+| 950210 | okmis         | localhost | okmis_mms     | Query   | 98   | Waiting for table level lock | select Treatment.*, xBillStatus.Descr as BillStatusDescr
+      , Client.LName, Client.FName, Client. |
+| 950234 | okmis         | localhost | okmis_mms     | Query   | 97   | Waiting for table level lock | select Treatment.*, xBillStatus.Descr as BillStatusDescr
+      , Client.LName, Client.FName, Client. |
+| 950237 | okmis         | localhost | okmis_mms     | Query   | 97   | Waiting for table level lock | select Treatment.*, xBillStatus.Descr as BillStatusDescr
+      , Client.LName, Client.FName, Client. |
+| 950259 | okmis         | localhost | okmis_mms     | Query   | 85   | Waiting for table level lock | select AmtDue from Treatment where AmtDue > 0  and ClientID=51903  order by ContLogDate              |
+| 950346 | okmis         | localhost | okmis_mms     | Query   | 74   | Waiting for table level lock | select Treatment.*, xBillStatus.Descr as BillStatusDescr
+      , Client.LName, Client.FName, Client. |
+| 950371 | okmis         | localhost | okmis_mms     | Query   | 68   | Waiting for table level lock | select Treatment.ClientID, Treatment.ProvID, Treatment.TrID, Treatment.SCID
+     , Treatment.ContLog |
+| 950406 | okmis         | localhost | okmis_mms     | Query   | 63   | Waiting for table level lock | select AmtDue from Treatment where AmtDue > 0  and ClientID=51658  order by ContLogDate              |
+| 950431 | okmis         | localhost | okmis_mms     | Query   | 61   | Waiting for table level lock | select Treatment.ClientID, Treatment.ProvID, Treatment.TrID, Treatment.SCID
+     , Treatment.ContLog |
+| 950493 | okmis         | localhost | okmis_mms     | Query   | 52   | Waiting for table level lock | select Treatment.ClientID, Treatment.ProvID, Treatment.TrID, Treatment.SCID
+     , Treatment.ContLog |
+| 950570 | okmis         | localhost | okmis_mms     | Query   | 47   | Waiting for table level lock | select Treatment.ClientID, Treatment.ProvID, Treatment.TrID, Treatment.SCID
+     , Treatment.ContLog |
+| 950744 | okmis         | localhost | okmis_mms     | Query   | 45   | Waiting for table level lock | select Treatment.ClientID, Treatment.ProvID, Treatment.TrID, Treatment.SCID
+     , Treatment.ContLog |
+| 951163 | okmis         | localhost | okmis_mms     | Query   | 21   | Waiting for table level lock | select * from Treatment where FormID='5794937_1'                                                     |
+| 951167 | scheduler_mms | localhost | scheduler_mms | Sleep   | 6    |                              |                                                                                                      |
+| 951272 | scheduler_mms | localhost | scheduler_mms | Sleep   | 7    |                              |                                                                                                      |
+| 951388 | root          | localhost |               | Query   | 0    | init                         | show processlist                                                                                     |
++--------+---------------+-----------+---------------+---------+------+------------------------------+------------------------------------------------------------------------------------------------------+

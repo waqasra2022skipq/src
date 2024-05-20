@@ -1,0 +1,6 @@
+select ProviderPrivs.Type
+      ,Provider.ProvID,Provider.FName, Provider.LName, Provider.Name, Provider.Active
+ from ProviderPrivs
+  left join Provider on Provider.ProvID=ProviderPrivs.ProvID
+ where ProviderPrivs.Type='Agent' and Provider.Active=1
+ order by Provider.LName,Provider.FName;

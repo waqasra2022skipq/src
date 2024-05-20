@@ -1,0 +1,100 @@
+% Psychological Status box
+ULOrigin PageWidth LM RM add sub 242 box
+ULOrigin 23 sub moveto
+RMx CurrentY lineto
+stroke
+
+Header setfont
+ULOrigin 18 sub dup 3 -1 roll moveto
+(PSYCHOLOGICAL STATUS) cshow
+
+Body setfont
+
+% Psychological Status
+% --------------------
+
+% Headers for checkboxes
+(Evaluation Rating) BodyLeftEdge      	ULOriginY 55 sub   moveto   show
+(Not At All)        ULOriginX 168 add 	ULOriginY 55 sub   moveto   uscoreShow
+(Mild)              ULOriginX 258 add 	ULOriginY 55 sub   moveto   uscoreShow
+(Moderate)          ULOriginX 323 add 	ULOriginY 55 sub   moveto   uscoreShow
+(Serious)           ULOriginX 403 add 	ULOriginY 55 sub   moveto   uscoreShow
+(Severe)            ULOriginX 482 add 	ULOriginY 55 sub   moveto   uscoreShow
+
+% define the starting position and interval to move down each line
+/LinePosition ULOriginY 78 sub def
+/Interval -15 def
+% Column positions
+[ ULOriginX 189 add
+  ULOriginX 266 add
+  ULOriginX 343 add
+  ULOriginX 418 add
+  ULOriginX 495 add ]
+% Position Reporting strings
+[(  NotAtAll) (  Mild) (  Moderate) (  Serious) (  Severe)]
+
+[(Anger)  (Relationship Disorder) (Depressive State)    (Anxious State) 
+ (Phobic) (Thought Disorder)      (Behavioral Problems) (Substance Abuse / Dep)
+          (Homicidal Potential)   (Suicidal Potential)  (Memory Problems)] {
+  dup = % for reporting position
+  ULOriginX 20 add LinePosition moveto show 
+  0 1 4 {
+    2 copy get exch    % Get the position report string and exch
+    3 index exch get   % Get the X coord from the array
+    LinePosition       % Y coord
+    moveto reportPos
+    currentpoint CBSize boxOnLine   % and draw a checkbox
+  } for
+  /LinePosition LinePosition Interval add def
+} forall
+mark 3 1 roll cleartomark % clean up - remove the two arrays
+
+% Bottom box
+% ----------
+ULOrigin 257 sub PageWidth LM RM add sub 396 box
+ULOrigin 469 sub moveto
+RMx CurrentY lineto
+stroke
+
+(Is the Client a Victim of Abuse?)
+  BodyLeftEdge ULOriginY 275 sub moveto show
+  (Yes)
+    ULOriginX 210 add ULOriginY 275 sub moveto (AbuseVictim-Yes) reportPos 
+    currentpoint rlcb
+  (No)
+    ULOriginX 282 add ULOriginY 275 sub moveto (AbuseVictim-No)  reportPos 
+    currentpoint rlcb
+(If So, Please Describe: 1\) the Type of Abuse; 2\) If Reported and If So, to Whom; 3\) Date of Abuse.) 
+  BodyLeftEdge ULOriginY 304 sub moveto show
+  (AbuseText)
+    BodyLeftEdge ULOriginY 320 sub moveto reportPos
+(Does the Client Engage in Self Abuse?)
+  BodyLeftEdge ULOriginY 488 sub moveto show
+  (Yes)
+    (SelfAbuse-Yes) 
+      ULOriginX 210 add ULOriginY 488 sub moveto reportPos
+    currentpoint rlcb
+  (No)
+    (SelfAbuse-No) 
+      ULOriginX 282 add ULOriginY 488 sub moveto reportPos
+    currentpoint rlcb
+(If So, Please Give Details.)
+  BodyLeftEdge ULOriginY 517 sub moveto show
+  (SelfAbuseText) 
+    BodyLeftEdge ULOriginY 533 sub moveto reportPos
+
+(Client Last Name: )
+  ULOriginX 36 add 18 moveto =show
+  0 -2 rmoveto
+  126 0 rlineto
+(First: )
+  ULOriginX 256 add 18 moveto =show
+  0 -2 rmoveto
+  110 0 rlineto
+(MI: )
+  ULOriginX 394 add 18 moveto =show
+  0 -2 rmoveto
+  58 0 rlineto
+  stroke
+(3  of  4) dup stringwidth pop PageWidth RM sub exch sub 18 moveto show
+showpage

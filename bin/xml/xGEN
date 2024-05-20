@@ -1,0 +1,19 @@
+#!/usr/local/bin/perl
+use lib '/usr/local/mis/lib';
+#   use strict;
+   use DBI;
+use DBForm;
+use DBA;
+   use XML::Generator::DBI;
+   use XML::Handler::YAWriter;
+my $form = DBForm->new();
+my $dbh = $form->dbconnect();
+
+#   my $dbh = DBI->connect ("DBI:mysql:test", "testuser", "testpass", { RaiseError => 1, PrintError => 0});
+   my $out = XML::Handler::YAWriter->new(AsFile => "-");
+   my $gen = XML::Generator::DBI->new(
+                                   Handler => $out,
+                                   dbh => $dbh
+                               );
+   $gen->execute ("SELECT LName, RaceFather FROM Client");
+   $dbh->disconnect ();

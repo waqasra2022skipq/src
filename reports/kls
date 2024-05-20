@@ -1,0 +1,22 @@
+
+select Treatment.TrID,Treatment.ContLogDate,Treatment.ClinicID,xSC.SCNum
+      ,Client.LName,Client.FName,Client.ClientID
+#      ,Clinic.Name as ClinicName
+#      ,CONCAT(Counselor.LName,', ',Counselor.FName) as PrimaryProvider
+#      ,Client.DOB,TIMESTAMPDIFF(YEAR, Client.DOB, CURDATE()) AS Age
+#      ,xRaces.Descr as Race
+      ,misICD10.ICD10
+#      ,count(*)
+ from Treatment 
+  left join Client on Client.ClientID=Treatment.ClientID
+  left join Provider as Clinic on Clinic.ProvID=Client.clinicClinicID
+  left join Provider as Counselor on Counselor.ProvID=Client.ProvID
+  left join okmis_config.xRaces on xRaces.ID=SUBSTRING_INDEX(Client.Race,'${multidel}',1)
+  left join xSC on xSC.SCID=Treatment.SCID
+  left join xInsurance on xInsurance.ID=xSC.InsID
+  left join ClientNoteProblems on ClientNoteProblems.TrID=Treatment.TrID
+  left join okmis_config.misICD10 on misICD10.ID=ClientNoteProblems.UUID
+ where Client.ClientID=51851
+   and (Treatment.ContLogDate >= '2019-01-01' and Treatment.ContLogDate<='2019-12-31')
+   and misICD10.ICD10='F02.81'
+# group by Client.LName,Client.FName,Client.ClientID

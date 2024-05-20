@@ -1,0 +1,187 @@
+package Rollup;
+use DBI;
+use DBForm;
+use myDBI;
+############################################################################
+sub Notes
+{
+  my ($self,$form,$ClientID,$ProvID) = @_;
+  my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+# THIS LOOP IS TO REMOVE THE 'OLD' NAMED FILES...
+  for (my $j = 1; $j <= 5; $j++)
+  {
+    my $NoteDef = DBA->noteNum($j);
+#warn qq|rollupNotes: ClientID=${ClientID}, ProvID=${ProvID}, j=$j, NoteDef=$NoteDef\n|;
+    my $HomePath = $ProvID ? qq|/Provider/EDocs/${ProvID}| : qq|/Client/EDocs/${ClientID}|;
+    my $RootPath = $form->{DOCROOT} . ${HomePath};
+    my $FileName = $ProvID ? qq|${NoteDef}Notes${ProvID}.xdp| : qq|${NoteDef}Notes${ClientID}.xdp|;
+    my $HomeName = ${HomePath} . '/' . ${FileName};
+    my $RootName = ${RootPath} . '/' . ${FileName};
+#warn qq|rollupNotes: HomeName=${HomeName}\n|;
+#warn qq|rollupNotes: RootName=${RootName}\n|;
+# first delete them.
+    unlink($RootName);
+    if ( $ProvID )
+    {
+      my $sDelete = $dbh->prepare("delete from ProviderEDocs where ProvID=? and Rollup=?");
+      $sDelete->execute($ProvID,$FileName);
+      $sDelete->finish();
+    }
+    else
+    {
+      my $sDelete = $dbh->prepare("delete from ClientEDocs where ClientID=? and Rollup=?");
+      $sDelete->execute($ClientID,$FileName);
+      $sDelete->finish();
+    }
+  }
+  my $HomePath = $ProvID ? qq|/Provider/EDocs/${ProvID}| : qq|/Client/EDocs/${ClientID}|;
+  my $RootPath = $form->{DOCROOT} . ${HomePath};
+  my $FileName = $ProvID ? qq|Notes${ProvID}.pdf| : qq|Notes${ClientID}.pdf|;
+  my $HomeName = ${HomePath} . '/' . ${FileName};
+  my $RootName = ${RootPath} . '/' . ${FileName};
+#warn qq|rollupNotes: HomeName=${HomeName}\n|;
+#warn qq|rollupNotes: RootName=${RootName}\n|;
+# first delete them.
+  unlink($RootName);
+  if ( $ProvID )
+  {
+    my $sDelete = $dbh->prepare("delete from ProviderEDocs where ProvID=? and Rollup=?");
+    $sDelete->execute($ProvID,$FileName);
+    $sDelete->finish();
+  }
+  else
+  {
+    my $sDelete = $dbh->prepare("delete from ClientEDocs where ClientID=? and Rollup=?");
+    $sDelete->execute($ClientID,$FileName);
+    $sDelete->finish();
+  }
+
+  my $TrIDs='';
+  my $with = $ProvID ? qq|ProvID='${ProvID}'| : qq|ClientID='${ClientID}'|;
+  my $qNotes = qq|select TrID from Treatment where ${with} order by ClientID,ContLogDate,ContLogBegTime,ContLogEndTime|;
+#warn "rollupNotes: qNotes=\n$qNotes\n";
+  $sNotes=$dbh->prepare($qNotes);
+  $sNotes->execute();
+  while ( my ($TrID) = $sNotes->fetchrow_array ) { $TrIDs .= qq|${TrID} |; }
+  unless ( $TrIDs eq '' )
+  {
+    my $cmd = qq|/home/okmis/mis/src/cgi/bin/printNotes.pl DBNAME=$form->{'DBNAME'}\\&TrIDs=${TrIDs}\\&mlt=$form->{mlt}\\&file=${RootName}|;
+#warn qq|Notes: cmd:${cmd}\n|;
+    system("${cmd}");
+#warn qq|rollupNotes: create: ${RootName}\n|;
+    my $rEDocs = ();
+    my $table = qq|ClientEDocs|;
+    my $where = qq|ClientID='${ClientID}' and Rollup='${FileName}'|;
+    if ( $ProvID )
+    {
+      $rEDocs->{ProvID} = $ProvID; 
+      $table = qq|ProviderEDocs|;
+      $where = qq|ProvID='${ProvID}' and Rollup='${FileName}'|;
+    }
+    else { $rEDocs->{ClientID} = $ClientID; }
+#warn qq|rollupNotes: table: ${table}\n|;
+#warn qq|rollupNotes: where: ${where}\n|;
+    my $TODAY = DBUtil->Date($form->{TODAY},'fmt','MM/DD/YYYY');
+    my $Title = $ProvID ? qq|Rollup provider '${ProvID}' ClientNotes: ${TODAY}|
+                        : qq|Rollup client '${ClientID}' ClientNotes: ${TODAY}|;
+    $rEDocs->{Title} = $Title;
+    $rEDocs->{Descr} = qq|Rollup on ${TODAY}|;
+    $rEDocs->{Type} = '22';                       # 'Client' Type.
+    $rEDocs->{Path} = $HomeName;                  # sql Path from Home Directory
+    $rEDocs->{Rollup} = $FileName;
+    $rEDocs->{CreateDate} = $form->{TODAY};       # last time created.
+    $rEDocs->{CreateProvID} = $form->{LOGINPROVID};
+    $rEDocs->{ChangeProvID} = $form->{LOGINPROVID};
+#foreach my $f ( sort keys %{$rEDocs} ) { warn ": rEDocs-$f=$rEDocs->{$f}\n"; }
+    my $UPDID = DBA->doUpdate($form,$table,$rEDocs,$where);
+  }
+  $sNotes->finish();
+  return($TrIDs);
+}
+############################################################################
+sub edocs
+{
+  my ($self,$form,$ClientID,$Table,$Legacy) = @_;
+#warn qq|edocs: ClientID=${ClientID}, Table=${Table}, Legacy=${Legacy}\n|;
+  my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+  my $HomePath = qq|/Client/EDocs/${ClientID}|;
+  my $RootPath = $form->{DOCROOT} . ${HomePath};
+  my $TODAY = DBUtil->Date($form->{TODAY},'fmt','MM/DD/YYYY');
+  my $Title = qq|Rollup client '${ClientID}' ${Table}: ${TODAY}|;
+  my $Descr = qq|Rollup on ${TODAY}|;
+  my $EType = 22;        # 'Client' Type.
+  my $RECID = myDBI->getTableConfig($Table,'RECID');
+  my $FileName = qq|${Table}${ClientID}.pdf|;
+  my $PrintRoutine = 'print'.$Table;
+#warn qq|rollupNotes: FileName=${FileName}\n|;
+#warn qq|rollupNotes: PrintRoutine=${PrintRoutine}\n|;
+  my $HomeName = ${HomePath} . '/' . ${FileName};
+  my $RootName = ${RootPath} . '/' . ${FileName};
+#warn qq|rollupNotes: HomeName=${HomeName}\n|;
+#warn qq|rollupNotes: RootName=${RootName}\n|;
+#warn qq|rollupNotes: OLDRootName=${OLDRootName}\n|;
+# first delete them.
+  unlink($RootName);
+  (my $OLDRootName = $RootName) =~ s/pdf/xdp/g;
+  unlink($OLDRootName);
+  my $sDelete = $dbh->prepare("delete from ClientEDocs where ClientID=? and Rollup=?");
+  $sDelete->execute($ClientID,$FileName);
+  (my $OLDFileName = $FileName) =~ s/pdf/xdp/g;
+  $sDelete->execute($ClientID,$OLDFileName);
+  $sDelete->finish();
+  my $order = $Table eq 'ClientDischarge' ? 'ClientDischargeCDC.TransDate'
+            : $Table eq 'ClientAdmit' ? 'ClientAdmit.AdmitDate'
+            : $Table eq 'ClientPrAuth' ? 'ClientPrAuth.EffDate'
+            : $Table eq 'ClientTrPlan' ? 'ClientTrPlan.EffDate'
+            : return();
+  my $join = $Table eq 'ClientDischarge'
+           ? "left join ClientDischargeCDC on ClientDischargeCDC.ClientDischargeID=ClientDischarge.ID"
+           : '';
+  my $daterange = '';
+  if ( $Table eq 'ClientAdmit' )
+  {
+    if ( $Legacy )      # could change to include ALL rollups with value of Legacy (see setClientRollup)
+    {
+      $daterange = qq|and ClientAdmit.AdmitDate<='${Legacy}'|;
+      $FileName = qq|ClientIntake${ClientID}.xdp|;
+      $HomeName = ${HomePath} . '/' . ${FileName};
+      $RootName = ${RootPath} . '/' . ${FileName};
+      $PrintRoutine = qq|PrintClientIntakePre2017|;
+      $Title = qq|Rollup client '${ClientID}' ClientIntake: ${TODAY}|;
+#warn "edocs: daterange=${daterange}, FileName=${FileName}, RootName=${RootName}, PrintRoutine=${PrintRoutine}\n";
+    }
+    else
+    {
+      $daterange = qq|and ClientAdmit.AdmitDate>'2017-01-01'|;
+    }
+  }
+  my $IDs='';
+  my $q = qq|select ${Table}.${RECID} from ${Table} ${join} where ${Table}.ClientID=? ${daterange} order by ${order}|;
+#warn "edocs: q=\n$q\nClientID=${ClientID}, Table=${Table}, PrintRoutine=${PrintRoutine}, RECID=${RECID}\n";
+  my $s=$dbh->prepare($q);
+  $s->execute($ClientID);
+#my $rows = $s->rows; warn qq|edocs: rows=${rows}\n|;
+  while ( my ($ID) = $s->fetchrow_array ) { $IDs .= qq|${ID} |; }
+  unless ( $IDs eq '' )
+  {
+    my $cmd = qq|/home/okmis/mis/src/cgi/bin/${PrintRoutine}.cgi DBNAME=$form->{'DBNAME'}\\&IDs=${IDs}\\&Client_ClientID=${ClientID}\\&mlt=$form->{mlt}\\&file=${RootName}|;
+#warn qq|edocs: cmd:${cmd}\n|;
+    system("${cmd}");
+    my $rEDocs = ();
+    $rEDocs->{ClientID} = $ClientID;
+    $rEDocs->{Title} = $Title;
+    $rEDocs->{Descr} = $Descr;
+    $rEDocs->{Type} = $EType;
+    $rEDocs->{Path} = $HomeName;                  # sql Path from Home Directory
+    $rEDocs->{Rollup} = $FileName;
+    $rEDocs->{CreateDate} = $form->{TODAY};       # last time created.
+    $rEDocs->{CreateProvID} = $form->{LOGINPROVID};
+    $rEDocs->{ChangeProvID} = $form->{LOGINPROVID};
+    my $UPDID = DBA->doUpdate($form,'ClientEDocs',$rEDocs,"ClientID='${ClientID}' and Rollup='${FileName}'");
+#warn qq|edocs: UPDID:${UPDID}\n|;
+  }
+  $s->finish();
+  return($IDs);
+}
+############################################################################
+1;

@@ -1,0 +1,132 @@
+diff ../../core6/lib/ntsRequest.php ntsRequest.php
+95,96c95,97
+< 
+< 			ntsCsrf::show_error('no token', $requested_panel);
+---
+> 			if (!isset($_POST['nts-source']) && $_POST['nts-source'] != 'EHR') {
+> 				ntsCsrf::show_error('no token', $requested_panel);
+> 			}
+100c101,102
+< 		if ($_POST[$csrf_token_name] != $_COOKIE[$csrf_cookie_name])
+---
+> 		if ((isset($_POST[$csrf_token_name]) && 
+> 			$_POST[$csrf_token_name]) != isset($_COOKIE[$csrf_cookie_name]) && $_COOKIE[$csrf_cookie_name])
+106,107c108,110
+< 
+< 			ntsCsrf::show_error('token mismatch', $requested_panel);
+---
+> 			if (!isset($_POST['nts-source']) && $_POST['nts-source'] != 'EHR') {
+> 				ntsCsrf::show_error('token mismatch', $requested_panel);
+> 			}
+diff ../../core6/lib/ntsUser.php ntsUser.php
+1420a1421,1422
+> 		if (isset($_POST['nts-source']) && $_POST['nts-source'] == 'EHR')
+> 			return;
+diff ../../core6/model/user/check_password.php check_password.php
+12c12,17
+< if( strlen($suppliedUsername) < 1 ){
+---
+> $ehr_login_token = '';
+> if ($object->getProp( 'ehr_login_token' ) != '') {
+> 	$ehr_login_token = $object->getProp( 'ehr_login_token' );
+> }
+> 
+> if( strlen($suppliedUsername) < 1 && !$ehr_login_token){
+14c19
+< 	$actionError = M("Wrong username or password");
+---
+> 	$actionError = M("Wrong username or password1");
+20c25,29
+< 	if( $integrator->checkPassword($suppliedUsername, $suppliedPassword) ){
+---
+> 	if ($ehr_login_token) {
+> 		$ids = getUserByLoginToken($ehr_login_token);
+> 		$userInfo = $integrator->getUserByEmail( $ids[0] );
+> 		$object->setId( $userInfo['id'] );
+> 	} elseif ($integrator->checkPassword($suppliedUsername, $suppliedPassword)) {
+33a43,57
+> 
+> 	function getUserByLoginToken($loginToken) {
+> 		$sql =<<<EOT
+> 		SELECT * FROM {PRFX}users WHERE ehr_login_token = '$loginToken'
+> EOT;
+> 		$mainDb =& dbWrapper::getInstance();
+> 		$result = $mainDb->runQuery( $sql );
+> 		if ($result) {
+> 			while ($u = $result->fetch()) {
+> 				$ids[] = $u['email'];
+> 			}
+> 		}
+> 		return $ids;
+> 	}
+> 
+diff ../../core6/model/user/create.php create.php
+32c32
+< $newId = $integrator->createUser( $objectInfo, $metaInfo );
+---
+> $objectInfo = checkIfRequestFromEHR($objectInfo);
+33a34,35
+> // This function call createUser() of ntsUser.php file class and create user....
+> $newId = $integrator->createUser( $objectInfo, $metaInfo );
+37c39
+< 	}
+---
+> }
+42a45,50
+> }
+> 
+> function checkIfRequestFromEHR($objectInfo) {
+> 	if (isset($_POST['nts-source']) && $_POST['nts-source'] == 'EHR') {
+> 		$objectInfo['source'] = 'EHR';
+> 		$objectInfo['ehr_login_token'] = $_POST['nts-ehr_login_token'];
+43a52,54
+> 	return $objectInfo;
+> }
+> 
+diff ../../core6/panels/admin/company/staff/create/action.php action.php
+67a68,74
+> 			if (isset($_POST['nts-source'])) {
+> 				echo json_encode([
+> 					'status' => false,
+> 					'user' => 'admin',
+> 					'data' => 'username already exist... Please try again with different username/email.'
+> 				]);die;
+> 			}
+diff ../../core6/panels/admin/root.php root.php
+17,21c17,22
+< 	$forwardTo = ntsLink::makeLink( 'anon/login', '', array('user' => 'admin') );
+< 	ntsView::redirect( $forwardTo );
+< 	exit;
+< 	}
+< 
+---
+> 	if (!isset($_POST['nts-source'])) {
+> 		$forwardTo = ntsLink::makeLink( 'anon/login', '', array('user' => 'admin') );
+> 		ntsView::redirect( $forwardTo );
+> 		exit;
+> 	}}
+> 	
+diff ../../core6/panels/anon/login/action.php action-2.php
+25c25,29
+< switch( $action ){
+---
+> $ehr_login_token = '';
+> if (isset($_GET['source']) && $_GET['source'] && $_GET['token']) {
+> 	$ehr_login_token = $_GET['token'];
+> }
+> switch( $action || $ehr_login_token ){
+37a42
+> 			$object->setProp( 'ehr_login_token', $ehr_login_token );
+42c47
+< 			if( ! $cm->isOk() ){
+---
+> 			if( ! $cm->isOk() && !$ehr_login_token){
+diff ../../core6/panels/anon/register/action.php action-3.php
+100a101,107
+> 			if (isset($_POST['nts-source'])) {
+> 				echo json_encode([
+> 					'status' => false,
+> 					'user' => 'user',
+> 					'data' => 'username already exist... Please try again with different username/email.'
+> 				]);die;
+> 			}

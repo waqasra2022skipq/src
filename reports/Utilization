@@ -1,0 +1,310 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use DBA;
+use DBUtil;
+use cBill;
+use Inv;
+use Time::Local;
+$DT = localtime();
+############################################################################
+# usage:
+#   Utilization ForProvID=id\&Type=t\&CurDate=date > outfile
+#                    t=current,overall
+############################################################################
+$form = DBForm->new();
+$form = DBUtil->setDates($form);
+my $DateRange = qq|from $form->{FromDateD} thru $form->{ToDateD}|;
+print "Type=$form->{Type}, FromDate=$form->{FromDate}, ToDate=$form->{ToDate}\n" if ( $form->{debug} );
+my $CURDATE = $form->{CurDate} ? $form->{CurDate} : $form->{TODAY};
+print "CURDATE=$CURDATE\n" if ( $form->{debug} );
+
+$dbh = $form->dbconnect();
+############################################################################
+# some global variables.
+$ProvUtil = ();
+$ClientUtil = ();
+$ProvByName = ();
+$ClientByName = ();
+
+# Set the global statements for selects.
+$sBig = $dbh->prepare("set sql_big_tables=1");
+$sBig->execute();
+
+# We don't care about Active=1 Clients, it's based on PA for period.
+# sort must be oldest to newest to get previous/current PAs.
+my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+my $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID','where');
+my $SelCurrent = $form->{Type} =~ /overall/i 
+   ? qq|    and ClientPrAuth.EffDate < '${CURDATE}'\n|
+   : qq|    and '${CURDATE}' between ClientPrAuth.EffDate and ClientPrAuth.ExpDate\n|;
+$qPrAuth = qq|
+select ClientPrAuth.*, Insurance.Priority, Insurance.InsID
+     , Client.LName, Client.FName, Client.ProvID, Client.DOB
+     , Provider.LName as PLName, Provider.FName as PFName
+  from ClientPrAuth
+    left join ClientPrAuthCDC on ClientPrAuthCDC.ClientPrAuthID=ClientPrAuth.ID
+    left join Insurance on Insurance.InsNumID=ClientPrAuth.InsuranceID
+    left join Client on Client.ClientID=ClientPrAuth.ClientID
+    left join Provider on Provider.ProvID=Client.ProvID
+  ${ClinicSelection}
+  and ClientPrAuthCDC.TransType < 60
+  ${SelCurrent}
+    and ClientPrAuth.PAnumber is not null
+  order by Provider.LName, Provider.FName, Client.LName, Client.FName, ClientPrAuth.EffDate
+|;
+#and (Client.ClientID=567 or Client.ClientID=569)
+#and Client.ProvID=138
+print qq|Utilization: qPrAuth=\n$qPrAuth\n| if ( $form->{debug} );
+$sPrAuth = $dbh->prepare($qPrAuth);
+############################################################################
+# Start the process.
+# calculate hours 'Auth' for the Primary Providers Clients PAs.
+my ($cnt,$PAgroup) = (0,'');
+my ($ProvID,$ClientID) = ('','');
+my ($PrevProvID,$PrevClientID) = ('','');
+my ($PrevPAUnitsAuth,$PrevPAUnitsUsed) = (0,0);
+my ($PrevPAAmtAuth,$PrevPAAmtUsed) = (0,0);
+$sPrAuth->execute();
+while ( $rPrAuth = $sPrAuth->fetchrow_hashref )
+{
+  $cnt++;
+  $PAgroup=$rPrAuth->{PAgroup};
+print qq|\nPrAuthID=$rPrAuth->{ID}\n| if ( $form->{debug} );
+  $ProvID=$rPrAuth->{ProvID};            # this is the Primary Provider
+  $ClientID=$rPrAuth->{ClientID};
+# did we find a current PA?
+  $ProvUtil->{$ProvID}->{CURRENT} = "N/A";
+  $ClientUtil->{$ProvID}->{$ClientID}->{CURRENT} = "N/A";
+##
+# this is the previous PA period for overall.
+  if ( $ProvID == $PrevProvID && $ClientID == $PrevClientID )
+  {
+print qq|setPAPrev: $PrevProvID,$PrevClientID: $PrevPAAmtAuth,$PrevPAAmtUsed; $PrevPAUnitsAuth,$PrevPAUnitsUsed\n| if ( $form->{debug} );
+    $ProvUtil->{$PrevProvID}->{lastPA}->{UnitsAuth} = $PrevPAUnitsAuth;
+    $ProvUtil->{$PrevProvID}->{lastPA}->{UnitsUsed} = $PrevPAUnitsUsed;
+    $ClientUtil->{$PrevProvID}->{$PrevClientID}->{lastPA}->{UnitsAuth} = $PrevPAUnitsAuth;
+    $ClientUtil->{$PrevProvID}->{$PrevClientID}->{lastPA}->{UnitsUsed} = $PrevPAUnitsUsed;
+    $ProvUtil->{$PrevProvID}->{lastPA}->{AmtAuth} = $PrevPAAmtAuth;
+    $ProvUtil->{$PrevProvID}->{lastPA}->{AmtUsed} = $PrevPAAmtUsed;
+    $ClientUtil->{$PrevProvID}->{$PrevClientID}->{lastPA}->{AmtAuth} = $PrevPAAmtAuth;
+    $ClientUtil->{$PrevProvID}->{$PrevClientID}->{lastPA}->{AmtUsed} = $PrevPAAmtUsed;
+  }
+  my ($PrevUnitsAuth,$PrevUnitsUsed) = (0,0);
+  my ($PrevAmtAuth,$PrevAmtUsed) = (0,0);
+  my ($TotalUnitsAuth,$TotalUnitsUsed) = (0,0);
+  my ($TotalAmtAuth,$TotalAmtUsed) = (0,0);
+  my $inv = Inv->InvPA($form,$rPrAuth,$CURDATE);
+  $inv = $inv->InvNotes($form,$rPrAuth->{ClientID},$rPrAuth->{InsID});
+#foreach my $f ( sort keys %{$inv} ) { my $a=$inv->{$f}; warn "inv-$f=$inv->{$f}, a=$a\n"; foreach my $b ( sort keys %{ $inv->{$f} } ) { warn "inv-$f-$b=$inv->{$f}->{$b}\n"; } }
+print qq|\nClientID=$rPrAuth->{ClientID},$inv->{PAEffDate},$inv->{PAExpDate},$inv->{PAnumber},$inv->{CAPAmount},$inv->{LOS}\n| if ( $form->{debug} );
+  foreach my $Dates ( @{$inv->{PADates}} )
+  {
+    my ($BDate,$EDate) = split('/',$Dates);
+print qq|BDate=$BDate,EDate=$EDate\n| if ( $form->{debug} );
+    my $fBDate = DBUtil->Date($BDate,'fmt','MM/DD/YYYY');
+    my $fEDate = DBUtil->Date($EDate,'fmt','MM/DD/YYYY');
+print qq|fBDate=$fBDate,fEDate=$fEDate\n| if ( $form->{debug} );
+    my $key = "${fBDate}-${fEDate}";
+print qq|\nkey=$key\n| if ( $form->{debug} );
+print qq|MonthAmtAuth=$inv->{$key}->{AmtAuth}\n| if ( $form->{debug} );
+print qq|MonthAmtUsed=$inv->{$key}->{AmtUsed}\n| if ( $form->{debug} );
+print qq|MonthUnitsAuth=$inv->{$key}->{UnitsAuth}\n| if ( $form->{debug} );
+print qq|MonthUnitsUsed=$inv->{$key}->{UnitsUsed}\n| if ( $form->{debug} );
+#foreach my $f ( sort keys %{ $inv->{$key} } ) { warn "inv-$f=$inv->{$key}->{$f}\n"; }
+    my $AmtAuth = $inv->{$key}->{AmtAuth};
+    my $AmtUsed = $inv->{$key}->{AmtUsed};
+    my $UnitsAuth = $inv->{$key}->{UnitsAuth};
+    my $UnitsUsed = $inv->{$key}->{UnitsUsed};
+#   this is the current month, if current requested.
+    if ( $BDate le $CURDATE && $CURDATE le $EDate )
+    {
+print qq|setPrev: $PrevAmtAuth,$PrevAmtUsed; $PrevUnitsAuth,$PrevUnitsUsed\n| if ( $form->{debug} );
+      $ProvUtil->{$ProvID}->{previous}->{UnitsAuth} += $PrevUnitsAuth;
+      $ProvUtil->{$ProvID}->{previous}->{UnitsUsed} += $PrevUnitsUsed;
+      $ClientUtil->{$ProvID}->{$ClientID}->{previous}->{UnitsAuth} += $PrevUnitsAuth;
+      $ClientUtil->{$ProvID}->{$ClientID}->{previous}->{UnitsUsed} += $PrevUnitsUsed;
+      $ProvUtil->{$ProvID}->{previous}->{AmtAuth} += $PrevAmtAuth;
+      $ProvUtil->{$ProvID}->{previous}->{AmtUsed} += $PrevAmtUsed;
+      $ClientUtil->{$ProvID}->{$ClientID}->{previous}->{AmtAuth} += $PrevAmtAuth;
+      $ClientUtil->{$ProvID}->{$ClientID}->{previous}->{AmtUsed} += $PrevAmtUsed;
+      last;                 # only go upto current period of PA.
+    }
+print qq|setThis: $AmtAuth,$AmtUsed; $UnitsAuth,$UnitsUsed\n| if ( $form->{debug} );
+    if ( $PAgroup eq '' )
+    {
+      $TotalUnitsAuth += $UnitsAuth;
+      $TotalUnitsUsed += $UnitsUsed;
+      $PrevUnitsAuth = $UnitsAuth;
+      $PrevUnitsUsed = $UnitsUsed;
+    }
+    else
+    {
+      $TotalAmtAuth += $AmtAuth;
+      $TotalAmtUsed += $AmtUsed;
+      $PrevAmtAuth = $AmtAuth;
+      $PrevAmtUsed = $AmtUsed;
+    }
+  }
+print qq|TotalAmtAuth=$TotalAmtAuth\n| if ( $form->{debug} );
+print qq|TotalAmtUsed=$TotalAmtUsed\n| if ( $form->{debug} );
+print qq|TotalUnitsAuth=$TotalUnitsAuth\n| if ( $form->{debug} );
+print qq|TotalUnitsUsed=$TotalUnitsUsed\n| if ( $form->{debug} );
+# this is the current PA
+  if ( $inv->{PAEffDate} le $CURDATE && $CURDATE le $inv->{PAExpDate} )
+  {
+    $ProvUtil->{$ProvID}->{curtotal}->{AmtAuth} += $TotalAmtAuth;
+    $ProvUtil->{$ProvID}->{curtotal}->{AmtUsed} += $TotalAmtUsed;
+    $ClientUtil->{$ProvID}->{$ClientID}->{curtotal}->{AmtAuth} += $TotalAmtAuth;
+    $ClientUtil->{$ProvID}->{$ClientID}->{curtotal}->{AmtUsed} += $TotalAmtUsed;
+    $ProvUtil->{$ProvID}->{curtotal}->{UnitsAuth} += $TotalUnitsAuth;
+    $ProvUtil->{$ProvID}->{curtotal}->{UnitsUsed} += $TotalUnitsUsed;
+    $ClientUtil->{$ProvID}->{$ClientID}->{curtotal}->{UnitsAuth} += $TotalUnitsAuth;
+    $ClientUtil->{$ProvID}->{$ClientID}->{curtotal}->{UnitsUsed} += $TotalUnitsUsed;
+    delete $ProvUtil->{$ProvID}->{CURRENT};
+    delete $ClientUtil->{$ProvID}->{$ClientID}->{CURRENT};
+  }
+  $ProvUtil->{$ProvID}->{total}->{AmtAuth} += $TotalAmtAuth;
+  $ProvUtil->{$ProvID}->{total}->{AmtUsed} += $TotalAmtUsed;
+  $ClientUtil->{$ProvID}->{$ClientID}->{total}->{AmtAuth} += $TotalAmtAuth;
+  $ClientUtil->{$ProvID}->{$ClientID}->{total}->{AmtUsed} += $TotalAmtUsed;
+  $ProvUtil->{$ProvID}->{total}->{UnitsAuth} += $TotalUnitsAuth;
+  $ProvUtil->{$ProvID}->{total}->{UnitsUsed} += $TotalUnitsUsed;
+  $ClientUtil->{$ProvID}->{$ClientID}->{total}->{UnitsAuth} += $TotalUnitsAuth;
+  $ClientUtil->{$ProvID}->{$ClientID}->{total}->{UnitsUsed} += $TotalUnitsUsed;
+  $PrevProvID=$ProvID;
+  $PrevClientID=$ClientID;
+  $PrevPAAmtAuth = $TotalAmtAuth;
+  $PrevPAAmtUsed = $TotalAmtUsed;
+  $PrevPAUnitsAuth = $TotalUnitsAuth;
+  $PrevPAUnitsUsed = $TotalUnitsUsed;
+  $ClientByName->{$ProvID}->{"$rPrAuth->{LName}, $rPrAuth->{FName} (${ClientID})"} = $ClientID;
+  $ProvByName->{"$rPrAuth->{PLName}, $rPrAuth->{PFName} (${ProvID})"} = $ProvID;
+}
+$sPrAuth->finish();
+
+# finish the report...
+main->Report($cnt);
+
+$sBig->finish();
+$form->complete();
+exit;
+
+############################################################################
+# output the report
+sub Report
+{
+  my ($self,$cnt) = @_;
+  my $SELDATE = DBUtil->Date($CURDATE,'fmt','MM/DD/YYYY');
+  my $hdr = $form->{Type} =~ /overall/i ? "'before' ${SELDATE}" : "'within' ${SELDATE} and months before.";
+  my $clbl = $form->{Type} =~ /overall/i ? 'curtotal' : 'current';
+  my $plbl = $form->{Type} =~ /overall/i ? 'lastPA' : 'previous';
+  my $tlbl = $form->{Type} =~ /overall/i ? 'total' : 'curtotal';
+  my $type = $form->{Type} =~ /overall/i ? 'Overall (meaning previous PA total and current PA total plus all PA total)' : 'Current (meaning monthly total for previous month and total entire current PA)';
+
+  print qq|${DT}\nUtilization Report for approved PAs ${hdr} (Found ${cnt} PAs)\n|;
+  print qq|Type: ${type}\n|;
+  print qq|Legend: P for Provider, C for Client\n|;
+  if ( $form->{Type} =~ /overall/i )
+  { print qq|Type\tName\tPrevious PA\tCurrent PA\tTotal All PAs\n|; }
+  else
+  { print qq|Type\tName\tPrevious Month\tTotal PA\n|; }
+
+  my $Index=0;
+  foreach my $ProviderName ( sort keys %{$ProvByName} )
+  {
+print qq|$ProviderName=$ProvByName->{$ProviderName}\n| if ( $form->{debug} );
+    my $ProvID=$ProvByName->{$ProviderName};
+print qq|CurAmtPct:\n| if ( $form->{debug} );
+    my $CurPct = $ProvUtil->{$ProvID}->{CURRENT};
+    if ( $CurPct eq '' )
+    {
+      my $CurAmtPct = main->CalcPct($ProvUtil->{$ProvID}->{$clbl}->{AmtAuth}
+                                   ,$ProvUtil->{$ProvID}->{$clbl}->{AmtUsed});
+print qq|CurUntPct:\n| if ( $form->{debug} );
+      my $CurUntPct = main->CalcPct($ProvUtil->{$ProvID}->{$clbl}->{UnitsAuth}
+                                   ,$ProvUtil->{$ProvID}->{$clbl}->{UnitsUsed});
+      $CurPct = $CurAmtPct > 0 && $CurUntPct > 0 ? (($CurAmtPct+$CurUntPct)/2)
+              : $CurAmtPct > 0 ? $CurAmtPct : $CurUntPct;
+      $CurPct = sprintf("%.1f",$CurPct) . '%';
+    }
+print qq|PreAmtPct:\n| if ( $form->{debug} );
+    my $PreAmtPct = main->CalcPct($ProvUtil->{$ProvID}->{$plbl}->{AmtAuth}
+                                 ,$ProvUtil->{$ProvID}->{$plbl}->{AmtUsed});
+print qq|PreUntPct:\n| if ( $form->{debug} );
+    my $PreUntPct = main->CalcPct($ProvUtil->{$ProvID}->{$plbl}->{UnitsAuth}
+                                 ,$ProvUtil->{$ProvID}->{$plbl}->{UnitsUsed});
+    my $PrePct = $PreAmtPct > 0 && $PreUntPct > 0 ? (($PreAmtPct+$PreUntPct)/2)
+               : $PreAmtPct > 0 ? $PreAmtPct : $PreUntPct;
+    $PrePct = sprintf("%.1f",$PrePct) . '%';
+print qq|TotAmtPct:\n| if ( $form->{debug} );
+    my $TotAmtPct = main->CalcPct($ProvUtil->{$ProvID}->{$tlbl}->{AmtAuth}
+                                 ,$ProvUtil->{$ProvID}->{$tlbl}->{AmtUsed});
+print qq|TotUntPct:\n| if ( $form->{debug} );
+    my $TotUntPct = main->CalcPct($ProvUtil->{$ProvID}->{$tlbl}->{UnitsAuth}
+                                 ,$ProvUtil->{$ProvID}->{$tlbl}->{UnitsUsed});
+    my $TotPct = $TotAmtPct > 0 && $TotUntPct > 0 ? (($TotAmtPct+$TotUntPct)/2)
+               : $TotAmtPct > 0 ? $TotAmtPct : $TotUntPct;
+    $TotPct = sprintf("%.1f",$TotPct) . '%';
+
+    if ( $form->{Type} =~ /overall/i )
+    { print qq|P\t${ProviderName}\t${PrePct}\t${CurPct}\t${TotPct}\n|; }
+    else
+    { print qq|P\t${ProviderName}\t${PrePct}\t${TotPct}\n|; }
+
+    foreach my $ClientName ( sort keys %{$ClientByName->{$ProvID}} )
+    {
+      my $ClientID = $ClientByName->{$ProvID}->{$ClientName};
+      my $CurPct = $ClientUtil->{$ProvID}->{$ClientID}->{CURRENT};
+print qq|f2=$f2\nCurAmtPct:\n| if ( $form->{debug} );
+      if ( $CurPct eq '' )
+      {
+        my $CurAmtPct = main->CalcPct($ClientUtil->{$ProvID}->{$ClientID}->{$clbl}->{AmtAuth}
+                                     ,$ClientUtil->{$ProvID}->{$ClientID}->{$clbl}->{AmtUsed});
+print qq|CurUntPct:\n| if ( $form->{debug} );
+        my $CurUntPct = main->CalcPct($ClientUtil->{$ProvID}->{$ClientID}->{$clbl}->{UnitsAuth}
+                                     ,$ClientUtil->{$ProvID}->{$ClientID}->{$clbl}->{UnitsUsed});
+        $CurPct = $CurAmtPct > 0 && $CurUntPct > 0 ? (($CurAmtPct+$CurUntPct)/2)
+                : $CurAmtPct > 0 ? $CurAmtPct : $CurUntPct;
+        $CurPct = sprintf("%.1f",$CurPct) . '%';
+      }
+print qq|PreAmtPct:\n| if ( $form->{debug} );
+      my $PreAmtPct = main->CalcPct($ClientUtil->{$ProvID}->{$ClientID}->{$plbl}->{AmtAuth}
+                                   ,$ClientUtil->{$ProvID}->{$ClientID}->{$plbl}->{AmtUsed});
+print qq|PreUntPct:\n| if ( $form->{debug} );
+      my $PreUntPct = main->CalcPct($ClientUtil->{$ProvID}->{$ClientID}->{$plbl}->{UnitsAuth}
+                                   ,$ClientUtil->{$ProvID}->{$ClientID}->{$plbl}->{UnitsUsed});
+      my $PrePct = $PreAmtPct > 0 && $PreUntPct > 0 ? (($PreAmtPct+$PreUntPct)/2)
+                 : $PreAmtPct > 0 ? $PreAmtPct : $PreUntPct;
+      $PrePct = sprintf("%.1f",$PrePct) . '%';
+print qq|TotAmtPct:\n| if ( $form->{debug} );
+      my $TotAmtPct = main->CalcPct($ClientUtil->{$ProvID}->{$ClientID}->{$tlbl}->{AmtAuth}
+                                   ,$ClientUtil->{$ProvID}->{$ClientID}->{$tlbl}->{AmtUsed});
+print qq|TotUntPct:\n| if ( $form->{debug} );
+      my $TotUntPct = main->CalcPct($ClientUtil->{$ProvID}->{$ClientID}->{$tlbl}->{UnitsAuth}
+                                   ,$ClientUtil->{$ProvID}->{$ClientID}->{$tlbl}->{UnitsUsed});
+      my $TotPct = $TotAmtPct > 0 && $TotUntPct > 0 ? (($TotAmtPct+$TotUntPct)/2)
+                 : $TotAmtPct > 0 ? $TotAmtPct : $TotUntPct;
+      $TotPct = sprintf("%.1f",$TotPct) . '%';
+      if ( $form->{Type} =~ /overall/i )
+      { print qq|C\t${ClientName}\t${PrePct}\t${CurPct}\t${TotPct}\n|; }
+      else
+      { print qq|C\t${ClientName}\t${PrePct}\t${TotPct}\n|; }
+    }
+  }
+  return(1);
+}
+
+sub CalcPct
+{
+  my ($self,$InAuth,$InUsed) = @_;
+
+  my $Auth = $InAuth ? $InAuth : 0;
+  my $Used = $InUsed ? $InUsed : 0;
+  if ( $Auth == 0 ) { $Pct = 0; }
+  else { $Pct = ($Used / $Auth) * 100; }
+  print qq|Pct:\tUsed/Auth\t$Used\t$Auth\t=$Pct\n| if ( $form->{debug} );
+  return sprintf("%.1f",$Pct);
+}
+############################################################################

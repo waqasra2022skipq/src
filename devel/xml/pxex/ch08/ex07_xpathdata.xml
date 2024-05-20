@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!DOCTYPE inventory [
+  <!ENTITY poison "<note>danger: poisonous!</note>">
+  <!ENTITY endang "<note>endangered species</note>">
+]>
+<!-- Rivenwood Arboretum inventory -->
+<inventory date="2001.9.4">
+  <category type="tree">
+    <item id="284">
+      <name style="latin">Carya glabra</name>
+      <name style="common">Pignut Hickory</name>
+      <location>east quadrangle</location>
+      &endang;
+    </item>
+    <item id="222">
+      <name style="latin">Toxicodendron vernix</name>
+      <name style="common">Poison Sumac</name>
+      <location>west promenade</location>
+      &poison;
+    </item>
+  </category>
+  <category type="shrub">
+    <item id="210">
+      <name style="latin">Cornus racemosa</name>
+      <name style="common">Gray Dogwood</name>
+      <location>south lawn</location>
+    </item>
+    <item id="104">
+      <name style="latin">Alnus rugosa</name>
+      <name style="common">Speckled Alder</name>
+      <location>east quadrangle</location>
+      &endang;
+    </item>
+  </category>
+</inventory>

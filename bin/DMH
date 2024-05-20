@@ -1,0 +1,12 @@
+select Contracts.PIN,Contracts.InsID,xInsurance.Descr,Provider.Name,Contracts.ProvID
+ from Contracts 
+  left join Provider on Provider.ProvID=Contracts.ProvID 
+  left join xInsurance on xInsurance.ID=Contracts.InsID
+ where Provider.Active=1 and xInsurance.Descr='medicaid' and Contracts.DMHuserid2 is not null
+ group by Contracts.PIN;
+select Credentials.PIN,Credentials.InsID,xInsurance.Descr,Provider.FName,Provider.LName,Credentials.ProvID
+ from Credentials 
+  left join Provider on Provider.ProvID=Credentials.ProvID 
+  left join xInsurance on xInsurance.ID=Credentials.InsID
+ where Provider.Active=1 and xInsurance.Descr='medicaid' and Credentials.DMHuserid2 is not null
+ group by Credentials.PIN;

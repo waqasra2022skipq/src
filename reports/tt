@@ -1,0 +1,21 @@
+I have added some features to help with Secondary Providers getting access to clients.
+
+First the outline of how the system works and should have always worked. No longer are ALL clients, a provider has access to, listed on the Client List. Only the client’s they are Primary Provider for.
+
+On the Manager Tree (MT) Listing:
+ Client List for Provider where Provider is the Primary Provider for the client.
+added to the right side of the screen...
+ Client List for Provider where Provider has been given access to client from the Client Page (only seen for Preference ‘List Clients on Manager Tree’.)
+
+How to set up Provider access:
+A Provider is setup on the MT where if they are a Manager they can see the Client List for their sub-providers.
+A Provider ‘outside’ the branch can be given access at 2 Levels: 1) under the Client Menu->Access Control, 2) Under their Provider Menu->Access Control.
+
+1) Client Menu->Access Control is ‘give away’ access granted to a provider ONLY by the Primary Provider. These secondary providers can be Rehab/SA/etc. This ‘give away’ access was intended for the provider to type in the name of the client in the search box (instead of being on their Client List). However, the need for a listing for these ‘give away’ clients became necessary. This is where the ‘new’ preference ‘List Clients on Manager Tree’ comes in handy for providers. Remember to ‘turn on’ this preference for the secondary providers with Provider Menu->Administration->Preferences. Then they will see on the right side of their MT the  to show these clients.
+
+2) Provider Menu->Access Control is branch access. It is where a whole tree branch is given access to the provider as in the Clinic or just another one or more providers. When this is done the branch shows up on the provider’s MT and they can click on the Client List for a given Primary Provider to see their clients. (‘give away’ is not needed because they see the provider’s client list.)
+
+Note: Another feature is available on the Provider Menu->Administration->Provider Manager Tree. This is a ‘non-working listing’ of what the provider sees on their MT. Only available to those with the HR ‘Provider Access Screens’ privilege. It will help the manager visualize what the access control they have given that provider.
+
+FYI: This change fixes system response time. Some years back the Client Listing started including these ‘give away’ Client access. This was a mistake, which, because many many providers were being given this type of access, it would make the Client List extremely large for some providers. This became a huge problem on Monday’s at 9-10am when these processes would backup and cause the system to run so slow that it seemed to not be running at all. During the rest of the week it would be ok, just a little slow for these providers (some Client Lists would never come up being too large it would time out), but on Mondays with everyone doing their notes for the whole week, trying to get them done before billing at noon, the system would slow down. This change fixes this problem and system response time should no longer be affected.
+

@@ -1,0 +1,14 @@
+text { font: 12px sans-serif; }
+svg  { display: block; }
+#chart1, svg 
+{
+  background-color: white;
+  color: black;
+  margin-top: 10;
+  margin-right: 10;
+  margin-bottom: 10;
+  margin-left: 10;
+  padding: 5px;
+  height: 500;
+  width: 1000;
+}

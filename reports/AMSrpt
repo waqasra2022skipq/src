@@ -1,0 +1,66 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use DBA;
+my $DT = localtime();
+
+############################################################################
+# setup Meaningful Use Accounting
+#   ./rptAMS DBNAME=db&BillDate=billdate&ClientID=clientid
+############################################################################
+my $form = DBForm->new();
+if ( ! SysAccess->verify($form,'Privilege=Agent') )
+{ $form->error("Access Denied! / Agent Privilege"); }
+
+my $debug = 0;
+$form = DBUtil->setDates($form);
+my $fdow = DBUtil->Date($form->{FromDate},'dow');
+my $fdayname = (Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday)[$fdow];
+my $tdow = DBUtil->Date($form->{ToDate},'dow');
+my $tdayname = (Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday)[$tdow];
+my $DateRange = qq|from ${fdayname} $form->{FromDateD} - ${tdayname} $form->{ToDateD}|;
+if ( $form->{LOGINPROVID} == 91 ) { foreach my $f ( sort keys %{$form} ) { warn "NoteRpt: form-$f=$form->{$f}\n"; } }
+
+my $dbh = $form->dbconnect();
+my $GetPatientList = $form->{'ActivityName'} eq '' ? 0 : 1;
+my @HDRS = $GetPatientList
+         ? ('PatientId','ActivityName','Denominator','Numerator_Stage2','Numerator_Stage3')
+         : ('ActivityName','Denominator','Numerator_Stage2','Numerator_Stage3');
+my $e = qq|
+CALL emradv_sp_AMS_CalculateAMSReport(
+'$form->{ProvIDs}',                                                  ## Provider or ALL
+'$form->{ClinicIDs}',                                                ## Agency or ALL
+STR_TO_DATE('$form->{FromDate}','%Y-%m-%d'),                         ## From Date
+STR_TO_DATE('$form->{ToDate}','%Y-%m-%d'),                           ## To Date
+'$form->{ActivityName}',                                             ## Activity Name
+'$form->{AMSType}',                                                  ## 'Stage2' or 'Stage3' or 'ACITransition' or 'ACIonly'
+'${GetPatientList}','1');
+|;
+warn qq|$e\n|;
+my $ProvName = $form->{'ProvIDs'} eq '' ? qq|Provider ALL| : DBA->getxref($form,'Provider',$form->{'ProvIDs'},'FName LName');
+my $ClinicName = $form->{'ClinicIDs'} eq '' ? qq|Clinic ALL| : DBA->getxref($form,'Provider',$form->{'ClinicIDs'},'Name');
+my $Title = $GetPatientList ? qq|ActivityName '$form->{'ActivityName'}'| : '';
+print qq|${DT}\n${ProvName} ${ClinicName} ${Title}\nAMS '$form->{'AMSType'}' Report ${DateRange}\n|;
+foreach my $hdr ( @HDRS ) { print "${hdr}\t"; }
+print qq|\n|;
+my $p= $dbh->prepare($e);
+$p->execute();
+while ( my $r = $p->fetchrow_hashref )
+{ 
+  my $i = 0;
+  foreach my $fld ( @HDRS ) 
+  { 
+    $i++;
+    my $val = $GetPatientList == 0 && $form->{'output'} eq 'html' && $i == 1
+             ?  qq|<A HREF="javascript:ReportWindow('/cgi/bin/GenReport.cgi?Name=AMSReport&mlt=$form->{mlt}&hdrline=4&output=html&AMSType=$form->{AMSType}&ActivityName=$r->{$fld}&ClientIDs=$form->{ClientIDs}&ClinicIDs=$form->{ClinicIDs}&FromDate=$form->{FromDate}&ProvIDs=$form->{ProvIDs}&ToDate=$form->{ToDate}&daterange=$form->{daterange}&xtable=xAMSReports&submit=1','AMSrpt',900,1000)" >$r->{$fld}</A>|
+             : $r->{$fld};
+    $val = DBA->getxref($form,'Client',$r->{$fld},'FName LName').qq| ($r->{$fld})| if ( $fld eq 'PatientId' );
+    print qq|${val}\t|; 
+  }
+  print qq|\n|;
+}
+$p->finish();
+$form->complete();
+exit;
+############################################################################

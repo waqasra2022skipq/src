@@ -1,0 +1,5 @@
+select ClientID,ID as InvNum,InvDate,TotalAmt
+ from Invoices
+ where InvDate>= NOW() - INTERVAL 3 MONTH
+ order by ClientID,InvDate
+;

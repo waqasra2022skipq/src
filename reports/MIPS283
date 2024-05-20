@@ -1,0 +1,199 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use myForm;
+use myDBI;
+use DBA;
+use DBUtil;
+use Time::Local;
+my $DT = localtime();
+############################################################################
+# usage:
+#   MIPS 
+############################################################################
+my $form = myForm->new();
+my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $debug = $form->{'LOGINPROVID'} == 91 ? 0 : 0;
+if ( $debug ) { foreach my $f ( sort keys %{$form} ) { print "form-$f=$form->{$f}\n"; } }
+my $Type = $form->{'Type'};
+$form->{'FromDate'} = '2019-01-01';
+$form->{'ToDate'} = '2019-12-31';
+$form = DBUtil->setDates($form);
+my $DateRange = qq|from $form->{FromDateD} thru $form->{ToDateD}|;
+
+my $multidel = chr(253);
+my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+# join xInsurance needed for withSelection
+my $withSelection = DBA->withSelection($form,'and','Treatment.ClinicID','Treatment.ProvID','Treatment.ClientID','Treatment.TrID');
+my $Header = DBA->withSelectionHeader($form);
+#warn qq|Header: ${Header}\n|;
+$withSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+  $QID = qq|QID283|;
+  $TITLE = qq|Dementia Associated Behavioral and Psychiatric Symptoms Screening and Management - National Quality Strategy Domain: Effective Clinical Care - Meaningful Measure Area: Prevention, Treatment, and Management of Mental Health|;
+  $CTYPE = qq|MIPS CLINICAL QUALITY MEASURES (CQMS)|;
+  $MTYPE = qq|Process|;
+  $DESC = qq|Percentage of patients with dementia for whom there was a documented screening for behavioral and psychiatric symptoms, including depression, and for whom, if symptoms screening was positive, there was also documentation of recommendations for management in the last 12 months|;
+  $INST = qq|This measure is to be submitted a minimum of once per performance period for patients with a diagnosis of dementia seen during the performance period. This measure may be submitted by Merit-based Incentive Payment System (MIPS) eligible clinicians who perform the quality actions described in the measure based on the services provided and the measure-specific denominator coding.|;
+  my @FLDS = ('ClinicName:ClinicName','LName:LastName','FName:FirstName','ClientID:ClientID','DOB:DateOfBirth','Age:Age','Race:Race','pcount:ProbAddr','PrimaryProvider:PrimaryProvider');
+  my $numFLDS = scalar(@FLDS)-2;
+print qq|numFLDS=${numFLDS}\n| if ( $debug );
+  my $qrecord = qq|
+select Treatment.TrID,Treatment.ContLogDate,Treatment.ClinicID,xSC.SCNum
+      ,Client.LName,Client.FName,Client.ClientID
+      ,Clinic.Name as ClinicName
+      ,CONCAT(Counselor.LName,', ',Counselor.FName) as PrimaryProvider
+      ,Client.DOB,TIMESTAMPDIFF(YEAR, Client.DOB, CURDATE()) AS Age
+      ,xRaces.Descr as Race
+      ,misICD10.ICD10
+      ,count(*) as pcount
+ from Treatment 
+  left join Client on Client.ClientID=Treatment.ClientID
+  left join Provider as Clinic on Clinic.ProvID=Client.clinicClinicID
+  left join Provider as Counselor on Counselor.ProvID=Client.ProvID
+  left join okmis_config.xRaces on xRaces.ID=SUBSTRING_INDEX(Client.Race,'${multidel}',1)
+  left join xSC on xSC.SCID=Treatment.SCID
+  left join xInsurance on xInsurance.ID=xSC.InsID
+  left join ClientNoteProblems on ClientNoteProblems.TrID=Treatment.TrID
+  left join okmis_config.misICD10 on misICD10.ID=ClientNoteProblems.UUID
+ where Client.ClientID>100
+   and (Treatment.ContLogDate >= '$form->{FromDate}' and Treatment.ContLogDate<='$form->{ToDate}')
+   and (misICD10.ICD10='A52.17'
+        or misICD10.ICD10='A81.00'
+        or misICD10.ICD10='A81.01'
+        or misICD10.ICD10='A81.89'
+        or misICD10.ICD10='B20'
+        or misICD10.ICD10='F01.50'
+        or misICD10.ICD10='F01.51'
+        or misICD10.ICD10='F02.80'
+        or misICD10.ICD10='F02.81'
+        or misICD10.ICD10='F03.90'
+        or misICD10.ICD10='F03.91'
+        or misICD10.ICD10='F05'
+        or misICD10.ICD10='F10.27'
+        or misICD10.ICD10='G30.0'
+        or misICD10.ICD10='G30.1'
+        or misICD10.ICD10='G30.8'
+        or misICD10.ICD10='G30.9'
+        or misICD10.ICD10='G31.01'
+        or misICD10.ICD10='G31.09'
+        or misICD10.ICD10='G31.83'
+        or misICD10.ICD10='G31.85'
+        or misICD10.ICD10='G31.89'
+        or misICD10.ICD10='G94'
+       )
+   and (xSC.SCNum='90791'
+        or xSC.SCNum='90792'
+        or xSC.SCNum='90832'
+        or xSC.SCNum='90833'
+        or xSC.SCNum='90834'
+        or xSC.SCNum='90836'
+        or xSC.SCNum='90837'
+        or xSC.SCNum='90838'
+        or xSC.SCNum='96116'
+        or xSC.SCNum='96121'
+        or xSC.SCNum='96127'
+        or xSC.SCNum='96130'
+        or xSC.SCNum='96131'
+        or xSC.SCNum='96132'
+        or xSC.SCNum='96133'
+        or xSC.SCNum='96136'
+        or xSC.SCNum='96137'
+        or xSC.SCNum='96138'
+        or xSC.SCNum='96139'
+        or xSC.SCNum='96146'
+        or xSC.SCNum='96150'
+        or xSC.SCNum='96151'
+        or xSC.SCNum='96152'
+        or xSC.SCNum='96153'
+        or xSC.SCNum='96154'
+        or xSC.SCNum='96155'
+        or xSC.SCNum='97165'
+        or xSC.SCNum='97166'
+        or xSC.SCNum='97167'
+        or xSC.SCNum='97168'
+        or xSC.SCNum='99201'
+        or xSC.SCNum='99202'
+        or xSC.SCNum='99203'
+        or xSC.SCNum='99204'
+        or xSC.SCNum='99205'
+        or xSC.SCNum='99211'
+        or xSC.SCNum='99212'
+        or xSC.SCNum='99213'
+        or xSC.SCNum='99214'
+        or xSC.SCNum='99215'
+        or xSC.SCNum='99221'
+        or xSC.SCNum='99222'
+        or xSC.SCNum='99223'
+        or xSC.SCNum='99231'
+        or xSC.SCNum='99232'
+        or xSC.SCNum='99233'
+        or xSC.SCNum='99238'
+        or xSC.SCNum='99239'
+        or xSC.SCNum='99281'
+        or xSC.SCNum='99282'
+        or xSC.SCNum='99283'
+        or xSC.SCNum='99284'
+        or xSC.SCNum='99285'
+        or xSC.SCNum='99304'
+        or xSC.SCNum='99305'
+        or xSC.SCNum='99306'
+        or xSC.SCNum='99307'
+        or xSC.SCNum='99308'
+        or xSC.SCNum='99309'
+        or xSC.SCNum='99310'
+        or xSC.SCNum='99324'
+        or xSC.SCNum='99325'
+        or xSC.SCNum='99326'
+        or xSC.SCNum='99327'
+        or xSC.SCNum='99328'
+        or xSC.SCNum='99334'
+        or xSC.SCNum='99335'
+        or xSC.SCNum='99336'
+        or xSC.SCNum='99337'
+        or xSC.SCNum='99339'
+        or xSC.SCNum='99340'
+        or xSC.SCNum='99341'
+        or xSC.SCNum='99342'
+        or xSC.SCNum='99343'
+        or xSC.SCNum='99344'
+        or xSC.SCNum='99345'
+        or xSC.SCNum='99347'
+        or xSC.SCNum='99348'
+        or xSC.SCNum='99349'
+        or xSC.SCNum='99350'
+        or xSC.SCNum='99487'
+        or xSC.SCNum='99489'
+        or xSC.SCNum='99490'
+        or xSC.SCNum='99497'
+        or xSC.SCNum='99498'
+       )
+  ${withSelection}
+ group by Client.LName,Client.FName,Client.ClientID
+|;
+# group by Client.LName,Client.FName,Client.ClientID,xSC.SCNum,misICD10.ICD10
+#warn qq|qrecord=\n${qrecord}\n|;
+my ($rcount,$total) = (0,0);
+print qq|${DT}\n${QID} ${TITLE} ${DateRange} ${Header}\n|;
+foreach my $f ( @FLDS ) { my ($fld,$hdr) = split(':',$f); print qq|${hdr}\t|; }
+print qq|\n|;
+my $sGCode = $dbh->prepare("select TrID from Treatment left join xSC on xSC.SCID=Treatment.SCID where Treatment.ClientID=? and xSC.SCNum IN ('G9919','G9920','G9921')");
+my $srecord = $dbh->prepare($qrecord);
+$srecord->execute();
+while (my $rrecord = $srecord->fetchrow_hashref)
+{ 
+  $sGCode->execute($rrecord->{'ClientID'});
+  next if (my $rGCode = $sGCode->fetchrow_hashref);
+#  if (my $rGCode = $sGCode->fetchrow_hashref) { warn qq|FOUND: $rrecord->{'ClientID'}\n|; }
+  $rcount++;
+  foreach my $f ( @FLDS ) { my ($fld,$hdr) = split(':',$f); print qq|$rrecord->{$fld}\t|; }
+  print qq|\n|;
+  $total += $rrecord->{'pcount'};
+}
+print qq|${rcount}|."\t" x $numFLDS.qq|${total}\n|;
+$srecord->finish();
+$sGCode->finish();
+
+myDBI->cleanup();
+exit;
+############################################################################
+# where (Client.ClientID=50234 or Client.ClientID=60348 or Client.ClientID=46424 or Client.ClientID=56680 or Client.ClientID=49679)

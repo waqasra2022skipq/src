@@ -1,0 +1,23 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+
+sub test {
+  my $filepath = shift;
+  my $testname = shift;
+
+  ##$filepath =~ m#((?:[^/]*/)*)(.*)#;
+  my ($directory,$filename) = $filepath =~ m#((?:[^/]*/)*)(.*)#;
+
+  print "$filepath -- $testname\n";
+  print "  1: $1\n";
+  print "  2: $2\n\n";
+  print "  directory: $directory\n";
+  print "  filename: $filename\n";
+}
+
+test('/var/log/xyz/10032008.log', 'absolute path');
+test('var/log/xyz/10032008.log', 'relative path');
+test('10032008.log', 'filename-only');
+test('/10032008.log', 'file directly under root');

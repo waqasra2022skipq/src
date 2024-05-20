@@ -1,0 +1,60 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBUtil;
+############################################################################
+# usage:
+#   email -s Subject -m Message -f Attachments -a email_address ...
+############################################################################
+###########################################
+# setup defaults
+##
+($Addr, $Subj, $Mesg, $File) = ('','','','');
+($AddrFlag, $SubjFlag, $MesgFlag, $FileFlag) = (0,0,0);
+
+###########################################
+# get any cat or echo to email message...
+##
+# does not work after kernel upgrade.
+##($inputbytes) = (stat(STDIN))[7];
+##if ($inputbytes > 0) { while (<STDIN>) { $Mesg .= $_; } }
+if ( ! -t STDIN ) { while (<STDIN>) { $Mesg .= $_; } }
+#print "m=$Mesg\n";
+$form='';
+
+###########################################
+# parse out any arguments
+##
+while ( $_ = $ARGV[0] )
+{ 
+  shift;
+  if ( /^-a(.+)/i ) { $Addr = qq|$1 |; }
+  elsif ( /^-s(.+)/i ) { $Subj = $1; }
+  elsif ( /^-m(.+)/i ) { $Mesg = $1; }
+  elsif ( /^-f(.+)/i ) { $File .= qq|$1 |; }
+  elsif ( /^-a$/i ) { $AddrFlag = 1; $SubjFlag = 0; $MesgFlag=0; $FileFlag=0; }
+  elsif ( /^-s$/i ) { $AddrFlag = 0; $SubjFlag = 1; $MesgFlag=0; $FileFlag=0; }
+  elsif ( /^-m$/i ) { $AddrFlag = 0; $SubjFlag = 0; $MesgFlag=1; $FileFlag=0; }
+  elsif ( /^-f$/i ) { $AddrFlag = 0; $SubjFlag = 0; $MesgFlag=0; $FileFlag=1; }
+  elsif ( $AddrFlag ) { $Addr .= qq|$_ |; }
+  elsif ( $SubjFlag ) { $Subj = $_; }
+  elsif ( $MesgFlag ) { $Mesg = $_; }
+  elsif ( $FileFlag ) { $File .= qq|$_ |; }
+  else { print "ERROR: processing command!\n"; }
+}
+###########################################
+#print "a=$Addr\n";
+#print "s=$Subj\n";
+#print "m=$Mesg\n";
+#print "f=$File\n";
+if ( $Addr eq '' )
+{ print "\n";
+  print "usage: \n";
+  print "    email -a Address -s Subject -m Message -f Attachments\n";
+  print "\n";
+  exit;
+}
+###########################################
+# send email via sub-routine
+DBUtil->email($form, $Addr, $Subj, $Mesg, $File, 0);
+exit;

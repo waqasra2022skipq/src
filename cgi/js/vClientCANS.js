@@ -1,0 +1,54 @@
+<!-- Cloak
+function validate(form)
+{
+  return vEntry("notnull",form.ClientCANS_TestDate_1
+                         ,form.ClientCANS_q1_1
+                         ,form.ClientCANS_q2_1
+                         ,form.ClientCANS_q3_1
+                         ,form.ClientCANS_q4_1
+                         ,form.ClientCANS_q5_1
+                         ,form.ClientCANS_q6_1
+                         ,form.ClientCANS_q7_1
+                         ,form.ClientCANS_q8_1
+                         ,form.ClientCANS_q9_1
+                         ,form.ClientCANS_q10_1
+                         ,form.ClientCANS_q11_1
+                         ,form.ClientCANS_q12_1
+                         ,form.ClientCANS_q13_1
+                         ,form.ClientCANS_q14_1
+                         ,form.ClientCANS_q15_1
+                         ,form.ClientCANS_q16_1
+                         ,form.ClientCANS_q17_1
+                         ,form.ClientCANS_q18_1
+                         ,form.ClientCANS_q19_1
+                         ,form.ClientCANS_q20_1
+                         ,form.ClientCANS_q21_1
+                         ,form.ClientCANS_q22_1
+                         ,form.ClientCANS_q23_1
+                         ,form.ClientCANS_q24_1
+                         ,form.ClientCANS_q25_1
+                         ,form.ClientCANS_q26_1
+                         ,form.ClientCANS_q27_1
+                         ,form.ClientCANS_q28_1
+                         ,form.ClientCANS_q29_1
+                         ,form.ClientCANS_q30_1
+                         ,form.ClientCANS_q31_1
+                         ,form.ClientCANS_q32_1
+                         ,form.ClientCANS_q33_1
+                         ,form.ClientCANS_q34_1
+                         ,form.ClientCANS_q35_1
+                         ,form.ClientCANS_q36_1
+                         ,form.ClientCANS_q37_1
+                         ,form.ClientCANS_q38_1
+                         ,form.ClientCANS_q39_1
+                         ,form.ClientCANS_q40_1
+                         ,form.ClientCANS_q41_1
+                         ,form.ClientCANS_q42_1
+                         ,form.ClientCANS_q43_1
+                         ,form.ClientCANS_q44_1
+                         ,form.ClientCANS_q45_1
+                         ,form.ClientCANS_q46_1
+                         ,form.ClientCANS_q47_1
+               );
+}
+//  DeCloak -->

@@ -1,0 +1,128 @@
+/* CSS Document */
+body {
+	background-attachment: fixed;
+	background-color: #999999;
+	background-repeat: repeat;
+	background-position: left top;
+	margin: 0;
+	padding: 0px;
+	left: 0px;
+	top: 0px;
+	background-image: url(images/bkgrd_ucglogo.gif);
+}
+.tdHomeNav {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	color: #333333;
+	background-color: #E0C391;
+	letter-spacing: 1px;
+}
+.txtItalics {
+	font-style: italic;
+}
+.tdTop {
+	vertical-align: top;
+}
+.tdCenter {
+	text-align: center;
+}
+a:link {
+	color: #3300FF;
+	text-decoration: none;
+}
+a:visited {
+	text-decoration: none;
+	color: #990099;
+}
+a:hover {
+	text-decoration: underline;
+}
+.txt10pxBlack {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	color: #000000;
+}
+.txtHeader16bold {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 16px;
+	font-weight: bold;
+	color: #333333;
+}
+.txtBody11px {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: #333333;
+}
+.txtHeader14bold {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	font-weight: bold;
+	color: #333333;
+}
+.txtHeader12bold {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-weight: bold;
+	color: #666666;
+}
+.txt10pxGrey {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	color: #333333;
+}
+.txtHeader14Bgrey {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	font-weight: bold;
+	color: #666666;
+}
+.navLeftHeader {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-weight: bold;
+	color: #000000;
+}
+.tableWhite {
+	background-color: #FFFFFF;
+}
+.tdbgrdline {
+	background-color: #666666;
+}
+.txtBox10 {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+}
+.tdbgrdTan {
+	background-color: #E0C391;
+}
+.txtEmailUp {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	font-weight: normal;
+	color: #333333;
+}
+.tableLightGrey {
+	background-color: #e5e5e5;
+}
+.txtBox11 {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+}
+.searchResults {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	line-height: 25px;
+}
+.brptxt {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 90%;
+	color: #000000;
+	line-height: normal;
+}
+.txtCommentary {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #000000;
+	line-height: 18px;
+}
+

@@ -1,0 +1,28 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use DBA;
+############################################################################
+# This routine removes the dangling ProgNote record.
+############################################################################
+my $form = DBForm->new();
+my $dbh = $form->dbconnect();
+my $qHungNotes = qq|select ProgNotes.NoteID,ProgNotes.ID from ProgNotes left join Treatment on Treatment.TrID=ProgNotes.NoteID where Treatment.TrID is null|;
+my $sHungNotes=$dbh->prepare($qHungNotes);
+my $qHungDEL = qq|delete from ProgNotes where ID=?|;
+my $sHungDEL = $dbh->prepare($qHungDEL);
+$sHungNotes->execute() || $form->dberror($qHungNotes);
+my $cnt = $sHungNotes->rows;
+while ( my ($TrID,$ID) = $sHungNotes->fetchrow_array ) 
+{ 
+  print qq|  delete ID:${ID} for TrID:${TrID}.\n|;
+  $sHungDEL->execute($ID) || $form->dberror($qHungDEL);
+  $sHungDEL->finish();
+}
+$sHungDEL->finish();
+$sHungNotes->finish();
+print qq|  ${cnt} rows updated.\n|;
+$form->complete();
+############################################################################
+exit;

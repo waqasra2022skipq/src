@@ -1,0 +1,65 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBA;
+use myForm;
+use myDBI;
+use DBUtil;
+use Time::Local;
+my $DT = localtime();
+############################################################################
+# usage:
+#   NoRiskAp ForProvID=id
+############################################################################
+my $form = myForm->new();
+my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+#foreach my $f ( sort keys %{$form} ) { warn "form-$f=$form->{$f}\n"; }
+
+my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+# join xInsurance needed for withSelection
+my $Header = DBA->withSelectionHeader($form);
+my $ClinicSelection = DBA->withSelection($form,'where','Client.clinicClinicID','','','');
+$ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+my $sProvider = $dbh->prepare("select LName, FName from Provider where ProvID=?");
+# Type=38 (Assessment)
+my $sClientEDocs = $dbh->prepare("select * from ClientEDocs where ClientEDocs.ClientID=? and ClientEDocs.Type=38 and ClientEDocs.Title LIKE '%Health Risk Appraisal%' order by ClientEDocs.Title");
+my $qClient = qq|
+select Clinic.Name as Clinic
+     ,Client.LName, Client.FName, Client.ClientID, Client.Active, Client.DOB
+     ,Client.CreateDate, Client.ProvID
+     ,CONCAT(Counselor.LName,', ',Counselor.FName,' (',Counselor.ProvID,')') as PrimaryProvider
+  from Client
+    left join Provider as Clinic on Clinic.ProvID=Client.clinicClinicID
+    left join Provider as Counselor on Counselor.ProvID=Client.ProvID
+    left join Insurance on Insurance.ClientID=Client.ClientID
+    left join xInsurance on xInsurance.ID=Insurance.InsID
+  ${ClinicSelection}
+  order by Clinic.Name, Client.LName, Client.FName|;
+#warn qq|qClient=\n${qClient}\n|;
+my $sClient = $dbh->prepare($qClient);
+print qq|${DT}\n${Header}Missing Risk Appraisal report.\n|;
+print qq|Clinic\tClient Name\tActive\tDOB\tAge\tProvider Name\tMessage\n|;
+$sClient->execute();
+while (my $rClient = $sClient->fetchrow_hashref)
+{ 
+  my $ClientID = $rClient->{'ClientID'};
+  my $ActiveFlag = $rClient->{'Active'} ? 'Yes' : 'No';;
+  my $ClientName = qq|$rClient->{'LName'}, $rClient->{'FName'} ($rClient->{'ClientID'})|;
+  my $Age = DBUtil->Date($rClient->{DOB}, 'age');
+  $sProvider->execute($rClient->{ProvID});
+  my ($ProvLName, $ProvFName) = $sProvider->fetchrow_array;
+  my $ProvName = qq|$ProvLName, $ProvFName ($rClient->{ProvID})|; 
+    $sClientEDocs->execute($ClientID);
+    if (my $rClientEDocs = $sClientEDocs->fetchrow_hashref) { null; }
+    else
+    {
+      print qq|$rClient->{'Clinic'}\t${ClientName}\t${ActiveFlag}\t$rClient->{'DOB'}\t${Age}\t${ProvName}\tNO HEALTH RISK APPRAISAL ENTERED\n|;
+    }
+}
+
+$sProvider->finish();
+$sClientEDocs->finish();
+$sClient->finish();
+myDBI->cleanup();
+exit;
+############################################################################

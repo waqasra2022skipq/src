@@ -1,0 +1,84 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use DBA;
+use myHTML;
+
+############################################################################
+my $form = DBForm->new();
+foreach my $f ( sort keys %{$form} ) { warn ": form-$f=$form->{$f}\n"; }
+unless ( $form->{LOGINPROVID} == 91 ) { $form->error("Page DENIED!"); }
+my $html = myHTML->newHTML($form,'Rollup CCDA','CheckPopupWindow noclock countdown_1') . qq|
+<SCRIPT type="text/javascript" src="/cgi/js/ajaxrequest.js"></SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/pickDate.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" >
+function validate(form)
+{
+  return true;
+}
+  \$.datepicker.setDefaults({ dateFormat: 'yy-mm-dd' });
+  \$( function() { \$( "#datepicker1" ).datepicker(); } );
+  \$( function() { \$( "#datepicker2" ).datepicker(); } );
+</SCRIPT>
+
+<TABLE CLASS="main" >
+  <TR> <TD CLASS="hdrcol title" >Rollup CCDA</TD> </TR>
+</TABLE>
+<FORM NAME="MU" ACTION="/cgi/bin/rest.cgi" METHOD="POST" >
+<TABLE CLASS="home fullsize" >
+  <TR>
+    <TD CLASS="strcol" >
+      Name <INPUT TYPE="text" NAME="CLIENTNAME" PLACEHOLDER="Name" >
+      Date of Birth <INPUT TYPE="text" ID="datepicker1" NAME="DOB" VALUE="" PLACEHOLDER="yyyy-mm-dd" ></p>
+    </TD>
+  </TR>
+  <TR>
+    <TD CLASS="strcol" >
+      <BUTTON TYPE="button" ONCLICK="callAjax('searchClient',this.value,'selClient','&multiple=10&name=ClientID&pattern='+document.MU.CLIENTNAME.value+'&dob='+document.MU.DOB.value+'&mlt=$form->{mlt}','mu.pl');" >Search</BUTTON>
+    </TD>
+  </TR>
+  <TR>
+    <TD CLASS="strcol" >
+      Patients
+      <SPAN ID="selClient"></SPAN>
+    </TD>
+  </TR>
+  <TR>
+    <TD CLASS="strcol" >
+      <BUTTON TYPE="button" ONCLICK="callAjax('setClientDetails',this.value,'showDetails','&clientID='+document.MU.ClientID.value+'&mlt=$form->{mlt}','mu.pl');" >Get Patient Details</BUTTON>
+    </TD>
+  </TR>
+  <TR>
+    <TD CLASS="strcol" >
+      <SELECT NAME="STATS" >,
+        <OPTION VALUE="Demographics">Demographics
+        <OPTION VALUE="Vitals">Vitals
+      </SELECT>
+    </TD>
+  </TR>
+  <TR>
+    <TD CLASS="strcol" >
+      Details
+      <SPAN ID="showDetails"></SPAN>
+    </TD>
+  </TR>
+</TABLE>
+  
+<INPUT TYPE="hidden" NAME="mlt" VALUE="$form->{mlt}">
+<BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR>
+</FORM>
+<SCRIPT LANGUAGE="JavaScript">
+document.MU.elements[0].focus();
+callAjax('searchClient','','selClient','&multiple=10','mu.pl');
+</SCRIPT>
+    </TD>
+  </TR>
+</TABLE>
+</BODY>
+</HTML>
+|;
+print $html;
+$form->complete();
+exit;
+############################################################################

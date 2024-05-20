@@ -1,0 +1,14 @@
+<plist>
+  <dict>
+    <key>DefaultDirectory</key>
+    <string>/usr/local/fooby</string>
+    <key>RecentDocuments</key>
+    <array>
+      <string>/Users/bobo/docs/menu.pdf</string>
+      <string>/Users/slappy/pagoda.pdf</string>
+      <string>/Library/docs/Baby.pdf</string>
+    </array>
+    <key>BGColor</key>
+    <string>sage</string>
+  </dict>
+</plist>

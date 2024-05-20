@@ -1,0 +1,2 @@
+#update ha45_v6_users set email='' where username = 'support@okmis.com';
+update ha45_v6_users set email='' where email = 'NULL';

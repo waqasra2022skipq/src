@@ -1,0 +1,6 @@
+carolkennedy
+Adriana#43
+
+select ClientID,LName,FName,DOB,SSN from Client where ClientID=60117;
+ClientID	LName	FName	DOB	SSN
+60117	Barker	Charity	1992-04-01	637-30-2184

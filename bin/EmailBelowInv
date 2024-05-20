@@ -1,0 +1,93 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use DBA;
+use MgrTree;
+use Inv;
+############################################################################
+# usage: EmailBelowInv ForProvID=id\&CurDate=date
+############################################################################
+my $form = DBForm->new();
+my $dbh = $form->dbconnect();
+my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+my $CURDATE = $form->{CurDate} ? $form->{CurDate} : $form->{TODAY};
+print "Email_BelowInv: for ${CURDATE}\n";
+
+############################################################################
+my $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID','where');
+# We don't care about Active=1 Clients, it's based on PA for period.
+# get current PAs.
+my $sClient = $dbh->prepare("select * from Client ${ClinicSelection} order by LName, FName");
+my $sProvider = $dbh->prepare("select * from Provider where ProvID=?");
+############################################################################
+# Start the process.
+my $cnt=0;
+print qq|Client\tAmtAuth\tAmtUsed\tAmtLeft\t%\n|;
+$sClient->execute();
+while ( $rClient = $sClient->fetchrow_hashref )
+{
+  my $inv = Inv->setInv($form,$rClient->{'ClientID'},$CURDATE);
+  next if ( $inv->{'PAgroup'} eq '' );   # medicaid
+
+  # CurPeriod: MM/DD/YYYY-MM/DD/YYYY
+  my $CurPeriod = $inv->{'CurPeriod'};
+  $AmtLeft = sprintf("%.2f",$inv->{$CurPeriod}->{'AmtAuth'} - $inv->{$CurPeriod}->{'AmtUsed'});
+  next if ( $AmtLeft >= 0 );
+
+  $AmtAuth = sprintf("%.2f",$inv->{$CurPeriod}->{'AmtAuth'});
+  $AmtUsed = sprintf("%.2f",$inv->{$CurPeriod}->{'AmtUsed'});
+  $PctAmt = $AmtAuth > 0 ?  sprintf("%.1f",(($AmtLeft / $AmtAuth) * 100)) : '0.0';
+
+  my $BillingReportFlag = SysAccess->chkPriv($form,'BillingReports',$rClient->{'ProvID'});
+  my $ClientName = qq|$rClient->{'LName'}, $rClient->{'FName'} ($rClient->{'ClientID'})|;
+  my $PGCode = $inv->{'PGgroup'};
+
+# Agency
+  $AgencyID = MgrTree->getAgency($form,$inv->{ClinicID});
+  $sProvider->execute($AgencyID);
+  $rAgency = $sProvider->fetchrow_hashref;
+# Clinic
+  $sProvider->execute($inv->{ClinicID});
+  my $rClinic = $sProvider->fetchrow_hashref;
+# Provider
+  $sProvider->execute($inv->{ProviderID});
+  my $rProvider = $sProvider->fetchrow_hashref;
+# Manager
+  my $MgrProvID = MgrTree->getManager($form,$inv->{'ProviderID'});
+  $sProvider->execute($MgrProvID);
+  my $rManager = $sProvider->fetchrow_hashref;
+
+  my $Addrs = qq|$rProvider->{'Email'} $rManager->{'Email'}|;
+  my $Subject = qq|Notes exceed PA for Client ID: $rClient->{ClientID}|;
+  my $Message = qq|
+Agency: $rAgency->{Name}
+Clinic: $rClinic->{'Name'}
+Reported: ${CURDATE}
+
+Provider: $rProvider->{FName} $rProvider->{LName},
+
+Notes for PA Period exceed Authorized Amount
+Period: ${CurPeriod}
+Client: $rClient->{'ClientID'}
+PGCode: ${PGCode}
+|;
+  $Message .= qq|
+Amount Auth: ${AmtAuth}
+Amount Used: ${AmtUsed}\
+Left: ${AmtLeft}
+| if ( $BillingReportFlag );
+  $Message .= qq|Percent: ${PctAmt}%\n|;
+  if ( $Addrs eq '' ) { $Addrs = qq|>>>NO ADDRESS|; }
+  elsif ( $rProvider->{Active} != 1 ) { $Addrs = qq|>>>INACTIVE PROVIDER|; }
+  else { DBUtil->email($form,$Addrs,$Subject,$Message); }
+  print qq|${Subject}\t${Addrs}\n|;
+  print qq|$rClient->{'ClientID'}\t${AmtAuth}\t${AmtUsed}\t${AmtLeft}\t${PctAmt}%\n|;
+  $cnt++;
+}
+print qq|${cnt} PAs exceeded.\n|;
+$sClient->finish();
+$sProvider->finish();
+$form->complete();
+exit;
+############################################################################

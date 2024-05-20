@@ -1,0 +1,58 @@
+#!/usr/bin/perl 
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use myForm;
+use myDBI;
+use Rollup;
+############################################################################
+my $form = myForm->new();
+#warn "ENTER ClientRollup: MIS_Action=$form->{'MIS_Action'}, fwdLINK=$form->{fwdLINK}\n";
+
+if ( !$form->{Provider_ProvID} ) { myDBI->error("Provider Page / denied ProvID NULL"); }
+if ( ! SysAccess->verify($form,'hasProviderAccess') )
+{ myDBI->error("Provider Access Page / Not Provider"); }
+my $ProvID = $form->{Provider_ProvID};
+my $mlt = $form->{mlt};
+my $misLINKS = $form->{misLINKS};
+my $Location = qq|/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=${ProvID}&mlt=${mlt}&misLINKS=$misLINKS\n\n|;
+
+# PROGRAM NOT IN USE.
+############################################################################
+##
+# make sure the directory exists
+##
+my $HomePath = qq|/Provider/EDocs/${ProvID}|;
+my $RootPath = $form->{DOCROOT} . ${HomePath};
+system("perl /bin/mkdir -pm 777 ${RootPath}");
+
+
+my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+
+# get Provider record for summary output.
+my $sProvider = $dbh->prepare("select Type from Provider where ProvID=?");
+$sProvider->execute($form->{Provider_ProvID});
+my $rProvider = $sProvider->fetchrow_hashref;
+
+Rollup->ProviderEDocs($form, $ProvID, "ProviderCreds");
+
+if ( $rProvider->{Type} == 3 ) {
+	# To Print Provider Billing for Clininc
+	Rollup->ProviderEDocs($form, $ProvID, "Billing");
+}
+
+if ( $rProvider->{Type} == 2 ) {
+	# If Agency
+	# Rollup->ProviderEDocs($form, $ProvID, "Billing837");
+	Rollup->ProviderEDocs($form, $ProvID, "ProviderPay");
+	Rollup->ProviderEDocs($form, $ProvID, "Treatment");
+}
+Rollup->ProviderEDocs($form, $ProvID, "ProviderEDocs");
+Rollup->RollupFiles($form, $ProvID);
+my $cnt = Rollup->Notes($form,'',$ProvID); # Progress
+
+warn qq|Rollup complete: ${Location}\n\n|;
+myDBI->cleanup();
+print qq|Location: ${Location}\n\n|;
+exit;
+############################################################################
+

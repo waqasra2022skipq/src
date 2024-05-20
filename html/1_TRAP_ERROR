@@ -1,0 +1,10 @@
+function trapError(sMsg,sUrl,sLine){
+var s="A problem was encountered that prevents the page from being displayed properly or functioning properly.\n\nTry one of the following steps to correct the problem:\n"
+s+="\t- Click Refresh.\n"
+s+="\t- Close your browser and try again.\n"
+s+="\t- Make sure you are running the latest version of your browser.\n"
+s+="\n\n(Error: "+sMsg+" URL: "+sUrl+" Line: "+sLine+")"
+alert(s)
+return true
+}
+window.onerror=trapError

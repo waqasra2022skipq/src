@@ -1,0 +1,36 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use SysAccess;
+############################################################################
+my $form = DBForm->new();
+my $dbh = $form->dbconnect();
+my $ForProvID = $form->{'ProvID'};
+my $DB = $form->{'DBNAME'};
+if ( SysAccess->getRule($form,'PayrollByBillDate',$ForProvID) )
+{ print qq|YES: PayrollByBillDate (${DB})\n|; }
+else
+{ print qq|NO : PayrollByBillDate (${DB})\n|; }
+if ( SysAccess->getRule($form,'NoteSign',$ForProvID) )
+{ print qq|YES: NoteSign (${DB})\n|; }
+else
+{ print qq|NO : NoteSign (${DB})\n|; }
+if ( SysAccess->getRule($form,'NoteServiceType',$ForProvID) )
+{ print qq|YES: NoteServiceType (${DB})\n|; }
+else
+{ print qq|NO : NoteServiceType (${DB})\n|; }
+if ( SysAccess->getRule($form,'EnableCDC',$ForProvID) )
+{ print qq|YES: EnableCDC (${DB})\n|; }
+else
+{ print qq|NO : EnableCDC (${DB})\n|; }
+if ( SysAccess->getRule($form,'EnableBill',$ForProvID) )
+{ print qq|YES: EnableBill (${DB})\n|; }
+else
+{ print qq|NO : EnableBill (${DB})\n|; }
+if ( SysAccess->getRule($form,'GenerateInvoices',$ForProvID) )
+{ print qq|YES: GenerateInvoices (${DB})\n|; }
+else
+{ print qq|NO : GenerateInvoices (${DB})\n|; }
+##############################################################################
+exit;

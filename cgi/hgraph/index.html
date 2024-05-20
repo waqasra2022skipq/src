@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+        <title>hGraph - Health Score Graphing</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+        <meta name="description" content="hGraph">
+        <link href="https://fonts.googleapis.com/css?family=Merriweather&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="./css/style.css">
+
+        <script src="jquery.min.js" type="text/javascript"></script>
+        <script src="d3.js" type="text/javascript"></script>
+        <script src="hammer.js" type="text/javascript"></script>
+        <script src="hg.js" type="text/javascript"></script>
+</head>
+
+<body>
+
+        <section id="userinfo">
+
+                <div id="user-info">
+                        <div class="user selected">
+                                <div class="image">
+                                        <img src="" id="userimg">
+                                </div>
+                                <h1 class="name" id="username" style="font-size:40px"></h1>
+                                <div class="intro" id="intro"> <span id="userage"></span>yo <span
+                                                id="usergender"></span></div>
+                        </div>
+
+                </div>
+
+        </section>
+        <div id="main"></div>
+
+        <div id="user-selection">
+                <ul>
+                </ul>
+        </div>
+        <script src="data/datafile.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,52 @@
+!!!!!!!!!!!! OLD CODE DOCUMENTATION !!!!!!!!!!!!!!!!!!!!
+sub genPatient
+sub genClinical
+  </dataEnterer>| . $self->genParticipants($form,$rTreatment,$rNoteDetail,'ClientNoteFamilyI','') . qq|
+| . $self->genParticipants($form,$rTreatment,$rNoteDetail,'ClientNoteFamilyP','  ') . qq|
+| . $self->genCareTeam($form,$rClientTrPlan->{'ID'},'  ') . qq|
+sub genPatientInfo
+  $out .= $self->genAllergies($form,$rTreatment,$rNoteDetail,'  ')."\n";
+  $out .= $self->genEncounters($form,'  ',$ClientID,$rTreatment->{'TrID'},$rTreatment->{'ContLogDate'},$rTreatment->{'ContLogDate'})."\n";
+  $out .= $self->genProblems($form,$rTreatment,$rNoteDetail,'  ')."\n";
+  $out .= $self->genLabResults($form,$rTreatment,$rNoteDetail,'  ')."\n";
+  $out .= $self->genVitalSigns($form,$rTreatment,$rNoteDetail,'  ')."\n";
+  $out .= $self->genSocialHistory($form,$rTreatment,$rNoteDetail,'  ')."\n";
+  $out .= $self->genProcedures($form,$rTreatment,$rNoteDetail,'  ')."\n";
+  $out .= $self->genTrPlan($form,$rTreatment,$rNoteDetail,$rClientTrPlan,$Assessment,'  ')."\n";
+  $out .= $self->genMedications($form,$rTreatment,$rNoteDetail,'  ')."\n";
+  $out .= $self->genMedicationsAdmin($form,$rTreatment,$rNoteDetail,'  ')."\n";
+  $out .= $self->genImmunization($form,$rTreatment,$rNoteDetail,'  ')."\n";
+  $out .= $self->genFunctionalStatus($form,$rTreatment,$rNoteDetail,'  ')."\n";
+  $out .= $self->genReferrals($form,$rTreatment,$rNoteDetail,'  ')."\n";
+  $out .= $self->genChiefComplaint($form,$rTreatment,$rNoteDetail,$rClientTrPlan,'  ');
+  $out .= $self->genHealthStatus($form,$rTreatment,$rNoteDetail,'  ');
+sub genAllergies
+sub genParticipants
+sub genCareTeam
+sub genProblems
+sub genLabResults
+| . $self->genLabResultsObs($form,$rTreatment,$rNoteDetail,"${spc}    ",$r->{'ID'}) . qq|
+sub genLabResultsObs
+sub genVitalSigns
+sub genSocialHistory
+sub genProcedures
+sub genTrPlan         # FIX xxx
+  $out .= $self->genTrPlanPG($form,$rTreatment,$rNoteDetail,$rClientTrPlan,'  ')."\n";
+  $out .= $self->genHealthConcern($form,$rTreatment,$rNoteDetail,'  ');
+sub genTrPlanPG             # FIX xxx
+sub genHealthConcern
+sub genMedications
+sub genMedicationsAdmin
+sub genImmunization
+sub genFunctionalStatus
+sub genReferrals                   # FIX xxx NEEDED?
+sub genChiefComplaint
+sub genHealthStatus
+sub genKLS
+sub setXML2
+  my $token = $form->{'TODAY'}.'_'.DBUtil->genToken();
+  $xml .= $self->genPatient($form,$rClient,$rTreatment,$rNoteDetail);
+  $xml .= $self->genClinical($form,$rClient,$rTreatment,$rNoteDetail,$rClientTrPlan);
+  $xml .= $self->genPatientInfo($form,$rClient,$rTreatment,$rNoteDetail,$rClientTrPlan,$Assessment);
+sub genEncounters
+| . $self->genCareTeam($form,$rClientTrPlan->{'ID'},"${spc}    ") . qq|

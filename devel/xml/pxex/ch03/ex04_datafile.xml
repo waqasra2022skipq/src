@@ -1,0 +1,14 @@
+<preferences>
+  <font role="console">
+    <fname>Courier</name>
+    <size>9</size>
+  </font>
+  <font role="default">
+    <fname>Times New Roman</name>
+    <size>14</size>
+  </font>
+  <font role="titles">
+    <fname>Helvetica</name>
+    <size>10</size>
+  </font>
+</preferences>

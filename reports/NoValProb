@@ -1,0 +1,85 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use DBA;
+use DBUtil;
+use Time::Local;
+my $DT = localtime();
+############################################################################
+# usage:
+#   NoValProb ForProvID=id\\&Days=dd
+#                               dd=15,30,45...
+############################################################################
+my $form = DBForm->new();
+#foreach my $f ( sort keys %{$form} ) { warn "form-$f=$form->{$f}\n"; }
+my $dbh = $form->dbconnect();
+
+my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+# join xInsurance needed for withSelection
+my $Header = DBA->withSelectionHeader($form);
+my $ClinicSelection = DBA->withSelection($form,'and','Client.clinicClinicID','','','');
+$ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+my $sProvider = $dbh->prepare("select LName, FName from Provider where ProvID=?");
+my $qClientProblems = qq|
+select ClientProblems.ClientID,ClientProblems.Priority,misICD10.ICD10,misICD10.sctName
+ from ClientProblems 
+  left join okmis_config.misICD10 on misICD10.ID=ClientProblems.UUID
+ where ClientProblems.ClientID=?
+   and (sctName REGEXP ".*[(]finding[)]\$"
+    or sctName REGEXP ".*[(]situation[)]\$"
+    or sctName REGEXP ".*[(]event[)]\$")
+ order by ClientProblems.Priority|;
+my $sClientProblems = $dbh->prepare($qClientProblems);
+my $qClient = qq"
+select Client.LName, Client.FName, Client.ClientID, Client.DOB, Client.ProvID, Client.Active, count(*) as Count
+      ,ClientProblems.ID
+  from Client 
+    left join ClientACL on ClientACL.ClientID=Client.ClientID
+    left join ClientProblems on ClientProblems.ClientID=Client.ClientID
+    left join ClientPrAuth on ClientPrAuth.ClientID=Client.ClientID
+    left join ClientPrAuthCDC on ClientPrAuthCDC.ClientPrAuthID=ClientPrAuth.ID
+    left join Insurance on Insurance.InsNumID=ClientPrAuth.InsuranceID
+    left join xInsurance on xInsurance.ID=Insurance.InsID
+  where ClientACL.ProvID='${ForProvID}'
+    and ClientPrAuth.PAnumber is not null
+    and curdate() between ClientPrAuth.EffDate and ClientPrAuth.ExpDate
+    and (ClientPrAuthCDC.TransType=23 || ClientPrAuthCDC.TransType=42)
+  ${ClinicSelection}
+  group by Client.LName, Client.FName, Client.ClientID";
+#warn qq|qClient=\n${qClient}\n|;
+my $sClient = $dbh->prepare($qClient);
+print qq|${DT}\n${Header}Patients that do not have a (Finding), (Situation), or (Event) on the Problem List report.\n|;
+print qq|Client Name\tActive\tDOB\tAge\tNoOfProblems\tProvider Name\tMessage\n|;
+$sClient->execute();
+while (my $rClient = $sClient->fetchrow_hashref)
+{ 
+  my $ClientID = $rClient->{'ClientID'};
+  my $ActiveFlag = $rClient->{'Active'} ? 'Yes' : 'No';;
+  my $ClientName = qq|$rClient->{'LName'}, $rClient->{'FName'} ($rClient->{'ClientID'})|;
+  my $Age = DBUtil->Date($rClient->{DOB}, 'age');
+  $sProvider->execute($rClient->{ProvID});
+  my ($ProvLName, $ProvFName) = $sProvider->fetchrow_array;
+  my $ProvName = qq|$ProvLName, $ProvFName ($rClient->{ProvID})|; 
+  if ( $rClient->{ID} eq '' )
+  {
+    my $msg = 'NO CLIENT PROBLEMS ADDRESSED';
+    print qq|${ClientName}\t${ActiveFlag}\t$rClient->{'DOB'}\t${Age}\t$rClient->{'Count'}\t${ProvName}\t${msg}\n|;
+  }
+  else
+  {
+    $sClientProblems->execute($ClientID);
+    if (my $rClientProblems = $sClientProblems->fetchrow_hashref) { null; }
+    else
+    {
+      print qq|${ClientName}\t${ActiveFlag}\t$rClient->{'DOB'}\t${Age}\t$rClient->{'Count'}\t${ProvName}\tNO finding, situation or event PROBLEMS ENTERED\n|;
+    }
+  }
+}
+
+$sProvider->finish();
+$sClientProblems->finish();
+$sClient->finish();
+$form->complete();
+exit;
+############################################################################

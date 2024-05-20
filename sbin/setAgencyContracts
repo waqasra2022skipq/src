@@ -1,0 +1,48 @@
+#!/usr/bin/perl
+############################################################################
+use lib '/home/okmis/mis/src/lib';
+use myConfig;
+use myForm;
+use myDBI;
+use Accounts;
+require(myConfig->cfg('CFG').'/accounts.cfg');
+############################################################################
+# for bin/ProFTP
+  my $form;
+  my $cdbh = myDBI->dbconnect('okmis_config');
+  my $d = $cdbh->prepare("delete from AgencyContracts");
+  $d->execute() || myDBI->dberror("delete from AgencyContracts");
+  $d->finish();
+  warn qq|setAgencyContracts: NPIRECs: ENTER\n|;
+  my @DBS = Accounts->dbs('active');
+  foreach my $DBNAME ( @DBS )
+  {
+    $form = myForm->new("DBNAME=$DBNAME");
+#warn qq|NPIRECs: got form\n|;
+#foreach my $f ( sort keys %{$form} ) { warn "NPIRECs: form-$f=$form->{$f}\n"; }
+#warn qq|NPIRECs: after form\n|;
+    my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+    my $sContracts = $dbh->prepare("select Contracts.PIN,Contracts.OrgID,ProviderControl.NPI,Provider.Name,xInsurance.Descr,xInsurance.RecID,xInsurance.SubID from Contracts left join xInsurance on xInsurance.ID=Contracts.InsID left join Provider on Provider.ProvID=Contracts.ProvID left join ProviderControl on ProviderControl.ProvID=Contracts.ProvID where Provider.Active=1 and ProviderControl.NPI is not null and Contracts.PIN is not null and xInsurance.RecID is not null and xInsurance.SubID is not null order by ProviderControl.NPI, xInsurance.Descr desc");
+    $sContracts->execute();
+    while ( my ($PIN,$OrgID,$NPI,$Name,$Descr,$RecID,$SubID) = $sContracts->fetchrow_array )
+    {
+      my $r = ();
+      $r->{DB} = $DBNAME;
+      $r->{NPI} = $NPI;
+      $r->{RecID} = $RecID;
+      $r->{SubID} = $SubID;
+      $r->{Descr} = $Descr;
+      $PIN =~ s/-//g;
+      $r->{PIN} = $PIN;
+      $r->{OrgID} = $OrgID;
+      $r->{Name} = $Name;
+      my $q = DBA->genInsert($form,'AgencyContracts',$r);
+      my $s = $cdbh->prepare($q);
+      $s->execute() || myDBI->dberror($q);
+      $s->finish();
+    }
+    $sContracts->finish();
+  }
+myDBI->cleanup();
+exit;
+############################################################################

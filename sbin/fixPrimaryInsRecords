@@ -1,0 +1,56 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use myForm;
+use myDBI;
+use Rollup;
+
+############################################################################
+# usage: fixPrimaryInsRecords "DBNAME=db"
+############################################################################
+
+# Get the command name...
+my ($pw, $cmd) = $0 =~ m/(.*\/)(.*)$/;
+print qq|#${cmd}: Started | . localtime() . qq|\n|;
+
+my $form = myForm->new();
+my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+
+print qq|  Database Selected = $form->{'DBNAME'}...\n|;
+
+# Select unique ClientId with Priority = 2
+my $EB = $dbh->prepare("SELECT * FROM Insurance WHERE ClientID IN (SELECT ClientID FROM Insurance GROUP BY ClientID HAVING COUNT(*) = 1) AND Priority = 2");
+
+$EB->execute();
+
+# Check if the query is bringing any results
+if ($EB->rows == 0) {
+    print "No records found for the given conditions.\n";
+} else {
+    while (my $rEB = $EB->fetchrow_hashref) {
+        # Uncomment the following line to display the selected records
+        my $ClientID = $rEB->{'ClientID'};
+        my $InsNumID = $rEB->{'InsNumID'};
+        print qq|  ClientId = ${ClientID}: InsuranceId = ${InsNumID}: Priority = 2\n|;
+
+        # Update Priority from 2 to 1 for the selected records
+        my $upd_cl_insurance = $dbh->prepare("UPDATE Insurance SET Priority = 1 WHERE ClientId = ? AND Priority = 2 AND InsNumID = ?");
+        
+        $upd_cl_insurance->execute($ClientID, $InsNumID);
+
+        print qq|  ClientId = ${ClientID}: InsuranceId = ${InsNumID}: Priority = 2 -> 1\n|;
+    }
+}
+
+# Finish statement handle
+$EB->finish();
+$upd_cl_insurance->finish();
+
+# Disconnect the database handle
+$dbh->disconnect();
+
+myDBI->cleanup();
+print qq|#${cmd}: Complete | . localtime() . qq|\n\n|;
+############################################################################
+exit;
+

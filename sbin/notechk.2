@@ -1,0 +1,8 @@
+# still need scholarshipped
+select NoteTrans.ID, NoteTrans.BillDate, NoteTrans.RecDate, NoteTrans.PaidAmt, NoteTrans.Code, NoteTrans.SRC, NoteTrans.TrID
+     , Treatment.BillDate as TBD, Treatment.BillStatus, Treatment.RecDate as TRD, Treatment.BilledAmt, Treatment.AmtDue 
+  from NoteTrans
+    left join Treatment on Treatment.TrID=NoteTrans.TrID
+  where Treatment.BillStatus = 5 and Treatment.AmtDue > 0
+  order by Treatment.BillStatus, Treatment.RecDate, Treatment.TrID
+;

@@ -1,0 +1,102 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use Accounts;
+use DBI;
+use DBForm;
+############################################################################
+my $form;
+my $list=0;
+if ( $ARGV[0] eq 'list' ) { $list=1; shift; }
+my $now=0;
+if ( $ARGV[0] eq 'now' ) { $now=1; shift; }
+my $all=0;
+if ( $ARGV[0] eq 'all' ) { $all=1; shift; }
+my $WithProv='';
+if ( $ARGV[0] =~ /ProvID=/ ) { $WithProv=qq|and Links.$ARGV[0]|; shift; }
+my @DBS = scalar(@ARGV) ? @ARGV : Accounts->dbs('active'); 
+my $total = 0;
+print qq|${WithProv}\n|;
+print qq|list=$list, now=$now, all=$all\n|;
+print qq|Started: |.localtime().qq|\n|;
+print qq|==========================================\n|;
+foreach my $DBNAME ( @DBS )
+{
+#next if ( $DBNAME eq 'okmis_4un' );
+#next if ( $DBNAME eq 'okmis_now' );
+#next if ( $DBNAME eq 'okmis_oapcg' );
+  #print qq|Database: $DBNAME\n|;
+  $form = DBForm->new("DBNAME=$DBNAME");
+  my $dbh = $form->dbconnect();
+  my ($HRS,$MIN,$SEC) = split(':',$form->{NOW});
+  my $Line = ();
+  my $Now = ();
+  my $Times = ();
+  my $SortBy = ();
+#        , TIME_FORMAT(CURTIME(),'%r') as HMSAMPM
+#        , '09:11:12 PM' as HMSAMPM
+  my $q = qq|
+select *, DATE_FORMAT(Links.Access,'%m/%d/%Y') as TheDate, TIME_FORMAT(Links.Access,'%r') as TheTime
+        , TIME_FORMAT(CURTIME(),'%r') as HMSAMPM
+  from Links
+    left join Provider on Provider.ProvID=Links.ProvID
+  where Links.Access > curdate()
+    ${WithProv}
+  order by Links.ID, Provider.LName, Provider.FName
+|;
+  my $s = $dbh->prepare($q);
+  $s->execute || $form->dberror($q);
+  while ( my $r = $s->fetchrow_hashref )
+  {
+    $total++;
+    $ProvName = "$r->{LName}, $r->{FName}";
+    (my $Script = $r->{url}) =~ s/\/cgi\/bin\///g;
+    $Script =~ s/\.cgi//;
+    $Script =~ s/&mlt=.*$//g;
+    $Script =~ s/mlt=.*$//g;
+    $Script =~ s/&misLINKS=.*$//g;
+    $Script =~ s/misLINKS=.*$//g;
+    $Script = substr($Script,0,80);
+    my $DB = DBUtil->FmtStr($DBNAME,10,'L');
+    my $PN = DBUtil->FmtStr($ProvName,20,'L');
+    my $ID = DBUtil->FmtStr($r->{ProvID},4,'L');
+    my $DT = DBUtil->FmtStr($r->{TheDate},12,'L');
+    my $TM = DBUtil->FmtStr($r->{TheTime},12,'L');
+    my $SC = DBUtil->FmtStr($Script,65,'L');
+    $Line->{$r->{ProvID}} = qq|${DB} ${PN} ${ID} ${DT} ${TM} ${SC}\n|;
+    ##$Line->{$r->{ProvID}} = sprintf "%.*10s %.*10s %.*4s %.*12s %.*12s %.*45s \n",${DBNAME}, ${ProvName}, $r->{ProvID}, $r->{TheDate}, $r->{TheTime}, ${Script};
+    $Times->{$r->{ProvID}} = $r->{Access};
+    print $Line->{$r->{ProvID}} if ( $list );
+    my ($NOW_HMS,$NOW_AMPM) = split(' ',$r->{HMSAMPM});
+    my ($NOW_H,$NOW_M,$NOW_S) = split(':',$NOW_HMS);
+    my ($HMS,$AMPM) = split(' ',$TM);
+    my ($H,$M,$S) = split(':',$HMS);
+#print qq|$r->{'ProvID'}, NOW_HMS=$NOW_HMS, $r->{HMSAMPM}\n|;
+#print qq|$r->{'ProvID'}, HMS=$HMS, $TM\n|;
+#print qq|$r->{'ProvID'}, NOW_H=${NOW_H}/${H}, NOW_AMPM=${NOW_AMPM}/${AMPM}\n| if ( $r->{'ProvID'} eq 2500 );
+    $Now->{$r->{ProvID}} = $Line->{$r->{ProvID}} if ( $now && ($NOW_H == $H && $NOW_AMPM eq $AMPM) );
+#print qq|Line=$Line->{$r->{ProvID}}, ${now}\n| if ( $r->{'ProvID'} eq 2500 );
+#print qq|Now=$Now->{$r->{ProvID}}, ${now}\n| if ( $r->{'ProvID'} eq 2500 );
+  }
+  $s->finish();
+  if ( $now )
+  {
+    my $cnt = 0;
+    foreach my $p ( sort keys %{$Now} ) { $cnt++; $SortBy->{$Now->{$p}} = $p; }
+    my $idx = 0; $cnt = 0 if ( $all );
+#    foreach my $d ( sort keys %{$SortBy} ) { $idx++; next unless ( $idx > $cnt-7 ); print $Now->{$SortBy->{$d}}; }
+    foreach my $d ( sort keys %{$SortBy} ) { $idx++; print $Now->{$SortBy->{$d}}; }
+  }
+  if ( $list == 0 && $now == 0 )
+  {
+    my $cnt = 0;
+    foreach my $p ( sort keys %{$Times} ) { $cnt++; $SortBy->{$Times->{$p}} = $p; }
+    my $idx = 0; $cnt = 0 if ( $all );
+    foreach my $d ( sort keys %{$SortBy} ) { $idx++; next unless ( $idx > $cnt-7 ); print $Line->{$SortBy->{$d}}; }
+  }
+  $form->complete();
+}
+print qq|==========================================\n|;
+print qq|Completed: |.localtime().qq|\n|;
+print qq|total=${total}\n|;
+exit;
+############################################################################

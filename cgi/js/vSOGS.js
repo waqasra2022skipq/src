@@ -1,0 +1,63 @@
+<!--
+function validate(form)
+{
+  return vEntry("notnull",form.SOGS_TransDate_1
+                         ,form.SOGS_TransType_1
+                         ,form.SOGS_A1a1_1
+                         ,form.SOGS_A1a2_1
+                         ,form.SOGS_A1b1_1
+                         ,form.SOGS_A1b2_1
+                         ,form.SOGS_A1c1_1
+                         ,form.SOGS_A1c2_1
+                         ,form.SOGS_A1d1_1
+                         ,form.SOGS_A1d2_1
+                         ,form.SOGS_A1e1_1
+                         ,form.SOGS_A1e2_1
+                         ,form.SOGS_A1f1_1
+                         ,form.SOGS_A1f2_1
+                         ,form.SOGS_A1g1_1
+                         ,form.SOGS_A1g2_1
+                         ,form.SOGS_A1h1_1
+                         ,form.SOGS_A1h2_1
+                         ,form.SOGS_A1i1_1
+                         ,form.SOGS_A1i2_1
+                         ,form.SOGS_A1j1_1
+                         ,form.SOGS_A1j2_1
+                         ,form.SOGS_A1k1_1
+                         ,form.SOGS_A1k2_1
+                         ,form.SOGS_A1l1_1
+                         ,form.SOGS_A1l2_1
+                         ,form.SOGS_A1m1_1
+                         ,form.SOGS_A1m2_1
+                         ,form.SOGS_A1n1_1
+                         ,form.SOGS_A1n2_1
+                         ,form.SOGS_A2_1
+                         ,form.SOGS_A3_1
+                         ,form.SOGS_A4_1
+                         ,form.SOGS_A5b_1
+                         ,form.SOGS_A6_1
+                         ,form.SOGS_A7_1
+                         ,form.SOGS_A8_1
+                         ,form.SOGS_A9_1
+                         ,form.SOGS_A10_1
+                         ,form.SOGS_A11_1
+                         ,form.SOGS_A12_1
+                         ,form.SOGS_A13_1
+                         ,form.SOGS_A14_1
+                         ,form.SOGS_A15_1
+                         ,form.SOGS_A16_1
+                         ,form.SOGS_A17_1
+                         ,form.SOGS_A18a_1
+                         ,form.SOGS_A18b_1
+                         ,form.SOGS_A18c_1
+                         ,form.SOGS_A18d_1
+                         ,form.SOGS_A18e_1
+                         ,form.SOGS_A18f_1
+                         ,form.SOGS_A18g_1
+                         ,form.SOGS_A18h_1
+                         ,form.SOGS_A18i_1
+                         ,form.SOGS_A18j_1
+                         ,form.SOGS_A18k_1
+               );
+}
+// DeCloak -->

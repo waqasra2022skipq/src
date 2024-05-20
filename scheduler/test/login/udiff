@@ -1,0 +1,16 @@
+echo diff ../../core6/lib/ntsRequest.php ntsRequest.php 
+diff ../../core6/lib/ntsRequest.php ntsRequest.php 
+echo diff ../../core6/lib/ntsUser.php ntsUser.php 
+diff ../../core6/lib/ntsUser.php ntsUser.php 
+echo diff ../../core6/model/user/check_password.php check_password.php 
+diff ../../core6/model/user/check_password.php check_password.php 
+echo diff ../../core6/model/user/create.php create.php 
+diff ../../core6/model/user/create.php create.php 
+echo diff ../../core6/panels/admin/company/staff/create/action.php action.php 
+diff ../../core6/panels/admin/company/staff/create/action.php action.php 
+echo diff ../../core6/panels/admin/root.php root.php 
+diff ../../core6/panels/admin/root.php root.php 
+echo diff ../../core6/panels/anon/login/action.php action-2.php 
+diff ../../core6/panels/anon/login/action.php action-2.php 
+echo diff ../../core6/panels/anon/register/action.php action-3.php 
+diff ../../core6/panels/anon/register/action.php action-3.php 

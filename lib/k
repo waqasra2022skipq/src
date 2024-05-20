@@ -1,0 +1,1 @@
+select ClientLabResults.Code, xLabResults.ConceptCode, xLabResults.ConceptName from ClientLabResults left join okmis_config.xLabResults on xLabResults.ConceptCode=ClientLabResults.Code where ClientLabsID=1 \G

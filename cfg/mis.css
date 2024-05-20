@@ -1,0 +1,21 @@
+
+/* == black on white ============================ */
+.blackonwhite
+{ 
+  color: black;
+  background-color: white;
+  border: solid 3px silver;
+  font-family: Verdana, Arial, Helvetica;
+}
+.txtheader { text-align: center; vertical-align: top; text-decoration: underline; }
+.txtcenter { text-align: center; vertical-align: top; }
+.txtleft   { text-align: left; vertical-align: top; }
+.txtright  { text-align: right; vertical-align: top; }
+.txtgiantb { font-size: 1.5em; font-weight: bold; }
+.txtgiant  { font-size: 1.5em; font-weight: normal; }
+.txtlarge  { font-size: 1em; font-weight: bold; }
+.txtnormal { font-size: 1em; font-weight: normal; }
+.txtmedium { font-size: .8em; font-weight: normal; }
+.txtsmall  { font-size: .6em; font-weight: normal; }
+.txtxsmall { font-size: .4em; font-weight: normal; }
+.hotmsg    { color: red; font-style: italic; }

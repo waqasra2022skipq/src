@@ -1,0 +1,2 @@
+INSERT INTO `user` VALUES ('localhost','shiftexec_mms','*4A12BC2C6ED7526F51081079AB0F78B2A77DF658','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','N','','','','',0,0,0,0,'',NULL,'N');
+INSERT INTO `db` VALUES ('localhost','shiftexec_mms','shiftexec_mms','Y','Y','Y','Y','Y','Y','N','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y','Y');

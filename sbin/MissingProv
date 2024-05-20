@@ -1,0 +1,5 @@
+select ProviderID, ManagerID, ProvID, LName, FName 
+  from Manager 
+  left join Provider on Provider.ProvID=Manager.ProviderID
+  where ProvID is null
+;

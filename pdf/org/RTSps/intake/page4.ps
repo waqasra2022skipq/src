@@ -1,0 +1,275 @@
+% Header box
+% -------------------
+ULOrigin PageWidth RM LM add sub 80 box
+
+ULOrigin 20 sub moveto % drop 20 from ULOrigin
+CurrentY               % leave y coord for cshow
+Header setfont
+(INTEGRIS BEHAVIORAL HEALTH) cshow
+ULOrigin 34 sub moveto
+CurrentY
+SubHeader setfont
+(OAYS PROVIDER NETWORK) cshow
+ULOrigin 65 sub moveto
+CurrentY
+Header setfont
+(CLIENT OUTPATIENT ASSESSMENT) cshow
+ULOrigin 76 sub moveto
+CurrentY
+/Times findfont 9 scalefont setfont
+(\(TO BE COMPLETED BY THIRD VISIT\)) cshow
+
+% Identifying information box 
+% ---------------------------
+ULOrigin 94 sub moveto
+currentpoint PageWidth RM LM add sub 334 box
+newpath ULOrigin 117 sub moveto
+PageWidth RM sub CurrentY lineto
+stroke
+
+/Times-Bold findfont 11 scalefont setfont
+ULOrigin 110 sub moveto
+CurrentY
+(IDENTIFYING INFORMATION / SOCIAL STATUS) cshow
+
+Body setfont
+BodyLeftEdge ULOriginY 149 sub moveto
+(Last Name: ) =show
+0 -2 rmoveto
+162 0 rlineto
+ULOrigin pop 240 add CurrentY moveto
+(First Name: ) =show
+0 -2 rmoveto
+156 0 rlineto
+ULOrigin pop 468 add CurrentY moveto
+(MI: ) =show
+0 -2 rmoveto
+PageWidth RM 6 add sub CurrentY lineto
+stroke
+
+% Lines: 172, 195, 219, 242, 265, 289, 312, 336, 359, 379, 406
+% To keep all boxes and columns consistent
+/Col1  	ULOriginX 102 add def
+/Col1Text Col1 14 add def
+/Col2  	ULOriginX 168 add def
+/Col2Text Col2 14 add def
+/Col3  	ULOriginX 250 add def
+/Col3Text Col3 14 add def
+/Col4  	ULOriginX 322 add def
+/Col4Text Col4 14 add def
+/Col5  	ULOriginX 394 add def
+/Col5Text Col5 14 add def
+
+/Line1 	ULOriginY 172 sub def
+/Line2 	ULOriginY 196 sub def
+/Line3 	ULOriginY 220 sub def
+/Line4 	ULOriginY 244 sub def
+/Line5 	ULOriginY 268 sub def
+/Line6 	ULOriginY 290 sub def
+/Line7 	ULOriginY 314 sub def
+/Line8 	ULOriginY 338 sub def
+/Line9 	ULOriginY 362 sub def
+/Line10 ULOriginY 386 sub def
+/Line11 ULOriginY 410 sub def
+
+BodyLeftEdge Line1 moveto
+(Lives With:) show
+Col1 Line1 CBSize boxOnLine
+  Line1 Col1 moveto (Spouse) reportPos
+  Col1Text Line1 moveto
+  (Spouse) show
+Col2 Line1 CBSize boxOnLine
+  Col2 Line1 moveto (Alone) reportPos
+  Col2Text Line1 moveto
+  (Alone) show
+Col3 Line1 CBSize boxOnLine
+  Col3 Line1 moveto (Parents) reportPos
+  Col3Text Line1 moveto
+  (Parents) show
+Col4 Line1 CBSize boxOnLine
+  Col4 Line1 moveto (Community Placement) reportPos
+  Col4Text Line1 moveto
+  (Community Placement) show
+
+Col1 Line2 CBSize boxOnLine
+  Col1 Line2 moveto (Other CB\(Lives with\)) reportPos
+  Col1Text Line2 moveto
+  (Other:) show
+  Col2 Line2 moveto (Other Text\(Lives with\)) reportPos
+  0 -2 rmoveto
+  PageWidth RM 6 add sub Line2 lineto
+  stroke
+
+BodyLeftEdge Line3 moveto
+(Marital Status:) show
+Col1 Line3 moveto
+  (Single) reportPos
+  currentpoint CBSize boxOnLine
+  Col1Text Line3 moveto
+  (Single) show
+Col2 Line3 moveto
+  (Married) reportPos
+  currentpoint CBSize boxOnLine
+  Col2Text Line3 moveto
+  (Married) show
+Col3 Line3 moveto
+  (Divorced) reportPos
+  currentpoint CBSize boxOnLine
+  Col3Text Line3 moveto
+  (Divorced) show
+Col4 Line3 moveto
+  (Widowed) reportPos
+  currentpoint CBSize boxOnLine
+  Col4Text Line3 moveto
+  (Widowed) show
+Col5 Line3 moveto
+  (N/A \(Marital\)) reportPos
+  currentpoint CBSize boxOnLine
+  Col5Text Line3 moveto
+  (N/A) show
+
+BodyLeftEdge Line4 moveto
+(Parental Status:) show
+Col1 Line4 moveto
+  (Single Parent) reportPos
+  currentpoint CBSize boxOnLine
+  Col1Text Line4 moveto
+  (Single Parent) show
+Col3 Line4 moveto
+  (Single Parent w/ Children CB) reportPos 
+  currentpoint CBSize boxOnLine
+  Col3Text Line4 moveto
+  (Single Parent With Child\(ren\)  No. ) show
+  (Single Parent With Children Text) reportPos
+  0 -2 rmoveto
+  24 0 rlineto
+  stroke
+
+Col1 Line5 moveto
+  (Two Parent Family) reportPos
+  currentpoint CBSize boxOnLine
+  Col1Text Line5 moveto
+  (Two Parent Family) show
+Col3 Line5 moveto
+  (N/A \(Parental\)) reportPos
+  currentpoint CBSize boxOnLine
+  Col3Text Line5 moveto
+  (N/A) show
+Col4 Line5 moveto
+  (Other\(Parental\) CB) reportPos
+  currentpoint CBSize boxOnLine
+  Col4Text Line5 moveto
+  (Other: ) show
+  (Other\(Parental\) Text) reportPos
+  0 -2 rmoveto
+  PageWidth RM 6 add sub CurrentY lineto
+  stroke
+
+/Times findfont 13 scalefont setfont
+BodyLeftEdge Line6 moveto
+(OTHER RELEVANT DEMOGRAPHICS APPLICABLE TO CLIENT:) show
+
+Body setfont
+Col1 Line7 moveto
+  (Employed Half-time) reportPos
+  currentpoint CBSize boxOnLine
+  Col1Text Line7 moveto
+  (Employed Half-time) show
+Col3 Line7 moveto
+  (Unemployed) reportPos
+  currentpoint CBSize boxOnLine
+  Col3Text Line7 moveto
+  (Unemployed) show
+Col5 Line7 moveto
+  (Disability) reportPos
+  currentpoint CBSize boxOnLine
+  Col5Text Line7 moveto
+  (Disability) show
+
+Col1 Line8 moveto
+  (Worker's Comp) reportPos
+  currentpoint CBSize boxOnLine
+  Col1Text Line8 moveto
+  (Worker's Comp) show
+Col3 Line8 moveto
+  (Retired) reportPos
+  currentpoint CBSize boxOnLine
+  Col3Text Line8 moveto
+  (Retired) show
+Col5 Line8 moveto
+  (Student) reportPos
+  currentpoint CBSize boxOnLine
+  Col5Text Line8 moveto
+  (Student) show
+
+Col1 Line9 moveto
+  (Child Welfare) reportPos
+  currentpoint CBSize boxOnLine
+  Col1Text Line9 moveto
+  (Child Welfare) show
+Col3 Line9 moveto
+  (OJA) reportPos
+  currentpoint CBSize boxOnLine
+  Col3Text Line9 moveto
+  (OJA) show
+Col5 Line9 moveto
+  (Custody) reportPos
+  currentpoint CBSize boxOnLine
+  Col5Text Line9 moveto
+  (Custody) show
+
+Col1 Line10 moveto
+  (OCI) reportPos
+  currentpoint CBSize boxOnLine
+  Col1Text Line10 moveto
+  (OCI) show
+Col3 Line10 moveto
+  (Expelled) reportPos
+  currentpoint CBSize boxOnLine
+  Col3Text Line10 moveto
+  (Expelled From School) show
+Col5 Line10 moveto
+ (ED / SED) reportPos
+  currentpoint CBSize boxOnLine
+  Col5Text Line10 moveto
+  (ED / SED) show
+
+Col1 Line11 moveto
+  (Other \(Demographics\) CB) reportPos
+  currentpoint CBSize boxOnLine
+  Col1Text Line11 moveto
+  (IEP) show
+Col3 Line11 moveto
+  (Other \(Demo\) Text) reportPos
+  currentpoint CBSize boxOnLine
+  Col3Text Line11 moveto
+  (Other: ) show
+  0 -2 rmoveto
+  PageWidth RM 6 add sub CurrentY lineto
+  stroke
+
+
+% Physical History box
+% --------------------
+ULOrigin 443 sub moveto
+currentpoint PageWidth RM LM add sub 208 box
+newpath ULOrigin 467 sub moveto
+PageWidth RM sub CurrentY lineto
+stroke
+/Times-Bold findfont 11 scalefont setfont
+ULOrigin 460 sub moveto
+CurrentY
+(PHYSICAL HISTORY) cshow
+
+Body setfont
+BodyLeftEdge ULOriginY 484 sub moveto
+(Is client currently under the care of a physician for medical problems? \(If so, give physician name & details\)) show
+
+
+% Page number
+% -----------
+% Right-Justify the page number against the right-side box boundary 
+%   1/2" from bottom
+(1  of  4) dup stringwidth pop PageWidth RM sub exch sub 18 moveto
+show
+showpage

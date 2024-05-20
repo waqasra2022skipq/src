@@ -1,0 +1,23 @@
+#!/bin/bash
+# kls, daily 2/2/98, 11/26/2001
+# ------------------------------------
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   print "\nServices not installed!"
+   exit 1
+fi
+Cnt=1
+cat me |
+while read line; do
+t1=$(echo $line | awk -F' ' '{print $1}')
+  if [ "${t1}" = "INSERT" ]; then
+p1=$(echo $line | awk -F'(' '{print $1}')
+p2=$(echo $line | awk -F'(' '{print $2}')
+#p3=$(echo $line | awk -F',' '{print $1","$2","$3","$4","$5","$6","$7","$8}","$9","$10')
+print "${p1}($Cnt,${p2}"
+   Cnt=$(expr $Cnt + 1)
+  else
+    print "$line"
+  fi
+done

@@ -1,0 +1,112 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use  DBI;
+use  DBForm;
+use  DBA;
+use Time::Local;
+$DT = localtime();
+
+############################################################################
+# usage:
+#   LastMedicalContact ForProvID=id\\&Days=dd
+#                                          dd=5,10,20,30,45...
+############################################################################
+$form = DBForm->new();
+my $dbh = $form->dbconnect();
+$xref='Clinics';
+  $s=$dbh->prepare("select * from Provider where Type=3");
+  $s->execute();
+  while (my $r = $s->fetchrow_hashref) { $$xref{$r->{ProvID}} = $r; }
+$s->finish;
+my $Days = $form->{'Days'} ? $form->{'Days'} : 0;
+my $ForProvID = $form->{'ForProvID'} ? $form->{'ForProvID'} : $form->{'LOGINPROVID'};
+my $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID');
+
+############################################################################
+my $sClientReferrals = $dbh->prepare("select * from ClientReferrals where ClientID=? ");
+my $sInsurance = $dbh->prepare("select * from Insurance where ClientID=? and Priority=1 order by InsNumEffDate desc");
+my $sPrAuth = $dbh->prepare("select * from ClientPrAuth where ClientID=? and ? between EffDate and ExpDate order by EffDate  desc");
+
+my $Sel = $form->{'Type'} eq 'LBHP' ?
+     qq|and xSC.SCNum NOT LIKE 'H2014%' and xSC.SCNum NOT LIKE 'H2015%' and xSC.SCNum NOT LIKE 'H2017%' and xSC.SCNum NOT LIKE 'T1016%' and xSC.SCNum NOT LIKE 'T1017%' and xSC.SCNum NOT LIKE '9%'|
+        : $form->{'Type'} eq 'Medical' ?
+     qq|and (xSC.SCNum LIKE '90792%' or xSC.SCNum LIKE '90833%' or xSC.SCNum LIKE '90838%' or xSC.SCNum LIKE '90866%' or xSC.SCNum LIKE '99%')|
+        : qq||;
+#warn qq|Sel=$Sel\n|;
+my $sTreatment = $dbh->prepare("select * from Treatment left join xSC on xSC.SCID=Treatment.SCID where ClientID=? and xSC.SCNum NOT LIKE 'X%' ${Sel} order by Treatment.ContLogDate desc");
+my $sProvider = $dbh->prepare("select * from Provider where ProvID=?");
+
+############################################################################
+my $sortrecs = ();
+my $Hdr = $form->{'Type'} eq 'LBHP'    ? 'LBHP Contact'
+        : $form->{'Type'} eq 'Medical' ? 'Medical Contact'
+        : 'Contact';
+print qq|${DT}\nClient's Last ${Hdr} Report over ${Days} days\n|;
+print "ClinicName\tClient\tClientID\tActive\tAddress\tReferred By\tLast Service\tContact Date\tDays\tNote Provider\tPrimary Provider\tTLevel\tPrimary Insurance\n";
+my $qClient = qq|
+select Client.* from Client 
+    left join Provider on Provider.ProvID=Client.clinicClinicID
+  where Client.Active=1 ${ClinicSelection} 
+  order by Provider.Name, Client.LName, Client.FName
+|;
+#warn qq|qClient=$qClient\n|;
+my $sClient = $dbh->prepare($qClient);
+$sClient->execute() || $form->dberror($qClient);
+while ( my $rClient = $sClient->fetchrow_hashref )
+{
+
+  $sTreatment->execute($rClient->{ClientID}) || $form->dberror("select Treatment");
+  my $rTreatment = $sTreatment->fetchrow_hashref;
+  my $days = DBUtil->Date($form->{TODAY},'diff',$rTreatment->{ContLogDate});
+#warn qq|$rClient->{ClientID},$Days,$rTreatment->{ContLogDate},$days\n|;
+  if ( $days > $Days )
+  {
+    my $ReferredBy = 'NONE';
+    $sClientReferrals->execute($rClient->{'ClientID'}) || $form->dberror("select ClientReferrals");
+    if ( my $rClientReferrals = $sClientReferrals->fetchrow_hashref )
+    {
+      my $rxNPI = DBA->selxref($form,'xNPI','NPI',$rClientReferrals->{'ReferredBy1NPI'});
+      $ReferredBy = $rxNPI->{'ProvOrgName'};
+    }
+    $rClient->{ContactDate} = $rTreatment->{ContLogDate};      # carry to print array
+    $rClient->{SCNum} = $rTreatment->{SCNum};                  # carry to print array
+    $rClient->{NoteProvID} = $rTreatment->{ProvID};            # carry to print array
+    my $key = qq|${days}_$rClient->{LName} $rClient->{FName}|;
+    $sortrecs->{$ReferredBy}->{$key} = $rClient;
+  }
+}
+foreach my $RefBy ( sort keys %{$sortrecs} )
+{
+  foreach my $key ( sort { $b <=> $a } keys %{$sortrecs->{$RefBy}} )
+  {
+    my $r = $sortrecs->{$RefBy}->{$key};
+    my ($days,$rest) = split('_',$key);
+    my $ClinicName = $Clinics{$r->{clinicClinicID}}{Name};
+    my $InsName = 'NONE';
+    $sInsurance->execute($r->{ClientID}) || $form->dberror("select Insurance $r->{ClientID}");
+    if ( my $rInsurance = $sInsurance->fetchrow_hashref ) 
+    { $InsName = DBA->getxref($form,'xInsurance',$rInsurance->{InsID},'Name'); }
+    my $TL = 'NONE';
+    $sPrAuth->execute($r->{ClientID},$r->{ContactDate}) || $form->dberror("select ClientPrAuth $r->{CLientID}/$r->{ContactDate}");
+    if ( my $rPrAuth = $sPrAuth->fetchrow_hashref ) 
+    { $TL = $rPrAuth->{TL}; }
+    my $PrimaryProvider = 'UNK';
+    $sProvider->execute($r->{ProvID});
+    if ( my $rProvider = $sProvider->fetchrow_hashref )
+    { $PrimaryProvider = qq|$rProvider->{LName}, $rProvider->{FName} ($rProvider->{ProvID})|; }
+    my $NoteProvider = 'UNK';
+    $sProvider->execute($r->{NoteProvID});
+    if ( my $rProvider = $sProvider->fetchrow_hashref )
+    { $NoteProvider = qq|$rProvider->{LName}, $rProvider->{FName} ($rProvider->{ProvID})|; }
+    print qq|${ClinicName}\t$r->{FName} $r->{LName}\t$r->{ClientID}\t$r->{Active}\t$r->{Addr1}\t${RefBy}\t$r->{SCNum}\t$r->{ContactDate}\t${days}\t${NoteProvider}\t${PrimaryProvider}\t${TL}\t${InsName}\n|;
+  }
+}
+$sClientReferrals->finish();
+$sTreatment->finish();
+$sClient->finish();
+$sInsurance->finish();
+$sPrAuth->finish();
+$sProvider->finish();
+$form->complete();
+exit;
+############################################################################

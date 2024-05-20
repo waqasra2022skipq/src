@@ -1,0 +1,14 @@
+# move Transaction
+#update NoteTrans set TrID=312325 where ID=439933;
+#update Treatment set BillStatus=5,RecDate='2019-05-21',StatusDate=RecDate,AmtDue=0.00 where TrID=312325;
+#update Treatment set BillStatus=6,StatusDate='2018-10-17',DenCode='016',DenDate=StatusDate,RecDate=NULL,CIPDate=NULL,COPLDate=NULL,PaidDate=NULL,AmtDue=50.10 where TrID=256333;
+
+# Recoupment
+#update Treatment set BillStatus=9,RecDate=NULL,AmtDue=22.32 where TrID=310719;
+
+# reDENY note
+#update Treatment set BillStatus=6,StatusDate='2020-03-09',DenCode='A1',DenDate=StatusDate,RecDate=NULL,CIPDate=NULL,COPLDate=NULL,PaidDate=NULL,AmtDue=57.36 where TrID=358237;
+
+# unScholarship/rebill
+update Treatment set BillStatus=6, BillDate=NULL, CIPDate=NULL, DenDate=NULL, DenCode=NULL, RecDate=NULL, COPLDate=NULL, PaidDate=NULL,AmtDue=54.42 where TrID=328911;
+delete from NoteTrans where ID=509557;

@@ -1,0 +1,188 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use SysAccess;
+use DBA;
+use DBUtil;
+use cBill;
+use uBill;
+use Time::Local;
+my $DT = localtime();
+
+############################################################################
+# usage: BillingErrors DBNAME={dbname}\&GenProvReport=1
+#        GenProvReport: adds Totals with warn (formatted output to STDERR)
+#                        this sends the STDERR to the user
+############################################################################
+my $form = DBForm->new();
+if ( ! SysAccess->verify($form,'Privilege=BillingReports') )
+{ $form->error("Access Denied! / Privilege"); }
+$form = DBUtil->setDates($form);
+my $DateRange = qq|from $form->{FromDateD} thru $form->{ToDateD}|;
+my $dbh = $form->dbconnect();
+#foreach my $f ( sort keys %{$form} ) { warn "form-$f=$form->{$f}\n"; }
+
+#######################################################
+# Initialize table lookups
+##
+$s=$dbh->prepare("select * from Provider where Type=3");
+  $s->execute();
+  while (my $r = $s->fetchrow_hashref) { $ClinicList{$r->{ProvID}} = $r; }
+$s=$dbh->prepare("select * from xInsurance");
+  $s->execute();
+  while (my $r = $s->fetchrow_hashref) { $xInsurance{$r->{ID}} = $r; }
+  $xInsurance{0}{ID} = 0;
+  $xInsurance{0}{Name} = 'No Insurance';
+  $xInsurance{0}{Descr} = 'none';
+$s->finish();
+
+$sProvider = $dbh->prepare("select * from Provider where ProvID=?");
+my $NotSet = ();
+my $qBillit = qq|update Treatment set BillStatus=?, StatusMsg=NULL where TrID=? and BillStatus=2|;
+my $sBillit = $dbh->prepare($qBillit);
+my $qUnBill = qq|update Treatment set BillStatus=2, StatusMsg=? where TrID=?|;
+my $sUnBill = $dbh->prepare($qUnBill);
+
+my $NoAuth = ''; my $NoDiag = '';
+#############################################################################
+# START THE SHOW. Process the Providers/Clinics
+my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+#my $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Treatment.ClinicID');
+my $addSelection = DBA->getForProvID($form,$ForProvID,'and','Treatment.ClinicID','Treatment.ProvID');
+##
+# select Treatments Reviewed but not InProcess and not yet Scholarshipped or Reconciled...
+##
+my $qNotes = qq|
+  select Treatment.ClinicID, Treatment.ClientID, Treatment.TrID, Treatment.SCID
+      ,Treatment.ContLogDate, Treatment.ContLogBegTime, Treatment.ContLogEndTime
+      ,Treatment.BillDate, Treatment.BillStatus
+      ,Clinic.Name as ClinicName
+      ,Client.FName, Client.LName
+      ,xSC.InsID, xSC.SCID, xSC.SCNum
+      ,xInsurance.Descr as InsDescr, xInsurance.Name as InsName
+  from Treatment
+    left join Provider as Clinic on Clinic.ProvID=Treatment.ClinicID
+    left join Client on Client.ClientID=Treatment.ClientID
+    left join xSC on xSC.SCID=Treatment.SCID
+    left join xInsurance on xInsurance.ID=xSC.InsID
+  where Treatment.BillStatus<3 and Treatment.MgrRevDate is not null
+    ${addSelection}
+  order by Clinic.Name, xInsurance.Name, Client.LName, Client.FName, Treatment.ContLogDate
+|;
+#print "BillingErrors: qNotes=$qNotes\n";
+$sNotes = $dbh->prepare($qNotes);
+
+#####################################################################
+##
+# Validate billing.
+##
+my ($Cnt,$FatalCnt,$WarnCnt) = (0,0,0);
+my ($NoteCnt,$PrevKey,$Key,$BillAmt,$Passed,$Failed) = (0,'','',0,0,0);
+print qq|${DT}\nBilling Errors\n|;
+print qq|Type\tMessage\tClinicName\tInsName\tClientName\tTrID\tContDate\tSCNum\n|;
+$sNotes->execute() || $form->dberror($qNotes);
+while ( $rNotes = $sNotes->fetchrow_hashref )
+{
+  $Cnt++;
+#print qq|Client: $rNotes->{ClientID}\t$rNotes->{TrID}\t$rNotes->{BillStatus}\t$rNotes->{BillDate}\n|;
+#foreach my $f ( sort keys %{$rNotes} ) { warn "rNotes-$f=$rNotes->{$f}\n"; }
+  my $ClinicID = $rNotes->{ClinicID};
+  my $ClinicName = $rNotes->{ClinicName};
+  my $InsID = $rNotes->{InsID} ? $rNotes->{InsID} : '0';           # 0 = No Insurance, none.
+  my $InsDescr = $rNotes->{InsID} ? $rNotes->{InsDescr} : 'none';  # 0 = No Insurance, none.
+  my $InsName = $rNotes->{InsID} ? $rNotes->{InsName} : 'none';    # 0 = No Insurance, none.
+  my $ClientID = $rNotes->{ClientID};
+  my $ClientName = qq|$rNotes->{LName}, $rNotes->{FName} ($rNotes->{ClientID})|;
+  my $TrID = $rNotes->{TrID};
+  my $ContDate = $rNotes->{ContLogDate};
+  my $SCNum = $rNotes->{SCNum};
+  my ($code,$msg,$fatalmsg) = (0,'','');
+
+  $Key = $ClinicName . '_' . $InsName;
+  if ( $PrevKey ne '' && $Key ne $PrevKey )
+  {
+    my ($C,$I) = split('_',$PrevKey);
+    $BillAmt = sprintf("%.2f",$BillAmt);
+    print qq|Totals\t\t${C}\t${I}\t${NoteCnt}\t\$${BillAmt}\tPassed=${Passed}\tFailed=${Failed}\n|;
+    if ( $form->{GenProvReport} )
+    {
+      my $CN = $C . ' ' x int(30 - length($C));
+      my $IN = $I . ' ' x int(30 - length($I));
+      my $NC = ' ' x int(8 - length($NoteCnt)) . $NoteCnt;
+      my $BA = ' ' x int(12 - length($BillAmt)) . '$' . $BillAmt;
+      warn qq|Totals\t\t${CN}\t${IN}\t${NC}\t${BA}\tPassed=${Passed}\tFailed=${Failed}\n|;
+    }
+    $NoteCnt = 0;
+    $BillAmt = 0;
+    $Passed = 0;
+    $Failed = 0;
+  }
+  $NoteCnt++;
+  $PrevKey = $Key;
+#print qq|\nClientID=$ClientID,InsID=$InsID,InsDescr=$InsDescr,TrID=$TrID,SCNum=$SCNum\n|;
+  my $rxSC = cBill->getServiceCode($form,$rNotes->{SCID},$rNotes->{ContLogDate},$rNotes->{ContLogBegTime},$rNotes->{ContLogEndTime},$rNotes->{TrID},$rNotes->{BillDate});
+#  if ( $rxSC->{UnitLbl} eq 'NonBill' )    # print so our NoteCnt matches.
+#  { print qq|NonBill\t\t$ClinicName\t$InsName\t$ClientName\t$TrID\t$ContDate\t$SCNum\n|; }
+#  else
+#  {
+#print qq|execute CheckNote: $ClientID,$TrID, $rNotes->{BillDate}\n|;
+    my ($code,$msg) = cBill->CheckNote($form,$rNotes->{TrID});
+    $fatalmsg .= main->PrintError($form,$code,$msg,$ClinicName,$InsName,$ClientName,$TrID,$ContDate,$SCNum);
+#  }
+  if ( $fatalmsg eq '' )
+  {
+    my $BillStatus = $rNotes->{BillDate} eq '' ? 0 : 1;  # no BillDate means 'new' else 'rebill';
+#print qq|execute Billit: $ClientID,$TrID, $rNotes->{BillDate},$BillStatus\n|;
+    $sBillit->execute($BillStatus,$TrID) || $form->dberror($qBillit);
+    $BillAmt+=$rxSC->{BillAmt};
+    $Passed++;
+  }
+  else
+  {
+#print qq|execute UnBill: $ClientID,$TrID\n|;
+    $sUnBill->execute($fatalmsg,$TrID) || $form->dberror($qUnBill);
+    $Failed++;
+  }
+}
+my ($C,$I) = split('_',$PrevKey);
+$BillAmt = sprintf("%.2f",$BillAmt);
+print qq|Totals\t\t${C}\t${I}\t${NoteCnt}\t\$${BillAmt}\tPassed=${Passed}\tFailed=${Failed}\n|;
+if ( $form->{GenProvReport} )
+{
+  my $CN = $C . ' ' x int(30 - length($C));
+  my $IN = $I . ' ' x int(30 - length($I));
+  my $NC = ' ' x int(8 - length($NoteCnt)) . $NoteCnt;
+  my $BA = ' ' x int(12 - length($BillAmt)) . '$' . $BillAmt;
+  warn qq|Totals\t\t${CN}\t${IN}\t${NC}\t${BA}\tPassed=${Passed}\tFailed=${Failed}\n|;
+  foreach my $key ( sort keys %{$NotSet} ) { warn "$NotSet->{$key}\n"; }
+}
+$sNotes->finish();
+$sBillit->finish();
+$sUnBill->finish();
+$form->complete();
+exit;
+##############################################################################
+sub PrintError
+{
+  my ($self,$form,$code,$errormsg,@flds) = @_;
+# count here...
+  my ($out,$FatalMsg) = ('','');
+  if ( $code && $errormsg )
+  {
+    $FatalCnt++;
+    $FatalMsg=$errormsg;
+    print "FATAL!\t${errormsg}"; 
+    foreach my $f ( @flds ) { print "\t${f}"; }
+    print "\n";
+  }
+  elsif ( $errormsg )
+  {
+    $WarnCnt++;
+    print "Warning\t${errormsg}";
+    foreach my $f ( @flds ) { print "\t${f}"; }
+    print "\n";
+  }
+  return($FatalMsg);
+}
+##############################################################################

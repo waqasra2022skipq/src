@@ -1,0 +1,150 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use Accounts;
+use myConfig;
+use DBI;
+use DBForm;
+use DBA;
+use utils;
+use Cwd;
+my $FUNCERROR='';
+my $FUNCCODE=0;
+############################################################################
+# usage: syncit [recs|forms|both|check|all] drop
+#        copy FROMDB to okmis_config mysql database
+#        drop = 99 to clean up (delete) records not found
+############################################################################
+# get the command name...
+my ($pw,$cmd) = $0 =~ m/(.*\/)(.*)$/;
+my $arg = shift;
+my $drop = shift;
+
+############################################################################
+my $FROMDB="okmis_mms";
+my $FROMACCT="mms";
+my $form = DBForm->new("DBNAME=$FROMDB");
+my $WWW = myConfig->cfg('WWW');
+my $ACCTPATH = $WWW.'/'.$FROMACCT;
+my $FORMDIR = myConfig->cfg('FORMDIR');
+my $PROVID = 90;
+
+if ( $arg eq '' || ($arg ne 'recs' && $arg ne 'forms' && $arg ne 'both' && $arg ne 'check' && $arg ne 'all' ) )
+{
+  print qq|\n|;
+  print qq|arg=${arg}, drop=${drop}\n|;
+  print qq|use: 'recs' for sync of ProviderEDocs to MISEDocs\n|;
+  print qq|use: 'forms' for sync of ${FROMACCT}/Provider/EDocs/${PROVID} to ${FORMDIR}\n|;
+  print qq|use; 'both' for both recs and forms.\n|; 
+  print qq|use; 'check' for dangling records or forms.\n|; 
+  print qq|use; 'all' for every sync and check.\n|; 
+  print qq|use; 'syncit check 99' to drop/delete dangling files.\n|; 
+  print qq|\n|;
+  exit;
+}
+
+chdir(myConfig->cfg('WORKDIR'));
+my $pwd=cwd();
+print qq|\n|;
+print qq|${cmd}: Started: |.localtime().qq|\n|;
+print qq|${cmd}: pwd=$pwd\n|;
+print qq|======================================\n\n|;
+
+main->setMISEDocs($form,$PROVID) if ( $arg eq 'recs' || $arg eq 'both' || $arg eq 'all' );;
+main->setFORMDIR($form,$PROVID,$ACCTPATH,$FORMDIR) if ( $arg eq 'forms' || $arg eq 'both' || $arg eq 'all' );;
+#####################################################################
+# check dangling records
+if ( $arg eq 'check' || $arg eq 'all' )
+{
+  chdir($ACCTPATH);
+  my $pwd=cwd();
+#print "\nchkNoSQL: drop=$drop, dbname=$dbname, pwd=$pwd\n";
+  utils->chkNoSQL($form,$drop,"Provider/EDocs/${PROVID}/*","ProviderEDocs");
+#print "\nchkNoFile: drop=$drop, dbname=$dbname, pwd=$pwd\n";
+  utils->chkNoFile($form,$drop,"Provider/EDocs/${PROVID}/*","ProviderEDocs","where Path is not null and ProvID='${PROVID}'");
+}
+#####################################################################
+
+print qq|\n|;
+print qq|======================================\n\n|;
+print qq|${cmd}: Completed: |.localtime().qq|\n|;
+$form->complete();
+exit;
+############################################################################
+sub setMISEDocs
+{ 
+  my ($self,$form,$ProvID) = @_;
+  my $dbh = $form->dbconnect();
+  my $cdbh = $form->connectdb('okmis_config');
+# delete/clear okmis_config-MISEDocs...
+  print qq|  delete/clear okmis_config-MISEDocs...\n|;
+  my $sDelete=$cdbh->prepare("delete from MISEDocs where ProvID='${ProvID}'");
+  $sDelete->execute();
+
+# rebuild/insert from okmis_mms-ProviderEDocs...
+  print qq|  rebuild/insert from okmis_mms-ProviderEDocs...\n|;
+  my $s=$dbh->prepare("select * from ProviderEDocs where ProvID='${ProvID}' order by ID");
+  $s->execute();
+  my $cnt = $s->rows;
+  print qq|  copy ${cnt} records...\n|;
+  while ( my $r = $s->fetchrow_hashref )
+  {
+    my $query = DBA->genInsert($form,'MISEDocs',$r);
+    print qq|: insert: ID=$r->{ID}: Title=$r->{Title}\n|;
+    ##print qq|: insert: ID=$r->{ID}: query=\n$query\n|;
+    my $sql = $cdbh->prepare($query);
+    $sql->execute() || $form->dberror($query);
+#    my $NEWID = $sql->{'mysql_insertid'};           # NEWID = 0 because we gave it an ID.
+#warn qq|setMISEDocs: NEWID=$NEWID\n|;
+    $sql->finish();
+  }
+  $s->finish();
+  $cdbh->disconnect();
+  return();
+}
+sub setFORMDIR
+{ 
+  my ($self,$form,$ProvID,$fromdir,$todir) = @_;
+print "\nsetFORMDIR: fromdir=$fromdir, todir=$todir\n";
+  my $dbh = $form->dbconnect();
+
+# copy records 
+  my $s=$dbh->prepare("select ProviderEDocs.*, xEDocTags.Tag from ProviderEDocs left join okmis_config.xEDocTags on xEDocTags.ID=ProviderEDocs.Type where ProviderEDocs.ProvID='${ProvID}' and ProviderEDocs.Path is not null");
+  $s->execute();
+  my $cnt = $s->rows;
+  print qq|  copy ${cnt} files...\n|;
+  while ( my $r = $s->fetchrow_hashref )
+  {
+    my $Path = $r->{'Path'};
+    my $Tag = $r->{'Tag'};
+print "Path=$Path, Tag=$Tag\n";
+    my ($directory,$filename) = $Path =~ m/(.*\/)(.*)$/;
+print "directory=$directory, filename=$filename\n";
+    my $fromfile = "${fromdir}${Path}";
+    my $tofile = "${todir}/${ProvID}/${Tag}:${filename}";
+    print qq|  copy: ${fromfile}\n|;
+    print qq|    to: ${tofile}\n|;
+    main->copyfile($fromfile,$tofile,'-p') || print "<<<ERROR>>>: copyfile failed: $FUNCCODE: $FUNCERROR\n";;
+  }
+  $s->finish();
+  return();
+}
+#############################################################################
+sub copyfile
+{
+  my ($self,$fromfile,$tofile,$args) = @_;
+
+  my ($dir,$file) = $tofile =~ m/(.*\/)(.*)$/;
+  unless ( -f $fromfile ) { $FUNCCODE=-1; $FUNCERROR = "from: ${fromfile} NOT FOUND!"; return(0); }
+  unless ( -d $dir ) { $FUNCCODE=-1; $FUNCERROR = "to: ${dir} NOT FOUND!"; return(0); }
+
+  my $cmd = qq|cp ${args} "${fromfile}" "${tofile}"|;
+warn qq|copyfile: ${cmd}\n|;
+  my $outfile = myConfig->cfg('WORKDIR').'/tmp/'.DBUtil->genToken().'_'.DBUtil->Date('','stamp') . '.sec';
+  $FUNCCODE = system("${cmd} > ${outfile} 2>&1");
+  $FUNCERROR = $! . DBUtil->ReadFile($outfile);
+#warn qq|error: 1=$!= 2=$?= 3=$@=\n|;
+#warn qq|clean: ${outfile}\n|;
+  system("rm ${outfile}");      # cleanup...
+  return( $FUNCCODE == 0 ? 1 : 0 );   # swap for or (||)
+}
+1;

@@ -1,0 +1,6 @@
+./gen837 DBNAME=okmis_mms\&InsDescr=railroad\&BillDate=2014-05-19
+./gen837 DBNAME=okmis_mms\&InsDescr=railroad\&BillDate=2014-05-26
+./gen837 DBNAME=okmis_mms\&InsDescr=railroad\&BillDate=2014-06-02
+./gen837 DBNAME=okmis_mms\&InsDescr=railroad\&BillDate=2014-06-09
+./gen837 DBNAME=okmis_mms\&InsDescr=railroad\&BillDate=2014-06-16
+./gen837 DBNAME=okmis_mms\&InsDescr=railroad\&BillDate=2014-06-23

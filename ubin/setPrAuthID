@@ -1,0 +1,37 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use DBA;
+use Inv;
+
+############################################################################
+# setPrAuthID DBNAME=oays\&ContDate=lastweek|date
+############################################################################
+$form = DBForm->new();
+my $dbh = $form->dbconnect();
+#foreach my $f ( sort keys %{$form} ) { warn "form-$f=$form->{$f}\n"; }
+my $TrIDs = ''; my $conj = '';
+foreach my $id ( split(' ',$form->{TrIDs}) ) { $TrIDs .= qq|${conj}TrID=$id|; $conj=' or '; }
+my $ClientID = $form->{ClientID};
+my $Date = $form->{d} =~ /lastweek/i ? DBUtil->Date('',0,-7) : $form->{d};
+############################################################################
+my $qNote = qq|select * from Treatment left join xSC on xSC.SCID=Treatment.SCID |;
+if ( $TrIDs ne '' )
+{ $qNote .= qq|where ( $TrIDs )|; }
+elsif ( $ClientID ne '' )
+{ $qNote .= qq|where ClientID = '$ClientID'|; }
+elsif ( $Date ne '' )
+{ $qNote .= qq|where ContLogDate >= '$Date'|; }
+warn qq|qNote=\n$qNote\n|;
+my $sNote = $dbh->prepare($qNote);
+print "PrAuthID\tClientID\tTrID\tSCID\tContDate\tUnits\tBilledAmt\tAmtDue\n";
+$sNote->execute() || $form->dberror($qNote);
+while ( my $rNote = $sNote->fetchrow_hashref )
+{
+  my $PrAuthID = Inv->setNotePrAuthID($form,$rNote->{TrID});
+  my $Code = qq|$rNote->{SCID} $rNote->{SCNum} $rNote->{InsID}|;
+  print qq|$PrAuthID\t$rNote->{ClientID}\t$rNote->{TrID}\t${Code}\t$rNote->{ContLogDate}\t$rNote->{Units}\t$rNote->{BilledAmt}\t$rNote->{AmtDue}\n|;
+}
+$sNote->finish();
+############################################################################

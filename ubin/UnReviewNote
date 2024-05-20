@@ -1,0 +1,1 @@
+update Treatment set RevStatus=2, MgrProvID=NULL, MgrRevDate=NULL, MgrRevTime=NULL where TrID=;

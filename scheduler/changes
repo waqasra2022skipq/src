@@ -1,0 +1,45 @@
+changes to core6/model/init.php...
+24a25,29
+> define( 'NTS_DB_CONF_FILE', dirname(NTS_LIB_DIR) . '/' . basename(dirname($_SERVER['SCRIPT_FILENAME'])) . '.cfg'  );
+> /* echo "basedirname " .  basename(dirname($_SERVER['SCRIPT_FILENAME'])) . '.cfg' . "<BR>"; */
+> /* echo "NTS_LIB_DIR " . NTS_LIB_DIR . "<BR>"; */
+> /* echo "NTS_DB_CONF_FILE " . NTS_DB_CONF_FILE . "<BR>"; */
+> 
+49c54
+< 	( file_exists(NTS_APP_DIR . '/../db.php') )
+---
+> 	( file_exists(NTS_DB_CONF_FILE) )
+52c57
+< 	include_once( NTS_APP_DIR . '/../db.php' );
+---
+> 	include_once( NTS_DB_CONF_FILE );
+194c199
+< ?>
+\ No newline at end of file
+---
+> ?>
+changes to core6/setup/form.php...
+107c107
+< <INPUT TYPE="text" NAME="admin_email" VALUE="admin@yoursiteaddress.com" SIZE="36" TABINDEX="6">
+---
+> <INPUT TYPE="text" NAME="admin_email" VALUE="support@okmis.com" SIZE="36" TABINDEX="6">
+changes to core6/panels/admin/footer.php...
+27c27
+< 	&copy; 2010-<?php echo $currentYear; ?> <a href="http://www.hitappoint.com/"><b>hitAppoint <?php echo ucfirst(NTS_APP_LEVEL); ?></b></a> ver. <?php echo $app['current_version']; ?>
+---
+>         &copy; 2010-<?php echo $currentYear; ?> ver. <?php echo $app['current_version']; ?>
+39c39
+< </div>
+\ No newline at end of file
+---
+> </div>
+changes to core6/plugins/sms/panels/admin/sms/logs/action.php...
+4c4
+< $NTS_VIEW['showPerPage'] = 20;
+---
+> $NTS_VIEW['showPerPage'] = 50;
+37c37
+< ?>
+\ No newline at end of file
+---
+> ?>

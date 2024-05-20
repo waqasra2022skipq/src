@@ -1,0 +1,68 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use  DBI;
+use  DBForm;
+use  DBA;
+use Time::Local;
+$DT = localtime();
+
+############################################################################
+# usage:
+#   NoProblems ForProvID=id
+############################################################################
+$form = DBForm->new();
+my $dbh = $form->dbconnect();
+my $ForProvID = $form->{'ForProvID'} ? $form->{'ForProvID'} : $form->{'LOGINPROVID'};
+my $ProviderSelection = DBA->getProviderSelection($form,$ForProvID,'Client.ProvID','where');
+my $sClientProblemsCnt = $dbh->prepare("
+select ClientProblems.ClientID,ClientProblems.Priority,misICD10.ICD10
+ from ClientProblems 
+  left join okmis_config.misICD10 on misICD10.ID=ClientProblems.UUID
+ where ClientProblems.ClientID=? and misICD10.ICD10 LIKE 'F%'
+ order by ClientProblems.Priority
+");
+my $sClientProblems = $dbh->prepare("
+select ClientProblems.ClientID,ClientProblems.Priority,misICD10.ICD10
+ from ClientProblems 
+  left join okmis_config.misICD10 on misICD10.ID=ClientProblems.UUID
+ where ClientProblems.ClientID=?
+ order by ClientProblems.Priority
+");
+$ProviderSelection .= qq| and Provider.Active=1| if ( $form->{Active} );
+my $q = qq|
+select Client.ClientID,Client.LName,Client.FName,Client.Active,Client.ProvID,Provider.LName as PLName,Provider.FName as PFName
+ from Client 
+  left join Provider on Provider.ProvID=Client.ProvID
+ where Client.Active=1
+ order by Client.LName,Client.FName
+|;
+my $q = qq|
+select Client.ClientID,Client.LName,Client.FName,Client.Active,Client.ProvID,Provider.LName as PLName,Provider.FName as PFName
+ from Treatment 
+  left join Client on Client.ClientID=Treatment.ClientID
+  left join Provider on Provider.ProvID=Client.ProvID
+ where Client.Active=1 and Treatment.BillStatus IN (0,1)
+ group by Client.LName,Client.FName
+|;
+#warn qq|q=$q\n|;
+my $s = $dbh->prepare($q);
+############################################################################
+print qq|${DT}\nClients with No MH Problems\n|;
+print qq|Client\tFName\tClientID\tActive\tProvider\tFName\ProvID\n|;
+$s->execute() || $form->dberror($q);
+while ( my $r = $s->fetchrow_hashref )
+{
+  $sClientProblemsCnt->execute($r->{'ClientID'}) || $form->dberror("NoProblems: select ClientProblems");
+  my $cnt = $sClientProblemsCnt->rows;
+  next if ( $cnt );
+  print qq|$r->{'LName'}\t$r->{'FName'}\t$r->{'ClientID'}\t$r->{'Active'}\t$r->{'PLName'}\t$r->{'PFName'}\t$r->{'ProvID'}\n|;
+#  $sClientProblems->execute($r->{'ClientID'}) || $form->dberror("NoProblems: select ClientProblems");
+#  while ( my $rClientProblems = $sClientProblems->fetchrow_hashref )
+#  { print qq|\tCurrently\t$rClientProblems->{'ICD10'}\t$rClientProblems->{'InitiatedDate'}\n|; }
+}
+$s->finish();
+$sClientProblems->finish();
+$sClientProblemsCnt->finish();
+$form->complete();
+exit;
+############################################################################

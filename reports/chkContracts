@@ -1,0 +1,11 @@
+# Aetna=283
+# BCBS Blue Traditional   bcbsok  129
+# BCBS Blue Choice        bcbsok  178
+# BCBS Blue Preferred     bcbsok  203
+# BCBS Non-participating  bcbsok  204
+# Medicare = 212
+# Medicaid = 100
+select ID,ProvID,InsID,PIN,RefID,OrgID,TaxID,Taxonomy from Contracts where InsID=283;
+select BillFlag,AutoReconcile,AutoPay,BillType from Contracts where InsID=283;
+select UseReferring,UseRendering,UseSFacility from Contracts where InsID=283;
+select ContractType,ServMeasure,ContractCode,SourceCode from Contracts where InsID=283;

@@ -1,0 +1,54 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBForm;
+use myDBI;
+######################################################################
+##
+my $FACCT = $ARGV[0];
+my $table = $ARGV[1];
+my $ID = $ARGV[2];
+my $form = DBForm->new("DBNAME=$FACCT");
+my $dbh = $form->dbconnect();
+my $RECID = $table eq 'Treatment' ? 'TrID' : 'ID';
+main->setTable($table,"where ${RECID}=${ID}");
+$form->complete();
+exit;
+###################################################################
+sub setTable
+{
+  my ($self,$inTable,$with) = @_;
+  my $s=$dbh->prepare("select * from ${inTable} ${with}");
+  $s->execute() || print qq|select * from ${inTable} ${with}\n|;;
+  while ( my $r = $s->fetchrow_hashref )
+  {
+    my $RECID = myDBI->getTableConfig($inTable,'RECID');
+    my $RECIDVAL = $r->{$RECID};
+    print "delete from ${inTable} where ${RECID}=${RECIDVAL};\n";
+    main->det($inTable,$RECIDVAL,0);
+  }
+  $s->finish();
+  return;
+}
+sub det
+{
+  my ($self,$inTable,$ID,$Cnt) = @_;
+
+  $Cnt++;
+  foreach my $table ( myDBI->getDetTables($inTable) )
+  {
+    my $RECID = myDBI->getTableConfig($table,'RECID');
+    my $HDRID = myDBI->getTableConfig($table,'DETAILID');
+    my $s=$dbh->prepare("select * from ${table} where $HDRID=$ID");
+    print qq|## select * from ${table} where ${HDRID}=${ID}\n|;
+    $s->execute() || print qq|select * from $table where $HDRID=$ID\n|;
+    my $rows=$s->rows;
+    while ( my $r = $s->fetchrow_hashref )
+    { 
+      my $RECIDVAL = $r->{$RECID};
+      my $spc = ' ' x $Cnt;
+      print "${spc}delete from ${table} where ${RECID}=${RECIDVAL};\n";
+      main->det($table,$RECIDVAL,$Cnt);
+    }
+    $s->finish();
+  }
+}

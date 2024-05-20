@@ -1,0 +1,1 @@
+select SCNum,AmtDue,count(*),TrID,ClientID from Treatment left join xSC on xSC.SCID=Treatment.SCID where xSC.InsID=212 and Treatment.BillStatus=5 group by AmtDue order by AmtDue desc,SCNum;

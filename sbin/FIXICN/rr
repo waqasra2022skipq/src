@@ -1,0 +1,7 @@
+select TrID,BillStatus,StatusDate,RecDate
+from Treatment
+where TrID=146656 
+or TrID=147037 
+or TrID=144366 
+or TrID=144701
+or TrID=145433

@@ -1,0 +1,36 @@
+#!/bin/bash
+# kls, daily 11/4/08
+# ------------------------------------
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   print "\nServices not installed!"
+   exit 1
+fi
+# ------------------------------------
+  print "\n======================================"
+  print "${CMD} Started: $(date)"
+# ------------------------------------
+# in directory.
+  iDir=${MAINDIR}/officeally/receive
+  if [ ! -d ${iDir} ]; then
+    print "\nError NO ${iDir}!!!"
+    exit 1
+  fi
+  cd ${iDir}
+  sDir=${MAINDIR}/officeally/received
+  if [ ! -d ${sDir} ]; then
+    print "\nError NO ${sDir}!!!"
+    exit 1
+  fi
+# ------------------------------------
+# process EVT files
+  for file in $(/usr/bin/find FS_HCFA_*_IN_C.txt -type f); do
+    print "\nProcess ${file} pwd=$(pwd)..."
+    ${MISSBIN}/parseFS ${file}
+    mv -v ${file} ${sDir}/${file}
+  done
+# ------------------------------------
+  print "\n${CMD} Complete: $(date)"
+  print "======================================\n"
+# ------------------------------------

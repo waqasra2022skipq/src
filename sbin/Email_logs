@@ -1,0 +1,24 @@
+#!/bin/bash
+# kls, daily 11/11/2008
+# ------------------------------------
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   echo -e "\nServices not installed!"
+   exit 1
+fi
+[ ! -d "$LOGDIR" ] && {  echo "Directory $LOGDIR does not exists."; exit 1; }
+# ------------------------------------
+
+cd ${LOGDIR}
+print "${CMD} Started: $(pwd) $(date)"
+for File in $(find . -mmin -5 -name "*.cronrpt"); do
+  /usr/sbin/lsof ${File} | grep -q COMMAND &>/dev/null
+  if [ $? -eq 0 ]; then
+    echo "Warning: ${File} still open"
+  else
+    echo "send ${File}..."
+    cat ${File} | ${MISBIN}/email -a support@okmis.com -s "cronrpt: ${File} ${YMD}"
+  fi
+done
+# ------------------------------------

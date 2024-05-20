@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<?xfa generator="XFA2_0" APIVersion="2.2.4333.0" ?>
+<xdp:xdp xmlns:xdp="http://ns.adobe.com/xdp/" >
+<xfa:datasets xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/" >
+<xfa:data>
+
+<SOGS>
+  <companyname>Center for Therapeutic Interventions</companyname>
+  <ClientName>Jodi Green (11903)</ClientName>
+  <Staff>Carol McCoy (211)</Staff>
+   <A10>Yes</A10>
+   <A11>Yes</A11>
+   <A12>Yes</A12>
+   <A13>Yes</A13>
+   <A14>Yes</A14>
+   <A15>Yes</A15>
+   <A16>No</A16>
+   <A17>No</A17>
+   <A18a>Yes</A18a>
+   <A18b>No</A18b>
+   <A18c>No</A18c>
+   <A18d>Yes</A18d>
+   <A18e>Yes</A18e>
+   <A18f>No</A18f>
+   <A18g>No</A18g>
+   <A18h>No</A18h>
+   <A18i>No</A18i>
+   <A18j>No</A18j>
+   <A18k>No</A18k>
+   <A1a1>More than 1 year ago</A1a1>
+   <A1a2>3 or more times per week</A1a2>
+   <A1b1>Not at all</A1b1>
+   <A1b2>Less than 1 time per week</A1b2>
+   <A1c1>Not at all</A1c1>
+   <A1c2>Less than 1 time per week</A1c2>
+   <A1d1>Not at all</A1d1>
+   <A1d2>Less than 1 time per week</A1d2>
+   <A1e1>Not at all</A1e1>
+   <A1e2>Less than 1 time per week</A1e2>
+   <A1f1>More than 1 year ago</A1f1>
+   <A1f2>3 or more times per week</A1f2>
+   <A1g1>More than 1 year ago</A1g1>
+   <A1g2>3 or more times per week</A1g2>
+   <A1h1>Not at all</A1h1>
+   <A1h2>Less than 1 time per week</A1h2>
+   <A1i1>Not at all</A1i1>
+   <A1i2>Less than 1 time per week</A1i2>
+   <A1j1>More than 1 year ago</A1j1>
+   <A1j2>3 or more times per week</A1j2>
+   <A1k1>Not at all</A1k1>
+   <A1k2>Less than 1 time per week</A1k2>
+   <A1l1>Not at all</A1l1>
+   <A1l2>Less than 1 time per week</A1l2>
+   <A1m></A1m>
+   <A1m1>Not at all</A1m1>
+   <A1m2>Less than 1 time per week</A1m2>
+   <A1n1>Not at all</A1n1>
+   <A1n2>Less than 1 time per week</A1n2>
+   <A2>Moderately</A2>
+   <A3>Yes more than one year ago to today</A3>
+   <A4>More than 100 up to 1000 dollars</A4>
+   <A5a>A friend or someone else important in my life</A5a>
+   <A5b>Yes</A5b>
+   <A6>Most of the time I lost</A6>
+   <A7>Yes</A7>
+   <A7a>In the past 6 months</A7a>
+   <A8>Yes less than half the time I lost</A8>
+   <A9>Yes</A9>
+   <ChangeDate>2023-02-08 18:37:51</ChangeDate>
+   <ChangeProvID>211</ChangeProvID>
+   <ClientID>11903</ClientID>
+   <CreateDate>2023-02-08</CreateDate>
+   <CreateProvID>211</CreateProvID>
+   <FormID>10253717_1</FormID>
+   <ID>527</ID>
+   <ProvID>211</ProvID>
+   <TotalScore>11</TotalScore>
+   <TransDate>01/26/2023</TransDate>
+   <TransType>A</TransType>
+</SOGS>
+
+<SOGS>
+  <companyname>Center for Therapeutic Interventions</companyname>
+  <ClientName>Jodi Green (11903)</ClientName>
+  <Staff>Carol McCoy (211)</Staff>
+   <A10>Yes</A10>
+   <A11>Yes</A11>
+   <A12>Yes</A12>
+   <A13>Yes</A13>
+   <A14>Yes</A14>
+   <A15>Yes</A15>
+   <A16>No</A16>
+   <A17>No</A17>
+   <A18a>Yes</A18a>
+   <A18b>No</A18b>
+   <A18c>No</A18c>
+   <A18d>Yes</A18d>
+   <A18e>Yes</A18e>
+   <A18f>No</A18f>
+   <A18g>No</A18g>
+   <A18h>No</A18h>
+   <A18i>No</A18i>
+   <A18j>No</A18j>
+   <A18k>No</A18k>
+   <A1a1>More than 1 year ago</A1a1>
+   <A1a2>3 or more times per week</A1a2>
+   <A1b1>Not at all</A1b1>
+   <A1b2>Less than 1 time per week</A1b2>
+   <A1c1>Not at all</A1c1>
+   <A1c2>Less than 1 time per week</A1c2>
+   <A1d1>Not at all</A1d1>
+   <A1d2>Less than 1 time per week</A1d2>
+   <A1e1>Not at all</A1e1>
+   <A1e2>Less than 1 time per week</A1e2>
+   <A1f1>More than 1 year ago</A1f1>
+   <A1f2>3 or more times per week</A1f2>
+   <A1g1>More than 1 year ago</A1g1>
+   <A1g2>3 or more times per week</A1g2>
+   <A1h1>Not at all</A1h1>
+   <A1h2>Less than 1 time per week</A1h2>
+   <A1i1>Not at all</A1i1>
+   <A1i2>Less than 1 time per week</A1i2>
+   <A1j1>More than 1 year ago</A1j1>
+   <A1j2>3 or more times per week</A1j2>
+   <A1k1>Not at all</A1k1>
+   <A1k2>Less than 1 time per week</A1k2>
+   <A1l1>Not at all</A1l1>
+   <A1l2>Less than 1 time per week</A1l2>
+   <A1m></A1m>
+   <A1m1>Not at all</A1m1>
+   <A1m2>Less than 1 time per week</A1m2>
+   <A1n1>Not at all</A1n1>
+   <A1n2>Less than 1 time per week</A1n2>
+   <A2>Slightly</A2>
+   <A3>Yes more than one year ago to today</A3>
+   <A4>More than 100 up to 1000 dollars</A4>
+   <A5a>A friend or someone else important in my life</A5a>
+   <A5b>Yes</A5b>
+   <A6>Most of the time I lost</A6>
+   <A7>Yes</A7>
+   <A7a>In the past 6 months</A7a>
+   <A8>Yes less than half the time I lost</A8>
+   <A9>Yes</A9>
+   <ChangeDate>2023-08-20 15:23:34</ChangeDate>
+   <ChangeProvID>211</ChangeProvID>
+   <ClientID>11903</ClientID>
+   <CreateDate>2023-08-20</CreateDate>
+   <CreateProvID>211</CreateProvID>
+   <FormID>11020014_1</FormID>
+   <ID>550</ID>
+   <ProvID>211</ProvID>
+   <TotalScore>11</TotalScore>
+   <TransDate>08/15/2023</TransDate>
+   <TransType>U</TransType>
+</SOGS>
+
+</xfa:data>
+</xfa:datasets>
+<pdf href="http://forms.okmis.com/printing/PrintSOGS_Rev2.pdf" xmlns="http://ns.adobe.com/xdp/pdf/" />
+</xdp:xdp>

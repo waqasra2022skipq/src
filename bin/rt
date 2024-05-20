@@ -1,0 +1,3 @@
+select TrID,ContDate,BillDate,SCNum,Code
+ from NoteTrans
+ where Code='ER-O';

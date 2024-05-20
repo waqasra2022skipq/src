@@ -1,0 +1,69 @@
+<HTML>
+<HEAD>
+<TITLE>HM Version 4.0.4 Examples</TITLE>
+
+<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/Browser.js" TYPE="text/javascript"></SCRIPT>
+<SCRIPT LANGUAGE='JavaScript' SRC='/cgi/js/Menu.js' TYPE='text/javascript'></SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" >
+My_Privs = ['All'];
+My_MenuWidth = 150;
+My_FontFamily = "Arial,sans-serif";
+My_FontSize = 10;
+My_FontBold = 0;
+My_FontItalic = 0;
+My_FontColor = "blue";
+My_FontColorOver = "white";
+My_BGColor = "#DDDDDD";
+My_BGColorOver = "#FFCCCC";
+My_ItemPadding = 3;
+
+My_BorderWidth = 2;
+My_BorderColor = "black";
+My_BorderStyle = "solid";
+My_SeparatorSize = 2;
+My_SeparatorColor = "#d0ff00";
+My_ImageSrc = "rightArrow.gif";
+My_ImageSrcLeft = "leftArrow.gif";
+
+My_ImageSize = 5;
+My_ImageHorizSpace = 0;
+My_ImageVertSpace = 2;
+
+My_KeepHilite = true; 
+My_ClickStart = 0;
+My_ClickKill = true;
+My_ChildOverlap = 20;
+My_ChildOffset = 10;
+My_ChildPerCentOver = null;
+My_TopSecondsVisible = .5;
+My_StatusDisplayBuild =0;
+My_StatusDisplayLink = 0;
+My_UponDisplay = null;
+My_UponHide = null;
+My_RightToLeft = false;
+My_ShowLinkCursor = 1;
+
+</SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/MenuDEF.js" TYPE="text/javascript"></SCRIPT>
+
+</HEAD>
+<BODY>
+
+<BLOCKQUOTE>
+<H3>Sample HTML page with 3 Hierarchical Menus</H3>
+<P>Permanent Menu:</P>
+<BR><BR>
+<P><A HREF="aLinkForOldBrowsersGoesHere.html" onMouseOver="fPopUp('Menu1',event)" onMouseOut="fPopDown('Menu1')" onClick="return false">Relative-to-Mouse-Position Popup Menu</A></P>
+<BR>
+<P><A HREF="aLinkForOldBrowsersGoesHere.html" onMouseOver="popUp('Menu3',event)" onMouseOut="popDown('Menu3')" onClick="return false">Absolute Position Popup Menu</A></P>
+</BLOCKQUOTE>
+
+<SCRIPT LANGUAGE="JavaScript" >
+if(isMenu) 
+{
+
+  document.write("<SCRIPT LANGUAGE='JavaScript' SRC='/cgi/js/Menu"+ BrowserID +".js' TYPE='text/javascript'><\/SCRIPT>");
+}
+</SCRIPT>
+</BODY>
+</HTML>

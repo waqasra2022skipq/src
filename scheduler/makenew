@@ -1,0 +1,30 @@
+#!/bin/bash
+# ---------------------------------
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   echo "\nServices not installed!"
+   exit 1
+fi
+usage()
+{
+   print "$*"
+   print "\nUsage: ${CMD} sqldb"
+   print " where: "
+   print "         sqldb is sql database to create from demo scheduler"
+   print " will save demo scheduler to build from."
+   print
+   exit 3
+}
+if [ $# -eq 0 ]; then usage; fi
+SQLdb=$1
+if [ -d /var/lib/mysql/${SQLdb} ]; then usage ${SQLdb} ALREADY exist!; fi
+# ---------------------------------
+DEMOSCH=scheduler_demo.sqldump
+echo -e "pwd=$(pwd)"
+echo -e "Create ${DEMOSCH}..."
+/usr/bin/mysqldump scheduler_demo > ${DEMOSCH}
+echo -e "Create ${SQLdb}..."
+/usr/bin/mysqladmin create ${SQLdb}
+echo -e "Create ${SQLdb} tables/data...from ${DEMOSCH}"
+/usr/bin/mysql ${SQLdb} < ${DEMOSCH}

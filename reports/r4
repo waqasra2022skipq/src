@@ -1,0 +1,2 @@
+select TrID, BillStatus, StatusDate, RecDate, AmtDue from Treatment where BillStatus>0 and BillDate is null;
+select TrID, BillStatus, StatusDate, RecDate, AmtDue from Treatment where BillStatus=0 and BillDate is not null;

@@ -1,0 +1,3 @@
+      <INPUT TYPE="file" NAME="TheFile"
+             ACCEPT="application/msword,image/gif,image/jpeg,application/pdf,image/png,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/zip,.doc,.gif,.jpeg,.jpg,.pdf,.png,.xls,.xlsx,.zip" > 
+      <INPUT TYPE="file" NAME="TheFile" STYLE="border: solid 1px red" >

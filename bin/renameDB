@@ -1,0 +1,230 @@
+#!/bin/bash
+# kls, daily 11/4/08
+# ------------------------------------
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   echo -e "\nServices not installed!"
+   exit 1
+fi
+# runs AFTER Process FTP to fix DB not found errors
+#  because these people used their Provider PIN, not their Agency PIN
+# ------------------------------------
+echo -e "\n${CMD} Started: $(date)"
+cd "${ADMINDIR}/835"
+echo -e "\nSearch pwd=$(pwd)..."
+# ------------------------------------
+# Mindy Jones
+# .1922188705..201711220100.uPDjL5.835
+    find .1922188705* -type f 2>/dev/null | while read file; do
+      echo -e "MINDY JONES: file: $file\n"
+      p1=$(echo $file | awk -F'.' '{print $1}')
+      p2=$(echo $file | awk -F'.' '{print $2}')
+      p3=$(echo $file | awk -F'.' '{print $3}')
+      p4=$(echo $file | awk -F'.' '{print $4}')
+      p5=$(echo $file | awk -F'.' '{print $5}')
+      p6=$(echo $file | awk -F'.' '{print $6}')
+      p7=$(echo $file | awk -F'.' '{print $7}')
+      p8=$(echo $file | awk -F'.' '{print $8}')
+      #echo -e "parts:${p1}\n ${p2}\n ${p3}\n ${p4}\n ${p5}\n ${p6}\n ${p7}\n ${p8}"
+      #y=$(echo "${p3:0:4}")
+      #m=$(echo "${p3:4:2}")
+      #d=$(echo "${p3:6:2}")
+      cat ${file} | sed "s;1922188705;1245286285;g" > o1
+      mv -v o1 okmis_mms.1245286285.coventry.${p4}.${p5}.${p6}
+      mv -v ${file} done
+    done
+# ------------------------------------
+# ------------------------------------
+# Inward Bound Family Counseling Center, LLC
+# .1306094818..201506180933.LiVp4B.835
+    find .1306094818* -type f 2>/dev/null | while read file; do
+      echo -e "IBF: file: $file\n"
+      p1=$(echo $file | awk -F'.' '{print $1}')
+      p2=$(echo $file | awk -F'.' '{print $2}')
+      p3=$(echo $file | awk -F'.' '{print $3}')
+      p4=$(echo $file | awk -F'.' '{print $4}')
+      p5=$(echo $file | awk -F'.' '{print $5}')
+      p6=$(echo $file | awk -F'.' '{print $6}')
+      p7=$(echo $file | awk -F'.' '{print $7}')
+      p8=$(echo $file | awk -F'.' '{print $8}')
+      #echo -e "parts:${p1}\n ${p2}\n ${p3}\n ${p4}\n ${p5}\n ${p6}\n ${p7}\n ${p8}"
+      #y=$(echo "${p3:0:4}")
+      #m=$(echo "${p3:4:2}")
+      #d=$(echo "${p3:6:2}")
+      cat ${file} | sed "s;1306094818;1427323872;g" > o1
+      mv -v o1 okmis_ibf.1427323872.uhc.${p4}.${p5}.${p6}
+      mv -v ${file} done
+    done
+# ------------------------------------
+# ------------------------------------
+# Misti Center
+# .1730327925..201506180933.LiVp4B.835
+    find .1730327925* -type f 2>/dev/null | while read file; do
+      echo -e "MISTI: file: $file\n"
+      p1=$(echo $file | awk -F'.' '{print $1}')
+      p2=$(echo $file | awk -F'.' '{print $2}')
+      p3=$(echo $file | awk -F'.' '{print $3}')
+      p4=$(echo $file | awk -F'.' '{print $4}')
+      p5=$(echo $file | awk -F'.' '{print $5}')
+      p6=$(echo $file | awk -F'.' '{print $6}')
+      p7=$(echo $file | awk -F'.' '{print $7}')
+      p8=$(echo $file | awk -F'.' '{print $8}')
+      #echo -e "parts:${p1}\n ${p2}\n ${p3}\n ${p4}\n ${p5}\n ${p6}\n ${p7}\n ${p8}"
+      #y=$(echo "${p3:0:4}")
+      #m=$(echo "${p3:4:2}")
+      #d=$(echo "${p3:6:2}")
+      cat ${file} | sed "s;1730327925;1528390846;g" > o1
+      mv -v o1 okmis_lbhp.1528390846.hcsolutions.${p4}.${p5}.${p6}
+      mv -v ${file} done
+    done
+    find okmis_lbhp.1730327925.allied* -type f 2>/dev/null | while read file; do
+      echo -e "MISTI: file: $file\n"
+      p1=$(echo $file | awk -F'.' '{print $1}')
+      p2=$(echo $file | awk -F'.' '{print $2}')
+      p3=$(echo $file | awk -F'.' '{print $3}')
+      p4=$(echo $file | awk -F'.' '{print $4}')
+      p5=$(echo $file | awk -F'.' '{print $5}')
+      p6=$(echo $file | awk -F'.' '{print $6}')
+      p7=$(echo $file | awk -F'.' '{print $7}')
+      p8=$(echo $file | awk -F'.' '{print $8}')
+      #echo -e "parts:${p1}\n ${p2}\n ${p3}\n ${p4}\n ${p5}\n ${p6}\n ${p7}\n ${p8}"
+      #y=$(echo "${p3:0:4}")
+      #m=$(echo "${p3:4:2}")
+      #d=$(echo "${p3:6:2}")
+      cat ${file} | sed "s;1730327925;1528390846;g" > o1
+      mv -v o1 okmis_lbhp.1528390846.allied.${p4}.${p5}.${p6}
+      mv -v ${file} done
+    done
+# ------------------------------------
+# ------------------------------------
+# Jade Graham
+# .1417388430..201506180933.LiVp4B.835
+    find .1417388430* -type f 2>/dev/null | while read file; do
+      echo -e "JADE: file: $file\n"
+      p1=$(echo $file | awk -F'.' '{print $1}')
+      p2=$(echo $file | awk -F'.' '{print $2}')
+      p3=$(echo $file | awk -F'.' '{print $3}')
+      p4=$(echo $file | awk -F'.' '{print $4}')
+      p5=$(echo $file | awk -F'.' '{print $5}')
+      p6=$(echo $file | awk -F'.' '{print $6}')
+      p7=$(echo $file | awk -F'.' '{print $7}')
+      p8=$(echo $file | awk -F'.' '{print $8}')
+      #echo -e "parts:${p1}\n ${p2}\n ${p3}\n ${p4}\n ${p5}\n ${p6}\n ${p7}\n ${p8}"
+      #y=$(echo "${p3:0:4}")
+      #m=$(echo "${p3:4:2}")
+      #d=$(echo "${p3:6:2}")
+      cat ${file} | sed "s;1417388430;1285081364;g" > o1
+      mv -v o1 okmis_lbhp.1285081364.bcbsok.${p4}.${p5}.${p6}
+      mv -v ${file} done
+    done
+# ------------------------------------
+# ------------------------------------
+# Ella Robertson
+# okmis_lbhp.1093020943.uhc.201808020336.XvcqtG.835
+    find okmis_lbhp.1093020943.uhc.*.835 -type f 2>/dev/null | while read file; do
+      echo -e "ELLA: file: $file\n"
+      p1=$(echo $file | awk -F'.' '{print $1}')
+      p2=$(echo $file | awk -F'.' '{print $2}')
+      p3=$(echo $file | awk -F'.' '{print $3}')
+      p4=$(echo $file | awk -F'.' '{print $4}')
+      p5=$(echo $file | awk -F'.' '{print $5}')
+      p6=$(echo $file | awk -F'.' '{print $6}')
+      p7=$(echo $file | awk -F'.' '{print $7}')
+      p8=$(echo $file | awk -F'.' '{print $8}')
+      #echo -e "parts:${p1}\n ${p2}\n ${p3}\n ${p4}\n ${p5}\n ${p6}\n ${p7}\n ${p8}"
+      #y=$(echo "${p3:0:4}")
+      #m=$(echo "${p3:4:2}")
+      #d=$(echo "${p3:6:2}")
+      cat ${file} | sed "s;1093020943;1740636661;g" > o1
+      mv -v o1 okmis_lbhp.1740636661.uhc.${p4}.${p5}.${p6}
+      mv -v ${file} done
+    done
+# ------------------------------------
+# ------------------------------------
+# Trauma Center for Children and Families, LLC
+# .1740420934..201506180933.LiVp4B.835
+    find .1740420934* -type f 2>/dev/null | while read file; do
+      echo -e "TCCF: file: $file\n"
+      p1=$(echo $file | awk -F'.' '{print $1}')
+      p2=$(echo $file | awk -F'.' '{print $2}')
+      p3=$(echo $file | awk -F'.' '{print $3}')
+      p4=$(echo $file | awk -F'.' '{print $4}')
+      p5=$(echo $file | awk -F'.' '{print $5}')
+      p6=$(echo $file | awk -F'.' '{print $6}')
+      p7=$(echo $file | awk -F'.' '{print $7}')
+      p8=$(echo $file | awk -F'.' '{print $8}')
+      #echo -e "parts:${p1}\n ${p2}\n ${p3}\n ${p4}\n ${p5}\n ${p6}\n ${p7}\n ${p8}"
+      #y=$(echo "${p3:0:4}")
+      #m=$(echo "${p3:4:2}")
+      #d=$(echo "${p3:6:2}")
+      cat ${file} | sed "s;1740420934;1275877144;g" > o1
+      mv -v o1 okmis_lbhp.1275877144.uhc.${p4}.${p5}.${p6}
+      mv -v ${file} done
+    done
+# ------------------------------------
+# ------------------------------------
+# A Calm Safe Place
+# .463117410..201506180933.LiVp4B.835
+    find .463117410* -type f 2>/dev/null | while read file; do
+      echo -e "CALM: file: $file\n"
+      p1=$(echo $file | awk -F'.' '{print $1}')
+      p2=$(echo $file | awk -F'.' '{print $2}')
+      p3=$(echo $file | awk -F'.' '{print $3}')
+      p4=$(echo $file | awk -F'.' '{print $4}')
+      p5=$(echo $file | awk -F'.' '{print $5}')
+      p6=$(echo $file | awk -F'.' '{print $6}')
+      p7=$(echo $file | awk -F'.' '{print $7}')
+      p8=$(echo $file | awk -F'.' '{print $8}')
+      #echo -e "parts:${p1}\n ${p2}\n ${p3}\n ${p4}\n ${p5}\n ${p6}\n ${p7}\n ${p8}"
+      #y=$(echo "${p3:0:4}")
+      #m=$(echo "${p3:4:2}")
+      #d=$(echo "${p3:6:2}")
+      ###cat ${file} | sed "s;1740420934;1275877144;g" > o1
+      # uses FI in NM1*PE for TaxID: 463117410
+      cat ${file} > o1
+      mv -v o1 okmis_lbhp.463117410.tricare.${p4}.${p5}.${p6}
+      mv -v ${file} done
+    done
+# .1255764643..20170608210331.Fg6s6T.835
+    find .1255764643* -type f 2>/dev/null | while read file; do
+      echo -e "CALM: file: $file\n"
+      mv -v .1255764643.*.835 done
+    done
+# ------------------------------------
+# Elizabeth Hooks inactive
+# .1528245065..20170111055613.9CbTK7.835
+    find .1528245065* -type f 2>/dev/null | while read file; do
+      echo -e "HOOKS: file: $file\n"
+      mv -v .1528245065.*.835 done
+    done
+# ------------------------------------
+# Journey Within Myself inactive
+# .1730312075..20170405055856.cdLWYx.835
+    find .1730312075* -type f 2>/dev/null | while read file; do
+      echo -e "JWS: file: $file\n"
+      mv -v .1730312075.*.835 done
+    done
+# ------------------------------------
+# Jennifer Sweeton Kansas client
+# .1730545153..201806080431.4Gb65w.835
+    find .1730545153* -type f 2>/dev/null | while read file; do
+      echo -e "JS KANSAS: file: $file\n"
+      mv -v .1730545153.*.835 done
+    done
+# ------------------------------------
+# Kara Rodgers retired
+# .1508908344..20170405055856.cdLWYx.835
+    find .1508908344* -type f 2>/dev/null | while read file; do
+      echo -e "Kara Rodgers: file: $file\n"
+      mv -v .1508908344.*.835 done
+    done
+# ------------------------------------
+# move for later analysis...
+    find .[1-9]* -type f 2>/devnull | while read file; do
+      echo -e "Miscellaneous: file: $file\n"
+      mv -v ${file} do
+    done
+# ------------------------------------
+echo -e "\n${CMD} Complete: $(date)\n"
+# ------------------------------------

@@ -1,0 +1,223 @@
+/* jquery-ui dialog */
+.ui-dialog .ui-dialog-content 
+{
+    border: 1px solid silver;
+    padding: .5em 1em;
+    background: white;
+    overflow: auto;
+    zoom: 1;
+}
+/* .ui-dialog,.ui-widget, .ui-widget-content, .ui-corner-all, .foo, .ui-draggable, .ui-resizable */
+.ui-dialog
+{
+    background: silver !important;
+}
+.dialog-onload
+{
+    display: none;
+}
+
+/* jquery-ui popups */
+.ui-tooltip 
+{
+    color: black;
+    background: lightgreen;
+    border: 1px solid green;
+    font-family: arial, sans-serif verdana;
+    font-size: 14px;
+    text-align: left;
+    padding: 20px 10px;
+    position: absolute;
+    max-width: 380px;
+    z-index: 9999;
+}
+/* this is the arrow at bottom */
+.bottom .ui-tooltip-content::after 
+{
+    content: " ";
+    position: absolute;
+    top: 100%; /* At the bottom of the tooltip */
+    left: 50%;
+    margin-left: -10px;
+    border-width: 10px;
+    border-style: solid;
+    border-color: lightgreen transparent transparent transparent;
+}
+/* this is the arrow at top */
+.top .ui-tooltip-content::after 
+{
+    content: " ";
+    position: absolute;
+    bottom: 100%;  /* At the top of the tooltip */
+    left: 50%;
+    margin-left: -10px;
+    border-width: 10px;
+    border-style: solid;
+    border-color: transparent transparent lightgreen transparent;
+ }
+.right .ui-tooltip-content::after 
+{
+    content: " ";
+    position: absolute;
+    top: 50%;
+    left: 100%; /* To the right of the tooltip */
+    margin-top: -10px;
+    border-width: 10px;
+    border-style: solid;
+    border-color: transparent transparent transparent lightgreen;
+}
+.left .ui-tooltip-content::after 
+{
+    content: " ";
+    position: absolute;
+    top: 50%;
+    right: 100%; /* To the left of the tooltip */
+    margin-top: -10px;
+    border-width: 10px;
+    border-style: solid;
+    border-color: transparent lightgreen transparent transparent;
+}
+/* jquery-ui grid */
+.ui-block-a, .ui-block-b, .ui-block-c, .ui-block-d, .ui-block-e 
+{
+    background-color: white;
+    width: 100%;
+    padding: 0px;
+}
+
+/* jquery-ui accordion */
+.accordion
+{
+  width: 300px;
+  margin: 5px auto;
+}
+.accordion
+{
+  background-color: #f3f3f3;
+  color: #777;
+  font-size: 10pt;
+  height: 100%;
+  width: 100%;
+  line-height: 10pt;
+  margin: 0;
+  padding: 0px;
+  border: none;
+}
+.ui-accordion-header
+{
+  color: black;
+  background-color: #f3f3f3;
+  font-size: 10pt;
+  height: 100%;
+  width: 100%;
+  line-height: 5pt;
+  margin: 0;
+  padding: 0px;
+  border: none;
+}
+.ui-accordion-header-active
+{
+  color: white;
+  background-color: blue;
+  line-height: 5px;
+  display: block;
+  width: 100%;
+  text-indent: 10px;
+}
+.ui-accordion-header-collapsed
+{
+  color: black;
+  background-color: silver;
+  line-height: 5px;
+  display: block;
+  width: 100%;
+  text-indent: 10px;
+}
+.ui-accordion-content
+{
+  background-color: #f3f3f3;
+  color: #777;
+  font-size: 10pt;
+  height: 100%;
+  width: 100%;
+  line-height: 10pt;
+  margin: 0;
+  padding: 0px;
+  border: none;
+}
+/* used with jquery/addons: scriptbreaker-multiple-accordion-1.js and myaccordion */
+.topnav 
+{
+  width: 213px;
+  padding: 40px 28px 25px 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+ul.topnav 
+{
+  padding: 0;
+  margin: 0;
+  line-height: 0.5em;
+  list-style: none;
+}
+
+ul.topnav li {}
+
+ul.topnav li a 
+{
+  line-height: 10px;
+  padding: 10px 5px;
+  color: #000;
+  display: block;
+  text-decoration: none;
+}
+
+ul.topnav li a:hover 
+{
+  background-color:#675C7C;
+  color:white;
+}
+
+ul.topnav ul 
+{
+  margin: 0;
+  padding: 0;
+  display: none;
+}
+
+ul.topnav ul li 
+{
+  margin: 0;
+  padding: 0;
+  clear: both;
+}
+
+ul.topnav ul li a 
+{
+  padding-left: 20px;
+  font-weight: normal;
+  outline:0;
+}
+
+ul.topnav ul li a:hover 
+{
+  background-color:#D3C99C;
+  color:#675C7C;
+}
+
+ul.topnav ul ul li a 
+{
+  color:silver;
+  padding-left: 40px;
+}
+
+ul.topnav ul ul li a:hover 
+{
+  background-color:#D3CEB8;
+  color:#675C7C;
+}
+
+ul.topnav span
+{
+  float:right;
+}

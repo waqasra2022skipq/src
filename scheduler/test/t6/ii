@@ -1,0 +1,5 @@
+mv style.css ../../core6/assets/css/style.css.org
+mv emails.xml ../../core6/defaults/language/emails.xml.org
+mv ntsEmailTemplateManager.php ../../core6/lib/ntsEmailTemplateManager.php.org
+mv _notifier.php ../../core6/model/appointment/_notifier.php.org
+mv sms.xml ../../core6/plugins/sms/defaults/language/sms.xml.org

@@ -1,0 +1,31 @@
+JQUERY CHECK & UNCHECK CHECKBOXES
+If you prefer a jQuery check/uncheck function, the below code will achieve exactly the same as above. This code will target all checkboxes on a page using the $(“input:checkbox”) selector.
+1
+2
+3
+4
+5
+6
+7
+8
+$(document).ready(function() {
+  $('#check-all').click(function(){
+    $("input:checkbox").attr('checked', true);
+  });
+  $('#uncheck-all').click(function(){
+    $("input:checkbox").attr('checked', false);
+  });
+});
+Rather than adding the check all function to the link itself, 
+the jQuery version listens for when the ‘check all’ or ‘uncheck all’ link is clicked, 
+which means these links will need an ID adding to them as below:
+<a id="check-all" href="javascript:void(0);">check all</a>
+<a id="uncheck-all" href="javascript:void(0);">uncheck all</a> 
+If you wanted to target specific checkboxes instead of all checkboxes on the page, 
+you could add a class to the input which allows you to check/uncheck the boxes by replacing the 
+code 
+$(“input:checkbox”).attr(‘checked’, true); 
+with 
+$(“.checkboxclass”).attr(‘checked’, true);
+ 
+

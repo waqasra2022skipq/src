@@ -1,0 +1,54 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use DBA;
+use DBUtil;
+use Inv;
+############################################################################
+# usage: expTrPlan DBNAME=db
+#   select TrPlanS and find one before it over lapping it
+############################################################################
+my $form = DBForm->new();
+my $dbh = $form->dbconnect();
+my $debug = $form->{'debug'};
+my $test = $form->{'test'};
+my $max = $form->{'max'} ? $form->{'max'} : 7;
+my $sUpdTP=$dbh->prepare("update ClientTrPlan set ExpDate=? where ID=?");
+my $sCheck=$dbh->prepare("select ClientTrPlan.*, Client.FName,Client.LName from ClientTrPlan left join Client on Client.ClientID=ClientTrPlan.ClientID where ClientTrPlan.ClientID=? and ClientTrPlan.Locked=1 and ClientTrPlan.EffDate<? and ClientTrPlan.ExpDate>=?");
+
+print qq|expTrPlan: max=$max\n|;
+my $cnt=0;
+my $with = $form->{'ClientID'} ? qq|and ClientTrPlan.ClientID='$form->{ClientID}'| : '';
+print qq|expTrPlan: with=$with\n| if ( $debug );
+my $sClientTrPlan=$dbh->prepare("select ClientTrPlan.*, Client.FName,Client.LName from ClientTrPlan left join Client on Client.ClientID=ClientTrPlan.ClientID where ClientTrPlan.Locked=1 ${with} order by ClientTrPlan.ClientID, ClientTrPlan.ExpDate desc");
+$sClientTrPlan->execute() || $form->dberror("expTrPlan: select TrPlan");
+while ( my $rClientTrPlan = $sClientTrPlan->fetchrow_hashref )
+{ 
+  $cnt++;
+  my $ClientID=$rClientTrPlan->{'ClientID'};
+  my $EffDate=$rClientTrPlan->{'EffDate'};
+# select TrPlanS where EffDate<EffDateofthis1 and ExpDate>=EffDateofthis1
+#   only get those previous because EffDateofthis1 is NEVER less than itself
+  print qq|check: $rClientTrPlan->{'LName'}, $rClientTrPlan->{'FName'} $rClientTrPlan->{'ClientID'}: $rClientTrPlan->{'EffDate'}/$rClientTrPlan->{'ExpDate'}\n| if ( $debug );
+  $sCheck->execute($ClientID,$EffDate,$EffDate) || $form->dberror("expTrPlan: Check: $ClientID,$EffDate");
+  while ( my $rCheck = $sCheck->fetchrow_hashref )
+  { 
+    my $NewDate = DBUtil->Date($EffDate,0,-1);
+    my $diff = DBUtil->Date($NewDate,'diff',$rCheck->{'EffDate'});
+    print qq|check:  $rClientTrPlan->{'LName'}, $rClientTrPlan->{'FName'} $rClientTrPlan->{'ClientID'}: $rClientTrPlan->{'EffDate'}/$rClientTrPlan->{'ExpDate'} ($rClientTrPlan->{'Locked'}) NOW: $rCheck->{'EffDate'}/$rCheck->{'ExpDate'} set ExpDate=${NewDate} ($rCheck->{'Locked'}) (diff=${diff})\n|;
+    print qq|  Exp before Eff! \n| if ( $NewDate < $rCheck->{'EffDate'} );
+    next if ( $test );
+    next if ( $diff < $max );
+print qq|diff=$diff, $rCheck->{'EffDate'}/${NewDate}\n|;
+    print qq|change:  $rCheck->{'LName'}, $rCheck->{'FName'} $rCheck->{'ClientID'}: $rCheck->{'EffDate'}/$rCheck->{'ExpDate'} set ExpDate=${NewDate} ($rCheck->{'Locked'})\n|;
+    $sUpdTP->execute($NewDate,$rCheck->{'ID'}) || $form->dberror("update ClientTrPlan: $NewDate,$rCheck->{'ID'}");
+  }
+}
+print qq|${cnt} records processed.\n|;
+$sClientTrPlan->finish();
+$sCheck->finish();
+$sUpdTP->finish();
+$form->complete();
+exit;
+############################################################################

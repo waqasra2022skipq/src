@@ -1,0 +1,23 @@
+#!/bin/bash
+#-------------------------
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   echo -e "\nServices not installed!"
+   exit 1
+fi
+#-------------------------
+MODULE=$1
+#-------------------------
+Usage()
+{
+   echo $1
+   echo
+   echo "Usage: ${CMD} module"
+   echo
+   exit
+}
+#-------------------------
+if [ -z "${MODULE}" ]; then Usage "No module!"; fi
+perl -M${MODULE} -e "print \$${MODULE}::VERSION"
+print "\n"

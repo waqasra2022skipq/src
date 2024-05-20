@@ -1,0 +1,207 @@
+/* SWIM2.0 :: Simple website menu
+****************************************************************
+* DOM scripting by brothercake -- http://www.brothercake.com/
+* Licensed under GPL -- http://www.gnu.org/copyleft/gpl.html
+****************************************************************
+* For professional menu solutions visit -- http://www.udm4.com/ 
+****************************************************************
+*/
+
+
+
+
+
+/* tame the lists */
+ul.horizontal, ul.horizontal li {
+	margin:0;
+	padding:0;
+	list-style-type:none;
+	font-size:100%; /* fix for win/ie's "non-linear text scaling" bug */
+	}
+
+
+/* navbar list */
+ul.horizontal {
+	position:absolute;
+	left:0;
+	width:100%;
+	cursor:default;
+	
+	z-index:2000;
+	
+	/* navbar top position 
+	   this DOES NOT already include 1px compensation 
+	   on TOP, for list-item border collapse 
+	   (1px defaults to around 0.05em) */
+	top:1.05em;
+	}
+
+
+/* navbar list-items */
+ul.horizontal li {
+	width:auto;
+	float:left;
+	position:relative;
+	cursor:pointer;
+	cursor:hand;
+	
+	text-align:left;
+	
+	/* navbar items' left position relative to the container
+	   this DOES NOT already include 1px compensation 
+	   on LEFT, for list-item border collapse 
+	   (1px defaults to around 0.05em) */
+	left:10.55em;
+	
+	/* shift list-items to collapse borders horizontally */
+	margin:0 0 0 -1px;
+	}
+	
+/* we have to use a different positioning trick for ie, so: 
+   - set the two values below to reflect the navbar items' left position,  
+   - then reduce the margin-left value by 1px (approx 0.05em)  
+     to re-apply the list-item border-collapse */
+* html ul.horizontal li {
+	margin:0 -10.55em 0 10.5em;
+	}
+
+/* we also need to use the same trick for safari < 1.2, so 
+   - apply the same values again 
+   we're also increasing the border-collapse and compensation slightly
+   to cover for a float-related rounding-error in mozilla and safari 
+   this is using a substring-matching attribute selector 
+   which is also visible to safari 1.2, konqueror, mozilla and osx/msn  
+   but that's okay, because it still works 
+   we can't do that for everybody, because it breaks in opera */
+ul[class^="horizontal"] li {
+	margin:0 -10.55em 0 10.45em;
+	left:0.05em;
+	}
+
+
+/* menu lists */
+ul.horizontal ul {
+	z-index:2020;
+	padding:0;
+	cursor:default;
+	position:absolute;
+	top:auto;
+	
+	/* menu width */
+	width:8.2em;
+	
+	/* menu offset, which already includes 1px compensation 
+	   for list-item border collapse */
+	margin:0 0 0 0;
+	
+	/* 
+	position menus off the screen to hide 
+	because using display, visibility, overflow or clip,  
+	would hide them from browser-based screenreaders as well 
+	using left this time because top doesn't work correctly in safari
+	and using px because left:-Nem causes a horizontal scrollbar in some opera builds
+	it also has the advantage that menus which might extend beyond the window
+	won't create a horizontal scrollbar unless they're open
+	*/
+	left:-10000px;
+	}
+	
+	
+/* menu list-items */
+ul.horizontal ul li {
+	/* duplicate menu width */
+	width:8.2em;
+	
+	/* compensate for navbar positioning */
+	left:auto;
+	
+	/* shift list-items to collapse borders vertically */
+	margin:-1px 0 0 0;
+	}
+
+
+/* you can use <ul> classes to specify different menu widths */
+ul.horizontal ul.wider, ul.horizontal ul.wider li {
+	width:12.2em;
+	}
+
+
+/* further child-menu offset */
+ul.horizontal ul ul {
+	/* this DOES NOT already include 1px compensation 
+	   on TOP and LEFT, for list-item border collapse 
+	   (1px defaults to around 0.05em) */
+	margin:-0.45em 0 0 7.65em;
+	/* overlapping the menus improves usability */
+	}
+
+
+/* menu triggers -- position menus back on the screen to show 
+   hide these from safari < 1.2 because of it's "sticky hover" bug 
+   and because the menu positioning doesn't work
+   using the "@media with Media Type in Mixed Case" hack
+   http://www.dithered.com/css_filters/css_only/media_mixed_case.html */
+@media Screen, Projection { 
+	ul.horizontal li:hover > ul { left:auto; }
+	ul.horizontal ul li:hover > ul { top:0; }
+	}
+
+
+/* links */
+ul.horizontal a, ul.horizontal a:visited {
+	display:block;
+	cursor:pointer;
+	cursor:hand;
+	
+	background:#ffc;
+	border:1px solid #edbb85;
+	padding:5px 7px;
+	font:normal normal bold 0.7em tahoma, verdana, sans-serif;
+	color:#008000;
+	text-decoration:none;
+	letter-spacing:1px;
+	}
+	
+/* rollover pseudo-classes, and scriptable persistence class */
+ul.horizontal a:hover, ul.horizontal a:focus, ul.horizontal a.rollover, ul.horizontal a.rollover:visited {
+	background:#ffefcf;
+	color:#806020;
+	}
+
+/* opera 5 and 6, and mac/ie5, need float on the links */
+ul.horizontal a { float:left; }
+
+/* but it would break other browsers, so we need to negate it
+   using a rule that's hidden from them with the "@media with Media Type in Mixed Case" hack
+   http://www.dithered.com/css_filters/css_only/media_mixed_case.html */
+@media Screen, Projection { ul.horizontal a { float:none; } }
+
+/* msn/osx can see through that, but needs the float as well, 
+   so re-apply it using the "not my child" hack
+   http://www.jasonkarldavis.com/articles/notmychild/ */
+ul.horizontal a:not(:nth-child(n)) { float:left; }
+
+/* compensate submenus, using !important to increase specificity for osx/msn */
+ul.horizontal ul a { float:none !important; }
+
+/* hacks for win/ie to cure 'excess hidden margins' and 'double margin float' bugs */
+@media screen, projection {
+	* html ul.horizontal li {
+		/* for ie5.0 */
+		display:inline; 
+		/* for ie5.5+ */
+		f\loat:left; 
+		/* this cures 'events fall through the menu' bug in ie6 
+		   you can can change the color, but don't remove it or use an image */ 
+		background:#ffffff; 
+		}
+	}
+
+/* use different comparative positioning for ie, 
+   to avoid problems with virtual z-ordering */
+* html ul.horizontal li { position:static; }
+* html ul.horizontal a { position:relative; }
+
+/* hide menus from konqueror < 3.2 */
+ul[class^="horizontal"] ul { display:none; }
+ul[class^="horizontal"] ul { displa\y:block; }

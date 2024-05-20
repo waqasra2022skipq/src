@@ -1,0 +1,83 @@
+<?php
+$appEdit = ntsLib::getVar( 'admin/manage:appEdit' );
+$object = ntsLib::getVar( 'admin/manage/appointments/edit::OBJECT' );
+$resourceId = $object->getProp('resource_id');
+
+$iCanEdit = in_array($resourceId, $appEdit) ? true : false;
+
+$object = ntsLib::getVar( 'admin/manage/appointments/edit::OBJECT' );
+$ff =& ntsFormFactory::getInstance();
+$fParams = array(
+	'starts_at'		=> $object->getProp('starts_at'),
+	'max_duration'	=> $object->getProp('duration') + 12 * 60 * 60,
+	'duration'		=> $object->getProp('duration'),
+	'end_time'		=> $object->getProp('starts_at') + $object->getProp('duration'),
+	'lead_out'		=> $object->getProp('lead_out'),
+	);
+
+$fParams = array_merge( $fParams, $object->getByArray() );
+
+$availability_status = $object->get_availability_status();
+$NTS_VIEW['availability_status'] = $availability_status;
+
+$conflicts = $object->get_conflicts();
+$NTS_VIEW['conflicts'] = $conflicts;
+
+$NTS_VIEW['customForm'] =& $ff->makeForm( dirname(__FILE__) . '/custom-form', $fParams );
+$NTS_VIEW['customForm']->readonly = $iCanEdit ? false : true;
+
+/* get any promotions applied for this appointment */
+$promotions = array();
+$am =& ntsAccountingManager::getInstance();
+$acc_postings = $am->get_postings( $object->getClassName(), $object->getId() );
+foreach( $acc_postings as $ap ){
+	$promotion = NULL;
+	switch( $ap['obj_class'] ){
+		case 'promotion':
+			$promotion = ntsObjectFactory::get('promotion');
+			$promotion->setId( $ap['obj_id'] );
+			break;
+		case 'coupon':
+			$coupon = ntsObjectFactory::get('coupon');
+			$coupon->setId( $ap['obj_id'] );
+			$promotion = ntsObjectFactory::get('promotion');
+			$promotion->setId( $coupon->getProp('promotion_id') );
+			break;
+	}
+	if( $promotion ){
+		$promotions[] = $promotion;
+	}
+}
+$NTS_VIEW['promotions'] = $promotions;
+
+switch( $action ){
+	case 'update':
+		if( $NTS_VIEW['customForm']->validate() ){
+			$formValues = $NTS_VIEW['customForm']->getValues();
+			$object->setByArray( $formValues );
+
+			$cm =& ntsCommandManager::getInstance();
+			$cm->runCommand( $object, 'update' );
+
+			if( $cm->isOk() ){
+				$msg = array( M('Appointment'), ntsView::objectTitle($object), M('Update'), M('OK') );
+				$msg = join( ': ', $msg );
+				ntsView::addAnnounce( $msg, 'ok' );
+
+			/* continue to the list with anouncement */
+				$forwardTo = ntsLink::makeLink( '-current-' );
+				ntsView::redirect( $forwardTo );
+				exit;
+				}
+			else {
+				$errorText = $cm->printActionErrors();
+				ntsView::addAnnounce( $errorText, 'error' );
+				}
+			}
+		else {
+		/* form not valid, continue to create form */
+			}
+		
+		break;
+	}
+?>

@@ -1,0 +1,137 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use DBA;
+use DBUtil;
+use Time::Local;
+$DT = localtime();
+############################################################################
+# usage:
+#   ClientEligibility ForProvID=id
+############################################################################
+my $form = DBForm->new();
+my $dbh = $form->dbconnect();
+
+my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+my $InsCode = $form->{InsCode};
+my $multidel = chr(253);
+############################################################################
+$s=$dbh->prepare("select * from xInsurance");
+  $s->execute();
+  while (my $r = $s->fetchrow_hashref) { $xInsurance->{$r->{ID}} = $r; }
+$s->finish();
+my $qInsurance = qq|
+select * 
+  from Insurance 
+  where ClientID=? and Priority=?
+    and Insurance.InsNumEffDate<=curdate()
+    and (curdate()<=Insurance.InsNumExpDate or Insurance.InsNumExpDate is null)
+|;
+my $sInsurance = $dbh->prepare($qInsurance);
+$sProvider = $dbh->prepare("select * from Provider where ProvID=?");
+my $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID','where');
+$ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+$qClient = qq|select Provider.Name as Clinic
+     ,Client.LName, Client.FName, Client.ClientID, Client.Active
+     ,Client.DOB, Client.Gend, xRaces.Descr as Race
+     ,truncate((to_days(curdate()) - to_days(Client.DOB)) / 365,0) as Age
+     ,Client.Zip
+     ,ClientReferrals.RefDate
+     ,ClientReferrals.ReferredBy1NPI
+     ,to_days(curdate()) - to_days(ClientReferrals.RefDate) as Days
+     ,xCustAgency.Descr as CustAgency
+     ,Client.ProvID as PrimaryProvID
+     ,Client.clinicClinicID
+     ,xNPI.ProvOrgName
+  from Client
+    left join ClientIntake on ClientIntake.ClientID=Client.ClientID
+    left join ClientReferrals on ClientReferrals.ClientID=Client.ClientID
+    left join ClientLegal on ClientLegal.ClientID=Client.ClientID
+    left join Provider on Provider.ProvID=Client.clinicClinicID
+    left join okmis_config.xCustAgency on xCustAgency.ID=ClientLegal.CustAgency
+    left join okmis_config.xRaces on xRaces.ID=SUBSTRING_INDEX(Client.Race,'${multidel}',1)
+    left join okmis_config.xNPI on xNPI.NPI=ClientReferrals.ReferredBy1NPI
+  ${ClinicSelection}
+  order by xNPI.ProvOrgName, Provider.Name, Client.LName, Client.FName
+|;
+#warn qq|q=\n$qClient\n|;
+############################################################################
+#print qq| \nGARY: '$dbh->prepare($qClient)'\n |;
+
+print qq|${DT}\nClient '$InsCode' Eligibility Report\n|;
+print qq|Referred By\tClinic\tClient\tClientID\tActive\tDOB\tGend\tRace\tAge\tZip\tRefDate\tDays\tCustAgency\tProvider\tPrimary\tPlan Description\tInsNum\tSecondary\tPlan Description\tInsNum\tTertiary\tPlan Description\tInsNum\tLastActive\tLastInActive\n|;
+my $sClient = $dbh->prepare($qClient);
+$sClient->execute() || $form->dberror($query);
+while ( my $rClient = $sClient->fetchrow_hashref )
+{
+
+  my $flag = 0;
+  $sInsurance->execute($rClient->{ClientID},1);
+  my $rInsurance = $sInsurance->fetchrow_hashref;
+  my $PriInsCode = $xInsurance->{$rInsurance->{InsID}}{InsCode};
+  my $PriInsName = $xInsurance->{$rInsurance->{InsID}}{Name};
+  my $PriInsNum = $rInsurance->{InsIDNum};
+  $flag = 1 if ( $PriInsCode eq $InsCode );
+  
+  $sInsurance->execute($rClient->{ClientID},2);
+  my $rInsurance = $sInsurance->fetchrow_hashref;
+  my $SecInsCode = $xInsurance->{$rInsurance->{InsID}}{InsCode};
+  my $SecInsName = $xInsurance->{$rInsurance->{InsID}}{Name};
+  my $SecInsNum = $rInsurance->{InsIDNum};
+  $flag = 2 if ( $SecInsCode eq $InsCode );
+
+  $sInsurance->execute($rClient->{ClientID},3);
+  my $rInsurance = $sInsurance->fetchrow_hashref;
+  my $TerInsCode = $xInsurance->{$rInsurance->{InsID}}{InsCode};
+  my $TerInsName = $xInsurance->{$rInsurance->{InsID}}{Name};
+  my $TerInsNum = $rInsurance->{InsIDNum};
+  $flag = 3 if ( $TerInsCode eq $InsCode );
+
+  next unless ( $flag );
+
+  my $ClientName = "$rClient->{LName}, $rClient->{FName}";
+
+  $sProvider->execute($rClient->{PrimaryProvID});
+  my $rProvider = $sProvider->fetchrow_hashref;
+  my $PrimaryProvName = qq|$rProvider->{LName}, $rProvider->{FName} ($rProvider->{ProvID})|;
+  my $plan = $InsCode eq 'MB' ? " and PlanDescr='Medicare Part B'"
+           : $InsCode eq 'MC' ? " and (PlanDescr='Title 19' or PlanDescr='Expansion Healthy Adult Program' or PlanDescr='SoonerCare Choice' or PlanDescr='Mental Health and Substance Abuse')"
+           : '';
+  my $qActiveEligible = qq|select * from Eligible where ClientID=? and Benefit=1 and ToDate >= curdate() and InsCode='$InsCode' ${plan} order by PlanDescr desc, FromDate desc, ToDate desc|;
+#print qq| \n qActiveEligible: '$qActiveEligible'\n |;
+  $sActiveEligible = $dbh->prepare($qActiveEligible);
+  $sActiveEligible->execute($rClient->{ClientID}) || $form->dberror("read Active Eligibility");
+  my $rActiveEligible = $sActiveEligible->fetchrow_hashref;
+  my $LastActive = $rActiveEligible->{FromDate} eq '' ? 'none'
+                 : DBUtil->Date($rActiveEligible->{FromDate},'fmt','MM/DD/YYYY');
+
+  my $qInActiveEligible = qq|select * from Eligible where ClientID=? and Benefit=0 and InsCode='$InsCode' ${plan} order by FromDate desc, ToDate desc|;
+  $sInActiveEligible = $dbh->prepare($qInActiveEligible);
+  $sInActiveEligible->execute($rClient->{ClientID}) || $form->dberror("read InActive Eligibility");
+  my $rInActiveEligible = $sInActiveEligible->fetchrow_hashref;
+  my $LastInActive = $rInActiveEligible->{FromDate} eq '' ? 'none'
+                   : DBUtil->Date($rInActiveEligible->{FromDate},'fmt','MM/DD/YYYY');
+
+  my $PriPlanDescr = ''; #$flag == 1 ? $rActiveEligible->{'PlanDescr'} : '';
+  my $SecPlanDescr = $flag == 2 ? $rActiveEligible->{'PlanDescr'} : '';
+  my $TerPlanDescr = $flag == 3 ? $rActiveEligible->{'PlanDescr'} : '';
+  
+#print qq |\n rEligiblePlanDesc: $rActiveEligible->{'PlanDescr'}\n|;
+$sActiveEligible->execute($rClient->{ClientID}) || $form->dberror("read Active Eligibility");
+
+  while ( my $rEligiblePlanDesc = $sActiveEligible->fetchrow_hashref )
+{
+	$PriPlanDescr .= qq|<b>$rEligiblePlanDesc->{'PlanDescr'}</b> ($rEligiblePlanDesc->{'FromDate'}-$rEligiblePlanDesc->{'ToDate'})<br/>|;
+	#print qq |\n rEligiblePlanDesc: $PriPlanDescr\n|;
+}
+  print qq|$rClient->{ProvOrgName}\t$rClient->{Clinic}\t${ClientName}\t$rClient->{ClientID}\t$rClient->{Active}\t$rClient->{DOB}\t$rClient->{Gend}\t$rClient->{Race}\t$rClient->{Age}\t$rClient->{Zip}\t$rClient->{RefDate}\t$rClient->{Days}\t$rClient->{CustAgency}\t${PrimaryProvName}\t${PriInsName}\t${PriPlanDescr}\t${PriInsNum}\t${SecInsName}\t${SecPlanDescr}\t${SecInsNum}\t${TerInsName}\t${TerPlanDescr}\t${TerInsNum}\t${LastActive}\t${LastInActive}\n|;
+}
+$sInsurance->finish();
+$sProvider->finish();
+$sClient->finish();
+$sActiveEligible->finish();
+$sInActiveEligible->finish();
+$form->complete();
+exit;
+############################################################################

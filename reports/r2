@@ -1,0 +1,1 @@
+./ClientStats DBNAME=okmms_dev\&mlt=IC7HeIZrwXqJ\&Type=\&hdrline=3\&output=html\&AMSType=\&Active=\&ActivityName=\&CQM=\&ClientIDs=\&ClinicIDs=\&CustAgency=\&Days=\&Folder=\&Format=\&FromDate=\&InsCode=\&InsID=\&ProvIDs=\&ToDate=\&daterange=lastquarter\&sYearMonth=\&ReportDescr=Statistics by Note for Clients\&xtable=\&submit=1

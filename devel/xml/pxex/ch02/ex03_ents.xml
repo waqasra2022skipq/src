@@ -1,0 +1,20 @@
+<!DOCTYPE memo
+  SYSTEM "/xml-dtds/memo.dtd"
+[
+  <!ENTITY companyname "Willy Wonka's Chocolate Factory">
+  <!ENTITY healthplan  SYSTEM "hp.txt">
+]>
+
+<memo>
+  <to>All Oompa-loompas</to>
+  <para>
+    &companyname; has a new owner and CEO, Charlie Bucket. Since
+    our name, &companyname;, has considerable brand recognition,
+    the board has decided not to change it. However, at Charlie's
+    request, we will be changing our healthcare provider to the
+    more comprehensive &Uuml;mpacare, which has better facilities
+    for 'Loompas (text of the plan to follow). Thank you for working
+    at &companyname;!
+  </para>
+  &healthplan;
+</memo>

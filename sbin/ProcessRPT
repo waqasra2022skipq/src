@@ -1,0 +1,31 @@
+#!/bin/bash
+# kls, daily 11/4/08
+# ------------------------------------
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   print "\nServices not installed!"
+   exit 1
+fi
+# ------------------------------------
+  print "\n======================================"
+  print "${CMD} Started: $(date)"
+# ------------------------------------
+# in directory.
+  iDir=${MAINDIR}/tricare/received
+  if [ ! -d ${iDir} ]; then
+    print "\nError NO ${iDir}!!!"
+    exit 1
+  fi
+  cd ${iDir}
+  pwd
+# ------------------------------------
+# process RPT files
+  for file in $(/usr/bin/find RPT* -type f -mtime -1); do
+    print "\nProcess ${file} pwd=$(pwd)..."
+    ${MISSBIN}/parseRPT ${file}
+  done
+# ------------------------------------
+  print "\n${CMD} Complete: $(date)"
+  print "======================================\n"
+# ------------------------------------

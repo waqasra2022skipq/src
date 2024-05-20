@@ -1,0 +1,4215 @@
+#!/usr/bin/perl
+############################################################################
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use myForm;
+use myDBI;
+use DBA;
+use MgrTree;
+use myConfig;
+use DBUtil;
+use Time::Local;
+my $DT=localtime();
+
+use PDFlib::PDFlib;
+use strict;
+############################################################################
+
+my $form = myForm->new();
+my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $cdbh = myDBI->dbconnect('okmis_config');
+my $IDs = $form->{'IDs'};
+
+my $pagewidth = 612;
+my $pageheight = 792;
+
+my $searchpath = "../data";
+
+my $fontname= "Arial";
+my $boldfontname= "Arial-BoldMT";
+my $fontsizesmall = 8;
+my $fontsize = 9;
+my $fontsizemid = 10;
+my $fontsizelarge = 11;
+my $fontsizemidlarge = 12;
+my $fontsizexlarge = 13;
+my $fontsizexxlarge = 15;
+my $basefontoptions = "fontname=" . $fontname . " fontsize=" . $fontsize . " embedding encoding=unicode charref";
+my $basefontoptions_i = $basefontoptions . " fontstyle=italic";
+my $baseboldfontoptions = "fontname=" . $boldfontname . " fontsize=" . $fontsize . " embedding encoding=unicode";
+my $baseboldfontoptions_u = $baseboldfontoptions . " underline=true underlineposition=-15% underlinewidth=0.3";
+my $basemidfontoptions = $basefontoptions . " fontsize=" . $fontsizemid;
+my $basemidfontoptions_i = $basemidfontoptions . " fontstyle=italic";
+my $baseboldmidfontoptions = $baseboldfontoptions . " fontsize=" . $fontsizemid;
+my $baseboldmidfontoptions_u = $baseboldmidfontoptions . " underline=true underlineposition=-15% underlinewidth=0.3";
+my $baselargefontoptions = $basefontoptions . " fontsize=" . $fontsizelarge;
+my $baseboldlargefontoptions = $baseboldfontoptions . " fontsize=" . $fontsizelarge;
+my $baseboldlargefontoptions_u = $baseboldlargefontoptions . " underline=true underlineposition=-15% underlinewidth=0.3";
+my $baseboldlargefontoptions_ui = $baseboldlargefontoptions_u . " fontstyle=italic";
+my $baseboldlargefontoptions_i = $baseboldlargefontoptions . " fontstyle=italic";
+my $basesmallfontoptions = $basefontoptions . " fontsize=" . $fontsizesmall;
+my $baseboldsmallfontoptions = $baseboldfontoptions . " fontsize=" . $fontsizesmall;
+my $basemidlargefontoptions = $basefontoptions . " fontsize=" . $fontsizemidlarge;
+my $baseboldmidlargefontoptions = $baseboldfontoptions . " fontsize=" . $fontsizemidlarge;
+my $baseboldmidlargefontoptions_u = $baseboldmidlargefontoptions . " underline=true underlineposition=-15% underlinewidth=0.3";
+my $baseboldxlargefontoptions = $baseboldfontoptions . " fontsize=" . $fontsizexlarge;
+my $basecheckfontoptions = "fontname={DejaVuSans} encoding=unicode fontsize=10 charref";
+
+my $clientFooterId = $form->{'ClientID'};
+my $clientFooterUser = '';
+
+my $marginleft = 30.4;
+my $margintop = 35;
+my $marginbottom = $pageheight - 33.8;
+my $contentwidth = $pagewidth - 2 * $marginleft;
+my $h_footer = 4 * $fontsizelarge;
+my $y_footer = $marginbottom - $h_footer;
+
+my $ypos = $margintop;
+my $pagecount = 0;
+
+############################################################################
+#warn "printClientIntake: ClientID=$form->{'ClientID'}\n";
+#warn "printClientIntake: IDs=$form->{'IDs'}\n";
+my $IDs = $form->{'IDs'};;
+# $IDs = '1';
+# $form->{'TODAY'} = '2021-04-30';
+# get the last Admission Date...
+if ( $form->{'ClientID'} )
+{
+  my $sGet = $dbh->prepare("select * from ClientAdmit where ClientID=? order by AdmitDate desc");
+  $sGet->execute($form->{'ClientID'}) || myDBI->dberror("Get: select ClientAdmit $form->{'ClientID'}");
+  my $rGet = $sGet->fetchrow_hashref;
+  $IDs = $rGet->{ID};
+  $sGet->finish();
+}
+#warn "printClientIntake: IDs=${IDs}\n";
+##
+# prepare selects...
+##
+my $sProvider = $dbh->prepare("select Provider.*, ProviderControl.LOGO from Provider left join ProviderControl on ProviderControl.ProvID=Provider.ProvID where Provider.ProvID=?");
+my $sClient = $dbh->prepare("select * from Client where Client.ClientID=?");
+my $sClientIntake = $dbh->prepare("select * from ClientIntake where ClientID=?");
+my $sClientReferrals = $dbh->prepare("select * from ClientReferrals where ClientID=?");
+my $sClientLegal = $dbh->prepare("select * from ClientLegal where ClientID=?");
+my $sClientEmergency = $dbh->prepare("select * from ClientEmergency where ClientID=?");
+my $sClientEducation = $dbh->prepare("select * from ClientEducation where ClientID=?");
+my $sClientMHProblems = $dbh->prepare("select * from ClientMHProblems where ClientID=?");
+my $sMedHx = $dbh->prepare("select * from MedHx where ClientID=?");
+my $sClientHealth = $dbh->prepare("select * from ClientHealth where ClientID=?");
+my $sClientDevl = $dbh->prepare("select * from ClientDevl where ClientID=?");
+my $sGuardianHistory = $dbh->prepare("select * from GuardianHistory where ClientID=?");
+my $sClientSocial = $dbh->prepare("select * from ClientSocial where ClientID=?");
+my $sClientRelations = $dbh->prepare("select * from ClientRelations where ClientID=?");
+my $sClientResources = $dbh->prepare("select * from ClientResources where ClientID=?");
+my $sMentalStat = $dbh->prepare("select * from MentalStat where ClientID=?");
+my $sClientSummary = $dbh->prepare("select * from ClientSummary where ClientID=?");
+# G5 is Date of Interview and if entered on HealthHistory Screen can be null, G4 is Date of Admit
+my $sDischarge=$dbh->prepare("select * from ClientDischarge left join ClientDischargeCDC on ClientDischargeCDC.ClientDischargeID=ClientDischarge.ID where ClientDischarge.ClientID=? and ClientDischargeCDC.TransDate<? order by ClientDischargeCDC.TransDate desc");
+my $sInsurance = $dbh->prepare("select Insurance.*,xInsurance.Name,xInsurance.Ph1 from Insurance left join xInsurance on xInsurance.ID=Insurance.InsID where Insurance.ClientID=? and Insurance.Priority=? order by Insurance.InsNumEffDate desc, Insurance.InsNumExpDate");
+my $sClientVitalSigns = $dbh->prepare("select * from ClientVitalSigns where ClientID=? order by VDate desc");
+my $sClientCDCHA = $dbh->prepare("select * from ClientCDCHA where ClientID=? order by TestDate desc");
+my $sClientMHSF = $dbh->prepare("select * from ClientMHSF where ClientID=? order by TestDate desc");
+my $sClientSATobacco = $dbh->prepare("select * from ClientSATobacco where ClientID=? order by vdate desc");
+my $sClientAUDIT = $dbh->prepare("select * from ClientAUDIT where ClientID=? order by TestDate desc");
+my $sClientCRAFFT = $dbh->prepare("select * from ClientCRAFFT where ClientID=? order by TestDate desc");
+
+my $filename = '/tmp/'.$form->{'LOGINID'}.'_'.DBUtil->genToken().'_'.DBUtil->Date('','stamp').'.pdf';
+my $outfile = $form->{'file'} eq ''                # create and print pdf else just create.
+        ? $form->{'DOCROOT'}.$filename
+        : $form->{'file'};
+# $outfile = 'kls.pdf';
+#warn qq|outfile=${outfile}\n|;
+############################################################################
+
+eval {
+
+  # create a new PDFlib object 
+  my $p = new PDFlib::PDFlib;
+
+  $p->set_option("SearchPath={{" . $searchpath . "}}");
+
+  # This mean we don't have to check error return values, but will
+  # get an exception in case of runtime problems.
+  
+  $p->set_option("errorpolicy=exception");
+
+  # all strings are expected as utf8
+  $p->set_option("stringformat=utf8");
+
+  $p->begin_document($outfile, "");
+
+  $p->set_info("Creator", "Millennium Information Services");
+  $p->set_info("Author", "Keith Stephenson");
+  $p->set_info("Title", "Client Intake");
+
+  main->printIntake($p);
+
+  $p->end_document("");
+
+};
+
+if ($@) {
+  die("$0: PDFlib Exception occurred:\n$@");
+}
+
+$sProvider->finish();
+$sClient->finish();
+$sClientIntake->finish();
+$sClientReferrals->finish();
+$sClientLegal->finish();
+$sClientEmergency->finish();
+$sClientEducation->finish();
+$sClientMHProblems->finish();
+$sMedHx->finish();
+$sClientHealth->finish();
+$sClientDevl->finish();
+$sGuardianHistory->finish();
+$sClientSocial->finish();
+$sClientRelations->finish();
+$sClientResources->finish();
+$sMentalStat->finish();
+$sClientSummary->finish();
+$sDischarge->finish();
+$sInsurance->finish();
+$sClientVitalSigns->finish();
+$sClientCDCHA->finish();
+$sClientMHSF->finish();
+$sClientSATobacco->finish();
+$sClientAUDIT->finish();
+$sClientCRAFFT->finish();
+
+$cdbh->disconnect();
+myDBI->cleanup();
+if ( $form->{'file'} eq '' )                # create and print pdf.
+{ print qq|Location: ${filename}\n\n|; }
+exit;
+
+############################################################################
+
+sub printIntake {
+  my ($self, $p) = @_;
+
+  my $sClientAdmit = $dbh->prepare("select * from ClientAdmit where ID=?");
+  foreach my $ID ( split(' ',$IDs) )
+  { 
+  #warn "printClientIntake: ID=$ID\n";
+    $sClientAdmit->execute($ID) || myDBI->dberror("select ClientAdmit ${ID}");
+    if ( my $rClientAdmit = $sClientAdmit->fetchrow_hashref )
+    { 
+      $sClient->execute($rClientAdmit->{'ClientID'}) || myDBI->dberror("select Client $rClientAdmit->{'ClientID'}");
+      my $rClient = $sClient->fetchrow_hashref;
+      main->createPages($p, $rClientAdmit, $rClient);
+    }
+    else
+    {
+#warn qq|skip ID: |.$TrID."\n";
+      my $rClientAdmit = ();
+      my $rClient = ();
+      $rClient->{'LName'} = 'Admit Record Missing!';
+      $rClient->{'Addr1'} = 'NOT FOUND!';
+      main->createPages($p, $rClientAdmit, $rClient);
+    }
+  }
+  $sClientAdmit->finish();
+  if ($pagecount) {
+    main->createPageCount($p);
+  } else {
+    main->createEmptyPage($p);
+  }
+}
+
+sub createPages {
+  my ($self, $p, $rClientAdmit, $rClient) = @_;
+
+  ##
+# Header info...
+  #my $AgencyID = MgrTree->getAgency($form,$rClient->{clinicClinicID});
+  my $AdmitID = $rClientAdmit->{ProvID}
+                 ? $rClientAdmit->{'ProvID'}      # set after Note entered
+                 : $rClient->{'clinicClinicID'};  # otherwise clinic assigned to
+  my $AgencyID = MgrTree->getAgency($form,$AdmitID);
+  $sProvider->execute($AgencyID) || myDBI->dberror("select Agency ${AgencyID}");
+  my $rAgency = $sProvider->fetchrow_hashref;
+  my $AgencyName = $rAgency->{Name};
+  my $AgencyAddr = $rAgency->{Addr1} . ', ';
+  $AgencyAddr .= $rAgency->{Addr2} . ', ' if ( $rAgency->{Addr2} );
+  my $AgencyCSZ .= $rAgency->{City} . ', ' . $rAgency->{ST} . '  ' . $rAgency->{Zip};
+  my $AgencyPh = 'Office: ' . $rAgency->{WkPh} . '  Fax: ' . $rAgency->{Fax};
+##
+# Client info...
+my $ClientID = $rClient->{'ClientID'};
+my $ClientName = qq|$rClient->{FName} $rClient->{LName}|;
+
+# other Client information...
+$sClientIntake->execute($ClientID) || myDBI->dberror("select ClientIntake ${ClientID}");
+my $rClientIntake = $sClientIntake->fetchrow_hashref;
+$sClientReferrals->execute($ClientID) || myDBI->dberror("select ClientReferrals ${ClientID}");
+my $rClientReferrals = $sClientReferrals->fetchrow_hashref;
+$sClientLegal->execute($ClientID) || myDBI->dberror("select ClientLegal ${ClientID}");
+my $rClientLegal = $sClientLegal->fetchrow_hashref;
+$sClientEmergency->execute($ClientID) || myDBI->dberror("select ClientEmergency ${ClientID}");
+my $rClientEmergency = $sClientEmergency->fetchrow_hashref;
+$sClientEducation->execute($ClientID) || myDBI->dberror("select ClientEducation ${ClientID}");
+my $rClientEducation = $sClientEducation->fetchrow_hashref;
+$sClientMHProblems->execute($ClientID) || myDBI->dberror("select ClientMHProblems ${ClientID}");
+my $rClientMHProblems = $sClientMHProblems->fetchrow_hashref;
+$sMedHx->execute($ClientID) || myDBI->dberror("select MedHx ${ClientID}");
+my $rMedHx = $sMedHx->fetchrow_hashref;
+$sClientHealth->execute($ClientID) || myDBI->dberror("select ClientHealth ${ClientID}");
+my $rClientHealth = $sClientHealth->fetchrow_hashref;
+$sClientDevl->execute($ClientID) || myDBI->dberror("select ClientDevl ${ClientID}");
+my $rClientDevl = $sClientDevl->fetchrow_hashref;
+$sGuardianHistory->execute($ClientID) || myDBI->dberror("select GuardianHistory ${ClientID}");
+my $rGuardianHistory = $sGuardianHistory->fetchrow_hashref;
+$sClientSocial->execute($ClientID) || myDBI->dberror("select ClientSocial ${ClientID}");
+my $rClientSocial = $sClientSocial->fetchrow_hashref;
+$sClientRelations->execute($ClientID) || myDBI->dberror("select ClientRelations ${ClientID}");
+my $rClientRelations = $sClientRelations->fetchrow_hashref;
+$sClientResources->execute($ClientID) || myDBI->dberror("select ClientResources ${ClientID}");
+my $rClientResources = $sClientResources->fetchrow_hashref;
+$sMentalStat->execute($ClientID) || myDBI->dberror("select MentalStat ${ClientID}");
+my $rMentalStat = $sMentalStat->fetchrow_hashref;
+$sClientSummary->execute($ClientID) || myDBI->dberror("select ClientSummary ${ClientID}");
+my $rClientSummary = $sClientSummary->fetchrow_hashref;
+$sDischarge->execute($ClientID,$rClientAdmit->{AdmitDate});
+my $rDischarge = $sDischarge->fetchrow_hashref;
+$sInsurance->execute($ClientID,1);       # select the Primary Insurance for this client.
+my $rInsurance = $sInsurance->fetchrow_hashref;
+$sClientVitalSigns->execute($ClientID) || myDBI->dberror("select ClientVitalSigns ${ClientID}");
+my $rClientVitalSigns = $sClientVitalSigns->fetchrow_hashref;
+$sClientCDCHA->execute($ClientID) || myDBI->dberror("select ClientCDCHA ${ClientID}");
+my $rClientCDCHA = $sClientCDCHA->fetchrow_hashref;
+$sClientMHSF->execute($ClientID) || myDBI->dberror("select ClientMHSF ${ClientID}");
+my $rClientMHSF = $sClientMHSF->fetchrow_hashref;
+$sClientSATobacco->execute($ClientID) || myDBI->dberror("select ClientSATobacco ${ClientID}");
+my $rClientSATobacco = $sClientSATobacco->fetchrow_hashref;
+$sClientAUDIT->execute($ClientID) || myDBI->dberror("select ClientAUDIT ${ClientID}");
+my $rClientAUDIT = $sClientAUDIT->fetchrow_hashref;
+#foreach my $f ( sort keys %{$rClientAUDIT} ) { warn "PrintIntake: $f=$rClientAUDIT->{$f}\n"; }
+$rClientAUDIT->{'Score'} = $rClientAUDIT->{'q1'}+$rClientAUDIT->{'q2'}+$rClientAUDIT->{'q3'}+$rClientAUDIT->{'q4'}+$rClientAUDIT->{'q5'}+$rClientAUDIT->{'q6'}+$rClientAUDIT->{'q7'}+$rClientAUDIT->{'q8'}+$rClientAUDIT->{'q9'}+$rClientAUDIT->{'q10'};
+$rClientAUDIT->{'Result'} = $rClientAUDIT->{'Score'} >= 8 ? 'Positive' : 'Negative';
+$sClientCRAFFT->execute($ClientID) || myDBI->dberror("select ClientCRAFFT ${ClientID}");
+my $rClientCRAFFT = $sClientCRAFFT->fetchrow_hashref;
+my $Score = $rClientCRAFFT->{'q1'}+$rClientCRAFFT->{'q2'}+$rClientCRAFFT->{'q3'}+$rClientCRAFFT->{'q4'}+$rClientCRAFFT->{'q5'}+$rClientCRAFFT->{'q6'};
+$rClientCRAFFT->{'Score'} = $Score > 1 ? 'Positive '.$Score : 'Negative '.$Score;
+
+$sProvider->execute($rClientAdmit->{'ProvID'}) || myDBI->dberror("select AdmitProvider $rClientAdmit->{ProvID}");
+my $rAdmitProvider = $sProvider->fetchrow_hashref;
+$sProvider->execute($rClient->{'ProvID'}) || myDBI->dberror("select PrimaryProvider $rClient->{ProvID}");
+my $rPrimaryProvider = $sProvider->fetchrow_hashref;
+
+# KLS START
+my $ReAdmit = $rDischarge->{TransDate} eq '' ? 0 : 1;
+my $ReferredTo = $rClientReferrals->{'ReferredToNPI'} eq '' ? 0 : 1;
+my $problem1 = DBA->getxref($form,'xProblems',$rClientIntake->{'Problem1'},'Catagory Descr');
+my $problem2 = DBA->getxref($form,'xProblems',$rClientIntake->{'Problem2'},'Catagory Descr');
+my $problem3 = DBA->getxref($form,'xProblems',$rClientIntake->{'Problem3'},'Catagory Descr');
+my $isPregnant = $rClientIntake->{'PregnantDate'} eq '' ? 0 : 1;
+my $alertPregnant = $rClientIntake->{'PregnantDate'} eq '' ? '' 
+                  : qq| PREGNANT: Due: |.DBUtil->Date($rClientIntake->{'PregnantDate'},'fmt','MM/DD/YYYY');
+my $notDating = $rClientHealth->{'AgeDating'} eq '' 
+             || $rClientHealth->{'AgeDating'} eq 'not yet' ? 1 : 0;
+my $notSexual = $rClientHealth->{'AgeSexual'} eq '' 
+             || $rClientHealth->{'AgeSexual'} eq 'not yet' ? 1 : 0;
+my $STD = $rClientHealth->{'STD'} eq '' ? 0 : 1;
+
+# COVID Dates
+my $cd1Date = $rClientHealth->{'COVIDDose1Date'} eq '' ? 'Unknown date' 
+          : ' '.DBUtil->Date($rClientHealth->{'COVIDDose1Date'},'fmt','MM/DD/YYYY');
+my $cd2Date = $rClientHealth->{'COVIDDose2Date'} eq '' ? 'Unknown date' 
+          : ' '.DBUtil->Date($rClientHealth->{'COVIDDose2Date'},'fmt','MM/DD/YYYY');
+my $cd3Date = $rClientHealth->{'COVIDDose3Date'} eq '' ? 'Unknown date' 
+          : ' '.DBUtil->Date($rClientHealth->{'COVIDDose3Date'},'fmt','MM/DD/YYYY');
+my $cd4Date = $rClientHealth->{'COVIDDose4Date'} eq '' ? 'Unknown date' 
+          : ' '.DBUtil->Date($rClientHealth->{'COVIDDose4Date'},'fmt','MM/DD/YYYY');
+
+my $cd1 = $rClientHealth->{'COVIDDose1'};
+my $cd2 = $rClientHealth->{'COVIDDose2'};
+my $cd3 = $rClientHealth->{'COVIDDose3'};
+my $cd4 = $rClientHealth->{'COVIDDose4'};
+
+my $ci1Date = $rClientHealth->{'COVIDInfection1Date'} eq '' ? 'Unknown date' 
+          : ' '.DBUtil->Date($rClientHealth->{'COVIDInfection1Date'},'fmt','MM/DD/YYYY');
+my $ci2Date = $rClientHealth->{'COVIDInfection2Date'} eq '' ? 'Unknown date' 
+          : ' '.DBUtil->Date($rClientHealth->{'COVIDInfection2Date'},'fmt','MM/DD/YYYY');
+my $ci3Date = $rClientHealth->{'COVIDInfection3Date'} eq '' ? 'Unknown date' 
+          : ' '.DBUtil->Date($rClientHealth->{'COVIDInfection3Date'},'fmt','MM/DD/YYYY');
+my $ci4Date = $rClientHealth->{'COVIDInfection4Date'} eq '' ? 'Unknown date' 
+          : ' '.DBUtil->Date($rClientHealth->{'COVIDInfection4Date'},'fmt','MM/DD/YYYY');
+
+my $ct1Date = $rClientHealth->{'COVIDTherapeutic1Date'} eq '' ? 'Unknown date' 
+          : ' '.DBUtil->Date($rClientHealth->{'COVIDTherapeutic1Date'},'fmt','MM/DD/YYYY');
+my $ct2Date = $rClientHealth->{'COVIDTherapeutic2Date'} eq '' ? 'Unknown date' 
+          : ' '.DBUtil->Date($rClientHealth->{'COVIDTherapeutic2Date'},'fmt','MM/DD/YYYY');
+my $ct3Date = $rClientHealth->{'COVIDTherapeutic3Date'} eq '' ? 'Unknown date' 
+          : ' '.DBUtil->Date($rClientHealth->{'COVIDTherapeutic3Date'},'fmt','MM/DD/YYYY');
+my $ct4Date = $rClientHealth->{'COVIDTherapeutic4Date'} eq '' ? 'Unknown date' 
+          : ' '.DBUtil->Date($rClientHealth->{'COVIDTherapeutic4Date'},'fmt','MM/DD/YYYY');
+
+my $ct1 = $rClientHealth->{'COVIDTherapeutic1'};
+my $ct2 = $rClientHealth->{'COVIDTherapeutic2'};
+my $ct3 = $rClientHealth->{'COVIDTherapeutic3'};
+my $ct4 = $rClientHealth->{'COVIDTherapeutic4'};
+
+# END COVID Section
+
+my $hDate = $rClientHealth->{'HearingDate'} eq '' ? 'Unknown date' 
+          : '; '.DBUtil->Date($rClientHealth->{'HearingDate'},'fmt','MM/DD/YYYY');
+my $vDate = $rClientHealth->{'VisionDate'} eq '' ? 'Unknown date' 
+          : '; '.DBUtil->Date($rClientHealth->{'VisionDate'},'fmt','MM/DD/YYYY');
+my $toiletproblem = $rClientDevl->{'ToiletProblems'} == 1 ? qq|Bladder|
+                  : $rClientDevl->{'ToiletProblems'} == 2 ? qq|Bowel|
+                  : $rClientDevl->{'ToiletProblems'} == 3 ? qq|Both|
+                  : '';
+my $toiletseverity = $rClientDevl->{'ToiletSeverity'} == 1 ? qq|Mild|
+                   : $rClientDevl->{'ToiletSeverity'} == 2 ? qq|Moderate|
+                   : $rClientDevl->{'ToiletSeverity'} == 3 ? qq|Sever|
+                   : '';
+my $toiletageAchive = $rClientDevl->{'ToiletDaytime'} eq '' ? '' 
+                    : qq|daytime: $rClientDevl->{'ToiletDaytime'} |;
+$toiletageAchive   .= $rClientDevl->{'ToiletNighttime'} eq '' ? ''
+                    : qq|nighttime: $rClientDevl->{'ToiletNighttime'} |;
+my $mm_unknown = $rClientDevl->{'MotorMilestones'} eq 'U' ? 'Yes' : 'No';         # trigger
+#warn qq|1=$rClientDevl->{'Handicap1'}=,=$rClientDevl->{'FuncStatus1'}=\n|;
+my $h1 = $rClientDevl->{'Handicap1'} eq '' ? '' : DBA->getxref($form,'xHandicap',$rClientDevl->{'Handicap1'},'Descr');
+my $f1 = $rClientDevl->{'FuncStatus1'} eq '' ? '' : DBA->getxref($form,'xFunctionalStatus',$rClientDevl->{'FuncStatus1'},'ConceptName');
+my $handicap1 = $h1 eq '' && $f1 eq '' ? ''
+              : $f1 eq '' ? qq|1) ${h1}|
+              : $h1 eq '' ? qq|Functional Status: ${f1}|
+              : qq|1) ${h1} Functional Status: ${f1}|;
+my $h2 = $rClientDevl->{'Handicap2'} eq '' ? '' : DBA->getxref($form,'xHandicap',$rClientDevl->{'Handicap2'},'Descr');
+my $f2 = $rClientDevl->{'FuncStatus2'} eq '' ? '' : DBA->getxref($form,'xFunctionalStatus',$rClientDevl->{'FuncStatus2'},'ConceptName');
+my $handicap2 = $h2 eq '' && $f2 eq '' ? ''
+              : $f2 eq '' ? qq|2) ${h2}|
+              : $h2 eq '' ? qq|Functional Status: ${f2}|
+              : qq|2) ${h2} Functional Status: ${f2}|;
+my $h3 = $rClientDevl->{'Handicap3'} eq '' ? '' : DBA->getxref($form,'xHandicap',$rClientDevl->{'Handicap3'},'Descr');
+my $f3 = $rClientDevl->{'FuncStatus3'} eq '' ? '' : DBA->getxref($form,'xFunctionalStatus',$rClientDevl->{'FuncStatus3'},'ConceptName');
+my $handicap3 = $h3 eq '' && $f3 eq '' ? ''
+              : $f3 eq '' ? qq|3) ${h3}|
+              : $h3 eq '' ? qq|Functional Status: ${f3}|
+              : qq|3) ${h3} Functional Status: ${f3}|;
+my $h4 = $rClientDevl->{'Handicap4'} eq '' ? '' : DBA->getxref($form,'xHandicap',$rClientDevl->{'Handicap4'},'Descr');
+my $f4 = $rClientDevl->{'FuncStatus4'} eq '' ? '' : DBA->getxref($form,'xFunctionalStatus',$rClientDevl->{'FuncStatus4'},'ConceptName');
+my $handicap4 = $h4 eq '' && $f4 eq '' ? ''
+              : $f4 eq '' ? qq|4) ${h4}|
+              : $h4 eq '' ? qq|Functional Status: ${f4}|
+              : qq|4) ${h4} Functional Status: ${f4}|;
+my $useTobacco = $rMedHx->{'DailyTobaccoUse'} ? 'Yes' : 'No';                     # trigger
+my $SmoklessPerDay  = $rMedHx->{'DailyTobaccoUse'}-$rClientCDCHA->{'q11'};         # this is NicotineUse-CigaretteUse PerDay
+#warn qq|SmoklessPerDay=${SmoklessPerDay}, DailyTobaccoUse=$rMedHx->{'DailyTobaccoUse'}, q11=$rClientCDCHA->{'q11'}\n|;
+my $useDrug = $rMedHx->{'DrugAbuse'} == 1 ? 'Yes' : 'No';                         # trigger
+my $prenatalexp = $rMedHx->{'PrenatalExp'} eq ''
+                ? 'No'
+                : DBA->subCHAR(DBA->getxref($form,'xDrugs',$rMedHx->{'PrenatalExp'},'Descr'));
+my $residence = DBA->getxref($form,'xResidence',$rClientRelations->{'Residence'},'Descr');
+# Child Placement types...based on < 18
+my $Age = DBUtil->Date($rClient->{'DOB'},'age',$rClientAdmit->{'AdmitDate'});
+# 1 Not in out-of-home treatment
+# 2 Residential treatment
+# 3 Specialized community group home
+# 4 Foster home
+# 5 Group home
+# 6 Other
+my $placement = $Age >= 18 ? ''
+              : $residence =~ /residential care facility/i ? 'Residential treatment'
+              : $residence =~ /specialized community group home/i ? 'Specialized community group home'
+              : $residence =~ /foster/i ? 'Foster home'
+              : $residence =~ /group home/i ? 'Group home' : 'Not in out-of-home treatment';
+my $correctional = $rClientLegal->{'InJail'} ? 'In Jail ' : '';
+$correctional .= $residence =~ /prison/i ? 'In Prison ' : ''; 
+$correctional = 'None' if ( $correctional eq '' );
+my $homeless = $rClientRelations->{'HomelessLong'} && $rClientRelations->{'HomelessMany'} ? 'Frequent/Chronic'
+             : $rClientRelations->{'HomelessLong'} ? 'Chronic'
+             : $rClientRelations->{'HomelessMany'} ? 'Frequent' : 'No';
+my $leisure = $rClientSocial->{'WhoSpendTime'} eq '1' ? 'Family'
+            : $rClientSocial->{'WhoSpendTime'} eq '2' ? 'Friends'
+            : $rClientSocial->{'WhoSpendTime'} eq '3' ? 'Alone' : '';
+my $milflag = $rClientIntake->{'MilFlag'} eq '0' ? 'None'
+            : $rClientIntake->{'MilFlag'} eq '1' ? 'Active'
+            : $rClientIntake->{'MilFlag'} eq '2' ? 'Reserved'
+            : $rClientIntake->{'MilFlag'} eq '3' ? 'Discharged'
+            : $rClientIntake->{'MilFlag'} eq '4' ? 'Retired' : 'Unknown';
+my $strength1 = $rClientSummary->{'S1'} eq '' ? '' : qq|1) |.DBA->subCHAR($rClientSummary->{'S1'});
+my $strength2 = $rClientSummary->{'S2'} eq '' ? '' : qq|\n2) |.DBA->subCHAR($rClientSummary->{'S2'});
+my $strength3 = $rClientSummary->{'S3'} eq '' ? '' : qq|\n3) |.DBA->subCHAR($rClientSummary->{'S3'});
+my $strength4 = $rClientSummary->{'S4'} eq '' ? '' : qq|\n4) |.DBA->subCHAR($rClientSummary->{'S4'});
+my $needs1 = $rClientSummary->{'L1'} eq '' ? '' : qq|1) |.DBA->subCHAR($rClientSummary->{'L1'});
+my $needs2 = $rClientSummary->{'L2'} eq '' ? '' : qq|\n2) |.DBA->subCHAR($rClientSummary->{'L2'});
+my $needs3 = $rClientSummary->{'L3'} eq '' ? '' : qq|\n3) |.DBA->subCHAR($rClientSummary->{'L3'});
+my $needs4 = $rClientSummary->{'L4'} eq '' ? '' : qq|\n4) |.DBA->subCHAR($rClientSummary->{'L4'});
+
+#####################
+  my $HeaderInfo = { 
+    'companyname' => $AgencyName, 
+    'companyaddr' =>  $AgencyAddr, 
+    'companycsz' => $AgencyCSZ, 
+    'companyphone' => $AgencyPh,
+    'LOGO' => $rAgency->{'LOGO'} 
+                   };
+  my $Resubmission = ${ReAdmit};
+  my $referralData = main->setReferrals($rClientReferrals);
+  my $PrimaryReferral = $referralData->{'primaryReferral_name'};
+  my $PrimaryReferralDate = $referralData->{'primaryReferral_date'};
+  my $PrimaryReferralContact = $referralData->{'primaryReferral_contact'};
+  my $PrimaryReferralPhone = $referralData->{'primaryReferral_phn'};
+  my $SecondaryReferral = $referralData->{'secondaryReferral_name'};
+  my $SecondaryReferralDate = $referralData->{'secondaryReferral_date'};
+  my $SecondaryReferralContact = $referralData->{'secondaryReferral_contact'};
+  my $SecondaryReferralPhone = $referralData->{'secondaryReferral_phn'};
+  my @referringPhysicianData = main->setNPIs($rClientReferrals->{'RefPhysNPI'},'referringPhysician','None');
+  my $ReferringPhysician = $referringPhysicianData[0]->{'referringPhysician_name'};
+  my $ReferringPhysicianDate = DBUtil->Date($rClientReferrals->{'RefPhysDate'},'fmt','MM/DD/YYYY');
+  my $ReferringPhysicianPhone = $referringPhysicianData[0]->{'referringPhysician_phone'};
+  my $TransportedBy = $rClientReferrals->{'TransBy'};
+  my $TransportedByPhone = $rClientReferrals->{'TransPh'};
+  my $Address = $rClientReferrals->{'TransAddr'};
+  my $City = $rClientReferrals->{'TransCity'};
+  my $County = $rClientReferrals->{'TransCounty'};
+  my $State = $rClientReferrals->{'TransST'};
+  my $Zip = $rClientReferrals->{'TransZip'};
+  my $ReasonForReferral = $rClientReferrals->{'RefReason'};
+  my $SQUseTobacco = main->setYN('','',$rClientReferrals->{'UseTobacco'});
+  my $SQTobaccoCessation = main->setYN('','',$rClientReferrals->{'TobaccoCessation'});
+  my $SQHarmfulintent = $rClientReferrals->{'Harmfulintent'};
+  if($SQHarmfulintent == 0) {
+    $SQHarmfulintent = 'Neither';
+  }
+  if($SQHarmfulintent == 1) {
+    $SQHarmfulintent = 'Suicidal';
+  }
+  if($SQHarmfulintent == 2) {
+    $SQHarmfulintent = 'Homocidal';
+  }
+  if($SQHarmfulintent == 2) {
+    $SQHarmfulintent = 'Both';
+  } 
+  my $SQSuicidePlan = main->setYN('','',$rClientReferrals->{'SuicidePlan'},'','','No');
+  my $SQRiskOthers = main->setYN('','',$rClientReferrals->{'RiskOthers'},'','','No');
+  my $SQWitnessTrauma = main->setYN('','',$rClientReferrals->{'WitnessTrauma'});
+  my $SQUseAlcoholDrugs = main->setYN('','',$rClientReferrals->{'UseAlcoholDrugs'});
+  my $SQRecieveADT = main->setYN('','',$rClientReferrals->{'RecieveADT'});
+  my $SQMoodDisorder = main->setYN('','',$rClientReferrals->{'MoodDisorder'});
+  my $ReturnToReferralSource = $rClientReferrals->{'ReturnToRef'};
+  my $IneligibleForServices = ${ReferredTo};
+  my @referredtoData = main->setNPIs($rClientReferrals->{'ReferredToNPI'},'referredto','None');
+  my $ReferredToName = $referredtoData[0]->{'referredto_name'};
+  my $IntakeDate = DBUtil->Date($rClientAdmit->{'AdmitDate'},'fmt','MM/DD/YYYY');
+  my $IntakeTime = substr($rClientAdmit->{'AdmitTime'},0,5);
+  my $Staff = $rAdmitProvider->{'FName'}. " " . $rAdmitProvider->{'LName'};
+  my $clientData = main->setClient($rClient,$rClientIntake,$rClientVitalSigns,$rClientRelations);
+  my $IdentifyingLastName = $clientData->{'client_lastName'};
+  my $IdentifyingMaiden = $clientData->{'client_maiden'};
+  my $IdentifyingFirstName = $clientData->{'client_firstName'};
+  my $IdentifyingMI = $clientData->{'client_mi'};
+  my $IdentifyingSuffix = $clientData->{'client_suffix'};
+  my $IdentifyingAddress = $clientData->{'client_address'};
+  my $IdentifyingCity = $clientData->{'client_city'};
+  my $IdentifyingCounty = $clientData->{'client_county'};
+  my $IdentifyingState = $clientData->{'client_state'};
+  my $IdentifyingZip = $clientData->{'client_zip'};
+  my $IdentifyingHomePhone = $clientData->{'client_homephn'};
+  my $IdentifyingWorkPhone = $clientData->{'client_workphn'};
+  my $IdentifyingCellPhone = $clientData->{'client_cellphn'};
+  my $IdentifyingCarrier = $clientData->{'client_carrier'};
+  my $IdentifyingEmail = $clientData->{'client_email'};
+  my $IdentifyingSSN = $clientData->{'client_ssn'};
+  my $IdentifyingDOB = $clientData->{'client_dob'};
+  my $IdentifyingPOB = $clientData->{'client_pob'};
+  my $IdentifyingOrder = $clientData->{'client_order'};
+  my $MaritalStatus = $clientData->{'client_maritalStatus'};
+  my $HeightFt = $clientData->{'client_height_ft'};
+  my $HeightIn = $clientData->{'client_height_in'};
+  my $Weight = $clientData->{'client_weight'};
+  my $Eyes = $clientData->{'client_eyes'};
+  my $Hair = $clientData->{'client_hair'};
+  my $GenderM = ($clientData->{'clientGender_male'} eq 'Male') ? 1 : 0;
+  my $GenderF = ($clientData->{'clientGender_female'} eq 'Female') ? 1 : 0;
+  my $GenderUkn = ($clientData->{'clientGender_unknown'} eq 'Ukn') ? 1 : 0;
+  my @emerContactData = main->setEmerContact($ClientID);
+  my $EmergencyLastName = $emerContactData[0]->{'guardian1_lastname'};
+  my $EmergencyFirstName = $emerContactData[0]->{'guardian1_firstName'};
+  my $EmergencyMI = $emerContactData[0]->{'guardian1_mi'};
+  my $EmergencyAddress = $emerContactData[0]->{'guardian1_address'};
+  my $EmergencyCity = $emerContactData[0]->{'guardian1_city'};
+  my $EmergencyCounty = $emerContactData[0]->{'guardian1_county'};
+  my $EmergencyState = $emerContactData[0]->{'guardian1_state'};
+  my $EmergencyZip = $emerContactData[0]->{'guardian1_zip'};
+  my $EmergencyHomePhone = $emerContactData[0]->{'guardian1_homePhn'};
+  my $EmergencyWorkPhone = $emerContactData[0]->{'guardian1_workPhn'};
+  my $EmergencyCellPhone = $emerContactData[0]->{'guardian1_cellPhn'};
+  my $Relationship = $emerContactData[0]->{'guardian1_relationship'};
+  my $EmergencyEmail = $emerContactData[0]->{'guardian1_email'};
+  my $LegalGuardian = $emerContactData[0]->{'guardian1_legal'};
+  my $EmergencyContact = $emerContactData[0]->{'guardian1_contact'};
+
+  my @physNPIData = main->setNPIs($rClientEmergency->{'PhysNPI'},'hci','None','Primary Care Physician');
+  my @desigHospNPIData = main->setNPIs($rClientEmergency->{'DesigHospNPI'},'hci','None','Designated Hospital');
+  my @pharmacyNPIData = main->setNPIs($rClientEmergency->{'PharmacyNPI'},'hci','None','Designated Pharmacy');
+  my @dentistNPIData = main->setNPIs($rClientEmergency->{'DentistNPI'},'hci','None','Designated Dentist');
+  my @visionNPIData = main->setNPIs($rClientEmergency->{'VisionNPI'},'hci','None','Designated Vision');
+  my @hearingNPIData = main->setNPIs($rClientEmergency->{'HearingNPI'},'hci','None','Designated Hearing');
+  my @HealthCareInfoHeaders = ("Name", "Address", "Phone", "Type");
+  my @HealthCareInfoHeaderWidths = (40, 50, 25, 30);
+  my @HealthCareInfo = (@physNPIData, @desigHospNPIData, @pharmacyNPIData, @dentistNPIData, @visionNPIData, @hearingNPIData);
+  my $HealthVaultEmail = $rClientEmergency->{'HealthVault'};
+  
+  my $insuranceData = main->setInsurance($ClientID);
+  my $InsurancePrimary = $insuranceData->{'primaryInsurance_name'};
+  my $PrimaryCoPay = $insuranceData->{'primaryInsurance_copay'};
+  my $PrimaryDeductible = $insuranceData->{'primaryInsurance_deductible'};
+  my $PrimaryPolicyHolder = $insuranceData->{'primaryInsurance_pholder'};
+  my $PrimaryPolicy = $insuranceData->{'primaryInsurance_pnumber'};
+  my $PrimaryAuthPhone = $insuranceData->{'primaryInsurance_paphn'};
+  my $InsuranceSecondary = $insuranceData->{'secondaryInsurance_name'};
+  my $SecondaryCoPay = $insuranceData->{'secondaryInsurance_copay'};
+  my $SecondaryDeductible = $insuranceData->{'secondaryInsurance_deductible'};
+  my $SecondaryPolicyHolder = $insuranceData->{'secondaryInsurance_pholder'};
+  my $SecondaryPolicy = $insuranceData->{'secondaryInsurance_pnumber'};
+  my $SecondaryAuthPhone = $insuranceData->{'secondaryInsurance_paphn'};
+  my $InsuranceTertiary = $insuranceData->{'tertiaryInsurance_name'};
+  my $TertiaryCoPay = $insuranceData->{'tertiaryInsurance_copay'};
+  my $TertiaryDeductible = $insuranceData->{'tertiaryInsurance_deductible'};
+  my $TertiaryPolicyHolder = $insuranceData->{'tertiaryInsurance_pholder'};
+  my $TertiaryPolicy = $insuranceData->{'tertiaryInsurance_pnumber'};
+  my $TertiaryAuthPhone = $insuranceData->{'tertiaryInsurance_paphn'};
+
+  my $PresentingProblemPrimary = $problem1;
+  my $PresentingProblemSecondary = $problem2;
+  my $PresentingProblemTertiary = $problem3;
+  my $PresentingProblemOverall = main->setTextxrefMV($form,'xHealthStatus',$rClientHealth->{'OverallHealth'},'','overAllHealthStatus','  ','ConceptName');
+  my $PresentingProblemHistory = $rClientIntake->{'Problem'};
+  my $PresentingProblemAttempted = main->setTextxrefMF($form,'xProblemSolutions',$rClientMHProblems,$rClientMHProblems->{'OtherTherapyText'},'attemptedSolution','  ');
+  my $MedicalPhysicalHistory = $rClientHealth->{'HospOverNight'};
+  my $HospReasons = $rClientHealth->{'PhysHist'};
+  my $RefusedSexualHistory = $rClientHealth->{'RefusedQues'};
+  my $AgeDating = $rClientHealth->{'AgeDating'};
+  my $NotYetDating = ${notDating};
+  my $AgeSexual = $rClientHealth->{'AgeSexual'};
+  my $NotYetSexual = ${notSexual};
+  my $SexualOrient = main->setTextxrefMV($form,'xSexualOrientation',$rClientHealth->{'SexPref'},'','shR3_sexOrientation','  ','ConceptName');
+  my $GenderExpre = main->setTextxrefMV($form,'xGenderIdentity',$rClientHealth->{'SexID'},'','shR4_genderID','  ','ConceptName');
+  my $SexualActive = main->setYN('  ','shR5_sexActive',$rClientHealth->{'SexActive'},'Yes','No','UNKNOWN');
+  my $SexuallyTransmit = main->setYN('  ','shR6_std',$STD,'Yes','No','UNKNOWN');
+  my $SexualProblems = main->setYN('  ','shR8_sexProblem',$rClientHealth->{'SexProb'},'Yes','No','UNKNOWN');
+  my $MoreSexualActive = main->setYN('  ','shR10_chemical',$rClientHealth->{'SexChems'},'Yes','No','UNKNOWN');
+  my $TradeSex = main->setYN('  ','shR11_tradedSex',$rClientHealth->{'SexTrade'},'Yes','No','UNKNOWN');
+  my $FeelGuiltySex = main->setYN('  ','shR12_guilty',$rClientHealth->{'SexGuilt'},'Yes','No','UNKNOWN');
+  my $AllergiesAlerts = main->setTextxrefMV($form,'xNoAllergies',$rClientIntake->{'NoAllergies'},'','allergiesAlert','  ','Descr');
+  my @AllergenTableHeaders = ("Allergen", "<$baseboldmidfontoptions>Severity\n<$basefontoptions_i>(None, Mild, Moderate, Severe, Fatal)", "Start Date", "Stop Date", "Reaction", "Comments/Notes");
+  my @AllergenTableHeaderWidths = (23, 20, 15, 15, 18, 23);
+  my @AllergenTableData = main->setClientAllergies($ClientID);
+  my $ImmunizationsCurrent = main->setYN('  ','immunization_current',$rClientHealth->{'ImmunizeDesc'},'Yes','No','No','Yes');
+  
+# COVID SECTION
+  my $CovidDose1 = main->setTextxrefMV($form,'xCOVIDVaccines',$rClientHealth->{'COVIDDose1'},'','covid_dose_1','  ','Name');
+  my $CovidDose2 = main->setTextxrefMV($form,'xCOVIDVaccines',$rClientHealth->{'COVIDDose2'},'','covid_dose_1','  ','Name');
+  my $CovidDose3 = main->setTextxrefMV($form,'xCOVIDVaccines',$rClientHealth->{'COVIDDose3'},'','covid_dose_1','  ','Name');
+  my $CovidDose4 = main->setTextxrefMV($form,'xCOVIDVaccines',$rClientHealth->{'COVIDDose4'},'','covid_dose_1','  ','Name');
+  my $CovidDose1Date = ${cd1Date};
+  my $CovidDose2Date = ${cd2Date};
+  my $CovidDose3Date = ${cd3Date};
+  my $CovidDose4Date = ${cd4Date};
+
+  my $CovidInfection1Date = ${ci1Date};
+  my $CovidInfection2Date = ${ci2Date};
+  my $CovidInfection3Date = ${ci3Date};
+  my $CovidInfection4Date = ${ci4Date};
+
+  my $CovidTherapeutic1 = main->setTextxrefMV($form,'xCOVIDTherapeutic',$rClientHealth->{'COVIDTherapeutic1'},'','covid_th_1','  ','Name');
+  my $CovidTherapeutic2 = main->setTextxrefMV($form,'xCOVIDTherapeutic',$rClientHealth->{'COVIDTherapeutic2'},'','covid_th_1','  ','Name');
+  my $CovidTherapeutic3 = main->setTextxrefMV($form,'xCOVIDTherapeutic',$rClientHealth->{'COVIDTherapeutic3'},'','covid_th_1','  ','Name');
+  my $CovidTherapeutic4 = main->setTextxrefMV($form,'xCOVIDTherapeutic',$rClientHealth->{'COVIDTherapeutic4'},'','covid_th_1','  ','Name');
+  my $N95 = main->setYN('  ','immunization_current',$rClientHealth->{'ClientHealthN95'},'Yes','No','No','Yes');
+  my $CHTK = main->setYN('  ','immunization_current',$rClientHealth->{'ClientHealthHKR'},'Yes','No','No','Yes');
+  my $CovidTherapeutic1Date = ${ct1Date};
+  my $CovidTherapeutic2Date = ${ct2Date};
+  my $CovidTherapeutic3Date = ${ct3Date};
+  my $CovidTherapeutic4Date = ${ct4Date};
+
+
+  my $HearingScreeningDate = ${hDate};
+
+  my $HearingScreeningDate = ${hDate};
+  my $HearingScreeningResult = main->setYN('  ','hearing_result',$rClientHealth->{'HearingPass'},'Passed','Failed','UNKNOWN');
+  my $VisionScreeningDate = ${vDate};
+  my $VisionScreeningResult = main->setYN('  ','vision_result',$rClientHealth->{'VisionPass'},'Passed','Failed','UNKNOWN');
+  my @CurMedicationsTbHeaders = ("Physician", "Medication", "Type", "Date", "Reason");
+  my @CurMedicationsTbHeaderWidths = (20, 30, 35, 15, 20);
+  my @CurMedicationsTbData = main->setMeds($ClientID);
+  my $DevelopmentalAgeFactors = main->setYN('    ','developmental_factor',$rMedHx->{'DevlFlag'},'Yes','No','UNKNOWN');
+  my $PrenatalCondition = main->setTextxrefMF($form,'xPrenatal',$rClientDevl,'','developmental_prenatal','  ');
+#warn qq|PrenatalCondition=${PrenatalCondition}\n|;
+  my $PerinatalCondition = main->setTextxrefMF($form,'xPerinatal',$rClientDevl,$rClientDevl->{'PerinatalOtherText'},'developmental_perinatal','  ');
+  my $PostnatalELife = main->setTextxrefMF($form,'xPostnatal',$rClientDevl,$rClientDevl->{'PostnatalOtherText'},'developmental_postnatal','  ');
+  my $ToiletingProblems = ${toiletproblem};
+  my $ToiletingSeverity = ${toiletseverity};
+  my $ToiletingAgeAchieved = ${toiletageAchive};
+  my $EmergencyRoom = main->setYN('    ','emergencyRoom',$rClientDevl->{'EmergencyRoom'},'Yes','No','UNKNOWN');
+  # my @EmergencyRoomTbHeaders = ("Date", "Reason");
+  # my @EmergencyRoomTbHeaderWidths = (20, 80);
+  # my @EmergencyRoomTbData = (
+  #   { "date" => "Lorem Ipsum", "reason" => "Lorem Ipsum" },
+  #   { "date" => "Lorem Ipsum", "reason" => "Lorem Ipsum" },
+  #   { "date" => "Lorem Ipsum", "reason" => "Lorem Ipsum" },
+  #   { "date" => "Lorem Ipsum", "reason" => "Lorem Ipsum" },
+  # );
+  my $EmergencyRoomText = $rClientDevl->{'EmergencyRoomText'};
+  my $MotoMilestonesUnkown = ${mm_unknown};
+  my $MotoSitAlone = main->setYN('  ','mm_sitAlone',$rClientDevl->{'MMSitAlone'});
+  my $MotoCrawl = main->setYN('  ','mm_crawl',$rClientDevl->{'MMCrawl'});
+  my $MotoWalkWellAlone = main->setYN('  ','mm_walkWell',$rClientDevl->{'MMWalk'});
+  my $MotoGoDownStairs = main->setYN('  ','mm_goDown',$rClientDevl->{'MMGoDownStairs'});
+  my $MotoRideTricycle = main->setYN('  ','mm_rideTricycle',$rClientDevl->{'MMRideTricycle'});
+  my $MotoRideWithoutTraining = main->setYN('  ','mm_rideBicycle',$rClientDevl->{'MMRideBicycle'});
+  my $GrossMotoDifficultyRidingToy = main->setYN('  ','gfm_ridingToy',$rClientDevl->{'RidingToy'});
+  my $GrossMotoDifficultyPumpingSelf = main->setYN('  ','gfm_pumpingSelf',$rClientDevl->{'PumpingSelfOnSwing'});
+  my $GrossMotoDifficultyLearningRide = main->setYN('  ','gfm_learning',$rClientDevl->{'LearningHowRideBike'});
+  my $GrossMotoDislikesColoring = main->setYN('  ','gfm_coloring',$rClientDevl->{'ColoringPaperPencilTasks'});
+  my $GrossMotoDislikesPlayingPuzzles = main->setYN('  ','gfm_puzzles',$rClientDevl->{'EasilyFrustrated'});
+  my $GrossMotoDifficultyPlaingToys = main->setYN('  ','gfm_playing',$rClientDevl->{'PlayingSmallToys'});
+  my $GrossMotoDifficultyUsingScissors = main->setYN('  ','gfm_scissors',$rClientDevl->{'UsingScissors'});
+  my $GrossMotoSeemsWeaker = main->setYN('  ','gfm_weaker',$rClientDevl->{'Weaker'});
+  my $GrossMotoAppearsStiff = main->setYN('  ','gfm_stiff',$rClientDevl->{'AppearsStiff'});
+  my $GrossMotoDifficultyNewMotor = main->setYN('  ','gfm_motorTask',$rClientDevl->{'NewMotorTasks'});
+  my $GrossMotoDifficultyCatching = main->setYN('  ','gfm_catching',$rClientDevl->{'CatchingBall'});
+  my $GrossMotoDifficultyKicking = main->setYN('  ','gfm_kicking',$rClientDevl->{'KickingBall'});
+  my $GrossMotoDifficultyLearningSwim = main->setYN('  ','gfm_swim',$rClientDevl->{'LearningHowSwim'});
+  my $SelfSkillsUseSpoon = main->setYN('  ','shs_useSpoon',$rClientDevl->{'UseOfSpoon'});
+  my $SelfSkillsCutting = main->setYN('  ','shs_cuttingKnife',$rClientDevl->{'CuttingWithKnife'});
+  my $SelfSkillsDressing = main->setYN('  ','shs_dressingSelf',$rClientDevl->{'DressingSelf'});
+  my $SelfSkillsClothing = main->setYN('  ','shs_clothFastener',$rClientDevl->{'ClothingFasteners'});
+  my $SelfSkillsTying = main->setYN('  ','shs_tyingShoes',$rClientDevl->{'TyingShoes'});
+  my $SelfSkillsBrushingTeeth = main->setYN('  ','shs_brushTeeth',$rClientDevl->{'BrushingTeeth'});
+  my $SelfSkillsMakingSandwich = main->setYN('  ','shs_simpleSandwich',$rClientDevl->{'MakingSimpleSandwich'});
+  my $SelfSkillsCompleting = main->setYN('  ','shs_chores',$rClientDevl->{'CompletingChores'});
+  my $SelfSkillsMakingBed = main->setYN('  ','shs_makingBed',$rClientDevl->{'MakingBed'});
+  my $SelfSkillsBath = main->setYN('  ','shs_bath',$rClientDevl->{'TakingBathShower'});
+  my $SelfSkillsWashing = main->setYN('  ','shs_washHair',$rClientDevl->{'WashingHair'});
+  my $MoveBalCarSick = main->setYN('  ','mb_carSick',$rClientDevl->{'CarSickFrequently'});
+  my $MoveBalNausea = main->setYN('  ','mb_nausea',$rClientDevl->{'NauseaVomitsFromMovement'});
+  my $MoveBalGiveAdequate = main->setYN('  ','mb_warnNausea',$rClientDevl->{'WarningFeelingNausea'});
+  my $MoveBalSeeksTwirling = main->setYN('  ','mb_twirling',$rClientDevl->{'SeeksSpinning'});
+  my $MoveBalSeeksStimulation = main->setYN('  ','mb_seeksQty',$rClientDevl->{'SeeksParkrides'});
+  my $MoveBalClimb = main->setYN('  ','mb_climbPlay',$rClientDevl->{'HesitatesPlayground'});
+  my $MoveBalLearningClimb = main->setYN('  ','mb_learnClimb',$rClientDevl->{'HasTroubleClimb'});
+  my $MoveBalDislikesLiftedUp = main->setYN('  ','mb_dislikeLift',$rClientDevl->{'LiftedUp'});
+  my $MoveBalStomach = main->setYN('  ','placedStomach',$rClientDevl->{'PlacedOnAsInfant'});
+  my $MoveBalRocksSelf = main->setYN('  ','mb_rockSelf',$rClientDevl->{'RocksSelfWhenStressed'});
+  my $MoveBalCrawlingAbsent = main->setYN('  ','mb_crawling',$rClientDevl->{'PeriodCrawling'});
+  my $MoveBalWalksOnToes = main->setYN('  ','mb_walkOnToes',$rClientDevl->{'WalksOnToes'});
+  my $MoveBalConstantlyMoving = main->setYN('  ','mb_goMoving',$rClientDevl->{'ConstantlyMoving'});
+  my $MoveBalTrips = main->setYN('  ','mb_tripsFall',$rClientDevl->{'TripsFallsFrequently'});
+  my $TouchUnaware = main->setYN('  ','tch_unaware',$rClientDevl->{'UnawareBeingTouched'});
+  my $TouchHurtPain = main->setYN('  ','tch_hurtPain',$rClientDevl->{'UnawareBeingHurt'});
+  my $TouchSensitive = main->setYN('  ','tch_sensitive',$rClientDevl->{'OverlySensitive'});
+  my $TouchTicklish = main->setYN('  ','tch_ticklish',$rClientDevl->{'ExcessivelyTicklish'});
+  my $TouchCertainClothing = main->setYN('  ','tch_dislikeCloth',$rClientDevl->{'ClothingTags'});
+  my $TouchWearingShort = main->setYN('  ','tch_resistsWearing',$rClientDevl->{'ResistsShorts'});
+  my $TouchDifficultyTransitioning = main->setYN('  ','tch_transition',$rClientDevl->{'TransitioningSeasons'});
+  my $TouchExamineObjects = main->setYN('  ','tch_examObject',$rClientDevl->{'PuttingObjectsInMouth'});
+  my $TouchBeingCuddled = main->setYN('  ','tch_dislikeCuddle',$rClientDevl->{'BeingCuddled'});
+  my $TouchAvoidsPutting = main->setYN('  ','tch_avoidMessy',$rClientDevl->{'AvoidsMessy'});
+  my $TouchFaceHands = main->setYN('  ','tch_unawareMessy',$rClientDevl->{'UnawareMessy'});
+  my $TouchHairCutting = main->setYN('  ','tch_dislikeCutting',$rClientDevl->{'DislikesHairCutting'});
+  my $TouchBathShower = main->setYN('  ','tch_dislikeBath',$rClientDevl->{'DislikesBath'});
+  my $TouchWaterTemper = main->setYN('  ','tch_sensitiveWater',$rClientDevl->{'VerySensitiveWater'});
+  my $TouchToeFingerCutting = main->setYN('  ','tch_dislikeToe',$rClientDevl->{'DislikesNailCutting'});
+  my $TouchPinches = main->setYN('  ','tch_pinches',$rClientDevl->{'PinchesBites'});
+  my $TouchBangsHead = main->setYN('  ','tch_bangsHead',$rClientDevl->{'BangsHeadRepeatedly'});
+  my $TouchFistedHands = main->setYN('  ','tch_crawlFisted',$rClientDevl->{'CrawledFistedHands'});
+  my $TouchSlightBumps = main->setYN('  ','tch_slightBumps',$rClientDevl->{'SensitiveSlightBumpsScrapes'});
+  my $TouchTendency = main->setYN('  ','tch_touchThing',$rClientDevl->{'TendencyTouchThingsConstantly'});
+  my $TouchPushes = main->setYN('  ','tch_pushBites',$rClientDevl->{'FrequentlyPushesBitesHits'});
+  my $AuditoryEarInfections = main->setYN('  ','al_earInfection',$rClientDevl->{'RepeatedEarInfections'});
+  my $AuditoryDistracted = main->setYN('  ','al_distracted',$rClientDevl->{'DistractedBySounds'});
+  my $AuditoryOftenFails = main->setYN('  ','tch_oftenFails',$rClientDevl->{'OftenFailsListen'});
+  my $AuditoryOverlySensitive = main->setYN('  ','tch_overSensitive',$rClientDevl->{'SensitiveMildlyLoudNoises'});
+  my $AuditoryFrequentlyCover = main->setYN('  ','tch_freqCover',$rClientDevl->{'CoversEarsWhenSoundsAreLoud'});
+  my $AuditorySomeNoises = main->setYN('  ','tch_afraidNoise',$rClientDevl->{'AfraidSomeNoises'});
+  my $AuditoryOwnVoice = main->setYN('  ','tch_enjoysEcho',$rClientDevl->{'EnjoysHearingOwnVoice'});
+  my $AuditoryDelayedSpeech = main->setYN('  ','tch_delayedSpeech',$rClientDevl->{'DelayedSpeechDevelopment'});
+  my $AuditoryDifficultToUnderstand = main->setYN('  ','tch_understand',$rClientDevl->{'DifficultUnderstand'});
+  my $AuditoryStammers = main->setYN('  ','tch_stammers',$rClientDevl->{'Stammers'});
+  my $AuditoryIncompleteSentences = main->setYN('  ','tch_speaksInc',$rClientDevl->{'SpeaksIncompleteSentences'});
+  my $AuditoryConfusedLocation = main->setYN('  ','tch_confusedLoc',$rClientDevl->{'ConfusedLocationSound'});
+  my $AuditoryPayingAttention = main->setYN('  ','tch_attnProximity',$rClientDevl->{'HasDifficultyPayingAttention'});
+  my $AuditoryWhatIsSaid = main->setYN('  ','tch_notUnderstand',$rClientDevl->{'DoesNotSeemUnderstand'});
+  my $AuditoryTalksConstantly = main->setYN('  ','tch_talks',$rClientDevl->{'TalksConstantly'});
+  my $AuditoryDiagnoisis = main->setYN('  ','tch_hearingLoss',$rClientDevl->{'DiagnosisHearingLoss'});
+  my $EmoticalAcceptChanges = main->setYN('  ','emt_notAccept',$rClientDevl->{'DoesNotAcceptChange'});
+  my $EmoticalEasilyFrustrated = main->setYN('  ','emt_easilyFrustrate',$rClientDevl->{'BecomesEasilyFrustrated'});
+  my $EmoticalBeImpulsive = main->setYN('  ','emt_aptImpulsive',$rClientDevl->{'AptBeImpulsive'});
+  my $EmoticalMoodVariations = main->setYN('  ','emt_moodVar',$rClientDevl->{'MarkedMoodVariations'});
+  my $EmoticalTendsToWithdraw = main->setYN('  ','emt_withdrawGrps',$rClientDevl->{'TendsWithdrawFromGroups'});
+  my $EmoticalHardWay = main->setYN('  ','emt_hardWay',$rClientDevl->{'DoThingsHardway'});
+  my $EmoticalActivities = main->setYN('  ','emt_changeAct',$rClientDevl->{'ChangesActivitiesFrequently'});
+  my $EmoticalBreaksToys = main->setYN('  ','emt_freqBreakToys',$rClientDevl->{'BreaksToys'});
+  my $EmoticalImpatient = main->setYN('  ','emt_impatient',$rClientDevl->{'Impatient'});
+  my $EmoticalTolerateFrustration = main->setYN('  ','emt_cantTolerate',$rClientDevl->{'CannotTolerateFrustration'});
+  my $EmoticalHums = main->setYN('  ','emt_hums',$rClientDevl->{'HumsTapsFingers'});
+  my $EmoticalDoesNotFinish = main->setYN('  ','emt_doesntFinish',$rClientDevl->{'DoesNotFinish'});
+  my $EmoticalSettleDown = main->setYN('  ','emt_settleDown',$rClientDevl->{'TakesLongTimeSettledown'});
+  my $EmoticalInsistsBedroom = main->setYN('  ','emt_insistToys',$rClientDevl->{'ToysInOrder'});
+  my $EmoticalDisorganized = main->setYN('  ','emt_disorganized',$rClientDevl->{'GenerallyDisorganized'});
+  my $EmoticalUnableToPut = main->setYN('  ','emt_unableOrder',$rClientDevl->{'UnablePutThingsInOrder'});
+  my $EmoticalCannotSit = main->setYN('  ','emt_boardGame',$rClientDevl->{'CannotSitThroughBoardgame'});
+  my $EmoticalWithoutThinking = main->setYN('  ','emt_notThinking',$rClientDevl->{'DoesThingsWithoutThinking'});
+  my $EmoticalCannotQuietly = main->setYN('  ','emt_cantPlay',$rClientDevl->{'CannotPlayQuietly'});
+  my $EmoticalAlwaysGo = main->setYN('  ','emt_alwaysGo',$rClientDevl->{'AlwaysOnGo'});
+  my $EmoticalRunsThanWalks = main->setYN('  ','emt_runs',$rClientDevl->{'RunsRatherThanWalks'});
+  my $EmoticalFidgets = main->setYN('  ','emt_fidgets',$rClientDevl->{'Fidgets'});
+  my $EmoticalHandsToSelf = main->setYN('  ','emt_cantKeep',$rClientDevl->{'CannotKeepHandsSelf'});
+  my $EmoticalTakeToVisit = main->setYN('  ','emt_diffVisit',$rClientDevl->{'DifficultVisit'});
+  my $EmoticalResistsChanges = main->setYN('  ','emt_risistsChange',$rClientDevl->{'ResistsChangesInRoutine'});
+  my $EmoticalDifficultBabysitter = main->setYN('  ','emt_diffBabysit',$rClientDevl->{'DifficultLeaveWithBabysitter'});
+  my $EmoticalOverlyCautious = main->setYN('  ','emt_cautious',$rClientDevl->{'OverlyCautious'});
+  my $EmoticalCriesReason = main->setYN('  ','emt_cries',$rClientDevl->{'CriesSlightestReason'});
+  my $EmoticalForgetSocial = main->setYN('  ','emt_forgetSocial',$rClientDevl->{'ForgetSocialExpectations'});
+  my $EmoticalTolerateNoisy = main->setYN('  ','emt_cantTolerate',$rClientDevl->{'CannotTolerateNoisy'});
+  my $EmoticalNeedsCalm = main->setYN('  ','emt_needCalm',$rClientDevl->{'NeedsCalm'});
+  my $EmoticalSloppyWork = main->setYN('  ','emt_sloppy',$rClientDevl->{'DoesSloppyWork'});
+  my $EmoticalIgnoresRules = main->setYN('  ','emt_ignoreSocial',$rClientDevl->{'IgnoresSocialRules'});
+  my $EmoticalNoGuilt = main->setYN('  ','emt_noGuilt',$rClientDevl->{'HasNoGuilt'});
+  my $EmoticalBelievesRules = main->setYN('  ','emt_ruleApply',$rClientDevl->{'BelievesRulesApplyOnlyOthers'});
+  my $EmoticalLearnExperience = main->setYN('  ','emt_doesntLearn',$rClientDevl->{'DoesNotSeemLearn'});
+  my $EmoticalTellRight = main->setYN('  ','emt_cantTell',$rClientDevl->{'CannotTellRight'});
+  my $EmoticalHasExcuse = main->setYN('  ','emt_excuse',$rClientDevl->{'AlwaysHasExcuse'});
+  my $EmoticalUnfairTreatment = main->setYN('  ','emt_complain',$rClientDevl->{'ComplainsUnfairTreatment'});
+  my $EmoticalPoorSelfImage = main->setYN('  ','emt_poorImage',$rClientDevl->{'HasPoorSelfimage'});
+  my $EmoticalOverlyConcerned = main->setYN('  ','emt_overConcern',$rClientDevl->{'OverlyConcerned'});
+  my $EmoticalIrritable = main->setYN('  ','emt_irritable',$rClientDevl->{'Irritable'});
+  my $EmoticalShortFuse = main->setYN('  ','emt_shortFuse',$rClientDevl->{'HasShortFuse'});
+  my $EmoticalHurtSomeone = main->setYN('  ','emt_hasHurt',$rClientDevl->{'HurtSome'});
+  my $EmoticalInsensitive = main->setYN('  ','emt_insensitive',$rClientDevl->{'InsensitiveFeelingsOthers'});
+  my $EmoticalResistsAuthority = main->setYN('  ','emt_resistAuth',$rClientDevl->{'ResistsAuthority'});
+  my $EmoticalDefiant = main->setYN('  ','emt_defiant',$rClientDevl->{'DefiantWhenDisciplined'});
+  my $EmoticalPurposely = main->setYN('  ','emt_doesOpp',$rClientDevl->{'PurposelyDoesOpposite'});
+  my $EmoticalMakesUp = main->setYN('  ','emt_untruths',$rClientDevl->{'MakesUpUntruths'});
+  my $EmoticalPicksOnly = main->setYN('  ','emt_picksSmall',$rClientDevl->{'PicksOnSmaller'});
+  my $EmoticalCannotBeTrusted = main->setYN('  ','emt_cantTrust',$rClientDevl->{'CannotBeTrustedAlone'});
+  my $EmoticalWantsFriends = main->setYN('  ','emt_wantFriend',$rClientDevl->{'WantsFriends'});
+  my $EmoticalHasFewFriends = main->setYN('  ','emt_fewFriends',$rClientDevl->{'HasFewFriends'});
+  my $EmoticalHasNoFriends = main->setYN('  ','emt_noFriend',$rClientDevl->{'HasNoCloseFriends'});
+  my $EmoticalPrefersChildren = main->setYN('  ','emt_playOlder',$rClientDevl->{'PrefersPlayOlderChildren'});
+  my $EmoticalPrefersAdults = main->setYN('  ','emt_playAdult',$rClientDevl->{'PrefersPlayAdults'});
+  my $EmoticalPrefersYounger = main->setYN('  ','emt_playYounger',$rClientDevl->{'PrefersPlayYoungerChildren'});
+  my $EmoticalPhysicallyRough = main->setYN('  ','emt_physRough',$rClientDevl->{'PhysicallyRoughOthers'});
+  my $EmoticalExcessivelyBossy = main->setYN('  ','emt_excessBossy',$rClientDevl->{'ExcessivelyBossy'});
+  my $EmoticalGetsIntoFights = main->setYN('  ','emt_getFight',$rClientDevl->{'GetsIntoFights'});
+  my $EmoticalOverlySubmissive = main->setYN('  ','emt_submissive',$rClientDevl->{'OverlySubmissive'});
+  my $EmoticalHasToBeLeader = main->setYN('  ','emt_leader',$rClientDevl->{'HasBeLeader'});
+  my $EmoticalResistsSharing = main->setYN('  ','emt_resistShare',$rClientDevl->{'ResistsSharing'});
+  my $EmoticalRoleOfClown = main->setYN('  ','emt_assumeRole',$rClientDevl->{'AssumesRoleClown'});
+  my $EmoticalDepressed = main->setYN('  ','emt_depress',$rClientDevl->{'AppearsDepressed'});
+  my $AcademicScissors = main->setYN('  ','aa_scissors',$rClientDevl->{'Scissors'});
+  my $AcademicFineHandWork = main->setYN('  ','aa_handWork',$rClientDevl->{'FineHandWork'});
+  my $AcademicLetters = main->setYN('  ','emt_recLetter',$rClientDevl->{'RecognizingLetters'});
+  my $AcademicNumbers = main->setYN('  ','emt_recNum',$rClientDevl->{'RecognizingNumbers'});
+  my $AcademicDrawing = main->setYN('  ','emt_drawing',$rClientDevl->{'DrawingColoringTasks'});
+  my $AcademicWriting = main->setYN('  ','emt_write',$rClientDevl->{'WritingNeatly'});
+  my $AcademicLearning = main->setYN('  ','emt_learnCnt',$rClientDevl->{'LearningMoney'});
+  my $AcademicTelling = main->setYN('  ','emt_regClock',$rClientDevl->{'TellingTime'});
+  
+  my %treatmentsData = main->setHospitalTreatments($ClientID,'MH','psychoTreatment');
+  my $InpatientSetting = $treatmentsData{"psychoTreatment_inPatient"};
+  my $OutPatientSetting = $treatmentsData{"psychoTreatment_outPatient"};
+  my @TreatmentsTbHeaders = ("Where", "Type", "When", "How Long", "Reason");
+  my @TreatmentsTbHeaderWidths = (35, 25, 20, 20, 35);
+  my @TreatmentsTbData = @{$treatmentsData{"psychoTreatment"}};
+  my $SuicidalHistoryAttms = $rMedHx->{'AttSuicides'};
+  my $DateofLastAttm = DBUtil->Date($rMedHx->{'AttSuicideDate'},'fmt','MM/DD/YYYY');
+  my $AreThereFirearms = main->setYN('  ','suicidal_firearms',$rMedHx->{'Firearms'});
+  my $IsThereFamilyHistory = main->setYN('  ','suicidal_history',$rMedHx->{'FamilySuicideHx'});
+  my $IncidentOfSelfHarm = $rMedHx->{SelfHarm};
+  my $EverUsedTobacco = ${useTobacco};
+  my $AgeFirstTobacco = $rClientSATobacco->{'Age'};
+  my $ManyTimesNicotine = $rMedHx->{'DailyTobaccoUse'};
+  my $Cigarette = $rClientCDCHA->{'q11'};
+  my $SmokingStatus = main->setTextxrefMV($form,'xSmokingStatus',$rClientSATobacco->{'SmokingStatus'},'','ut_smokingStatus','  ','Descr');
+  my $ManyTimesTobacco = ${SmoklessPerDay};
+  my $EverUsedAlcohol = main->setYN('  ','afua_usedAlcohol',$rMedHx->{'UsedAlcohol'});
+  my @alcoholData = main->setSA($ClientID);
+  my $AgeFirstAlcohol = $alcoholData[0]->{"afua_firstUsed"};
+  my $EverUsedDrug = ${useDrug};
+  my $gamblingData = main->setGambling($ClientID);
+  my $GamblingHistory = $gamblingData->{"gamblingHistory"};
+  my %treatmentGamblingData = main->setHospitalTreatments($ClientID,'GA','treatmentGambling',1);
+  my $GamblingTreatmentBefore = $treatmentGamblingData{"treatmentGambling_rcvd"};
+  my $OtherBehaviorals = $gamblingData->{"oba_apply"};
+  my $traumaData = main->setTrauma($ClientID);
+  my $TraumaInYourLife = $traumaData->{"violenceHistory"};
+  my @abuseData = main->setFamilyAbuse($ClientID,'Abuse','personAbused');
+  my $PeopleAbusedYou = $abuseData[0]->{"personAbused_you"};
+  my $AbusedAnyone = $abuseData[0]->{"personAbused_other"};
+  my $BatteredOrBeaten = main->setYN('  ','rav_battered',$rMedHx->{'BatteredWP'});
+  my $DomesticViolence = main->setYN('  ','rav_witness',$rClientIntake->{'WitnessDV'});
+  my %treatmentViolenceData = main->setHospitalTreatments($ClientID,'TR','treatmentViolence',1);
+  my $TreatmentSpecifically = $treatmentViolenceData{"treatmentViolence_rcvd"};
+  my $familyHistoryData = main->setFamilyHistory($ClientID,$rClient,$rClientIntake,$rGuardianHistory,$rClientRelations);
+  my $MarritalStateYears = $familyHistoryData->{"ms_years"};
+  my $MarritalStateMonths = $familyHistoryData->{"ms_months"};
+  my $NumOfTimesMarried = $familyHistoryData->{"ms_num"};
+  my $RelationshipsHistory = $familyHistoryData->{"fh_relHistory"};
+  my $SignificantOtherName = $familyHistoryData->{"fh_othersName"};
+  my $SignificantOtherPhone = $familyHistoryData->{"fh_othersPhn"};
+  my $SignificantOtherAddress = $familyHistoryData->{"fh_othersAddr"};
+  my $SignificantOtherCity = $familyHistoryData->{"fh_othersCity"};
+  my $SignificantOtherState = $familyHistoryData->{"fh_othersSt"};
+  my $SignificantOtherZip = $familyHistoryData->{"fh_othersZip"};
+  my $StructureFamily = $familyHistoryData->{"fr_structure"};
+  my $ParentsStatus = $familyHistoryData->{"fr_parentsStatus"};
+  my $UnderTheCareOf = $familyHistoryData->{"fr_growingUpCare"};
+  my $IndicateRelationship = $familyHistoryData->{"fr_dscpRel"};
+  my $DeservedAndFair = $familyHistoryData->{"fr_dscFair"};
+  my $HowPunished = $familyHistoryData->{"fr_punished"};
+  my @RelationshipsTbHeaders = ("Name", "Relation", "Age", "In Home", "Rating", "Why?");
+  my @RelationshipsTbHeaderWidths = (35, 20, 10, 15, 15, 20);
+  my @RelationshipsTbData = main->setFamily($ClientID,'relationships');
+  my $LivingStuation = ${residence};
+  my $LivingStuationAdmitDate = DBUtil->Date($rClientRelations->{'ResAdmitDate'},'fmt','MM/DD/YYYY');
+  my $LivingStuationGHLevel = DBA->getxref($form,'xGHLevel',$rClientRelations->{'GHLevel'},'Descr');
+  my $LivingStuationSatisfiedArrs = main->setYN('  ','fr_clsArrangement',$rClientRelations->{'SatResidence'});
+  my $CorrectionalSetting = ${correctional};
+  my $Homeless = ${homeless};
+  my $ChildOutOfHome = $placement;
+  my $DaysInAPlacement = $rMedHx->{'RestrictivePlacement'};
+  my $NumOfPlacements = $rClientRelations->{'ResNum'};
+  my @WhereServicesTbHeaders = ("Name", "Address", "Phone", "Type");
+  my @WhereServicesTbHeaderWidths = (40, 30, 30, 30);
+  my @WhereServicesTbData = main->setNPIs($rClientRelations->{'FacIDNPI'},'ohp','None','Service Facility');
+  my $UsualLivingArr = DBA->getxref($form,'xLivingArrASI',$rClientRelations->{'FamUsualLivArr'},'Descr');
+  my $UsualLivingSatisfiedArrs = main->setYN('  ','fr_arrangement',$rClientRelations->{'SatUsualLivArr'},'Indifferent','No');
+  my @IncomeTbHeaders = ("Source of Income", "Last 30 days", "Yearly");
+  my @IncomeTbHeaderWidths = (60, 60, 15);
+  my %incomeData = main->setIncome($ClientID);
+  my @IncomeTbData = @{$incomeData{"income"}};
+  my $IncomeLast30Total = $incomeData{"income_totallast"};
+  my $IncomeYearlyTotal = $incomeData{"income_totalyearly"};
+  my $NumOfPeopleContribute = $rClientResources->{'IncomeDeps'};
+  my $AbleToPayMonthlyBills = main->setYN('  ','income_able',$rClientResources->{'AbleToPay'});
+  my $ValidDriverLicense = main->setYN('  ','basicNeeds_yn1',$rClientResources->{'ValidDL'});
+  my $AutomobileAvailable = main->setYN('  ','basicNeeds_yn2',$rClientResources->{'AutoForUse'});
+  my $AbleToCareForBasicNeeds = main->setYN('  ','basicNeeds_yn3',$rClientResources->{'AbleToCare'});
+  my $AbleToMeetNeeds = main->setYN('  ','basicNeeds_yn4',$rClientResources->{'AbleToMeetNeeds'});
+  my $AbleToMeetDemands = main->setYN('  ','basicNeeds_yn5',$rClientResources->{'AbleToMeetLegal'});
+  my $ResourcesRecoveryNeeds = main->setYN('  ','basicNeeds_yn6',$rClientResources->{'RecoveryNeeds'});
+  my $ResourcesFamilyAdequate = main->setYN('  ','basicNeeds_yn7',$rClientResources->{'BasicNeeds'});
+  my $DescribeLimitations = $rClientResources->{'FinDesc'};
+  my $SomeoneContributeSupport = main->setYN('  ','supportSystem_yn1',$rClientResources->{'RegSupport'});
+  my $MajorityOfSupport = main->setYN('  ','supportSystem_yn2',$rClientResources->{'MajSupport'});
+  my $ActiveWithTreatment = main->setYN('  ','supportSystem_active',$rClientResources->{'ActiveSupport'});
+  my $FamilySupportive = main->setYN('  ','supportSystem_yn3',$rClientResources->{'FamilySupport'});
+  my $EmployerSupportive = main->setYN('  ','supportSystem_yn4',$rClientResources->{'EmplSupport'});
+  my $ChurchSupportive = main->setYN('  ','supportSystem_yn5',$rClientResources->{'ChurchSupport'});
+  my $SelfHelpInvolvement = main->setYN('  ','supportSystem_yn6',$rClientResources->{'SelfHelp'});
+  my $AttendedSelfHelpGroups = $rClientResources->{'SelfHelp30'};
+  my $Comments = $rClientResources->{'SupportDesc'};
+  my %legalData =  main->setLegal($ClientID,$rClient,$rClientLegal,$rClientEmergency);
+  my $LegalPapers = $legalData{"legal_papers"};
+  my $LegalStatus = $legalData{"legal_status"};
+  my $CountyOfJurisdiction = $legalData{"legal_county"};
+  my $CustodyAgency = $legalData{"legal_custodyAgency"};
+  my $CustodyChildrenOnly = $legalData{"legal_childOnly"};
+  my $CustodyAdultsOnly = $legalData{"legal_adultOnly"};
+  my $HaveAProbation = $legalData{"legal_probation"};
+  my @CustodyTbHeaders = ("Name", "Address", "Phone", "Contact");
+  my @CustodyTbHeaderWidths = (40, 30, 30, 30);
+  my @CustodyTbData = @{$legalData{"legalPPO"}};
+  my $ArrestedPastTwelve = $legalData{"legal_arrest"};
+  my $OccuredPast30 = $legalData{"legal_last30days"};
+  my $CulturalRace = main->setTextxrefMV($form,'xRaces',$rClient->{'Race'},'','sco_clientRace','  ','Descr');
+  my $CulturalEthnicity = main->setTextxrefMV($form,'xEthnicity',$rClient->{'Ethnicity'},'','sco_clientEthnicity','  ','Descr');
+  my $CulturalTribal = DBA->getxref($form,'xTribe',$rClientSocial->{'Tribe'},'Descr');
+  my $CulturalTraditionalPractices = $rClientSocial->{'TribePart'};
+  my $CulturalGangAffiliation = $rClientSocial->{'Gang'};
+  my $CulturalGangInvolve = $rClientSocial->{'GangValue'};
+  my $CulturalOtherSocial = $rClientSocial->{'OtherAffiliation'};
+  my $CulturalSocialInvolve = $rClientSocial->{'OtherValue'};
+  my $CulturalUnique = $rClientSocial->{'UniqueYou'};
+  my $CulturalImportant = $rClientSocial->{'ImportantYou'};
+  my $LanguagePrimary = DBA->getxref($form,'xLanguages',$rClientSocial->{'PreLang'},'English');
+  my $LanguageSecondary = DBA->getxref($form,'xLanguages',$rClientSocial->{'SecLang'},'English');
+  my $LanguageSpeakEng = main->setYN('  ','language_speaks',$rClientSocial->{'SpeakEnglish'});
+  my $LanguageReadEng = main->setYN('  ','language_reads',$rClientSocial->{'ReadEnglish'});
+  my $LanguageReadingLiteracy = DBA->getxref($form,'xLiteracyFindings',$rClientSocial->{'ReadingLiteracy'},'ConceptName');
+  my $LanguageWriteEng = main->setYN('  ','language_writes',$rClientSocial->{'WriteEnglish'});
+  my $LanguageWritingLiteracy = DBA->getxref($form,'xLiteracyFindings',$rClientSocial->{'WritingLiteracy'},'ConceptName');
+  my $LanguageNo = $rClientSocial->{'LangProbs'};
+  my $ReligionRaisedCountry = $rClientSocial->{'RaisedIn'};
+  my $ReligionPreferToLive = $rClientSocial->{'PreferLive'};
+  my $ReligionTraditionalHealer = main->setYN('  ','orientation_clientsees',$rClientSocial->{'Healer'});
+  my $ReligionTreatmentConflict = main->setYN('  ','orientation_clientfeels',$rClientSocial->{'ReligionDiff'},'Yes','No','No','Yes');
+  my $ReligionMeaningGods = $rClientSocial->{'ReligionMean'};
+  my $ReligionAttendChurch = main->setYN('  ','orientation_churchchild',$rClientSocial->{'ReligionChild'});
+  my $ReligionCurrentlyAttendChurch = main->setYN('  ','orientation_churchnow',$rClientSocial->{'ReligionAttend'});
+  my $ReligionBehaviorsImpacted = main->setYN('  ','orientation_clientbehav',$rClientSocial->{'ReligionViews'});
+  my $ReligionExperiencesChurch = main->setYN('  ','orientation_clientexp',$rClientSocial->{'ReligionExp'},'Yes','No','No','Yes');
+  my $RecreationalSpendTime = ${leisure};
+  my $RecreationalSatisfied = main->setYN('  ','leisure_satisfied',$rClientSocial->{'SatSpendTime'},'Indifferent','No');
+  my $RecreationalCloseFriends = $rClientSocial->{'NumCloseFriends'};
+  my $RecreationalInterests = main->setYN('  ','leisure_interests',$rClientSocial->{'Hobby'},'Yes','No','No','Yes');
+  my $RecreationalDoneForFun = $rClientSocial->{'RecDesc'};
+  my $RecentDeath = $rClientSocial->{'StressDeath'};
+  my $Divorced = $rClientSocial->{'StressDivorce'};
+  my $Separation = $rClientSocial->{'StressSeparation'};
+  my $SeparationComments = $rClientSocial->{'StressDesc'};
+  my $EmoticallyUnable = $rClientSocial->{'RelDestrFlag'};
+  my $EmoticallyUnableComments = $rClientSocial->{'RelDestrDesc'};
+  my $InvolvesSelf = $rClientSocial->{'RelPDFlag'};
+  my $InvolvesSelfComments = $rClientSocial->{'RelPDDesc'};
+  my $ExperiencesAnxiety = $rClientSocial->{'RelIntimateFlag'};
+  my $ExperiencesAnxietyComments = $rClientSocial->{'RelIntimateDesc'};
+  my $AssumesResponsibility = $rClientSocial->{'RelNeedsFlag'};
+  my $AssumesResponsibilityComments = $rClientSocial->{'RelNeedsDesc'};
+  my $LevelOfSocialFunc = $rClientSocial->{'RelSocialDesc'};
+  my $AttainmentHighestGrade = DBA->getxref($form,'xSchoolGrades',$rClientEducation->{'SchoolGrade'},'Concept');
+  my $AttainmentRepeated = main->setYN('  ','attainment_repeated',$rClientEducation->{'RepeatGrade'},'Yes','No','No','Yes');
+  my $AttainmentRepeatedGrades = DBA->getxref($form,'xSchoolGrades',$rClientEducation->{'RepeatGrade'},'Concept');
+  my $AttainmentRepeatedReason = $rClientIntake->{'RepeatGradeDesc'};
+  my $AttainmentNameOfSchool = DBA->getxref($form,'xSchoolSites',$rClientIntake->{'LastSchoolName'},'SchoolSite');
+  my $AttainmentSchoolDistrict = DBA->getxref($form,'xSchoolDistricts',$rClientIntake->{'LastSchoolDist'},'DistrictName');
+  my $AttainmentMonthsOfTraining = $rClientEducation->{'MonthsTechEd'};
+  my $AttainmentSubjectsLike = DBA->getxref($form,'xSubjects',$rClientIntake->{'SubjectsLike'},'Descr');
+  my $AttainmentSubjectsDislike = DBA->getxref($form,'xSubjects',$rClientIntake->{'SubjectsDisLike'},'Descr');
+  my $LearningAbilityDescribe = DBA->getxref($form,'xLearnAbility',$rClientIntake->{'LearnAbility'},'Descr');
+  my $LearningAbilityIQTest = main->setYN('  ','learning_iqtest',$rClientIntake->{'IQ'},'Yes','No','No','Yes');
+  my $LearningAbilityIQScore = $rClientIntake->{'IQ'};
+  my $ReturnToDayCare = $rClientIntake->{'AbsentDayCare'};
+  my $CurrentSchoolStatus = DBA->getxref($form,'xSchoolStat',$rClientIntake->{'SchoolStat'},'Descr');
+  my $GradeCurrentlyAttending = DBA->getxref($form,'xSchoolGrades',$rClientEducation->{'CurrentGrade'},'Concept');
+  my $SchoolPerformance = $rClientIntake->{'GPA'};
+  my $SpecialEducationClassification = DBA->getxref($form,'xSpecEd',$rClientIntake->{'SpecEd'},'Descr');
+  my $BeingServedIEP = main->setYN('  ','cef_iep',$rClientIntake->{'IEP'});
+  my $SpecialEducationClasses = DBA->getxref($form,'xPeriod',$rClientIntake->{'SpecEdLength'},'Descr');
+  my $GradeStartReceiving = DBA->getxref($form,'xSchoolGrades',$rClientEducation->{'SpecEdStart'},'Concept');
+  my $DaysChildAbsent = $rClientIntake->{'AbsentSchool'};
+  my $DaysChildSuspended = $rClientIntake->{'SuspendedSchool'};
+  my $CollaborationWithSchool = $rClientIntake->{'SchoolCollab'};
+  my $EmploymentStatus = DBA->getxref($form,'xEmplStat',$rClient->{'EmplStat'},'Descr');
+  my $EmploymentType = DBA->getxref($form,'xEmplType',$rClient->{'EmplType'},'Descr');
+  my $VocationalLastWork = $rClientIntake->{'JobDesc'};
+  my $VocationalLength = DBA->getxref($form,'xPeriod',$rClientIntake->{'JobLength'},'Descr');
+  my $WorkedOutsideHome = main->setYN('  ','vocational_workOutside',$rClientIntake->{'JobDesc'},'Yes','No','No','Yes');
+  my $LastTimeWorked = DBUtil->Date($rClientIntake->{'JobLengthLast'},'fmt','MM/DD/YYYY');
+  my $WhatTypeWorked = $rClientIntake->{'JobDescLast'};
+  my $SpecialJobSkills = main->setYN('  ','vocational_skills',$rClientIntake->{'JobSkills'},'Yes','No','No','Yes');
+  my $VocationalSkillType = $rClientIntake->{'JobSkills'};
+  my $WorkIntendToDo = $rClientIntake->{'JobCareer'};
+  my $MilitaryService = ${milflag};
+  my $BranchOfService = DBA->getxref($form,'xMilBranch',$rClientIntake->{'MilBranch'},'Descr');
+  my $TypeOfDischarge = DBA->getxref($form,'xMilDis',$rClientIntake->{'MilDis'},'Descr');
+  my $RelativesMilitaryService = DBA->getxref($form,'xRelationship',$rClientIntake->{'MilRel'},'Descr');
+  my $PhysicalAppearance = main->xText($form,'MHAppearance',$rMentalStat,'','','mentalPhys_appearance','  ');
+  my $PhysicalManner = main->xText($form,'MHDress',$rMentalStat,'','','mentalPhys_dress','  ');
+  my $PhysicalHygiene = main->xText($form,'MHHygiene',$rMentalStat,'','','mentalPhys_hygiene','  ');
+  my $PhysicalNutrition = main->xText($form,'MHNutrition',$rMentalStat,'','','mentalPhys_nutrition','  ');
+  my $PhysicalProsthetic = main->xText($form,'MHProstheticDevices',$rMentalStat,'','','mentalPhys_prosthetic','  ');
+  my $InterviewPosture = main->xText($form,'MHPosture',$rMentalStat,'','','mentalBehavior_posture','  ');
+  my $InterviewFacial = main->xText($form,'MHFacial',$rMentalStat,'','','mentalBehavior_facial','  ');
+  my $MotorGait = main->xText($form,'MHGait',$rMentalStat,'','','mentalMotor_gait','  ');
+  my $MotorBehavior = main->xText($form,'MHMotor',$rMentalStat,'','','mentalMotor_behavior','  ');
+  my $SpeechQuantity = main->xText($form,'MHSpeechQuan',$rMentalStat,'','','mentalSpeech_quantity','  ');
+  my $SpeechQuality = main->xText($form,'MHSpeechQual',$rMentalStat,'','','mentalSpeech_quality','  ');
+  my $SpeechImpairment = main->xText($form,'MHSpeechImpair',$rMentalStat,'','','mentalSpeech_impairment','  ');
+  my $InterviewerAffect = main->xText($form,'MHAffect',$rMentalStat,'','','mentalInterviewer_affect','  ');
+  my $InterviewerMood = main->xText($form,'MHMood',$rMentalStat,'','','mentalInterviewer_mood','  ');
+  my $ThoughtProcesses = main->xText($form,'MHThoughtProcesses',$rMentalStat,'','','mental_thought','  ');
+  my $Preoccupations = main->xText($form,'MHPreoccupations',$rMentalStat,'','','mental_preoccupation','  ');
+  my $Delusions = main->xText($form,'MHDelusions',$rMentalStat,'','','mental_delusion','  ');
+  my $Hallucinations = main->xText($form,'MHHallucinations',$rMentalStat,'','','mental_hallucination','  ');
+  my $Consciousness = main->xText($form,'MHConsciousness',$rMentalStat,'','','mental_consciousness','  ');
+  my $Orientation = main->xText($form,'MHOrientation',$rMentalStat,'','','mental_orientation','  ');
+  my $AttentionConcentration = main->xText($form,'MHAttention',$rMentalStat,'','','mental_attention','  ');
+  my $Memory = main->xText($form,'MHMemory',$rMentalStat,'','','mental_memory','  ');
+  my $EstimatedIntellectualAbility = main->xText($form,'MHIntAbility',$rMentalStat,'','','mental_ability','  ');
+  my $Insight = main->xText($form,'MHInsight',$rMentalStat,'','','mental_insight','  ');
+  my $Judgment = main->xText($form,'MHJudgement',$rMentalStat,'','','mental_judgment','  ');
+  my $SkillsOfIndependence = main->xText($form,'MHIndependence',$rMentalStat,'','','mental_skills','  ');
+  my $MentalStatus = main->xText($form,'MHMentalExam',$rMentalStat,'','','mental_exam','  ');
+  my @ProblemListTbHeaders = ("ICD10", "ICD Name", "Initiated Date", "Resolved Date", "Notes");
+  my @ProblemListTbHeaderWidths = (10, 30, 15, 18, 30);
+  my @ProblemListTbData = main->setICD10($ClientID);
+  my $StrengthsAbilities = "${strength1}${strength2}${strength3}${strength4}";
+  my $NeedsLiabilities = "${needs1}${needs2}${needs3}${needs4}";
+  my $ClientsPreferences = $rClientSummary->{'Prefs'};
+  my $ClientsOverallExpectation = $rClientSummary->{'Overall'};
+  my $ClientsStageOfCharge = DBA->getxref($form,'xStageOfChange',$rClientSummary->{'Stage'},'Descr');
+  my $InterpretiveSummary = $rClientIntake->{'Summary'};
+  my $Alert = "$rClientEmergency->{'Alert'}${alertPregnant}";
+  my $LevelOfCare = DBA->getxref($form,'xLOC',$rClientIntake->{'LOC'},'Descr');
+  my $ServiceFocus = DBA->getxref($form,'xServiceFocus',$rClientIntake->{'ServiceFocus'},'Descr');
+  my $ServicesProvided = DBA->getxref($form,'xServices',$rClientIntake->{'Services'},'Descr');
+  my @ReferralsTbHeaders = ("Name", "Address", "Phone", "Type");
+  my @ReferralsTbHeaderWidths = (40, 30, 30, 30);
+  my @ReferralsTbData = main->setNPIs($rClientIntake->{'ReferralsNPI'},'referrals','None','Collaboration');
+  my $SignStaff = $rAdmitProvider->{'FName'}." ".$rAdmitProvider->{'LName'}."; ".main->setCredentials($form,$rClientAdmit->{'ProvID'},$rInsurance->{'InsID'});
+  my $SignLicense = main->setLicense($form,$rClientAdmit->{'ProvID'},$rClientAdmit->{'AdmitDate'});
+  my $SignDate = DBUtil->Date($rClientAdmit->{'AdmitDate'},'fmt','MM/DD/YYYY').qq| @ $rClientAdmit->{'AdmitTime'}|;
+#####################
+
+  my $optlist;
+  my $tf;
+  my $h_tf;
+  my $row;
+  my $col;
+  my $tbl;
+  my $h_tbl;
+  my $TitleInfo;
+
+  main->createHeader($p, $HeaderInfo);
+
+  $ypos += $fontsizexxlarge;
+  $p->fit_textline("REFERRAL SOURCE / REASON", $marginleft, $ypos, $baseboldmidlargefontoptions);
+  $p->setlinewidth(0.5);
+  $p->set_graphics_option("linejoin=1");
+  $p->rect(265.3, $ypos + 1.5, 9, 9);
+  $p->stroke();
+  $p->fit_textline("Re-admission", 278.9, $ypos, $baseboldfontoptions);
+  $p->fit_textline($Resubmission ? '&#x2713;' : '', 266, $ypos + 0.5, $basecheckfontoptions);
+
+  $ypos += 23.7;
+  $p->fit_textline("Primary Referral:", $marginleft, $ypos, $baseboldfontoptions);
+  $p->fit_textline($PrimaryReferral, 106.1, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(105.1, $ypos + 3);
+  $p->lineto(314.5, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Date:", 320.4, $ypos, $baseboldfontoptions);
+  $p->fit_textline($PrimaryReferralDate, 345.8, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(344.8, $ypos + 3);
+  $p->lineto(389.6, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Contact:", 395.4, $ypos, $baseboldfontoptions);
+  $p->fit_textline($PrimaryReferralContact, 434.4, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(433.4, $ypos + 3);
+  $p->lineto(497.2, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Phone:", 503.6, $ypos, $baseboldfontoptions);
+  $p->fit_textline($PrimaryReferralPhone, 535.6, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(534.6, $ypos + 3);
+  $p->lineto(585.6, $ypos + 3);
+  $p->stroke();
+
+  $ypos += 14.8;
+  $p->fit_textline("Secondary Referral:", $marginleft, $ypos, $baseboldfontoptions);
+  $p->fit_textline($SecondaryReferral, 117.3, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(116.3, $ypos + 3);
+  $p->lineto(314.5, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Date:", 320.4, $ypos, $baseboldfontoptions);
+  $p->fit_textline($SecondaryReferralDate, 345.8, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(344.8, $ypos + 3);
+  $p->lineto(389.6, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Contact:", 395.4, $ypos, $baseboldfontoptions);
+  $p->fit_textline($SecondaryReferralContact, 434.4, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(433.4, $ypos + 3);
+  $p->lineto(497.2, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Phone:", 503.6, $ypos, $baseboldfontoptions);
+  $p->fit_textline($SecondaryReferralPhone, 535.6, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(534.6, $ypos + 3);
+  $p->lineto(585.6, $ypos + 3);
+  $p->stroke();
+
+  $ypos += 14.8;
+  $p->fit_textline("Referring Physician:", $marginleft, $ypos, $baseboldfontoptions);
+  $p->fit_textline($ReferringPhysician, 120.3, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(119.3, $ypos + 3);
+  $p->lineto(328.6, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Date:", 331.9, $ypos, $baseboldfontoptions);
+  $p->fit_textline($ReferringPhysicianDate, 372, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(371, $ypos + 3);
+  $p->lineto(433.7, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Phone:", 436.8, $ypos, $baseboldfontoptions);
+  $p->fit_textline($ReferringPhysicianPhone, 473.1, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(472.1, $ypos + 3);
+  $p->lineto(535.7, $ypos + 3);
+  $p->stroke();
+
+  $ypos += 14.8;
+  $p->fit_textline("Transported by:", $marginleft, $ypos, $baseboldfontoptions);
+  $p->fit_textline($TransportedBy, 104.4, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(102.4, $ypos + 3);
+  $p->lineto(328.6, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Phone:", 331.9, $ypos, $baseboldfontoptions);
+  $p->fit_textline($TransportedByPhone, 368.6, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(367.6, $ypos + 3);
+  $p->lineto(438.8, $ypos + 3);
+  $p->stroke();
+
+  $ypos += 14.8;
+  $p->fit_textline("Address:", $marginleft, $ypos, $baseboldfontoptions);
+  $p->fit_textline($Address, 74.2, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(73.2, $ypos + 3);
+  $p->lineto(218.5, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("City:", 221.6, $ypos, $baseboldfontoptions);
+  $p->fit_textline($City, 248.2, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(247.2, $ypos + 3);
+  $p->lineto(351.1, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("County:", 354.2, $ypos, $baseboldfontoptions);
+  $p->fit_textline($County, 395.6, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(394.6, $ypos + 3);
+  $p->lineto(466.3, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("State:", 469.6, $ypos, $baseboldfontoptions);
+  $p->fit_textline($State, 498.2, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(497.2, $ypos + 3);
+  $p->lineto(520.2, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Zip:", 522.8, $ypos, $baseboldfontoptions);
+  $p->fit_textline($Zip, 543, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(542, $ypos + 3);
+  $p->lineto(585.4, $ypos + 3);
+  $p->stroke();
+
+  $ypos += 12.6;
+  $p->fit_textline("Reason for Referral:", $marginleft, $ypos, $baseboldfontoptions);
+
+  $tf = $p->create_textflow($ReasonForReferral, $basesmallfontoptions . " leading=120% alignment=justify");
+  $h_tf = main->renderTextflow($p, $tf, $marginleft, $contentwidth, $HeaderInfo);
+
+  $ypos += $h_tf;
+
+  $ypos += 18;
+  $p->fit_textline("Screening Questions:", $marginleft, $ypos, $baseboldfontoptions_u);
+  
+  $ypos += 14.8;
+  $p->fit_textline("Tobacco:", $marginleft, $ypos, $baseboldfontoptions);
+  main->renderQueDotsAns($p, "Do you use Tobacco?", 120, undef, undef, undef, $SQUseTobacco, undef, undef, $basefontoptions, $basesmallfontoptions);
+  main->renderQueDotsAns($p, "Are you interested in Tobacco Cessation?", 200, undef, undef, undef, $SQTobaccoCessation, undef, undef, $basefontoptions, $basesmallfontoptions);
+  $ypos += 14.8;
+  $p->fit_textline("Risk:", $marginleft, $ypos, $baseboldfontoptions);
+  main->renderQueDotsAns($p, "Does this individual pose a danger to themselves or others?", 250, undef, undef, undef, $SQHarmfulintent, undef, undef, $basefontoptions, $basesmallfontoptions);
+  main->renderQueDotsAns($p, "Do you have a plan?", 115, undef, undef, undef, $SQSuicidePlan, undef, undef, $basefontoptions, $basesmallfontoptions);
+  main->renderQueDotsAns($p, "Do you have thoughts of hurting others?", 210, undef, undef, undef, $SQRiskOthers, undef, undef, $basefontoptions, $basesmallfontoptions);
+  $ypos += 14.8;
+  $p->fit_textline("Trauma:", $marginleft, $ypos, $baseboldfontoptions);
+  main->renderQueDotsAns($p, "Have you experienced or witnessed trauma?", 211, undef, undef, undef, $SQWitnessTrauma, undef, undef, $basefontoptions, $basesmallfontoptions);
+  $ypos += 14.8;
+  $p->fit_textline("Drugs and Alcohol:", $marginleft, $ypos, $baseboldfontoptions);
+  main->renderQueDotsAns($p, "Do you currently use Alcohol or drugs?", 188, undef, undef, undef, $SQUseAlcoholDrugs, undef, undef, $basefontoptions, $basesmallfontoptions);
+  main->renderQueDotsAns($p, "Will you be receiving treatment here for that?", 215, undef, undef, undef, $SQRecieveADT, undef, undef, $basefontoptions, $basesmallfontoptions);
+  $ypos += 14.8;
+  $p->fit_textline("Mood:", $marginleft, $ypos, $baseboldfontoptions);
+  main->renderQueDotsAns($p, "Do you experience excessive Anxiety/Worry?", 215, undef, undef, undef, $SQMoodDisorder, undef, undef, $basefontoptions, $basesmallfontoptions);
+
+  $ypos += 18;
+  $p->fit_textline("1. Initial Intake Information", $marginleft, $ypos, $baseboldfontoptions_u);
+
+  $ypos += 16.4;
+  $p->fit_textline("Return to referral source", 47.9, $ypos, $baseboldfontoptions);
+  $p->fit_textline($ReturnToReferralSource ? '&#x2713;' : '', 33.3, $ypos + 1, $basecheckfontoptions);
+  $p->rect(32.6, $ypos + 2, 9, 9);
+  $p->stroke();
+  $p->fit_textline("Inappropriate/Ineligible for services.", 175.8, $ypos, $baseboldfontoptions);
+  $p->fit_textline($IneligibleForServices ? '&#x2713;' : '', 163.2, $ypos + 1, $basecheckfontoptions);
+  $p->rect(162.5, $ypos + 2, 9, 9);
+  $p->stroke();
+
+  $ypos += 16.4;
+  $p->fit_textline("Referred To:", $marginleft, $ypos, $baseboldfontoptions);
+  $p->fit_textline($ReferredToName, 85, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(84, $ypos + 3);
+  $p->lineto(293, $ypos + 3);
+  $p->stroke();
+
+  $ypos += 16.4;
+  $p->fit_textline("Intake Date:", $marginleft, $ypos, $baseboldfontoptions);
+  $p->fit_textline($IntakeDate, 85, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(84, $ypos + 3);
+  $p->lineto(151.4, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Time:", 154.2, $ypos, $baseboldfontoptions);
+  $p->fit_textline($IntakeTime, 181.5, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(180.5, $ypos + 3);
+  $p->lineto(225.2, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Staff:", 267.8, $ypos, $baseboldfontoptions);
+  $p->fit_textline($Staff, 294, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(293, $ypos + 3);
+  $p->lineto(585.2, $ypos + 3);
+  $p->stroke();
+
+  $ypos += 20.4;
+  $p->fit_textline("IDENTIFYING INFORMATION", $marginleft, $ypos, $baseboldmidlargefontoptions);
+
+  $ypos += 22.6;
+  $p->fit_textline("Last Name:", $marginleft, $ypos, $baseboldfontoptions);
+  $p->fit_textline($IdentifyingLastName, 88.4, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(87.4, $ypos + 3);
+  $p->lineto(176, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Maiden:", 179.2, $ypos, $baseboldfontoptions);
+  $p->fit_textline($IdentifyingMaiden, 213.4, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(212.4, $ypos + 3);
+  $p->lineto(324.4, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("First Name:", 327.5, $ypos, $baseboldfontoptions);
+  $p->fit_textline($IdentifyingFirstName, 377.8, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(376.8, $ypos + 3);
+  $p->lineto(473.2, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("M.I.", 476.8, $ypos, $baseboldfontoptions);
+  $p->fit_textline($IdentifyingMI, 495.5, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(494.5, $ypos + 3);
+  $p->lineto(520.6, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Suffix:", 520.7, $ypos, $baseboldfontoptions);
+  $p->fit_textline($IdentifyingSuffix, 550.7, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(549.7, $ypos + 3);
+  $p->lineto(585.2, $ypos + 3);
+  $p->stroke();
+
+  $ypos += 14.8;
+  $p->fit_textline("Address:", $marginleft, $ypos, $baseboldfontoptions);
+  $p->fit_textline($IdentifyingAddress, 72.7, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(71.7, $ypos + 3);
+  $p->lineto(213, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("City:", 216, $ypos, $baseboldfontoptions);
+  $p->fit_textline($IdentifyingCity, 241.2, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(240.2, $ypos + 3);
+  $p->lineto(361.2, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("County:", 364.1, $ypos, $baseboldfontoptions);
+  $p->fit_textline($IdentifyingCounty, 400.6, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(399.6, $ypos + 3);
+  $p->lineto(473, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("State:", 476.3, $ypos, $baseboldfontoptions);
+  $p->fit_textline($IdentifyingState, 502.4, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(501.4, $ypos + 3);
+  $p->lineto(520.6, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Zip:", 523.2, $ypos, $baseboldfontoptions);
+  $p->fit_textline($IdentifyingZip, 542.1, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(541.1, $ypos + 3);
+  $p->lineto(585.2, $ypos + 3);
+  $p->stroke();
+
+  $ypos += 14.8;
+  $p->fit_textline("Home Phone:", $marginleft, $ypos, $baseboldfontoptions);
+  $p->fit_textline($IdentifyingHomePhone, 88.8, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(87.8, $ypos + 3);
+  $p->lineto(175.9, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Work Phone:", 178.7, $ypos, $baseboldfontoptions);
+  $p->fit_textline($IdentifyingWorkPhone, 234.7, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(233.7, $ypos + 3);
+  $p->lineto(324, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Cell Phone:", 327.4, $ypos, $baseboldfontoptions);
+  $p->fit_textline($IdentifyingCellPhone, 377.7, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(376.7, $ypos + 3);
+  $p->lineto(473, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Carrier:", 476.3, $ypos, $baseboldfontoptions);
+  $p->fit_textline($IdentifyingCarrier, 508.8, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(507.8, $ypos + 3);
+  $p->lineto(585.4, $ypos + 3);
+  $p->stroke();
+
+  $ypos += 14.8;
+  $p->fit_textline("Email:", $marginleft, $ypos, $baseboldfontoptions);
+  $p->fit_textline($IdentifyingEmail, 58.4, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(57.4, $ypos + 3);
+  $p->lineto(175.7, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("SSN:", 178.6, $ypos, $baseboldfontoptions);
+  $p->fit_textline($IdentifyingSSN, 202.9, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(201.9, $ypos + 3);
+  $p->lineto(287.4, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("D.O.B", 290.6, $ypos, $baseboldfontoptions);
+  $p->fit_textline($IdentifyingDOB, 321.9, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(320.9, $ypos + 3);
+  $p->lineto(399.4, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Place Of Birth:", 402.8, $ypos, $baseboldfontoptions);
+  $p->fit_textline($IdentifyingPOB, 465.5, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(464.5, $ypos + 3);
+  $p->lineto(520.6, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Order:", 523.6, $ypos, $baseboldfontoptions);
+  $p->fit_textline($IdentifyingOrder, 552.9, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(551.9, $ypos + 3);
+  $p->lineto(585.2, $ypos + 3);
+  $p->stroke();
+
+  $ypos += 14.8;
+  $p->fit_textline("Marital Status:", $marginleft, $ypos, $baseboldfontoptions);
+  $p->fit_textline($MaritalStatus, 92.4, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(91.4, $ypos + 3);
+  $p->lineto(252.6, $ypos + 3);
+  $p->stroke();
+
+  $ypos += 14.8;
+  $p->fit_textline("Height:", $marginleft, $ypos, $baseboldfontoptions);
+  $p->fit_textline($HeightFt, 67.7, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(66.7, $ypos + 3);
+  $p->lineto(99.9, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Ft.", 103.2, $ypos, $baseboldfontoptions);
+  $p->fit_textline($HeightIn, 116.8, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(115.8, $ypos + 3);
+  $p->lineto(150.4, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("In.", 153.6, $ypos, $baseboldfontoptions);
+  $p->fit_textline("Weight:", 175, $ypos, $baseboldfontoptions);
+  $p->fit_textline($Weight, 210.5, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(209.5, $ypos + 3);
+  $p->lineto(252.6, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Eyes:", 253.2, $ypos, $baseboldfontoptions);
+  $p->fit_textline($Eyes, 279, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(278, $ypos + 3);
+  $p->lineto(346.8, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Hair:", 347.3, $ypos, $baseboldfontoptions);
+  $p->fit_textline($Hair, 369.2, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(368.2, $ypos + 3);
+  $p->lineto(437.7, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Gender:", 442.2, $ypos, $baseboldfontoptions);
+  $p->rect(481.7, $ypos + 1, 9, 9);
+  $p->stroke();
+  $p->fit_textline("M", 496.3, $ypos, $baseboldfontoptions);
+  $p->fit_textline($GenderM ? '&#x2713;' : '', 482.4, $ypos, $basecheckfontoptions);
+  $p->rect(512, $ypos + 1, 9, 9);
+  $p->stroke();
+  $p->fit_textline("F", 526.6, $ypos, $baseboldfontoptions);
+  $p->fit_textline($GenderF ? '&#x2713;' : '', 512.7, $ypos, $basecheckfontoptions);
+  $p->rect(542.2, $ypos + 1, 9, 9);
+  $p->stroke();
+  $p->fit_textline("Ukn", 557, $ypos, $baseboldfontoptions);
+  $p->fit_textline($GenderUkn ? '&#x2713;' : '', 543.2, $ypos, $basecheckfontoptions);
+
+  $ypos += 20.4;
+  $p->fit_textline("IN CASE OF AN EMERGENCY", $marginleft, $ypos, $baseboldmidlargefontoptions);
+  $p->fit_textline("(Parent/Guardian if client is under 18 or under legal guardianship)", 202.8, $ypos, $basemidfontoptions);
+
+  main->renderTextline($p, "Last Name:", $marginleft, 22.8, $baseboldfontoptions, $HeaderInfo);
+  $p->fit_textline($EmergencyLastName, 82.8, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(81.8, $ypos + 3);
+  $p->lineto(287.3, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("First Name:", 287.8, $ypos, $baseboldfontoptions);
+  $p->fit_textline($EmergencyFirstName, 337.3, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(336.3, $ypos + 3);
+  $p->lineto(520.6, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("M.I", 523.5, $ypos, $baseboldfontoptions);
+  $p->fit_textline($EmergencyMI, 544.1, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(543.1, $ypos + 3);
+  $p->lineto(585.2, $ypos + 3);
+  $p->stroke();
+
+  main->renderTextline($p, "Address:", $marginleft, 14.8, $baseboldfontoptions);
+  $p->fit_textline($EmergencyAddress, 72.7, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(71.7, $ypos + 3);
+  $p->lineto(213, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("City:", 216, $ypos, $baseboldfontoptions);
+  $p->fit_textline($EmergencyCity, 241.2, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(240.2, $ypos + 3);
+  $p->lineto(361.2, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("County:", 364.1, $ypos, $baseboldfontoptions);
+  $p->fit_textline($EmergencyCounty, 400.1, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(399.6, $ypos + 3);
+  $p->lineto(473, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("State:", 476.3, $ypos, $baseboldfontoptions);
+  $p->fit_textline($EmergencyState, 502.4, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(501.4, $ypos + 3);
+  $p->lineto(520.6, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Zip:", 523.2, $ypos, $baseboldfontoptions);
+  $p->fit_textline($EmergencyZip, 542.1, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(541.1, $ypos + 3);
+  $p->lineto(585.2, $ypos + 3);
+  $p->stroke();
+
+  main->renderTextline($p, "Home Phone:", $marginleft, 14.8, $baseboldfontoptions);
+  $p->fit_textline($EmergencyHomePhone, 88.8, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(87.8, $ypos + 3);
+  $p->lineto(175.9, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Work Phone:", 178.7, $ypos, $baseboldfontoptions);
+  $p->fit_textline($EmergencyWorkPhone, 234.7, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(233.7, $ypos + 3);
+  $p->lineto(324, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Cell Phone:", 327.4, $ypos, $baseboldfontoptions);
+  $p->fit_textline($EmergencyCellPhone, 377.7, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(376.7, $ypos + 3);
+  $p->lineto(585.2, $ypos + 3);
+  $p->stroke();
+
+  main->renderTextline($p, "Relationship:", $marginleft, 14.8, $baseboldfontoptions);
+  $p->fit_textline($Relationship, 88.8, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(87.8, $ypos + 3);
+  $p->lineto(212.8, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Email:", 213.4, $ypos, $baseboldfontoptions);
+  $p->fit_textline($EmergencyEmail, 251.6, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(250.6, $ypos + 3);
+  $p->lineto(361.2, $ypos + 3);
+  $p->stroke();
+  $p->rect(364.1, $ypos + 1, 9, 9);
+  $p->stroke();
+  $p->fit_textline("Legal Guardian", 378.5, $ypos, $baseboldfontoptions);
+  $p->fit_textline($LegalGuardian ? '&#x2713;' : '', 364.8, $ypos, $basecheckfontoptions);
+  $p->rect(476.2, $ypos + 1, 9, 9);
+  $p->stroke();
+  $p->fit_textline("Emergency Contact", 490.6, $ypos, $baseboldfontoptions);
+  $p->fit_textline($EmergencyContact ? '&#x2713;' : '', 476.9, $ypos, $basecheckfontoptions);
+
+  main->renderTextline($p, "Health Care Information / Resources", $marginleft, 15.2, $baseboldmidlargefontoptions_u);
+
+  $ypos += 6.5;
+  $row = 1;
+  $col = 1;
+  $tbl = -1;
+  $optlist =  "fittextline={position={center center} $baseboldmidfontoptions_u} margin=3";
+  for ($col=1; $col <= $#HealthCareInfoHeaders+1; $col++) {
+    $tbl = $p->add_table_cell($tbl, $col, $row, $HealthCareInfoHeaders[$col-1], $optlist . " colwidth=${HealthCareInfoHeaderWidths[$col-1]}%");
+  }
+  $row++;
+  # ---------- Data rows: one for each item 
+  $optlist =  "fittextline={position={left center} " . $basefontoptions . "} marginleft=2";
+  my $optlistcenter =  "fittextline={position={center center} " . $basefontoptions . "} marginleft=2";
+  for (my $i = 0; $i <  $#HealthCareInfo+1; $i++) {
+    $col = 1;
+    # column 1: Name
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $HealthCareInfo[$i]{hci_name}, $optlist);
+    # column 2: Address
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $HealthCareInfo[$i]{hci_address}, $optlist);
+    # column 3: Phone 
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $HealthCareInfo[$i]{hci_phone}, $optlistcenter);
+    # column 4: Type
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $HealthCareInfo[$i]{hci_type}, $optlist);
+    $row++;
+  }
+#warn qq|renderTable: HealthCareInfo, rows=${row}\n|;
+  $h_tbl = main->renderTable($p, $tbl, $HeaderInfo);
+  $ypos += $h_tbl;
+
+  main->renderTextline($p, "HealthVault/Direct Email:", $marginleft, 15, $baseboldmidfontoptions, $HeaderInfo);
+  $p->fit_textline($HealthVaultEmail, 153.1, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(152.1, $ypos + 3);
+  $p->lineto(242.6, $ypos + 3);
+  $p->stroke();
+
+  main->renderTextline($p, "INSURANCE", $marginleft, 21.3, $baseboldmidlargefontoptions_u, $HeaderInfo);
+  $p->fit_textline("(Copy front AND back of insurance cards and Upload to Electronic Docs)", 113.4, $ypos, $basemidfontoptions);
+
+  main->renderTextline($p, "Primary:", $marginleft, 14.8, $baseboldfontoptions, $HeaderInfo);
+  $p->fit_textline($InsurancePrimary, 213.6, $ypos, $basesmallfontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(66, $ypos + 3);
+  $p->lineto(361.2, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("CoPay:", 365.6, $ypos, $baseboldfontoptions);
+  $p->fit_textline("\$" . $PrimaryCoPay, 430.5, $ypos, $basesmallfontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(396, $ypos + 3);
+  $p->lineto(465, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Deductible:", 468.1, $ypos, $baseboldfontoptions);
+  $p->fit_textline("\$" . $PrimaryDeductible, 550.8, $ypos, $basesmallfontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(516.3, $ypos + 3);
+  $p->lineto(585.3, $ypos + 3);
+  $p->stroke();
+
+  main->renderTextline($p, "Policy Holder:", $marginleft, 14.8, $baseboldfontoptions, $HeaderInfo);
+  $p->fit_textline($PrimaryPolicyHolder, 91, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(90, $ypos + 3);
+  $p->lineto(211.5, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Policy #:", 216.2, $ypos, $baseboldfontoptions);
+  $p->fit_textline($PrimaryPolicy, 253.4, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(252.4, $ypos + 3);
+  $p->lineto(369.6, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Prior Auth. Phone:", 373, $ypos, $baseboldfontoptions);
+  $p->fit_textline($PrimaryAuthPhone, 452.5, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(451.5, $ypos + 3);
+  $p->lineto(585.4, $ypos + 3);
+  $p->stroke();
+
+  main->renderTextline($p, "Secondary:", $marginleft, 14.8, $baseboldfontoptions, $HeaderInfo);
+  $p->fit_textline($InsuranceSecondary, 219.8, $ypos, $basesmallfontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(78.5, $ypos + 3);
+  $p->lineto(361.2, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("CoPay:", 365.6, $ypos, $baseboldfontoptions);
+  $p->fit_textline("\$" . $SecondaryCoPay, 430.5, $ypos, $basesmallfontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(396, $ypos + 3);
+  $p->lineto(465, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Deductible:", 468.1, $ypos, $baseboldfontoptions);
+  $p->fit_textline("\$" . $SecondaryDeductible, 550.8, $ypos, $basesmallfontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(516.3, $ypos + 3);
+  $p->lineto(585.3, $ypos + 3);
+  $p->stroke();
+
+  main->renderTextline($p, "Policy Holder:", $marginleft, 14.8, $baseboldfontoptions, $HeaderInfo);
+  $p->fit_textline($SecondaryPolicyHolder, 91, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(90, $ypos + 3);
+  $p->lineto(211.5, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Policy #:", 216.2, $ypos, $baseboldfontoptions);
+  $p->fit_textline($SecondaryPolicy, 253.4, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(252.4, $ypos + 3);
+  $p->lineto(369.6, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Prior Auth. Phone:", 373, $ypos, $baseboldfontoptions);
+  $p->fit_textline($SecondaryAuthPhone, 452.5, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(451.5, $ypos + 3);
+  $p->lineto(585.4, $ypos + 3);
+  $p->stroke();
+
+  main->renderTextline($p, "Tertiary:", $marginleft, 14.8, $baseboldfontoptions, $HeaderInfo);
+  $p->fit_textline($InsuranceTertiary, 213.4, $ypos, $basesmallfontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(65.6, $ypos + 3);
+  $p->lineto(361.2, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("CoPay:", 365.6, $ypos, $baseboldfontoptions);
+  $p->fit_textline("\$" . $TertiaryCoPay, 430.5, $ypos, $basesmallfontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(396, $ypos + 3);
+  $p->lineto(465, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Deductible:", 468.1, $ypos, $baseboldfontoptions);
+  $p->fit_textline("\$" . $TertiaryDeductible, 550.8, $ypos, $basesmallfontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(516.3, $ypos + 3);
+  $p->lineto(585.3, $ypos + 3);
+  $p->stroke();
+
+  main->renderTextline($p, "Policy Holder:", $marginleft, 14.8, $baseboldfontoptions, $HeaderInfo);
+  $p->fit_textline($TertiaryPolicyHolder, 91, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(90, $ypos + 3);
+  $p->lineto(211.5, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Policy #:", 216.2, $ypos, $baseboldfontoptions);
+  $p->fit_textline($TertiaryPolicy, 253.4, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(252.4, $ypos + 3);
+  $p->lineto(369.6, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Prior Auth. Phone:", 373, $ypos, $baseboldfontoptions);
+  $p->fit_textline($TertiaryAuthPhone, 452.5, $ypos, $basesmallfontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(451.5, $ypos + 3);
+  $p->lineto(585.4, $ypos + 3);
+  $p->stroke();
+
+  main->renderTextline($p, "* Cite name as it appears on the insurance card.", 32.6, 13.2, $basemidfontoptions_i, $HeaderInfo);
+
+  main->renderTextline($p, "PRESENTING PROBLEM", $marginleft, 19, $baseboldmidlargefontoptions, $HeaderInfo);
+  $p->fit_textline("(Indicate P=Primary S=Secondary T=Tertiary & Check appropriate specifier)", 174.5, $ypos, $basemidfontoptions);
+
+  main->renderTextline($p, "Primary:", $marginleft, 22.8, $baseboldmidfontoptions, $HeaderInfo);
+  $tf = $p->create_textflow($PresentingProblemPrimary, $basefontoptions . " leading=120% alignment=justify");
+  $h_tf = main->renderTextflow($p, $tf, $marginleft, $contentwidth, $HeaderInfo);
+  $ypos += $h_tf;
+
+  main->renderTextline($p, "Secondary:", $marginleft, 18, $baseboldmidfontoptions, $HeaderInfo);
+  $tf = $p->create_textflow($PresentingProblemSecondary, $basefontoptions . " leading=120% alignment=justify");
+  $h_tf = main->renderTextflow($p, $tf, $marginleft, $contentwidth, $HeaderInfo);
+  $ypos += $h_tf;
+
+  main->renderTextline($p, "Tertiary:", $marginleft, 18, $baseboldmidfontoptions, $HeaderInfo);
+  $tf = $p->create_textflow($PresentingProblemTertiary, $basefontoptions . " leading=120% alignment=justify");
+  $h_tf = main->renderTextflow($p, $tf, $marginleft, $contentwidth, $HeaderInfo);
+  $ypos += $h_tf;
+
+  main->renderTextline($p, "Overall Health Status:", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  $tf = $p->create_textflow($PresentingProblemOverall, $basefontoptions . " leading=120% alignment=justify");
+  $h_tf = main->renderTextflow($p, $tf, $marginleft, $contentwidth, $HeaderInfo);
+  $ypos += $h_tf;
+
+  main->renderTextline($p, "History of Presenting Problem:", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  $tf = $p->create_textflow($PresentingProblemHistory, $basefontoptions . " leading=120% alignment=justify");
+  $h_tf = main->renderTextflow($p, $tf, $marginleft, $contentwidth, $HeaderInfo);
+  $ypos += $h_tf;
+
+  main->renderTextline($p, "Attempted Solutions by Self or Parent/Teachers:", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  $tf = $p->create_textflow($PresentingProblemAttempted, $basefontoptions . " leading=120% alignment=justify");
+  $h_tf = main->renderTextflow($p, $tf, $marginleft, $contentwidth, $HeaderInfo);
+  $ypos += $h_tf;
+
+  main->renderTextline($p, "HEALTH HISTORY", $marginleft, 22, $baseboldmidlargefontoptions_u, $HeaderInfo);
+
+  main->renderTextline($p, "Medical/Physical history", $marginleft, 18.6, $baseboldmidfontoptions_u, $HeaderInfo);
+
+  main->renderTextline($p, "How many times in your life have you been hospitalized overnight for medical problems?", $marginleft, 21.8, $basemidfontoptions, $HeaderInfo);
+  $p->set_graphics_option("dasharray={1.1 5.1}");
+  $p->setlinewidth(1.1);
+  $p->moveto(427, $ypos);
+  $p->lineto(549.7, $ypos);
+  $p->stroke();
+  $p->set_graphics_option("dasharray=none");
+  $p->setlinewidth(0.5);
+  $p->moveto(551.5, $ypos + 3);
+  $p->lineto(583.7, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline($MedicalPhysicalHistory, 567.6, $ypos, $basefontoptions . " position={center bottom}");
+
+  main->renderTextline($p, "Describe reason(s)", $marginleft, 17, $basemidfontoptions, $HeaderInfo);
+  $tf = $p->create_textflow($HospReasons, $basefontoptions . " leading=120% alignment=justify");
+  $h_tf = main->renderTextflow($p, $tf, $marginleft, $contentwidth, $HeaderInfo);
+  $ypos += $h_tf;
+
+  main->renderTextline($p, "SEXUAL HISTORY, Including HIV/AIDS & STD & At-Risk Behaviors:", $marginleft, 22, $baseboldmidlargefontoptions_u, $HeaderInfo);
+
+  main->renderTextline($p, "Client refused to answer", 44.1, 16.4, $basemidfontoptions, $HeaderInfo);
+  $p->fit_textline($RefusedSexualHistory ? '&#x2713;' : '', $marginleft + 0.7, $ypos, $basecheckfontoptions);
+  $p->rect($marginleft, $ypos + 1, 9, 9);
+  $p->stroke();
+  $p->fit_textline("ALL", 154.3, $ypos, $baseboldmidfontoptions);
+  $p->fit_textline("questions regarding sexual history", 176.8, $ypos, $basemidfontoptions);
+
+  main->renderTextline($p, "Age began dating:", $marginleft, 16, $basemidfontoptions, $HeaderInfo);
+  $p->fit_textline($AgeDating, 144.7, $ypos, $basefontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(113.4, $ypos + 3);
+  $p->lineto(176.1, $ypos + 3);
+  $p->stroke();
+  $p->rect(179, $ypos + 1, 9, 9);
+  $p->stroke();
+  $p->fit_textline("Not yet dating", 194.2, $ypos, $basemidfontoptions);
+  $p->fit_textline($NotYetDating ? '&#x2713;' : '', 179.7, $ypos, $basecheckfontoptions);
+  $p->fit_textline("Age began sexual activity:", 268.8, $ypos, $basemidfontoptions);
+  $p->fit_textline($AgeSexual, 419.4, $ypos, $basefontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(385.2, $ypos + 3);
+  $p->lineto(453.6, $ypos + 3);
+  $p->stroke();
+  $p->rect(457.9, $ypos + 1, 9, 9);
+  $p->stroke();
+  $p->fit_textline("Not yet sexually active", 473.3, $ypos, $basemidfontoptions);
+  $p->fit_textline($NotYetSexual ? '&#x2713;' : '', 458.6, $ypos, $basecheckfontoptions);
+
+  main->renderTextline($p, "Sexual Orientation:", $marginleft, 15, $basemidfontoptions, $HeaderInfo);
+  $p->fit_textline($SexualOrient, 197.2, $ypos, $basefontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(117.9, $ypos + 3);
+  $p->lineto(276.5, $ypos + 3);
+  $p->stroke();
+
+  main->renderTextline($p, "Gender Expression/Orientation:", $marginleft, 15, $basemidfontoptions, $HeaderInfo);
+  $p->fit_textline($GenderExpre, 251.1, $ypos, $basefontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(171.8, $ypos + 3);
+  $p->lineto(330.4, $ypos + 3);
+  $p->stroke();
+
+  main->renderTextline($p, "Are you sexually active or want to be sexually active?", $marginleft, 15, $basemidfontoptions, $HeaderInfo);
+  $p->fit_textline($SexualActive, 318.9, $ypos, $basefontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(269, $ypos + 3);
+  $p->lineto(368.8, $ypos + 3);
+  $p->stroke();
+
+  main->renderTextline($p, "Sexually transmitted diseases/treatment?", $marginleft, 15, $basemidfontoptions, $HeaderInfo);
+  $p->fit_textline($SexuallyTransmit, 265.8, $ypos, $basefontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(215.4, $ypos + 3);
+  $p->lineto(316.2, $ypos + 3);
+  $p->stroke();
+
+  main->renderTextline($p, "Any sexual problems?", $marginleft, 15, $basemidfontoptions, $HeaderInfo);
+  $p->fit_textline($SexualProblems, 178.2, $ypos, $basefontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(131, $ypos + 3);
+  $p->lineto(225.4, $ypos + 3);
+  $p->stroke();
+  
+  main->renderTextline($p, "Are you more sexually active while using chemicals?", $marginleft, 15, $basemidfontoptions, $HeaderInfo);
+  $p->fit_textline($MoreSexualActive, 317.9, $ypos, $basefontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(265.7, $ypos + 3);
+  $p->lineto(370.1, $ypos + 3);
+  $p->stroke();
+
+  main->renderTextline($p, "Have you traded sex for drugs or money?", $marginleft, 15, $basemidfontoptions, $HeaderInfo);
+  $p->fit_textline($TradeSex, 267, $ypos, $basefontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(217.7, $ypos + 3);
+  $p->lineto(316.2, $ypos + 3);
+  $p->stroke();
+
+  main->renderTextline($p, "Do you feel guilty about any sexual behavior?", $marginleft, 15, $basemidfontoptions, $HeaderInfo);
+  $p->fit_textline($FeelGuiltySex, 285.9, $ypos, $basefontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(235.7, $ypos + 3);
+  $p->lineto(336, $ypos + 3);
+  $p->stroke();
+
+  main->renderTextline($p, "Allergies / Adverse Reactions / Alerts", $marginleft, 23.6, $baseboldmidfontoptions, $HeaderInfo);
+  $p->fit_textline($AllergiesAlerts, 210.4, $ypos, $basefontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(209.4, $ypos + 3);
+  $p->lineto(336, $ypos + 3);
+  $p->stroke();
+
+  $ypos += 6.5;
+  $row = 1;
+  $col = 1;
+  $tbl = -1;
+
+  for ($col=1; $col <= $#AllergenTableHeaders+1; $col++) {
+    if ($col eq 2) {
+      $optlist =  "fittextline={position={center center} $basefontoptions}";
+      $tf = $p->create_textflow($AllergenTableHeaders[$col-1], $basefontoptions . " lastalignment=center");
+      $optlist = "fittextline={position={center center}} textflow=" . $tf . " colwidth=20% margin=2 margintop=0 marginbottom=4";
+      $tbl = $p->add_table_cell($tbl, $col, $row, "", $optlist);
+    } else {
+      $optlist =  "fittextline={position={center center} $baseboldmidfontoptions}";
+      $tbl = $p->add_table_cell($tbl, $col, $row, $AllergenTableHeaders[$col-1], $optlist . " colwidth=" . $AllergenTableHeaderWidths[$col-1] . "%");
+    }
+  }
+  $row++;
+
+#warn qq|start renderTable: AllergenTableData, rows=${row}\n|;
+
+  $optlist =  "fittextline={position={left center} " . $basefontoptions . "} marginleft=2";
+  $optlistcenter =  "fittextline={position={center center} " . $basefontoptions . "} marginleft=2";
+  for (my $i = 0; $i <  $#AllergenTableData+1; $i++) {
+    $col = 1;
+    # column 1: Allergen
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $AllergenTableData[$i]{allergen}, $optlist);
+    # column 2: Severity
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $AllergenTableData[$i]{severity}, $optlistcenter);
+    # column 3: Start Date
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $AllergenTableData[$i]{start_date}, $optlistcenter);
+    # column 4: Stop Date
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $AllergenTableData[$i]{stop_date}, $optlistcenter);
+    # column 5: Reaction
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $AllergenTableData[$i]{reaction}, $optlistcenter);
+    # column 4: Comments/Notes
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $AllergenTableData[$i]{comments_notes}, $optlistcenter);
+    $row++;
+#warn qq|renderTable: AllergenTableData, row=${row}\n|;
+  }
+  
+#warn qq|renderTable: AllergenTableData, rows=${row}\n|;
+  $h_tbl = main->renderTable($p, $tbl, $HeaderInfo);
+  $ypos += $h_tbl;
+
+  main->renderTextline($p, "IMMUNIZATION", $marginleft, 22, $baseboldmidlargefontoptions_u, $HeaderInfo);
+
+  main->renderTextline($p, "Are your immunizations current (child & adolescent)?", $marginleft, 14.9, $basemidfontoptions, $HeaderInfo);
+  $p->fit_textline($ImmunizationsCurrent, 296.9, $ypos, $basefontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(266.4, $ypos + 3);
+  $p->lineto(327.4, $ypos + 3);
+  $p->stroke();
+
+  main->renderTextline($p, "COVID VACCINES", $marginleft, 17.8, $baseboldmidfontoptions_u, $HeaderInfo);
+
+  main->renderTextline($p, "COVID DOSE 1:", $marginleft, 14.1, $basemidfontoptions, $HeaderInfo);
+  $p->fit_textline($CovidDose1Date, 178.5, $ypos, $basefontoptions . " position={center bottom}");
+  #$p->setlinewidth(0.5);
+  $p->moveto(141.1, $ypos + 3);
+  #$p->lineto(224.8, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline($CovidDose1, 231.1, $ypos, $basefontoptions . " position={left bottom}");
+  #$p->setlinewidth(0.5);
+  $p->moveto(113.4, $ypos + 3);
+  #$p->lineto(176.1, $ypos + 3);
+  $p->stroke();
+
+  main->renderTextline($p, "COVID DOSE 2:", $marginleft, 14.1, $basemidfontoptions, $HeaderInfo);
+  $p->fit_textline($CovidDose2Date, 178.5, $ypos, $basefontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(132.2, $ypos + 3);
+  #$p->lineto(224.8, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline($CovidDose2, 231.1, $ypos, $basefontoptions . " position={left bottom}");
+  #$p->setlinewidth(0.5);
+  $p->moveto(113.4, $ypos + 3);
+  #$p->lineto(176.1, $ypos + 3);
+  $p->stroke();  
+  
+
+main->renderTextline($p, "COVID DOSE 3:", $marginleft, 14.1, $basemidfontoptions, $HeaderInfo);
+  $p->fit_textline($CovidDose3Date, 178.5, $ypos, $basefontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(132.2, $ypos + 3);
+  #$p->lineto(224.8, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline($CovidDose3, 231.1, $ypos, $basefontoptions . " position={left bottom}");
+  #$p->setlinewidth(0.5);
+  $p->moveto(113.4, $ypos + 3);
+  #$p->lineto(176.1, $ypos + 3);
+  $p->stroke(); 
+  
+
+main->renderTextline($p, "COVID DOSE 4:", $marginleft, 14.1, $basemidfontoptions, $HeaderInfo);
+  $p->fit_textline($CovidDose4Date, 178.5, $ypos, $basefontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(132.2, $ypos + 3);
+  #$p->lineto(224.8, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline($CovidDose4, 231.1, $ypos, $basefontoptions . " position={left bottom}");
+  #$p->setlinewidth(0.5);
+  $p->moveto(113.4, $ypos + 3);
+  #$p->lineto(176.1, $ypos + 3);
+  $p->stroke(); 
+ 
+main->renderTextline($p, "COVID Therapeutic 1:", $marginleft, 14.1, $basemidfontoptions, $HeaderInfo);
+  $p->fit_textline($CovidTherapeutic1Date, 178.5, $ypos, $basefontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(132.2, $ypos + 3);
+  #$p->lineto(224.8, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline($CovidTherapeutic1, 231.1, $ypos, $basefontoptions . " position={left bottom}");
+  #$p->setlinewidth(0.5);
+  $p->moveto(113.4, $ypos + 3);
+  #$p->lineto(176.1, $ypos + 3);
+  $p->stroke();  
+  
+main->renderTextline($p, "COVID Therapeutic 2:", $marginleft, 14.1, $basemidfontoptions, $HeaderInfo);
+  $p->fit_textline($CovidTherapeutic2Date, 178.5, $ypos, $basefontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(132.2, $ypos + 3);
+  #$p->lineto(224.8, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline($CovidTherapeutic2, 231.1, $ypos, $basefontoptions . " position={left bottom}");
+  #$p->setlinewidth(0.5);
+  $p->moveto(113.4, $ypos + 3);
+  #$p->lineto(176.1, $ypos + 3);
+  $p->stroke();  
+  
+main->renderTextline($p, "COVID Therapeutic 3:", $marginleft, 14.1, $basemidfontoptions, $HeaderInfo);
+  $p->fit_textline($CovidTherapeutic3Date, 178.5, $ypos, $basefontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(132.2, $ypos + 3);
+  #$p->lineto(224.8, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline($CovidTherapeutic3, 231.1, $ypos, $basefontoptions . " position={left bottom}");
+  #$p->setlinewidth(0.5);
+  $p->moveto(113.4, $ypos + 3);
+  #$p->lineto(176.1, $ypos + 3);
+  $p->stroke();  
+
+  
+main->renderTextline($p, "COVID Therapeutic 4:", $marginleft, 14.1, $basemidfontoptions, $HeaderInfo);
+  $p->fit_textline($CovidTherapeutic4Date, 178.5, $ypos, $basefontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(132.2, $ypos + 3);
+  #$p->lineto(224.8, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline($CovidTherapeutic4, 231.1, $ypos, $basefontoptions . " position={left bottom}");
+  #$p->setlinewidth(0.5);
+  $p->moveto(113.4, $ypos + 3);
+  #$p->lineto(176.1, $ypos + 3);
+  $p->stroke();  
+
+  
+
+main->renderTextline($p, "COVID INFECTION 1:", $marginleft, 14.1, $basemidfontoptions, $HeaderInfo);
+  $p->fit_textline($CovidInfection1Date, 178.5, $ypos, $basefontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(132.2, $ypos + 3);
+  #$p->lineto(224.8, $ypos + 3);
+  $p->stroke();
+  
+main->renderTextline($p, "COVID INFECTION 2:", $marginleft, 14.1, $basemidfontoptions, $HeaderInfo);
+  $p->fit_textline($CovidInfection2Date, 178.5, $ypos, $basefontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(132.2, $ypos + 3);
+  #$p->lineto(224.8, $ypos + 3);
+  $p->stroke();
+  
+main->renderTextline($p, "COVID INFECTION 3:", $marginleft, 14.1, $basemidfontoptions, $HeaderInfo);
+  $p->fit_textline($CovidInfection3Date, 178.5, $ypos, $basefontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(132.2, $ypos + 3);
+  #$p->lineto(224.8, $ypos + 3);
+  $p->stroke();
+  
+main->renderTextline($p, "COVID INFECTION 4:", $marginleft, 14.1, $basemidfontoptions, $HeaderInfo);
+  $p->fit_textline($CovidInfection4Date, 178.5, $ypos, $basefontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(132.2, $ypos + 3);
+  #$p->lineto(224.8, $ypos + 3);
+  $p->stroke();
+main->renderTextline($p, "N95 Mask Request", $marginleft, 14.1, $basemidfontoptions, $HeaderInfo);
+  $p->fit_textline($N95, 315.1, $ypos, $basefontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(264.7, $ypos + 3);
+  $p->lineto(365.5, $ypos + 3);
+  $p->stroke();
+main->renderTextline($p, "COVID Home Test Kit Request", $marginleft, 14.1, $basemidfontoptions, $HeaderInfo);
+  $p->fit_textline($CHTK, 315.1, $ypos, $basefontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(264.7, $ypos + 3);
+  $p->lineto(365.5, $ypos + 3);
+  $p->stroke();
+
+
+  main->renderTextline($p, "Hearing / Vision", $marginleft, 17.8, $baseboldmidfontoptions_u, $HeaderInfo);
+  
+  main->renderTextline($p, "Hearing Screening Date:", $marginleft, 14.1, $basemidfontoptions, $HeaderInfo);
+  $p->fit_textline($HearingScreeningDate, 183, $ypos, $basefontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(141.1, $ypos + 3);
+  $p->lineto(224.8, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Result", 231.1, $ypos, $basemidfontoptions);
+  $p->fit_textline($HearingScreeningResult, 315.1, $ypos, $basefontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(264.7, $ypos + 3);
+  $p->lineto(365.5, $ypos + 3);
+  $p->stroke();
+
+  main->renderTextline($p, "Vision Screening Date:", $marginleft, 14.1, $basemidfontoptions, $HeaderInfo);
+  $p->fit_textline($VisionScreeningDate, 178.5, $ypos, $basefontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(132.2, $ypos + 3);
+  $p->lineto(224.8, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Result", 231.1, $ypos, $basemidfontoptions);
+  $p->fit_textline($VisionScreeningResult, 315.1, $ypos, $basefontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(264.7, $ypos + 3);
+  $p->lineto(365.5, $ypos + 3);
+  $p->stroke();
+
+#warn qq|start CURRENT MEDICATIONS\n|;
+  main->renderTextline($p, "CURRENT MEDICATIONS", $marginleft, 22, $baseboldmidlargefontoptions_u, $HeaderInfo);
+
+  $ypos += 6.5;
+  $row = 1;
+  $col = 1;
+  $tbl = -1;
+
+#warn qq|start CURRENT MEDICATIONS TABLE\n|;
+  $optlist =  "fittextline={position={center center} $baseboldmidfontoptions_u} margin=3";
+  for ($col=1; $col <= $#CurMedicationsTbHeaders+1; $col++) {
+    $tbl = $p->add_table_cell($tbl, $col, $row, $CurMedicationsTbHeaders[$col-1], $optlist . " colwidth=" . $CurMedicationsTbHeaderWidths[$col-1] . "%");
+  }
+  $row++;
+#warn qq|start renderTable: CurMedicationsTbData, rows=${row}\n|;
+
+  $optlist =  "fittextline={position={left center} " . $basefontoptions . "} marginleft=2";
+  $optlistcenter =  "fittextline={position={center center} " . $basefontoptions . "} marginleft=2";
+  for (my $i = 0; $i <  $#CurMedicationsTbData+1; $i++) {
+    $col = 1;
+    # column 1: Physician
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $CurMedicationsTbData[$i]{physician}, $optlist);
+    # column 2: Medication
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $CurMedicationsTbData[$i]{medication}, $optlistcenter);
+    # column 3: Type
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $CurMedicationsTbData[$i]{type}, $optlistcenter);
+    # column 4: Date
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $CurMedicationsTbData[$i]{date}, $optlistcenter);
+    # column 5: Reason
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $CurMedicationsTbData[$i]{reason}, $optlistcenter);
+    $row++;
+  }
+  
+#warn qq|renderTable: CurMedicationsTbData, rows=${row}\n|;
+  $h_tbl = main->renderTable($p, $tbl, $HeaderInfo);
+  $ypos += $h_tbl;
+
+  main->renderTextline($p, "DEVELOPMENTAL HISTORY", $marginleft, 22, $baseboldmidlargefontoptions_u, $HeaderInfo);
+
+  $ypos += 3;
+
+  $tf = $p->create_textflow("Developmental age factors, motor development, and functioning accomplished within appropriate time frames?", $basemidfontoptions . " leading=120%");
+  $h_tf = main->renderTextflow($p, $tf, $marginleft, 465.6, $HeaderInfo);
+  $ypos += $h_tf;
+  $p->fit_textline($DevelopmentalAgeFactors, 539.3, $ypos, $basefontoptions . " position={center bottom}");
+  $p->set_graphics_option("dasharray={1.1 5.1}");
+  $p->setlinewidth(1.1);
+  $p->moveto(67, $ypos - 0.5);
+  $p->lineto(494.7, $ypos - 0.5);
+  $p->stroke();
+  $p->set_graphics_option("dasharray=none");
+  $p->setlinewidth(0.5);
+  $p->moveto(498.5, $ypos + 3);
+  $p->lineto(580, $ypos + 3);
+  $p->stroke();
+
+  main->renderTextline($p, "Prenatal", $marginleft, 22, $baseboldmidfontoptions, $HeaderInfo);
+  $p->fit_textline("(Mother’s condition while pregnant)", 72.4, $ypos, $basemidfontoptions);
+  $tf = $p->create_textflow($PrenatalCondition, $basefontoptions . " leading=120% alignment=justify");
+  $h_tf = main->renderTextflow($p, $tf, $marginleft, $contentwidth, $HeaderInfo);
+
+  $ypos += $h_tf;
+
+  main->renderTextline($p, "Perinatal", $marginleft, 18, $baseboldmidfontoptions, $HeaderInfo);
+  $p->fit_textline("(Condition at birth)", 75, $ypos, $basemidfontoptions);
+  $tf = $p->create_textflow($PerinatalCondition, $basefontoptions . " leading=120% alignment=justify");
+  $h_tf = main->renderTextflow($p, $tf, $marginleft, $contentwidth, $HeaderInfo);
+
+  $ypos += $h_tf;
+
+  main->renderTextline($p, "Postnatal", $marginleft, 18, $baseboldmidfontoptions, $HeaderInfo);
+  $p->fit_textline("(Early life)", 77.9, $ypos, $basemidfontoptions);
+  $tf = $p->create_textflow($PostnatalELife, $basefontoptions . " leading=120% alignment=justify");
+  $h_tf = main->renderTextflow($p, $tf, $marginleft, $contentwidth, $HeaderInfo);
+
+  $ypos += $h_tf;
+
+  main->renderTextline($p, "Toileting", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+
+  main->renderTextline($p, "Problems:", $marginleft, 14, $basefontoptions, $HeaderInfo);
+  $p->fit_textline($ToiletingProblems, 71.5, $ypos, $basefontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(70.5, $ypos + 3);
+  $p->lineto(154.5, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Severity:", 160.5, $ypos, $basefontoptions);
+  $p->fit_textline($ToiletingSeverity, 197.5, $ypos, $basefontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(196.5, $ypos + 3);
+  $p->lineto(279, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("Age Achieved:", 284.6, $ypos, $basefontoptions);
+  $p->fit_textline($ToiletingAgeAchieved, 345.1, $ypos, $basefontoptions);
+  $p->setlinewidth(0.5);
+  $p->moveto(344.1, $ypos + 3);
+  $p->lineto(426.6, $ypos + 3);
+  $p->stroke();
+
+  main->renderTextline($p, "Emergency Room:", $marginleft, 14, $baseboldfontoptions_u, $HeaderInfo);
+  $p->fit_textline($EmergencyRoom, 111.3, $ypos, $basefontoptions);
+
+  # $ypos += 6.5;
+  # $row = 1;
+  # $col = 1;
+  # $tbl = -1;
+  # $optlist =  "fittextline={position={center center} $baseboldmidfontoptions_u} margin=3";
+  # for ($col=1; $col <= $#EmergencyRoomTbHeaders+1; $col++) {
+  #   $tbl = $p->add_table_cell($tbl, $col, $row, $EmergencyRoomTbHeaders[$col-1], $optlist . " colwidth=" . $EmergencyRoomTbHeaderWidths[$col-1] . "%");
+  # }
+  # $row++;
+  # $optlist =  "fittextline={position={left center} " . $basefontoptions . "} marginleft=2";
+  # for (my $i = 0; $i <  $#EmergencyRoomTbData+1; $i++) {
+  #   $col = 1;
+  #   # column 1: Date
+  #   $tbl = $p->add_table_cell($tbl, $col++, $row, $EmergencyRoomTbData[$i]{date}, $optlist);
+  #   # column 2: Reason
+  #   $tbl = $p->add_table_cell($tbl, $col++, $row, $EmergencyRoomTbData[$i]{reason}, $optlist);
+  #   $row++;
+  # }
+  # $h_tbl = main->renderTable($p, $tbl, $HeaderInfo);
+  # $ypos += $h_tbl;
+
+  $tf = $p->create_textflow($EmergencyRoomText, $basefontoptions . " leading=120% alignment=justify");
+  $h_tf = main->renderTextflow($p, $tf, $marginleft, $contentwidth, $HeaderInfo);
+  $ypos += $h_tf;
+
+  main->renderTextline($p, "Motor Milestones", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  $p->fit_textline("(Age when accomplished)", 114.6, $ypos, $basemidfontoptions);
+  $p->fit_textline("Unknown", 277.6, $ypos, $basemidfontoptions);
+  $p->fit_textline($MotoMilestonesUnkown ? '&#x2713;' : '', 262.9, $ypos + 1, $basecheckfontoptions);
+  $p->rect(262.2, $ypos + 2, 9, 9);
+  $p->stroke();
+
+  main->renderTextline($p, "Sit Alone", $marginleft, 14, $basemidfontoptions, $HeaderInfo);
+  $p->fit_textline($MotoSitAlone, 91.9, $ypos, $basefontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(74.8, $ypos + 3);
+  $p->lineto(108.9, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("(5-7.5 m)", 112.5, $ypos, $basemidfontoptions);
+  $p->fit_textline("Crawl", 159.8, $ypos, $basemidfontoptions);
+  $p->fit_textline($MotoCrawl, 204.3, $ypos, $basefontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(187.8, $ypos + 3);
+  $p->lineto(220.7, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("(6-7 m)", 223.8, $ypos, $basemidfontoptions);
+  $p->fit_textline("Walk well alone", 264.9, $ypos, $basemidfontoptions);
+  $p->fit_textline($MotoWalkWellAlone, 358.4, $ypos, $basefontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(341.2, $ypos + 3);
+  $p->lineto(375.5, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("(11-14m)", 378.9, $ypos, $basemidfontoptions);
+  $p->fit_textline("Go down stairs", 426.2, $ypos, $basemidfontoptions);
+  $p->fit_textline($MotoGoDownStairs, 516.5, $ypos, $basefontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(497.4, $ypos + 3);
+  $p->lineto(535.6, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("(20m)", 538.5, $ypos, $basemidfontoptions);
+
+  main->renderTextline($p, "Ride Tricycle", $marginleft, 14, $basemidfontoptions, $HeaderInfo);
+  $p->fit_textline($MotoRideTricycle, 121.9, $ypos, $basefontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(89.7, $ypos + 3);
+  $p->lineto(154, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("(34m)", 159.8, $ypos, $basemidfontoptions);
+  $p->fit_textline("Ride bicycle without Training Wheels", 191.4, $ypos, $basemidfontoptions);
+  $p->fit_textline($MotoRideWithoutTraining, 389, $ypos, $basefontoptions . " position={center bottom}");
+  $p->setlinewidth(0.5);
+  $p->moveto(357.5, $ypos + 3);
+  $p->lineto(420.4, $ypos + 3);
+  $p->stroke();
+  $p->fit_textline("(6-7 years old)", 427.8, $ypos, $basemidfontoptions);
+
+  main->renderTextline($p, "Gross Motor and Fine Motor", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  $TitleInfo = { "title" => "Gross Motor and Fine Motor", "h_title" => 14, "optlist" => $baseboldmidfontoptions_u };
+  main->renderQueDotsAns($p, "Difficulty riding a riding toy, with feet pushing or propelling", 288.9, undef, $HeaderInfo, $TitleInfo, $GrossMotoDifficultyRidingToy);
+  main->renderQueDotsAns($p, "Difficulty pumping self on swing", 174.6, undef, $HeaderInfo, $TitleInfo, $GrossMotoDifficultyPumpingSelf);
+  main->renderQueDotsAns($p, "Difficulty learning how to ride a bike [5-6 y]", 223, undef, $HeaderInfo, $TitleInfo, $GrossMotoDifficultyLearningRide);
+  main->renderQueDotsAns($p, "Dislikes coloring or paper and pencil tasks", 223, undef, $HeaderInfo, $TitleInfo, $GrossMotoDislikesColoring);
+  main->renderQueDotsAns($p, "Dislikes playing with puzzles or becomes easily frustrated", 289, undef, $HeaderInfo, $TitleInfo, $GrossMotoDislikesPlayingPuzzles);
+  main->renderQueDotsAns($p, "Difficulty playing with small manipulative toys (i.e. Legos, etc.)", 307, undef, $HeaderInfo, $TitleInfo, $GrossMotoDifficultyPlaingToys);
+  main->renderQueDotsAns($p, "Difficulty using scissors or learning how to use scissors", 277, undef, $HeaderInfo, $TitleInfo, $GrossMotoDifficultyUsingScissors);
+  main->renderQueDotsAns($p, "Seems weaker and tires more easily that other children his/her age", 331, undef, $HeaderInfo, $TitleInfo, $GrossMotoSeemsWeaker);
+  main->renderQueDotsAns($p, "Appears stiff, awkward, or clumsy in movement", 240.6, undef, $HeaderInfo, $TitleInfo, $GrossMotoAppearsStiff);
+  main->renderQueDotsAns($p, "Seems to have great difficulty learning new motor tasks", 277, undef, $HeaderInfo, $TitleInfo, $GrossMotoDifficultyNewMotor);
+  main->renderQueDotsAns($p, "Difficulty catching a ball [5 y]", 157, undef, $HeaderInfo, $TitleInfo, $GrossMotoDifficultyCatching);
+  main->renderQueDotsAns($p, "Difficulty kicking a ball", 133, undef, $HeaderInfo, $TitleInfo, $GrossMotoDifficultyKicking);
+  main->renderQueDotsAns($p, "Difficulty learning how to swim", 168.6, undef, $HeaderInfo, $TitleInfo, $GrossMotoDifficultyLearningSwim);
+
+  main->renderTextline($p, "Self-Help Skills", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  $TitleInfo = { "title" => "Self-Help Skills", "h_title" => 14, "optlist" => $baseboldmidfontoptions_u };
+  main->renderQueDotsAns($p, "Difficulty with the use of a spoon (messy eater)", 240.6, undef, $HeaderInfo, $TitleInfo, $SelfSkillsUseSpoon);
+  main->renderQueDotsAns($p, "Difficulty cutting with a knife", 157, undef, $HeaderInfo, $TitleInfo, $SelfSkillsCutting);
+  main->renderQueDotsAns($p, "Difficulty with dressing self", 151, undef, $HeaderInfo, $TitleInfo, $SelfSkillsDressing);
+  main->renderQueDotsAns($p, "Difficulty with clothing fasteners (buttons, zippers) [3.5 y]", 283, undef, $HeaderInfo, $TitleInfo, $SelfSkillsClothing);
+  main->renderQueDotsAns($p, "Difficulty tying shoes", 127, undef, $HeaderInfo, $TitleInfo, $SelfSkillsTying);
+  main->renderQueDotsAns($p, "Difficulty brushing teeth185", 156.6, undef, $HeaderInfo, $TitleInfo, $SelfSkillsBrushingTeeth);
+  main->renderQueDotsAns($p, "Difficulty making a simple sandwich", 192.6, undef, $HeaderInfo, $TitleInfo, $SelfSkillsMakingSandwich);
+  main->renderQueDotsAns($p, "Difficulty completing chores", 157, undef, $HeaderInfo, $TitleInfo, $SelfSkillsCompleting);
+  main->renderQueDotsAns($p, "Difficulty making bed", 127, undef, $HeaderInfo, $TitleInfo, $SelfSkillsMakingBed);
+  main->renderQueDotsAns($p, "Difficulty taking a bath or shower (washing self)", 241, undef, $HeaderInfo, $TitleInfo, $SelfSkillsBath);
+  main->renderQueDotsAns($p, "Difficulty washing hair", 133, undef, $HeaderInfo, $TitleInfo, $SelfSkillsWashing);
+
+  main->renderTextline($p, "Movement and Balance", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  $TitleInfo = { "title" => "Movement and Balance", "h_title" => 14, "optlist" => $baseboldmidfontoptions_u };
+  main->renderQueDotsAns($p, "Car sick frequently", 114.6, undef, $HeaderInfo, $TitleInfo, $MoveBalCarSick);
+  main->renderQueDotsAns($p, "Nausea or vomits from other movement (i.e. swings, playground, merry-go-round)", 397, undef, $HeaderInfo, $TitleInfo, $MoveBalNausea);
+  main->renderQueDotsAns($p, "Is unable to give adequate warning about feeling of nausea", 294.6, undef, $HeaderInfo, $TitleInfo, $MoveBalGiveAdequate);
+  main->renderQueDotsAns($p, "Seeks quantities of twirling or spinning", 205, undef, $HeaderInfo, $TitleInfo, $MoveBalSeeksTwirling);
+  main->renderQueDotsAns($p, "Seeks quantity of stimulation on amusement park rides/swings", 307.2, undef, $HeaderInfo, $TitleInfo, $MoveBalSeeksStimulation);
+  main->renderQueDotsAns($p, "Hesitates to climb or play on playground equipment", 257, undef, $HeaderInfo, $TitleInfo, $MoveBalClimb);
+  main->renderQueDotsAns($p, "Has trouble or hesitancy in learning to climb or descend stairs", 307.2, undef, $HeaderInfo, $TitleInfo, $MoveBalLearningClimb);
+  main->renderQueDotsAns($p, "Dislikes being lifted up and gently tossed in the air by parent", 301, undef, $HeaderInfo, $TitleInfo, $MoveBalDislikesLiftedUp);
+  main->renderQueDotsAns($p, "Did not / does not like being placed on stomach or back as infant", 319, undef, $HeaderInfo, $TitleInfo, $MoveBalStomach);
+  main->renderQueDotsAns($p, "Rocks self when stressed", 145, undef, $HeaderInfo, $TitleInfo, $MoveBalRocksSelf);
+  main->renderQueDotsAns($p, "Period of crawling absent or very brief", 199, undef, $HeaderInfo, $TitleInfo, $MoveBalCrawlingAbsent);
+  main->renderQueDotsAns($p, "Walks on toes, now or in the past", 181, undef, $HeaderInfo, $TitleInfo, $MoveBalWalksOnToes);
+  main->renderQueDotsAns($p, "Is always on the “go” or constantly moving", 223, undef, $HeaderInfo, $TitleInfo, $MoveBalConstantlyMoving);
+  main->renderQueDotsAns($p, "Trips or falls frequently", 133, undef, $HeaderInfo, $TitleInfo, $MoveBalTrips);
+
+  main->renderTextline($p, "Touch", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  $TitleInfo = { "title" => "Touch", "h_title" => 14, "optlist" => $baseboldmidfontoptions_u };
+  main->renderQueDotsAns($p, "Seems unaware of being touched", 181, undef, $HeaderInfo, $TitleInfo, $TouchUnaware);
+  main->renderQueDotsAns($p, "Seems unaware of being hurt/pain in comparison to others", 295, undef, $HeaderInfo, $TitleInfo, $TouchHurtPain);
+  main->renderQueDotsAns($p, "Seems overly sensitive to being touched, pulls away from light touch", 337, undef, $HeaderInfo, $TitleInfo, $TouchSensitive);
+  main->renderQueDotsAns($p, "Seems excessively ticklish or strong dislike to being tickled", 294.6, undef, $HeaderInfo, $TitleInfo, $TouchTicklish);
+  main->renderQueDotsAns($p, "Dislikes the feeling of certain clothing or tags", 229, undef, $HeaderInfo, $TitleInfo, $TouchCertainClothing);
+  main->renderQueDotsAns($p, "Resists wearing short sleeve shirts or short pants", 253, undef, $HeaderInfo, $TitleInfo, $TouchWearingShort);
+  main->renderQueDotsAns($p, "Difficulty transitioning clothes to reflect seasons (summer to winter clothing or vise versa)", 427, undef, $HeaderInfo, $TitleInfo, $TouchDifficultyTransitioning);
+  main->renderQueDotsAns($p, "Continues to examine objects by putting them in the mouth (past age 1.5 yrs)", 373, undef, $HeaderInfo, $TitleInfo, $TouchExamineObjects);
+  main->renderQueDotsAns($p, "Dislikes being cuddled or hugged, unless on his/her terms", 289, undef, $HeaderInfo, $TitleInfo, $TouchBeingCuddled);
+  main->renderQueDotsAns($p, "Avoids putting hands in messy substances", 223, undef, $HeaderInfo, $TitleInfo, $TouchAvoidsPutting);
+  main->renderQueDotsAns($p, "Seems unaware that face and hands are messy", 247, undef, $HeaderInfo, $TitleInfo, $TouchFaceHands);
+  main->renderQueDotsAns($p, "Strongly dislikes hair cutting or washing", 211, undef, $HeaderInfo, $TitleInfo, $TouchHairCutting);
+  main->renderQueDotsAns($p, "Strongly dislikes bath or shower time", 199, undef, $HeaderInfo, $TitleInfo, $TouchBathShower);
+  main->renderQueDotsAns($p, "Very sensitive to water temperature (it must be “just right”)", 289, undef, $HeaderInfo, $TitleInfo, $TouchWaterTemper);
+  main->renderQueDotsAns($p, "Strongly dislikes toe or finger nail cutting", 211, undef, $HeaderInfo, $TitleInfo, $TouchToeFingerCutting);
+  main->renderQueDotsAns($p, "Pinches, bites, or otherwise hurt self", 193, undef, $HeaderInfo, $TitleInfo, $TouchPinches);
+  main->renderQueDotsAns($p, "Frequently bangs head repeatedly", 187, undef, $HeaderInfo, $TitleInfo, $TouchBangsHead);
+  main->renderQueDotsAns($p, "Crawled with fisted hands", 145, undef, $HeaderInfo, $TitleInfo, $TouchFistedHands);
+  main->renderQueDotsAns($p, "Seems overly sensitive to slight bumps or scrapes", 253, undef, $HeaderInfo, $TitleInfo, $TouchSlightBumps);
+  main->renderQueDotsAns($p, "Tendency to touch things constantly", 193, undef, $HeaderInfo, $TitleInfo, $TouchTendency);
+  main->renderQueDotsAns($p, "Frequently pushes, bites, or hits other children", 241, undef, $HeaderInfo, $TitleInfo, $TouchPushes);
+
+  main->renderTextline($p, "Auditory / Language", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  $TitleInfo = { "title" => "Auditory / Language", "h_title" => 14, "optlist" => $baseboldmidfontoptions_u };
+  main->renderQueDotsAns($p, "Has or has had repeated ear infections", 204, undef, $HeaderInfo, $TitleInfo, $AuditoryEarInfections);
+  main->renderQueDotsAns($p, "Particularly distracted by sounds, seeming to hear sounds that go unnoticed by others", 413, undef, $HeaderInfo, $TitleInfo, $AuditoryDistracted);
+  main->renderQueDotsAns($p, "Often fails to listen or pay attention to what is said to him/her", 299, undef, $HeaderInfo, $TitleInfo, $AuditoryOftenFails);
+  main->renderQueDotsAns($p, "Is overly sensitive to mildly loud noises", 204, undef, $HeaderInfo, $TitleInfo, $AuditoryOverlySensitive);
+  main->renderQueDotsAns($p, "Frequently covers ears when sounds are loud", 234, undef, $HeaderInfo, $TitleInfo, $AuditoryFrequentlyCover);
+  main->renderQueDotsAns($p, "Is afraid of some noises", 138, undef, $HeaderInfo, $TitleInfo, $AuditorySomeNoises);
+  main->renderQueDotsAns($p, "Enjoys hearing own voice echo or make loud noises", 264, undef, $HeaderInfo, $TitleInfo, $AuditoryOwnVoice);
+  main->renderQueDotsAns($p, "History of delayed speech development", 210, undef, $HeaderInfo, $TitleInfo, $AuditoryDelayedSpeech);
+  main->renderQueDotsAns($p, "Is difficult to understand", 138, undef, $HeaderInfo, $TitleInfo, $AuditoryDifficultToUnderstand);
+  main->renderQueDotsAns($p, "Stammers or stutters", 125, undef, $HeaderInfo, $TitleInfo, $AuditoryStammers);
+  main->renderQueDotsAns($p, "Speaks in incomplete sentences", 173, undef, $HeaderInfo, $TitleInfo, $AuditoryIncompleteSentences);
+  main->renderQueDotsAns($p, "Seems confused as to the location or direction of sound", 276, undef, $HeaderInfo, $TitleInfo, $AuditoryConfusedLocation);
+  main->renderQueDotsAns($p, "Has difficulty paying attention in proximity to other noises", 282, undef, $HeaderInfo, $TitleInfo, $AuditoryPayingAttention);
+  main->renderQueDotsAns($p, "Does not seem to understand what is said to him/her", 264, undef, $HeaderInfo, $TitleInfo, $AuditoryWhatIsSaid);
+  main->renderQueDotsAns($p, "Talks constantly", 102, undef, $HeaderInfo, $TitleInfo, $AuditoryTalksConstantly);
+  main->renderQueDotsAns($p, "Has a diagnosis of hearing loss", 173, undef, $HeaderInfo, $TitleInfo, $AuditoryDiagnoisis);
+
+  main->renderTextline($p, "Emotional", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  $TitleInfo = { "title" => "Emotional", "h_title" => 14, "optlist" => $baseboldmidfontoptions_u };
+  main->renderQueDotsAns($p, "Does not accept changes in routine easily", 216, undef, $HeaderInfo, $TitleInfo, $EmoticalAcceptChanges);
+  main->renderQueDotsAns($p, "Becomes easily frustrated", 150, undef, $HeaderInfo, $TitleInfo, $EmoticalEasilyFrustrated);
+  main->renderQueDotsAns($p, "Apt to be impulsive, heedless, accident-prone", 234, undef, $HeaderInfo, $TitleInfo, $EmoticalBeImpulsive);
+  main->renderQueDotsAns($p, "Marked mood variations, tendency to outbursts or tantrums", 294, undef, $HeaderInfo, $TitleInfo, $EmoticalMoodVariations);
+  main->renderQueDotsAns($p, "Tends to withdraw from groups, plays on the outskirts", 270, undef, $HeaderInfo, $TitleInfo, $EmoticalTendsToWithdraw);
+  main->renderQueDotsAns($p, "Seems to do things the hard way", 179, undef, $HeaderInfo, $TitleInfo, $EmoticalHardWay);
+  main->renderQueDotsAns($p, "Changes activities frequently", 161, undef, $HeaderInfo, $TitleInfo, $EmoticalActivities);
+  main->renderQueDotsAns($p, "Frequently breaks toys or is overly rough on toys", 246, undef, $HeaderInfo, $TitleInfo, $EmoticalBreaksToys);
+  main->renderQueDotsAns($p, "Is impatient, cannot wait", 138, undef, $HeaderInfo, $TitleInfo, $EmoticalImpatient);
+  main->renderQueDotsAns($p, "Cannot tolerate frustration", 150, undef, $HeaderInfo, $TitleInfo, $EmoticalTolerateFrustration);
+  main->renderQueDotsAns($p, "Hums or taps fingers", 126, undef, $HeaderInfo, $TitleInfo, $EmoticalHums);
+  main->renderQueDotsAns($p, "Does not finish what is started", 168, undef, $HeaderInfo, $TitleInfo, $EmoticalDoesNotFinish);
+  main->renderQueDotsAns($p, "Takes a long time to settle down", 174, undef, $HeaderInfo, $TitleInfo, $EmoticalSettleDown);
+  main->renderQueDotsAns($p, "Insists that bedroom/toys must be in precise order", 252, undef, $HeaderInfo, $TitleInfo, $EmoticalInsistsBedroom);
+  main->renderQueDotsAns($p, "Is generally disorganized", 144, undef, $HeaderInfo, $TitleInfo, $EmoticalDisorganized);
+  main->renderQueDotsAns($p, "Is unable to put things in order", 167, undef, $HeaderInfo, $TitleInfo, $EmoticalUnableToPut);
+  main->renderQueDotsAns($p, "Cannot sit through a board game", 180, undef, $HeaderInfo, $TitleInfo, $EmoticalCannotSit);
+  main->renderQueDotsAns($p, "Does things without thinking", 156, undef, $HeaderInfo, $TitleInfo, $EmoticalWithoutThinking);
+  main->renderQueDotsAns($p, "Cannot play quietly for 20 minutes", 185, undef, $HeaderInfo, $TitleInfo, $EmoticalCannotQuietly);
+  main->renderQueDotsAns($p, "Is always on the go", 119, undef, $HeaderInfo, $TitleInfo, $EmoticalAlwaysGo);
+  main->renderQueDotsAns($p, "Runs rather than walks", 132, undef, $HeaderInfo, $TitleInfo, $EmoticalRunsThanWalks);
+  main->renderQueDotsAns($p, "Fidgets or squirms", 114, undef, $HeaderInfo, $TitleInfo, $EmoticalFidgets);
+  main->renderQueDotsAns($p, "Cannot keep hands to self", 149, undef, $HeaderInfo, $TitleInfo, $EmoticalHandsToSelf);
+  main->renderQueDotsAns($p, "Is difficult to take to visit friends / relatives / shopping", 264, undef, $HeaderInfo, $TitleInfo, $EmoticalTakeToVisit);
+  main->renderQueDotsAns($p, "Resists changes in routine", 150, undef, $HeaderInfo, $TitleInfo, $EmoticalResistsChanges);
+  main->renderQueDotsAns($p, "Is difficult to leave with a babysitter", 186, undef, $HeaderInfo, $TitleInfo, $EmoticalDifficultBabysitter);
+  main->renderQueDotsAns($p, "Is overly cautious", 107, undef, $HeaderInfo, $TitleInfo, $EmoticalOverlyCautious);
+  main->renderQueDotsAns($p, "Cries for the slightest reason", 161, undef, $HeaderInfo, $TitleInfo, $EmoticalCriesReason);
+  main->renderQueDotsAns($p, "Forget social expectations", 149, undef, $HeaderInfo, $TitleInfo, $EmoticalForgetSocial);
+  main->renderQueDotsAns($p, "Cannot tolerate noisy, busy places", 185, undef, $HeaderInfo, $TitleInfo, $EmoticalTolerateNoisy);
+  main->renderQueDotsAns($p, "Needs a calm, quiet atmosphere in order to concentrate", 281, undef, $HeaderInfo, $TitleInfo, $EmoticalNeedsCalm);
+  main->renderQueDotsAns($p, "Does sloppy work in spite of effort", 180, undef, $HeaderInfo, $TitleInfo, $EmoticalSloppyWork);
+  main->renderQueDotsAns($p, "Ignores social rules of modesty", 168, undef, $HeaderInfo, $TitleInfo, $EmoticalIgnoresRules);
+  main->renderQueDotsAns($p, "Has no guilt for wrongdoing", 156, undef, $HeaderInfo, $TitleInfo, $EmoticalNoGuilt);
+  main->renderQueDotsAns($p, "Believes rules apply only to others", 186, undef, $HeaderInfo, $TitleInfo, $EmoticalBelievesRules);
+  main->renderQueDotsAns($p, "Does not seem to learn from experience", 209, undef, $HeaderInfo, $TitleInfo, $EmoticalLearnExperience);
+  main->renderQueDotsAns($p, "Cannot tell right from wrong", 155, undef, $HeaderInfo, $TitleInfo, $EmoticalTellRight);
+  main->renderQueDotsAns($p, "Always has an excuse", 131, undef, $HeaderInfo, $TitleInfo, $EmoticalHasExcuse);
+  main->renderQueDotsAns($p, "Complains of unfair treatment", 162, undef, $HeaderInfo, $TitleInfo, $EmoticalUnfairTreatment);
+  main->renderQueDotsAns($p, "Has poor self-image, feels worthless", 192, undef, $HeaderInfo, $TitleInfo, $EmoticalPoorSelfImage);
+  main->renderQueDotsAns($p, "Is overly concerned about performance", 204, undef, $HeaderInfo, $TitleInfo, $EmoticalOverlyConcerned);
+  main->renderQueDotsAns($p, "Is irritable", 77, undef, $HeaderInfo, $TitleInfo, $EmoticalIrritable);
+  main->renderQueDotsAns($p, "Has short fuse, explodes at any little thing", 216, undef, $HeaderInfo, $TitleInfo, $EmoticalShortFuse);
+  main->renderQueDotsAns($p, "Has hurt someone such that medical attention was necessary", 306, undef, $HeaderInfo, $TitleInfo, $EmoticalHurtSomeone);
+  main->renderQueDotsAns($p, "Is insensitive to feelings of others", 179, undef, $HeaderInfo, $TitleInfo, $EmoticalInsensitive);
+  main->renderQueDotsAns($p, "Resists authority", 107, undef, $HeaderInfo, $TitleInfo, $EmoticalResistsAuthority);
+  main->renderQueDotsAns($p, "Is defiant/belligerent when disciplined", 197, undef, $HeaderInfo, $TitleInfo, $EmoticalDefiant);
+  main->renderQueDotsAns($p, "Purposely does the opposite of what is told", 221, undef, $HeaderInfo, $TitleInfo, $EmoticalPurposely);
+  main->renderQueDotsAns($p, "Makes up untruths", 113, undef, $HeaderInfo, $TitleInfo, $EmoticalMakesUp);
+  main->renderQueDotsAns($p, "Picks only on people smaller than him/her", 216, undef, $HeaderInfo, $TitleInfo, $EmoticalPicksOnly);
+  main->renderQueDotsAns($p, "Cannot be trusted alone", 138, undef, $HeaderInfo, $TitleInfo, $EmoticalCannotBeTrusted);
+  main->renderQueDotsAns($p, "Wants friends but is rejected by others", 203, undef, $HeaderInfo, $TitleInfo, $EmoticalWantsFriends);
+  main->renderQueDotsAns($p, "Has a few friends, seems disliked", 180, undef, $HeaderInfo, $TitleInfo, $EmoticalHasFewFriends);
+  main->renderQueDotsAns($p, "Has no close friends", 125, undef, $HeaderInfo, $TitleInfo, $EmoticalHasNoFriends);
+  main->renderQueDotsAns($p, "Prefers to play with older children", 179, undef, $HeaderInfo, $TitleInfo, $EmoticalPrefersChildren);
+  main->renderQueDotsAns($p, "Prefers to play with adults", 149, undef, $HeaderInfo, $TitleInfo, $EmoticalPrefersAdults);
+  main->renderQueDotsAns($p, "Prefers to play with younger children", 192, undef, $HeaderInfo, $TitleInfo, $EmoticalPrefersYounger);
+  main->renderQueDotsAns($p, "Is physically rough with others", 167, undef, $HeaderInfo, $TitleInfo, $EmoticalPhysicallyRough);
+  main->renderQueDotsAns($p, "Is excessively bossy with peers", 173, undef, $HeaderInfo, $TitleInfo, $EmoticalExcessivelyBossy);
+  main->renderQueDotsAns($p, "Gets into fights because of frustration", 197, undef, $HeaderInfo, $TitleInfo, $EmoticalGetsIntoFights);
+  main->renderQueDotsAns($p, "Is overly submissive, easily led", 168, undef, $HeaderInfo, $TitleInfo, $EmoticalOverlySubmissive);
+  main->renderQueDotsAns($p, "Has to be the leader", 119, undef, $HeaderInfo, $TitleInfo, $EmoticalHasToBeLeader);
+  main->renderQueDotsAns($p, "Resists sharing", 101, undef, $HeaderInfo, $TitleInfo, $EmoticalResistsSharing);
+  main->renderQueDotsAns($p, "Assumes the role of the clown", 167, undef, $HeaderInfo, $TitleInfo, $EmoticalRoleOfClown);
+  main->renderQueDotsAns($p, "Appears depressed, sad, gloomy", 179, undef, $HeaderInfo, $TitleInfo, $EmoticalDepressed);
+
+  main->renderTextline($p, "Academic Area", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  $TitleInfo = { "title" => "Academic Area", "h_title" => 14, "optlist" => $baseboldmidfontoptions_u };
+  main->renderQueDotsAns($p, "Difficulty with scissors", 131, undef, $HeaderInfo, $TitleInfo, $AcademicScissors);
+  main->renderQueDotsAns($p, "Difficulty with fine hand work (puzzles, models, etc.)", 263, undef, $HeaderInfo, $TitleInfo, $AcademicFineHandWork);
+  main->renderQueDotsAns($p, "Difficulty recognizing letters", 155, undef, $HeaderInfo, $TitleInfo, $AcademicLetters);
+  main->renderQueDotsAns($p, "Difficulty recognizing numbers", 167, undef, $HeaderInfo, $TitleInfo, $AcademicNumbers);
+  main->renderQueDotsAns($p, "Difficulty with drawing or coloring tasks", 203, undef, $HeaderInfo, $TitleInfo, $AcademicDrawing);
+  main->renderQueDotsAns($p, "Difficulty with writing letters / numbers / words neatly [5 y]", 287, undef, $HeaderInfo, $TitleInfo, $AcademicWriting);
+  main->renderQueDotsAns($p, "Difficulty learning to count money", 179, undef, $HeaderInfo, $TitleInfo, $AcademicLearning);
+  main->renderQueDotsAns($p, "Difficulty telling time of a regular clock", 197, undef, $HeaderInfo, $TitleInfo, $AcademicTelling);
+
+  main->renderTextline($p, "Treatments", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+
+  main->renderTextline($p, "How many times have you been treated for any psychological or emotional problems:", $marginleft, 14, $basemidfontoptions, $HeaderInfo);
+  
+  main->renderQueAns($p, "In a hospital or inpatient setting", $marginleft, 174.6, 209.4, 1, $HeaderInfo, $InpatientSetting);
+  main->renderQueAns($p, "Outpatient/private patient setting", 234.6, 384.6, 419.4, 0, $HeaderInfo, $OutPatientSetting);
+
+  $ypos += 6.5;
+  $row = 1;
+  $col = 1;
+  $tbl = -1;
+
+  $optlist =  "fittextline={position={center center} $baseboldmidfontoptions_u} margin=3";
+  for ($col=1; $col <= $#TreatmentsTbHeaders+1; $col++) {
+    $tbl = $p->add_table_cell($tbl, $col, $row, $TreatmentsTbHeaders[$col-1], $optlist . " colwidth=" . $TreatmentsTbHeaderWidths[$col-1] . "%");
+  }
+  $row++;
+
+  $optlist =  "fittextline={position={left center} " . $basefontoptions . "} marginleft=2";
+  $optlistcenter =  "fittextline={position={center center} " . $basefontoptions . "} marginleft=2";
+  for (my $i = 0; $i <  $#TreatmentsTbData+1; $i++) {
+    $col = 1;
+    # column 1: Where
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $TreatmentsTbData[$i]->{"psychoTreatment_where"}, $optlist);
+    # column 2: Type
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $TreatmentsTbData[$i]->{"psychoTreatment_type"}, $optlistcenter);
+    # column 3: When
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $TreatmentsTbData[$i]->{"psychoTreatment_when"}, $optlistcenter);
+    # column 4: How Long
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $TreatmentsTbData[$i]->{"psychoTreatment_duration"}, $optlistcenter);
+    # column 5: Reason
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $TreatmentsTbData[$i]->{"psychoTreatment_reason"}, $optlistcenter);
+    $row++;
+  }
+  
+#warn qq|renderTable: TreatmentsTbData, rows=${row}\n|;
+  $h_tbl = main->renderTable($p, $tbl, $HeaderInfo);
+  $ypos += $h_tbl;
+
+  main->renderQueAns($p, "Suicidal history: # Attempts:", $marginleft, 156, 189.4, 1, $HeaderInfo, $SuicidalHistoryAttms);
+  main->renderQueAns($p, "Date of last attempt:", 195.8, 286.6, 371.5, 0, $HeaderInfo, $DateofLastAttm);
+  $p->fit_textline("**  Complete Risk/Rescue Rating", 373, $ypos, $basemidfontoptions);
+  main->renderQueAns($p, "Are there firearms in the home?", $marginleft, 172.8, 233.3, 1, $HeaderInfo, $AreThereFirearms);
+  main->renderQueAns($p, "Is there a family history of suicide?", 239.8, 401.5, 430.1, 0, $HeaderInfo, $AreThereFirearms);
+  main->renderQueDotsAns($p, "In the past 90 days, on how many days did an incident of self-harm occur?", 359, 554.2, $HeaderInfo, $TitleInfo, $IncidentOfSelfHarm);
+
+  main->renderTextline($p, "SUBSTANCE ABUSE HISTORY", $marginleft, 22, $baseboldmidlargefontoptions, $HeaderInfo);
+  
+  main->renderTextline($p, "Tobacco/Nicotine Use", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  main->renderQueDotsAns($p, "Have you ever used tobacco?", 162.2, 218.2, $HeaderInfo, undef, $EverUsedTobacco, 279.1);
+  main->renderQueAns($p, "Age first used tobacco?", 285.1, 389, 448, 0, $HeaderInfo, $AgeFirstTobacco);
+  main->renderQueAns($p, "How many times a day do you use nicotine?", $marginleft, 227.8, 279.1, 1, $HeaderInfo, $ManyTimesNicotine);
+  main->renderQueAns($p, "Cigarette?", 285.1, 333.6, 448, 0, $HeaderInfo, $Cigarette);
+  main->renderQueAns($p, "Smoking Status?", $marginleft, 107.8, 374.4, 1, $HeaderInfo, $SmokingStatus);
+  main->renderQueAns($p, "How many times per day do you use smokeless tobacco?", $marginleft, 287.5, 374.4, 1, $HeaderInfo, $ManyTimesTobacco);
+
+  main->renderTextline($p, "Alcohol Use", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  main->renderTextline($p, "History", $marginleft, 18, $baseboldmidfontoptions, $HeaderInfo);
+  main->renderQueDotsAns($p, "Have you ever used alcohol?", 161.5, 218.2, $HeaderInfo, undef, $EverUsedAlcohol, 256.6);
+  main->renderQueAns($p, "Age first used alcohol?", 285.1, 389, 448, 0, $HeaderInfo, $AgeFirstAlcohol);
+
+  main->renderTextline($p, "Drug Use", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  main->renderTextline($p, "History", $marginleft, 18, $baseboldmidfontoptions, $HeaderInfo);
+  $p->fit_textline("[Check substance(s) used and indicate age first used]", 67.2, $ypos, $basemidfontoptions_i);
+  main->renderQueDotsAns($p, "Have you ever abused any drug?", 179.5, 553.7, $HeaderInfo, undef, $EverUsedDrug);
+
+  main->renderTextline($p, "GAMBLING", $marginleft, 22, $baseboldmidlargefontoptions, $HeaderInfo);
+  main->renderQueDotsAns($p, "Do you have a history of gambling:", 185, 554.2, $HeaderInfo, undef, $GamblingHistory);
+  main->renderQueDotsAns($p, "Have you ever received gambling treatment before?", 263.5, 548.2, $HeaderInfo, undef, $GamblingTreatmentBefore);
+
+  main->renderTextline($p, "OTHER BEHAVIORAL ADDICTION", $marginleft, 22, $baseboldmidlargefontoptions, $HeaderInfo);
+  main->renderQueDotsAns($p, "Do you have a history of other behavioral addictions?", 269.8, 554.2, $HeaderInfo, undef, $OtherBehaviorals);
+
+  main->renderTextline($p, "TRAUMA", $marginleft, 22, $baseboldmidlargefontoptions, $HeaderInfo);
+  main->renderQueDotsAns($p, "Have you experienced any type of psychological trauma in your life?", 335, 554.2, $HeaderInfo, undef, $TraumaInYourLife);
+  main->renderTextline($p, "Role in Abuse / Violence", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  main->renderQueDotsAns($p, "Have any of these people abused you?", 329, 541.9, $HeaderInfo, undef, $PeopleAbusedYou);
+  $p->fit_textline("(Insert name in blank area)", 206.9, $ypos, $basemidfontoptions_i);
+  main->renderQueDotsAns($p, "Have you abused anyone?", 275, 541.9, $HeaderInfo, undef, $AbusedAnyone);
+  $p->fit_textline("(Insert name in blank area)", 152.4, $ypos, $basemidfontoptions_i);
+  $ypos += 4;
+  $tf = $p->create_textflow("Indicate from view of client:  If person abused client indicate Perpetrator; If client abused person indicate Victim.  If both, check both.",
+  $basemidfontoptions_i . " leading=120% alignment=justify");
+  $h_tf = main->renderTextflow($p, $tf, $marginleft, $contentwidth - 20, $HeaderInfo);
+  $ypos += $h_tf;
+  $ypos += 4;
+  main->renderQueDotsAns($p, "Have you ever been battered or beaten while pregnant (if applicable)?", 341, 541.9, $HeaderInfo, undef, $BatteredOrBeaten);
+  main->renderQueDotsAns($p, "Have you ever witnessed domestic violence?", 234, 541.9, $HeaderInfo, undef, $DomesticViolence);
+  main->renderQueDotsAns($p, "Have you received any treatment specifically for domestic violence or sexual assault?", 408, 541.9, $HeaderInfo, undef, $TreatmentSpecifically);
+  
+  main->renderTextline($p, "FAMILY HISTORY", $marginleft, 22, $baseboldmidlargefontoptions, $HeaderInfo);
+  main->renderQueAns($p, "How long have you been in current marrital state?", $marginleft, 256.1, 294.2, 1, $HeaderInfo, $MarritalStateYears);
+  $p->fit_textline("Years", 299.5, $ypos, $basemidfontoptions);
+  main->renderLine($p, 330.2, 370.3, $MarritalStateMonths);
+  $p->fit_textline("Months", 374.6, $ypos, $basemidfontoptions);
+  main->renderDotLine($p, 415, 441.6);
+  main->renderQueAns($p, "Number of times married:", 443, 558.2, undef, 0, $HeaderInfo, $NumOfTimesMarried);
+  $ypos += 4;
+  $tf = $p->create_textflow("Relationships History (Narrative of relationships history, separations, divorces, affairs, sexual partners, functional level of current relationship):",
+  $basemidfontoptions_i . " leading=120% alignment=justify");
+  $h_tf = main->renderTextflow($p, $tf, $marginleft, $contentwidth - 20, $HeaderInfo);
+  $ypos += $h_tf;
+  $tf = $p->create_textflow($RelationshipsHistory, $basefontoptions . " leading=120%");
+  $h_tf = main->renderTextflow($p, $tf, $marginleft, $contentwidth, $HeaderInfo);
+  $ypos += $h_tf;
+  $ypos += 4;
+  main->renderQueAns($p, "Significant Other's Name:", $marginleft, 145.7, 475, 1, $HeaderInfo, $SignificantOtherName);
+  main->renderQueAns($p, "Phone:", 481.2, 513.1, undef, 0, $HeaderInfo, $SignificantOtherPhone);
+  main->renderQueAns($p, "Address:", $marginleft, 70.6, 299.5, 1, $HeaderInfo, $SignificantOtherAddress);
+  main->renderQueAns($p, "City:", 306, 328.1, 440.6, 0, $HeaderInfo, $SignificantOtherCity);
+  main->renderQueAns($p, "State:", 446.4, 474.2, 501.2, 0, $HeaderInfo, $SignificantOtherState);
+  main->renderQueAns($p, "Zip:", 506.6, 525.4, undef, 0, $HeaderInfo, $SignificantOtherZip);
+
+  main->renderTextline($p, "Family Relationship", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  main->renderQueAns($p, "Structure of family you live with?", $marginleft, 177.4, undef, 1, $HeaderInfo, $StructureFamily);
+  main->renderQueAns($p, "Parents Status", $marginleft, 99.1, 341, 1, $HeaderInfo, $ParentsStatus);
+  main->renderQueDotsAns($p, "While growing up, have you (or did you) live under the care of anyone other than your parents?", 449.8, 554.2, $HeaderInfo, undef, $UnderTheCareOf);
+  main->renderTextline($p, "Who is (or was) the primary disciplinarian in the home?", $marginleft, 14, $basemidfontoptions, $HeaderInfo);
+  main->renderDotLine($p, 277, 309.6);
+  main->renderQueAns($p, "Indicate Relationship", 313, 409, undef, 0, $HeaderInfo, $IndicateRelationship);
+  main->renderQueDotsAns($p, "Is/Was it deserved and fair?", 157, 554.2, $HeaderInfo, undef, $DeservedAndFair);
+  main->renderTextline($p, "How were you punished?", $marginleft, 14, $basemidfontoptions, $HeaderInfo);
+  $tf = $p->create_textflow($HowPunished, $basefontoptions . " leading=120% alignment=justify");
+  $h_tf = main->renderTextflow($p, $tf, $marginleft, $contentwidth, $HeaderInfo);
+  $ypos += $h_tf;
+  
+  main->renderTextline($p, "Relationships:", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  $p->fit_textline("(List last, first, middle initial, age of each, and if they live in the home with you)", 102.2, $ypos, $basemidfontoptions);
+
+  $ypos += 6.5;
+  $row = 1;
+  $col = 1;
+  $tbl = -1;
+
+  $optlist =  "fittextline={position={center center} $baseboldmidfontoptions} margin=3";
+  for ($col=1; $col <= $#RelationshipsTbHeaders+1; $col++) {
+    $tbl = $p->add_table_cell($tbl, $col, $row, $RelationshipsTbHeaders[$col-1], $optlist . " colwidth=" . $RelationshipsTbHeaderWidths[$col-1] . "%");
+  }
+  $row++;
+
+  $optlist =  "fittextline={position={left center} " . $basefontoptions . "} marginleft=2";
+  $optlistcenter =  "fittextline={position={center center} " . $basefontoptions . "} marginleft=2";
+  for (my $i = 0; $i <  $#RelationshipsTbData+1; $i++) {
+    $col = 1;
+    # column 1: Name
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $RelationshipsTbData[$i]->{"relationships_name"}, $optlist);
+    # column 2: Relation
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $RelationshipsTbData[$i]->{"relationships_relation"}, $optlistcenter);
+    # column 3: Age
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $RelationshipsTbData[$i]->{"relationships_age"}, $optlistcenter);
+    # column 4: In Home
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $RelationshipsTbData[$i]->{"relationships_inhome"}, $optlistcenter);
+    # column 5: Rating
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $RelationshipsTbData[$i]->{"relationships_rating"}, $optlistcenter);
+    # column 6: Why?
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $RelationshipsTbData[$i]->{"relationships_reason"}, $optlistcenter);
+    $row++;
+  }
+  
+#warn qq|renderTable: RelationshipsTbData, rows=${row}\n|;
+  $h_tbl = main->renderTable($p, $tbl, $HeaderInfo);
+  $ypos += $h_tbl;
+  
+  main->renderTextline($p, "Current Living Situation", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  $p->fit_textline("(check only one):", 147.1, $ypos, $basemidfontoptions);
+  main->renderLine($p, 223, 376, $LivingStuation);
+  main->renderQueAns($p, "Admit date:", 378.8, 429.3, 476.5, 0, $HeaderInfo, $LivingStuationAdmitDate);
+  main->renderQueAns($p, "Group Home Level:", 479.6, 568.5, 585.1, 0, $HeaderInfo, $LivingStuationGHLevel);
+  main->renderQueDotsAns($p, "Are you satisfied with these arrangements?", 222, undef, $HeaderInfo, undef, $LivingStuationSatisfiedArrs);
+  main->renderQueDotsAns($p, "Correctional Setting:", 130, undef, $HeaderInfo, undef, $CorrectionalSetting, undef, undef, $baseboldmidfontoptions);
+  main->renderQueAns($p, "Homeless:", $marginleft, 82.1, 159.1, 1, $HeaderInfo, $Homeless, undef, $baseboldmidfontoptions);
+  main->renderQueAns($p, "(Child) Out of Home Placement:", $marginleft, 183.4, 340, 1, $HeaderInfo, $ChildOutOfHome, undef, $baseboldmidfontoptions);
+  main->renderQueAns($p, "In the past 90 days, how many days in a restrictive placement? (0-90)", $marginleft, 341.3, 395, 1, $HeaderInfo, $DaysInAPlacement);
+
+  main->renderTextline($p, "Out of Home Placement", $marginleft, 18, $baseboldmidfontoptions, $HeaderInfo);
+  main->renderQueDotsAns($p, "Number of placements client has had in the past 2 years:", 282, 548.2, $HeaderInfo, undef, $NumOfPlacements);
+  main->renderTextline($p, "Where services are primarily provided:", $marginleft, 14, $basemidfontoptions, $HeaderInfo);
+
+  $ypos += 6.5;
+  $row = 1;
+  $col = 1;
+  $tbl = -1;
+
+  $optlist =  "fittextline={position={center center} $baseboldmidfontoptions_u} margin=3";
+  for ($col=1; $col <= $#WhereServicesTbHeaders+1; $col++) {
+    $tbl = $p->add_table_cell($tbl, $col, $row, $WhereServicesTbHeaders[$col-1], $optlist . " colwidth=" . $WhereServicesTbHeaderWidths[$col-1] . "%");
+  }
+  $row++;
+
+  $optlist =  "fittextline={position={left center} " . $basefontoptions . "} marginleft=2";
+  $optlistcenter =  "fittextline={position={center center} " . $basefontoptions . "} marginleft=2";
+  for (my $i = 0; $i <  $#WhereServicesTbData+1; $i++) {
+    $col = 1;
+    # column 1: Name
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $WhereServicesTbData[$i]->{"ohp_name"}, $optlist);
+    # column 2: Address
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $WhereServicesTbData[$i]->{"ohp_address"}, $optlistcenter);
+    # column 3: Phone
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $WhereServicesTbData[$i]->{"ohp_phone"}, $optlistcenter);
+    # column 4: Type
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $WhereServicesTbData[$i]->{"ohp_type"}, $optlistcenter);
+    $row++;
+  }
+  
+#warn qq|renderTable: WhereServicesTbData, rows=${row}\n|;
+  $h_tbl = main->renderTable($p, $tbl, $HeaderInfo);
+  $ypos += $h_tbl;
+
+  main->renderQueAns($p, "Usual Living Arrangement", $marginleft, 223.7, 298.8, 1, $HeaderInfo, $UsualLivingArr, 18, $baseboldmidfontoptions);
+  $p->fit_textline("(past 3 years)", 157.7, $ypos, $basemidfontoptions_i);
+  main->renderQueDotsAns($p, "Are you satisfied with these arrangements?", 222, undef, $HeaderInfo, undef, $UsualLivingSatisfiedArrs);
+
+  main->renderTextline($p, "SOCIAL", $marginleft, 22, $baseboldmidlargefontoptions, $HeaderInfo);
+  main->renderTextline($p, "Income", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+
+  $ypos += 6.5;
+  $row = 1;
+  $col = 1;
+  $tbl = -1;
+
+  $optlist =  "fittextline={position={center center} $baseboldmidfontoptions_u} margin=3";
+  for ($col=1; $col <= $#IncomeTbHeaders+1; $col++) {
+    $tbl = $p->add_table_cell($tbl, $col, $row, $IncomeTbHeaders[$col-1], $optlist . " colwidth=" . $IncomeTbHeaderWidths[$col-1] . "%");
+  }
+  $row++;
+
+  $optlist =  "fittextline={position={left center} " . $basefontoptions . "} marginleft=2";
+  my $optlistright =  "fittextline={position={right center} " . $basefontoptions . "} marginleft=2";
+  for (my $i = 0; $i <  $#IncomeTbData+1; $i++) {
+    $col = 1;
+    # column 1: Source of Income
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $IncomeTbData[$i]->{"income_source"}, $optlist);
+    # column 2: Last 30 days
+    $tbl = $p->add_table_cell($tbl, $col++, $row, '$' . $IncomeTbData[$i]->{"income_last"}, $optlistright);
+    # column 3: Yearly
+    $tbl = $p->add_table_cell($tbl, $col++, $row, '$' . $IncomeTbData[$i]->{"income_yearly"}, $optlistright);
+    $row++;
+  }
+  
+#warn qq|renderTable: IncomeTbData, rows=${row}\n|;
+  $h_tbl = main->renderTable($p, $tbl, $HeaderInfo);
+  $ypos += $h_tbl;
+  
+  main->renderTextline($p, "Last 30 day Total:", 233.8, 14, $baseboldmidfontoptions, $HeaderInfo);
+  $p->fit_textline('$' . $IncomeLast30Total, 322, $ypos, $basefontoptions);
+  $p->fit_textline("Yearly Total:", 445.7, $ypos, $baseboldmidfontoptions);
+  $p->fit_textline('$' . $IncomeYearlyTotal, 508, $ypos, $basefontoptions);
+  main->renderQueDotsAns($p, "Number of people who contribute to or must live on the total annual income: (1-15)", 395, 548, $HeaderInfo, undef, $NumOfPeopleContribute);
+  main->renderQueDotsAns($p, "Are you able to pay your monthly bills and meet your budgeting and money needs?", 401, 548, $HeaderInfo, undef, $AbleToPayMonthlyBills);
+
+  main->renderTextline($p, "Caregiver/Client Resources, Issues, or Concerns About Meeting Basic Needs", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  main->renderTextline($p, "(food, shelter, health, transportation, etc.)", $marginleft, 14, $basemidfontoptions_i, $HeaderInfo);
+  main->renderQueDotsAns($p, "Do you have a valid driver's license", 307, 548, $HeaderInfo, undef, $ValidDriverLicense, undef, 18);
+  $p->fit_textline("(not suspended/revoked)", 189.8, $ypos, $basemidfontoptions_i);
+  $p->fit_textline("?", 302, $ypos, $basemidfontoptions);
+  main->renderQueDotsAns($p, "Do you have an automobile available for use", 431, 548, $HeaderInfo, undef, $AutomobileAvailable);
+  $p->fit_textline("(does not require ownership, only availability)", 230.6, $ypos, $basemidfontoptions_i);
+  $tf = $p->create_textflow("Are you able to care for your basic needs such as food preparation and meal planning, obtaining clothing, completing chores, personal care and life skills?",
+    $basemidfontoptions . " leading=120%");
+  $h_tf = main->renderTextflow($p, $tf, $marginleft, 518, $HeaderInfo);
+  $ypos += $h_tf;
+  main->renderDotLine($p, 548, 191);
+  main->renderLine($p, 555.5, undef, $AbleToCareForBasicNeeds, undef, 1);
+  $tf = $p->create_textflow("Are you able to meet your needs for medical, dental, mental health including abuse/neglect, violence or domestic violence and/or substance abuse concerns?",
+    $basemidfontoptions . " leading=120%");
+  $h_tf = main->renderTextflow($p, $tf, $marginleft, 518, $HeaderInfo);
+  $ypos += $h_tf;
+  main->renderDotLine($p, 548, 226);
+  main->renderLine($p, 555.5, undef, $AbleToMeetNeeds, undef, 1);
+  main->renderQueDotsAns($p, "Are you able to meet your legal demands?", 221, 548, $HeaderInfo, undef, $AbleToMeetDemands);
+  main->renderQueDotsAns($p, "Do you have the resources to meet your recovery needs and/or recovery environment?", 418, 548, $HeaderInfo, undef, $ResourcesRecoveryNeeds);
+  main->renderQueDotsAns($p, "Are the resources available to your family adequate in meeting the family's basic needs?", 424, 548, $HeaderInfo, undef, $ResourcesFamilyAdequate);
+  main->renderTextline($p, "If no on any of the above, describe the limitations:", $marginleft, 14, $basemidfontoptions, $HeaderInfo);
+  $tf = $p->create_textflow($DescribeLimitations, $basefontoptions . " leading=120%");
+  $h_tf = main->renderTextflow($p, $tf, $marginleft, $contentwidth, $HeaderInfo);
+  $ypos += $h_tf;
+
+  main->renderTextline($p, "Current Support System", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  $TitleInfo = { "title" => "Current Support System", "h_title" => 14, "optlist" => $baseboldmidfontoptions_u };
+  main->renderQueDotsAns($p, "Does someone contribute to support you in any way", 419, 548, $HeaderInfo, $TitleInfo, $SomeoneContributeSupport);
+  $p->fit_textline("(exclude support by an institution)", 263.3, $ypos, $basemidfontoptions_i);
+  $p->fit_textline("?", 414, $ypos, $basemidfontoptions);
+  main->renderQueDotsAns($p, "Does this constitute the majority of your support?", 251, 548, $HeaderInfo, $TitleInfo, $MajorityOfSupport);
+  main->renderQueDotsAns($p, "Will they be active with treatment?", 184, 548, $HeaderInfo, $TitleInfo, $ActiveWithTreatment);
+  main->renderQueDotsAns($p, "Family Supportive?", 119, 548, $HeaderInfo, $TitleInfo, $FamilySupportive);
+  main->renderQueDotsAns($p, "Employer Supportive?", 125, 548, $HeaderInfo, $TitleInfo, $EmployerSupportive);
+  main->renderQueDotsAns($p, "Church supportive?", 118, 548, $HeaderInfo, $TitleInfo, $ChurchSupportive);
+  main->renderQueDotsAns($p, "Self help involvement?", 131, 548, $HeaderInfo, $TitleInfo, $SelfHelpInvolvement);
+  main->renderTextline($p, "In the past 30 days, how many times have you attended self-help/support groups, or since admission if less than 30 days.", $marginleft, 14, $basemidfontoptions, $HeaderInfo);
+  $tf = $p->create_textflow($AttendedSelfHelpGroups, $basefontoptions . " leading=120%");
+  $h_tf = main->renderTextflow($p, $tf, $marginleft, $contentwidth, $HeaderInfo);
+  $ypos += $h_tf;
+  main->renderTextline($p, "Comments:", $marginleft, 18, $basemidfontoptions, $HeaderInfo);
+  $tf = $p->create_textflow($Comments, $basefontoptions . " leading=120%");
+  $h_tf = main->renderTextflow($p, $tf, $marginleft, $contentwidth, $HeaderInfo);
+  $ypos += $h_tf;
+
+  main->renderTextline($p, "LEGAL", $marginleft, 22, $baseboldmidlargefontoptions, $HeaderInfo);
+  main->renderTextline($p, "Legal Papers in File:", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  $tf = $p->create_textflow($LegalPapers, $basefontoptions . " leading=120%");
+  $h_tf = main->renderTextflow($p, $tf, $marginleft, $contentwidth, $HeaderInfo);
+  $ypos += $h_tf;
+  main->renderTextline($p, "Legal Status:", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  $tf = $p->create_textflow($LegalStatus, $basefontoptions . " leading=120%");
+  $h_tf = main->renderTextflow($p, $tf, $marginleft, $contentwidth, $HeaderInfo);
+  $ypos += $h_tf;
+
+  main->renderTextline($p, "Custody/Referral Type", $marginleft, 18, $baseboldmidfontoptions, $HeaderInfo);
+  main->renderQueAns($p, "County of Jurisdiction/Commitment:", $marginleft, 189.6, 360.9, 1, $HeaderInfo, $CountyOfJurisdiction);
+  main->renderQueAns($p, "Custody Agency:", $marginleft, 107.3, 263.2, 1, $HeaderInfo, $CustodyAgency);
+  main->renderQueAns($p, "(Children Only)", $marginleft, 99.4, 263.2, 1, $HeaderInfo, $CustodyChildrenOnly);
+  main->renderQueAns($p, "(Adults Only)", $marginleft, 88.6, 263.2, 1, $HeaderInfo, $CustodyAdultsOnly);
+  main->renderQueDotsAns($p, "Do you have a Probation or Parole (P & P), or OJA / DHS Case Worker?", 353.5, 548, $HeaderInfo, undef, $HaveAProbation);
+
+  $ypos += 6.5;
+  $row = 1;
+  $col = 1;
+  $tbl = -1;
+
+  $optlist =  "fittextline={position={center center} $baseboldmidfontoptions_u} margin=3";
+  for ($col=1; $col <= $#CustodyTbHeaders+1; $col++) {
+    $tbl = $p->add_table_cell($tbl, $col, $row, $CustodyTbHeaders[$col-1], $optlist . " colwidth=" . $CustodyTbHeaderWidths[$col-1] . "%");
+  }
+  $row++;
+
+  $optlist =  "fittextline={position={left center} " . $basefontoptions . "} marginleft=2";
+  $optlistcenter =  "fittextline={position={center center} " . $basefontoptions . "} marginleft=2";
+  for (my $i = 0; $i <  $#CustodyTbData+1; $i++) {
+    $col = 1;
+    # column 1: Name
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $CustodyTbData[$i]->{"legalPPO_name"}, $optlist);
+    # column 2: Address
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $CustodyTbData[$i]->{"legalPPO_address"}, $optlistcenter);
+    # column 3: Phone
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $CustodyTbData[$i]->{"legalPPO_phone"}, $optlistcenter);
+    # column 4: Contact
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $CustodyTbData[$i]->{"legalPPO_contact"}, $optlistcenter);
+    $row++;
+  }
+  
+#warn qq|renderTable: CustodyTbData, rows=${row}\n|;
+  $h_tbl = main->renderTable($p, $tbl, $HeaderInfo);
+  $ypos += $h_tbl;
+
+  main->renderQueAns($p, "How many times have you been arrested in the past twelve (12) months, or since admission if less than 12 months?",
+    $marginleft, 555.5, undef, 1, $HeaderInfo, $ArrestedPastTwelve);
+  main->renderQueDotsAns($p, "Of those arrests, how many have occurred in the past 30 days, or since admission if less than 30 days?",
+    502, 548, $HeaderInfo, undef, $OccuredPast30, undef, undef, undef, undef, 41.5);
+
+  main->renderTextline($p, "Cultural Orientation", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  main->renderQueAns($p, "Race:", $marginleft, 57.4, 307, 1, $HeaderInfo, $CulturalRace);
+  main->renderQueAns($p, "Ethnicity:", $marginleft, 72.2, 307, 1, $HeaderInfo, $CulturalEthnicity);
+  main->renderQueDotsAns($p, "Tribal Affiliation (CDIB Card):", 160, 476.2, $HeaderInfo, undef, $CulturalTribal);
+  main->renderTextBlock($p, "Describe any traditional practices you participate in:", $CulturalTraditionalPractices, $HeaderInfo);
+  main->renderTextBlock($p, "Gang Affiliation:", $CulturalGangAffiliation, $HeaderInfo);
+  main->renderTextBlock($p, "What do you value about your gang involvement:", $CulturalGangInvolve, $HeaderInfo);
+  main->renderTextBlock($p, "Other Social / Cultural Affiliation:", $CulturalOtherSocial, $HeaderInfo);
+  main->renderTextBlock($p, "What do you value about this social / cultural involvement:", $CulturalSocialInvolve, $HeaderInfo);
+  main->renderTextBlock($p, "What is unique or interesting about you:", $CulturalUnique, $HeaderInfo);
+  main->renderTextBlock($p, "What is important to you:", $CulturalImportant, $HeaderInfo);
+
+  main->renderTextline($p, "Language", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  main->renderQueAns($p, "Primary language:", $marginleft, 111.4, 230.9, 1, $HeaderInfo, $LanguagePrimary);
+  main->renderQueAns($p, "Secondary language:", 237, 331.9, 429.4, 0, $HeaderInfo, $LanguageSecondary);
+  main->renderQueDotsAns($p, "SPEAK English well?", 533, 548, $HeaderInfo, undef, $LanguageSpeakEng, undef, undef, undef, undef, 435.1, 1);
+  main->renderQueDotsAns($p, "READ English well?", 119, 194.2, $HeaderInfo, undef, $LanguageReadEng, 230.9);
+  main->renderQueDotsAns($p, "Reading Literacy Level:", 341, 396, $HeaderInfo, undef, $LanguageReadingLiteracy, 585, undef, undef, undef, 237, 1);
+  main->renderQueDotsAns($p, "WRITE English well?", 124, 194.2, $HeaderInfo, undef, $LanguageWriteEng, 230.9);
+  main->renderQueDotsAns($p, "Writing Literacy Level:", 335, 396, $HeaderInfo, undef, $LanguageWritingLiteracy, 585, undef, undef, undef, 237, 1);
+  main->renderTextBlock($p, "If no, please describe:", $LanguageNo, $HeaderInfo);
+
+  main->renderTextline($p, "Religion / Spiritual Orientation", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  main->renderQueDotsAns($p, "Were you raised in the country or city?", 202, 253.9, $HeaderInfo, undef, $ReligionRaisedCountry, 307.7);
+  main->renderQueDotsAns($p, "Where do you prefer to live?", 442, 523, $HeaderInfo, undef, $ReligionPreferToLive, undef, undef, undef, undef, 313.9, 1);
+  main->renderQueDotsAns($p, "Do you see a traditional healer?", 172, 548, $HeaderInfo, undef, $ReligionTraditionalHealer);
+  main->renderQueDotsAns($p, "Do you feel aspects of treatment will conflict with your cultural and spiritual background?", 419, 548, $HeaderInfo, undef, $ReligionTreatmentConflict);
+  main->renderTextBlock($p, "What meaning does God, Spirituality, or a Higher Power play in your life? (In Client’s Words)", $ReligionMeaningGods, $HeaderInfo);
+  main->renderQueDotsAns($p, "Did you attend church as a child?", 179, 548, $HeaderInfo, undef, $ReligionAttendChurch);
+  main->renderQueDotsAns($p, "Do you currently attend church or religious services?", 262, 548, $HeaderInfo, undef, $ReligionCurrentlyAttendChurch);
+  main->renderQueDotsAns($p, "Have your behaviors impacted your views of spirituality?", 280, 548, $HeaderInfo, undef, $ReligionBehaviorsImpacted);
+  main->renderQueDotsAns($p, "Have you had any exceptionally good or bad experiences with the church?", 359, 548, $HeaderInfo, undef, $ReligionExperiencesChurch);
+
+  main->renderTextline($p, "Recreational / Leisure", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  $p->fit_textline("If girlfriend/boyfriend is considered as family, then refer to them as family throughout this section.", 138.2, $ypos, $basemidfontoptions_i);
+  main->renderQueDotsAns($p, "With whom do you spend most of your free time?", 250, 536.2, $HeaderInfo, undef, $RecreationalSpendTime);
+  main->renderQueDotsAns($p, "Are you satisfied with spending your free time this way?", 275, 548, $HeaderInfo, undef, $RecreationalSatisfied);
+  main->renderQueDotsAns($p, "How many close friends do you have?", 521, 548, $HeaderInfo, undef, $RecreationalCloseFriends);
+  $p->fit_textline("Exclude family members.  Reciprocal/Mutually supportive relationships", 204.7, $ypos, $basemidfontoptions_i);
+  main->renderQueDotsAns($p, "Any special interests or hobbies?", 179, 548, $HeaderInfo, undef, $RecreationalInterests);
+  main->renderTextBlock($p, "What do you do or have you done for fun or enjoyment?", $RecreationalDoneForFun, $HeaderInfo);
+
+  main->renderTextline($p, "Present Psychosocial Stressors", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  $p->fit_textline("(Check those that apply and comment as needed)", 185.3, $ypos, $basemidfontoptions_i);
+  $ypos += 3;
+  main->renderCheckboxTextline($p, 1, "Recent death", 32.9, 14, undef, $RecentDeath, $HeaderInfo, 10);
+  main->renderCheckboxTextline($p, 0, "Divorced", 116.4, undef, undef, $Divorced, $HeaderInfo, 10);
+  main->renderCheckboxTextline($p, 0, "Separation from a significant relationship", 179.3, undef, undef, $Separation, $HeaderInfo, 10);
+  main->renderTextBlock($p, "Comments:", $SeparationComments, $HeaderInfo);
+  $ypos += 3;
+  main->renderTextflowBackground($p, 30, $HeaderInfo);
+  main->renderCheckboxTextflow($p, "Emotionally unable by past history to remain separated from a destructive relationship (i.e. living with chemical abuser, physical emotional/sexual abuser).",
+    32.9, 527, undef, $EmoticallyUnable, $HeaderInfo, 10);
+  main->renderTextBlock($p, "Comments:", $EmoticallyUnableComments, $HeaderInfo);
+  main->renderCheckboxTextline($p, 1, "Involves self in relationships with personality-disordered individuals.", 32.9, 14, undef, $InvolvesSelf, $HeaderInfo, 10);
+  main->renderTextBlock($p, "Comments:", $InvolvesSelfComments, $HeaderInfo);
+  main->renderCheckboxTextline($p, 1, "Experiences anxiety, boundary difficulties and separation issues in intimate relationships.", 32.9, 14, undef, $ExperiencesAnxiety, $HeaderInfo, 10);
+  main->renderTextBlock($p, "Comments:", $ExperiencesAnxietyComments, $HeaderInfo);
+  main->renderCheckboxTextline($p, 1, "Assumes responsibility for meeting others needs to the exclusion of their own.", 32.9, 14, undef, $AssumesResponsibility, $HeaderInfo, 10);
+  main->renderTextBlock($p, "Comments:", $AssumesResponsibilityComments, $HeaderInfo);
+
+  main->renderTextline($p, "Level of social functioning", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  $p->fit_textline("(i.e. client’s and therapist’s opinion of social/peer interaction)", 159.4, $ypos, $basemidfontoptions_i);
+  $tf = $p->create_textflow($LevelOfSocialFunc, $basefontoptions . " leading=120%");
+  $h_tf = main->renderTextflow($p, $tf, $marginleft, $contentwidth, $HeaderInfo);
+  $ypos += $h_tf;
+
+  main->renderTextline($p, "EDUCATIONAL HISTORY", $marginleft, 22, $baseboldmidlargefontoptions, $HeaderInfo);
+  main->renderTextline($p, "Attainment and Difficulties", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  main->renderQueAns($p, "What is the highest grade in school you have satisfactorily completed?", $marginleft, 343.4, undef, 1, $HeaderInfo, $AttainmentHighestGrade);
+  main->renderQueDotsAns($p, "Did you repeat any grades?", 155, 272.2, $HeaderInfo, undef, $AttainmentRepeated, 306);
+  main->renderQueAns($p, "If yes, which grades?", 313.2, 408.7, undef, 0, $HeaderInfo, $AttainmentRepeatedGrades);
+  main->renderTextBlock($p, "Why?", $AttainmentRepeatedReason, $HeaderInfo);
+  main->renderQueAns($p, "Name of school last attended?", $marginleft, 167, 386, 1, $HeaderInfo, $AttainmentNameOfSchool);
+  main->renderQueAns($p, "School district?", 393, 465.4, undef, 0, $HeaderInfo, $AttainmentSchoolDistrict);
+  main->renderQueAns($p, "How many months of Training or Technical education have you satisfactorily completed?", $marginleft, 425.5, 460, 1, $HeaderInfo, $AttainmentMonthsOfTraining);
+  $p->fit_textline("Month", 463.2, $ypos, $basemidfontoptions);
+  main->renderQueAns($p, "What subjects did/do you like in school?", $marginleft, 210.7, 306, 1, $HeaderInfo, $AttainmentSubjectsLike);
+  main->renderQueAns($p, "What subjects did/do you dislike in school?", $marginleft, 222.2, 306, 1, $HeaderInfo, $AttainmentSubjectsDislike);
+
+  main->renderTextline($p, "Learning Ability / Intelectual Functioning", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  main->renderQueDotsAns($p, "Would you describe yourself as a:", 179.5, 500.2, $HeaderInfo, undef, $LearningAbilityDescribe);
+  main->renderQueDotsAns($p, "Have you ever taken an I.Q. test?", 179.5, 272.2, $HeaderInfo, undef, $LearningAbilityIQTest, 306);
+  main->renderQueDotsAns($p, "If yes, what was your score?", 442, 548, $HeaderInfo, undef, $LearningAbilityIQScore, undef, undef, undef, undef, 313.2, 1);
+
+  main->renderTextline($p, "Current Daycare Functioning", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  $p->fit_textline("(preschool)", 170.9, $ypos, $basemidfontoptions);
+  main->renderQueDotsAns($p, "In the past 90 days, how many days was the child not permitted to return to day care? (0-66)", 443, 548, $HeaderInfo, undef, $ReturnToDayCare);
+
+  main->renderTextline($p, "Current Educational Functioning", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  $p->fit_textline("(child & adolescent)", 188.6, $ypos, $basemidfontoptions);
+  main->renderQueAns($p, "Current school status?", $marginleft, 132.5, 267.5, 1, $HeaderInfo, $CurrentSchoolStatus);
+  main->renderQueAns($p, "What grade are you currently attending?", $marginleft, 210, 320, 1, $HeaderInfo, $GradeCurrentlyAttending);
+  main->renderQueAns($p, "What is your current school performance (grades or GPA)?", $marginleft, 293.3, 320, 1, $HeaderInfo, $SchoolPerformance);
+  main->renderTextBlock($p, "Do you have a special education classification?", $SpecialEducationClassification, $HeaderInfo);
+  main->renderQueDotsAns($p, "Are you currently being served on an IEP?", 220, 548, $HeaderInfo, undef, $BeingServedIEP);
+  main->renderQueAns($p, "How long have you been receiving special education classes?", $marginleft, 307.6, 368.2, 1, $HeaderInfo, $SpecialEducationClasses);
+  main->renderQueAns($p, "In what grade did you start receiving special education classes?", $marginleft, 315.6, 368.2, 1, $HeaderInfo, $GradeStartReceiving);
+  main->renderQueAns($p, "In the past 90 days of the school year, how many days was the child/adolescent absent from school? (0-66)", $marginleft, 506.9, undef, 1, $HeaderInfo, $DaysChildAbsent);
+  main->renderQueAns($p, "In the past 90 days of the school year, how many days was the child/adolescent suspended from school? (0-66)", $marginleft, 526.8, undef, 1, $HeaderInfo, $DaysChildSuspended);
+  main->renderTextline($p, "Collaboration with the School System", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  $p->fit_textline("(school age children only)", 212.6, $ypos, $basemidfontoptions);
+  $tf = $p->create_textflow($CollaborationWithSchool, $basefontoptions . " leading=120%");
+  $h_tf = main->renderTextflow($p, $tf, $marginleft, $contentwidth, $HeaderInfo);
+  $ypos += $h_tf;
+
+  main->renderTextline($p, "VOCATIONAL HISTORY", $marginleft, 22, $baseboldmidlargefontoptions, $HeaderInfo);
+  main->renderQueAns($p, "Employment Status", $marginleft, 128.6, 237, 1, $HeaderInfo, $EmploymentStatus, 18, $baseboldmidfontoptions_u);
+  main->renderQueAns($p, "Employment Type", $marginleft, 128.6, 237, 1, $HeaderInfo, $EmploymentType, undef, $baseboldmidfontoptions_u);
+  main->renderQueDotsAns($p, "Have you worked at any job outside the home?", 238, 548, $HeaderInfo, undef, $WorkedOutsideHome);
+  main->renderQueAns($p, "If so, what type of work was it?", $marginleft, 167.5, 332.2, 1, $HeaderInfo, $VocationalLastWork);
+  main->renderQueAns($p, "How long?", 340.6, 388.9, 431.6, 0, $HeaderInfo, $VocationalLength);
+  main->renderQueAns($p, "Last time you worked?", $marginleft, 133.2, 332.2, 1, $HeaderInfo, $LastTimeWorked);
+  main->renderQueAns($p, "What type?", 340.6, 394.6, 431.6, 0, $HeaderInfo, $WhatTypeWorked);
+  main->renderQueDotsAns($p, "Do you have special job skills or training?", 215, 548, $HeaderInfo, undef, $SpecialJobSkills);
+  main->renderQueAns($p, "What type?", 35.5, 89.8, 167.8, 1, $HeaderInfo, $VocationalSkillType);
+  main->renderQueAns($p, "What type of work do you intend to do or have you done as a career?", $marginleft, 337.4, 400.8, 1, $HeaderInfo, $WorkIntendToDo);
+
+  main->renderTextline($p, "Military", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  main->renderQueAns($p, "Military Service?", $marginleft, 107, 186.2, 1, $HeaderInfo, $MilitaryService);
+  main->renderQueAns($p, "Which branch of service?", $marginleft, 145.4, 234.5, 1, $HeaderInfo, $BranchOfService);
+  main->renderQueAns($p, "Type of discharge?", $marginleft, 119.3, 216, 1, $HeaderInfo, $TypeOfDischarge);
+  main->renderTextBlock($p, "Relatives with military service?", $RelativesMilitaryService, $HeaderInfo);
+
+  main->renderTextline($p, "MENTAL STATUS EXAMINATION", $marginleft, 22, $baseboldmidlargefontoptions, $HeaderInfo);
+  $p->fit_textline("(select only one unless otherwise indicated)", 220, $ypos, $basemidlargefontoptions);
+  
+  main->renderTextline($p, "Physical", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  main->renderQueAns($p, "Appearance:", $marginleft, 86.4, 224.8, 1, $HeaderInfo, $PhysicalAppearance);
+  main->renderQueAns($p, "Manner of Dress:", $marginleft, 106.1, 224.5, 1, $HeaderInfo, $PhysicalManner);
+  main->renderQueAns($p, "Hygiene:", $marginleft, 69.6, 207.8, 1, $HeaderInfo, $PhysicalHygiene);
+  main->renderQueAns($p, "Nutrition:", $marginleft, 70.8, 207.8, 1, $HeaderInfo, $PhysicalNutrition);
+  main->renderQueAns($p, "Prosthetic Devices:", $marginleft, 117.4, 255.8, 1, $HeaderInfo, $PhysicalProsthetic);
+
+  main->renderTextline($p, "Interview Behavior", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  main->renderQueAns($p, "Posture:", $marginleft, 66.7, 204.9, 1, $HeaderInfo, $InterviewPosture);
+  main->renderQueAns($p, "Facial Expression:", $marginleft, 111.8, 250.2, 1, $HeaderInfo, $InterviewFacial);
+
+  main->renderTextline($p, "Motor Activity", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  main->renderQueAns($p, "Gait:", $marginleft, 52.8, 190.7, 1, $HeaderInfo, $MotorGait);
+  main->renderQueAns($p, "Motor Behavior:", $marginleft, 100.3, 238.7, 1, $HeaderInfo, $MotorBehavior);
+
+  main->renderTextline($p, "Speech", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  main->renderQueAns($p, "Quantity:", $marginleft, 72, 210.4, 1, $HeaderInfo, $SpeechQuantity);
+  main->renderQueAns($p, "Quality:", $marginleft, 66.5, 204.9, 1, $HeaderInfo, $SpeechQuality);
+  main->renderQueAns($p, "Impairment:", $marginleft, 84, 222.2, 1, $HeaderInfo, $SpeechImpairment);
+
+  main->renderTextline($p, "Interviewer-Patient Relationship", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  main->renderQueAns($p, "Affect:", $marginleft, 58.1, 196.5, 1, $HeaderInfo, $InterviewerAffect);
+  main->renderQueAns($p, "Mood:", $marginleft, 58.1, 196.5, 1, $HeaderInfo, $InterviewerMood);
+
+  main->renderTextline($p, "Thought Processes", $marginleft, 14, $baseboldmidfontoptions_u, $HeaderInfo);
+  $p->fit_textline("(Check all that apply)", 125.8, $ypos, $basemidfontoptions);
+  $tf = $p->create_textflow($ThoughtProcesses, $basefontoptions . " leading=120%");
+  $h_tf = main->renderTextflow($p, $tf, $marginleft, $contentwidth, $HeaderInfo);
+  $ypos += $h_tf;
+
+  main->renderTextline($p, "Preoccupations", $marginleft, 14, $baseboldmidfontoptions_u, $HeaderInfo);
+  $p->fit_textline("(Check all that apply)  [for suicide ideation/preoccupation complete Scale for Suicide Ideation]", 108.2, $ypos, $basemidfontoptions);
+  $tf = $p->create_textflow($Preoccupations, $basefontoptions . " leading=120%");
+  $h_tf = main->renderTextflow($p, $tf, $marginleft, $contentwidth, $HeaderInfo);
+  $ypos += $h_tf;
+
+  main->renderTextline($p, "Delusions", $marginleft, 14, $baseboldmidfontoptions_u, $HeaderInfo);
+  $p->fit_textline("(Check all that apply)", 80.9, $ypos, $basemidfontoptions);
+  $tf = $p->create_textflow($Delusions, $basefontoptions . " leading=120%");
+  $h_tf = main->renderTextflow($p, $tf, $marginleft, $contentwidth, $HeaderInfo);
+  $ypos += $h_tf;
+
+  main->renderTextline($p, "Hallucinations", $marginleft, 14, $baseboldmidfontoptions_u, $HeaderInfo);
+  $p->fit_textline("(Check all that apply)", 101.5, $ypos, $basemidfontoptions);
+  $tf = $p->create_textflow($Hallucinations, $basefontoptions . " leading=120%");
+  $h_tf = main->renderTextflow($p, $tf, $marginleft, $contentwidth, $HeaderInfo);
+  $ypos += $h_tf;
+
+  main->renderTextline($p, "Consciousness", $marginleft, 14, $baseboldmidfontoptions_u, $HeaderInfo);
+  $p->fit_textline("(Check all that apply)", 107, $ypos, $basemidfontoptions);
+  $tf = $p->create_textflow($Consciousness, $basefontoptions . " leading=120%");
+  $h_tf = main->renderTextflow($p, $tf, $marginleft, $contentwidth, $HeaderInfo);
+  $ypos += $h_tf;
+
+  main->renderQueAns($p, "Orientation:", $marginleft, 89, 287.7, 1, $HeaderInfo, $Orientation, 18, $baseboldmidfontoptions_u);
+  main->renderQueAns($p, "Attention/Concentration", $marginleft, 290.4, 358.8, 1, $HeaderInfo, $AttentionConcentration, 18, $baseboldmidfontoptions_u);
+  $p->fit_textline("(Serial 7's, WORLD backwards)", 147.6, $ypos, $basemidfontoptions);
+  main->renderQueAns($p, "Memory:", $marginleft, 72.2, 140.6, 1, $HeaderInfo, $Memory, 18, $baseboldmidfontoptions_u);
+  main->renderQueAns($p, "Estimated Intellectual Ability:", $marginleft, 171.4, 239.8, 1, $HeaderInfo, $EstimatedIntellectualAbility, 18, $baseboldmidfontoptions_u);
+  main->renderQueAns($p, "Insight:", $marginleft, 66.2, 254.9, 1, $HeaderInfo, $Insight, 18, $baseboldmidfontoptions_u);
+  main->renderQueAns($p, "Judgment:", $marginleft, 209.5, 279.6, 1, $HeaderInfo, $Judgment, 18, $baseboldmidfontoptions_u);
+  $p->fit_textline("(Ability to Delay Gratification)", 81.1, $ypos, $basemidfontoptions);
+  main->renderQueAns($p, "Skills of Independence:", $marginleft, 142.8, 329.5, 1, $HeaderInfo, $SkillsOfIndependence, 18, $baseboldmidfontoptions_u);
+  main->renderQueAns($p, "Mental Status Exam Screen", $marginleft, 164.9, 217.4, 1, $HeaderInfo, $MentalStatus, 18, $baseboldmidfontoptions);
+
+  main->renderTextline($p, "MENTAL STATUS EXAMINATION", $marginleft, 22, $baseboldmidlargefontoptions, $HeaderInfo);
+  main->renderTextline($p, "Problem List", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  $p->fit_textline("(INCLUDE ALL SPECIFIER CODES AND DESCRIPTIONS WITH AXIS I AND AXIS II DIAGNOSES)", 124.8, $ypos, $basemidfontoptions);
+
+  $ypos += 6.5;
+  $row = 1;
+  $col = 1;
+  $tbl = -1;
+
+  $optlist =  "fittextline={position={center center} $basemidfontoptions} margin=3";
+  for ($col=1; $col <= $#ProblemListTbHeaders+1; $col++) {
+    $tbl = $p->add_table_cell($tbl, $col, $row, $ProblemListTbHeaders[$col-1], $optlist . " colwidth=" . $ProblemListTbHeaderWidths[$col-1] . "%");
+  }
+  $row++;
+
+  for (my $i = 0; $i <  $#ProblemListTbData+1; $i++) {
+    $optlist =  "fittextline={position={left center} " . $basefontoptions . "} marginleft=2";
+    $optlistcenter =  "fittextline={position={center center} " . $basefontoptions . "} marginleft=2";
+    $col = 1;
+    # column 1: ICD 10
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $ProblemListTbData[$i]->{"ICD10"}, $optlist);
+    # column 2: ICD Name
+    $tf = $p->add_textflow(-1, $ProblemListTbData[$i]->{"icdName"}, $basefontoptions);
+    my $optlisttb = "fittextline={position={left center}} textflow=" . $tf . " margin=2";
+    $tbl = $p->add_table_cell($tbl, $col++, $row, "", $optlisttb);
+    # column 4: Initiated Date
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $ProblemListTbData[$i]->{"initiatedDate"}, $optlistcenter);
+    # column 5: Resolved Date
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $ProblemListTbData[$i]->{"resolvedDate"}, $optlistcenter);
+    # column 6: Notes
+    # $tbl = $p->add_table_cell($tbl, $col++, $row, $ProblemListTbData[$i]->{"notes"}, $optlist);
+    $tf = $p->add_textflow(-1, $ProblemListTbData[$i]->{"notes"}, $basefontoptions);
+    $optlist = "fittextline={position={center center}} textflow=" . $tf . " margin=2";
+    $tbl = $p->add_table_cell($tbl, $col++, $row, "", $optlist);
+    $row++;
+  }
+
+#warn qq|renderTable: ProblemListTbData, rows=${row}\n|;
+  $h_tbl = main->renderTable($p, $tbl, $HeaderInfo);
+  $ypos += $h_tbl;
+
+  main->renderTextline($p, "SUMMARY", $marginleft, 22, $baseboldmidlargefontoptions, $HeaderInfo);
+  
+  main->renderTextline($p, "Strengths / Abilities", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  $p->fit_textline("(In Client’s Words)", 127.2, $ypos, $basemidfontoptions_i);
+  $tf = $p->create_textflow($StrengthsAbilities, $basefontoptions . " leading=120%");
+  $h_tf = main->renderTextflow($p, $tf, $marginleft, $contentwidth, $HeaderInfo);
+  $ypos += $h_tf;
+
+  main->renderTextline($p, "Needs, Liabilities, and Barriers", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  $p->fit_textline("(In Client’s Words)", 179.3, $ypos, $basemidfontoptions_i);
+  $tf = $p->create_textflow($NeedsLiabilities, $basefontoptions . " leading=120%");
+  $h_tf = main->renderTextflow($p, $tf, $marginleft, $contentwidth, $HeaderInfo);
+  $ypos += $h_tf;
+
+  main->renderTextBlock($p, "Client’s Preferences", $ClientsPreferences, $HeaderInfo, 18, $baseboldmidfontoptions);
+  main->renderTextBlock($p, "Client’s Overall Expectation from Treatment", $ClientsOverallExpectation, $HeaderInfo, 18, $baseboldmidfontoptions);
+  main->renderTextBlock($p, "Client’s Stage of Change:", $ClientsStageOfCharge, $HeaderInfo, 18, $baseboldmidfontoptions);
+
+  main->renderTextline($p, "INTERPRETIVE SUMMARY", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  main->renderTextline($p, "(for Referral Screening specify problems, disposition, referrals if any. If services not appropriate state reason)", $marginleft, 14, $basemidfontoptions_i, $HeaderInfo);
+  $tf = $p->create_textflow($InterpretiveSummary, $basefontoptions . " leading=120%");
+  $h_tf = main->renderTextflow($p, $tf, $marginleft, $contentwidth, $HeaderInfo);
+  $ypos += $h_tf;
+
+  main->renderTextBlock($p, "ALERT", $Alert, $HeaderInfo, 18, $baseboldmidfontoptions);
+
+  main->renderTextline($p, "RECOMMENDATIONS", $marginleft, 22, $baseboldmidlargefontoptions, $HeaderInfo);
+
+  main->renderQueAns($p, "Level of Care", $marginleft, 156.6, 295.4, 1, $HeaderInfo, $LevelOfCare, 18, $baseboldmidfontoptions_u);
+  $p->fit_textline("(Check one)", 96, $ypos, $basemidfontoptions);
+  main->renderQueAns($p, "Service Focus", $marginleft, 156.6, 295.4, 1, $HeaderInfo, $ServiceFocus, 18, $baseboldmidfontoptions_u);
+  $p->fit_textline("(Check one)", 100.8, $ypos, $basemidfontoptions);
+  main->renderTextline($p, "Services to be provided", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+  $p->fit_textline("(Check all that apply)", 145.9, $ypos, $basemidfontoptions);
+  $tf = $p->create_textflow($ServicesProvided, $basefontoptions . " leading=120%");
+  $h_tf = main->renderTextflow($p, $tf, $marginleft, $contentwidth, $HeaderInfo);
+  $ypos += $h_tf;
+
+  main->renderTextline($p, "Referrals", $marginleft, 18, $baseboldmidfontoptions_u, $HeaderInfo);
+
+  $ypos += 6.5;
+  $row = 1;
+  $col = 1;
+  $tbl = -1;
+
+  $optlist =  "fittextline={position={center center} $baseboldmidfontoptions_u} margin=3";
+  for ($col=1; $col <= $#ReferralsTbHeaders+1; $col++) {
+    $tbl = $p->add_table_cell($tbl, $col, $row, $ReferralsTbHeaders[$col-1], $optlist . " colwidth=" . $ReferralsTbHeaderWidths[$col-1] . "%");
+  }
+  $row++;
+
+  $optlist =  "fittextline={position={left center} " . $basefontoptions . "} marginleft=2";
+  $optlistcenter =  "fittextline={position={center center} " . $basefontoptions . "} marginleft=2";
+  for (my $i = 0; $i <  $#ReferralsTbData+1; $i++) {
+    $col = 1;
+    # column 1: Name
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $ReferralsTbData[$i]->{"referrals_name"}, $optlist);
+    # column 2: Address
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $ReferralsTbData[$i]->{"referrals_address"}, $optlistcenter);
+    # column 3: Phone
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $ReferralsTbData[$i]->{"referrals_phone"}, $optlistcenter);
+    # column 4: Type
+    $tbl = $p->add_table_cell($tbl, $col++, $row, $ReferralsTbData[$i]->{"referrals_type"}, $optlistcenter);
+    $row++;
+  }
+  
+#warn qq|renderTable: ReferralsTbData, rows=${row}\n|;
+  $h_tbl = main->renderTable($p, $tbl, $HeaderInfo);
+  $ypos += $h_tbl;
+
+  main->renderTextline($p, "", $marginleft, 40, $basemidfontoptions, $HeaderInfo);
+  main->renderLine($p, $marginleft, 200.5, $SignStaff);
+  main->renderLine($p, 247.3, 372.6, $SignLicense, undef, 1);
+  main->renderLine($p, 439.6, 546.5, $SignDate, undef, 1);
+  main->renderTextline($p, "Signature of Staff, Credentials", 48.6, 14.8, $basemidfontoptions, $HeaderInfo);
+  $p->fit_textline("License", 293.4, $ypos, $basemidfontoptions);
+  $p->fit_textline("Date / Time", 468, $ypos, $basemidfontoptions);
+
+  main->createFooter($p);
+}
+
+sub createEmptyPage {
+  my ($self, $p) = @_;
+
+  $p->begin_page_ext($pagewidth, $pageheight, "topdown");
+  $p->fit_textline("NOT FOUND", $marginleft, 50, $basefontoptions);
+  $p->end_page_ext("");
+}
+
+sub createHeader {
+  my ($self, $p, $HeaderInfo) = @_;
+
+  my $Company = $HeaderInfo->{'companyname'};
+  my $Address = "$HeaderInfo->{'companyaddr'}\n$HeaderInfo->{'companycsz'}";
+  my $OffceFax = $HeaderInfo->{'companyphone'};
+  my $title = "INTAKE ASSESSMENT";
+
+  my $tf;
+
+  $p->begin_page_ext($pagewidth, $pageheight, "topdown");
+  $ypos = $margintop;
+
+  $ypos += $fontsizelarge;
+  $p->fit_textline($Company, $pagewidth / 2, $ypos, $baseboldlargefontoptions . " position={center bottom}");
+
+  my $h_address = 2 * $fontsizexxlarge;
+  $ypos += $h_address;
+  my $w_address = 150;
+  my $x_address = $pagewidth / 2 - $w_address / 2;
+  $tf = $p->create_textflow($Address, $baseboldlargefontoptions . " leading=110% alignment=justify lastalignment=center");
+  $p->fit_textflow($tf, $x_address, $ypos, $x_address+$w_address, $ypos - $h_address, "verticalalign=center");
+
+  $ypos += $fontsizelarge;
+  $p->fit_textline($OffceFax, $pagewidth / 2, $ypos, $baseboldlargefontoptions . " position={center bottom}");
+
+  # -----------------------------------
+  # Place image of logo
+  # -----------------------------------
+  my $y_offsetlogo = 2;
+  $ypos += $y_offsetlogo;
+  my $h_logo = $ypos - $margintop;
+  my $w_logo = 150;
+  
+  my ($logodirectory, $logofilename) = $HeaderInfo->{'LOGO'} =~ m/(.*\/)(.*)$/;
+  if ( $logofilename eq '' ) { $logofilename = 'logo.png'; }
+  elsif ( not -e "/usr/local/PDFlib/${logofilename}" ) { $logofilename = 'logo.png'; }
+  my $logoimage = $p->load_image("auto", $logofilename, "");
+  $p->fit_image($logoimage, $marginleft, $ypos, "boxsize={" . $w_logo . " " .  $h_logo . "} fitmethod=meet");
+  $p->close_image($logoimage);
+  ##
+
+  $ypos += 2 * $fontsizexxlarge;
+
+  $p->fit_textline($title, $pagewidth / 2, $ypos, $baseboldxlargefontoptions . " position={center bottom}");
+
+  $ypos += $fontsizexxlarge;
+
+}
+
+sub createFooter {
+  my ($self, $p,$ClientID) = @_;
+
+  my $tf;
+  my $optlist;
+
+  my $footertext = 
+    "<fontname=$boldfontname encoding=unicode>Here Confidentiality of drug/alcohol abuse records is protected by Federal Law." .
+    "<fontname=$fontname encoding=unicode> Federal regulations (42 CFR, Part 2 prohibits making any further disclosure of this information unless further disclosure is expressively permitted by written consent of the person to whom it pertains or as otherwise permitted by 42 CFR, Part 2. A GENERAL AUTHORIZATION FOR RELEASE OF MEDICAL OR OTHER INFORMATION IS NOT SUFFICIENT FOR THIS PURPOSE. The Federal rules restrict any use of the information to criminally investigate or prosecute any alcohol/drug abuse client.";
+
+  $optlist = $basesmallfontoptions . " leading=120% alignment=justify";
+  $tf = $p->create_textflow($footertext, $optlist);
+  $p->fit_textflow($tf, $marginleft, $marginbottom,
+      $marginleft+$contentwidth, $y_footer, "verticalalign=bottom");
+
+  ++$pagecount;
+  my $xpos = $pagecount < 10 ? 274 : 268.4;
+  $p->fit_textline("Client ID# : $clientFooterId, Client Name: $clientFooterUser",200,$marginbottom + 14,$baseboldmidfontoptions);
+  $p->fit_textline("Page " . $pagecount, $xpos, $marginbottom + 24, $baseboldmidfontoptions);
+  $p->suspend_page("");
+}
+
+sub createPageCount {
+  my ($self, $p) = @_;
+
+  for(my $i = 1; $i < $pagecount+1; $i++) {
+    # Revisit page $i
+    $p->resume_page("pagenumber $i");
+
+    # Add the total number of pages
+    $p->fit_textline(" of " . $pagecount, 306, $marginbottom + 24, $baseboldmidfontoptions);
+    $p->end_page_ext("");
+  }
+}
+
+sub renderTextflow {
+  my ($self, $p, $tf, $xpos, $width, $HeaderInfo) = @_;
+  my $result;
+  my $h_tf;
+
+  do {
+    $result = $p->fit_textflow($tf, $xpos, $y_footer, $xpos + $width, $ypos, "");
+    if ($result eq "_boxfull" || $result eq "_boxempty") {
+      main->createFooter($p);
+      main->createHeader($p, $HeaderInfo);
+    }
+  } while ($result ne "_stop");
+  $h_tf = $p->info_textflow($tf, "textheight");
+
+  return $h_tf;
+}
+
+
+sub renderTable {
+  my ($self, $p, $tbl, $HeaderInfo) = @_;
+  my $result;
+  my $h_tbl;
+  my $RowHeightLimit = 80;
+  my $diff;
+
+  my $optlist =
+            "header=1 footer=0" . 
+            " fill={{area=header fillcolor={gray 0.9}}}" .
+            " stroke={ {line=vertother linewidth=0.3 strokecolor={rgb 1 1 1}}}";
+
+  $diff = $y_footer - $ypos;
+  if ($diff <= $RowHeightLimit) {
+    main->createFooter($p);
+    main->createHeader($p, $HeaderInfo);
+  }
+  do {
+    $result = $p->fit_table($tbl, $marginleft, $y_footer, $marginleft + $contentwidth, $ypos, $optlist);
+    if ($result eq "_boxfull") {
+      main->createFooter($p);
+      main->createHeader($p, $HeaderInfo);
+    }
+  } while ($result eq "_boxfull");
+  $h_tbl = $p->info_table($tbl, "height");
+  
+  return $h_tbl;
+}
+
+sub renderTextline {
+  my ($self, $p, $text, $xpos, $h_tl, $optlist, $HeaderInfo, $TitleInfo, $bg, $h_bg, $margin) = @_;
+
+  if ($ypos + $h_tl > $y_footer) {
+    main->createFooter($p);
+    main->createHeader($p, $HeaderInfo);
+
+    if ($TitleInfo) {
+      $ypos += $TitleInfo->{"h_title"};
+      
+      if ($bg) {
+        main->renderTextlineBackground($p, $h_bg, $margin);
+      }
+
+      $p->fit_textline($TitleInfo->{"title"}, $xpos, $ypos, $TitleInfo->{"optlist"});
+    }
+  }
+  $ypos += $h_tl;
+
+  if ($bg) {
+    main->renderTextlineBackground($p, $h_bg, $margin);
+  }
+
+  $p->fit_textline($text, $xpos, $ypos, $optlist);
+}
+
+sub renderTextlineBackground {
+  my ($self, $p, $h_bg, $margin) = @_;
+
+  unless($h_bg) {
+    $h_bg = 18;
+  }
+
+  unless($margin) {
+    $margin = 5;
+  }
+
+  $p->setcolor("fill", "cmyk", 0.09, 0.06, 0.06, 0.0);
+  $p->set_graphics_option("linejoin=0");
+  $p->rect($marginleft, $ypos + $margin, $contentwidth, $h_bg);
+  $p->fill();
+  $p->setcolor("fill", "cmyk", 0.70, 0.68, 0.64, 0.74);
+}
+
+sub renderTextflowBackground {
+  my ($self, $p, $h_bg, $HeaderInfo) = @_;
+
+  if ($ypos + $h_bg > $y_footer) {
+    main->createFooter($p);
+    main->createHeader($p, $HeaderInfo);
+  }
+
+  $p->setcolor("fill", "cmyk", 0.09, 0.06, 0.06, 0.0);
+  $p->set_graphics_option("linejoin=0");
+  $p->rect($marginleft, $ypos + $h_bg, $contentwidth, $h_bg);
+  $p->fill();
+  $p->setcolor("fill", "cmyk", 0.70, 0.68, 0.64, 0.74);
+}
+
+sub renderQueDotsAns {
+  my ($self, $p, $que, $xposdotstart, $xposdotend, $HeaderInfo, $TitleInfo, $answer, $xposlineend, $yposque, $queopt, $ansopt, $xposque, $currentline) = @_;
+
+  if ($currentline) {
+    $p->fit_textline($que, $xposque, $ypos, ($queopt ? $queopt : $basemidfontoptions));
+  } else {
+    main->renderTextline($p, $que, ($xposque ? $xposque : $marginleft), ($yposque ? $yposque : 14), ($queopt ? $queopt : $basemidfontoptions), $HeaderInfo, $TitleInfo);
+  }
+  main->renderDotLine($p, ($xposdotend ? $xposdotend : 517.8), $xposdotstart);
+  main->renderLine($p, ($xposdotend ? $xposdotend : 517.8) + 7.5, ($xposlineend ? $xposlineend : 585), $answer, $ansopt, 1);
+}
+
+sub renderQueAns {
+  my ($self, $p, $que, $xpos, $xposlinestart, $xposlineend, $newline, $HeaderInfo, $answer, $yposque, $queopt, $ansopt) = @_;
+  if ($newline) {
+    main->renderTextline($p, $que, $xpos, ($yposque ? $yposque : 14), ($queopt ? $queopt : $basemidfontoptions), $HeaderInfo);
+  } else {
+    $p->fit_textline($que, $xpos, $ypos, $basemidfontoptions);
+  }
+  main->renderLine($p, $xposlinestart, ($xposlineend ? $xposlineend : 585), $answer, $ansopt, 1);
+}
+
+sub renderLine {
+  my ($self, $p, $start, $end, $text, $textopt, $iscenter) = @_;
+
+  $end = $end ? $end : 585;
+  $p->set_graphics_option("dasharray=none");
+  $p->setlinewidth(0.5);
+  $p->moveto($start, $ypos + 3.3);
+  $p->lineto($end, $ypos + 3.3);
+  $p->stroke();
+  $textopt = $textopt ? $textopt : $basefontoptions;
+  if ($iscenter) {
+    $textopt .= " position = { center bottom }";
+  }
+  $p->fit_textline($text, $iscenter == 1 ? ($start + $end) / 2 : $start + 1, $ypos, $textopt);
+}
+
+sub renderDotLine {
+  my ($self, $p, $start, $end) = @_;
+  $p->set_graphics_option("dasharray={1.1 5.1}");
+  $p->setlinewidth(1.1);
+  $p->moveto($start, $ypos);
+  $p->lineto($end, $ypos);
+  $p->stroke();
+}
+
+sub renderTextBlock {
+  my ($self, $p, $title, $text, $HeaderInfo, $h_title, $titleopt) = @_;
+  my $tf;
+  my $h_tf;
+
+  main->renderTextline($p, $title, $marginleft, ($h_title ? $h_title : 14), ($titleopt ? $titleopt : $basemidfontoptions), $HeaderInfo);
+  $tf = $p->create_textflow($text, $basefontoptions . " leading=120%");
+  $h_tf = main->renderTextflow($p, $tf, $marginleft, $contentwidth, $HeaderInfo);
+  $ypos += $h_tf;
+}
+
+sub renderCheckboxTextline {
+  my ($self, $p, $newline, $text, $xpos, $h_tl, $textopt, $checked, $HeaderInfo, $checkboxsize) = @_;
+
+  unless($checkboxsize) {
+    $checkboxsize = 9;
+  }
+
+  if ($newline) {
+    main->renderTextline($p, $text, $xpos + $checkboxsize + 4.6, $h_tl, ($textopt ? $textopt : $basemidfontoptions), $HeaderInfo, undef, 1);
+  } else {
+    $p->fit_textline($text, $xpos + $checkboxsize + 4.6, $ypos, ($textopt ? $textopt : $basemidfontoptions));
+  }
+
+  $p->setlinewidth(0.5);
+  $p->set_graphics_option("linejoin=1");
+  $p->rect($xpos, $ypos + 1.5, $checkboxsize, $checkboxsize);
+  $p->stroke();
+  $p->fit_textline($checked ? '&#x2713;' : '', $xpos + 0.7 + ($checkboxsize ? ($checkboxsize - 9) / 2 : 0),
+    $ypos + 0.5 - ($checkboxsize ? ($checkboxsize - 9) / 2 : 0), $basecheckfontoptions);
+}
+
+sub renderCheckboxTextflow {
+  my ($self, $p, $text, $xpos, $textwidth, $textopt, $checked, $HeaderInfo, $checkboxsize) = @_;
+
+  my $tf;
+  my $h_tf;
+
+  my $yposoffset = 2.5;
+
+  unless($checkboxsize) {
+    $checkboxsize = 9;
+  }
+
+  $tf = $p->create_textflow($text, ($textopt ? $textopt : $basemidfontoptions) . " leading=120%");
+  $h_tf = main->renderTextflow($p, $tf, $xpos + $checkboxsize + 4.6, $textwidth, $HeaderInfo);
+
+  $p->setlinewidth(0.5);
+  $p->set_graphics_option("linejoin=1");
+  $p->rect($xpos, $ypos + $checkboxsize + 1.5 + $yposoffset, $checkboxsize, $checkboxsize);
+  $p->stroke();
+  $p->fit_textline($checked ? '&#x2713;' : '', $xpos + 0.7 + ($checkboxsize ? ($checkboxsize - 9) / 2 : 0),
+    $ypos + $checkboxsize + 0.5 - ($checkboxsize ? ($checkboxsize - 9) / 2 : 0) + $yposoffset, $basecheckfontoptions);
+
+  $ypos += $h_tf;
+}
+
+############################################################################
+sub setReferrals
+{
+  my ($self,$r) = @_;
+  my ($xml,$cnt) = ('',0);
+  my $data = {};
+  if ( $r->{'ReferredBy1NPI'} )
+  {
+    my $rxNPI = DBA->selxref($form,'xNPI','NPI',$r->{'ReferredBy1NPI'});
+    $data->{'primaryReferral_name'} = $rxNPI->{'ProvOrgName'};
+    $data->{'primaryReferral_date'} = DBUtil->Date($r->{'RefDate'},'fmt','MM/DD/YYYY');
+    if ( $r->{ReferredCont1} )
+    { $data->{'primaryReferral_contact'} = $r->{'ReferredCont1'}; }
+    else
+    { $data->{'primaryReferral_contact'} = "$rxNPI->{'ProvPrefix'} $rxNPI->{'ProvFirstName'} $rxNPI->{'ProvLastName'}"; }
+    $data->{'primaryReferral_phn'} = $rxNPI->{'WkPh'};
+  }
+  if ( $r->{'ReferredBy2NPI'} )
+  {
+    my $rxNPI = DBA->selxref($form,'xNPI','NPI',$r->{'ReferredBy2NPI'});
+    $data->{'secondaryReferral_name'} = $rxNPI->{'ProvOrgName'};
+    $data->{'secondaryReferral_date'} = DBUtil->Date($r->{'RefDate2'},'fmt','MM/DD/YYYY');
+    if ( $r->{ReferredCont2} )
+    { $data->{'secondaryReferral_contact'} = $r->{'ReferredCont2'}; }
+    else
+    { $data->{'secondaryReferral_contact'} = "$rxNPI->{'ProvPrefix'} $rxNPI->{'ProvFirstName'} $rxNPI->{'ProvLastName'}"; }
+    $data->{'secondaryReferral_phn'} = $rxNPI->{'WkPh'};
+  }
+  return $data;
+}
+sub setNPIs
+{
+  my ($self,$NPIs,$tag,$defaulttext,$mytype) = @_;
+  my ($xml,$cnt) = ('',0);
+  my @data = ();
+#warn qq|setNPIs: NPIs=$NPIs\n|;
+  foreach my $NPI ( split(chr(253),$NPIs) )
+  {
+#warn qq|setNPIs: NPI=$NPI\n|;
+    my $rxNPI = DBA->selxref($form,'xNPI','NPI',$NPI);
+    my $name = $rxNPI->{'EntityTypeCode'} == 1
+             ? "$rxNPI->{'ProvLastName'}, $rxNPI->{'ProvFirstName'}"
+             : $rxNPI->{'ProvOrgName'};
+    my $zip = length($rxNPI->{Zip}) == 9 ? substr($rxNPI->{Zip},0,5).'-'.substr($rxNPI->{Zip},5,4) : $rxNPI->{Zip};
+    my $address = $rxNPI->{'Addr1'};
+    $address .= ', ' . $rxNPI->{'Addr2'} if ( $rxNPI->{'Addr2'} ne '' );
+    $address .= ', ' . $rxNPI->{'City'} if ( $rxNPI->{'City'} ne '' );
+    $address .= ', ' . $rxNPI->{'ST'} if ( $rxNPI->{'ST'} ne '' );
+    $address .= ', ' . $zip if ( $zip ne '' );
+    my $type = $mytype eq '' ? $rxNPI->{'Type'} : $mytype;
+    push(@data, {
+      "${tag}_name" => ${name},
+      "${tag}_address" => ${address},
+      "${tag}_phone" => $rxNPI->{'WkPh'},
+      "${tag}_type" => ${type}
+    });
+    $cnt++;
+  }
+  @data = ({
+    "${tag}_name" => ${defaulttext},
+    "${tag}_type" => ${mytype}
+  }) unless ( $cnt );
+  return(@data);
+}
+sub setClient
+{
+  my ($self,$rClient,$rClientIntake,$rClientVitalSigns,$rClientRelations) = @_;
+  my $MI = substr($rClient->{MName},0,1);
+  my $address = $rClient->{'Addr1'};
+  $clientFooterUser = $rClient->{'FName'}.' '.$rClient->{'LName'};
+  $address .= ', ' . $rClient->{'Addr2'} if ( $rClient->{'Addr2'} ne '' );
+  my $data = {};
+  $data->{'client_firstName'} = $rClient->{'FName'};
+  $data->{'client_lastName'} = $rClient->{'LName'};
+  $data->{'client_mi'} = ${MI};
+  $data->{'client_maiden'} = $rClient->{'MaidenName'};
+  $data->{'client_suffix'} = $rClient->{'Suffix'};
+  $data->{'client_address'} = ${address};
+  $data->{'client_city'} = $rClient->{'City'};
+  $data->{'client_county'} = $rClient->{'County'};
+  $data->{'client_state'} = $rClient->{'ST'};
+  $data->{'client_zip'} = $rClient->{'Zip'};
+  $data->{'client_homephn'} = $rClient->{'HmPh'};
+  $data->{'client_workphn'} = $rClient->{'WkPh'};
+  $data->{'client_cellphn'} = $rClient->{'MobPh'};
+  $data->{'client_carrier'} = DBA->getxref($form,'xCarrier',$rClient->{'Carrier'},'Descr');
+  $data->{'client_email'} = $rClient->{'Email'};
+  $data->{'client_ssn'} = $rClient->{'SSN'};
+  $data->{'client_dob'} = $rClient->{'DOB'};
+  $data->{'client_pob'} = $rClientIntake->{'POB'};
+  $data->{'client_order'} = $rClientIntake->{'BirthOrder'};
+  $data->{'client_maritalStatus'} = DBA->getxref($form,'xMarStat',$rClientRelations->{'MarStat'},'Descr');
+  $data->{'client_height_ft'} = $rClientVitalSigns->{'HeightFeet'};
+  $data->{'client_height_in'} = $rClientVitalSigns->{'HeightInches'};
+  $data->{'client_weight'} = $rClientVitalSigns->{'Weight'};
+  $data->{'client_eyes'} = DBA->getxref($form,'xEyes',$rClient->{'Eyes'},'Descr');
+  $data->{'client_hair'} = DBA->getxref($form,'xHair',$rClient->{'Hair'},'Descr');
+  $data->{'clientGender_male'} = DBA->getxref($form,'xGend',$rClient->{'Gend'},'Descr');
+  $data->{'clientGender_female'} = DBA->getxref($form,'xGend',$rClient->{'Gend'},'Descr');
+  $data->{'clientGender_unknown'} = DBA->getxref($form,'xGend',$rClient->{'Gend'},'Descr');
+  return $data;
+}
+
+# Parent/Guardian
+# ---------------
+sub setEmerContact
+{
+  my ($self,$ClientID) = @_;
+  my ($xml,$cnt) = ('',0);
+  my $qClientFamily = qq|select * from ClientFamily where ClientID=? and (Guardian=1 or EmerContact=1) order by Age|;
+  my $sClientFamily = $dbh->prepare($qClientFamily);
+  $sClientFamily->execute($ClientID);
+  my $fi = 0;
+  my @data = ();
+  while ( my $rClientFamily = $sClientFamily->fetchrow_hashref )
+  {
+    $fi++;
+    my $MI = substr($rClientFamily->{'MName'},0,1);
+    my $address = $rClientFamily->{'Addr1'};
+    $address .= ', ' . $rClientFamily->{'Addr2'} if ( $rClientFamily->{'Addr2'} ne '' );
+    push(@data, {
+      "guardian${fi}_lastName" => $rClientFamily->{'LName'},
+      "guardian${fi}_firstName" => $rClientFamily->{'FName'},
+      "guardian${fi}_mi" => ${MI},
+      "guardian${fi}_address" => ${address},
+      "guardian${fi}_city" => $rClientFamily->{'City'},
+      "guardian${fi}_county" => $rClientFamily->{'County'},
+      "guardian${fi}_state" => $rClientFamily->{'ST'},
+      "guardian${fi}_zip" => $rClientFamily->{'Zip'},
+      "guardian${fi}_homePhn" => $rClientFamily->{HmPh},
+      "guardian${fi}_workPhn" => $rClientFamily->{WkPh},
+      "guardian${fi}_cellPhn" => $rClientFamily->{Cell},
+      "guardian${fi}_carrier" => DBA->getxref($form,'xCarrier',$rClientFamily->{Carrier},'Descr'),
+      "guardian${fi}_relationship" => DBA->getxref($form,'xRelationship',$rClientFamily->{Rel},'Descr'),
+      "guardian${fi}_email" => $rClientFamily->{Email},
+      "guardian${fi}_legal" => $rClientFamily->{Guardian},
+      "guardian${fi}_contact" => $rClientFamily->{EmerContact},
+      "guardian${fi}_specialinstructions" => DBA->subCHAR($rClientFamily->{Comments})
+    });
+  }
+  $sClientFamily->finish();
+  @data = ({
+    'guardian1_lastname' => 'None'
+  }) unless ( $fi );
+  return(@data);
+}
+
+sub setInsurance
+{
+  my ($self,$ClientID) = @_;
+  my ($xml,$cnt) = ('',0);
+  my $data = {};
+  my @tags = ('','primary','secondary','tertiary');
+  my $sGuarantor = $dbh->prepare("select * from Guarantor where InsuranceID=?");
+  for (my $i=1; $i<=3; $i++)
+  {
+    $sInsurance->execute($ClientID,$i);
+    if ( my $rInsurance = $sInsurance->fetchrow_hashref )
+    {
+      $sGuarantor->execute($rInsurance->{'InsNumID'});
+      my $rGuarantor = $sGuarantor->fetchrow_hashref;
+      (my $pholder = qq|$rGuarantor->{'FName'} $rGuarantor->{'MName'} $rGuarantor->{'LName'}|) =~ s/^\s*(.*?)\s*$/$1/g;
+      $data->{"@tags[$i]Insurance_name"} = DBA->getxref($form,'xInsurance',$rInsurance->{'InsID'},'Name');
+      $data->{"@tags[$i]Insurance_copay"} = sprintf("%.2f",$rInsurance->{'Copay'});
+      $data->{"@tags[$i]Insurance_deductible"} = sprintf("%.2f",$rInsurance->{'Deductible'});
+      $data->{"@tags[$i]Insurance_pholder"} = ${pholder};
+      $data->{"@tags[$i]Insurance_pnumber"} = $rInsurance->{'InsIDNum'};
+      $data->{"@tags[$i]Insurance_paphn"} = $rGuarantor->{'HmPh'};
+    }
+  }
+  $sGuarantor->finish();
+  return $data;
+}
+sub setClientAllergies
+{
+  my ($self,$ClientID) = @_;
+  my ($xml,$cnt) = ('',0);
+  my $sClientAllergies = $dbh->prepare("select * from ClientAllergies where ClientID=? order by StartDate, EndDate");
+  $sClientAllergies->execute($ClientID);
+  my @data = ();
+  while (my $rClientAllergies = $sClientAllergies->fetchrow_hashref )
+  {
+    my $allergy = DBA->getxref($form,'xAllergies',$rClientAllergies->{'AID'},'Descr');
+    my $severity = DBA->getxref($form,'xSeverity',$rClientAllergies->{'Severity'},'Descr');
+    my $reaction = DBA->getxref($form,'xAdverseReaction',$rClientAllergies->{'RID'},'ConceptName');
+    push(@data, {
+      "allergen" => $allergy,
+      "severity" => $severity,
+      "start_date" => DBUtil->Date($rClientAllergies->{StartDate},'fmt','MM/DD/YYYY'),
+      "stop_date" => DBUtil->Date($rClientAllergies->{EndDate},'fmt','MM/DD/YYYY'),
+      "reaction" => $reaction,
+      "comments_notes" => $rClientAllergies->{comments}
+    });
+    $cnt++;
+  }
+  $sClientAllergies->finish();
+  push(@data, {
+    "allergen" => "None"
+  }) unless ( $cnt );
+  return @data;
+}
+sub setMeds
+{
+  my ($self,$ClientID) = @_;
+  my ($xml,$cnt) = ('',0);
+  my $rMeds = DBA->getMeds($form,$ClientID);
+  my @data = ();
+  foreach my $f ( sort keys %{ $rMeds } )
+  {
+#warn qq|rMeds: ${f} = $rMeds->{$f}\n|;
+    my ($date,$time) = split(' ',$rMeds->{$f}->{'DrugDate'});
+    push(@data, {
+      "physician" => $rMeds->{$f}->{'PhysicianName'},
+      "medication" => $rMeds->{$f}->{'DrugInfo'},
+      "type" => $rMeds->{$f}->{'DrugType'},
+      "date" => DBUtil->Date($date,'fmt','MM/DD/YYYY'),
+      "reason" => $rMeds->{$f}->{'Reason'}
+    });
+    $cnt++;
+  }
+  push(@data, {
+    "physician" => "None"
+  }) unless ( $cnt );
+  return @data;
+}
+sub setHospitalTreatments
+{
+  my ($self,$ClientID,$type,$tag) = @_;
+  my ($xml,$lines,$cnt,$cntDO,$cntIP,$cntOP) = ('','',0,0,0,0);
+  my %data = ();
+  my $sMH = $dbh->prepare("select * from Hospital where ClientID=? and Type like '${type}%' order by IntDate desc");
+  $sMH->execute($ClientID);
+  while ( my $rMH = $sMH->fetchrow_hashref )
+  {
+    $cntDO++ if ( $rMH->{'Type'} =~ /DO$/ );
+    $cnt++;
+#warn qq|setHospital ${cnt}: Type=$rMH->{'Type'}, cntDO=${cntDO}\n|;
+    if ( $cnt <= 3 )
+    {
+      my $npi = $rMH->{HospIDNPI} ? $rMH->{HospIDNPI} : $rMH->{FacIDNPI};
+      $cntIP++ if ( $rMH->{HospIDNPI} );
+      $cntOP++ if ( $rMH->{FacIDNPI} );
+      my $rxNPI = DBA->selxref($form,'xNPI','NPI',$npi);
+      push(@{$data{$tag}}, {
+        "${tag}_where" => $rxNPI->{'ProvOrgName'},
+        "${tag}_type" => DBA->getxref($form,'xHospType',$rMH->{'Type'},'Text'),
+        "${tag}_when" => DBUtil->Date($rMH->{IntDate},'fmt','MM/DD/YYYY'),
+        "${tag}_duration" => $rMH->{'Length'},
+        "${tag}_reason" => $rMH->{Reason}
+      });
+    }
+  }
+  $sMH->finish();
+  my $rcvd = $cnt ? 'Yes' : 'No';
+  $data{"${tag}_rcvd"} = ${rcvd};
+  $data{"${tag}_total"} = ${cnt};
+  $data{"${tag}_detox"} = ${cntDO};
+  if ( $type eq 'MH' )
+  {
+    $data{"psychoTreatment_inPatient"} = ${cntIP};
+    $data{"psychoTreatment_outPatient"} = ${cntOP};
+  }
+
+  push(@{$data{$tag}}, {
+    "${tag}_where" => "None",
+  }) unless ( $cnt );
+
+  return %data;
+}
+sub setSA
+{
+  my ($self,$ClientID) = @_;
+  my ($xml,$cnt,$cntIP,$cntOP) = ('',0,0,0);
+  my $sSA = $dbh->prepare("select * from SAbuse where ClientID=? order by Age");
+  $sSA->execute($ClientID);
+  my @data = ();
+  while ( my $rSA = $sSA->fetchrow_hashref )
+  {
+    my $active = $rSA->{'Active'} ? 'Yes' : 'No';
+    my $name = DBA->getxref($form,'xDrugs',$rSA->{'Drug'},'Descr');
+    my $obj = {
+      "da_drug" => ${name},
+      "da_methodofuse" => DBA->getxref($form,'xMethods',$rSA->{'Method'},'Descr'),
+      "da_amount" => $rSA->{'Amount'},
+      "da_frequency" => DBA->getxref($form,'xFreqs',$rSA->{'Freq'},'Descr'),
+      "da_datefused" => DBUtil->Date($rSA->{'FromDate'},'fmt','MM/DD/YYYY'),
+      "da_datelused" => DBUtil->Date($rSA->{'ToDate'},'fmt','MM/DD/YYYY'),
+      "da_agefuse" => $rSA->{Age},
+      "da_ageruse" => $rSA->{AgeReg},
+      "da_drugofchoice" => DBA->getxref($form,'xPriority',$rSA->{'Priority'},'Descr'),
+      "afua_firstUsed" => $rSA->{'Age'},
+    };
+# add in Age first used Alcohol???
+    $obj->{"afua_firstUsed"} = $rSA->{'Age'} if ( $name =~ /alcohol/i );
+    push(@data, $obj);
+    $cnt++;
+  }
+  $sSA->finish();
+  push(@data, {
+    "da_drug" => "None"
+  }) unless ( $cnt );
+  return @data;
+}
+sub setGambling
+{
+  my ($self,$ClientID) = @_;
+  my ($xml,$cnt) = ('',0);
+  my $sClientGambling = $dbh->prepare("select * from Gambling where ClientID=?");
+  $sClientGambling->execute($ClientID) || myDBI->dberror("select ClientGambling ${ClientID}");
+  my $data = {};
+  if ( my $rClientGambling = $sClientGambling->fetchrow_hashref )      # only first one.
+  {
+    my $bbgs = $rClientGambling->{'History'} ? 'Positive'
+             : $rClientGambling->{'Anxious'} ? 'Positive'
+             : $rClientGambling->{'KeepFrom'} ? 'Positive'
+             : $rClientGambling->{'FinHelp'} ? 'Positive' : 'Negative';
+    my $finstat = $rClientGambling->{'FinanceStatus'} eq 'G' ? 'Good'
+                : $rClientGambling->{'FinanceStatus'} eq 'F' ? 'Fair'
+                : $rClientGambling->{'FinanceStatus'} eq 'P' ? 'Poor'
+                : '';
+    $data->{"gamblingHistory"} = main->setYN('  ','gamblingHistory',$rClientGambling->{'History'});
+    $data->{"bbgs_yn1"} = main->setYN('  ','bbgs_yn1',$rClientGambling->{'Anxious'});
+    $data->{"bbgs_yn2"} = main->setYN('  ','bbgs_yn2',$rClientGambling->{'KeepFrom'});
+    $data->{"bbgs_yn3"} = main->setYN('  ','bbgs_yn3',$rClientGambling->{'FinHelp'});
+    $data->{"bbgs_pn"} = ${bbgs};
+    $data->{"bbgs_yn4"} = main->setYN('  ','bbgs_yn4',$rClientGambling->{'Debts'});
+    $data->{"bbgs_yn4Desc"} = $rClientGambling->{'DebtsText'};
+    $data->{"bbgs_yn5"} = ${finstat};
+    $data->{"bbgs_yn5Desc"} = $rClientGambling->{'FinanceStatusText'};
+    $data->{"bbgs_yn6"} = main->setYN('  ','bbgs_yn6',$rClientGambling->{'LostTime'});
+    $data->{"bbgs_yn7"} = main->setYN('  ','bbgs_yn7',$rClientGambling->{'LifeUnhappy'});
+    $data->{"bbgs_yn8"} = main->setYN('  ','bbgs_yn8',$rClientGambling->{'Reputation'});
+    $data->{"bbgs_yn9"} = main->setYN('  ','bbgs_yn9',$rClientGambling->{'FeltRemorse'});
+    $data->{"bbgs_yn10"} = main->setYN('  ','bbgs_yn10',$rClientGambling->{'PayDebts'});
+    $data->{"bbgs_yn11"} = main->setYN('  ','bbgs_yn11',$rClientGambling->{'Ambition'});
+    $data->{"bbgs_yn12"} = main->setYN('  ','bbgs_yn12',$rClientGambling->{'WinBack'});
+    $data->{"bbgs_yn13"} = main->setYN('  ','bbgs_yn13',$rClientGambling->{'WinMore'});
+    $data->{"bbgs_yn14"} = main->setYN('  ','bbgs_yn14',$rClientGambling->{'RunOut'});
+    $data->{"bbgs_yn15"} = main->setYN('  ','bbgs_yn15',$rClientGambling->{'Borrowed'});
+    $data->{"bbgs_yn16"} = main->setYN('  ','bbgs_yn16',$rClientGambling->{'Sold'});
+    $data->{"bbgs_yn17"} = main->setYN('  ','bbgs_yn17',$rClientGambling->{'Reluctant'});
+    $data->{"bbgs_yn18"} = main->setYN('  ','bbgs_yn18',$rClientGambling->{'Careless'});
+    $data->{"bbgs_yn19"} = main->setYN('  ','bbgs_yn19',$rClientGambling->{'Longer'});
+    $data->{"bbgs_yn20"} = main->setYN('  ','bbgs_yn20',$rClientGambling->{'Escape'});
+    $data->{"bbgs_yn21"} = main->setYN('  ','bbgs_yn21',$rClientGambling->{'IllegalAct'});
+    $data->{"bbgs_yn22"} = main->setYN('  ','bbgs_yn22',$rClientGambling->{'DifSleeping'});
+    $data->{"bbgs_yn23"} = main->setYN('  ','bbgs_yn23',$rClientGambling->{'Arguments'});
+    $data->{"bbgs_yn24"} = main->setYN('  ','bbgs_yn24',$rClientGambling->{'Celebrate'});
+    $data->{"bbgs_yn25"} = main->setYN('  ','bbgs_yn25',$rClientGambling->{'SelfDestruct'});
+    $data->{"oba_history"} =  main->setYN('  ','oba_history',$rClientGambling->{'Addictions'});
+    $data->{"oba_apply"} = main->setTextxrefMF($form,'xBehavioralAddictions',$rClientGambling,$rClientGambling->{OtherAddictionsText},'oba_apply','  ');
+    $data->{"oba_desc"} = $rClientGambling->{AddictionsText};
+    $cnt++;
+  }
+  $sClientGambling->finish();
+  return $data;
+}
+sub setTrauma
+{
+  my ($self,$ClientID) = @_;
+  my ($xml,$cnt) = ('',0);
+  my $data = {};
+  my $sClientTrauma = $dbh->prepare("select * from ClientTrauma where ClientID=?");
+  $sClientTrauma->execute($ClientID) || myDBI->dberror("select ClientTrauma ${ClientID}");
+  if ( my $rClientTrauma = $sClientTrauma->fetchrow_hashref )      # only first one.
+  {
+    my $Accident = $rClientTrauma->{'AccidentText'} ne '' ? 1 : $rClientTrauma->{'Accident'};
+    my $NaturalDisaster = $rClientTrauma->{'NaturalDisasterText'} ne '' ? 1 : $rClientTrauma->{'NaturalDisaster'};
+    my $ManMadeDisaster = $rClientTrauma->{'ManMadeDisasterText'} ne '' ? 1 : $rClientTrauma->{'ManMadeDisaster'};
+    my $Injured = $rClientTrauma->{'InjuredText'} ne '' ? 1 : $rClientTrauma->{'Injured'};
+    my $FearKilled = $rClientTrauma->{'FearKilledText'} ne '' ? 1 : $rClientTrauma->{'FearKilled'};
+    my $SomeoneKilled = $rClientTrauma->{'SomeoneKilledText'} ne '' ? 1 : $rClientTrauma->{'SomoneKilled'};
+    my $DeadBody = $rClientTrauma->{'DeadBodyText'} ne '' ? 1 : $rClientTrauma->{'DeadBody'};
+    my $CloseMurder = $rClientTrauma->{'CloseMurderText'} ne '' ? 1 : $rClientTrauma->{'CloseMurder'};
+    my $CloseDie = $rClientTrauma->{'CloseDieText'} ne '' ? 1 : $rClientTrauma->{'CloseDie'};
+    my $SeriousIllness = $rClientTrauma->{'SeriousIllnessText'} ne '' ? 1 : $rClientTrauma->{'SeriousIllness'};
+    my $CloseThreat = $rClientTrauma->{'CloseThreatText'} ne '' ? 1 : $rClientTrauma->{'CloseThreat'};
+    my $Combat = $rClientTrauma->{'CombatText'} ne '' ? 1 : $rClientTrauma->{'Combat'};
+    my $ForcedSex = $rClientTrauma->{'ForcedSexText'} ne '' ? 1 : $rClientTrauma->{'ForcedSex'};
+    my $ForcedTouch = $rClientTrauma->{'ForcedTouchText'} ne '' ? 1 : $rClientTrauma->{'ForcedTouch'};
+    my $Other = $rClientTrauma->{'OtherDescr'} ne '' ? 1 : $rClientTrauma->{'Other'};
+
+    $data->{"violenceHistory"} = main->setYN('  ','violenceHistory',$rClientTrauma->{'Psych'});
+    $data->{"tcre_yn1"} = main->setYN('  ','tcre_yn1',$rClientTrauma->{'ThreatOfForce'});
+    $data->{"tcre_cnt1"} = $rClientTrauma->{'ThreatOfForceTimes'};
+    $data->{"tcre_age1"} = $rClientTrauma->{'ThreatOfForceAge'};
+    $data->{"tcre_yn2"} = main->setYN('  ','tcre_yn2',$rClientTrauma->{'Robbed'});
+    $data->{"tcre_cnt2"} = $rClientTrauma->{'RobbedTimes'};
+    $data->{"tcre_age2"} = $rClientTrauma->{'RobbedAge'};
+    $data->{"tcre_yn3"} = main->setYN('  ','tcre_yn3',$rClientTrauma->{'BreakInHomeNT'});
+    $data->{"tcre_cnt3"} = $rClientTrauma->{'BreakInHomeNTTimes'};
+    $data->{"tcre_age3"} = $rClientTrauma->{'BreakInHomeNTAge'};
+    $data->{"tcre_yn4"} = main->setYN('  ','tcre_yn4',$rClientTrauma->{'BreakInHome'});
+    $data->{"tcre_cnt4"} = $rClientTrauma->{'BreakInHomeTimes'};
+    $data->{"tcre_age4"} = $rClientTrauma->{'BreakInHomeAge'};
+    $data->{"tdet_yn1"} = main->setYN('  ','tdet_yn1',$Accident);
+    $data->{"tdet_cnt1"} = $rClientTrauma->{'AccidentTimes'};
+    $data->{"tdet_age1"} = $rClientTrauma->{'AccidentAge'};
+    $data->{"tdet_yn1Desc"} = $rClientTrauma->{'AccidentText'};
+    $data->{"tdet_yn2"} = main->setYN('  ','tdet_yn2',$NaturalDisaster);
+    $data->{"tdet_cnt2"} = $rClientTrauma->{'NaturalDisasterTimes'};
+    $data->{"tdet_age2"} = $rClientTrauma->{'NaturalDisasterAge'};
+    $data->{"tdet_yn2Desc"} = $rClientTrauma->{'NaturalDisasterText'};
+    $data->{"tdet_yn3"} = main->setYN('  ','tdet_yn3',$ManMadeDisaster);
+    $data->{"tdet_cnt3"} = $rClientTrauma->{'ManMadeDisasterTimes'};
+    $data->{"tdet_age3"} = $rClientTrauma->{'ManMadeDisasterAge'};
+    $data->{"tdet_yn3Desc"} = $rClientTrauma->{'ManMadeDisasterText'};
+    $data->{"tdet_yn4"} = main->setYN('  ','tdet_yn4',$rClientTrauma->{'DangerChemicals'});
+    $data->{"tdet_cnt4"} = $rClientTrauma->{'DangerChemicalsTimes'};
+    $data->{"tdet_age4"} = $rClientTrauma->{'DangerChemicalsAge'};
+    $data->{"tdet_yn5"} = main->setYN('  ','tdet_yn5',$Injured);
+    $data->{"tdet_cnt5"} = $rClientTrauma->{'InjuredTimes'};
+    $data->{"tdet_age5"} = $rClientTrauma->{'InjuredAge'};
+    $data->{"tdet_yn5Desc"} = $rClientTrauma->{'InjuredText'};
+    $data->{"tdet_yn6"} = main->setYN('  ','tdet_yn6',$FearKilled) ;
+    $data->{"tdet_cnt6"} = $rClientTrauma->{'FearKilledTimes'};
+    $data->{"tdet_age6"} = $rClientTrauma->{'FearKilledAge'};
+    $data->{"tdet_yn6Desc"} = $rClientTrauma->{'FearKilledText'};
+    $data->{"tdet_yn7"} = main->setYN('  ','tdet_yn7',$SomeoneKilled);
+    $data->{"tdet_cnt7"} = $rClientTrauma->{'SomeoneKilledTimes'};
+    $data->{"tdet_age7"} = $rClientTrauma->{'SomeoneKilledAge'};
+    $data->{"tdet_yn7Desc"} = $rClientTrauma->{'SomeoneKilledText'};
+    $data->{"tdet_yn8"} = main->setYN('  ','tdet_yn8',$DeadBody);
+    $data->{"tdet_cnt8"} = $rClientTrauma->{'DeadBodyTimes'};
+    $data->{"tdet_age8"} = $rClientTrauma->{'DeadBodyAge'};
+    $data->{"tdet_yn8Desc"} = $rClientTrauma->{'DeadBodyText'};
+    $data->{"tdet_yn9"} = main->setYN('  ','tdet_yn9',$CloseMurder);
+    $data->{"tdet_cnt9"} = $rClientTrauma->{'CloseMurderTimes'};
+    $data->{"tdet_age9"} = $rClientTrauma->{'CloseMurderAge'};
+    $data->{"tdet_yn9Desc"} = $rClientTrauma->{'CloseMurderText'};
+    $data->{"tdet_yn10"} = main->setYN('  ','tdet_yn10',$CloseDie);
+    $data->{"tdet_cnt10"} = $rClientTrauma->{'CloseDieTimes'};
+    $data->{"tdet_age10"} = $rClientTrauma->{'CloseDieAge'};
+    $data->{"tdet_yn10Desc"} = $rClientTrauma->{'CloseDieText'};
+    $data->{"tdet_yn11"} = main->setYN('  ','tdet_yn11',$SeriousIllness);
+    $data->{"tdet_cnt11"} = $rClientTrauma->{'SeriousIllnessTimes'};
+    $data->{"tdet_age11"} = $rClientTrauma->{'SeriousIllnessAge'};
+    $data->{"tdet_yn11Desc"} = $rClientTrauma->{'SeriousIllnessText'};
+    $data->{"tdet_yn12"} = main->setYN('  ','tdet_yn12',$CloseThreat);
+    $data->{"tdet_cnt12"} = $rClientTrauma->{'CloseThreatTimes'};
+    $data->{"tdet_age12"} = $rClientTrauma->{'CloseThreatAge'};
+    $data->{"tdet_yn12Desc"} = $rClientTrauma->{'CloseThreatText'};
+    $data->{"tdet_yn13"} = main->setYN('  ','tdet_yn13',$Combat);
+    $data->{"tdet_cnt13"} = $rClientTrauma->{'CombatTimes'};
+    $data->{"tdet_age13"} = $rClientTrauma->{'CombatAge'};
+    $data->{"tdet_yn13Desc"} = $rClientTrauma->{'CombatText'};
+    $data->{"tpse_yn1"} = main->setYN('  ','tpse_yn1',$ForcedSex);
+    $data->{"tpse_cnt1"} = $rClientTrauma->{'ForcedSexTimes'};
+    $data->{"tpse_age1"} = $rClientTrauma->{'ForcedSexAge'};
+    $data->{"tpse_yn1Desc"} = $rClientTrauma->{'ForcedSexText'};
+    $data->{"tpse_yn2"} = main->setYN('  ','tpse_yn2',$ForcedTouch);
+    $data->{"tpse_cnt2"} = $rClientTrauma->{'ForcedTouchTimes'};
+    $data->{"tpse_age2"} = $rClientTrauma->{'ForcedTouchAge'};
+    $data->{"tpse_yn2Desc"} = $rClientTrauma->{'ForcedTouchText'};
+    $data->{"tpse_yn3"} = main->setYN('  ','tpse_yn3',$rClientTrauma->{'ForcedContact'});
+    $data->{"tpse_cnt3"} = $rClientTrauma->{'ForcedContactTimes'};
+    $data->{"tpse_age3"} = $rClientTrauma->{'ForcedContactAge'};
+    $data->{"tpse_yn4"} = main->setYN('  ','tpse_yn4',$rClientTrauma->{'CloseAttack'});
+    $data->{"tpse_cnt4"} = $rClientTrauma->{'CloseAttackTimes'};
+    $data->{"tpse_age4"} = $rClientTrauma->{'CloseAttackAge'};
+    $data->{"tpse_yn5"} = main->setYN('  ','tpse_yn5',$rClientTrauma->{'CloseInjured'});
+    $data->{"tpse_cnt5"} = $rClientTrauma->{'CloseInjuredTimes'};
+    $data->{"tpse_age5"} = $rClientTrauma->{'CloseInjuredAge'};
+    $data->{"tpse_yn6"} = main->setYN('  ','tpse_yn6',$rClientTrauma->{'HardSpank'});
+    $data->{"tpse_cnt6"} = $rClientTrauma->{'HardSpankTimes'};
+    $data->{"tpse_age6"} = $rClientTrauma->{'HardSpankAge'};
+    $data->{"tpse_yn7"} = main->setYN('  ','tpse_yn7',$Other);
+    $data->{"tpse_cnt7"} = $rClientTrauma->{'OtherTimes'};
+    $data->{"tpse_age7"} = $rClientTrauma->{'OtherAge'};
+    $data->{"tpse_yn7Desc"} = $rClientTrauma->{'OtherDescr'};
+##  $rClientTrauma = treatmentTrauma_rcvd   # set by setHospitalTreatment
+    $cnt++;
+  }
+  $sClientTrauma->finish();
+  return $data;
+}
+sub setFamilyAbuse
+{
+  my ($self,$ClientID,$action,$tag) = @_;
+  my ($xml,$cnt) = ('',0);
+  my @data = ();
+  my $with = $action eq 'Abuse'
+           ? qq|AbuseEmotion='V' or AbuseEmotion='P' or AbuseEmotion='B' or AbusePhysical='V' or AbusePhysical='P' or AbusePhysical='B' or AbuseSexual='V' or AbuseSexual='P' or AbuseSexual='B'|
+           : qq|AbuseAlcohol=1 or AbuseDrugs=1 or AbusePsych=1|;
+  my $qClientFamily = qq|select ClientFamily.*,xRelationship.Descr as Relation from ClientFamily left join okmis_config.xRelationship on xRelationship.ID=ClientFamily.Rel where ClientFamily.ClientID=? and (${with}) order by Age|;
+#warn qq|setFamilyAbuse: q=\n${qClientFamily}\n|;
+  my $sClientFamily = $dbh->prepare($qClientFamily);
+  $sClientFamily->execute($ClientID);
+  while ( my $rClientFamily = $sClientFamily->fetchrow_hashref )
+  {
+    my $obj = {};
+    $obj->{"${tag}_name"} = "$rClientFamily->{'LName'}, $rClientFamily->{'FName'} $rClientFamily->{'MName'}";
+    $obj->{"${tag}_relation"} = $rClientFamily->{'Relation'};
+    if ( $action eq 'Abuse' )
+    {
+      my $emotional .= $rClientFamily->{'AbuseEmotion'} eq 'V' ? 'victim'
+                     : $rClientFamily->{'AbuseEmotion'} eq 'P' ? 'perpetrator'
+                     : $rClientFamily->{'AbuseEmotion'} eq 'B' ? 'both'
+                     : $rClientFamily->{'AbuseEmotion'} eq 'N' ? 'none' : '';
+      $obj->{"${tag}_emotional"} = ${emotional};
+      my $physical .= $rClientFamily->{'AbusePhysical'} eq 'V' ? 'victim'
+                    : $rClientFamily->{'AbusePhysical'} eq 'P' ? 'perpetrator'
+                    : $rClientFamily->{'AbusePhysical'} eq 'B' ? 'both'
+                    : $rClientFamily->{'AbusePhysical'} eq 'N' ? 'none' : '';
+      $obj->{"${tag}_physical"} = ${physical};
+      my $sexual .= $rClientFamily->{'AbuseSexual'} eq 'V' ? 'victim'
+                  : $rClientFamily->{'AbuseSexual'} eq 'P' ? 'perpetrator'
+                  : $rClientFamily->{'AbuseSexual'} eq 'B' ? 'both'
+                  : $rClientFamily->{'AbuseSexual'} eq 'N' ? 'none' : '';
+      $obj->{"${tag}_sexual"} = ${sexual};
+      my $AbusedYou .= $rClientFamily->{'AbuseEmotion'} =~ /P|B/ ? 'Yes'
+                     : $rClientFamily->{'AbusePhysical'} =~ /P|B/ ? 'Yes'
+                     : $rClientFamily->{'AbuseSexual'} =~ /P|B/ ? 'Yes' : 'No';
+      $obj->{"personAbused_you"} = ${AbusedYou};
+      my $AbusedThem .= $rClientFamily->{'AbuseEmotion'} =~ /V|B/ ? 'Yes'
+                      : $rClientFamily->{'AbusePhysical'} =~ /V|B/ ? 'Yes'
+                      : $rClientFamily->{'AbuseSexual'} =~ /V|B/ ? 'Yes' : 'No';
+      $obj->{"personAbused_other"} = ${AbusedThem};
+    }
+    else
+    {
+      my ($type,$dlm) = ('','');
+      my $obj = {};
+      foreach my $val ( 'Alcohol','Drugs','Psych' )
+      { if ( $rClientFamily->{"Abuse${val}"} ) { $type .= qq|${dlm}${val}|; $dlm = '; '; } }
+      $obj->{"${tag}_type"} = ${type};
+    }
+    push(@data, $obj);
+    $cnt++;
+  }
+  $sClientFamily->finish();
+  push(@data, {
+    "${tag}_name" => "None"
+  }) unless ( $cnt );
+  return @data;
+}
+sub setFamilyHistory
+{
+  my ($self,$ClientID,$rClient,$rClientIntake,$rGuardianHistory,$rClientRelations) = @_;
+  my ($xml,$cnt) = ('',0);
+  my $data = {};
+  $data->{"ms_years"} = $rClientRelations->{'MarStatY'};
+  $data->{"ms_months"} = $rClientRelations->{'MarStatM'};
+  $data->{"ms_num"} = $rClientRelations->{'MarStatTimes'};
+  $data->{"fh_relHistory"} = $rClientRelations->{'RelHistory'};
+  my $sClientFamily = $dbh->prepare("select * from ClientFamily where ClientID=? and (Rel='H' or Rel='W' or Rel='SO') order by Age");
+  $sClientFamily->execute($ClientID);
+  if ( my $rClientFamily = $sClientFamily->fetchrow_hashref )
+  {
+    my $phone = $rClientFamily->{'HmPh'} ne '' ? $rClientFamily->{'HmPh'}
+              : $rClientFamily->{'WkPh'} ne '' ? $rClientFamily->{'WkPh'}
+              : $rClientFamily->{'Cell'} ne '' ? $rClientFamily->{'Cell'} : 'none';
+    my $address = $rClientFamily->{'Addr1'};
+    $address .= ', ' . $rClientFamily->{'Addr2'} if ( $rClientFamily->{'Addr2'} ne '' );
+    $data->{"fh_othersName"} = "$rClientFamily->{FName} $rClientFamily->{MName} $rClientFamily->{LName}";
+    $data->{"fh_othersPhn"} = ${phone};
+    $data->{"fh_othersAddr"} = ${address};
+    $data->{"fh_othersCity"} = $rClientFamily->{'City'};
+    $data->{"fh_othersSt"} = $rClientFamily->{'ST'};
+    $data->{"fh_othersZip"} = $rClientFamily->{'Zip'};
+    $cnt++;
+  }
+  $data->{"fh_othersName"} = "None" unless ( $cnt );
+
+  my $livedwith = $rGuardianHistory->{'FName'};
+  $livedwith .= ' '.$rGuardianHistory->{'MName'} if ( $rGuardianHistory->{'MName'} ne '' );
+  $livedwith .= ' '.$rGuardianHistory->{'LName'} if ( $rGuardianHistory->{'LName'} ne '' );
+  my $livedwithflag = $livedwith eq '' ? 'No' : 'Yes';
+  my $disciplineFair = $rClientRelations->{'DisciplineDesc'} eq '' ? 'Yes' : 'No';
+
+  $data->{"fr_structure"} = DBA->getxref($form,'xLivesWith',$rClientRelations->{'LivesWith'},'Descr').' '.$rClientRelations->{'LivesWithDesc'};
+  $data->{"fr_parentsStatus"} = DBA->getxref($form,'xParentsStatus',$rClientRelations->{'ParStat'},'Descr');
+  $data->{"fr_growingUp"} = ${livedwithflag};
+  $data->{"fr_growingUpCare"} = ${livedwith};
+  $data->{"fr_careDuration"} = $rGuardianHistory->{'GrdnComments'};
+  $data->{"fr_dscpRel"} = DBA->getxref($form,'xRelationship',$rClientRelations->{'DisciplineBy'},'Descr');
+  $data->{"fr_dscFair"} = ${disciplineFair};
+  $data->{"fr_dscpReason"} = $rClientRelations->{'DisciplineDesc'};
+  $data->{"fr_punished"} = $rClientRelations->{'PunishDesc'};
+
+  $sClientFamily->finish();
+  return $data;
+}
+sub setFamily
+{
+  my ($self,$ClientID,$tag) = @_;
+  my ($xml,$cnt,$newline) = ('',0,'');
+  my @data = ();
+  my $qClientFamily = qq|select ClientFamily.*,xRelationship.Descr as Relation from ClientFamily left join okmis_config.xRelationship on xRelationship.ID=ClientFamily.Rel where ClientFamily.ClientID=? order by xRelationship.Sibling desc, Age|;
+#warn qq|setFamily: q=\n${qClientFamily}\n|;
+  my $sClientFamily = $dbh->prepare($qClientFamily);
+  $sClientFamily->execute($ClientID);
+  while ( my $rClientFamily = $sClientFamily->fetchrow_hashref )
+  {
+    my $name = $rClientFamily->{'FName'};
+    $name .=  ' '.$rClientFamily->{'MName'} if ( $rClientFamily->{'MName'} ne '' );
+    $name .=  ' '.$rClientFamily->{'LName'} if ( $rClientFamily->{'LName'} ne '' );
+    push(@data, {
+      "${tag}_name" => ${name},
+      "${tag}_relation" => $rClientFamily->{'Relation'},
+      "${tag}_age" => $rClientFamily->{Age},
+      "${tag}_inhome" => main->setYN('  ',"${tag}_inhome",$rClientFamily->{'Inhome'}),
+      "${tag}_rating" => $rClientFamily->{'RelValue'},
+      "${tag}_reason" => $rClientFamily->{'RelValueDesc'},
+    });
+    $cnt++;
+  }
+  $sClientFamily->finish();
+  push(@data, {
+    "${tag}_name" => "None"
+  }) unless ( $cnt );
+  return @data;
+}
+sub setIncome
+{
+  my ($self,$ClientID) = @_;
+  my ($xml,$cnt,$Tot30,$Total,$newline) = ('',0,0,0,'');
+  my %data = ();
+  my $sClientIncome = $dbh->prepare("select * from ClientIncome where ClientID=? and (ExpDate<'$form->{TODAY}' or ExpDate is null) order by EffDate");
+  $sClientIncome->execute($ClientID);
+  while ( my $rClientIncome = $sClientIncome->fetchrow_hashref )
+  {
+    push(@{$data{"income"}}, {
+      "income_source" => DBA->getxref($form,'xIncome',$rClientIncome->{'Src'},'Descr'),
+      "income_last" => sprintf("%.2f",$rClientIncome->{'Amt30'}),
+      "income_yearly" => sprintf("%.2f",$rClientIncome->{'Amt'})
+    });
+    $Tot30 += $rClientIncome->{'Amt30'};
+    $Total += $rClientIncome->{'Amt'};
+    $cnt++;
+  }
+  push(@{$data{"income"}}, {
+    "income_source" => "None Reported"
+  }) unless ( $cnt );
+  $data{"income_totallast"} = sprintf("%.2f",$Tot30);
+  $data{"income_totalyearly"} = sprintf("%.2f",$Total);
+  $sClientIncome->finish();
+  return %data;
+}
+sub setLegal
+{
+  my ($self,$ClientID,$rClient,$rClientLegal,$rClientEmergency) = @_;
+#foreach my $f ( sort keys %{$rClientLegal} ) { warn "ClientLegal: $f=$rClientLegal->{$f}\n"; }
+  my ($xml,$cnt) = ('',0);
+  my %data = ();
+  my $LegalPapers = $rClientEmergency->{'DNR'} == 1 ? "Do Not Resuscitate\n" : '';
+  $LegalPapers .= $rClientEmergency->{'AD'} == 1 ? "Mental Health Advanced Directive\n" : '';
+  $LegalPapers .= $rClientEmergency->{'LW'} == 1 ? "Living Will" : '';
+  $LegalPapers = 'None' if ( $LegalPapers eq '' );
+  my $JOLTS = $rClientLegal->{'JOLTS'} eq '' ? '' : qq|JOLTS: $rClientLegal->{'JOLTS'}|;
+  my $CASEID = $rClientLegal->{'CASEID'} eq '' ? '' : qq|CASEID: $rClientLegal->{'CASEID'}|;
+
+  $data{"legal_papers"} = ${LegalPapers};
+  $data{"legal_status"} = DBA->getxref($form,'xLegalStatus',$rClientLegal->{'LegalStatus'},'Descr');
+  $data{"legal_county"} = DBA->getxref($form,'xCountyOK',$rClientLegal->{'CommitmentCounty'},'Descr');
+  $data{"legal_custodyAgency"} = DBA->getxref($form,'xCustAgency',$rClientLegal->{'CustAgency'},'Descr');
+  $data{"legal_childOnly"} = ${JOLTS};
+  $data{"legal_adultOnly"} = ${CASEID};
+  $data{"legal_probation"} = main->setYN('  ','legal_probation',$rClientLegal->{'OnPP'});
+  $data{"legal_arrest"} = $rClientLegal->{'Arrested'};
+  $data{"legal_last30days"} = $rClientLegal->{'Arrest1'};
+
+  my $newline = '';
+  my $sClientLegalPP = $dbh->prepare("select * from ClientLegalPP where ClientID=? order by CreateDate");
+  $sClientLegalPP->execute($ClientID);
+  while ( my $rClientLegalPP = $sClientLegalPP->fetchrow_hashref )
+  {
+    my $address = $rClientLegalPP->{'Addr'};
+    $address .= ', ' . $rClientLegalPP->{'City'} if ( $rClientLegalPP->{'City'} ne '' );
+    $address .= ', ' . $rClientLegalPP->{'ST'} if ( $rClientLegalPP->{'ST'} ne '' );
+    $address .= ', ' . $rClientLegalPP->{'Zip'} if ( $rClientLegalPP->{'Zip'} ne '' );
+
+    push(@{$data{"legalPPO"}}, {
+      "legalPPO_name" => $rClientLegalPP->{'Name'},
+      "legalPPO_address" => ${address},
+      "legalPPO_phone" => $rClientLegalPP->{'WkPh'},
+      "legalPPO_contact" => $rClientLegalPP->{'XXX'}
+    });
+    $cnt++;
+  }
+  push(@{$data{"legalPPO"}}, {
+    "legalPPO_name" => "None Reported"
+  }) unless ( $cnt );
+  $sClientLegalPP->finish();
+
+  $newline = '';
+  $cnt = 0;
+  my $sClientLegalHx = $dbh->prepare("select * from ClientLegalHx where ClientID=? order by Date");
+  $sClientLegalHx->execute($ClientID);
+  while ( my $rClientLegalHx = $sClientLegalHx->fetchrow_hashref )
+  {
+    push(@{$data{"legalHistory"}}, {
+      "legalHistory_date" => DBUtil->Date($rClientLegalHx->{'Date'},'fmt','MM/DD/YYYY'),
+      "legalHistory_location" => "$rClientLegalHx->{'City'}, $rClientLegalHx->{'ST'}",
+      "legalHistory_type" => DBA->getxref($form,'xLegalType',$rClientLegalHx->{'Type'},'Descr'),
+      "legalHistory_charge" => DBA->getxref($form,'xLegalCharge',$rClientLegalHx->{'Charge'},'Descr'),
+      "legalHistory_outcome" => DBA->getxref($form,'xLegalOutCome',$rClientLegalHx->{'OutCome'},'Descr'),
+    });
+    $cnt++;
+  }
+  push(@{$data{"legalHistory"}}, {
+    "legalHistory_date" => "None Reported"
+  }) unless ( $cnt );
+  $sClientLegalHx->finish();
+  return %data;
+}
+sub setICD10
+{
+  my ($self,$ClientID) = @_;
+  my ($xml,$cnt,$Tot30,$Total,$newline) = ('',0,0,0,'');
+  my @data = ();
+  my $sClientProblems = $dbh->prepare("select ClientProblems.*,misICD10.ICD10, misICD10.icdName, misICD10.SNOMEDID, misICD10.sctName, DATE_FORMAT(ClientProblems.InitiatedDate,'%m/%d/%Y') as InitiatedDate, DATE_FORMAT(ClientProblems.ResolvedDate,'%m/%d/%Y') as ResolvedDate, ClientProblems.Priority from ClientProblems left join okmis_config.misICD10 on misICD10.ID = ClientProblems.UUID where ClientProblems.ClientID=? order by ClientProblems.Priority");
+  $sClientProblems->execute($ClientID);
+  while ( my $rClientProblems = $sClientProblems->fetchrow_hashref )
+  {
+    push(@data, {
+      "ICD10" => $rClientProblems->{'ICD10'},
+      "icdName" => $rClientProblems->{'icdName'},
+      "sctName" => $rClientProblems->{'sctName'},
+      "initiatedDate" => $rClientProblems->{'InitiatedDate'},
+      "resolvedDate" => $rClientProblems->{'ResolvedDate'},
+      "notes" => $rClientProblems->{'Comments'},
+    });
+    $cnt++;
+  }
+  push(@data, {
+    "ICD10" => "None Reported"
+  }) unless ( $cnt );
+  $sClientProblems->finish();
+  return @data;
+}
+############################################################################
+############################################################################
+sub setYN
+{
+  my ($self,$spc,$tag,$val,$yes,$no,$isnull,$notnull) = @_;
+#warn qq|setYN: tag=$tag= val=$val= yes=$yes= no=$no= isnull=$isnull= notnull=$notnull=\n|;
+  $yes = 'Yes' if ( $yes eq '');
+  $no = 'No' if ( $no eq '');
+  my $unk;
+  my $v = $val eq '1' ? $yes 
+        : $val eq '0' ? $no 
+        : $val eq '2' ? "Yes"              # for ASI values.
+        : $val eq 'A' ? "Aided" 
+        : $val eq 'R' ? "Refused to answer" 
+        : $val eq 'S' ? "Sometimes" 
+        : $val eq 'U' ? "Unknown" 
+        : $val eq '' ? $isnull 
+        : $val ne '' ? $notnull 
+        : $unk;
+  my $xml = qq|${v}|;
+#warn qq|setYN: xml=$xml=\n|;
+  return($xml);
+}
+# SPLIT xMentalStat to xTables....
+sub xText
+{
+  my ($self,$form,$category,$r,$dlm,$cat,$tag,$tab) = @_;
+#warn qq|category=$category, dlm=$dlm, cat=$cat, tag=$tag, tab=$tab\n|; 
+#foreach my $f ( sort keys %{$r} ) { warn "xText: $f=$r->{$f}\n"; }
+  my ($out,$spc,$vals) = ('','','');
+  $dlm = '; ' unless ( $dlm );
+  my $sx = $cdbh->prepare("select * from xMentalStat where Category='${category}' order by Num,Descr");
+  $sx->execute();
+  while ( my $rx = $sx->fetchrow_hashref )
+  { if ( $rx->{'Value'} eq $r->{$rx->{'Field'}} ) { $vals .= qq|${spc}$rx->{'Descr'}|; $spc = $dlm; } }
+##warn qq|Descr=$rx->{'Descr'}, Value=$rx->{'Value'}, Field=$rx->{'Field'}, Field=$r->{$rx->{'Field'}}\n|; 
+##warn qq|vals=$vals= cat=$cat=\n|; 
+  $vals .= qq| ${cat}| unless ( $cat eq '' );
+#warn qq|vals=$vals= \n|; 
+  $out = $tag eq '' ? $vals : DBA->subCHAR($vals);
+  return($out);
+}
+sub setCredentials
+{
+  my ($self,$form,$ProvID,$InsID) = @_;
+#warn qq|setCredentials: ProvID=${ProvID}, InsID=${InsID}\n|;
+  my $sCredentials = $dbh->prepare("select Credentials.*, xCredentials.Descr from Credentials left join okmis_config.xCredentials on xCredentials.ID=Credentials.CredID where Credentials.ProvID=? and Credentials.InsID=? order by Credentials.Rank, Credentials.Restriction desc");
+  $sCredentials->execute($ProvID,$InsID) || myDBI->dberror("select Credentials: ${ProvID}/${InsID}");
+  my $rCredentials = $sCredentials->fetchrow_hashref;
+#warn qq|Cred: ID=$rCredentials->{ID}, CredID=$rCredentials->{CredID}, Rest=$rCredentials->{'Restriction'}\n|;
+  my $credentials = DBA->getxref($form,'xCredentials',$rCredentials->{CredID},'Descr');
+  my $restriction = DBA->getxref($form,'xSCRestrictions',$rCredentials->{Restriction},'Descr');
+  $sCredentials->finish();
+  return("${credentials} ${restriction}");
+}
+sub setLicense
+{
+  my ($self,$form,$ProvID,$D) = @_;
+
+  my ($license,$ST) = ('','OK');
+#warn qq|setLicense: ProvID=${ProvID}, D=${D}\n|;
+  my $sProviderLicenses = $dbh->prepare("select * from ProviderLicenses where ProvID=? and ProviderLicenses.State=? and ProviderLicenses.LicEffDate<? and (?<=ProviderLicenses.LicExpDate or ProviderLicenses.LicExpDate is null)");
+  $sProviderLicenses->execute($ProvID,$ST,$D,$D) || myDBI->dberror("select ProviderLicenses: ${ProvID}");
+  my $rProviderLicenses = $sProviderLicenses->fetchrow_hashref;
+  my $license = $rProviderLicenses->{'LicType'};
+  $license .= $rProviderLicenses->{'LicNumber'} eq '' ? ' #pending' : ' '.$rProviderLicenses->{'LicNumber'};
+  $sProviderLicenses->finish();
+  return($license);
+}
+# set xml textvalue from multiple values in field; loop through field chr(253); xref to xtable
+sub setTextxrefMV
+{
+  my ($self,$form,$xtable,$multivalues,$cat,$tag,$tab,$flds) = @_;
+#warn qq|xtable=$xtable, multivalues=$multivalues, cat=$cat, tag=$tag, tab=$tab, flds=${flds}\n|; 
+  my ($xml,$text,$spc,$dlm) = ('','','','; ');;
+  foreach my $value ( split(chr(253),$multivalues) )
+  {
+    $text .= qq|${spc}| . DBA->getxref($form,$xtable,$value,$flds);
+#warn qq|value=${value}= text=${text}=\n|; 
+    $spc = $dlm;
+  }
+  $text = DBA->subCHAR($text);
+  $xml = qq|${tab}|.$text.qq|\n|;
+  return($xml);
+}
+# set xml textvalue from multiple fields in record; loop through xtabel for field=Value
+sub setTextxrefMF
+{
+  my ($self,$form,$xtable,$r,$cat,$tag,$tab) = @_;
+#warn qq|\nxtable=$xtable, cat=$cat, tag=$tag, tab=$tab\n|; 
+  my ($xml,$spc,$vals,$dlm) = ('','','','; ');
+  my $cdbh = myDBI->dbconnect('okmis_config');      # connect to the config database.
+  my $sx = $cdbh->prepare("select * from ${xtable} order by Num,Descr");
+  $sx->execute();
+  while ( my $rx = $sx->fetchrow_hashref )
+  { 
+#warn qq|theValue=$rx->{'theValue'}, theField=$rx->{'theField'}, Descr=$rx->{'Descr'}\n|; 
+#warn qq|   Field=$r->{$rx->{'theField'}}\n|; 
+    if ( $rx->{'theValue'} eq $r->{$rx->{'theField'}} )
+    { $vals .= qq|${spc}$rx->{'Descr'}|; $spc = $dlm; } 
+#warn qq|vals=$vals= spc=$spc=\n|; 
+  }
+#warn qq|vals=$vals= cat=$cat=\n|; 
+  $vals .= qq| ${cat}| unless ( $cat eq '' );
+#warn qq|vals=$vals= \n|; 
+  $vals = DBA->subCHAR($vals);
+  $xml = $tag eq '' ? $vals : qq|${tab}|.${vals}.qq|\n|;
+  return($xml);
+}

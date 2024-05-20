@@ -1,0 +1,39 @@
+select xInsurance.Descr,Provider.ProvID,Provider.Name
+      ,Contracts.BillFlag,Contracts.PIN,ProviderControl.NPI,Contracts.ContractCode,Contracts.SourceCode,Contracts.OrgID
+ from Contracts
+  left join xInsurance on xInsurance.ID=Contracts.InsID
+  left join Provider on Provider.ProvID=Contracts.ProvID
+  left join ProviderControl on ProviderControl.ProvID=Contracts.ProvID
+ where Provider.Active=1 
+#   and Contracts.BillType='EL'
+#   and Contracts.SourceCode is not null
+#   and ProviderControl.NPI is not null and Contracts.PIN is not null
+#   and xInsurance.Descr='bcbsok'
+#   and xInsurance.ID='348'
+ order by xInsurance.Descr,ProviderControl.NPI;
+#select xInsurance.Descr,Provider.ProvID
+#      ,Contracts.UseReferring,Contracts.UseRendering,Contracts.UseSFacility 
+#      ,Contracts.ContractType,Contracts.ServMeasure
+# from Contracts
+#  left join xInsurance on xInsurance.ID=Contracts.InsID
+#  left join Provider on Provider.ProvID=Contracts.ProvID
+#  left join ProviderControl on ProviderControl.ProvID=Contracts.ProvID
+# where Provider.Active=1 
+##   and Contracts.BillType='EL'
+##   and Contracts.SourceCode is not null
+##   and ProviderControl.NPI is not null and Contracts.PIN is not null
+#   and xInsurance.Descr='bcbsok'
+# order by xInsurance.Descr;
+#select xInsurance.Descr,Provider.ProvID
+#      ,xInsurance.SenderID,xInsurance.SenderCode,xInsurance.ReceiverID 
+#      ,xInsurance.ReceiverCode,xInsurance.SubID,xInsurance.RecID,xInsurance.PayID
+# from Contracts
+#  left join xInsurance on xInsurance.ID=Contracts.InsID
+#  left join Provider on Provider.ProvID=Contracts.ProvID
+#  left join ProviderControl on ProviderControl.ProvID=Contracts.ProvID
+# where Provider.Active=1 
+#   and Contracts.BillType='EL'
+##   and Contracts.SourceCode is not null
+##   and ProviderControl.NPI is not null and Contracts.PIN is not null
+#   and xInsurance.Descr='bcbsok'
+# order by xInsurance.Descr;

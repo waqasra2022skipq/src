@@ -1,0 +1,10 @@
+  <TR >
+    <TD CLASS="strcol" >
+      Have you ever had vaginal intercourse?
+    </TD>
+    <TD CLASS="strcol" >
+      <INPUT TYPE="radio" NAME="ClientHealth_Intercourse_1" VALUE=1 <<ClientHealth_Intercourse_1=1>> > Yes
+      <INPUT TYPE="radio" NAME="ClientHealth_Intercourse_1" VALUE=0 <<ClientHealth_Intercourse_1=0>> > No
+      <INPUT TYPE="radio" NAME="ClientHealth_Intercourse_1" VALUE=R <<ClientHealth_Intercourse_1=R>> > Refused to answer
+    </TD>
+  </TR>

@@ -1,0 +1,28 @@
+#!/bin/bash
+#--------------------
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   echo -e "\nServices not installed!"
+   exit 1
+fi
+LogFile=${LOGDIR}/${CMD}
+#--------------------
+TmpFile=/tmp/$$
+DB=$1
+TrID=$2
+#-------------------------
+Usage()
+{
+   echo $1
+   echo
+   echo "Usage: ${CMD} database statement"
+   echo
+   exit
+}
+#-------------------------
+if [ -z "${TrID}" ]; then Usage "No TrID!"; fi
+if [ ! -d ${DBDIR}/${DB} ]; then Usage "Invalid database!"; fi
+  echo "select Treatment.ClientID as CID, Treatment.TrID, Treatment.SCID, NoteTrans.SCNum, Treatment.ContLogDate, Treatment.BilledAmt, Treatment.AmtDue, NoteTrans.RecDate, NoteTrans.PaidAmt, NoteTrans.Code from Treatment left join NoteTrans on NoteTrans.TrID=Treatment.TrID where Treatment.TrID=$TrID order by Treatment.ContLogDate, NoteTrans.RecDate;" > ${TmpFile}.in
+  ${DBCMD} ${DB} < ${TmpFile}.in
+  rm ${TmpFile}.in

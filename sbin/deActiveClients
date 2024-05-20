@@ -1,0 +1,35 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use MgrTree;
+############################################################################
+# was used to deactivate MidDel Client and insert a Unplanned Discharge
+############################################################################
+$form = DBForm->new();
+my $dbh = $form->dbconnect();
+my $sClients = $dbh->prepare("select * from Client where clinicClinicID=? and Active=1 and CreateDate<'2008-01-01'");
+my $sTreatment = $dbh->prepare("select count(*) from Treatment where ClientID=? and ContLogDate>='2008-01-01'");
+foreach my $ClinicID ( split(' ',$form->{Clinics}) )
+{
+  print qq|# Clinic=$ClinicID\n|;
+  $sClients->execute($ClinicID) || $form->dberror("select Clients");
+  while ( my $rClient = $sClients->fetchrow_hashref )
+  {
+    my $ClientID=$rClient->{ClientID};
+    $sTreatment->execute($ClientID) || $form->dberror("select Treatment");
+    my ($cnt) = $sTreatment->fetchrow_array;
+    if ( $cnt == 0 )
+    {
+      print qq|# None: $cnt: $rClient->{ClientID}=$rClient->{LName}, $rClient->{FName} ($rClient->{clinicClinicID},$rClient->{Active},$rClient->{CreateDate})\n|;
+      print qq|update Client set Active=0 where ClientID=$rClient->{ClientID};\n|;
+      print qq|INSERT INTO Discharge (ID,ClientID,Type,UnPlan,Date,NoMed,CreateProvID,CreateDate,ChangeProvID,DevelopBy,Assessment) VALUES (NULL,$ClientID,'U','NR','2008-05-28','1',91,'2008-05-28',91,'Jeremy Wente, Manager','No services since begining of 2008');\n|;
+    }
+    else
+    {
+      print qq|# Found: $cnt: $rClient->{ClientID}=$rClient->{LName}, $rClient->{FName} ($rClient->{clinicClinicID},$rClient->{Active},$rClient->{CreateDate})\n|;
+    }
+  }
+}
+exit;
+############################################################################

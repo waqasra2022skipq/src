@@ -1,0 +1,2573 @@
+<?xml version="1.0" encoding="utf-8"?>
+<file>
+<language>Lietuvių</language>
+<author>eWeb</author>
+<lastUpdate>09 08 2016</lastUpdate>
+<charset>utf-8</charset>
+
+<string>
+	<original>1st</original>
+	<translate>Pirmas</translate>
+</string>
+<string>
+	<original>2nd</original>
+	<translate>Antras</translate>
+</string>
+<string>
+	<original>3rd</original>
+	<translate>Trečias</translate>
+</string>
+<string>
+	<original>4th</original>
+	<translate>Ketvirtas</translate>
+</string>
+<string>
+	<original>5th</original>
+	<translate>Penktas</translate>
+</string>
+<string>
+	<original>Access Denied</original>
+	<translate>Prieiga draudžiama</translate>
+</string>
+<string>
+	<original>Access Level</original>
+	<translate>Prieigos lygis</translate>
+</string>
+<string>
+	<original>Account</original>
+	<translate>Paskyra</translate>
+</string>
+<string>
+	<original>Actions</original>
+	<translate>Veiksmai</translate>
+</string>
+<string>
+	<original>Activate</original>
+	<translate>Įjungti</translate>
+</string>
+<string>
+	<original>Activated</original>
+	<translate>Įjungta</translate>
+</string>
+<string>
+	<original>Active</original>
+	<translate>Aktyvu</translate>
+</string>
+<string>
+	<original>Add</original>
+	<translate>Pridėti</translate>
+</string>
+<string>
+	<original>Add Another Appointment</original>
+	<translate>Pridėti naują registraciją</translate>
+</string>
+<string>
+	<original>Add To Customer</original>
+	<translate>Priskirti Klientui</translate>
+</string>
+<string>
+	<original>Add a star sign (*) before the default value</original>
+	<translate>Pridėti žvaigždutės simbolį (*) prieš numatytąsias reikšmes</translate>
+</string>
+<string>
+	<original>Add online payment options to enable this</original>
+	<translate>Pridėkite apmokėjimo internetu būdą prieš aktyvuodami tai</translate>
+</string>
+<string>
+	<original>Add-ons</original>
+	<translate>Moduliai</translate>
+</string>
+<string>
+	<original>Additional Information</original>
+	<translate>Papildoma informacija</translate>
+</string>
+<string>
+	<original>Admin Area</original>
+	<translate>Administratoriaus aplinka</translate>
+</string>
+<string>
+	<original>Administrative User</original>
+	<translate>Vartotojas Administratorius</translate>
+</string>
+<string>
+	<original>Administrative Users</original>
+	<translate>Administratoriai</translate>
+</string>
+<string>
+	<original>Administrator</original>
+	<translate>Administratorius</translate>
+</string>
+<string>
+	<original>All</original>
+	<translate>Visi</translate>
+</string>
+<string>
+	<original>All Appointments</original>
+	<translate>Visos registracijos</translate>
+</string>
+<string>
+	<original>All Day</original>
+	<translate>Visos dienos</translate>
+</string>
+<string>
+	<original>Allow Overlapping Appointments For One Customer</original>
+	<translate>Leisti persikeičiančias registracijas tam pačiam klientui</translate>
+</string>
+<string>
+	<original>Allowed</original>
+	<translate>Leista</translate>
+</string>
+<string>
+	<original>Allowed Types</original>
+	<translate>Leistini tipai</translate>
+</string>
+<string>
+	<original>Already Approved</original>
+	<translate>Jau patvirtintos</translate>
+</string>
+<string>
+	<original>Already Completed</original>
+	<translate>Užbaigtos</translate>
+</string>
+<string>
+	<original>Already Confirmed</original>
+	<translate>Patvirtintos</translate>
+</string>
+<string>
+	<original>Already Paid</original>
+	<translate>Apmokėtos</translate>
+</string>
+<string>
+	<original>Already Registered</original>
+	<translate>Užregistruotos</translate>
+</string>
+<string>
+	<original>Already in use</original>
+	<translate>Naudojamos</translate>
+</string>
+<string>
+	<original>Always</original>
+	<translate>Visada</translate>
+</string>
+<string>
+	<original>Amount</original>
+	<translate>Suma</translate>
+</string>
+<string>
+	<original>Any</original>
+	<translate>Bet kuris</translate>
+</string>
+<string>
+	<original>Any From List</original>
+	<translate>Bet kuris iš sąrašo</translate>
+</string>
+<string>
+	<original>Anything</original>
+	<translate>Bet kas</translate>
+</string>
+<string>
+	<original>Anytime</original>
+	<translate>Bet kuriuo laiku</translate>
+</string>
+<string>
+	<original>Apply</original>
+	<translate>Teikti</translate>
+</string>
+<string>
+	<original>Apply Min Advance Booking From</original>
+	<translate>Pritaikyti minimalų išankstinį registracijos mokestį</translate>
+</string>
+<string>
+	<original>Appointment</original>
+	<translate>Registracija</translate>
+</string>
+<string>
+	<original>Appointment Blocks Day</original>
+	<translate>Registracijų dienos blokas</translate>
+</string>
+<string>
+	<original>Appointment Flow</original>
+	<translate>Registracijų srautas</translate>
+</string>
+<string>
+	<original>Appointments</original>
+	<translate>Registracijos</translate>
+</string>
+<string>
+	<original>Approval</original>
+	<translate>Patvirtinimas</translate>
+</string>
+<string>
+	<original>Approve</original>
+	<translate>Patrvirtinti</translate>
+</string>
+<string>
+	<original>Approved</original>
+	<translate>Patvirtinta</translate>
+</string>
+<string>
+	<original>Apr</original>
+	<translate>Bal</translate>
+</string>
+<string>
+	<original>Archive</original>
+	<translate>Archyvas</translate>
+</string>
+<string>
+	<original>Archived</original>
+	<translate>Archyvuota</translate>
+</string>
+<string>
+	<original>Are you sure?</original>
+	<translate>Ar tikrai?</translate>
+</string>
+<string>
+	<original>Assign</original>
+	<translate>Priskirti</translate>
+</string>
+<string>
+	<original>Attach Ical File To Notification Email</original>
+	<translate>Prisegti bylą prie patvirtinimo el. pašto</translate>
+</string>
+<string>
+	<original>Attachment</original>
+	<translate>Prisegta byla</translate>
+</string>
+<string>
+	<original>Attachments</original>
+	<translate>Prisegtos bylos</translate>
+</string>
+<string>
+	<original>Aug</original>
+	<translate>Aug</translate>
+</string>
+<string>
+	<original>Auto Approved</original>
+	<translate>Automatiškai patvirtinta</translate>
+</string>
+<string>
+	<original>Auto Complete Appointments After</original>
+	<translate>Automatiškai užbaigti registraciją po</translate>
+</string>
+<string>
+	<original>Auto Reject Appointments If Not Approved Within</original>
+	<translate>Automatiškai atmesti registraciją jei nepatvirtinta per</translate>
+</string>
+<string>
+	<original>Automatic Actions</original>
+	<translate>Automatizuoti veiksmai</translate>
+</string>
+<string>
+	<original>Automatically Activate Packages Even Without Payment</original>
+	<translate>Automatiškai aktyvuoti pakuotes net be mokėjomo</translate>
+</string>
+<string>
+	<original>Automatically Select Any Available</original>
+	<translate>Automatiškai pasirinkti iš prieinamų</translate>
+</string>
+<string>
+	<original>Automatically add a new invoice to a customer</original>
+	<translate>Automatiškai pridėti sąskaitą - faktūrą Klientui</translate>
+</string>
+<string>
+	<original>Automatically add a package to a new customer</original>
+	<translate>Automatiškai priskirti pakuotę naujam Klientui</translate>
+</string>
+<string>
+	<original>Availability</original>
+	<translate>Galimi pasirinkimai</translate>
+</string>
+<string>
+	<original>Available</original>
+	<translate>Galima</translate>
+</string>
+<string>
+	<original>Available Balance</original>
+	<translate>Turimas balansas</translate>
+</string>
+<string>
+	<original>Available In Package Only</original>
+	<translate>Prieinama tik paslaugų pakuotėse</translate>
+</string>
+<string>
+	<original>Back</original>
+	<translate>Atgal</translate>
+</string>
+<string>
+	<original>Backup</original>
+	<translate>Atsarginė kopija</translate>
+</string>
+<string>
+	<original>Backup File</original>
+	<translate>Atsarginės kopijos byla</translate>
+</string>
+<string>
+	<original>Backup Reminder</original>
+	<translate>Atsarginio kopijavimo priminimas</translate>
+</string>
+<string>
+	<original>Balance</original>
+	<translate>Balansas</translate>
+</string>
+<string>
+	<original>Bookable Resource</original>
+	<translate>Kabinetas</translate>
+</string>
+<string>
+	<original>Bookable Resources</original>
+	<translate>Specialistai</translate>
+</string>
+<string>
+	<original>Bundle</original>
+	<translate>Pakuotė</translate>
+</string>
+<string>
+	<original>Bundles</original>
+	<translate>Pakuotės</translate>
+</string>
+<string>
+	<original>CC</original>
+	<translate>CC</translate>
+</string>
+<string>
+	<original>CSV Field Delimiter</original>
+	<translate>CSV laukelio skirtukas</translate>
+</string>
+<string>
+	<original>CSV File</original>
+	<translate>CSV byla</translate>
+</string>
+<string>
+	<original>Can Be Paid By Balance</original>
+	<translate>Galima mokėti balansu</translate>
+</string>
+<string>
+	<original>Cancel</original>
+	<translate>Atšaukti</translate>
+</string>
+<string>
+	<original>Cancellation/Reschedule Deadline</original>
+	<translate>Vėliausia galima atšaukimo data </translate>
+</string>
+<string>
+	<original>Cancelled</original>
+	<translate>Atšaukta</translate>
+</string>
+<string>
+	<original>Capacity</original>
+	<translate>Apimtis</translate>
+</string>
+<string>
+	<original>Cash</original>
+	<translate>Grynais</translate>
+</string>
+<string>
+	<original>Categories</original>
+	<translate>Kategorijos</translate>
+</string>
+<string>
+	<original>Category</original>
+	<translate>Kategorija</translate>
+</string>
+<string>
+	<original>Change</original>
+	<translate>Keisti</translate>
+</string>
+<string>
+	<original>Change Password</original>
+	<translate>Keisti slaptažodį</translate>
+</string>
+<string>
+	<original>Change Role</original>
+	<translate>Keisti rolę</translate>
+</string>
+<string>
+	<original>Change Status</original>
+	<translate>Keisti būklę</translate>
+</string>
+<string>
+	<original>Check</original>
+	<translate>Pažymėti</translate>
+</string>
+<string>
+	<original>Checkbox On</original>
+	<translate>Žymeklis įjungtas</translate>
+</string>
+<string>
+	<original>Clean Up</original>
+	<translate>Valyti</translate>
+</string>
+<string>
+	<original>Click Here To</original>
+	<translate>Spauskite čiao</translate>
+</string>
+<string>
+	<original>Click Proceed Below To Confirm Appointment</original>
+	<translate>Spauskite "Tęsti" norėdami patvirtinti registraciją</translate>
+</string>
+<string>
+	<original>Click here to confirm your email</original>
+	<translate>Spauskite čia norėdami patvirtinti el. paštą</translate>
+</string>
+<string>
+	<original>Click this link to open Outlook and set it up.</original>
+	<translate>Spauskite norėdami atidaryti ir konfigūruoti Outlook</translate>
+</string>
+<string>
+	<original>Click to activate</original>
+	<translate>Spauskite norėdami aktyvuoti</translate>
+</string>
+<string>
+	<original>Click to disable</original>
+	<translate>Spauskite norėdami išjungti</translate>
+</string>
+<string>
+	<original>Clustered Appointments Only</original>
+	<translate>Tik grupuotos registracijos</translate>
+</string>
+<string>
+	<original>Company</original>
+	<translate>Įmonė</translate>
+</string>
+<string>
+	<original>Company Timezone</original>
+	<translate>Įmonės laiko zona</translate>
+</string>
+<string>
+	<original>Complete</original>
+	<translate>Baigta</translate>
+</string>
+<string>
+	<original>Complete Uninstall</original>
+	<translate>Pilnas šalinimas</translate>
+</string>
+<string>
+	<original>Completed</original>
+	<translate>Baigta</translate>
+</string>
+<string>
+	<original>Confirm</original>
+	<translate>Patvirtinti</translate>
+</string>
+<string>
+	<original>Confirm Appointment</original>
+	<translate>Patvirtinti registraciją</translate>
+</string>
+<string>
+	<original>Confirm Appointments</original>
+	<translate>Patvirtinti registracijas</translate>
+</string>
+<string>
+	<original>Confirm Package</original>
+	<translate>Patvirtinti pakuotę</translate>
+</string>
+<string>
+	<original>Confirm Password</original>
+	<translate>Patvirtinti slaptažodį</translate>
+</string>
+<string>
+	<original>Confirmation</original>
+	<translate>Patvirtinimas</translate>
+</string>
+<string>
+	<original>Conflicts</original>
+	<translate>Konfliktai</translate>
+</string>
+<string>
+	<original>Congratulations, your account has been created and activated</original>
+	<translate>Sveikiname, Jūsų paskyra buvo sukurta ir aktyvuota.</translate>
+</string>
+<string>
+	<original>Continue</original>
+	<translate>Tęsti</translate>
+</string>
+<string>
+	<original>Copy</original>
+	<translate>Kopijuoti</translate>
+</string>
+<string>
+	<original>Coupon</original>
+	<translate>Kuponas</translate>
+</string>
+<string>
+	<original>Coupon Code</original>
+	<translate>Turite kupono kodą</translate>
+</string>
+<string>
+	<original>Coupon Code Required</original>
+	<translate>Būtina nurodyti kupono kodą</translate>
+</string>
+<string>
+	<original>Coupon Codes</original>
+	<translate>Kuponų kodai</translate>
+</string>
+<string>
+	<original>Create</original>
+	<translate>Sukurti</translate>
+</string>
+<string>
+	<original>Create Appointment</original>
+	<translate>Sukurti registraciją apsilankymui</translate>
+</string>
+<string>
+	<original>Create Appointments</original>
+	<translate>Kurti registracijas apsilankymams</translate>
+</string>
+<string>
+	<original>Create a package first</original>
+	<translate>Pirmiausia sukurkute paslaugų paketą</translate>
+</string>
+<string>
+	<original>Created</original>
+	<translate>Sukurta</translate>
+</string>
+<string>
+	<original>Credit Card</original>
+	<translate>Kreditinė kortelė</translate>
+</string>
+<string>
+	<original>Credits</original>
+	<translate>Kreditai</translate>
+</string>
+<string>
+	<original>Cron Job Last Run</original>
+	<translate>Paskutinis periodinis darbas</translate>
+</string>
+<string>
+	<original>Currency</original>
+	<translate>Valiuta</translate>
+</string>
+<string>
+	<original>Current</original>
+	<translate>Dabartinis</translate>
+</string>
+<string>
+	<original>Custom</original>
+	<translate>Pasirinktinis</translate>
+</string>
+<string>
+	<original>Custom Dates</original>
+	<translate>Pasirinktinės datos</translate>
+</string>
+<string>
+	<original>Custom Form</original>
+	<translate>Pasirinktinė forma</translate>
+</string>
+<string>
+	<original>Custom Forms</original>
+	<translate>Pasirinktinės formos</translate>
+</string>
+<string>
+	<original>Customer</original>
+	<translate>Klientas</translate>
+</string>
+<string>
+	<original>Customer Limit</original>
+	<translate>Kliento limitas</translate>
+</string>
+<string>
+	<original>Customers</original>
+	<translate>Klientai</translate>
+</string>
+<string>
+	<original>Date</original>
+	<translate>Data</translate>
+</string>
+<string>
+	<original>Date Format</original>
+	<translate>Datos formatas</translate>
+</string>
+<string>
+	<original>Date Range</original>
+	<translate>Datos ribos</translate>
+</string>
+<string>
+	<original>Date and Time</original>
+	<translate>Data ir laikas</translate>
+</string>
+<string>
+	<original>Dates</original>
+	<translate>Datos</translate>
+</string>
+<string>
+	<original>Day</original>
+	<translate>Diena</translate>
+</string>
+<string>
+	<original>Days</original>
+	<translate>Dienos</translate>
+</string>
+<string>
+	<original>Dec</original>
+	<translate>Gruo</translate>
+</string>
+<string>
+	<original>Default Value</original>
+	<translate>Numatyta reikšmė</translate>
+</string>
+<string>
+	<original>Defaults</original>
+	<translate>Numatytosios reikšmės</translate>
+</string>
+<string>
+	<original>Delete</original>
+	<translate>Šalinti</translate>
+</string>
+<string>
+	<original>Delete All Appointments</original>
+	<translate>Šalinti visas registracijas apsilankymams</translate>
+</string>
+<string>
+	<original>Delete Invoice and Payments</original>
+	<translate>Šalinti sąskaitą - faktūrą bei mokėjimus</translate>
+</string>
+<string>
+	<original>Deleted</original>
+	<translate>Pašalinta</translate>
+</string>
+<string>
+	<original>Description</original>
+	<translate>Aprašymas</translate>
+</string>
+<string>
+	<original>Desired Username</original>
+	<translate>Norimas vartotojo vardas</translate>
+</string>
+<string>
+	<original>Details</original>
+	<translate>Duomenys</translate>
+</string>
+<string>
+	<original>Disable</original>
+	<translate>Išjungti</translate>
+</string>
+<string>
+	<original>Disable Email</original>
+	<translate>Išjungti el. paštą</translate>
+</string>
+<string>
+	<original>Discount</original>
+	<translate>Nuolaida</translate>
+</string>
+<string>
+	<original>Down</original>
+	<translate>Žemyn</translate>
+</string>
+<string>
+	<original>Download</original>
+	<translate>Parsisiųsti</translate>
+</string>
+<string>
+	<original>Download Backup</original>
+	<translate>Parsisiųsti atrsarginę rinkmeną</translate>
+</string>
+<string>
+	<original>Due</original>
+	<translate>Iki</translate>
+</string>
+<string>
+	<original>Due Amount</original>
+	<translate>Iki suma</translate>
+</string>
+<string>
+	<original>Due Date</original>
+	<translate>Iki data</translate>
+</string>
+<string>
+	<original>Duplicated</original>
+	<translate>Dublikuota</translate>
+</string>
+<string>
+	<original>Duration</original>
+	<translate>Trukmė</translate>
+</string>
+<string>
+	<original>Edit</original>
+	<translate>Keisti</translate>
+</string>
+<string>
+	<original>Email</original>
+	<translate>El. paštas</translate>
+</string>
+<string>
+	<original>Email Notifications Templates</original>
+	<translate>El. laiškų šablonai</translate>
+</string>
+<string>
+	<original>Emails</original>
+	<translate>El. laiškai</translate>
+</string>
+<string>
+	<original>Enable Company Side Attachments</original>
+	<translate>Leisti pašalines prisegtas bylas</translate>
+</string>
+<string>
+	<original>Ends At</original>
+	<translate>Baigiasi</translate>
+</string>
+<string>
+	<original>English Letters, Numbers, Underscores Only</original>
+	<translate>Tik angliškos raidės ir skaičiai</translate>
+</string>
+<string>
+	<original>Enter 0 for no limit</original>
+	<translate>Įveskite 0, norėdami panaikinti ribojimą</translate>
+</string>
+<string>
+	<original>Enter Code Shown</original>
+	<translate>Įveskite parodytą kodą</translate>
+</string>
+<string>
+	<original>Error</original>
+	<translate>Klaida</translate>
+</string>
+<string>
+	<original>Error Message If Validation Fails</original>
+	<translate>Klaidos žinutė patikrinimui nepavykus</translate>
+</string>
+<string>
+	<original>Even</original>
+	<translate>Lygu</translate>
+</string>
+<string>
+	<original>Event Actions</original>
+	<translate>Įvykių veiksmai</translate>
+</string>
+<string>
+	<original>Every 3 Weeks</original>
+	<translate>Kas 3 savaites</translate>
+</string>
+<string>
+	<original>Every 6 Weeks</original>
+	<translate>Kas 6 savaites</translate>
+</string>
+<string>
+	<original>Every Day</original>
+	<translate>Kasdien</translate>
+</string>
+<string>
+	<original>Every Fortnight</original>
+	<translate>Kas porą savaičių</translate>
+</string>
+<string>
+	<original>Every Month</original>
+	<translate>Kas mėnesį</translate>
+</string>
+<string>
+	<original>Every Other Day</original>
+	<translate>Kiekvieną kitą dieną</translate>
+</string>
+<string>
+	<original>Every Week</original>
+	<translate>Kas savaitę</translate>
+</string>
+<string>
+	<original>Expired</original>
+	<translate>Nebegalioja</translate>
+</string>
+<string>
+	<original>Expires</original>
+	<translate>Baigiasi galiojimas</translate>
+</string>
+<string>
+	<original>Expires In</original>
+	<translate>Baigiasi galiojimas</translate>
+</string>
+<string>
+	<original>Export</original>
+	<translate>Eksportuoti</translate>
+</string>
+<string>
+	<original>External User Access</original>
+	<translate>Išorinis vartotojų priėjimas</translate>
+</string>
+<string>
+	<original>Failed</original>
+	<translate>Nepavyko</translate>
+</string>
+<string>
+	<original>Feb</original>
+	<translate>Vas</translate>
+</string>
+<string>
+	<original>Fields Not Recognized</original>
+	<translate>Neatpažinti laukeliai</translate>
+</string>
+<string>
+	<original>Fill in if required by your web hosting. You may need to consult your web hosting administrator or help documentation.</original>
+	<translate>Užpildykite, jei tai reikalinga svetainės talpinimui. Prieš atlikdami šį veiksmą, pasitarkite su sistemos administratoriumi.</translate>
+</string>
+<string>
+	<original>Filter</original>
+	<translate>Filtruoti</translate>
+</string>
+<string>
+	<original>Finance Settings</original>
+	<translate>Mokėjimų nustatymai</translate>
+</string>
+<string>
+	<original>Finish Duration</original>
+	<translate>Pabaigos trukmė</translate>
+</string>
+<string>
+	<original>First Appointment Only</original>
+	<translate>Tik pirmam apsilankymui</translate>
+</string>
+<string>
+	<original>First Invoice</original>
+	<translate>Pirma sąskaita - faktūra</translate>
+</string>
+<string>
+	<original>First Name</original>
+	<translate>Vardas</translate>
+</string>
+<string>
+	<original>First Purchase</original>
+	<translate>Pirmas pirkimas</translate>
+</string>
+<string>
+	<original>First Time Visitors Splash Screen</original>
+	<translate>Iššokantis langelis pirmą kartą besilankantiems</translate>
+</string>
+<string>
+	<original>First Time?</original>
+	<translate>Lankotės pirmą kartą?</translate>
+</string>
+<string>
+	<original>Fixed</original>
+	<translate>Fiksuota</translate>
+</string>
+<string>
+	<original>Fixed Dates</original>
+	<translate>Fiksuotos datos</translate>
+</string>
+<string>
+	<original>Fixed Services</original>
+	<translate>Fiksuotos paslaugos </translate>
+</string>
+<string>
+	<original>Fixed Time</original>
+	<translate>Fiksuotas laikas</translate>
+</string>
+<string>
+	<original>Footer</original>
+	<translate>Paraštė</translate>
+</string>
+<string>
+	<original>Footer For All Emails</original>
+	<translate>Paraštė visiems el. laiškams</translate>
+</string>
+<string>
+	<original>For example, if set to Minute, it will show 90 Minutes rather than 1 Hour 30 Minutes.</original>
+	<translate>Pavyzdžiui, jei nustatytos Minutės - bus rodoma 90 minučių vietoje 1 valandos 30 minučių</translate>
+</string>
+<string>
+	<original>For tomorrow availability, when applying Min Advance Booking, count from now or from the start of availability time</original>
+	<translate>Rytojaus prieinamumui, takijnat minimalų apsilankymo apmokėjimą, skaičiuoti nuo dabar, arba nuo prieinamumo termino laiko</translate>
+</string>
+<string>
+	<original>Forgot Your Password</original>
+	<translate>Pamiršote slaptažodį</translate>
+</string>
+<string>
+	<original>Form</original>
+	<translate>Forma</translate>
+</string>
+<string>
+	<original>Form Field</original>
+	<translate>Formos laukelis</translate>
+</string>
+<string>
+	<original>Form Fields</original>
+	<translate>Formos laukeliai</translate>
+</string>
+<string>
+	<original>Forms</original>
+	<translate>Formos</translate>
+</string>
+<string>
+	<original>Free</original>
+	<translate>Nemokamai</translate>
+</string>
+<string>
+	<original>Fri</original>
+	<translate>Pen</translate>
+</string>
+<string>
+	<original>Friday</original>
+	<translate>Penktadienis</translate>
+</string>
+<string>
+	<original>From</original>
+	<translate>Nuo</translate>
+</string>
+<string>
+	<original>Frontend View</original>
+	<translate>Tinklapio vaizdas</translate>
+</string>
+<string>
+	<original>Full</original>
+	<translate>Pilnas</translate>
+</string>
+<string>
+	<original>Full Name</original>
+	<translate>Vardas ir pavardė</translate>
+</string>
+<string>
+	<original>Full Price</original>
+	<translate>Pilna kaina</translate>
+</string>
+<string>
+	<original>Fully Booked</original>
+	<translate>Visi apsilankymai rezervuoti</translate>
+</string>
+<string>
+	<original>Fully Paid</original>
+	<translate>Pilnai apmokėta</translate>
+</string>
+<string>
+	<original>Gateway</original>
+	<translate>Vartai</translate>
+</string>
+<string>
+	<original>Gateway Response</original>
+	<translate>Vartų atsakymas</translate>
+</string>
+<string>
+	<original>Get Notified</original>
+	<translate>Gauti perspėjimą</translate>
+</string>
+<string>
+	<original>Go</original>
+	<translate>Eiti</translate>
+</string>
+<string>
+	<original>Header</original>
+	<translate>Antraštė</translate>
+</string>
+<string>
+	<original>Header For All Emails</original>
+	<translate>Antraštė visiems el. paštams</translate>
+</string>
+<string>
+	<original>Help Text</original>
+	<translate>Pagalbinis tekstas</translate>
+</string>
+<string>
+	<original>Hidden</original>
+	<translate>Paslėpta</translate>
+</string>
+<string>
+	<original>Hide</original>
+	<translate>Paslėpti</translate>
+</string>
+<string>
+	<original>Hide End Time In Customer Notification Emails</original>
+	<translate>Paslėpti pabaigos laiką klientų informavimo el. paštuose</translate>
+</string>
+<string>
+	<original>History</original>
+	<translate>Istorija</translate>
+</string>
+<string>
+	<original>Home</original>
+	<translate>Pradžia</translate>
+</string>
+<string>
+	<original>Host</original>
+	<translate>Aptarnauja</translate>
+</string>
+<string>
+	<original>Hour</original>
+	<translate>Valanda</translate>
+</string>
+<string>
+	<original>Hours</original>
+	<translate>Valandos</translate>
+</string>
+<string>
+	<original>If invoice ref numbers are sequential, then start with</original>
+	<translate>Jei sąskaitų faktūrų numeriai eina iš eilės, pradėti nuo</translate>
+</string>
+<string>
+	<original>If set to 1, the recurring option will be disabled</original>
+	<translate>Jei nustatymuose nurodyta 1, pasikartojimas yra išjungtas</translate>
+</string>
+<string>
+	<original>If you proceed, these appointments will be cancelled</original>
+	<translate>Jei tęsite, šios apsilankyų registracijos bus panaikintos</translate>
+</string>
+<string>
+	<original>If you use a web address (starting with http://), it will redirect to that page</original>
+	<translate>Jei naudojate web adresq (prasideda nuo http://), jis bus nukreipiamas į puslapį</translate>
+</string>
+<string>
+	<original>Import</original>
+	<translate>Importuoti</translate>
+</string>
+<string>
+	<original>Including</original>
+	<translate>Įtraukta</translate>
+</string>
+<string>
+	<original>Info</original>
+	<translate>Informacija</translate>
+</string>
+<string>
+	<original>Input Validation</original>
+	<translate>Įvesties patikra</translate>
+</string>
+<string>
+	<original>Install</original>
+	<translate>Diegti</translate>
+</string>
+<string>
+	<original>Integers Only</original>
+	<translate>Tik skaičiai</translate>
+</string>
+<string>
+	<original>Internal</original>
+	<translate>Vidinis</translate>
+</string>
+<string>
+	<original>Interval</original>
+	<translate>Intervalas</translate>
+</string>
+<string>
+	<original>Invoice</original>
+	<translate>Sąskaita - faktūra</translate>
+</string>
+<string>
+	<original>Invoice Footer</original>
+	<translate>Sąskaitos - faktūros paraštė</translate>
+</string>
+<string>
+	<original>Invoice Header</original>
+	<translate>Sąskaitos - faktūros antraštė</translate>
+</string>
+<string>
+	<original>Invoice Ref Numbers</original>
+	<translate>Sąskaitos faktūros numeris</translate>
+</string>
+<string>
+	<original>Invoices</original>
+	<translate>Sąskaitos - faktūros</translate>
+</string>
+<string>
+	<original>Is Active</original>
+	<translate>Yra aktyvi</translate>
+</string>
+<string>
+	<original>It seems that you have not made a backup for some time, it's highly recommended to do it now</original>
+	<translate>Atrodo kad Jūs dar nekūrėte atsarginių rinkmenų. Rekomenduojame atlikti tai dabar</translate>
+</string>
+<string>
+	<original>Item Name</original>
+	<translate>Pavadinimas</translate>
+</string>
+<string>
+	<original>Items</original>
+	<translate>Prekės</translate>
+</string>
+<string>
+	<original>Jan</original>
+	<translate>Sau</translate>
+</string>
+<string>
+	<original>Jul</original>
+	<translate>Lie</translate>
+</string>
+<string>
+	<original>Jun</original>
+	<translate>Bir</translate>
+</string>
+<string>
+	<original>Just One Option Per Page</original>
+	<translate>Tik vienas pasirinkimas puslapyje</translate>
+</string>
+<string>
+	<original>Label</original>
+	<translate>Etiketė</translate>
+</string>
+<string>
+	<original>Language</original>
+	<translate>Kalba</translate>
+</string>
+<string>
+	<original>Languages</original>
+	<translate>Kalbos</translate>
+</string>
+<string>
+	<original>Last Name</original>
+	<translate>Pavardė</translate>
+</string>
+<string>
+	<original>Leave these blank to autogenerate a random password</original>
+	<translate>palikite tuščią, norėdami generuoti automatiškai</translate>
+</string>
+<string>
+	<original>Let Customer Select</original>
+	<translate>Leisti klientui pasirinkti</translate>
+</string>
+<string>
+	<original>Let Customer Select With Auto Assign Option</original>
+	<translate>Leisti klientio pasirinkti su automatiniu priskyrimu</translate>
+</string>
+<string>
+	<original>License Code</original>
+	<translate>Rakto kodas</translate>
+</string>
+<string>
+	<original>List</original>
+	<translate>Sąrašas</translate>
+</string>
+<string>
+	<original>Location</original>
+	<translate>Vieta</translate>
+</string>
+<string>
+	<original>Location Fully Booked</original>
+	<translate>Vieta pilani užpildyta</translate>
+</string>
+<string>
+	<original>Locations</original>
+	<translate>Vietos</translate>
+</string>
+<string>
+	<original>Logged out</original>
+	<translate>Atsijungėte</translate>
+</string>
+<string>
+	<original>Login</original>
+	<translate>Prisijungti</translate>
+</string>
+<string>
+	<original>Login Details</original>
+	<translate>Prisijungimo duomenys</translate>
+</string>
+<string>
+	<original>Logout</original>
+	<translate>Atsijungti</translate>
+</string>
+<string>
+	<original>Logs</original>
+	<translate>Įvykių žurnalas</translate>
+</string>
+<string>
+	<original>Lowercase English Letters, Numbers, Underscores Only</original>
+	<translate>Tik mažosios angliškos raidės ir skaičiai</translate>
+</string>
+<string>
+	<original>Mandatory Fields Missing</original>
+	<translate>Neužpilyti būtini laukeliai</translate>
+</string>
+<string>
+	<original>Mar</original>
+	<translate>Kov</translate>
+</string>
+<string>
+	<original>Max Advance Booking</original>
+	<translate>Didžiausias registracijos mokestis</translate>
+</string>
+<string>
+	<original>Max Appointments In Cart</original>
+	<translate>Daugiausiai apsilankymų krepšelyje</translate>
+</string>
+<string>
+	<original>Max Capacity Per Appointment</original>
+	<translate>Didžiausia apsilankymo apimtis</translate>
+</string>
+<string>
+	<original>Max Gap</original>
+	<translate>Didžiasias tarpas</translate>
+</string>
+<string>
+	<original>Max Measure For Duration Display</original>
+	<translate>Didžiausias matavimas trukmės rodymui</translate>
+</string>
+<string>
+	<original>Max Number Of Recurring Appointments</original>
+	<translate>Didžiausias besikartojančių apsilankymų skaičius</translate>
+</string>
+<string>
+	<original>Max Size</original>
+	<translate>Maksimalus dydis</translate>
+</string>
+<string>
+	<original>Max gap between appointments</original>
+	<translate>Didžiausias tarpas tarp apsilankymų</translate>
+</string>
+<string>
+	<original>May</original>
+	<translate>Geg</translate>
+</string>
+<string>
+	<original>Merge</original>
+	<translate>Sujungti</translate>
+</string>
+<string>
+	<original>Merge To</original>
+	<translate>Prijungti prie</translate>
+</string>
+<string>
+	<original>Message</original>
+	<translate>Žinutė</translate>
+</string>
+<string>
+	<original>Migrated To Version</original>
+	<translate>Migravo į  versiją</translate>
+</string>
+<string>
+	<original>Min Advance Booking</original>
+	<translate>Mažiausias apsilankymo mokestis</translate>
+</string>
+<string>
+	<original>Minute</original>
+	<translate>Minutė</translate>
+</string>
+<string>
+	<original>Minutes</original>
+	<translate>Minutės</translate>
+</string>
+<string>
+	<original>Misc</original>
+	<translate>Kita</translate>
+</string>
+<string>
+	<original>Missing</original>
+	<translate>Trūksta</translate>
+</string>
+<string>
+	<original>Mon</original>
+	<translate>Pir</translate>
+</string>
+<string>
+	<original>Monday</original>
+	<translate>Pirmadienis</translate>
+</string>
+<string>
+	<original>Month</original>
+	<translate>Mėnuo</translate>
+</string>
+<string>
+	<original>Months</original>
+	<translate>Mėnesiai</translate>
+</string>
+<string>
+	<original>Months To Show</original>
+	<translate>Rodytio mėnesius</translate>
+</string>
+<string>
+	<original>Most Active</original>
+	<translate>Aktyviausi</translate>
+</string>
+<string>
+	<original>Move Down</original>
+	<translate>Žemyn</translate>
+</string>
+<string>
+	<original>Move Paid Amount To Customer Balance</original>
+	<translate>Perkelti sumokėtą sumą į kliento balansą</translate>
+</string>
+<string>
+	<original>Move Up</original>
+	<translate>Aukštyn</translate>
+</string>
+<string>
+	<original>Moved Down</original>
+	<translate>Perkelta žemyn</translate>
+</string>
+<string>
+	<original>Moved Up</original>
+	<translate>Perkelta aukštyn</translate>
+</string>
+<string>
+	<original>My Packages</original>
+	<translate>Mano pakuotės</translate>
+</string>
+<string>
+	<original>My Profile</original>
+	<translate>Mano paskyra</translate>
+</string>
+<string>
+	<original>My Timezone</original>
+	<translate>Mano laiko zona</translate>
+</string>
+<string>
+	<original>N/A</original>
+	<translate>Nėra</translate>
+</string>
+<string>
+	<original>Name</original>
+	<translate>Vardas</translate>
+</string>
+<string>
+	<original>Never Expires</original>
+	<translate>Niekada nesibaigia</translate>
+</string>
+<string>
+	<original>New</original>
+	<translate>Nauja</translate>
+</string>
+<string>
+	<original>New Appointment</original>
+	<translate>Naujas apsilankymas</translate>
+</string>
+<string>
+	<original>New Customers</original>
+	<translate>Nauji klientai</translate>
+</string>
+<string>
+	<original>New Item</original>
+	<translate>Nauja prekė</translate>
+</string>
+<string>
+	<original>New to our site? Please take a moment to register!</original>
+	<translate>Lankotės pirmą kartą? Kviečiame rwegistruotis!</translate>
+</string>
+<string>
+	<original>Newsletter</original>
+	<translate>Naujienlaiškis</translate>
+</string>
+<string>
+	<original>No</original>
+	<translate>Ne</translate>
+</string>
+<string>
+	<original>No Email</original>
+	<translate>Nėra el. pašto</translate>
+</string>
+<string>
+	<original>No Locations Defined!</original>
+	<translate>Nenorodytos vietos</translate>
+</string>
+<string>
+	<original>No Services Defined!</original>
+	<translate>Nenorodytos paslaugos</translate>
+</string>
+<string>
+	<original>No Show</original>
+	<translate>Nerodoma</translate>
+</string>
+<string>
+	<original>No availability configured</original>
+	<translate>Prieinamumas nenustatytas</translate>
+</string>
+<string>
+	<original>None</original>
+	<translate>Nei vienas</translate>
+</string>
+<string>
+	<original>Not Active</original>
+	<translate>Neaktyvus</translate>
+</string>
+<string>
+	<original>Not Allowed</original>
+	<translate>Neleidžiama</translate>
+</string>
+<string>
+	<original>Not Approved</original>
+	<translate>Neleista</translate>
+</string>
+<string>
+	<original>Not Available</original>
+	<translate>Neprieinama</translate>
+</string>
+<string>
+	<original>Not Confirmed</original>
+	<translate>Nepatvirtinta</translate>
+</string>
+<string>
+	<original>Not For Sale</original>
+	<translate>Ne pardavimui</translate>
+</string>
+<string>
+	<original>Not Found</original>
+	<translate>Nerasta</translate>
+</string>
+<string>
+	<original>Not Paid</original>
+	<translate>Neapmokėta</translate>
+</string>
+<string>
+	<original>Not Registered</original>
+	<translate>Neregistruota</translate>
+</string>
+<string>
+	<original>Not Required</original>
+	<translate>Nereikalaujama</translate>
+</string>
+<string>
+	<original>Not Shown For Security Reasons</original>
+	<translate>Nerodoma saugumo sumetimais</translate>
+</string>
+<string>
+	<original>Not Sufficient</original>
+	<translate>Nepakankama</translate>
+</string>
+<string>
+	<original>Not The First Option In Select List</original>
+	<translate>Ne pirma pozicia pasirinkimo sąraše</translate>
+</string>
+<string>
+	<original>Not Used</original>
+	<translate>Nenaudota</translate>
+</string>
+<string>
+	<original>Not Valid</original>
+	<translate>Negalioja</translate>
+</string>
+<string>
+	<original>Note</original>
+	<translate>Pastaba</translate>
+</string>
+<string>
+	<original>Notes</original>
+	<translate>Pastabos</translate>
+</string>
+<string>
+	<original>Notification</original>
+	<translate>Pranešimas</translate>
+</string>
+<string>
+	<original>Notifications</original>
+	<translate>Pranešimai</translate>
+</string>
+<string>
+	<original>Nov</original>
+	<translate>Lap</translate>
+</string>
+<string>
+	<original>Now</original>
+	<translate>Dabar</translate>
+</string>
+<string>
+	<original>Number of appointments</original>
+	<translate>Registracijų skaičius</translate>
+</string>
+<string>
+	<original>Numbers only</original>
+	<translate>Tik skaičiai</translate>
+</string>
+<string>
+	<original>OK</original>
+	<translate>Gerai</translate>
+</string>
+<string>
+	<original>Occupies Entire Location</original>
+	<translate>Užima visą vietą</translate>
+</string>
+<string>
+	<original>Oct</original>
+	<translate>Spa</translate>
+</string>
+<string>
+	<original>Odd</original>
+	<translate>Lygus</translate>
+</string>
+<string>
+	<original>Office</original>
+	<translate>Biuras</translate>
+</string>
+<string>
+	<original>Old</original>
+	<translate>Senas</translate>
+</string>
+<string>
+	<original>One Entry Only</original>
+	<translate>Tik vienas įrašas</translate>
+</string>
+<string>
+	<original>One option per line</original>
+	<translate>Vienas pasirinkimas linijoje</translate>
+</string>
+<string>
+	<original>Only This One</original>
+	<translate>Tik šitas</translate>
+</string>
+<string>
+	<original>Only lowercase English letters, numbers, and underscores please!</original>
+	<translate>Prašome įvesti tik mažasias angliškas raides arba skaičius</translate>
+</string>
+<string>
+	<original>Optional</original>
+	<translate>Pasiinktinai</translate>
+</string>
+<string>
+	<original>Order</original>
+	<translate>Užsakymas</translate>
+</string>
+<string>
+	<original>Other Appointment</original>
+	<translate>Kitas apsilankymas</translate>
+</string>
+<string>
+	<original>Outlook 2007 supports iCal subscriptions which will automatically update your Outlook calendar with new appointments.</original>
+	<translate>Outlook 2007 palaiko iCal subscriptions, tai leidžia automatiškai naujinti Outlook kalendorių su naujais apsilankymais.</translate>
+</string>
+<string>
+	<original>Overpaid</original>
+	<translate>Permokėta</translate>
+</string>
+<string>
+	<original>Overview</original>
+	<translate>Peržiūra</translate>
+</string>
+<string>
+	<original>Package</original>
+	<translate>Paslaugų paketas</translate>
+</string>
+<string>
+	<original>Package Order</original>
+	<translate>Paslaugų paketo užsakymas</translate>
+</string>
+<string>
+	<original>Package Orders</original>
+	<translate>Paslaugų paketų užsakymai</translate>
+</string>
+<string>
+	<original>Packages</original>
+	<translate>Paslaugų paketai</translate>
+</string>
+<string>
+	<original>Pages</original>
+	<translate>Puslapiai</translate>
+</string>
+<string>
+	<original>Paid</original>
+	<translate>Sumokėta</translate>
+</string>
+<string>
+	<original>Paid Amount</original>
+	<translate>Sumokėta suma</translate>
+</string>
+<string>
+	<original>Paid Through</original>
+	<translate>Sumokėta per</translate>
+</string>
+<string>
+	<original>Part</original>
+	<translate>Dalis</translate>
+</string>
+<string>
+	<original>Partially Paid</original>
+	<translate>Dalinai sumokėta</translate>
+</string>
+<string>
+	<original>Password</original>
+	<translate>Slaptažodis</translate>
+</string>
+<string>
+	<original>Password Changed</original>
+	<translate>Slaptažodis pakeistas</translate>
+</string>
+<string>
+	<original>Password Reset</original>
+	<translate>Slaptažodžio naujinimas</translate>
+</string>
+<string>
+	<original>Passwords don't match!</original>
+	<translate>Slaptažodžiai nesutampa!</translate>
+</string>
+<string>
+	<original>Past</original>
+	<translate>Senesni</translate>
+</string>
+<string>
+	<original>Pay At Our Office</original>
+	<translate>Mokėti vietoje</translate>
+</string>
+<string>
+	<original>Pay By Balance</original>
+	<translate>Mokėti balansu</translate>
+</string>
+<string>
+	<original>Pay Later</original>
+	<translate>Mokėti vėliau</translate>
+</string>
+<string>
+	<original>Pay Now</original>
+	<translate>Mokėti dabar</translate>
+</string>
+<string>
+	<original>Pay Online</original>
+	<translate>Mokėti internetu</translate>
+</string>
+<string>
+	<original>Payment</original>
+	<translate>Mokėjimas</translate>
+</string>
+<string>
+	<original>Payment Balance</original>
+	<translate>Mokėjimų balansas</translate>
+</string>
+<string>
+	<original>Payment Gateway</original>
+	<translate>Mokėjimo būdas</translate>
+</string>
+<string>
+	<original>Payment Gateways</original>
+	<translate>Mokėjimų būdai</translate>
+</string>
+<string>
+	<original>Payment Notes</original>
+	<translate>Mokėjimų žinutės</translate>
+</string>
+<string>
+	<original>Payment Required</original>
+	<translate>Mokėjimas būtinas</translate>
+</string>
+<string>
+	<original>Payments</original>
+	<translate>Mokėjimai</translate>
+</string>
+<string>
+	<original>Paypal Email</original>
+	<translate>Paypal El. paštas</translate>
+</string>
+<string>
+	<original>Pending</original>
+	<translate>Laukiama</translate>
+</string>
+<string>
+	<original>Permission Denied</original>
+	<translate>Prieiga uždrausta</translate>
+</string>
+<string>
+	<original>Permissions</original>
+	<translate>Leidimai</translate>
+</string>
+<string>
+	<original>Permissions Summary</original>
+	<translate>Leidimų santrauka</translate>
+</string>
+<string>
+	<original>Phone number should have at least {NUM} digits</original>
+	<translate>Tel. numeris privalo turėti bent {NUM} skaičius</translate>
+</string>
+<string>
+	<original>Pick one randomly from available ones in the front end</original>
+	<translate>Pasirinkite vieną atsitiktinai, iš prieinamų puslapyje</translate>
+</string>
+<string>
+	<original>Please Confirm Your Email</original>
+	<translate>Prašome patvirtinti savo el. paštą</translate>
+</string>
+<string>
+	<original>Please Enter Your License Code</original>
+	<translate>Įveskite licenzijos kodą</translate>
+</string>
+<string>
+	<original>Please Select</original>
+	<translate>Pasirinkite</translate>
+</string>
+<string>
+	<original>Please Upgrade</original>
+	<translate>Prašome atnaujinti</translate>
+</string>
+<string>
+	<original>Please choose at least 1 option</original>
+	<translate>Pasirinkite bent vieną</translate>
+</string>
+<string>
+	<original>Please choose at least 2 options</original>
+	<translate>Pasirinkite bent du</translate>
+</string>
+<string>
+	<original>Please confirm the password</original>
+	<translate>Patvirtinkite slaptažodį</translate>
+</string>
+<string>
+	<original>Please enter your details to proceed</original>
+	<translate>Įveskite duomenis norėdami tęsti</translate>
+</string>
+<string>
+	<original>Please give a reason</original>
+	<translate>Prašome nurodyti priežastį</translate>
+</string>
+<string>
+	<original>Please login or register to proceed</original>
+	<translate>Norėdami tęsti, prisijunkite arba registruokitės</translate>
+</string>
+<string>
+	<original>Please note that Google Calendar can take up to a day to update after an appointment is made here.</original>
+	<translate>Turėkite omenyje, kad Google kalendoriaus atnaujinimas gali užtrukti iki vienos paros po to, kai čia įvedama nauja apsilankymo registracija</translate>
+</string>
+<string>
+	<original>Please note that this operation can not be reverted!</original>
+	<translate>Pakeitimai, atlikti vykdant šią operaciją nebegalės būti atšaukti!</translate>
+</string>
+<string>
+	<original>Please open your inbox and click the confirmation link in our message</original>
+	<translate>Prašome patikrinti savo el. paštą bei paspausti patvirtinimo nuorodą, esančią jame.</translate>
+</string>
+<string>
+	<original>Please try again</original>
+	<translate>Bandykite dar kartą</translate>
+</string>
+<string>
+	<original>Plugin</original>
+	<translate>Modulis</translate>
+</string>
+<string>
+	<original>Plugins</original>
+	<translate>Moduliai</translate>
+</string>
+<string>
+	<original>Preview</original>
+	<translate>Peržiūra</translate>
+</string>
+<string>
+	<original>Price</original>
+	<translate>Kaina</translate>
+</string>
+<string>
+	<original>Price Format</original>
+	<translate>Kainos formatas</translate>
+</string>
+<string>
+	<original>Price Not Changed</original>
+	<translate>Kaina nesikeitė</translate>
+</string>
+<string>
+	<original>Print</original>
+	<translate>Spausdinti</translate>
+</string>
+<string>
+	<original>Print View</original>
+	<translate>Spausdinimo vaizdas</translate>
+</string>
+<string>
+	<original>Proceed</original>
+	<translate>Tęsti</translate>
+</string>
+<string>
+	<original>Proceed Anyway</original>
+	<translate>Vistiek tęsti</translate>
+</string>
+<string>
+	<original>Processing Time</original>
+	<translate>Vykdymo laikas</translate>
+</string>
+<string>
+	<original>Profile</original>
+	<translate>Paskyra</translate>
+</string>
+<string>
+	<original>Promotion</original>
+	<translate>Akcija</translate>
+</string>
+<string>
+	<original>Promotions</original>
+	<translate>Akcijos</translate>
+</string>
+<string>
+	<original>Purchase</original>
+	<translate>Pirkinys</translate>
+</string>
+<string>
+	<original>Quantity</original>
+	<translate>Kiekis</translate>
+</string>
+<string>
+	<original>Random</original>
+	<translate>Atsitiktinis</translate>
+</string>
+<string>
+	<original>Reassign</original>
+	<translate>Iš naujo priskirti</translate>
+</string>
+<string>
+	<original>Recent</original>
+	<translate>Paskutiniai</translate>
+</string>
+<string>
+	<original>Recurring</original>
+	<translate>Besikartonatys</translate>
+</string>
+<string>
+	<original>Redirect to a Thank You page</original>
+	<translate>Nukreipti į padėkojimo puslapį</translate>
+</string>
+<string>
+	<original>Ref Code</original>
+	<translate>Kodas</translate>
+</string>
+<string>
+	<original>Refno</original>
+	<translate>Numeris</translate>
+</string>
+<string>
+	<original>Refund</original>
+	<translate>Pinigų grąžinimas</translate>
+</string>
+<string>
+	<original>Register</original>
+	<translate>Registruotis</translate>
+</string>
+<string>
+	<original>Registered Customers</original>
+	<translate>Registruoti klientai</translate>
+</string>
+<string>
+	<original>Registration</original>
+	<translate>Registracija</translate>
+</string>
+<string>
+	<original>Reject</original>
+	<translate>Atmesti</translate>
+</string>
+<string>
+	<original>Remain</original>
+	<translate>Išlieka</translate>
+</string>
+<string>
+	<original>Remember Me</original>
+	<translate>Prisiminti mane</translate>
+</string>
+<string>
+	<original>Reminder</original>
+	<translate>Priminimas</translate>
+</string>
+<string>
+	<original>Reminders</original>
+	<translate>Priminimai</translate>
+</string>
+<string>
+	<original>Remove</original>
+	<translate>Šalinti</translate>
+</string>
+<string>
+	<original>Remove Balance</original>
+	<translate>Šalinti balansą</translate>
+</string>
+<string>
+	<original>Request (Automatically Approved)</original>
+	<translate>Užklausti (automatiškai patvirtinta)</translate>
+</string>
+<string>
+	<original>Require Clients Give Appointment Cancellation Reason</original>
+	<translate>Reikalauti nurodyti apsilankymo atšaukimo priežastį</translate>
+</string>
+<string>
+	<original>Require Deposit</original>
+	<translate>Reikalauti depozito</translate>
+</string>
+<string>
+	<original>Require Strong Passwords</original>
+	<translate>Reikalauti stiprių slaptažodžių</translate>
+</string>
+<string>
+	<original>Required</original>
+	<translate>Būtina</translate>
+</string>
+<string>
+	<original>Reschedule</original>
+	<translate>Iš naujo suplanuoti</translate>
+</string>
+<string>
+	<original>Resend Confirmation Code</original>
+	<translate>Pakartotinai siųsti patvirtinimo kodą</translate>
+</string>
+<string>
+	<original>Reset</original>
+	<translate>Nustatyti iš naujo</translate>
+</string>
+<string>
+	<original>Reset To Defaults</original>
+	<translate>Keisti į numatytasias reikšmes</translate>
+</string>
+<string>
+	<original>Response</original>
+	<translate>Atsakymas</translate>
+</string>
+<string>
+	<original>Restore</original>
+	<translate>Atkurti</translate>
+</string>
+<string>
+	<original>Restrictions</original>
+	<translate>Ribojimai</translate>
+</string>
+<string>
+	<original>Role</original>
+	<translate>Rolė</translate>
+</string>
+<string>
+	<original>SMS</original>
+	<translate>SMS</translate>
+</string>
+<string>
+	<original>SMS Notifications Templates</original>
+	<translate>SMS pranešimų šablonai</translate>
+</string>
+<string>
+	<original>SMTP Settings</original>
+	<translate>SMTP nustatymai</translate>
+</string>
+<string>
+	<original>Sat</original>
+	<translate>Šeš</translate>
+</string>
+<string>
+	<original>Saturday</original>
+	<translate>Šeštadienis</translate>
+</string>
+<string>
+	<original>Save</original>
+	<translate>Saugoti</translate>
+</string>
+<string>
+	<original>Schedule Now</original>
+	<translate>Planuoti dabar</translate>
+</string>
+<string>
+	<original>Schedules</original>
+	<translate>Planai</translate>
+</string>
+<string>
+	<original>Search</original>
+	<translate>Ieškoti</translate>
+</string>
+<string>
+	<original>Seat</original>
+	<translate>Sėdynė</translate>
+</string>
+<string>
+	<original>Seats</original>
+	<translate>Darbo vietos</translate>
+</string>
+<string>
+	<original>Secure</original>
+	<translate>Saugus</translate>
+</string>
+<string>
+	<original>Select</original>
+	<translate>Pasirinkti</translate>
+</string>
+<string>
+	<original>Select All</original>
+	<translate>Pasirinkti visus</translate>
+</string>
+<string>
+	<original>Select Options</original>
+	<translate>Pasirinkite variantus</translate>
+</string>
+<string>
+	<original>Selling Price</original>
+	<translate>Pardavimo kaina</translate>
+</string>
+<string>
+	<original>Send</original>
+	<translate>Siųsti</translate>
+</string>
+<string>
+	<original>Send CC For Appointment</original>
+	<translate>Siųsti CC apsilankymui</translate>
+</string>
+<string>
+	<original>Send Email</original>
+	<translate>Siųsti el. laišką</translate>
+</string>
+<string>
+	<original>Send New Password</original>
+	<translate>Siųsti naują slaptažodį</translate>
+</string>
+<string>
+	<original>Send Notification</original>
+	<translate>Siųsti pranešimą</translate>
+</string>
+<string>
+	<original>Send Reminder Before</original>
+	<translate>Siųsti priminimą prieš</translate>
+</string>
+<string>
+	<original>Send To</original>
+	<translate>Siųsti kam:</translate>
+</string>
+<string>
+	<original>Sent At</original>
+	<translate>Siųsti kur:</translate>
+</string>
+<string>
+	<original>Sep</original>
+	<translate>Spa</translate>
+</string>
+<string>
+	<original>Sequential</original>
+	<translate>Iš eilės</translate>
+</string>
+<string>
+	<original>Series</original>
+	<translate>Serijos</translate>
+</string>
+<string>
+	<original>Service</original>
+	<translate>Pageidaujamas seansas</translate>
+</string>
+<string>
+	<original>Service Bundles</original>
+	<translate>Paslaugų pakuotės</translate>
+</string>
+<string>
+	<original>Services</original>
+	<translate>Paslaugos</translate>
+</string>
+<string>
+	<original>Set For All Services</original>
+	<translate>Nustatyti visoms paslaugoms</translate>
+</string>
+<string>
+	<original>Set Status</original>
+	<translate>Nustatyti būklę</translate>
+</string>
+<string>
+	<original>Set this if not available for booking by customers</original>
+	<translate>Pažymėkite, jei nenaudojama klientų rezervacijoms</translate>
+</string>
+<string>
+	<original>Set to 0 to disable</original>
+	<translate>Įveskite 0 tam kad išjungti</translate>
+</string>
+<string>
+	<original>Settings</original>
+	<translate>Nustatymai</translate>
+</string>
+<string>
+	<original>Show Booked Timeslots In Front End</original>
+	<translate>Rodyti užsakytus laikus tinklapyje</translate>
+</string>
+<string>
+	<original>Show Order</original>
+	<translate>Rodymo tvarka</translate>
+</string>
+<string>
+	<original>Slot Type</original>
+	<translate>Sloto tipas</translate>
+</string>
+<string>
+	<original>Smaller Goes First</original>
+	<translate>Mažesni pirmiausiai</translate>
+</string>
+<string>
+	<original>Staff</original>
+	<translate>Komanda</translate>
+</string>
+<string>
+	<original>Staff Can Edit Customers Login Details</original>
+	<translate>Komanda gali keisti klientų prisijungimo duomenis</translate>
+</string>
+<string>
+	<original>Staff do not have access to company configuration, payments, and system settings</original>
+	<translate>Komanda neturi priėjimo prie konfigūracijos, mokėjimų bei sistemos nustatymų</translate>
+</string>
+<string>
+	<original>Start Of Tomorrow Availability</original>
+	<translate>Rytojaus prieinamumo pradžia</translate>
+</string>
+<string>
+	<original>Starts At</original>
+	<translate>Prasideda</translate>
+</string>
+<string>
+	<original>Status</original>
+	<translate>Būklė</translate>
+</string>
+<string>
+	<original>Subject</original>
+	<translate>Tema</translate>
+</string>
+<string>
+	<original>Subtotal</original>
+	<translate>Tarpinė suma</translate>
+</string>
+<string>
+	<original>Sun</original>
+	<translate>Sek</translate>
+</string>
+<string>
+	<original>Sunday</original>
+	<translate>Sekmadienis</translate>
+</string>
+<string>
+	<original>Suspend</original>
+	<translate>Užšaldyti</translate>
+</string>
+<string>
+	<original>Suspended</original>
+	<translate>Užšaldyta</translate>
+</string>
+<string>
+	<original>Sync</original>
+	<translate>Sinchronizacija</translate>
+</string>
+<string>
+	<original>System</original>
+	<translate>Sistema</translate>
+</string>
+<string>
+	<original>System Access Level</original>
+	<translate>Sistemos prieigos lygis</translate>
+</string>
+<string>
+	<original>System Name</original>
+	<translate>Sistemos pavadinimas</translate>
+</string>
+<string>
+	<original>Tags</original>
+	<translate>Žymos</translate>
+</string>
+<string>
+	<original>Tax Rate</original>
+	<translate>Mokesčio dydis</translate>
+</string>
+<string>
+	<original>Tax Title</original>
+	<translate>Mokesčio pavadinimas</translate>
+</string>
+<string>
+	<original>Taxable</original>
+	<translate>Apmokestinama</translate>
+</string>
+<string>
+	<original>Template</original>
+	<translate>Šablonas</translate>
+</string>
+<string>
+	<original>Templates</original>
+	<translate>Šablonai</translate>
+</string>
+<string>
+	<original>Text</original>
+	<translate>Tekstas</translate>
+</string>
+<string>
+	<original>Text Field Size</original>
+	<translate>Teksto laukelio dydis</translate>
+</string>
+<string>
+	<original>Textarea</original>
+	<translate>Teksto laukelis</translate>
+</string>
+<string>
+	<original>Textarea Columns</original>
+	<translate>Teksto laukelio kolonos</translate>
+</string>
+<string>
+	<original>Textarea Rows</original>
+	<translate>Teksto laukelio eilės</translate>
+</string>
+<string>
+	<original>The end time should be after the start</original>
+	<translate>Pabaigos data turi būti po pradžios datos</translate>
+</string>
+<string>
+	<original>There has been a problem with your payment</original>
+	<translate>Įvyko klaida vykdant mokėjimą</translate>
+</string>
+<string>
+	<original>There is a problem with your account</original>
+	<translate>Jūsų paskyra neveikia</translate>
+</string>
+<string>
+	<original>This Date Only</original>
+	<translate>Tik šiai datai</translate>
+</string>
+<string>
+	<original>This may depend on your Excel regional settings</original>
+	<translate>Tai gali būti taikoma Jūsų EXCEL regiono nustatymams</translate>
+</string>
+<string>
+	<original>This one will automatically assign a specified package to a newly created or registered customer (after being activated).</original>
+	<translate>Tai automatiškai priskirs nurodytą pakuotę naujiems klientams (po el. pašto aktyvacijos).</translate>
+</string>
+<string>
+	<original>This one will redirect a customer to a specified Thank You page upon an appointment booking.</original>
+	<translate>Tai automatiškai po apsilankymo regitracijos nukreips klientą į puslapį su padėka.</translate>
+</string>
+<string>
+	<original>This should not be bigger than</original>
+	<translate>Tai negali būti daugiau nei</translate>
+</string>
+<string>
+	<original>This should not be smaller than the min advance booking</original>
+	<translate>Tai negali būti mažiau nei minimalus išankstinės registracijos mokestis</translate>
+</string>
+<string>
+	<original>Thu</original>
+	<translate>Ket</translate>
+</string>
+<string>
+	<original>Thursday</original>
+	<translate>Ketvirtadienis</translate>
+</string>
+<string>
+	<original>Time</original>
+	<translate>Laikas</translate>
+</string>
+<string>
+	<original>Time Format</original>
+	<translate>Laiko formatas</translate>
+</string>
+<string>
+	<original>Time Range</original>
+	<translate>laiko atkarpa</translate>
+</string>
+<string>
+	<original>Time Unit</original>
+	<translate>Laiko vienetas</translate>
+</string>
+<string>
+	<original>Timeoff</original>
+	<translate>Laikas kai niekas nevyksta</translate>
+</string>
+<string>
+	<original>Timezone</original>
+	<translate>Laiko zona</translate>
+</string>
+<string>
+	<original>Title</original>
+	<translate>Pavadinimas</translate>
+</string>
+<string>
+	<original>To</original>
+	<translate>Kam:</translate>
+</string>
+<string>
+	<original>Toggle All</original>
+	<translate>Įjungti visus</translate>
+</string>
+<string>
+	<original>Too Much</original>
+	<translate>Per daug</translate>
+</string>
+<string>
+	<original>Total</original>
+	<translate>Viso</translate>
+</string>
+<string>
+	<original>Total Amount</original>
+	<translate>Bendra suma</translate>
+</string>
+<string>
+	<original>Total Due</original>
+	<translate>Viso iki</translate>
+</string>
+<string>
+	<original>Total Paid</original>
+	<translate>Viso sumokėta</translate>
+</string>
+<string>
+	<original>Total Price</original>
+	<translate>Bendra kaina</translate>
+</string>
+<string>
+	<original>Total Value</original>
+	<translate>Bendra vertė</translate>
+</string>
+<string>
+	<original>Transactions</original>
+	<translate>Pervedimai</translate>
+</string>
+<string>
+	<original>Travel Time</original>
+	<translate>Kelionės laikas</translate>
+</string>
+<string>
+	<original>Tue</original>
+	<translate>Ant</translate>
+</string>
+<string>
+	<original>Tuesday</original>
+	<translate>Antradienis</translate>
+</string>
+<string>
+	<original>Type</original>
+	<translate>Tipas</translate>
+</string>
+<string>
+	<original>URL For Customer</original>
+	<translate>Kliento URL</translate>
+</string>
+<string>
+	<original>Uncategorized</original>
+	<translate>Nekategorizuota</translate>
+</string>
+<string>
+	<original>Uninstall</original>
+	<translate>Panaikinti sąranką</translate>
+</string>
+<string>
+	<original>Unique</original>
+	<translate>Unikalus</translate>
+</string>
+<string>
+	<original>Unit Price</original>
+	<translate>Vieneto kaina</translate>
+</string>
+<string>
+	<original>Unlimited</original>
+	<translate>Neribotas</translate>
+</string>
+<string>
+	<original>Unmark</original>
+	<translate>Nuimti žymę</translate>
+</string>
+<string>
+	<original>Unpaid Invoices</original>
+	<translate>Neapmokėtos sąsklaitos - faktūros</translate>
+</string>
+<string>
+	<original>Up</original>
+	<translate>Į viršų</translate>
+</string>
+<string>
+	<original>Upcoming</original>
+	<translate>Artėjantys</translate>
+</string>
+<string>
+	<original>Update</original>
+	<translate>Naujinti</translate>
+</string>
+<string>
+	<original>Upgrade</original>
+	<translate>Atnaujinti</translate>
+</string>
+<string>
+	<original>Upload dir does not exist</original>
+	<translate>Užkrovimo direktorijos nėra</translate>
+</string>
+<string>
+	<original>Upload dir is not writable</original>
+	<translate>Naįmanoma įrašyti į užkrovimo direktoriją</translate>
+</string>
+<string>
+	<original>Uploaded</original>
+	<translate>Užkrauti</translate>
+</string>
+<string>
+	<original>Uploads Directory</original>
+	<translate>Užkrovimų direktorija</translate>
+</string>
+<string>
+	<original>Usage</original>
+	<translate>Naudojimas</translate>
+</string>
+<string>
+	<original>Usage Count</original>
+	<translate>Naudojimų skaitiklis</translate>
+</string>
+<string>
+	<original>Usage Limit</original>
+	<translate>Naudojimų riba</translate>
+</string>
+<string>
+	<original>Use Balance</original>
+	<translate>Naudoti balansą</translate>
+</string>
+<string>
+	<original>Use Captcha For Non-Registered Users</original>
+	<translate>Naudoti Captcha neregistruotiems klientams</translate>
+</string>
+<string>
+	<original>Use Email As Username</original>
+	<translate>naudoti el. pašto adresą  kaip prisijungimo vardą</translate>
+</string>
+<string>
+	<original>Use at least 8 characters</original>
+	<translate>Naudokite bent 8 simbolius</translate>
+</string>
+<string>
+	<original>Use both letters and numbers</original>
+	<translate>Naudokite raides ir skaičius</translate>
+</string>
+<string>
+	<original>Used</original>
+	<translate>Panaudoti</translate>
+</string>
+<string>
+	<original>User</original>
+	<translate>Vartotojas</translate>
+</string>
+<string>
+	<original>User Registration</original>
+	<translate>Vertotojo registracija</translate>
+</string>
+<string>
+	<original>Username</original>
+	<translate>Vartotojo vardas</translate>
+</string>
+<string>
+	<original>Users</original>
+	<translate>Vartotojai</translate>
+</string>
+<string>
+	<original>Valid Email Required</original>
+	<translate>Būtina įvesti galiojantį el. pašto adresą</translate>
+</string>
+<string>
+	<original>Valid For</original>
+	<translate>Galioja kam: </translate>
+</string>
+<string>
+	<original>Valid Phone Number (10 digits)</original>
+	<translate>Galiojantis telefono numeris (10 skaičių)</translate>
+</string>
+<string>
+	<original>Valid Phone Number (11 digits)</original>
+	<translate>Galiojantis telefono numeris (11 skaičių)</translate>
+</string>
+<string>
+	<original>Valid Till</original>
+	<translate>Galioja iki</translate>
+</string>
+<string>
+	<original>Valid URL Syntax</original>
+	<translate>Galiojanti URL sintaksė</translate>
+</string>
+<string>
+	<original>Validation</original>
+	<translate>Patikrinimas</translate>
+</string>
+<string>
+	<original>Validations</original>
+	<translate>Patikrinimai</translate>
+</string>
+<string>
+	<original>Value</original>
+	<translate>Vertė</translate>
+</string>
+<string>
+	<original>Value Type</original>
+	<translate>Vertės tipas</translate>
+</string>
+<string>
+	<original>View</original>
+	<translate>Žiūrėti</translate>
+</string>
+<string>
+	<original>View Only</original>
+	<translate>Tik peržiūra</translate>
+</string>
+<string>
+	<original>View and Update</original>
+	<translate>Peržiūrėti ir naujinti</translate>
+</string>
+<string>
+	<original>Visible Time Of Day</original>
+	<translate>Matomas dienos laikas</translate>
+</string>
+<string>
+	<original>Waiting For Approval</original>
+	<translate>Laukiama patvirtinimo</translate>
+</string>
+<string>
+	<original>Warning: your current data will be deleted by restoring from backup file</original>
+	<translate>Įspėjimas: dabartiniai duomenys bus pakeisti duomenimis iš atsarginės rinkmenos bylos</translate>
+</string>
+<string>
+	<original>We can recognize the following fields in your CSV file</original>
+	<translate>Neatpažįstame sekančių laukų iš pateiktos CSV bylos</translate>
+</string>
+<string>
+	<original>Web Page Title</original>
+	<translate>Puslapio pavadinimas</translate>
+</string>
+<string>
+	<original>Wed</original>
+	<translate>Tre</translate>
+</string>
+<string>
+	<original>Wednesday</original>
+	<translate>Trįečiadienis</translate>
+</string>
+<string>
+	<original>Week</original>
+	<translate>Savaitė</translate>
+</string>
+<string>
+	<original>Week Starts On</original>
+	<translate>Savaitė prasideda</translate>
+</string>
+<string>
+	<original>Week Wizard</original>
+	<translate>Savaitės vedlys</translate>
+</string>
+<string>
+	<original>Weekday</original>
+	<translate>Savaitės diena</translate>
+</string>
+<string>
+	<original>Weekdays</original>
+	<translate>Savaitės dienos</translate>
+</string>
+<string>
+	<original>Weeks</original>
+	<translate>Savaitės</translate>
+</string>
+<string>
+	<original>When</original>
+	<translate>Kada</translate>
+</string>
+<string>
+	<original>When enabling this, be sure you remember your own email address</original>
+	<translate>Kai įgali9site šį pasirinkimą, nepamirškite savo el. pašto</translate>
+</string>
+<string>
+	<original>When you merge a service to another one, this service is deleted and all appointments and schedules are transferred to the other one</original>
+	<translate>Kai apjungiate paslaugas, prijungtoji paslauga ištrinama ir jos registruoti apsilankymai perkeliami į naują junginį</translate>
+</string>
+<string>
+	<original>When you merge this account to another one, this one is deleted and all appointments and other customer related data are transferred to the other one</original>
+	<translate>Kai prijungiate vieną paskyrą prie kitos, visos prijungtos paskyros apsilankymų registracijos perkeliamos į naują jungtinę paskyrą</translate>
+</string>
+<string>
+	<original>With Selected</original>
+	<translate>Su pasirinktais</translate>
+</string>
+<string>
+	<original>Wrong Code</original>
+	<translate>Kodas netinka</translate>
+</string>
+<string>
+	<original>Wrong Confirmation Link</original>
+	<translate>Netinkama patvirtinimo nuoroda</translate>
+</string>
+<string>
+	<original>Wrong username or password</original>
+	<translate>Netinkamas vartotojo vardas ir / ar slaptažodis</translate>
+</string>
+<string>
+	<original>Years</original>
+	<translate>Metai</translate>
+</string>
+<string>
+	<original>Yes</original>
+	<translate>Taip</translate>
+</string>
+<string>
+	<original>Yes, I've configured the cron job</original>
+	<translate>Taip, aš sukonfigūravau periodinį darbą</translate>
+</string>
+<string>
+	<original>Your new password has been sent to your email</original>
+	<translate>Jūsų naujas slaptažodis atsiųstas į Jūsų el. paštą</translate>
+</string>
+<string>
+	<original>iCal Summary</original>
+	<translate>iCal suvestinė</translate>
+</string>
+<string>
+	<original>Time Off</original>
+	<translate>Pertrauka</translate>
+</string>
+<string>
+	<original>Europe</original>
+	<translate>Europa</translate>
+</string>
+<string>
+	<original>Phone</original>
+	<translate>Telefonas</translate>
+</string>
+
+</file>

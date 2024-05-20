@@ -1,0 +1,12 @@
+
+select ProgNotes.Progress,Treatment.ContLogDate,Client.LName,Client.FName,Clinic.Name as ClinicName
+      ,DATE_FORMAT(Treatment.ContLogDate,'%Y-%m') as MyX
+ from ProgNotes
+  left join Treatment on Treatment.TrID=ProgNotes.NoteID
+  left join Client on Client.ClientID=ProgNotes.ClientID
+  left join ClientACL on ClientACL.ClientID=Client.ClientID
+  left join Provider as Clinic on Clinic.ProvID=Treatment.ClinicID
+ where Treatment.ContLogDate>="2016-08-01" and Treatment.ContLogDate<="2016-08-31"
+and ProgNotes.Progress=1
+  and  ClientACL.ProvID='91'
+ order by Client.LName,Client.FName,Client.ClientID

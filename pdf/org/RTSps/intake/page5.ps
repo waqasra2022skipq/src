@@ -1,0 +1,66 @@
+% Main box(es)
+ULOrigin PageWidth LM RM add sub 664 box
+ULOrigin 109 sub moveto
+  PageWidth RM sub CurrentY lineto
+ULOrigin 220 sub moveto
+  PageWidth RM sub CurrentY lineto
+ULOrigin 331 sub moveto
+  PageWidth RM sub CurrentY lineto
+ULOrigin 441 sub moveto
+  PageWidth RM sub CurrentY lineto
+ULOrigin 553 sub moveto
+  PageWidth RM sub CurrentY lineto
+stroke
+
+Body setfont 
+
+BodyLeftEdge ULOriginY 16 sub moveto
+(List Any Significant Medical Problems and/or Diagnoses:) show
+% Move down one line, to the left edge
+BodyLeftEdge currentpoint exch pop 16 sub moveto
+(SMP &/| D) reportPos
+
+BodyLeftEdge ULOriginY 125 sub moveto
+(List Any Previous Surgeries / Medical Procedures Performed:) show
+BodyLeftEdge currentpoint exch pop 16 sub moveto
+(Surgeries) reportPos
+
+BodyLeftEdge ULOriginY 236 sub moveto
+(List All Medication Allergies / Reactions:) show
+BodyLeftEdge currentpoint exch pop 16 sub moveto
+(Med A/R) reportPos
+
+BodyLeftEdge ULOriginY 347 sub moveto
+(List All over the Counter Medications Currently Taken:) show
+BodyLeftEdge currentpoint exch pop 16 sub moveto
+(otc Med) reportPos
+
+BodyLeftEdge ULOriginY 457 sub moveto
+(List All Prescription Medications Currently Taken:) show
+BodyLeftEdge currentpoint exch pop 16 sub moveto
+(Prescription Med) reportPos
+
+BodyLeftEdge ULOriginY 569 sub moveto
+(List Any past / Current History of Mental Illness in Other Family Members:) 
+  show
+BodyLeftEdge currentpoint exch pop 16 sub moveto
+(Family Mental Illness) reportPos
+
+newpath
+ULOriginX 36 add 18 moveto
+  (Client Last Name: ) =show
+  0 -2 rmoveto
+  126 0 rlineto
+ULOriginX 256 add 18 moveto
+  (First: ) =show
+  0 -2 rmoveto
+  110 0 rlineto
+ULOriginX 394 add 18 moveto
+  (MI: ) =show
+  0 -2 rmoveto
+  58 0 rlineto
+  stroke
+
+(2  of  4) dup stringwidth pop PageWidth RM sub exch sub 18 moveto
+show
+showpage

@@ -1,0 +1,129 @@
+## okmis_adv
+#./DMHloc.pl DBNAME=okmis_adv\&AgencySite=200020790B\&AgencyNum=1     #Waterwood Clinic	100
+#./DMHloc.pl DBNAME=okmis_adv\&AgencySite=200020790C\&AgencyNum=1     #Macarthur Clinic	101
+#./DMHloc.pl DBNAME=okmis_adv\&AgencySite=200020790D\&AgencyNum=1     #NW Expressway Clinic	102
+#./DMHloc.pl DBNAME=okmis_adv\&AgencySite=200020790H\&AgencyNum=1     #Bethany Clinic	265
+#./DMHloc.pl DBNAME=okmis_adv\&AgencySite=200020790I\&AgencyNum=1     #Stillwater Clinic	266
+#./DMHloc.pl DBNAME=okmis_adv\&AgencySite=200020790J\&AgencyNum=1     #Kelly Clinic	267
+#
+## okmis_anv
+#./DMHloc.pl DBNAME=okmis_anv\&AgencySite=200092660A\&AgencyNum=1     #ANV Outpatient Mental Health	93
+#
+## okmis_anw
+#./DMHloc.pl DBNAME=okmis_anw\&AgencySite=200335040A\&AgencyNum=1     #Greenwood Group Practice	100
+#./DMHloc.pl DBNAME=okmis_anw\&AgencySite=200335040B\&AgencyNum=1     #Tulsa Clinic	131
+#
+## okmis_bpl
+#./DMHloc.pl DBNAME=okmis_bpl\&AgencySite=200241240A\&AgencyNum=1     #Oklahoma City Clinic	100
+#
+## okmis_ccc
+#./DMHloc.pl DBNAME=okmis_ccc\&AgencySite=200110320A\&AgencyNum=1     #OKC Clinic	311
+#./DMHloc.pl DBNAME=okmis_ccc\&AgencySite=200110320B\&AgencyNum=1     #Yukon Clinic	461
+#
+## okmis_ccs
+#./DMHloc.pl DBNAME=okmis_ccs\&AgencySite=200568000A\&AgencyNum=1     #Cobblestone Counseling Clinic	103
+#
+## okmis_csl
+#./DMHloc.pl DBNAME=okmis_csl\&AgencySite=200489390A\&AgencyNum=1     #Counseling Solutions, LLC	100
+#
+## okmis_cti
+#./DMHloc.pl DBNAME=okmis_cti\&AgencySite=200081620A\&AgencyNum=1     #Tulsa SA Medicaid Clinic	101
+#./DMHloc.pl DBNAME=okmis_cti\&AgencySite=200081620E\&AgencyNum=1     #Bartlesville SA Medicaid Clinic	159
+#
+## okmis_elf
+#./DMHloc.pl DBNAME=okmis_elf\&AgencySite=200097840A\&AgencyNum=1     #Eufaula Outpatient Clinic	93
+#./DMHloc.pl DBNAME=okmis_elf\&AgencySite=200097840B\&AgencyNum=1     #Eufaula Case Management	94
+#
+## okmis_eti
+#./DMHloc.pl DBNAME=okmis_eti\&AgencySite=200056310A\&AgencyNum=1     #ETI Clinic	93
+#
+## okmis_fho
+#./DMHloc.pl DBNAME=okmis_fho\&AgencySite=200289460A\&AgencyNum=1     #Future & Hope Outreach Clinic	100
+#
+## okmis_foh
+#./DMHloc.pl DBNAME=okmis_foh\&AgencySite=200531360A\&AgencyNum=1     #Fountain of Hope Clinic	100
+#
+## okmis_gcs
+#./DMHloc.pl DBNAME=okmis_gcs\&AgencySite=200539560B\&AgencyNum=1     #Gillispie Family Ministries Clinic	100
+#
+## okmis_gpr
+#./DMHloc.pl DBNAME=okmis_gpr\&AgencySite=100736990A\&AgencyNum=1     #Shawnee Title 19 Clinic	100
+#./DMHloc.pl DBNAME=okmis_gpr\&AgencySite=100736990D\&AgencyNum=1     #Chandler Title 19 Clinic	102
+#./DMHloc.pl DBNAME=okmis_gpr\&AgencySite=100736990F\&AgencyNum=1     #Shawnee Mabel Basset Clinic	160
+#./DMHloc.pl DBNAME=okmis_gpr\&AgencySite=100736990G\&AgencyNum=1     #Stillwater Title 19 Clinic	101
+#
+## okmis_ibf
+#./DMHloc.pl DBNAME=okmis_ibf\&AgencySite=200515110A\&AgencyNum=1     #IBF Counseling Center	105
+#
+## okmis_ipi
+#./DMHloc.pl DBNAME=okmis_ipi\&AgencySite=200211790A\&AgencyNum=1     #Medicaid Clinic	100
+#
+## okmis_kca
+#./DMHloc.pl DBNAME=okmis_kca\&AgencySite=100732840A\&AgencyNum=1     #Hugo SA Basic Clinic	107
+#
+## okmis_kcs
+#./DMHloc.pl DBNAME=okmis_kcs\&AgencySite=200566490A\&AgencyNum=1     #Cleveland Clinic	102
+#
+## okmis_lbhp
+###FIX NULL	100	medicaid	Brighter Beginnings Counseling Clinic	214
+#./DMHloc.pl DBNAME=okmis_lbhp\&AgencySite=200288810A\&AgencyNum=1     #Carolyn Burns Clinic	111
+#./DMHloc.pl DBNAME=okmis_lbhp\&AgencySite=200292350B\&AgencyNum=1     #Betty Jackson CARF Clinic	129
+#./DMHloc.pl DBNAME=okmis_lbhp\&AgencySite=200605100A\&AgencyNum=1     #Tulsa Therapy Solutions Clinic	211
+#./DMHloc.pl DBNAME=okmis_lbhp\&AgencySite=200647140A\&AgencyNum=1     #Jade Latimer Graham, LLC Clinic	196
+#./DMHloc.pl DBNAME=okmis_lbhp\&AgencySite=100656220D\&AgencyNum=0     #Kim	James	101
+#./DMHloc.pl DBNAME=okmis_lbhp\&AgencySite=200245420A\&AgencyNum=0     #Misti	Center	109
+#./DMHloc.pl DBNAME=okmis_lbhp\&AgencySite=200325940A\&AgencyNum=0     #Teresa	Henson	126
+#./DMHloc.pl DBNAME=okmis_lbhp\&AgencySite=200329280B\&AgencyNum=0     #Derick	Chi	201
+#./DMHloc.pl DBNAME=okmis_lbhp\&AgencySite=200343000A\&AgencyNum=0     #Hannah	Conly	151
+#./DMHloc.pl DBNAME=okmis_lbhp\&AgencySite=200348740A\&AgencyNum=0     #Deon	Whiteside	207
+#./DMHloc.pl DBNAME=okmis_lbhp\&AgencySite=200354300A\&AgencyNum=0     #Fred	Hendreson	212
+#./DMHloc.pl DBNAME=okmis_lbhp\&AgencySite=200363830B\&AgencyNum=0     #Ella	Robertson	215
+#./DMHloc.pl DBNAME=okmis_lbhp\&AgencySite=200517890A\&AgencyNum=0     #Catherine	Graham	197
+#./DMHloc.pl DBNAME=okmis_lbhp\&AgencySite=200527560A\&AgencyNum=0     #Pascal	Langsi	200
+#
+## okmis_lkt
+#./DMHloc.pl DBNAME=okmis_lkt\&AgencySite=200608200A\&AgencyNum=1     #LKT Clinic	100
+#
+## okmis_met
+#./DMHloc.pl DBNAME=okmis_met\&AgencySite=200470310A\&AgencyNum=1     #MCS Clinic	100
+#
+## okmis_mms
+###FIX ./DMHloc.pl DBNAME=okmis_mms\&AgencySite=200129170\&AgencyNum=1     #MCS Latimer Clinic	2371
+#./DMHloc.pl DBNAME=okmis_mms\&AgencySite=200129170A\&AgencyNum=1     #MCS Norman Clinic	1204
+#./DMHloc.pl DBNAME=okmis_mms\&AgencySite=200129170B\&AgencyNum=1     #MCS Talihina Clinic	2195
+#./DMHloc.pl DBNAME=okmis_mms\&AgencySite=200129170D\&AgencyNum=1     #MCS Hobart Clinic	2298
+#./DMHloc.pl DBNAME=okmis_mms\&AgencySite=200129170E\&AgencyNum=1     #MCS Poteau Clinic	2304
+#./DMHloc.pl DBNAME=okmis_mms\&AgencySite=200129170F\&AgencyNum=1     #MCS Enid Clinic	2359
+#./DMHloc.pl DBNAME=okmis_mms\&AgencySite=200129170G\&AgencyNum=1     #MCS Stillwater Clinic	2370
+#./DMHloc.pl DBNAME=okmis_mms\&AgencySite=200129170H\&AgencyNum=1     #MCS Skiatook Clinic	2287
+#./DMHloc.pl DBNAME=okmis_mms\&AgencySite=100635990D\&AgencyNum=0     #Wade	Hamil	102
+#
+## okmis_oays
+#./DMHloc.pl DBNAME=okmis_oays\&AgencySite=100707910B\&AgencyNum=1     #GP Hobart Outpatient Services	927
+#./DMHloc.pl DBNAME=okmis_oays\&AgencySite=100710510E\&AgencyNum=1     #YST Home Based Services	101
+#./DMHloc.pl DBNAME=okmis_oays\&AgencySite=100731690A\&AgencyNum=1     #YFSSC Clinic	1383
+#./DMHloc.pl DBNAME=okmis_oays\&AgencySite=100731690B\&AgencyNum=1     #YFSSC TANF Clinic	1400
+#./DMHloc.pl DBNAME=okmis_oays\&AgencySite=100740990A\&AgencyNum=1     #Del City Counseling	209
+#./DMHloc.pl DBNAME=okmis_oays\&AgencySite=100740990B\&AgencyNum=1     #Midwest City Clinic	210
+#
+## okmis_opa
+#./DMHloc.pl DBNAME=okmis_opa\&AgencySite=200086340B\&AgencyNum=1     #Kara Rodgers Clinic	113
+#./DMHloc.pl DBNAME=okmis_opa\&AgencySite=100840200A\&AgencyNum=0     #Karan	Allbright	108
+#
+## okmis_pcd
+#./DMHloc.pl DBNAME=okmis_pcd\&AgencySite=200255170A\&AgencyNum=1     #Payne County Drug Court Clinic	100
+#
+## okmis_scs
+#./DMHloc.pl DBNAME=okmis_scs\&AgencySite=200487600A\&AgencyNum=1     #Syd-LYFE Counseling Service	92
+#
+## okmis_tccp
+#./DMHloc.pl DBNAME=okmis_tccp\&AgencySite=100840000A\&AgencyNum=0     #Richard 	Walton	109
+#./DMHloc.pl DBNAME=okmis_tccp\&AgencySite=200366860A\&AgencyNum=0     #Laura	Moore	119
+#./DMHloc.pl DBNAME=okmis_tccp\&AgencySite=200471900A\&AgencyNum=0     #Sarah	Jones	107
+#./DMHloc.pl DBNAME=okmis_tccp\&AgencySite=200516470A\&AgencyNum=0     #Tara	Pyle	103
+#./DMHloc.pl DBNAME=okmis_tccp\&AgencySite=200546040A\&AgencyNum=0     #Christopher	Hogue	104
+#./DMHloc.pl DBNAME=okmis_tccp\&AgencySite=200594670A\&AgencyNum=0     #Diane	Kirk	127
+#./DMHloc.pl DBNAME=okmis_tccp\&AgencySite=200613520A\&AgencyNum=0     #Jennifer	Brusich	121
+#
+## okmis_tsi
+#./DMHloc.pl DBNAME=okmis_tsi\&AgencySite=200113310A\&AgencyNum=1     #TSI Clinic	100

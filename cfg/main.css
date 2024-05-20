@@ -1,0 +1,272 @@
+/* stylesheet for Millennium Information Services */
+/* a0522d is golden brown */
+/* 5a7d9b is aqua blue */
+/* 336666 is aqua green */
+/* ffe4e1 is light pink */
+/* 000080 is royal blue */
+/* FFFFCC is light yellow */
+/* FBFFE7 is almost pink */
+/* 778899 is silver blue */
+/* e6e6fa is light silver blue */
+/* b0c4de is light steel blue */
+
+a:link    { color: blue; text-decoration: none; }
+a:visited { color: blue; text-decoration: none; }
+a:active  { color: #1E90FF; text-decoration: underline; }
+a:hover   { color: black; background-color: silver; text-decoration: none; }
+
+body 
+{
+  background-color: black;
+  color: white;
+  text-align: center;
+  font-family: Verdana, Arial, Helvetica;
+}
+.login, table.login
+{ 
+  color: black; background-color: silver; border: none;
+  font-family: Verdana, Arial, Helvetica;
+}
+.login th { text-align: right; }
+.login td { text-align: left; }
+
+.main, table.main
+{ 
+  color: white; background-color: black; border: none;
+  font-family: Verdana, Arial, Helvetica;
+}
+.main td { vertical-align: top; }
+.main a:link    { color: blue; text-decoration: none; }
+.main a:visited { color: blue; text-decoration: none; }
+.main a:active  { color: #1E90FF; text-decoration: underline; }
+.main a:hover   { color: blue; background-color: silver; text-decoration: none; }
+.info, table.info
+{ 
+  color: white; background-color: black; border: none;
+  text-align: center; font-size: 1em; font-weight: normal;
+  font-family: Verdana, Arial, Helvetica;
+}
+.info th { vertical-align: top; }
+.info td { vertical-align: top; }
+.info a:link    { color: black; background-color: black; text-decoration: none; }
+.info a:visited { color: black; background-color: black; text-decoration: none; }
+.info a:active  { color: black; background-color: black; text-decoration: none; }
+.info a:hover   { color: #FFCC00; background-color: black; text-decoration: none; }
+.clock, table.clock
+{
+  color: #FFCC00; background-color: black; border: solid 1px #FFCC00;
+  text-align: center; font-size: .7em; font-weight: bold;
+  font-family: Verdana, Arial, Helvetica;
+}
+td.clock { vertical-align: top; width: 100%; }
+
+.mail a:link { color: blue; border: solid 1px white; background-color: white; text-decoration: none; }
+.mail a:visited { color: blue; border: solid 1px white; background-color: white; text-decoration: none; }
+.mail a:active { color: blue; border: solid 1px white; background-color: white; text-decoration: underline; }
+.mail a:hover { color: red; border: solid 1px blue; background-color: silver; text-decoration: none; }
+
+.page a:link { color: blue; text-decoration: none; }
+.page a:visited { color: blue; text-decoration: none; }
+.page a:active { color: blue; text-decoration: underline; }
+.page a:hover { color: black; border: solid 1px black; background-color: silver; text-decoration: none; }
+
+.coname     { color: #1E90FF; text-align: left; font-family: cursive; font-style: oblique; font-size: 1.5em; }
+.toprow     { text-align: center; font-style: italic; }
+.tophdr     { text-align: center; font-style: italic; text-decoration: underline; }
+.hdrtxt     { text-align: center; vertical-align: top; text-decoration: underline; }
+.hdrstr     { text-align: left; vertical-align: top; text-decoration: underline; }
+.hdrcol     { text-align: center; vertical-align: top; }
+.strcol     { text-align: left; vertical-align: top; }
+.numcol     { text-align: right; vertical-align: top; }
+.banner     { font-size: 1.5em; font-weight: bold; }
+.header     { font-size: 1.5em; font-weight: normal; }
+.heading    { font-size: 1em; font-weight: bold; }
+.title      { font-size: 1em; font-weight: normal; }
+.subtitle   { font-size: .8em; font-weight: normal; }
+.label      { font-size: .6em; font-weight: normal; }
+.sublabel   { font-size: .4em; font-weight: normal; }
+.fullsize   { width: 100%; }
+.normsize   { width: 80%; }
+.halfsize   { width: 50%; }
+.indent     { padding-left: 40px; }
+.indent1    { text-indent: 40px; }
+.hotmsg     { color: red; font-style: italic; }
+.rptmsg     { font-style: italic; text-decoration: underline; }
+.rpthdr     { color: black; background-color: #F5F5DC; }
+.rpteven    { color: black; background-color: #90EE90; }
+.rptodd     { color: black; background-color: white; }
+
+/* == list = white on brown ============================ */
+.list, table.list
+{ 
+  color: white; background-color: brown; border: none;
+  font-family: Verdana, Arial, Helvetica;
+}
+.list td { vertical-align: top; }
+.list ul li { text-align: left; list-style-type: none; background-color: darkblue }
+.list a:link { color: darkblue; border: solid 1px silver; background-color: silver; text-decoration: none; }
+.list a:visited { color: darkblue; border: solid 1px silver; background-color: silver; text-decoration: none; }
+.list a:active { color: darkblue; border: solid 1px silver; background-color: silver; text-decoration: underline; }
+.list a:hover { color: #993333; border: solid 1px silver; background-color: silver; text-decoration: none; }
+
+/* == home = black on white ============================ */
+/* == site = white on black ============================ */
+.site, table.site
+{ 
+  color: white; background-color: black; border: none;
+  font-family: Verdana, Arial, Helvetica;
+}
+.site td { vertical-align: top; }
+.site ul li { text-align: left; list-style-type: none; }
+.site a:link { color: #FFCC00; border: solid 1px black; background-color: black; text-decoration: none; }
+.site a:visited { color: #FFCC00; border: solid 1px black; background-color: black; text-decoration: none; }
+.site a:active { color: #FFCC00; border: solid 1px black; background-color: black; text-decoration: underline; }
+.site a:hover { color: black; border: solid 1px #FFCC00; background-color: silver; text-decoration: none; }
+
+/* == home = black on white ============================ */
+.home, table.home
+{ 
+  color: black; background-color: white; border: solid 3px silver;
+  font-family: Verdana, Arial, Helvetica;
+}
+.home td { vertical-align: top; }
+.home ul li { text-align: left; list-style-type: none; }
+.home a:link    { color: darkblue; text-decoration: none; }
+.home a:visited { color: darkblue; text-decoration: none; }
+.home a:active  { color: darkblue; text-decoration: underline; }
+.home a:hover   { color: black; background-color: lightblue; text-decoration: underline; }
+
+/* == port = black on silver ========================== */
+.port, table.port
+{ 
+  color: black; background-color: silver; border: none;
+  font-family: Verdana, Arial, Helvetica;
+}
+.port td { vertical-align: top; }
+.port ul li { text-align: left; list-style-type: none; }
+.port a:link { color: darkblue; text-decoration: none; }
+.port a:visited { color: darkblue; text-decoration: none; }
+.port a:active { color: darkblue; text-decoration: underline; }
+.port a:hover { color: black; border: solid 1px black; background-color: #dea0a0; text-decoration: none; }
+
+/* used for popupMsg */
+/* see ID="textMsgLayer" for attributes...z-index, etc.*/
+.msgText
+{
+  color: black; text-align: center; font-size: .75em;
+  font-family: Verdana, Arial, Helvetica;
+}
+
+/* D3 */
+#chart1
+{
+  background-color: white;
+  color: black;
+  margin-top: 10;
+  margin-right: 10;
+  margin-bottom: 10;
+  margin-left: 10;
+  padding: 5px;
+  height: 500;
+  width: 1000;
+}
+svg
+{
+  display: block; 
+  font: 12px sans-serif;
+  background-color: white;
+  color: black;
+  margin-top: 10;
+  margin-right: 10;
+  margin-bottom: 10;
+  margin-left: 10;
+  padding: 5px;
+  height: 500;
+  width: 1000;
+}
+
+/* Accordion */
+.accordionItem H2 
+{
+  margin: 0;
+  font-size: 1em;
+  padding: 0.4em;
+  color: white;
+  text-align: center;
+  background-color: brown;
+  border-bottom: 3px solid white; 
+}
+.accordionItem P 
+{ margin: 0; font-size: 1em; padding: 0.4em; color: white; background-color: brown; border-bottom: 3px solid white; }
+.accordionItem H2:hover 
+{
+  cursor: pointer; 
+}
+.accordionItem DIV 
+{ margin: 0; padding: 1em 0.4em; background-color: #eeeeff; border-bottom: 3px solid brown; }
+.accordionItem.hide H2 
+{
+  color: black;
+  background-color: #ccccff;
+}
+.accordionItem.hide DIV 
+{ display: none; }
+
+.mybutton 
+{
+  background-color: green;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+
+/* fieldset instead of tables */
+fieldset 
+{
+  padding: 1em;
+  display: block;
+  margin-left: 20px;
+  margin-right: 20px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 2px;
+  padding-right: 2px;
+  color: black;
+  background-color: white;
+  border: 3px solid silver;
+  border-radius: 5px;
+}
+legend 
+{
+  color: black;
+  background-color: white;
+  font-size: 90%;
+  text-align: center;
+  border: 2px solid silver;
+  border-radius: 5px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 50px;
+  padding-right: 50px;
+}
+label 
+{
+  float: left;
+  width: 30%;
+  text-align: left;
+  font-weight: normal;
+  margin-top: 0;
+  margin-bottom: 10px;
+  margin-left: 10px;
+  margin-right: 0;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  padding-left: 10px;
+  padding-right: 10px;
+}

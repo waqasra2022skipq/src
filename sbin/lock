@@ -1,0 +1,2 @@
+#!/bin/bash
+/home/okmis/mis/src/sbin/lockunlock DBNAME=$1\&table=ClientPrAuth\&lock=1\&myID=$2

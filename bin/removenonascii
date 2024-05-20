@@ -1,0 +1,17 @@
+#!/usr/bin/perl
+# remove non ascii characters
+$str .= chr for 1..255;
+print $str,"\n\n";
+
+print "and...\n";
+
+# below, !-~ is a range which matches all characters between ! and ~.
+#  The range is set between ! and ~ because these are the first and last characters
+#  in the ASCII table (Alt+033 for ! and Alt+126 for ~ in Windows).
+#  As this range does not include whitespace, \s is separately included.
+#  \t simply represents a tab character.
+#  \s is similar to \t but the metacharacter \s is a shorthand for a whole
+#  character class that matches any whitespace character.
+#  This includes space, tab, newline and carriage return.
+$str =~ s/[^!-~\s]//g;
+print $str,"\n\n";

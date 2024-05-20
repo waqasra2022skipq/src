@@ -1,0 +1,94 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use myForm;
+use myDBI;
+use DBA;
+use DBUtil;
+use Time::Local;
+my $DT = localtime();
+############################################################################
+# usage:
+#   NoPHQ ForProvID=id
+############################################################################
+my $form = myForm->new();
+my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+#foreach my $f ( sort keys %{$form} ) { warn "form-$f=$form->{$f}\n"; }
+
+my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+# join xInsurance needed for withSelection
+my $ClinicSelection = DBA->withSelection($form,'and','Client.clinicClinicID','','','');
+my $Header = DBA->withSelectionHeader($form);
+$ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+my $sProvider = $dbh->prepare("select LName, FName from Provider where ProvID=?");
+my $qClient = qq"
+select Client.LName, Client.FName, Client.ClientID, Client.DOB, Client.ProvID, Client.RecDOLC as LastContDate, Client.Active
+      ,ClientPrAuth.PAnumber, ClientPrAuth.EffDate, ClientPrAuth.ExpDate, ClientPrAuthCDC.TransType
+      ,ClientPHQ.TestDate as TestPHQ
+      ,ClientPHQ4.TestDate as TestPHQ4
+      ,ClientPHQ9.TestDate as TestPHQ9
+      ,ClientTPHQ9.TestDate as TestTPHQ9
+      ,ClientPHQ15.TestDate as TestPHQ15
+      ,ClientPHQBrief.TestDate as TestPHQBrief
+      ,ClientPHQSADS.TestDate as TestPHQSADS
+      ,ClientSMFQ.TestDate as TestSMFQ
+  from Client 
+    left join ClientACL on ClientACL.ClientID=Client.ClientID
+    left join ClientPHQ on ClientPHQ.ClientID=Client.ClientID
+    left join ClientPHQ4 on ClientPHQ4.ClientID=Client.ClientID
+    left join ClientPHQ9 on ClientPHQ9.ClientID=Client.ClientID
+    left join ClientTPHQ9 on ClientTPHQ9.ClientID=Client.ClientID
+    left join ClientPHQ15 on ClientPHQ15.ClientID=Client.ClientID
+    left join ClientPHQBrief on ClientPHQBrief.ClientID=Client.ClientID
+    left join ClientPHQSADS on ClientPHQSADS.ClientID=Client.ClientID
+    left join ClientSMFQ on ClientSMFQ.ClientID=Client.ClientID
+    left join ClientPrAuth on ClientPrAuth.ClientID=Client.ClientID
+    left join ClientPrAuthCDC on ClientPrAuthCDC.ClientPrAuthID=ClientPrAuth.ID
+    left join Insurance on Insurance.InsNumID=ClientPrAuth.InsuranceID
+    left join xInsurance on xInsurance.ID=Insurance.InsID
+  where ClientACL.ProvID='${ForProvID}'
+    and ( ClientPHQ.TestDate is null
+          and ClientPHQ4.TestDate is null
+          and ClientPHQ9.TestDate is null
+          and ClientTPHQ9.TestDate is null
+          and ClientPHQ15.TestDate is null
+          and ClientPHQBrief.TestDate is null
+          and ClientPHQSADS.TestDate is null
+          and ClientSMFQ.TestDate is null 
+        )
+    and (
+          ClientPrAuth.PAnumber is not null
+          and curdate() between ClientPrAuth.EffDate and ClientPrAuth.ExpDate
+        )
+    and (ClientPrAuthCDC.TransType=23 || ClientPrAuthCDC.TransType=42)
+  ${ClinicSelection}
+  group by Client.LName, Client.FName, Client.ClientID";
+#warn qq|qClient=\n${qClient}\n|;
+my $sClient = $dbh->prepare($qClient);
+print qq|${DT}\n${Header}Missing PHQ Report.\nClients with missing any PHQ Test report\n|;
+print qq|Client Name\tClientID\tActive\tDOB\tAge\tPA Number\tTransType\tProvider Name\tMessage\tLast Contact Date\n|;
+$sClient->execute();
+while (my $rClient = $sClient->fetchrow_hashref)
+{ 
+  my $ClientID = $rClient->{'ClientID'};
+  my $ActiveFlag = $rClient->{'Active'} ? 'Yes' : 'No';
+  my $LastContDate = $rClient->{'LastContDate'};
+  my $ClientName = qq|$rClient->{'LName'}, $rClient->{'FName'}|;
+  my $Age = DBUtil->Date($rClient->{DOB}, 'age');
+## in select  next unless ( $rClient->{'TestPHQ'} eq '' && $rClient->{'TestPHQ4'} eq '' && $rClient->{'TestPHQ9'} eq '' && $rClient->{'TestTPHQ9'} eq '' && $rClient->{'TestPHQ15'} eq '' && $rClient->{'TestPHQBrief'} eq '' && $rClient->{'TestPHQSADS'} eq '' );
+## in select  next if ( $rClient->{'PAnumber'} eq '' );
+## in select  next unless ( $rClient->{'TransType'} =~ /23|42/ );
+  next if ( $Age < 13 );
+  my $msg = 'NO CLIENT PHQ TESTS';
+  $sProvider->execute($rClient->{ProvID});
+  my ($ProvLName, $ProvFName) = $sProvider->fetchrow_array;
+  my $ProvName = qq|$ProvLName, $ProvFName ($rClient->{ProvID})|; 
+  print qq|${ClientName}\t${ClientID}\t${ActiveFlag}\t$rClient->{'DOB'}\t${Age}\t$rClient->{'PAnumber'}\t$rClient->{'TransType'}\t${ProvName}\t${msg}\t${LastContDate}\n|;
+#  print qq|Dates:\t$rClient->{'TestPHQ'}\t$rClient->{'TestPHQ4'}\t$rClient->{'TestPHQ9'}\t$rClient->{'TestTPHQ9'}\t$rClient->{'TestPHQ15'}\t$rClient->{'TestPHQBrief'}\t$rClient->{'TestPHQSADS'}\n|;
+}
+
+$sProvider->finish();
+$sClient->finish();
+myDBI->cleanup();
+exit;
+############################################################################

@@ -1,0 +1,151 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use File::Copy;
+use DBA;
+use DBForm;
+use DBUtil;
+use myConfig;
+use XML::LibXML;
+############################################################################
+my $dbname = 'okmis_mms';
+my $dir = qq|/home/okmis/mis/src/phimail/received|;
+my $form = DBForm->new("DBNAME=$dbname");
+my $dbh = $form->dbconnect();
+my $ProvID = 2500;
+############################################################################
+my @dirfiles = glob("${dir}/newmsg_*");
+foreach my $dirfile ( @dirfiles )
+{
+  print qq|\nparse dirfile: $dirfile\n|;
+  if ( open(FILE,$dirfile) ) 
+  {
+    my $section = 0;
+    my ($recipient,$sender,$from,$to,$mdate,$subj) = main->getInfo();
+print qq|rec=${recipient}\nsend=${sender}\nfrom=${from}\nto=${to}\nmdate=${mdate}\nsubj=${subj}\n|;
+    my @attfiles = main->getFiles();
+print qq|attfiles=@attfiles\n|;
+    if ( $subj eq '' )
+    { print qq|>>>NO MESSAGES.\n|; }
+    else
+    {
+      my $rPhiMail = ();
+      $rPhiMail->{'CreateProvID'}=$form->{'LOGINPROVID'};
+      $rPhiMail->{'CreateDate'}=$form->{'TODAY'};
+      $rPhiMail->{'ChangeProvID'}=$form->{'LOGINPROVID'};
+      $rPhiMail->{'ProvID'}=$ProvID;
+      $rPhiMail->{'From'}=$sender;
+      $rPhiMail->{'To'}=$recipient;
+      $rPhiMail->{'InDate'}=$mdate;
+      $rPhiMail->{'Subject'}=$subj;
+foreach my $f ( sort keys %{$rPhiMail} ) { warn "addPhiMail-doUpdate: rPhiMail-$f=$rPhiMail->{$f}\n"; }
+      my $ID = DBA->doUpdate($form,'PhiMail',$rPhiMail);
+      foreach my $attfile ( @attfiles )
+      {
+        my $r = ();
+        $r->{'CreateProvID'}=$form->{'LOGINPROVID'};
+        $r->{'CreateDate'}=$form->{'TODAY'};
+        $r->{'ChangeProvID'}=$form->{'LOGINPROVID'};
+        $r->{'ProvID'}=$ProvID;
+        $r->{'PhiMailID'}=$ID;
+        $r->{'Title'}=$attfile;
+        $r->{'Descr'}=main->getDescr($dir.'/'.$attfile);
+        $r->{'filename'}='/phimail/'.$attfile;
+foreach my $f ( sort keys %{$r} ) { warn "addPhiMailAttachments-doUpdate: r-$f=$r->{$f}\n"; }
+        my $RECID = DBA->doUpdate($form,'PhiMailAttachments',$r);
+      }
+
+    }
+    close(FILE);
+    (my $donePath = $dirfile) =~ s/received/done/;
+    move($dirfile,$donePath) or print ">>> ERROR: Move ${dirfile} to ${donePath} failed: $!";
+  } else { print qq|>>>ERROR: open ${file} $!\n|; }
+}
+exit;
+################################################################
+sub getInfo
+{
+  my ($recipient,$sender,$from,$to,$msgdate,$subject) = ('','','','','','');
+  while ( $in = <FILE> )
+  {
+    chomp($in);
+#print qq|getInfo: in=${in}\n|;
+    $in =~ s/\r//g;               # carriage return
+    $in =~ s// /g;              # new line
+    $in =~ s/\n/ /g;              # new line
+    next if ( substr($in,0,2) eq '==' );
+    if ( $in =~ /^MimeType = / )
+    { my $mime = $in; }
+    elsif ( $in =~ /^recipient: / )
+    { ($type,$recipient) = split(/ /,$in,2); }
+    elsif ( $in =~ /^sender: / )
+    { ($type,$sender) = split(/ /,$in,2); }
+    elsif ( $in =~ /^From: / )
+    { ($type,$from) = split(/ /,$in,2); }
+    elsif ( $in =~ /^To: / )
+    { ($type,$to) = split(/ /,$in,2); }
+    elsif ( $in =~ /^Date: / )
+    { ($type,$msgdate) = split(/ /,$in,2); }
+    elsif ( $in =~ /^Subject: / )
+    { ($type,$subject) = split(/ /,$in,2); }
+    elsif ( $in =~ /^Files:/ )
+    { return($recipient,$sender,$from,$to,$msgdate,$subject); }
+  }
+  return($recipient,$sender,$from,$to,$msgdate,$subject);
+}
+sub getFiles
+{
+  my @files = ();
+  while ( $in = <FILE> )
+  {
+    chomp($in);
+print qq|getFiles: in=${in}=\n|;
+    $in =~ s/\r//g;               # carriage return
+    $in =~ s// /g;              # new line
+    $in =~ s/\n/ /g;              # new line
+    next if ( substr($in,0,2) eq '==' );
+    if ( $in =~ /^Files:/ ) { return(@files); } else { push(@files,$in); }
+  }
+print qq|getFiles: files=@files=\n|;
+  return(@files);        # end of file?
+}
+sub getDescr
+{
+  my ($self,$filename) = @_;
+  my $doc = '';
+  #   load_xml: initializes the parser and parse_file()
+print "${filename}\n";
+  eval { $doc = XML::LibXML->load_xml(location => $filename); };
+  return('parse_error') if ( $@ );
+  my $xml    = XML::LibXML::XPathContext->new;                # No argument here!
+  $xml->registerNs('x', 'urn:hl7-org:v3');
+  my ($longname,$othername) = ('','');
+  for my $node ( $xml->findnodes('//x:patient/x:name', $doc) )
+  {
+    my $type = $xml->findvalue('@use', $node);            # Context specified as argument.
+    for my $given ( $xml->findnodes('x:given', $node) )
+    {
+      if ( $type eq 'L' ) { $longname .= $given->to_literal.' '; }
+      else                { $othername .= $given->to_literal.' '; }
+    }
+    for my $family ( $xml->findnodes('x:family', $node) )
+    {
+      if ( $type eq 'L' ) { $longname .= $family->to_literal.' '; }
+      else                { $othername .= $family->to_literal.' '; }
+    }
+  }
+  my $patientname = $longname eq '' ? $othername : $longname;
+  my ($fname,$mname,$lname) = split(' ',$patientname);
+  $fname =~ s/^\s*(.*?)\s*$/$1/g;   # trim both leading/trailing
+print "$fname\n";
+  $mname =~ s/^\s*(.*?)\s*$/$1/g;   # trim both leading/trailing
+print "$mname\n";
+  $lname =~ s/^\s*(.*?)\s*$/$1/g;   # trim both leading/trailing
+print "$lname\n";
+  my $gender = $xml->findvalue('//x:patient/x:administrativeGenderCode/@code', $doc);
+print "0\t$gender\n";
+  my $dateofbirth = $xml->findvalue('//x:patient/x:birthTime/@value', $doc);
+print "0\t$dateofbirth\n";
+  my $descr = qq|${patientname} ${gender} ${dateofbirth}\n|; 
+  return($descr);
+}
+################################################################

@@ -1,0 +1,56 @@
+#!/bin/bash
+# ---------------------------------
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   echo "\nServices not installed!"
+   exit 1
+fi
+# ---------------------------------
+Dir=$1
+Wildcards=$2
+Folder=$3
+ProvID=$4
+ZIPDIR=$5
+if [ -z "${Dir}" ]; then Usage "No Directory given!!"; fi
+if [ -z "${Wildcards}" ]; then Usage "No File Wildcards given!!"; fi
+if [ -z "${Folder}" ]; then Usage "No Folder given!!"; fi
+if [ -z "${ProvID}" ]; then Usage "No ProvID given!!"; fi
+echo -e "Dir=${Dir}<BR>\n"
+echo -e "Wildcards=${Wildcards}<BR>\n"
+echo -e "Folder=${Folder}<BR>\n"
+echo -e "ProvID=${ProvID}<BR>\n"
+echo -e "ZIPDIR=${ZIPDIR}<BR>\n"
+pwd
+echo -e "<BR>\n"
+rm -rf ${Dir}/tmp/FILEs/${Folder}
+echo -e "<BR>\n"
+mkdir -vp ${Dir}/tmp/FILEs/${Folder}
+echo -e "<BR>\n"
+for wc in $Wildcards; do
+  mv -v ${Dir}/tmp/${wc} ${Dir}/tmp/FILEs/${Folder}
+done
+echo -e "<BR>\n"
+# yes=files zipped into Folder(directory) of zip file, no=files zipped into zip file
+if [ "${ZIPDIR}" = "yes" ]; then
+  cd ${Dir}/tmp/FILEs
+  pwd
+  echo -e "<BR>\n"
+  zip -r ${Folder}.zip ${Folder}
+  echo -e "<BR>\n"
+  mkdir -vp ${Dir}/Provider/EDocs/${ProvID}
+  echo -e "<BR>\n"
+  mv -v ${Folder}.zip ${Dir}/Provider/EDocs/${ProvID}
+  echo -e "<BR>\n"
+else
+  cd ${Dir}/tmp/FILEs/${Folder}
+  pwd
+  echo -e "<BR>\n"
+  zip ../${Folder}.zip *
+  echo -e "<BR>\n"
+  mkdir -vp ${Dir}/Provider/EDocs/${ProvID}
+  echo -e "<BR>\n"
+  cd ${Dir}/tmp/FILEs
+  mv -v ${Folder}.zip ${Dir}/Provider/EDocs/${ProvID}
+  echo -e "<BR>\n"
+fi

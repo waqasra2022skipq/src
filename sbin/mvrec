@@ -1,0 +1,2 @@
+#update NoteTrans set TrID=4281 where ID=7933;
+update Treatment set BillStatus=5,StatusDate='2014-01-08',RecDate='2014-01-08' where TrID=8269;

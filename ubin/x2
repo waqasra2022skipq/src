@@ -1,0 +1,1 @@
+db okmis_config update MISOK set setBilling=0;

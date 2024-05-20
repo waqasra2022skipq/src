@@ -1,0 +1,35 @@
+#!/bin/bash
+# ---------------------------------
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   echo "\nServices not installed!"
+   exit 1
+fi
+# ---------------------------------
+# (Apache) the httpd logs
+/sbin/service httpd stop
+sleep 1
+cd /usr/local/apache/logs
+if [ -d "saves.3" ]; then /bin/rm -rf saves.3; fi
+if [ -d "saves.2" ]; then /bin/mv -v saves.2 saves.3; fi
+if [ -d "saves.2" ]; then /bin/rm -rf saves.2; fi
+if [ -d "saves.1" ]; then /bin/mv -v saves.1 saves.2; fi
+/bin/mkdir saves.1
+/bin/mv -v *log saves.1
+if [ -f "/var/log/httpd/ssl_request_log" ]; then /bin/mv -v /var/log/httpd/ssl_request_log saves.1/ssl_request_log; fi
+sleep 1
+/sbin/service httpd start
+sleep 1
+
+################################
+# local logs
+cd ${LOGDIR}
+#if [ ! -d "${YMD}" ]; then /bin/mkdir ${YMD}; fi
+/bin/mv -v access_errors access_errors.${YMD}
+/bin/touch access_errors
+/bin/chmod 666 access_errors
+/bin/mv -v ENDOF ENDOF.${YMD}
+/bin/touch ENDOF
+/bin/chmod 666 ENDOF
+################################

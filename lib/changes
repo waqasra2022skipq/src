@@ -1,0 +1,102 @@
+WATCH changes after 9/25/2008 in mis.
+
+
+DBForm   now  GenForm
+DBUtil   now  Utils
+DBA     some  xSQL
+check csi/lib/SetHTML->List for proper function
+check csi/lib/xSQL->TBLread diff than old DBForm, ok
+verify csi/lib/SetHTML->TMPwrite for proper function
+changed return from updSQL: set in $form->{post_message} instead
+
+
+1c1
+< Utils.pm ExecCmd
+---
+> DBUtil.pm ExecCmd
+4,5c4
+<   my ($self, $form,$cmd,$sfx) = @_;
+<   chdir("$form->{DOCROOT}/tmp");
+---
+>   my ($self, $cmd, $sfx) = @_;
+8,10c7,9
+< my $pwd=cwd();
+< warn "ExecCmd: pwd=$pwd, cmd=$cmd\n";
+< warn "ExecCmd: outfile=$outfile\n";
+---
+> #my $pwd=cwd();
+> #warn "ExecCmd: pwd=$pwd, cmd=$cmd\n";
+> #warn "ExecCmd: outfile=$outfile\n";
+12c11
+<   return("$form->{DOCROOT}/tmp/$outfile");
+---
+>   return($outfile);
+
+1c1
+< csitmp DBA.pm expPrev
+---
+> mistmp DBA.pm expPrev
+22c22
+<     my $ExpDate = Utils->Date($inData->{InsNumEffDate},0,-1);
+---
+>     my $ExpDate = DBUtil->Date($inData->{InsNumEffDate},0,-1);
+31c31
+<     my $ExpDate = Utils->Date($inData->{EffDate},0,-1);
+---
+>     my $ExpDate = DBUtil->Date($inData->{EffDate},0,-1);
+
+
+1c1
+< csitmp GenForm.pm parse
+---
+> mistmp DBForm.pm parse
+10c10
+<   my ($str, $query_string, @key_value_pairs, $key_value);
+---
+>   my ($query_string, @key_value_pairs, $key_value);
+12c12,15
+<   if ( $ARGV[0] ) { $query_string = join(' ',@ARGV); }
+---
+>   if ( $InString )
+>   { $query_string = $InString; }
+>   elsif ( $ARGV[0] )
+>   { $query_string = join(' ',@ARGV); }
+14c17
+<   { read (STDIN, $str, $ENV{'CONTENT_LENGTH'}); $query_string .= $str; }
+---
+>   { read (STDIN, $query_string, $ENV{'CONTENT_LENGTH'}); }
+16,17c19
+<   { $query_string .= $ENV{'QUERY_STRING'}; }
+<   if ( $InString ) { $query_string = $query_string eq '' ? $InString : "${InString}&${query_string}"; }
+---
+>   { $query_string = $ENV{'QUERY_STRING'}; }
+24c26
+< warn qq|GenForm.pm-parse: REQUEST_METHOD=$ENV{REQUEST_METHOD}, query=$self->{query}\n|;
+---
+> #warn qq|DBForm.pm-parse: REQUEST_METHOD=$ENV{REQUEST_METHOD}, query=$self->{query}\n|;
+50c52
+<   $self->{'TODAY'} = Utils->Date();      # save date.
+---
+>   $self->{'TODAY'} = DBUtil->Date();      # save date.
+52a55
+>   require("$self->{DBNAME}.conf");
+
+
+
+1c1
+< csitmp GenForm.pm popLINK
+---
+> mistmp DBForm.pm popLINK
+5c5
+<   my $Location;
+---
+10a11
+15,18c16,18
+<   if ( $url eq '' )
+<   { $Location = $self->setLocation('home'); }
+<   else { $Location = "Location: " . $url . "\n\n"; }
+<   return($Location);
+---
+>   $url = qq|/cgi/bin/mis.cgi?MIS_Action=ManagerTree&mlt=$self->{mlt}&default=mgrtree| if ( $url eq '' );
+>   return($url);
+

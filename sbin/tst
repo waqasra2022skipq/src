@@ -1,0 +1,25 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBForm;
+my $form = DBForm->new();
+exit;
+
+#my $form = DBForm->new("DBNAME=okmis_demo");
+#my $dbh = $form->dbconnect();
+#my $ClientMedsFields = main->getit();
+#foreach my $f ( sort keys %{$ClientMedsFields} ) { warn "tst: ClientMedsFields-$f=$ClientMedsFields->{$f}\n"; }
+#$form->complete();
+#exit;
+#sub getit
+#{
+#  my $f = ();
+#  my $s = $dbh->prepare("show fields from ClientMeds");
+#  $s->execute() || $form->dberror("show fields");
+#  while ( my $flds = $s->fetchrow_hashref )
+#  {
+##warn qq| Field=$flds->{Field}\n|;
+#  $f->{$flds->{Field}} = 1;   # save the field name
+#  }
+#  $s->finish();
+#  return($f);
+#}

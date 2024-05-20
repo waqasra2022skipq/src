@@ -1,0 +1,45 @@
+
+      { "descr" => "page 2", "data" => [
+          { "type" => "textline", "ypos" => 433.2, "xpos" => 174.5, "optlist" => $basefontoptions,
+                                "text" => "" },             # Most Distressing Trauma
+          { "type" => "checkvert", "xpos" => 97.9, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [360.1, 371.6, 382.8],
+                                "val" => main->getSeverityRating(0, ([0, 0], [1, 1], [2, 3])) },             # B1
+          { "type" => "checkvert", "xpos" => 161.4, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [360.1, 371.6, 382.8],
+                                "val" => main->getSeverityRating(0, ([0, 0], [1, 1], [2, 3])) },             # B2
+          { "type" => "checkvert", "xpos" => 217.3, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [360.1, 371.6, 382.8],
+                                "val" => main->getSeverityRating(0, ([0, 0], [1, 1], [2, 3])) },             # B3
+          { "type" => "checkvert", "xpos" => 274.6, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [360.1, 371.6, 382.8],
+                                "val" => main->getSeverityRating(0, ([0, 0], [1, 1], [2, 3])) },             # B4
+          { "type" => "checkvert", "xpos" => 336.2, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [360.1, 371.6, 382.8],
+                                "val" => main->getSeverityRating(0, ([0, 0], [1, 1], [2, 3])) },             # B5
+          { "type" => "checkvert", "xpos" => 97.9, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [243.4, 254.9, 266],
+                                "val" => main->getSeverityRating(0, ([0, 0], [1, 1], [2, 3])) },             # C1
+          { "type" => "checkvert", "xpos" => 161.4, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [243.4, 254.9, 266],
+                                "val" => main->getSeverityRating(0, ([0, 0], [1, 1], [2, 3])) },             # C2
+          { "type" => "checkvert", "xpos" => 274.6, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [243.4, 254.9, 266],
+                                "val" => main->getSeverityRating(0, ([0, 0], [1, 1], [2, 3])) },             # D1
+          { "type" => "checkvert", "xpos" => 336.2, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [243.4, 254.9, 266],
+                                "val" => main->getSeverityRating(0, ([0, 0], [1, 1], [2, 3])) },             # D2
+          { "type" => "checkvert", "xpos" => 392.3, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [243.4, 254.9, 266],
+                                "val" => main->getSeverityRating(0, ([0, 0], [1, 1], [2, 3])) },             # D3
+          { "type" => "checkvert", "xpos" => 448.3, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [243.4, 254.9, 266],
+                                "val" => main->getSeverityRating(0, ([0, 0], [1, 1], [2, 3])) },             # D4
+          { "type" => "checkvert", "xpos" => 506.3, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [243.4, 254.9, 266],
+                                "val" => main->getSeverityRating(0, ([0, 0], [1, 1], [2, 3])) },             # D5
+          { "type" => "checkvert", "xpos" => 564.2, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [243.4, 254.9, 266],
+                                "val" => main->getSeverityRating(0, ([0, 0], [1, 1], [2, 3])) },             # D6
+          { "type" => "checkvert", "xpos" => 622.2, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [243.4, 254.9, 266],
+                                "val" => main->getSeverityRating(0, ([0, 0], [1, 1], [2, 3])) },             # D7
+          { "type" => "checkvert", "xpos" => 97.9, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [138.8, 150.2, 161.4],
+                                "val" => main->getSeverityRating(0, ([0, 0], [1, 1], [2, 3])) },             # E1
+          { "type" => "checkvert", "xpos" => 161.4, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [138.8, 150.2, 161.4],
+                                "val" => main->getSeverityRating(0, ([0, 0], [1, 1], [2, 3])) },             # E2
+          { "type" => "checkvert", "xpos" => 217.3, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [138.8, 150.2, 161.4],
+                                "val" => main->getSeverityRating(0, ([0, 0], [1, 1], [2, 3])) },             # E3
+          { "type" => "checkvert", "xpos" => 274.6, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [138.8, 150.2, 161.4],
+                                "val" => main->getSeverityRating(0, ([0, 0], [1, 1], [2, 3])) },             # E4
+          { "type" => "checkvert", "xpos" => 336.2, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [138.8, 150.2, 161.4],
+                                "val" => main->getSeverityRating(0, ([0, 0], [1, 1], [2, 3])) },             # E5
+          { "type" => "checkvert", "xpos" => 390.5, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [142.9, 154.4, 165.5],
+                                "val" => main->getSeverityRating(0, ([0, 0], [1, 1], [2, 3])) },             # E6
+      ] }

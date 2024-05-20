@@ -1,0 +1,16 @@
+select xSC.SCID
+      , xSC.SCNum
+      , xSC.SCName
+      , xSC.InsID
+      , xSCRates.UnitLbl
+      , xSCRates.ServiceRate
+      , xSCRates.HrsPerUnit as HPU
+      , xSCRates.RatePct
+#      , xSCRates.CommissionPct
+#      , xSCRates.RVUPct
+from xSC
+  left join xSCRates on xSCRates.SCID=xSC.SCID
+  where xSC.SCNum='W4957'
+#    and xSCRates.UnitLbl = 'Each'
+#     and xSCRates.HrsPerUnit!=xSCRates.RatePct
+  order by xSC.InsID, xSC.SCNum, xSC.SCName

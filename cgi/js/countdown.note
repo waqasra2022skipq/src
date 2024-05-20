@@ -1,0 +1,6 @@
+try in countdown.js
+function closenow()
+{   
+    open(location, '_self').close();
+    return false;   
+}

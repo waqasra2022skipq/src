@@ -1,0 +1,63 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use DBA;
+use DBUtil;
+use Time::Local;
+$DT = localtime();
+############################################################################
+# usage:
+#   ChangedProvider ForProvID=id
+############################################################################
+$form = DBForm->new;
+$dbh = $form->dbconnect;
+$PrevClientID='';
+$PrevProvID='';
+$flag = 0;
+
+############################################################################
+print "${DT}\nChanged Provider Report\n";
+print "Client\tProvider\tContLogDate\n";
+
+my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+my $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Treatment.ClinicID');
+$sTreatment=$dbh->prepare("
+select Client.LName, Client.FName, Client.ClientID, 
+       Provider.LName, Provider.FName, Provider.ProvID,
+       Treatment.ContLogDate
+   from Treatment
+     left join Client on Client.ClientID=Treatment.ClientID
+     left join Provider on Provider.ProvID=Treatment.ProvID
+   where to_days(Treatment.ContLogDate) > to_days(curdate())-30
+     ${ClinicSelection}
+   order by Treatment.ClientID, Treatment.ContLogDate
+");
+$sTreatment->execute();
+while ( my ($ClientLName, $ClientFName, $ClientID,
+            $ProviderLName, $ProviderFName, $ProvID,
+            $ContLogDate) = $sTreatment->fetchrow_array )
+{
+  if ( $PrevClientID eq $ClientID )
+  { 
+    $PrevProvID = $ProvID if ( $PrevProvID eq '' );
+    if ( $PrevProvID ne $ProvID )
+    {
+      print "$PrevClientLName, $PrevClientFName ($PrevClientID)\t$PrevProviderLName, $PrevProviderFName ($PrevProvID)\t$PrevContLogDate\n";
+      print "$ClientLName, $ClientFName ($ClientID)\t$ProviderLName, $ProviderFName ($ProvID)\t$ContLogDate\n";
+      $flag = 1;
+    }
+  }
+  else
+  { print "\n" if ( $flag ); $flag = 0; }
+  $PrevClientID = $ClientID;
+  $PrevClientLName = $ClientLName;
+  $PrevClientFName = $ClientFName;
+  $PrevProvID = $ProvID;
+  $PrevProviderLName = $ProviderLName;
+  $PrevProviderFName = $ProviderFName;
+  $PrevContLogDate = $ContLogDate;
+}
+
+$form->complete();
+exit;

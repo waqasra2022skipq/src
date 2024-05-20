@@ -1,0 +1,40 @@
+#!/usr/bin/perl --
+use strict; use warnings;
+use XML::LibXML;
+
+my $doc = XML::LibXML->new()->parse_string(
+    q{<?xml version='1.0' ?>
+<roshambo xmlns="http://example.com/roshambo">
+<sham>
+<bo name="40">null 40</bo>
+<bo name="2">null 2</bo>
+</sham>
+<sham xmlns:ftt="http://example.com/roshambo">
+<ftt:bo name="forty">ftt forty</ftt:bo>
+<ftt:bo name="two">ftt two</ftt:bo>
+</sham>
+</roshambo>
+}
+);
+
+
+for my $name ( $doc->findnodes( q{//*[local-name()="bo"]/@name} ) ) {
+    printf "%-25s %s %s\n", $name->nodePath, $name->nodeValue, $name->to_literal;
+}
+print "\n\n";
+for my $name ( $doc->findnodes( q{//*[local-name()="bo"]} ) ) {
+    printf "%-25s %s\n", $name->nodePath, $name->to_literal;
+}
+print "\n\n";
+
+for my $node ( $doc->findnodes( q{//*[name()="sham"]} ) ) {
+    print "@{[ $node->nodePath ]}\n";
+## any children    ## ./*
+## any descendants ## .//*
+## anywhere        ## //*
+    for my $name ( $node->findnodes( q{./*[local-name()="bo"]/@name} ) ) {
+  (my $city = $name->textContent) =~ s/^\s*(.*?)\s*$/$1/g;
+        printf "%-25s %s\n", $name->nodePath, $name->nodeValue, $name->to_literal;
+    }
+    print "\n\n";
+}

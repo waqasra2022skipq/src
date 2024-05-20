@@ -1,0 +1,24 @@
+select Client.LName as "Last Name"
+,Client.MName as "Middle Name"
+,Client.FName as "First Name"
+,Client.Suffix
+,Client.DOB as "Date of Birth"
+,Client.HmPh as "Home Phone"
+,Client.WkPh as "Work Phone"
+,Client.Fax as "Office Fax"
+,Client.Email
+,Client.SSN as "Social Security"
+,ClientRelations.MarStat as "Marital status"
+,Client.Gend as Gender
+,Client.Addr1 as "Address 1"
+,Client.Addr2 as "Address 2"
+,Client.City
+,Client.ST as State
+,Client.Zip as "Zip Code"
+,ClientEmergency.Alert as Comments
+from Insurance
+left join Client on Client.ClientID=Insurance.ClientID
+left join ClientEmergency on ClientEmergency.ClientID=Insurance.ClientID
+left join ClientRelations on ClientRelations.ClientID=Insurance.ClientID
+where Insurance.InsID=100 and Client.Active=1
+order by Client.LName, Client.FName

@@ -1,0 +1,31 @@
+BODY { 
+   background-color: silver; 
+   color: white;
+     }
+.name { font-family: Verdana; }
+.header { 
+   font-weight: bold; 
+   font-size: small; 
+   color: black; 
+   text-decoration: underline; 
+   text-align: center 
+        }
+.link { 
+   background-color: silver; 
+   font-family: Verdana; 
+   font-style: italic; 
+   font-size: x-small; 
+      }
+A.noline  {text-decoration:none; color: black;}
+A.noline:Hover {color: Firebrick;}
+.default { 
+    background: silver;
+    border-style: none;
+    padding-left: 3pt;
+    padding-right: 3pt;
+    color: black; 
+    font-family: Verdana "Times New Roman" "Times Roman" serif;
+    font-size: x-large;
+    font-weight: normal;
+    text-align: center;
+         }

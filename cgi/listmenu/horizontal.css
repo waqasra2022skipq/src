@@ -1,0 +1,115 @@
+/* SWIM2.0 :: Simple website menu
+****************************************************************
+*/
+ul.horizontal, ul.horizontal li 
+{
+  margin:0;
+  padding:0;
+  list-style-type:none;
+  font-size:100%;
+}
+
+ul.horizontal 
+{
+  position:relative;
+  z-index:400;
+  width:100%;
+  cursor:default;
+/*  left:0; */
+/*  top:1.05em; */
+}
+
+ul.horizontal li 
+{
+  position:relative;
+  width:auto;
+  float:left;
+  cursor:pointer;
+  text-align:left;
+  left:211px;
+  margin:0 0 0 -1px;
+}
+  
+* html ul.horizontal li 
+{
+  margin:0 0 0 -1px;
+}
+
+ul[class^="horizontal"] li 
+{
+  margin:0 0 0 -1px;
+  left:1px;
+}
+
+ul.horizontal ul 
+{
+  position:absolute;
+  z-index:420;
+  padding:0;
+  cursor:default;
+/*  top:auto; */
+  width:164px;
+  margin:0 0 0 0;
+  left:-20000px;
+}
+  
+ul.horizontal ul li 
+{
+  width:164px;
+  left:auto;
+  margin:-1px 0 0 0;
+}
+
+ul.horizontal ul.wider, ul.horizontal ul.wider li 
+{
+  width:240px;
+}
+
+ul.horizontal ul ul 
+{
+  margin:-9px 0 0 153px;
+}
+
+@media Screen, Projection 
+{ 
+  ul.horizontal li:hover > ul { left:auto; }
+  ul.horizontal ul li:hover > ul { top:0; }
+}
+
+ul.horizontal a, ul.horizontal a:visited 
+{
+  display:block;
+  cursor:pointer;
+  background:silver;
+  border:1px solid blue;
+  padding:5px 7px;
+  font:normal 12px arial, verdana, sans-serif;
+  color:blue;
+  text-decoration:none;
+  letter-spacing:1px;
+}
+  
+ul.horizontal a:hover, ul.horizontal a:focus, ul.horizontal a.rollover, ul.horizontal a.rollover:visited 
+{
+  background:coral;
+  color:black;
+  border: 1px solid black;
+}
+
+ul.horizontal a { float:left; }
+@media Screen, Projection { ul.horizontal a { float:none; } }
+ul.horizontal a:not(:nth-child(n)) { float:left; }
+ul.horizontal ul a { float:none !important; }
+@media screen, projection 
+{
+  * html ul.horizontal li 
+  {
+    display:inline; 
+    f\loat:left; 
+    background:#ffffff; 
+  }
+}
+* html ul.horizontal li { position:static; }
+* html ul.horizontal a { position:relative; }
+ul[class^="horizontal"] ul { display:none; }
+ul[class^="horizontal"] ul { displa\y:block; }

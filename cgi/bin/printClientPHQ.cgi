@@ -1,0 +1,3516 @@
+#!/usr/bin/perl
+############################################################################
+use lib '/home/okmis/mis/src/lib';
+use myConfig;
+use DBI;
+use myForm;
+use myDBI;
+use DBA;
+use MgrTree;
+use DBUtil;
+use Time::Local;
+use myConfig;
+use PDFlib::PDFlib;
+use strict;
+############################################################################
+my $form = myForm->new();
+my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $cdbh = myDBI->dbconnect('okmis_config');
+my $table = $form->{'action'};
+my $page = $form->{'page'};
+#warn "PrintPHQ: IDs=$form->{'IDs'}\n";
+##
+my $sPHQ = $dbh->prepare("select * from ${table} where ID=?");
+my $sClient = $dbh->prepare("select * from Client where ClientID=?");
+my $sProvider = $dbh->prepare("select * from Provider where ProvID=?");
+my $sxTables = $cdbh->prepare("select xTables.theTable,xTableFields.* from xTables left join xTableFields on xTableFields.TableID=xTables.ID where xTables.theTable=? and xTableFields.theField=?");
+my $sGuardian = $dbh->prepare("select * from ClientFamily where ClientID=? and Guardian=1");
+my $sGuarantor = $dbh->prepare("select * from Guarantor where ClientID=?");
+my $sEmerContact = $dbh->prepare("select * from ClientFamily where ClientID=? and EmerContact=1");
+############################################################################
+my $searchpath = "../data";
+
+my $pagewidth = 612;
+my $pageheight = 792;
+my $fontname= "Arial";
+my $boldfontname= "Arial-BoldMT";
+my $fontsizesmall = 8;
+my $fontsize = 9;
+my $fontsizemid = 10;
+my $fontsizelarge = 11;
+my $fontsizemidlarge = 12;
+my $fontsizexlarge = 13;
+my $fontsizemidxlarge = 14;
+my $fontsizexxlarge = 15;
+my $basefontoptions = "fontname=" . $fontname . " fontsize=" . $fontsize . " embedding encoding=unicode charref";
+my $basefontoptions_i = $basefontoptions . " fontstyle=italic";
+my $basefontoptions_u = $basefontoptions . " underline=true underlineposition=-15% underlinewidth=0.3";
+my $baseboldfontoptions = "fontname=" . $boldfontname . " fontsize=" . $fontsize . " embedding encoding=unicode";
+my $baseboldfontoptions_u = $baseboldfontoptions . " underline=true underlineposition=-15% underlinewidth=0.3";
+my $basemidfontoptions = $basefontoptions . " fontsize=" . $fontsizemid;
+my $basemidfontoptions_i = $basemidfontoptions . " fontstyle=italic";
+my $basemidfontoptions_u = $basemidfontoptions . " underline=true underlineposition=-15% underlinewidth=0.3";
+my $baseboldmidfontoptions = $baseboldfontoptions . " fontsize=" . $fontsizemid;
+my $baseboldmidfontoptions_u = $baseboldmidfontoptions . " underline=true underlineposition=-15% underlinewidth=0.3";
+my $baseboldmidfontoptions_i = $baseboldmidfontoptions . " fontstyle=italic";
+my $baselargefontoptions = $basefontoptions . " fontsize=" . $fontsizelarge;
+my $baseboldlargefontoptions = $baseboldfontoptions . " fontsize=" . $fontsizelarge;
+my $baseboldlargefontoptions_u = $baseboldlargefontoptions . " underline=true underlineposition=-15% underlinewidth=0.3";
+my $baseboldlargefontoptions_ui = $baseboldlargefontoptions_u . " fontstyle=italic";
+my $baseboldlargefontoptions_i = $baseboldlargefontoptions . " fontstyle=italic";
+my $basesmallfontoptions = $basefontoptions . " fontsize=" . $fontsizesmall;
+my $basesmallfontoptions_i = $basesmallfontoptions . " fontstyle=italic";
+my $baseboldsmallfontoptions = $baseboldfontoptions . " fontsize=" . $fontsizesmall;
+my $basemidlargefontoptions = $basefontoptions . " fontsize=" . $fontsizemidlarge;
+my $basemidlargefontoptions_i = $basemidlargefontoptions . " fontstyle=italic";
+my $basemidxlargefontoptions = $basefontoptions . " fontsize=" . $fontsizemidxlarge;
+my $baseboldmidxlargefontoptions = $baseboldfontoptions . " fontsize=" . $fontsizemidxlarge;
+my $basemidxlargefontoptions_i = $basemidxlargefontoptions . " fontstyle=italic";
+my $baseboldmidlargefontoptions = $baseboldfontoptions . " fontsize=" . $fontsizemidlarge;
+my $baseboldmidlargefontoptions_u = $baseboldmidlargefontoptions . " underline=true underlineposition=-15% underlinewidth=0.3";
+my $baseboldxlargefontoptions = $baseboldfontoptions . " fontsize=" . $fontsizexlarge;
+my $baseboldxlargefontoptions_i = $baseboldxlargefontoptions . " fontstyle=italic";
+my $basecheckfontoptions = "fontname={DejaVuSans} encoding=unicode fontsize=10 charref";
+
+my $marginleft = 30;
+my $margintop = 35;
+my $marginbottom = 30;
+my $contentwidth = $pagewidth - 2 * $marginleft;
+my $y_top = $pageheight - $margintop;
+my $y_bottom = $marginbottom;
+
+my $indoc;
+my $no_of_input_pages;
+my @pagehandles = ();
+my $pagecount = 0;
+
+my ($sec, $min, $hrs, $day, $month, $year, $wday, $julian) = localtime();
+my $FORMDIR= myConfig->cfg('FORMDIR');
+my $pdfpath = qq|$FORMDIR/Print${table}${page}.pdf|;
+#warn qq|pdfpath=${pdfpath}\n|;
+my $formid = $hrs.$min;
+my $filename = '/tmp/'.$form->{'LOGINID'}.'_'.DBUtil->genToken().'_'.DBUtil->Date('','stamp').'.pdf';
+my $outfile = $form->{'file'} eq ''                # create and print pdf else just create.
+        ? $form->{'DOCROOT'}.$filename
+        : $form->{'file'};
+#my $outfile = "kls.pdf";
+############################################################################
+# my $xdp = qq|<?xml version="1.0" encoding="UTF-8" ?> 
+# <?xfa generator="XFA2_0" APIVersion="2.2.4333.0" ?>
+# <xdp:xdp xmlns:xdp="http://ns.adobe.com/xdp/" >
+# <xfa:datasets xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/" >
+# <xfa:data>
+# <topmostSubform>
+# |;
+eval {
+
+  # create a new PDFlib object 
+  my $p = new PDFlib::PDFlib;
+
+  $p->set_option("SearchPath={{" . $searchpath . "}}");
+
+  # This mean we don't have to check error return values, but will
+  # get an exception in case of runtime problems.
+  
+  $p->set_option("errorpolicy=exception");
+
+  # all strings are expected as utf8
+  $p->set_option("stringformat=utf8");
+
+  $p->begin_document($outfile, "");
+
+  $p->set_info("Creator", "Millennium Information Services");
+  $p->set_info("Author", "Keith Stephenson");
+  $p->set_info("Title", "PHQ");
+
+  # Open the Block template which contains PDFlib Blocks 
+  $indoc = $p->open_pdi_document($pdfpath, "");
+  if ($indoc == -1) { die("Error: " . $p->get_errmsg()); }
+
+  $no_of_input_pages = $p->pcos_get_number($indoc, "length:pages");
+
+  main->openPdiPages($p);
+
+  main->printPHQ($p);
+
+  main->closePdiPages($p);
+
+  $p->end_document("");
+
+};
+
+if ($@) {
+  die("$0: PDFlib Exception occurred:\n$@");
+}
+
+$sPHQ->finish();
+$sClient->finish();
+$sProvider->finish();
+$sxTables->finish();
+$sGuardian->finish();
+$sGuarantor->finish();
+$sEmerContact->finish();
+
+myDBI->cleanup();
+
+if ( $form->{'file'} eq '' )                # create and print pdf.
+{ print qq|Location: ${filename}\n\n|; }
+
+exit;
+
+############################################################################
+sub printPHQ {
+  my ($self, $p) = @_;
+  
+  foreach my $ID ( split(' ',$form->{IDs}) )
+  { 
+  #warn "PrintPHQ: table=${table}, page=${page}, ID=${ID}\n";
+    $sPHQ->execute($ID) || myDBI->dberror("PrintPHQ: select ${table} ${ID}");
+    while ( my $rPHQ = $sPHQ->fetchrow_hashref )
+    { 
+      $sClient->execute($rPHQ->{'ClientID'}) || myDBI->dberror("select Client: $rPHQ->{'ClientID'}");
+      my $rClient = $sClient->fetchrow_hashref;
+      main->createPages($p, $rPHQ, $rClient); 
+    }
+  }
+
+  if ($pagecount eq 0) {
+    main->createEmptyPage($p);
+  }
+}
+
+sub createEmptyPage {
+  my ($self, $p) = @_;
+
+  $p->begin_page_ext($pagewidth, $pageheight, "topdown");
+  $p->fit_textline("NOT FOUND", $marginleft, 50, $basefontoptions);
+  $p->end_page_ext("");
+}
+
+sub createPages
+{
+  my ($self, $p, $rPHQ, $rClient) = @_;
+##
+# Header info...GO AHEAD AND SET THESE BUT DON'T PUT THEM ON THE FORM FOR NOW.
+  my $AgencyID = MgrTree->getAgency($form,$rClient->{'clinicClinicID'});
+  $sProvider->execute($AgencyID) || myDBI->dberror("printPHQ: select Provider $AgencyID");
+  my $rAgency = $sProvider->fetchrow_hashref;
+  my $AgencyName = $rAgency->{Name};
+  my $AgencyAddr = $rAgency->{Addr1} . ', ';
+  $AgencyAddr .= $rAgency->{Addr2} . ', ' if ( $rAgency->{Addr2} );
+  $AgencyAddr .= $rAgency->{City} . ', ' . $rAgency->{ST} . '  ' . $rAgency->{Zip};
+  my $AgencyPhFax = 'Office: ' . $rAgency->{WkPh} . '  Fax: ' . $rAgency->{Fax};
+  my $reportInfo = '';                                 # right side of heading
+  my $Title = '';
+##
+  $sProvider->execute($rClient->{'ProvID'}) || myDBI->dberror("printPHQ: select PrimaryProvider $rClient->{'ProvID'}");
+  my $rPrimaryProvider = $sProvider->fetchrow_hashref;
+  my $primaryprovider = qq|$rPrimaryProvider->{'FName'} $rPrimaryProvider->{'LName'}|;
+##
+  $sProvider->execute($rPHQ->{'ProvID'}) || myDBI->dberror("printPHQ: select Clinician $rPHQ->{'ProvID'}");
+  my $rClinician = $sProvider->fetchrow_hashref;
+  my $clinician = qq|$rClinician->{'FName'} $rClinician->{'LName'}|;
+##
+  my $today = DBUtil->Date($form->{TODAY},'fmt','MM/DD/YYYY');
+  my $testdate = DBUtil->Date($rPHQ->{TestDate},'fmt','MM/DD/YYYY');
+  my $testdateMDY = DBUtil->Date($rPHQ->{TestDate},'fmt','MMDDYY');
+  my $testtime = $rPHQ->{TestTime};
+##
+  my $clientid = $rClient->{'ClientID'};
+  my $clientname = qq|$rClient->{'FName'} $rClient->{'LName'}|;
+  my $clientnameid = qq|$rClient->{'FName'} $rClient->{'LName'} / ${clientid}|;
+  my $addr1 = $rClient->{'Addr1'};
+  my $addr2 = $rClient->{'Addr2'};
+  my $csz = qq|$rClient->{'City'}, $rClient->{'ST'}  $rClient->{'Zip'}|;
+  if ( $addr2 eq '' ) { $addr2 = $csz; $csz = ''; }
+  my $sex = $rClient->{'Gend'};
+  my $age = DBUtil->Date($rClient->{'DOB'},'age');
+  my $race = DBA->getxref($form,'xRaces',$rClient->{'Race'},'Descr');
+  my $ethnicity = DBA->getxref($form,'xEthnicity',$rClient->{'Ethnicity'},'Descr');
+  my $gender = DBA->getxref($form,'xGend',$rClient->{'Gend'},'Descr');
+##
+  $sGuardian->execute($clientid) || myDBI->dberror("printPHQ: select Guardian $clientid");
+  my $rGuardian = $sGuardian->fetchrow_hashref;
+  $sGuarantor->execute($clientid) || myDBI->dberror("printPHQ: select Guarantor $clientid");
+  my $rGuarantor = $sGuarantor->fetchrow_hashref;
+  $sEmerContact->execute($clientid) || myDBI->dberror("printPHQ: select sEmerContact $clientid");
+  my $rEmerContact = $sEmerContact->fetchrow_hashref;
+  my $caregiver = '';
+  my $caregiverrel = '';
+  my $caregiveraddr = '';
+  if ($age >= 18)
+  {
+    if ($rGuardian)
+    {
+      $caregiver .= " $rGuardian->{FName}" if ( $rGuardian->{FName} );
+      $caregiver .= " $rGuardian->{MName}" if ( $rGuardian->{MName} );
+      $caregiver .= " $rGuardian->{LName}" if ( $rGuardian->{LName} );
+      $caregiverrel = DBA->getxref($form,'xRelationship',$rGuardian->{Rel},'Descr');
+
+      $caregiveraddr = $rGuardian->{Addr1} . ', ';
+      $caregiveraddr .= $rGuardian->{Addr2} . ', ' if ( $rGuardian->{Addr2} );
+      $caregiveraddr .= $rGuardian->{City} . ', ' . $rGuardian->{ST} . ' / ' . $rGuardian->{Zip};
+    }
+    elsif ($rGuarantor)
+    {
+      $caregiverrel = main->getGuarantorRelationship($rGuarantor->{'ClientRel'});
+      $rGuarantor = $rClient if ( $caregiverrel =~ /self/i );
+      $caregiver .= " $rGuarantor->{FName}" if ( $rGuarantor->{FName} );
+      $caregiver .= " $rGuarantor->{MName}" if ( $rGuarantor->{MName} );
+      $caregiver .= " $rGuarantor->{LName}" if ( $rGuarantor->{LName} );
+
+      $caregiveraddr = $rGuarantor->{Addr1} . ', ';
+      $caregiveraddr .= $rGuarantor->{Addr2} . ', ' if ( $rGuarantor->{Addr2} );
+      $caregiveraddr .= $rGuarantor->{City} . ', ' . $rGuarantor->{ST} . ' / ' . $rGuarantor->{Zip};
+    }
+    else {
+      $caregiver = $clientname;
+      $caregiverrel = 'Self';
+
+      $caregiveraddr = $rClient->{Addr1} . ', ';
+      $caregiveraddr .= $rClient->{Addr2} . ', ' if ( $rClient->{Addr2} );
+      $caregiveraddr .= $rClient->{City} . ', ' . $rClient->{ST} . ' / ' . $rClient->{Zip};
+    }
+  }
+  else
+  {
+    $caregiver .= " $rEmerContact->{FName}" if ( $rEmerContact->{FName} );
+    $caregiver .= " $rEmerContact->{MName}" if ( $rEmerContact->{MName} );
+    $caregiver .= " $rEmerContact->{LName}" if ( $rEmerContact->{LName} );
+    $caregiverrel = DBA->getxref($form,'xRelationship',$rEmerContact->{Rel},'Descr');
+
+    $caregiveraddr = $rEmerContact->{Addr1} . ', ';
+    $caregiveraddr .= $rEmerContact->{Addr2} . ', ' if ( $rEmerContact->{Addr2} );
+    $caregiveraddr .= $rEmerContact->{City} . ', ' . $rEmerContact->{ST} . ' / ' . $rEmerContact->{Zip};
+  }
+##
+  my %DBData = ();
+  my $tALL = 0;
+  my ($total,$t1,$t2,$t3) = (0,0,0,0);         # total = all t1=total all 1's, t2=total all 2's, t3=total all 3's values
+  my ($t15,$t15_1,$t15_2) = (0,0,0);           # ClientPHQSADS [qA]
+  my ($t7,$t7_1,$t7_2,$t7_3) = (0,0,0,0);      # ClientPHQSADS [qB]
+  my ($t9,$t9_1,$t9_2,$t9_3) = (0,0,0,0);      # ClientPHQSADS [qD] & ClientPHQ9 [q10]
+  my ($tINT,$tWM,$tD1,$tD2,$tD3,$tD4,$tD5,$tD6) = (0,0,0,0,0,0,0,0);              # ClientODAS,2017
+  my ($tL1,$tL2,$tL3,$tL4,$tL5,$tL6) = (0,0,0,0,0,0);                             # ClientODAS,2017
+  my ($sLINT,$tLWM,$tLD1,$tLD2,$tLD3,$tLD4,$tLD5,$tLD6) = (0,0,0,0,0,0,0,0);      # ClientODAS,2017
+  my ($sIndicated,$sWMIndicated) = (0,0);                                         # ClientODAS,2017
+  foreach my $f ( sort keys %{$rPHQ} )
+  {
+    $sxTables->execute($table,$f) || myDBI->dberror("printPHQ: select xTables ${table}/${f}");
+    my $rxTables = $sxTables->fetchrow_hashref;
+#foreach my $m ( sort keys %{$rxTables} ) { warn "${f}: rxTables-$m=$rxTables->{$m}\n"; }
+    my $val = $rPHQ->{$f};
+    $DBData{${f}} = ${val};
+#   for check marks we get a range: 0-n; where the field Name: t(field)_n
+#warn qq|${f}: theType=$rxTables->{'theType'}\n|;
+    if ( $rxTables->{'theType'} =~ /radio/ )                # set check mark values
+    {
+      $DBData{"${f}_${val}"} = ${val};
+      $t1 += 1 if ( $val == 1 );
+      $t2 += 2 if ( $val == 2 );
+      $t3 += 3 if ( $val == 3 );
+      if ( $table eq 'ClientPHQSADS' && substr($f,0,2) eq 'qA' )
+      {
+        $t15_1 += 1 if ( $val == 1 );
+        $t15_2 += 2 if ( $val == 2 );
+      }
+      elsif ( $table eq 'ClientPHQSADS' && substr($f,0,2) eq 'qB' )
+      {
+        $t7_1 += 1 if ( $val == 1 );
+        $t7_2 += 2 if ( $val == 2 );
+        $t7_3 += 3 if ( $val == 3 );
+      }
+      elsif ( $table eq 'ClientPHQSADS' && substr($f,0,2) eq 'qD' )
+      {
+        $t9_1 += 1 if ( $val == 1 );
+        $t9_2 += 2 if ( $val == 2 );
+        $t9_3 += 3 if ( $val == 3 );
+      }
+      elsif ( $table eq 'ClientPHQ9' && substr($f,0,3) ne 'q10' )
+      {
+        $t9_1 += 1 if ( $val == 1 );
+        $t9_2 += 2 if ( $val == 2 );
+        $t9_3 += 3 if ( $val == 3 );
+      }
+      elsif ( $table eq 'ClientPCL5' )
+      {
+        $DBData{"${f}_N"} = ${val};
+      }
+      $tALL += $val;           # total all 'radio' values (could add for 'selectlist' if a digit?)
+#     END radio IF
+    }
+    if ( $table eq 'ClientTCUDS' && $f eq 'q12b' )      # Other specify check mark
+    { 
+      if ($val eq '') {
+        $DBData{"${f}_0"} = 0;
+      } else {
+        $DBData{"${f}_1"} = 1;
+      }
+    }
+    elsif ( $table eq 'ClientODAS' )
+    {
+      # Other specify check mark
+      if ( $f eq 'D4Primary' || $f eq 'D4Secondary' || $f eq 'D4Tertiary' )
+      {
+        $DBData{"${f}_${val}"} = ${val};
+      }
+      # totals...
+      $tINT += $val if ( $f eq 'D1q1' || $f eq 'D1q2' );
+      $tWM += $val if ( $f eq 'D1q3' || $f eq 'D1q4' || $f eq 'D1q5' || $f eq 'D1q6' );
+      $tD1 = $tINT + $tWM;
+#warn qq|f=$f: val=$val:\n tINT=$tINT, tWM=$tWM, tD1=$tD1\n|;
+      $tD2 += $val if ( substr($f,0,3) eq 'D2q' && $f ne 'D2q8' );
+      $tD3 += $val if ( substr($f,0,3) eq 'D3q' && $f ne 'D3q9' );
+      $tD4 += $val if ( substr($f,0,3) eq 'D4q' );
+      $tD5 += $val if ( substr($f,0,3) eq 'D5q' );
+      $tD6 += $val if ( substr($f,0,3) eq 'D6q' );
+#warn qq|f=$f: val=$val:\n tD1=$tD1, tD2=$tD2, tD3=$tD3\n tD4=$tD4, tD5=$tD5, tD6=$tD6\n|;
+    }
+    elsif ( $table eq 'ClientODAS2017' )
+    {
+      # Other specify check mark
+      if ( $f eq 'D4Primary' || $f eq 'D4Secondary' || $f eq 'D4Tertiary' )
+      {
+        $DBData{"${f}_${val}"} = ${val};
+      }
+      # totals...
+      $tINT += $val if ( $f eq 'D1q1' || $f eq 'D1q2' );
+      $tWM += $val if ( $f eq 'D1q3' || $f eq 'D1q4' || $f eq 'D1q5' || $f eq 'D1q6' || $f eq 'D1q7' );
+      $tD1 = $tINT + $tWM;
+#warn qq|f=$f: val=$val:\n tINT=$tINT, tWM=$tWM, tD1=$tD1\n|;
+      $tD2 += $val if ( substr($f,0,3) eq 'D2q' );
+      $tD3 += $val if ( substr($f,0,3) eq 'D3q' );
+      $tD4 += $val if ( substr($f,0,3) eq 'D4q' );
+      $tD5 += $val if ( substr($f,0,3) eq 'D5q' );
+      $tD6 += $val if ( substr($f,0,3) eq 'D6q' );
+#warn qq|f=$f: val=$val:\n tD1=$tD1, tD2=$tD2, tD3=$tD3\n tD4=$tD4, tD5=$tD5, tD6=$tD6\n|;
+    }
+  }
+# Totals...
+  $DBData{"tALL"} = ${tALL};
+  $total = $t1 + $t2 + $t3; 
+  $DBData{"t1"} = ${t1};
+  $DBData{"t2"} = ${t2};
+  $DBData{"t3"} = ${t3};
+  $DBData{"total"} = ${total};
+  if ( $table eq 'ClientPHQSADS' )
+  {
+    my $t15 = $t15_1 + $t15_2;
+    $DBData{"t15_1"} = ${t15_1};
+    $DBData{"t15_2"} = ${t15_2};
+    $DBData{"t15"} = ${t15};
+    my $t7 = $t7_1 + $t7_2 + $t7_3;
+    $DBData{"t7_1"} = ${t7_1};
+    $DBData{"t7_2"} = ${t7_2};
+    $DBData{"t7_3"} = ${t7_3};
+    $DBData{"t7"} = ${t7};
+    my $t9 = $t9_1 + $t9_2 + $t9_3;
+    $DBData{"t9_1"} = ${t9_1};
+    $DBData{"t9_2"} = ${t9_2};
+    $DBData{"t9_3"} = ${t9_3};
+    $DBData{"t9"} = ${t9};
+  }
+  elsif ( $table eq 'ClientPHQ9' )
+  {
+    my $t9 = $t9_1 + $t9_2 + $t9_3;
+    $DBData{"t9_1"} = ${t9_1};
+    $DBData{"t9_2"} = ${t9_2};
+    $DBData{"t9_3"} = ${t9_3};
+    $DBData{"t9"} = ${t9};
+  }
+  elsif ( $table eq 'ClientPCL5' )
+  {
+    my $tB = $rPHQ->{'q1'} + $rPHQ->{'q2'} + $rPHQ->{'q3'} + $rPHQ->{'q4'} + $rPHQ->{'q5'};
+    my $tC = $rPHQ->{'q6'} + $rPHQ->{'q7'};
+    my $tD = $rPHQ->{'q8'} + $rPHQ->{'q9'} + $rPHQ->{'q10'} + $rPHQ->{'q11'} + $rPHQ->{'q12'} + $rPHQ->{'q13'} + $rPHQ->{'q14'};
+    my $tE = $rPHQ->{'q15'} + $rPHQ->{'q16'} + $rPHQ->{'q17'} + $rPHQ->{'q18'} + $rPHQ->{'q19'} + $rPHQ->{'q20'};
+    $DBData{"tB"} = ${tB};
+    $DBData{"tC"} = ${tC};
+    $DBData{"tD"} = ${tD};
+    $DBData{"tE"} = ${tE};
+    my $tBE = $tB + $tC + $tD + $tE;
+    $DBData{"tBE"} = ${tBE};
+  }
+  elsif ( $table eq 'ClientCATS' )
+  {
+    $DBData{"caregiver"} = $rPHQ->{'Caregiver'};
+    $DBData{"provider"} = $rPHQ->{'Provider'};
+# set Caregiver Total PTSD Severity Score:
+    $DBData{'tCPTSD'} = $rPHQ->{'CqB1'} + $rPHQ->{'CqB2'} + $rPHQ->{'CqB3'} + $rPHQ->{'CqB4'} + $rPHQ->{'CqB5'}
+                      + $rPHQ->{'CqB6'} + $rPHQ->{'CqB7'} + $rPHQ->{'CqB8'} + $rPHQ->{'CqB9'} + $rPHQ->{'CqB10'}
+                      + $rPHQ->{'CqB11'} + $rPHQ->{'CqB12'} + $rPHQ->{'CqB13'} + $rPHQ->{'CqB14'} + $rPHQ->{'CqB15'}
+                      + $rPHQ->{'CqB16'} + $rPHQ->{'CqB17'} + $rPHQ->{'CqB18'} + $rPHQ->{'CqB19'} + $rPHQ->{'CqB20'};
+# now set all the Caregiver Symptoms boxes...
+    $DBData{'tC1thru5'} = 0;
+    $DBData{'tC1thru5'}++ if ( $rPHQ->{'CqB1'} >= 2 );
+    $DBData{'tC1thru5'}++ if ( $rPHQ->{'CqB2'} >= 2 );
+    $DBData{'tC1thru5'}++ if ( $rPHQ->{'CqB3'} >= 2 );
+    $DBData{'tC1thru5'}++ if ( $rPHQ->{'CqB4'} >= 2 );
+    $DBData{'tC1thru5'}++ if ( $rPHQ->{'CqB5'} >= 2 );
+    $DBData{'tC1thru5Flag'} = 1 if ( $DBData{'tC1thru5'} >= 1 );
+    $DBData{'tC6thru7'} = 0;
+    $DBData{'tC6thru7'}++ if ( $rPHQ->{'CqB6'} >= 2 );
+    $DBData{'tC6thru7'}++ if ( $rPHQ->{'CqB7'} >= 2 );
+    $DBData{'tC6thru7Flag'} = 1 if ( $DBData{'tC6thru7'} >= 1 );
+    $DBData{'tC8thru14'} = 0;
+    $DBData{'tC8thru14'}++ if ( $rPHQ->{'CqB8'} >= 2 );
+    $DBData{'tC8thru14'}++ if ( $rPHQ->{'CqB9'} >= 2 );
+    $DBData{'tC8thru14'}++ if ( $rPHQ->{'CqB10'} >= 2 );
+    $DBData{'tC8thru14'}++ if ( $rPHQ->{'CqB11'} >= 2 );
+    $DBData{'tC8thru14'}++ if ( $rPHQ->{'CqB12'} >= 2 );
+    $DBData{'tC8thru14'}++ if ( $rPHQ->{'CqB13'} >= 2 );
+    $DBData{'tC8thru14'}++ if ( $rPHQ->{'CqB14'} >= 2 );
+    $DBData{'tC8thru14Flag'} = 1 if ( $DBData{'tC8thru14'} >= 2 );
+    $DBData{'tC15thru20'} = 0;
+    $DBData{'tC15thru20'}++ if ( $rPHQ->{'CqB15'} >= 2 );
+    $DBData{'tC15thru20'}++ if ( $rPHQ->{'CqB16'} >= 2 );
+    $DBData{'tC15thru20'}++ if ( $rPHQ->{'CqB17'} >= 2 );
+    $DBData{'tC15thru20'}++ if ( $rPHQ->{'CqB18'} >= 2 );
+    $DBData{'tC15thru20'}++ if ( $rPHQ->{'CqB19'} >= 2 );
+    $DBData{'tC15thru20'}++ if ( $rPHQ->{'CqB20'} >= 2 );
+    $DBData{'tC15thru20Flag'} = 1 if ( $DBData{'tC15thru20'} >= 2 );
+    $DBData{'tCFI'} = 0;
+    $DBData{'tCFI'}++ if ( $rPHQ->{'CqC1'} == 1 );
+    $DBData{'tCFI'}++ if ( $rPHQ->{'CqC2'} == 1 );
+    $DBData{'tCFI'}++ if ( $rPHQ->{'CqC3'} == 1 );
+    $DBData{'tCFI'}++ if ( $rPHQ->{'CqC4'} == 1 );
+    $DBData{'tCFI'}++ if ( $rPHQ->{'CqC5'} == 1 );
+    $DBData{'tCFIFlag'} = 1 if ( $DBData{'tCFI'} >= 1 );
+
+# set Child Total PTSD Severity Score:
+    $DBData{'tPTSD'} = $rPHQ->{'qB1'} + $rPHQ->{'qB2'} + $rPHQ->{'qB3'} + $rPHQ->{'qB4'} + $rPHQ->{'qB5'}
+                     + $rPHQ->{'qB6'} + $rPHQ->{'qB7'} + $rPHQ->{'qB8'} + $rPHQ->{'qB9'} + $rPHQ->{'qB10'}
+                     + $rPHQ->{'qB11'} + $rPHQ->{'qB12'} + $rPHQ->{'qB13'} + $rPHQ->{'qB14'} + $rPHQ->{'qB15'}
+                     + $rPHQ->{'qB16'} + $rPHQ->{'qB17'} + $rPHQ->{'qB18'} + $rPHQ->{'qB19'} + $rPHQ->{'qB20'};
+# now set all the Child Symptoms boxes...
+    $DBData{'t1thru5'} = 0;
+    $DBData{'t1thru5'}++ if ( $rPHQ->{'qB1'} >= 2 );
+    $DBData{'t1thru5'}++ if ( $rPHQ->{'qB2'} >= 2 );
+    $DBData{'t1thru5'}++ if ( $rPHQ->{'qB3'} >= 2 );
+    $DBData{'t1thru5'}++ if ( $rPHQ->{'qB4'} >= 2 );
+    $DBData{'t1thru5'}++ if ( $rPHQ->{'qB5'} >= 2 );
+    $DBData{'t1thru5Flag'} = 1 if ( $DBData{'t1thru5'} >= 1 );
+    $DBData{'t6thru7'} = 0;
+    $DBData{'t6thru7'}++ if ( $rPHQ->{'qB6'} >= 2 );
+    $DBData{'t6thru7'}++ if ( $rPHQ->{'qB7'} >= 2 );
+    $DBData{'t6thru7Flag'} = 1 if ( $DBData{'t6thru7'} >= 1 );
+    $DBData{'t8thru14'} = 0;
+    $DBData{'t8thru14'}++ if ( $rPHQ->{'qB8'} >= 2 );
+    $DBData{'t8thru14'}++ if ( $rPHQ->{'qB9'} >= 2 );
+    $DBData{'t8thru14'}++ if ( $rPHQ->{'qB10'} >= 2 );
+    $DBData{'t8thru14'}++ if ( $rPHQ->{'qB11'} >= 2 );
+    $DBData{'t8thru14'}++ if ( $rPHQ->{'qB12'} >= 2 );
+    $DBData{'t8thru14'}++ if ( $rPHQ->{'qB13'} >= 2 );
+    $DBData{'t8thru14'}++ if ( $rPHQ->{'qB14'} >= 2 );
+    $DBData{'t8thru14Flag'} = 1 if ( $DBData{'t8thru14'} >= 2 );
+    $DBData{'t15thru20'} = 0;
+    $DBData{'t15thru20'}++ if ( $rPHQ->{'qB15'} >= 2 );
+    $DBData{'t15thru20'}++ if ( $rPHQ->{'qB16'} >= 2 );
+    $DBData{'t15thru20'}++ if ( $rPHQ->{'qB17'} >= 2 );
+    $DBData{'t15thru20'}++ if ( $rPHQ->{'qB18'} >= 2 );
+    $DBData{'t15thru20'}++ if ( $rPHQ->{'qB19'} >= 2 );
+    $DBData{'t15thru20'}++ if ( $rPHQ->{'qB20'} >= 2 );
+    $DBData{'t15thru20Flag'} = 1 if ( $DBData{'t15thru20'} >= 2 );
+    $DBData{'tFI'} = 0;
+    $DBData{'tFI'}++ if ( $rPHQ->{'qC1'} == 1 );
+    $DBData{'tFI'}++ if ( $rPHQ->{'qC2'} == 1 );
+    $DBData{'tFI'}++ if ( $rPHQ->{'qC3'} == 1 );
+    $DBData{'tFI'}++ if ( $rPHQ->{'qC4'} == 1 );
+    $DBData{'tFI'}++ if ( $rPHQ->{'qC5'} == 1 );
+    $DBData{'tFIFlag'} = 1 if ( $DBData{'tFI'} >= 1 );
+    $DBData{"MostTrauma"} = $rPHQ->{'TopOne'} eq '' ? $rPHQ->{'CTopOne'} : $rPHQ->{'TopOne'};  # Most Distressing Trauma
+  }
+  elsif ( $table eq 'ClientODAS' || $table eq 'ClientODAS2017' )
+  {
+    $DBData{"tINT"} = ${tINT};
+    $DBData{"tWM"} = ${tWM};
+    $DBData{"tD1"} = ${tD1};
+    $DBData{"tD2"} = ${tD2};
+    $DBData{"tD3"} = ${tD3};
+    $DBData{"tD4"} = ${tD4};
+    $DBData{"tD5"} = ${tD5};
+    $DBData{"tD6"} = ${tD6};
+# calculate the Service Levels ...
+    my $tLINT = $tINT == 0 ? 0 : $tINT <= 2 ? 1 : $tINT <= 4 ? 2 : $tINT <= 6 ? 3 : 4;
+    $tLWM = $tWM == 0 ? 0 : $tWM <= 4 ? 1 : $tWM <= 8 ? 1 : $tWM <= 12 ? 3 : 4;
+    $tL1 = $tLINT;      # same as L1 ACUTE INTOXICATION
+    $tL2 = $tD2 == 0 ? 0 : $tD2 <= 7 ? 1 : $tD2 <= 14 ? 2 : $tD2 <= 21 ? 3 : 4;
+    $tL3 = $tD3 == 0 ? 0 : $tD3 <= 8 ? 1 : $tD3 <= 16 ? 2 : $tD3 <= 24 ? 3 : 4;
+    $tL4 = $tD4 == 0 ? 0 : $tD4 <= 6 ? 1 : $tD4 <= 12 ? 2 : $tD4 <= 18 ? 3 : 4;
+    $tL5 = $tD5 == 0 ? 0 : $tD5 <= 10 ? 1 : $tD5 <= 20 ? 2 : $tD5 <= 30 ? 3 : 4;
+    $tL6 = $tD6 == 0 ? 0 : $tD6 <= 9 ? 1 : $tD6 <= 18 ? 2 : $tD6 <= 27 ? 3 : 4;
+    $DBData{"tLINT"} = ${tLINT};
+    $DBData{"tLWM"} = ${tLWM};
+    $DBData{"tL1"} = ${tL1};
+    $DBData{"tL2"} = ${tL2};
+    $DBData{"tL3"} = ${tL3};
+    $DBData{"tL4"} = ${tL4};
+    $DBData{"tL5"} = ${tL5};
+    $DBData{"tL6"} = ${tL6};
+# and calculate the Indicated Service Level ...
+    $sIndicated = $tL1 == 0 
+                  && ($tL2 >= 0 && $tL2 <= 1) || ($tL2 >= 2 && $tL2 <= 3 && $rPHQ->{'D2q8'} == 1)
+                  && ($tL3 >= 0 && $tL3 <= 1)
+                  && ($tL5 >= 2 && $tL5 <= 4)
+                  && ($tL6 >= 2 && $tL6 <= 3)
+                  && ($tL4 >= 3 && $tL4 <= 3) ? '0.5'
+                : ($tL1 >= 0 && $tL1 <= 1) || ($tL1 >= 2 && $tL1 <= 4 && $tWM >= 1)
+                  && ($tL2 >= 0 && $tL2 <= 1) || ($tL2 >= 2 && $tL2 <= 3 && $rPHQ->{'D2q8'} == 1)
+                  && ($tL3 >= 0 && $tL3 <= 1) || ($tL3 >= 2 && $tL3 <= 3 && $rPHQ->{'D3q9'} == 1)
+                  && ($tL5 >= 0 && $tL5 <= 2)
+                  && ($tL6 >= 0 && $tL6 <= 2)
+                  && ($tL4 >= 0 && $tL4 <= 2) || 
+                     ($tL4 >= 3 && $tL4 <= 4 && $tL1 >= 0 && $tL1 <= 1 && $tL2 >= 0 && $tL2 <= 1 && $tL3 >= 0 && $tL3 <= 1 && $tL5 >= 0 && $tL5 <= 1 && $tL6 >= 0 && $tL6 <= 1) ? '1'
+                : ($tL1 >= 3 && $tL1 <= 4)
+                  && ($tL2 >= 0 && $tL2 <= 1) || ($tL2 >= 2 && $tL2 <= 3 && $rPHQ->{'D2q8'} == 1)
+                  && ($tL3 >= 0 && $tL3 <= 1) || ($tL3 >= 2 && $tL3 <= 3 && $rPHQ->{'D3q9'} == 1)
+                  && ($tL5 >= 2 && $tL5 <= 4)
+                  && ($tL6 >= 0 && $tL6 <= 2)
+                  && ($tL4 >= 0 && $tL4 <= 2) ? 'OTP1'
+                : ($tL1 >= 0 && $tL1 <= 1) || ($tL1 >= 2 && $tL1 <= 4 && $tWM >= 1)
+                  && ($tL2 >= 0 && $tL2 <= 1) || ($tL2 >= 2 && $tL2 <= 3 && $rPHQ->{'D2q8'} == 1)
+                  && ($tL3 >= 0 && $tL3 <= 2)
+                  && ($tL5 >= 2 && $tL5 <= 3)
+                  && ($tL6 >= 2 && $tL6 <= 3)
+                  && ($tL4 >= 2 && $tL4 <= 3) ? '2.1'
+                : ($tL1 >= 0 && $tL1 <= 1) || ($tL1 >= 2 && $tL1 <= 4 && $tWM >= 1)
+                  && ($tL2 >= 0 && $tL2 <= 1) || ($tL2 >= 2 && $tL2 <= 3 && $rPHQ->{'D2q8'} == 1)
+                  && ($tL3 >= 0 && $tL3 <= 1) || ($tL3 >= 2 && $tL3 <= 3 && $rPHQ->{'D3q9'} == 1)
+                  && ($tL5 >= 1 && $tL5 <= 3)
+                  && ($tL6 >= 3 && $tL6 <= 4)
+                  && ($tL4 >= 0 && $tL4 <= 3) ? '3.1'
+                : ($tL1 >= 0 && $tL1 <= 1) || ($tL1 >= 2 && $tL1 <= 4 && $tWM >= 1)
+                  && ($tL2 >= 0 && $tL2 <= 1) || ($tL2 >= 2 && $tL2 <= 3 && $rPHQ->{'D2q8'} == 1)
+                  && ($tL3 >= 3 && $tL3 <= 4) || (($tL3 >= 1 && $tL3 <= 2) && ($tL4 >= 3 && $tL4 <= 4))
+                  && ($tL5 >= 3 && $tL5 <= 4)
+                  && ($tL6 >= 3 && $tL6 <= 4)
+                  && ($tL4 >= 3 && $tL4 <= 4) || (($tL4 >= 1 && $tL4 <= 2) && ($tL3 >= 3 && $tL3 <= 4)) ? '3.5'
+                : '';
+    $sWMIndicated = $tLWM == 2 ? '1 WM'
+                  : $tLWM == 3 ? '3.2 WM'
+                  : $tLWM == 4 ? '3.7 WM'
+                  : 'none';
+    $DBData{"sIndicated"} = $sIndicated;
+#warn qq|sIndicated=${sIndicated} / $DBData{'sIndicated'}\n|;
+#warn qq|tL1=${tL1}\n|;
+#warn qq|tL2=${tL2}\n|;
+#warn qq|tL3=${tL3}\n|;
+#warn qq|tL4=${tL4}\n|;
+#warn qq|tL5=${tL5}\n|;
+#warn qq|tL6=${tL6}\n|;
+#warn qq|tWM=${tWM}\n|;
+    $DBData{"sWMIndicated"} = $sWMIndicated;
+  }
+  elsif ( $table eq 'ClientGDSS' )                 # GDS Short Form
+  {
+    $rPHQ->{'Score'} = 0;
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q1'} == 0 ); 
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q2'} == 1 ); 
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q3'} == 1 ); 
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q4'} == 1 ); 
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q5'} == 0 ); 
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q6'} == 1 ); 
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q7'} == 0 ); 
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q8'} == 1 ); 
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q9'} == 1 ); 
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q10'} == 1 ); 
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q11'} == 0 ); 
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q12'} == 1 ); 
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q13'} == 0 ); 
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q14'} == 1 ); 
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q15'} == 1 ); 
+    $DBData{'Score'} = $rPHQ->{'Score'};
+  }
+  elsif ( $table eq 'ClientGDSL' )                 # GDS Long Form
+  {
+    $rPHQ->{'Score'} = 0;
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q1'} == 0 ); 
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q2'} == 1 ); 
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q3'} == 1 ); 
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q4'} == 1 ); 
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q5'} == 0 ); 
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q6'} == 1 ); 
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q7'} == 0 ); 
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q8'} == 1 ); 
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q9'} == 0 ); 
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q10'} == 1 ); 
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q11'} == 1 ); 
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q12'} == 1 ); 
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q13'} == 1 ); 
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q14'} == 1 ); 
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q15'} == 0 ); 
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q16'} == 1 ); 
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q17'} == 1 ); 
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q18'} == 1 ); 
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q19'} == 0 ); 
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q20'} == 1 ); 
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q21'} == 0 ); 
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q22'} == 1 ); 
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q23'} == 1 ); 
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q24'} == 1 ); 
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q25'} == 1 ); 
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q26'} == 1 );
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q27'} == 0 );
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q28'} == 1 );
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q29'} == 0 );
+    $rPHQ->{'Score'}++ if ( $rPHQ->{'q30'} == 0 );
+    $DBData{'Score'} = $rPHQ->{'Score'};
+  }
+  elsif ($table eq 'ClientCSSRSt')                # C-SSRS Safe-T Protocol
+  {
+    $DBData{'tSafeT'} = $rPHQ->{'q42'} + $rPHQ->{'q43'} + $rPHQ->{'q44'} + $rPHQ->{'q45'} + $rPHQ->{'q46'};
+  }
+# no logo on these forms...  #| . DBA->getLogo($form,'Client',$rClient->{ClientID},'base64') . qq|
+# no Agency/companyname on these forms...
+# reportInfo->testdate not on all forms, some only today's date
+  
+  $DBData{"reportInfo"} = $reportInfo;
+  $DBData{"clientnameid"} = $clientnameid;
+  $DBData{"footerLeft"} = $clientnameid;
+  # $DBData{"footerRight"} = $DT;
+  $DBData{"agencyname"} = $AgencyName;
+  $DBData{"agencyaddr"} = $AgencyAddr;
+  $DBData{"agencyphonefax"} = $AgencyPhFax;
+  $DBData{"primaryprovider"} = $primaryprovider;
+  $DBData{"clinician"} = $clinician;
+  $DBData{"testdate"} = $testdate;
+  $DBData{"testdate_pg2"} = $testdate;
+  $DBData{"testdate_pg3"} = $testdate;
+  $DBData{"testdateMDY"} = $testdateMDY;
+  $DBData{"testtime"} = $testtime;
+  $DBData{"today"} = $today;
+  $DBData{"clientid"} = $clientid;
+  $DBData{"clientname"} = $clientname;
+  $DBData{"addr1"} = $addr1;
+  $DBData{"addr2"} = $addr2;
+  $DBData{"csz"} = $csz;
+  $DBData{"sex"} = $sex;
+  $DBData{"sex_F"} = $sex;
+  $DBData{"sex_M"} = $sex;
+  $DBData{"age"} = $age;
+  $DBData{"race"} = $race;
+  $DBData{"ethnicity"} = $ethnicity;
+  $DBData{"gender"} = $gender;
+  $DBData{"caregiver"} = $caregiver;
+  $DBData{"caregiverrel"} = $caregiverrel;
+  $DBData{"caregiveraddr"} = $caregiveraddr;
+#  foreach my $f ( sort keys %DBData ) {
+#    warn("$f => " . $DBData{"$f"} . "\n");
+#  }
+
+#####################
+  my @PageData = ();
+
+  if ("$table$page" eq "ClientPHQSADS") {
+    @PageData = (
+      { "descr" => "page 1", "data" => [
+          { "type" => "check", "ypos" => 627.6, "optlist" => "fontsize=11", "xposarray" => [385, 447, 509],
+                                "val" => $DBData{"qA1"} },             # qA1
+          { "type" => "check", "ypos" => 611.3, "optlist" => "fontsize=11", "xposarray" => [385, 447, 509],
+                                "val" => $DBData{"qA2"} },             # qA2
+          { "type" => "check", "ypos" => 594.7, "optlist" => "fontsize=11", "xposarray" => [385, 447, 509],
+                                "val" => $DBData{"qA3"} },             # qA3
+          { "type" => "check", "ypos" => 578.2, "optlist" => "fontsize=11", "xposarray" => [385, 447, 509],
+                                "val" => $DBData{"qA4"} },             # qA4
+          { "type" => "check", "ypos" => 561.8, "optlist" => "fontsize=11", "xposarray" => [385, 447, 509],
+                                "val" => $DBData{"qA5"} },             # qA5
+          { "type" => "check", "ypos" => 529.7, "optlist" => "fontsize=11", "xposarray" => [385, 447, 509],
+                                "val" => $DBData{"qA6"} },             # qA6
+          { "type" => "check", "ypos" => 501.8, "optlist" => "fontsize=11", "xposarray" => [385, 447, 509],
+                                "val" => $DBData{"qA7"} },             # qA7
+          { "type" => "check", "ypos" => 485, "optlist" => "fontsize=11", "xposarray" => [385, 447, 509],
+                                "val" => $DBData{"qA8"} },             # qA8
+          { "type" => "check", "ypos" => 468.7, "optlist" => "fontsize=11", "xposarray" => [385, 447, 509],
+                                "val" => $DBData{"qA9"} },             # qA9
+          { "type" => "check", "ypos" => 452.4, "optlist" => "fontsize=11", "xposarray" => [385, 447, 509],
+                                "val" => $DBData{"qA10"} },             # qA10
+          { "type" => "check", "ypos" => 435.8, "optlist" => "fontsize=11", "xposarray" => [385, 447, 509],
+                                "val" => $DBData{"qA11"} },             # qA11
+          { "type" => "check", "ypos" => 419.3, "optlist" => "fontsize=11", "xposarray" => [385, 447, 509],
+                                "val" => $DBData{"qA12"} },             # qA12
+          { "type" => "check", "ypos" => 402.7, "optlist" => "fontsize=11", "xposarray" => [385, 447, 509],
+                                "val" => $DBData{"qA13"} },             # qA13
+          { "type" => "check", "ypos" => 386.4, "optlist" => "fontsize=11", "xposarray" => [385, 447, 509],
+                                "val" => $DBData{"qA14"} },             # qA14
+          { "type" => "check", "ypos" => 369.8, "optlist" => "fontsize=11", "xposarray" => [385, 447, 509],
+                                "val" => $DBData{"qA15"} },             # qA15
+          { "type" => "textline", "ypos" => 337.2, "xpos" => 372, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"t15"} },                       # t15
+          { "type" => "textline", "ypos" => 337.2, "xpos" => 453.1, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"t15_1"} },                       # t15_1
+          { "type" => "textline", "ypos" => 337.2, "xpos" => 514.8, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"t15_2"} },                       # t15_2
+          { "type" => "check", "ypos" => 244.8, "optlist" => "fontsize=11", "xposarray" => [385, 428.5, 472, 515.5],
+                                "xpos" => $DBData{"qB1"} },             # qB1
+          { "type" => "check", "ypos" => 227.3, "optlist" => "fontsize=11", "xposarray" => [385, 428.5, 472, 515.5],
+                                "val" => $DBData{"qB2"} },             # qB2
+          { "type" => "check", "ypos" => 210, "optlist" => "fontsize=11", "xposarray" => [385, 428.5, 472, 515.5],
+                                "val" => $DBData{"qB3"} },             # qB3
+          { "type" => "check", "ypos" => 192.5, "optlist" => "fontsize=11", "xposarray" => [385, 428.5, 472, 515.5],
+                                "val" => $DBData{"qB4"} },             # qB4
+          { "type" => "check", "ypos" => 175, "optlist" => "fontsize=11", "xposarray" => [385, 428.5, 472, 515.5],
+                                "val" => $DBData{"qB5"} },             # qB5
+          { "type" => "check", "ypos" => 157.2, "optlist" => "fontsize=11", "xposarray" => [385, 428.5, 472, 515.5],
+                                "val" => $DBData{"qB6"} },             # qB6
+          { "type" => "check", "ypos" => 139.9, "optlist" => "fontsize=11", "xposarray" => [385, 428.5, 472, 515.5],
+                                "val" => $DBData{"qB7"} },             # qB7
+          { "type" => "textline", "ypos" => 105.6, "xpos" => 372, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"t7"} },                       # t7
+          { "type" => "textline", "ypos" => 105.6, "xpos" => 434.6, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"t7_1"} },                       # t7_1
+          { "type" => "textline", "ypos" => 105.6, "xpos" => 479.3, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"t7_2"} },                       # t7_2
+          { "type" => "textline", "ypos" => 105.6, "xpos" => 521.3, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"t7_3"} },                       # t7_3
+      ] },
+      { "descr" => "page 2", "data" => [
+          { "type" => "check", "ypos" => 701.5, "optlist" => "fontsize=11", "xposarray" => [435.6, 507.8],
+                                "val" => $DBData{"qC1"} },             # qC1
+          { "type" => "check", "ypos" => 681.6, "optlist" => "fontsize=11", "xposarray" => [435.6, 507.8],
+                                "val" => $DBData{"qC2"} },             # qC2
+          { "type" => "check", "ypos" => 641, "optlist" => "fontsize=11", "xposarray" => [435.6, 507.8],
+                                "val" => $DBData{"qC3"} },             # qC3
+          { "type" => "check", "ypos" => 611.3, "optlist" => "fontsize=11", "xposarray" => [435.6, 507.8],
+                                "val" => $DBData{"qC4"} },             # qC4
+          { "type" => "check", "ypos" => 582.2, "optlist" => "fontsize=11", "xposarray" => [435.6, 507.8],
+                                "val" => $DBData{"qC5"} },             # qC5
+          { "type" => "check", "ypos" => 495.1, "optlist" => "fontsize=11", "xposarray" => [384.7, 428.9, 472, 518.3],
+                                "val" => $DBData{"qD1"} },             # qD1
+          { "type" => "check", "ypos" => 466.3, "optlist" => "fontsize=11", "xposarray" => [384.7, 428.9, 472, 518.3],
+                                "val" => $DBData{"qD2"} },             # qD2
+          { "type" => "check", "ypos" => 425.8, "optlist" => "fontsize=11", "xposarray" => [384.7, 428.9, 472, 518.3],
+                                "val" => $DBData{"qD3"} },             # qD3
+          { "type" => "check", "ypos" => 397, "optlist" => "fontsize=11", "xposarray" => [384.7, 428.9, 472, 518.3],
+                                "val" => $DBData{"qD4"} },             # qD4
+          { "type" => "check", "ypos" => 379.2, "optlist" => "fontsize=11", "xposarray" => [384.7, 428.9, 472, 518.3],
+                                "val" => $DBData{"qD5"} },             # qD5
+          { "type" => "check", "ypos" => 350.2, "optlist" => "fontsize=11", "xposarray" => [384.7, 428.9, 472, 518.3],
+                                "val" => $DBData{"qD6"} },             # qD6
+          { "type" => "check", "ypos" => 309.4, "optlist" => "fontsize=11", "xposarray" => [384.7, 428.9, 472, 518.3],
+                                "val" => $DBData{"qD7"} },             # qD7
+          { "type" => "check", "ypos" => 246.7, "optlist" => "fontsize=11", "xposarray" => [384.7, 428.9, 472, 518.3],
+                                "val" => $DBData{"qD8"} },             # qD8
+          { "type" => "check", "ypos" => 205.7, "optlist" => "fontsize=11", "xposarray" => [384.7, 428.9, 472, 518.3],
+                                "val" => $DBData{"qD9"} },             # qD9
+          { "type" => "textline", "ypos" => 172, "xpos" => 372, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"t9"} },                       # t9
+          { "type" => "textline", "ypos" => 172, "xpos" => 433.7, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"t9_1"} },                       # t9_1
+          { "type" => "textline", "ypos" => 172, "xpos" => 478.3, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"t9_2"} },                       # t9_2
+          { "type" => "textline", "ypos" => 172, "xpos" => 523.4, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"t9_3"} },                       # t9_3
+          { "type" => "check", "ypos" => 91.4, "optlist" => "fontsize=11", "xposarray" => [159, 310.8, 425, 518.2],
+                                "val" => $DBData{"qE"} },             # qE
+      ] }
+    );
+  }
+  elsif ("$table$page" eq "ClientPHQ") {
+    @PageData = (
+      { "descr" => "page 1", "data" => [
+          { "type" => "textline", "ypos" => 640.1, "xpos" => 100,
+                                "text" => $DBData{"clientname"} },                       # clientname
+          { "type" => "textline", "ypos" => 640.1, "xpos" => 241,
+                                "text" => $DBData{"age"} },                       # age
+          { "type" => "textline", "ypos" => 638.8, "xpos" => 305, "optlist" => $basecheckfontoptions . " fontsize=11",
+                                "text" => $DBData{"sex_F"} eq 'F' ? '&#x2713;' : '' },                       # Sex F
+          { "type" => "textline", "ypos" => 638.8, "xpos" => 360, "optlist" => $basecheckfontoptions . " fontsize=11",
+                                "text" => $DBData{"sex_M"} eq 'M' ? '&#x2713;' : '' },                       # Sex M
+          { "type" => "textline", "ypos" => 640.1, "xpos" => 473,
+                                "text" => $DBData{"testdate"} },                  # testdate
+          { "type" => "check", "ypos" => 582, "optlist" => "fontsize=11", "xposarray" => [397, 453.4, 509.8],
+                                "val" => $DBData{"q1a"} },             # q1a
+          { "type" => "check", "ypos" => 566.4, "optlist" => "fontsize=11", "xposarray" => [397, 453.4, 509.8],
+                                "val" => $DBData{"q1b"} },             # q1b
+          { "type" => "check", "ypos" => 550.8, "optlist" => "fontsize=11", "xposarray" => [397, 453.4, 509.8],
+                                "val" => $DBData{"q1c"} },             # q1c
+          { "type" => "check", "ypos" => 525.1, "optlist" => "fontsize=11", "xposarray" => [397, 453.4, 509.8],
+                                "val" => $DBData{"q1d"} },             # q1d
+          { "type" => "check", "ypos" => 509.5, "optlist" => "fontsize=11", "xposarray" => [397, 453.4, 509.8],
+                                "val" => $DBData{"q1e"} },             # q1e
+          { "type" => "check", "ypos" => 493.9, "optlist" => "fontsize=11", "xposarray" => [397, 453.4, 509.8],
+                                "val" => $DBData{"q1f"} },             # q1f
+          { "type" => "check", "ypos" => 478.6, "optlist" => "fontsize=11", "xposarray" => [397, 453.4, 509.8],
+                                "val" => $DBData{"q1g"} },             # q1g
+          { "type" => "check", "ypos" => 463, "optlist" => "fontsize=11", "xposarray" => [397, 453.4, 509.8],
+                                "val" => $DBData{"q1h"} },             # q1h
+          { "type" => "check", "ypos" => 447.4, "optlist" => "fontsize=11", "xposarray" => [397, 453.4, 509.8],
+                                "val" => $DBData{"q1i"} },             # q1i
+          { "type" => "check", "ypos" => 431.8, "optlist" => "fontsize=11", "xposarray" => [397, 453.4, 509.8],
+                                "val" => $DBData{"q1j"} },             # q1j
+          { "type" => "check", "ypos" => 416.4, "optlist" => "fontsize=11", "xposarray" => [397, 453.4, 509.8],
+                                "val" => $DBData{"q1k"} },             # q1k
+          { "type" => "check", "ypos" => 401, "optlist" => "fontsize=11", "xposarray" => [397, 453.4, 509.8],
+                                "val" => $DBData{"q1l"} },             # q1l
+          { "type" => "check", "ypos" => 385.4, "optlist" => "fontsize=11", "xposarray" => [397, 453.4, 509.8],
+                                "val" => $DBData{"q1m"} },             # q1m
+          { "type" => "check", "ypos" => 323.3, "optlist" => "fontsize=11", "xposarray" => [389.8, 432.5, 474.5, 517],
+                                "val" => $DBData{"q2a"} },             # q2a
+          { "type" => "check", "ypos" => 307.9, "optlist" => "fontsize=11", "xposarray" => [389.8, 432.5, 474.5, 517],
+                                "val" => $DBData{"q2b"} },             # q2b
+          { "type" => "check", "ypos" => 282, "optlist" => "fontsize=11", "xposarray" => [389.8, 432.5, 474.5, 517],
+                                "val" => $DBData{"q2c"} },             # q2c
+          { "type" => "check", "ypos" => 266.9, "optlist" => "fontsize=11", "xposarray" => [389.8, 432.5, 474.5, 517],
+                                "val" => $DBData{"q2d"} },             # q2d
+          { "type" => "check", "ypos" => 251, "optlist" => "fontsize=11", "xposarray" => [389.8, 432.5, 474.5, 517],
+                                "val" => $DBData{"q2e"} },             # q2e
+          { "type" => "check", "ypos" => 225.1, "optlist" => "fontsize=11", "xposarray" => [389.8, 432.5, 474.5, 517],
+                                "val" => $DBData{"q2f"} },             # q2f
+          { "type" => "check", "ypos" => 199.2, "optlist" => "fontsize=11", "xposarray" => [389.8, 432.5, 474.5, 517],
+                                "val" => $DBData{"q2g"} },             # q2g
+          { "type" => "check", "ypos" => 162.5, "optlist" => "fontsize=11", "xposarray" => [389.8, 432.5, 474.5, 517],
+                                "val" => $DBData{"q2h"} },             # q2h
+          { "type" => "check", "ypos" => 136.8, "optlist" => "fontsize=11", "xposarray" => [389.8, 432.5, 474.5, 517],
+                                "val" => $DBData{"q2i"} },             # q2i                                
+      ] },
+      { "descr" => "page 2", "data" => [
+          { "type" => "check", "ypos" => 677.3, "optlist" => "fontsize=11", "xposarray" => [421.4, 499],
+                                "val" => $DBData{"q3a"} },             # q3a
+          { "type" => "check", "ypos" => 646.6, "optlist" => "fontsize=11", "xposarray" => [421.4, 499],
+                                "val" => $DBData{"q3b"} },             # q3b
+          { "type" => "check", "ypos" => 610.1, "optlist" => "fontsize=11", "xposarray" => [421.4, 499],
+                                "val" => $DBData{"q3c"} },             # q3c
+          { "type" => "check", "ypos" => 583.9, "optlist" => "fontsize=11", "xposarray" => [421.4, 499],
+                                "val" => $DBData{"q3d"} },             # q3d
+          { "type" => "check", "ypos" => 535.2, "optlist" => "fontsize=11", "xposarray" => [421.4, 499],
+                                "val" => $DBData{"q4a"} },             # q4a
+          { "type" => "check", "ypos" => 519.6, "optlist" => "fontsize=11", "xposarray" => [421.4, 499],
+                                "val" => $DBData{"q4b"} },             # q4b
+          { "type" => "check", "ypos" => 504.2, "optlist" => "fontsize=11", "xposarray" => [421.4, 499],
+                                "val" => $DBData{"q4c"} },             # q4c
+          { "type" => "check", "ypos" => 488.6, "optlist" => "fontsize=11", "xposarray" => [421.4, 499],
+                                "val" => $DBData{"q4d"} },             # q4d
+          { "type" => "check", "ypos" => 473, "optlist" => "fontsize=11", "xposarray" => [421.4, 499],
+                                "val" => $DBData{"q4e"} },             # q4e
+          { "type" => "check", "ypos" => 457.7, "optlist" => "fontsize=11", "xposarray" => [421.4, 499],
+                                "val" => $DBData{"q4f"} },             # q4f
+          { "type" => "check", "ypos" => 431.5, "optlist" => "fontsize=11", "xposarray" => [421.4, 499],
+                                "val" => $DBData{"q4g"} },             # q4g
+          { "type" => "check", "ypos" => 416.2, "optlist" => "fontsize=11", "xposarray" => [421.4, 499],
+                                "val" => $DBData{"q4h"} },             # q4h
+          { "type" => "check", "ypos" => 400.8, "optlist" => "fontsize=11", "xposarray" => [421.4, 499],
+                                "val" => $DBData{"q4i"} },             # q4i
+          { "type" => "check", "ypos" => 385.2, "optlist" => "fontsize=11", "xposarray" => [421.4, 499],
+                                "val" => $DBData{"q4j"} },             # q4j
+          { "type" => "check", "ypos" => 369.6, "optlist" => "fontsize=11", "xposarray" => [421.4, 499],
+                                "val" => $DBData{"q4k"} },             # q4k
+          { "type" => "check", "ypos" => 292.6, "optlist" => "fontsize=11", "xposarray" => [397.4, 453.4, 509.8],
+                                "val" => $DBData{"q5a"} },             # q5a
+          { "type" => "check", "ypos" => 260.9, "optlist" => "fontsize=11", "xposarray" => [397.4, 453.4, 509.8],
+                                "val" => $DBData{"q5b"} },             # q5b
+          { "type" => "check", "ypos" => 245.5, "optlist" => "fontsize=11", "xposarray" => [397.4, 453.4, 509.8],
+                                "val" => $DBData{"q5c"} },             # q5c
+          { "type" => "check", "ypos" => 229.7, "optlist" => "fontsize=11", "xposarray" => [397.4, 453.4, 509.8],
+                                "val" => $DBData{"q5d"} },             # q5d
+          { "type" => "check", "ypos" => 214.3, "optlist" => "fontsize=11", "xposarray" => [397.4, 453.4, 509.8],
+                                "val" => $DBData{"q5e"} },             # q5e
+          { "type" => "check", "ypos" => 199, "optlist" => "fontsize=11", "xposarray" => [397.4, 453.4, 509.8],
+                                "val" => $DBData{"q5f"} },             # q5f
+          { "type" => "check", "ypos" => 173, "optlist" => "fontsize=11", "xposarray" => [397.4, 453.4, 509.8],
+                                "val" => $DBData{"q5g"} },             # q5g
+      ] },
+      { "descr" => "page 3", "data" => [
+          { "type" => "check", "ypos" => 721.2, "optlist" => "fontsize=11", "xposarray" => [435.1, 499],
+                                "val" => $DBData{"q6a"} },             # q6a
+          { "type" => "check", "ypos" => 683.3, "optlist" => "fontsize=11", "xposarray" => [435.1, 499],
+                                "val" => $DBData{"q6b"} },             # q6b
+          { "type" => "check", "ypos" => 642.5, "optlist" => "fontsize=11", "xposarray" => [435.1, 499],
+                                "val" => $DBData{"q6c"} },             # q6c
+          { "type" => "check", "ypos" => 583, "optlist" => "fontsize=11", "xposarray" => [435.1, 499],
+                                "val" => $DBData{"q7a"} },             # q7a
+          { "type" => "check", "ypos" => 565.4, "optlist" => "fontsize=11", "xposarray" => [435.1, 499],
+                                "val" => $DBData{"q7b"} },             # q7b
+          { "type" => "check", "ypos" => 541.2, "optlist" => "fontsize=11", "xposarray" => [435.1, 499],
+                                "val" => $DBData{"q7c"} },             # q7c
+          { "type" => "check", "ypos" => 516, "optlist" => "fontsize=11", "xposarray" => [435.1, 499],
+                                "val" => $DBData{"q7d"} },             # q7d
+          { "type" => "check", "ypos" => 473.8, "optlist" => "fontsize=11", "xposarray" => [435.1, 499],
+                                "val" => $DBData{"q8"} },             # q8
+          { "type" => "check", "ypos" => 431.3, "optlist" => "fontsize=11", "xposarray" => [435.1, 499],
+                                "val" => $DBData{"q9"} },             # q9
+          { "type" => "check", "ypos" => 372.7, "optlist" => "fontsize=11", "xposarray" => [435.1, 499],
+                                "val" => $DBData{"q10a"} },             # q10a
+          { "type" => "check", "ypos" => 336, "optlist" => "fontsize=11", "xposarray" => [435.1, 499],
+                                "val" => $DBData{"q10b"} },             # q10b
+          { "type" => "check", "ypos" => 309.6, "optlist" => "fontsize=11", "xposarray" => [435.1, 499],
+                                "val" => $DBData{"q10c"} },             # q10c
+          { "type" => "check", "ypos" => 284.2, "optlist" => "fontsize=11", "xposarray" => [435.1, 499],
+                                "val" => $DBData{"q10d"} },             # q10d
+          { "type" => "check", "ypos" => 258.7, "optlist" => "fontsize=11", "xposarray" => [435.1, 499],
+                                "val" => $DBData{"q10e"} },             # q10e
+          { "type" => "check", "ypos" => 170.9, "optlist" => "fontsize=11", "xposarray" => [124.3, 239, 351.1, 473.8],
+                                "val" => $DBData{"q11"} },             # q11
+      ] }
+    );
+  }
+  elsif ("$table$page" eq "ClientPHQ15") {
+    @PageData = (
+      { "descr" => "page 1", "data" => [
+          { "type" => "check", "ypos" => 584.6, "optlist" => "fontsize=11", "xposarray" => [396, 454.6, 513.6],
+                                "val" => $DBData{"q1"} },             # q1
+          { "type" => "check", "ypos" => 555.4, "optlist" => "fontsize=11", "xposarray" => [396, 454.6, 513.6],
+                                "val" => $DBData{"q2"} },             # q2
+          { "type" => "check", "ypos" => 526.3, "optlist" => "fontsize=11", "xposarray" => [396, 454.6, 513.6],
+                                "val" => $DBData{"q3"} },             # q3
+          { "type" => "check", "ypos" => 496.6, "optlist" => "fontsize=11", "xposarray" => [396, 454.6, 513.6],
+                                "val" => $DBData{"q4"} },             # q4
+          { "type" => "check", "ypos" => 467.8, "optlist" => "fontsize=11", "xposarray" => [396, 454.6, 513.6],
+                                "val" => $DBData{"q5"} },             # q5
+          { "type" => "check", "ypos" => 438.2, "optlist" => "fontsize=11", "xposarray" => [396, 454.6, 513.6],
+                                "val" => $DBData{"q6"} },             # q6
+          { "type" => "check", "ypos" => 409, "optlist" => "fontsize=11", "xposarray" => [396, 454.6, 513.6],
+                                "val" => $DBData{"q7"} },             # q7
+          { "type" => "check", "ypos" => 379.7, "optlist" => "fontsize=11", "xposarray" => [396, 454.6, 513.6],
+                                "val" => $DBData{"q8"} },             # q8
+          { "type" => "check", "ypos" => 350.4, "optlist" => "fontsize=11", "xposarray" => [396, 454.6, 513.6],
+                                "val" => $DBData{"q9"} },             # q9
+          { "type" => "check", "ypos" => 320.9, "optlist" => "fontsize=11", "xposarray" => [396, 454.6, 513.6],
+                                "val" => $DBData{"q10"} },             # q10
+          { "type" => "check", "ypos" => 291.8, "optlist" => "fontsize=11", "xposarray" => [396, 454.6, 513.6],
+                                "val" => $DBData{"q11"} },             # q11
+          { "type" => "check", "ypos" => 262.3, "optlist" => "fontsize=11", "xposarray" => [396, 454.6, 513.6],
+                                "val" => $DBData{"q12"} },             # q12
+          { "type" => "check", "ypos" => 233, "optlist" => "fontsize=11", "xposarray" => [396, 454.6, 513.6],
+                                "val" => $DBData{"q13"} },             # q13
+          { "type" => "check", "ypos" => 204, "optlist" => "fontsize=11", "xposarray" => [396, 454.6, 513.6],
+                                "val" => $DBData{"q14"} },             # q14
+          { "type" => "check", "ypos" => 174.5, "optlist" => "fontsize=11", "xposarray" => [396, 454.6, 513.6],
+                                "val" => $DBData{"q15"} },             # q15
+          { "type" => "textline", "ypos" => 134.6, "xpos" => 412.6, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"total"} },                       # total
+          { "type" => "textline", "ypos" => 134.6, "xpos" => 462, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"t1"} },                       # t1
+          { "type" => "textline", "ypos" => 134.6, "xpos" => 516.7, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"t2"} },                       # t2
+      ] }
+    );
+  }
+  elsif ("$table$page" eq "ClientPHQ9") {
+    @PageData = (
+      { "descr" => "page 1", "data" => [
+          { "type" => "check", "ypos" => 609.6, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [382.3, 428.6, 472.8, 517.4],
+                                "val" => $DBData{"q1"} },             # q1
+          { "type" => "check", "ypos" => 571, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [382.3, 428.6, 472.8, 517.4],
+                                "val" => $DBData{"q2"} },             # q2
+          { "type" => "check", "ypos" => 532.8, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [382.3, 428.6, 472.8, 517.4],
+                                "val" => $DBData{"q3"} },             # q3
+          { "type" => "check", "ypos" => 494.4, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [382.3, 428.6, 472.8, 517.4],
+                                "val" => $DBData{"q4"} },             # q4
+          { "type" => "check", "ypos" => 456.2, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [382.3, 428.6, 472.8, 517.4],
+                                "val" => $DBData{"q5"} },             # q5
+          { "type" => "check", "ypos" => 417.8, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [382.3, 428.6, 472.8, 517.4],
+                                "val" => $DBData{"q6"} },             # q6
+          { "type" => "check", "ypos" => 379.7, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [382.3, 428.6, 472.8, 517.4],
+                                "val" => $DBData{"q7"} },             # q7
+          { "type" => "check", "ypos" => 341, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [382.3, 428.6, 472.8, 517.4],
+                                "val" => $DBData{"q8"} },             # q8
+          { "type" => "check", "ypos" => 302.9, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [382.3, 428.6, 472.8, 517.4],
+                                "val" => $DBData{"q9"} },             # q9
+          { "type" => "textline", "ypos" => 258.7, "xpos" => 422.9, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"t9_1"} },                       # t9_1
+          { "type" => "textline", "ypos" => 258.7, "xpos" => 470.4, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"t9_2"} },                       # t9_2
+          { "type" => "textline", "ypos" => 258.7, "xpos" => 517.4, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"t9_3"} },                       # t9_3
+          { "type" => "textline", "ypos" => 244.6, "xpos" => 517.4, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"t9"} },                       # t9
+          { "type" => "check", "ypos" => 145.4, "xposarray" => [141.4, 252.7, 366.2, 479.8],
+                                "val" => $DBData{"q10"} },             # q10
+      ] }
+    );
+  }
+  elsif ("$table$page" eq "ClientGAD7") {
+    @PageData = (
+      { "descr" => "page 1", "data" => [
+          { "type" => "check", "ypos" => 594.7, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [352.8, 405.4, 459, 513.4],
+                                "val" => $DBData{"q1"} },             # q1
+          { "type" => "check", "ypos" => 559.1, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [352.8, 405.4, 459, 513.4],
+                                "val" => $DBData{"q2"} },             # q2
+          { "type" => "check", "ypos" => 522.7, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [352.8, 405.4, 459, 513.4],
+                                "val" => $DBData{"q3"} },             # q3
+          { "type" => "check", "ypos" => 487.1, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [352.8, 405.4, 459, 513.4],
+                                "val" => $DBData{"q4"} },             # q4
+          { "type" => "check", "ypos" => 450.7, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [352.8, 405.4, 459, 513.4],
+                                "val" => $DBData{"q5"} },             # q5
+          { "type" => "check", "ypos" => 415.1, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [352.8, 405.4, 459, 513.4],
+                                "val" => $DBData{"q6"} },             # q6
+          { "type" => "check", "ypos" => 379.1, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [352.8, 405.4, 459, 513.4],
+                                "val" => $DBData{"q7"} },             # q7
+          { "type" => "textline", "ypos" => 334.1, "xpos" => 359.6, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"total"} },                       # total
+          { "type" => "textline", "ypos" => 334.1, "xpos" => 405.4, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"t1"} },                       # t1
+          { "type" => "textline", "ypos" => 334.1, "xpos" => 459, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"t2"} },                       # t2
+          { "type" => "textline", "ypos" => 334.1, "xpos" => 513.4, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"t3"} },                       # t3
+      ] }
+    );
+  }
+  elsif ("$table$page" eq "ClientPHQ4") {
+    @PageData = (
+      { "descr" => "page 1", "data" => [
+          { "type" => "check", "ypos" => 587.9, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [351, 405.7, 459, 513],
+                                "val" => $DBData{"q1"} },             # q1
+          { "type" => "check", "ypos" => 548.6, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [351, 405.7, 459, 513],
+                                "val" => $DBData{"q2"} },             # q2
+          { "type" => "check", "ypos" => 510.5, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [351, 405.7, 459, 513],
+                                "val" => $DBData{"q3"} },             # q3
+          { "type" => "check", "ypos" => 472.7, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [351, 405.7, 459, 513],
+                                "val" => $DBData{"q4"} },             # q4
+          { "type" => "textline", "ypos" => 438.5, "xpos" => 351, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"total"} },                       # total
+          { "type" => "textline", "ypos" => 438.5, "xpos" => 398.5, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"t1"} },                       # t1
+          { "type" => "textline", "ypos" => 438.5, "xpos" => 450, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"t2"} },                       # t2
+          { "type" => "textline", "ypos" => 438.5, "xpos" => 505.4, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"t3"} },                       # t3
+      ] }
+    );
+  }
+  elsif ("$table$page" eq "ClientPHQBrief") {
+    @PageData = (
+      { "descr" => "page 1", "data" => [
+          { "type" => "textline", "ypos" => 667.1, "xpos" => 79.6,
+                                "text" => $DBData{"clientname"} },                       # clientname
+          { "type" => "textline", "ypos" => 667.1, "xpos" => 258.8,
+                                "text" => $DBData{"age"} },                       # age
+          { "type" => "textline", "ypos" => 667.1, "xpos" => 330.5, "optlist" => $basecheckfontoptions . " fontsize=11",
+                                "text" => $DBData{"sex_F"} eq 'F' ? '&#x2713;' : '' },                       # Sex F
+          { "type" => "textline", "ypos" => 667.1, "xpos" => 390.6, "optlist" => $basecheckfontoptions . " fontsize=11",
+                                "text" => $DBData{"sex_M"} eq 'M' ? '&#x2713;' : '' },                       # Sex M
+          { "type" => "textline", "ypos" => 667.1, "xpos" => 508,
+                                "text" => $DBData{"testdate"} },                  # testdate
+          { "type" => "check", "ypos" => 600.5, "xposarray" => [373.7, 421, 478.1, 535.2],
+                                "val" => $DBData{"q1a"} },             # q1a
+          { "type" => "check", "ypos" => 581.3, "xposarray" => [373.7, 421, 478.1, 535.2],
+                                "val" => $DBData{"q1b"} },             # q1b
+          { "type" => "check", "ypos" => 562.3, "xposarray" => [373.7, 421, 478.1, 535.2],
+                                "val" => $DBData{"q1c"} },             # q1c
+          { "type" => "check", "ypos" => 543.4, "xposarray" => [373.7, 421, 478.1, 535.2],
+                                "val" => $DBData{"q1d"} },             # q1d
+          { "type" => "check", "ypos" => 524.2, "xposarray" => [373.7, 421, 478.1, 535.2],
+                                "val" => $DBData{"q1d"} },             # q1e
+          { "type" => "check", "ypos" => 496.1, "xposarray" => [373.7, 421, 478.1, 535.2],
+                                "val" => $DBData{"q1f"} },             # q1f
+          { "type" => "check", "ypos" => 468.2, "xposarray" => [373.7, 421, 478.1, 535.2],
+                                "val" => $DBData{"q1g"} },             # q1g
+          { "type" => "check", "ypos" => 429.4, "xposarray" => [373.7, 421, 478.1, 535.2],
+                                "val" => $DBData{"q1h"} },             # q1h
+          { "type" => "check", "ypos" => 401.9, "xposarray" => [373.7, 421, 478.1, 535.2],
+                                "val" => $DBData{"q1i"} },             # q1i
+          { "type" => "check", "ypos" => 343.2, "xposarray" => [411.6, 468.7],
+                                "val" => $DBData{"q2a"} },             # q2a
+          { "type" => "check", "ypos" => 302.2, "xposarray" => [411.6, 468.7],
+                                "val" => $DBData{"q2b"} },             # q2b
+          { "type" => "check", "ypos" => 274.3, "xposarray" => [411.6, 468.7],
+                                "val" => $DBData{"q2c"} },             # q2c
+          { "type" => "check", "ypos" => 246.2, "xposarray" => [411.6, 468.7],
+                                "val" => $DBData{"q2d"} },             # q2d
+          { "type" => "check", "ypos" => 207.4, "xposarray" => [411.6, 468.7],
+                                "val" => $DBData{"q2e"} },             # q2e
+          { "type" => "check", "ypos" => 157.4, "xposarray" => [65.5, 207.4, 350.4, 470.6],
+                                "val" => $DBData{"q3"} },             # q3
+      ] },
+      { "descr" => "page 2", "data" => [
+          { "type" => "check", "ypos" => 717.4, "xposarray" => [415.2, 469, 529.2],
+                                "val" => $DBData{"q4a"} },             # q4a
+          { "type" => "check", "ypos" => 698.2, "xposarray" => [415.2, 469, 529.2],
+                                "val" => $DBData{"q4b"} },             # q4b
+          { "type" => "check", "ypos" => 679.2, "xposarray" => [415.2, 469, 529.2],
+                                "val" => $DBData{"q4c"} },             # q4c
+          { "type" => "check", "ypos" => 660.2, "xposarray" => [415.2, 469, 529.2],
+                                "val" => $DBData{"q4d"} },             # q4d
+          { "type" => "check", "ypos" => 641, "xposarray" => [415.2, 469, 529.2],
+                                "val" => $DBData{"q4e"} },             # q4e
+          { "type" => "check", "ypos" => 621.8, "xposarray" => [415.2, 469, 529.2],
+                                "val" => $DBData{"q4f"} },             # q4f
+          { "type" => "check", "ypos" => 602.6, "xposarray" => [415.2, 469, 529.2],
+                                "val" => $DBData{"q4g"} },             # q4g
+          { "type" => "check", "ypos" => 583.7, "xposarray" => [415.2, 469, 529.2],
+                                "val" => $DBData{"q4h"} },             # q4h
+          { "type" => "check", "ypos" => 564.5, "xposarray" => [415.2, 469, 529.2],
+                                "val" => $DBData{"q4i"} },             # q4i
+          { "type" => "check", "ypos" => 545.5, "xposarray" => [415.2, 469, 529.2],
+                                "val" => $DBData{"q4j"} },             # q4j
+          { "type" => "check", "ypos" => 464.4, "xposarray" => [415.2, 469],
+                                "val" => $DBData{"q5"} },             # q5
+          { "type" => "textline", "ypos" => 446.2, "xpos" => 312, "optlist" => $basefontoptions,
+                                "text" => $DBData{"q6"} },                       # q6
+          { "type" => "check", "ypos" => 400.1, "xposarray" => [415.2, 469],
+                                "val" => $DBData{"q7"} },             # q7
+          { "type" => "check", "ypos" => 347.5, "xposarray" => [66.7, 150.2, 249.4, 363.6, 456.7],
+                                "val" => $DBData{"q8a"} },             # q8a
+          { "type" => "check", "ypos" => 237.6, "xposarray" => [400.1, 462.2],
+                                "val" => $DBData{"q8b"} },             # q8b
+          { "type" => "check", "ypos" => 215.8, "xposarray" => [400.1, 462.2],
+                                "val" => $DBData{"q8c"} },             # q8d
+          { "type" => "check", "ypos" => 196.6, "xposarray" => [400.1, 462.2],
+                                "val" => $DBData{"q8d"} },             # q8d
+          { "type" => "check", "ypos" => 177.6, "xposarray" => [400.1, 462.2],
+                                "val" => $DBData{"q8e"} },             # q8e
+          { "type" => "check", "ypos" => 158.4, "xposarray" => [400.1, 462.2],
+                                "val" => $DBData{"q8f"} },             # q8f
+      ] }
+    );
+  }
+  elsif ("$table$page" eq "ClientTPHQ9") {
+    @PageData = (
+      { "descr" => "page 1", "data" => [
+          { "type" => "check", "ypos" => 610.9, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [382.3, 428.8, 473, 517.7],
+                                "val" => $DBData{"q1"} },             # q1
+          { "type" => "check", "ypos" => 580.3, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [382.3, 428.8, 473, 517.7],
+                                "val" => $DBData{"q2"} },             # q2
+          { "type" => "check", "ypos" => 548.3, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [382.3, 428.8, 473, 517.7],
+                                "val" => $DBData{"q3"} },             # q3
+          { "type" => "check", "ypos" => 519.5, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [382.3, 428.8, 473, 517.7],
+                                "val" => $DBData{"q4"} },             # q4
+          { "type" => "check", "ypos" => 489.2, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [382.3, 428.8, 473, 517.7],
+                                "val" => $DBData{"q5"} },             # q5
+          { "type" => "check", "ypos" => 453.6, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [382.3, 428.8, 473, 517.7],
+                                "val" => $DBData{"q6"} },             # q6
+          { "type" => "check", "ypos" => 415.1, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [382.3, 428.8, 473, 517.7],
+                                "val" => $DBData{"q7"} },             # q7
+          { "type" => "check", "ypos" => 364, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [382.3, 428.8, 473, 517.7],
+                                "val" => $DBData{"q8"} },             # q8
+          { "type" => "check", "ypos" => 312.8, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [382.3, 428.8, 473, 517.7],
+                                "val" => $DBData{"q9"} },             # q9
+          { "type" => "check", "ypos" => 272.5, "xposarray" => [138.2, 107.3],
+                                "val" => $DBData{"q10"} },             # q10
+          { "type" => "check", "ypos" => 195.1, "xposarray" => [141.5, 252.7, 366.1, 479.9],
+                                "val" => $DBData{"q11"} },             # q11
+          { "type" => "check", "ypos" => 159.5, "xposarray" => [138.2, 107.3],
+                                "val" => $DBData{"q12"} },             # q12
+          { "type" => "check", "ypos" => 121.3, "xposarray" => [138.2, 107.3],
+                                "val" => $DBData{"q13"} },             # q13
+          { "type" => "textline", "ypos" => 69.5, "xpos" => 306, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"total"} },                       # total
+      ] }
+    );
+  }
+  elsif ("$table$page" eq "ClientPHQ2") {
+    @PageData = (
+      { "descr" => "page 1", "data" => [
+          { "type" => "check", "ypos" => 608.8, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [382.3, 428.8, 473, 517.3],
+                                "val" => $DBData{"q1"} },             # q1
+          { "type" => "check", "ypos" => 570.2, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [382.3, 428.8, 473, 517.3],
+                                "val" => $DBData{"q2"} },             # q2
+          { "type" => "textline", "ypos" => 258.4, "xpos" => 423.4, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"total"} },                       # total
+          { "type" => "textline", "ypos" => 258.4, "xpos" => 519.1, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"total"} },                       # total
+      ] }
+    );
+  }
+  elsif ("$table$page" eq "ClientODAS") {
+    @PageData = (
+      { "descr" => "page 1", "data" => [
+      ] },
+      { "descr" => "page 2", "data" => [
+          { "type" => "textline", "ypos" => 604.8, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D1q1"} },                       # D1q1
+          { "type" => "textflow", "ypos" => 595.5, "xpos_start" => 129.8, "xpos_end" => 447.6, "optlist" => "leading=170%",
+                                "text" => $DBData{"TextD1q1"} },                       # TextD1q1
+          { "type" => "textline", "ypos" => 472, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D1q2"} },                       # D1q2
+          { "type" => "textflow", "ypos" => 472.3, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD1q2"} },                       # TextD1q2
+          { "type" => "textline", "ypos" => 423.8, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"tINT"} },                       # tINT
+          { "type" => "textflow", "ypos" => 387.4, "xpos_start" => 129.8, "xpos_end" => 447.6, "optlist" => "leading=160%",
+                                "text" => $DBData{"CommentsAI"} },                       # INT COMMENTS
+          { "type" => "textline", "ypos" => 232.3, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D1q3"} },                       # D1q3
+          { "type" => "textflow", "ypos" => 232.3, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD1q3"} },                       # TextD1q3
+          { "type" => "textline", "ypos" => 110.6, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D1q4"} },                       # D1q4
+          { "type" => "textflow", "ypos" => 110.6, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD1q4"} },                       # TextD1q4
+      ] },
+      { "descr" => "page 3", "data" => [
+          { "type" => "textline", "ypos" => 662.4, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D1q5"} },                       # D1q5
+          { "type" => "textflow", "ypos" => 662.4, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD1q5"} },                       # TextD1q5
+          { "type" => "textline", "ypos" => 552.5, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D1q6"} },                       # D1q6
+          { "type" => "textflow", "ypos" => 552.5, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD1q6"} },                       # TextD1q6
+          { "type" => "textline", "ypos" => 504.2, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"tWM"} },                       # tWM
+          { "type" => "check", "ypos" => 468.5, "optlist" => "fontsize=12 position={center bottom}", "xposarray" => [505.9, 473.3],
+                                "val" => $DBData{"D1q7"} },             # D1q7
+          { "type" => "check", "ypos" => 443.8, "optlist" => "fontsize=12 position={center bottom}", "xposarray" => [505.9, 473.3],
+                                "val" => $DBData{"D1q8"} },             # D1q8
+          { "type" => "textflow", "ypos" => 410, "xpos_start" => 57.4, "xpos_end" => 553.7, "optlist" => "leading=170%",
+                                "text" => $DBData{"CommentsWM"} },                       # WM COMMENTS
+          { "type" => "checkvert", "xpos" => 358.6, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [319, 307, 294.5, 282.5, 270.2],
+                                "val" => main->getSeverityRating($DBData{"tINT"}, ([0, 0], [1, 2], [3, 4], [5, 6], [7, 8])) },             # DIMENSION 1 INT SCORING
+          { "type" => "checkvert", "xpos" => 358.6, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [194.6, 182.2, 170.2, 157.9, 145.7],
+                                "val" => main->getSeverityRating($DBData{"tWM"}, ([0, 0], [1, 4], [5, 8], [9, 12], [13, 16])) },             # DIMENSION 1 WM SCORING
+      ] },
+      { "descr" => "page 4", "data" => [
+          { "type" => "textline", "ypos" => 640.3, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D2q1"} },                       # D2q1
+          { "type" => "textflow", "ypos" => 640.3, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD2q1"} },                       # TextD2q1
+          { "type" => "textline", "ypos" => 511, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D2q2"} },                       # D2q2
+          { "type" => "textflow", "ypos" => 511, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD2q2"} },                       # TextD2q2
+          { "type" => "textline", "ypos" => 389, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D2q3"} },                       # D2q3
+          { "type" => "textflow", "ypos" => 389, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD2q3"} },                       # TextD2q3
+          { "type" => "textline", "ypos" => 279.1, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D2q4"} },                       # D2q4
+          { "type" => "textflow", "ypos" => 279.1, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD2q4"} },                       # TextD2q4
+          { "type" => "textline", "ypos" => 169.2, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D2q5"} },                       # D2q5
+          { "type" => "textflow", "ypos" => 169.2, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD2q5"} },                       # TextD2q5
+      ] },
+      { "descr" => "page 5", "data" => [
+          { "type" => "textline", "ypos" => 662.4, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D2q6"} },                       # D2q6
+          { "type" => "textflow", "ypos" => 662.4, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD2q6"} },                       # TextD2q6
+          { "type" => "textline", "ypos" => 555.1, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D2q7"} },                       # D2q7
+          { "type" => "textflow", "ypos" => 555.1, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD2q7"} },                       # TextD2q7
+          { "type" => "check", "ypos" => 492.7, "optlist" => "fontsize=12 position={center bottom}", "xposarray" => [505.9, 473.3],
+                                "val" => $DBData{"D2q8"} },             # D2q8
+          { "type" => "textline", "ypos" => 459.8, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"tD2"} },                       # tD2
+          { "type" => "checkvert", "xpos" => 358.6, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [389.8, 377.8, 365.3, 353.3, 341],
+                                "val" => main->getSeverityRating($DBData{"tD2"}, ([0, 0], [1, 7], [8, 14], [15, 21], [22, 28])) },             # DIMENSION 2 SCORING
+          { "type" => "textflow", "ypos" => 314.2, "xpos_start" => 57.4, "xpos_end" => 553.7,
+                                "text" => $DBData{"CommentsD2"} },                       # CommentsD2
+          { "type" => "textline", "ypos" => 108.2, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D3q1"} },                       # D3q1
+          { "type" => "textflow", "ypos" => 108.2, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD3q1"} },                       # TextD3q1
+      ] },
+      { "descr" => "page 6", "data" => [
+          { "type" => "textline", "ypos" => 662.8, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D3q2"} },                       # D3q2
+          { "type" => "textflow", "ypos" => 662.8, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD3q2"} },                       # TextD3q2
+          { "type" => "textline", "ypos" => 541.4, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D3q3"} },                       # D3q3
+          { "type" => "textflow", "ypos" => 541.4, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD3q3"} },                       # TextD3q3
+          { "type" => "textline", "ypos" => 429.1, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D3q4"} },                       # D3q4
+          { "type" => "textflow", "ypos" => 429.1, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD3q4"} },                       # TextD3q4
+          { "type" => "textline", "ypos" => 319, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D3q5"} },                       # D3q5
+          { "type" => "textflow", "ypos" => 319, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD3q5"} },                       # TextD3q5
+          { "type" => "textline", "ypos" => 209.2, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D3q6"} },                       # D3q6
+          { "type" => "textflow", "ypos" => 209.2, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD3q6"} },                       # TextD3q6
+          { "type" => "textline", "ypos" => 87.1, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D3q7"} },                       # D3q7
+          { "type" => "textflow", "ypos" => 87.1, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD3q7"} },                       # TextD3q7
+      ] },
+      { "descr" => "page 7", "data" => [
+          { "type" => "textline", "ypos" => 638.6, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D3q8"} },                       # D3q8
+          { "type" => "textflow", "ypos" => 638.6, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD3q8"} },                       # TextD3q8
+          { "type" => "check", "ypos" => 575.3, "optlist" => "fontsize=12 position={center bottom}", "xposarray" => [505.9, 473.3],
+                                "val" => $DBData{"D3q9"} },             # D3q9
+          { "type" => "textline", "ypos" => 538.1, "xpos" => 468.7, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"tD3"} },                       # tD3
+          { "type" => "checkvert", "xpos" => 358.6, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [458.6, 446, 433.8, 421.6, 409.3],
+                                "val" => main->getSeverityRating($DBData{"tD3"}, ([0, 0], [1, 8], [9, 16], [17, 24], [25, 32])) },             # DIMENSION 3 SCORING
+          { "type" => "textflow", "ypos" => 384.2, "xpos_start" => 57.4, "xpos_end" => 553.7,
+                                "text" => $DBData{"CommentsD3"} },                       # CommentsD3
+          { "type" => "textline", "ypos" => 169.2, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D5q1"} },                       # D5q1
+          { "type" => "textflow", "ypos" => 168.2, "xpos_start" => 129.8, "xpos_end" => 447.6, "optlist" => "leading=170%",
+                                "text" => $DBData{"TextD5q1"} },                       # TextD5q1
+      ] },
+      { "descr" => "page 8", "data" => [
+          { "type" => "textline", "ypos" => 648, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D5q2"} },                       # D5q2
+          { "type" => "textflow", "ypos" => 647, "xpos_start" => 129.8, "xpos_end" => 447.6, "optlist" => "leading=170%",
+                                "text" => $DBData{"TextD5q2"} },                       # TextD5q2
+          { "type" => "textline", "ypos" => 523.7, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D5q3"} },                       # D5q3
+          { "type" => "textflow", "ypos" => 513.2, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD5q3"} },                       # TextD5q3
+          { "type" => "textline", "ypos" => 391.4, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D5q4"} },                       # D5q4
+          { "type" => "textflow", "ypos" => 381, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD5q4"} },                       # TextD5q4
+          { "type" => "textline", "ypos" => 259.4, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D5q5"} },                       # D5q5
+          { "type" => "textflow", "ypos" => 259.4, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD5q5"} },                       # TextD5q5
+          { "type" => "textline", "ypos" => 125, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D5q6"} },                       # D5q6
+          { "type" => "textflow", "ypos" => 125, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD5q6"} },                       # TextD5q6
+      ] },
+      { "descr" => "page 9", "data" => [
+          { "type" => "textline", "ypos" => 647.8, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D5q7"} },                       # D5q7
+          { "type" => "textflow", "ypos" => 647.8, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD5q7"} },                       # TextD5q7
+          { "type" => "textline", "ypos" => 537.6, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D5q8"} },                       # D5q8
+          { "type" => "textflow", "ypos" => 537.6, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD5q8"} },                       # TextD5q8
+          { "type" => "textline", "ypos" => 428.2, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D5q9"} },                       # D5q9
+          { "type" => "textflow", "ypos" => 418, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD5q9"} },                       # TextD5q9
+          { "type" => "textline", "ypos" => 308.6, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D5q10"} },                       # D5q10
+          { "type" => "textflow", "ypos" => 308.6, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD5q10"} },                       # TextD5q10
+          { "type" => "textline", "ypos" => 257.3, "xpos" => 505.2, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"tD5"} },                       # tD5
+          { "type" => "checkvert", "xpos" => 358.6, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [204.7, 192, 179.8, 167.5, 155.5],
+                                "val" => main->getSeverityRating($DBData{"tD5"}, ([0, 0], [1, 10], [11, 20], [21, 30], [31, 40])) },             # DIMENSION 5 SCORING
+          { "type" => "textflow", "ypos" => 143.5, "xpos_start" => 57.4, "xpos_end" => 553.7,
+                                "text" => $DBData{"CommentsD5"} },                       # CommentsD5
+      ] },
+      { "descr" => "page 10", "data" => [
+          { "type" => "textline", "ypos" => 616.1, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D6q1"} },                       # D6q1
+          { "type" => "textflow", "ypos" => 616.1, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD6q1"} },                       # TextD6q1
+          { "type" => "textline", "ypos" => 506.6, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D6q2"} },                       # D6q2
+          { "type" => "textflow", "ypos" => 506.6, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD6q2"} },                       # TextD6q2
+          { "type" => "textline", "ypos" => 397, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D6q3"} },                       # D6q3
+          { "type" => "textflow", "ypos" => 397, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD6q3"} },                       # TextD6q3
+          { "type" => "textline", "ypos" => 274.6, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D6q4"} },                       # D6q4
+          { "type" => "textflow", "ypos" => 274.6, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD6q4"} },                       # TextD6q4
+          { "type" => "textline", "ypos" => 140.2, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D6q5"} },                       # D6q5
+          { "type" => "textflow", "ypos" => 140.2, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD6q5"} },                       # TextD6q5
+      ] },
+      { "descr" => "page 11", "data" => [
+          { "type" => "textline", "ypos" => 672, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D6q6"} },                       # D6q6
+          { "type" => "textflow", "ypos" => 672, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD6q6"} },                       # TextD6q6
+          { "type" => "textline", "ypos" => 562.3, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D6q7"} },                       # D6q7
+          { "type" => "textflow", "ypos" => 562.3, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD6q7"} },                       # TextD6q7
+          { "type" => "textline", "ypos" => 453, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D6q8"} },                       # D6q8
+          { "type" => "textflow", "ypos" => 453, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD6q8"} },                       # TextD6q8
+          { "type" => "textline", "ypos" => 343.2, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D6q9"} },                       # D6q9
+          { "type" => "textflow", "ypos" => 343.2, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD6q9"} },                       # TextD6q9
+          { "type" => "textline", "ypos" => 291.6, "xpos" => 505.2, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"tD6"} },                       # tD6
+          { "type" => "checkvert", "xpos" => 358.6, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [226.6, 214.1, 201.8, 189.6, 177.6],
+                                "val" => main->getSeverityRating($DBData{"tD6"}, ([0, 0], [1, 9], [10, 18], [19, 27], [28, 36])) },             # DIMENSION 6 SCORING
+          { "type" => "textflow", "ypos" => 164.9, "xpos_start" => 57.4, "xpos_end" => 553.7,
+                                "text" => $DBData{"CommentsD6"} },                       # CommentsD6
+      ] },
+      { "descr" => "page 12", "data" => [
+          { "type" => "textline", "ypos" => 628.3, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D4q1"} },                       # D4q1
+          { "type" => "textflow", "ypos" => 628.3, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD4q1"} },                       # TextD4q1
+          { "type" => "textline", "ypos" => 508.5, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D4q2"} },                       # D4q2
+          { "type" => "textflow", "ypos" => 508.5, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD4q2"} },                       # TextD4q2
+          { "type" => "textline", "ypos" => 385.7, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D4q3"} },                       # D4q3
+          { "type" => "textflow", "ypos" => 385.7, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD4q3"} },                       # TextD4q3
+          { "type" => "textline", "ypos" => 251.5, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D4q4"} },                       # D4q4
+          { "type" => "textflow", "ypos" => 251.5, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD4q4"} },                       # TextD4q4
+          { "type" => "textline", "ypos" => 130.1, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D4q5"} },                       # D4q5
+          { "type" => "textflow", "ypos" => 130.1, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD4q5"} },                       # TextD4q5
+      ] },
+      { "descr" => "page 13", "data" => [
+          { "type" => "textline", "ypos" => 636, "xpos" => 502.3, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"D4q6"} },                       # D4q6
+          { "type" => "textflow", "ypos" => 636, "xpos_start" => 129.8, "xpos_end" => 447.6,
+                                "text" => $DBData{"TextD4q6"} },                       # TextD4q6
+          { "type" => "textline", "ypos" => 584.9, "xpos" => 505.2, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"tD4"} },                       # tD4
+          { "type" => "checkvert", "xpos" => 358.6, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [531.6, 519.4, 507.1, 494.9, 482.6],
+                                "val" => main->getSeverityRating($DBData{"tD4"}, ([0, 0], [1, 6], [7, 12], [13, 18], [19, 24])) },             # DIMENSION 4 SCORING
+          { "type" => "textflow", "ypos" => 460.6, "xpos_start" => 57.4, "xpos_end" => 553.7,
+                                "text" => $DBData{"CommentsD4"} },                       # CommentsD4
+      ] },
+      { "descr" => "page 14", "data" => [
+      ] },
+    );
+  }
+  elsif ("$table$page" eq "ClientODASTSLevels") {
+    @PageData = (
+      { "descr" => "page 1", "data" => [
+          { "type" => "textline", "ypos" => 706.8, "xpos" => 152.6, "optlist" => "fontsize=7 position={center bottom}",
+                                "text" => $DBData{"testdate"} },                  # Date
+          { "type" => "textline", "ypos" => 706.8, "xpos" => 420.2, "optlist" => "fontsize=7 position={center bottom}",
+                                "text" => $DBData{"clientid"} },                  # Client ID
+          { "type" => "textline", "ypos" => 688.6, "xpos" => 105.1, "optlist" => "fontsize=7 position={center bottom}",
+                                "text" => $DBData{"tL1"} },                       # tL1
+          { "type" => "textline", "ypos" => 688.6, "xpos" => 181.9, "optlist" => "fontsize=7 position={center bottom}",
+                                "text" => $DBData{"tL2"} },                       # tL2
+          { "type" => "textline", "ypos" => 688.6, "xpos" => 259.9, "optlist" => "fontsize=7 position={center bottom}",
+                                "text" => $DBData{"tL3"} },                       # tL3
+          { "type" => "textline", "ypos" => 688.6, "xpos" => 336.7, "optlist" => "fontsize=7 position={center bottom}",
+                                "text" => $DBData{"tL5"} },                       # tL5
+          { "type" => "textline", "ypos" => 688.6, "xpos" => 413.5, "optlist" => "fontsize=7 position={center bottom}",
+                                "text" => $DBData{"tL6"} },                       # tL6
+          { "type" => "textline", "ypos" => 688.6, "xpos" => 490.3, "optlist" => "fontsize=7 position={center bottom}",
+                                "text" => $DBData{"tL4"} },                       # tL4
+          { "type" => "textline", "ypos" => 146.9, "xpos" => 170.9, "optlist" => "fontsize=7 position={center bottom}",
+                                "text" => $DBData{"sIndicated"} },                # sIndicated
+          { "type" => "textline", "ypos" => 62.9, "xpos" => 181.9, "optlist" => "fontsize=7 position={center bottom}",
+                                "text" => $DBData{"clinician"} },                 # Clinician
+      ] }
+    );
+  }
+  elsif ("$table$page" eq "ClientODASWMScore") {
+    @PageData = (
+      { "descr" => "page 1", "data" => [
+          { "type" => "textline", "ypos" => 697.3, "xpos" => 118.1, "optlist" => "fontsize=7 position={center bottom}",
+                                "text" => $DBData{"testdate"} },                       # Date
+          { "type" => "textline", "ypos" => 697.3, "xpos" => 451.4, "optlist" => "fontsize=7 position={center bottom}",
+                                "text" => $DBData{"clientid"} },                       # Client ID
+          { "type" => "textline", "ypos" => 632.8, "xpos" => 245.5, "optlist" => "fontsize=7 position={center bottom}",
+                                "text" => $DBData{"tLWM"} },                       # DIMENSION 1 Severity Rating
+          { "type" => "textline", "ypos" => 133, "xpos" => 210.2, "optlist" => "fontsize=7 position={center bottom}",
+                                "text" => $DBData{"sWMIndicated"} },                       # LEVEL OF SERVICE INDICATED
+          { "type" => "textline", "ypos" => 60.2, "xpos" => 179.6, "optlist" => "fontsize=7 position={center bottom}",
+                                "text" => $DBData{"clinician"} },                       # Clinician
+      ] }
+    );
+  }
+  elsif ("$table$page" eq "ClientTCUDS") {
+    @PageData = (
+      { "descr" => "page 1", "data" => [
+          { "type" => "chararray", "ypos" => 690.2, "xposarray" => [59.8, 77.6, 94.6, 111.6, 128.6, 145.6, 162.6, 179.8, 197],
+                                "text" => $DBData{"clientid"} },                       # clientid
+          { "type" => "chararray", "ypos" => 690.2, "xposarray" => [455.8, 473, 492, 509.8, 528.7, 546],
+                                "text" => $DBData{"testdateMDY"} },                  # testdate
+          { "type" => "radio", "ypos" => 613.1, "xposarray" => [540.5, 495.6],
+                                "val" => $DBData{"q1"} },             # q1
+          { "type" => "radio", "ypos" => 589.9, "xposarray" => [540.5, 495.6],
+                                "val" => $DBData{"q2"} },             # q2
+          { "type" => "radio", "ypos" => 552.7, "xposarray" => [540.5, 495.6],
+                                "val" => $DBData{"q3"} },             # q3
+          { "type" => "radio", "ypos" => 529.5, "xposarray" => [540.5, 495.6],
+                                "val" => $DBData{"q4"} },             # q4
+          { "type" => "radio", "ypos" => 492.1, "xposarray" => [540.5, 495.6],
+                                "val" => $DBData{"q5"} },             # q5
+          { "type" => "radio", "ypos" => 469, "xposarray" => [540.5, 495.6],
+                                "val" => $DBData{"q6"} },             # q6
+          { "type" => "radio", "ypos" => 445.9, "xposarray" => [540.5, 495.6],
+                                "val" => $DBData{"q7"} },             # q7
+          { "type" => "radio", "ypos" => 422.7, "xposarray" => [540.5, 495.6],
+                                "val" => $DBData{"q8"} },             # q8
+          { "type" => "radio", "ypos" => 389.3, "xposarray" => [540.5, 495.6],
+                                "val" => $DBData{"q9"} },             # q9
+          { "type" => "radio", "ypos" => 352.6, "xposarray" => [540.5, 495.6],
+                                "val" => $DBData{"q10a"} },             # q10a
+          { "type" => "radio", "ypos" => 315.1, "xposarray" => [540.5, 495.6],
+                                "val" => $DBData{"q10b"} },             # q10b
+          { "type" => "radio", "ypos" => 277.7, "xposarray" => [540.5, 495.6],
+                                "val" => $DBData{"q11a"} },             # q11a
+          { "type" => "radio", "ypos" => 240.4, "xposarray" => [540.5, 495.6],
+                                "val" => $DBData{"q11b"} },             # q11b
+          { "type" => "radiovertmix", "xposarray" => [72.5, 310.9], "yposarray" => [[192.8, 180.8, 168.8, 156.8, 144.8, 132.8, 120.8, 108.8, 96.8, 84.8], [192.8, 180.8, 168.8, 156.8, 144.8, 132.8, 120.8, 108.8, 96.8]],
+                                "val" => $DBData{"q12a"} },             # q12a
+          { "type" => "radiotextline", "ypos" => 81, "xpos" => 396, "optlist" => $basefontoptions, "xposradio" => 310.9, "yposradio" => 84.8,
+                                "text" => $DBData{"q12b"} },                       # q12b
+      ] },
+      { "descr" => "page 2", "data" => [
+          { "type" => "chararray", "ypos" => 737.6, "xposarray" => [59.8, 77.6, 94.6, 111.6, 128.6, 145.6, 162.6, 179.8, 197],
+                                "text" => $DBData{"clientid"} },                       # clientid
+          { "type" => "chararray", "ypos" => 737.6, "xposarray" => [455.8, 473, 492, 509.8, 528.7, 546],
+                                "text" => $DBData{"testdateMDY"} },                  # testdate
+          { "type" => "radio", "ypos" => 622.1, "xposarray" => [355.1, 400.1, 449.6, 499.2, 548.7],
+                                "val" => $DBData{"q13a"} },             # q13a
+          { "type" => "radio", "ypos" => 604.9, "xposarray" => [355.1, 400.1, 449.6, 499.2, 548.7],
+                                "val" => $DBData{"q13b"} },             # q13b
+          { "type" => "radio", "ypos" => 587.9, "xposarray" => [355.1, 400.1, 449.6, 499.2, 548.7],
+                                "val" => $DBData{"q13c"} },             # q13c
+          { "type" => "radio", "ypos" => 570.7, "xposarray" => [355.1, 400.1, 449.6, 499.2, 548.7],
+                                "val" => $DBData{"q13d"} },             # q13d
+          { "type" => "radio", "ypos" => 553.5, "xposarray" => [355.1, 400.1, 449.6, 499.2, 548.7],
+                                "val" => $DBData{"q13e"} },             # q13e
+          { "type" => "radio", "ypos" => 536.3, "xposarray" => [355.1, 400.1, 449.6, 499.2, 548.7],
+                                "val" => $DBData{"q13f"} },             # q13f
+          { "type" => "radio", "ypos" => 519.2, "xposarray" => [355.1, 400.1, 449.6, 499.2, 548.7],
+                                "val" => $DBData{"q13g"} },             # q13g
+          { "type" => "radio", "ypos" => 502, "xposarray" => [355.1, 400.1, 449.6, 499.2, 548.7],
+                                "val" => $DBData{"q13h"} },             # q13h
+          { "type" => "radio", "ypos" => 484.9, "xposarray" => [355.1, 400.1, 449.6, 499.2, 548.7],
+                                "val" => $DBData{"q13i"} },             # q13i
+          { "type" => "radio", "ypos" => 467.6, "xposarray" => [355.1, 400.1, 449.6, 499.2, 548.7],
+                                "val" => $DBData{"q13j"} },             # q13j
+          { "type" => "radio", "ypos" => 450.6, "xposarray" => [355.1, 400.1, 449.6, 499.2, 548.7],
+                                "val" => $DBData{"q13k"} },             # q13k
+          { "type" => "radio", "ypos" => 433.4, "xposarray" => [355.1, 400.1, 449.6, 499.2, 548.7],
+                                "val" => $DBData{"q13l"} },             # q13l
+          { "type" => "radio", "ypos" => 416.3, "xposarray" => [355.1, 400.1, 449.6, 499.2, 548.7],
+                                "val" => $DBData{"q13m"} },             # q13m
+          { "type" => "radio", "ypos" => 399, "xposarray" => [355.1, 400.1, 449.6, 499.2, 548.7],
+                                "val" => $DBData{"q13n"} },             # q13n
+          { "type" => "radio", "ypos" => 382, "xposarray" => [355.1, 400.1, 449.6, 499.2, 548.7],
+                                "val" => $DBData{"q13o"} },             # q13o
+          { "type" => "radio", "ypos" => 364.8, "xposarray" => [355.1, 400.1, 449.6, 499.2, 548.7],
+                                "val" => $DBData{"q13p"} },             # q13p
+          { "type" => "radio", "ypos" => 347.5, "xposarray" => [355.1, 400.1, 449.6, 499.2, 548.7],
+                                "val" => $DBData{"q13q"} },             # q13q
+          { "type" => "radio", "ypos" => 330.5, "xposarray" => [355.1, 400.1, 449.6, 499.2, 548.7],
+                                "val" => $DBData{"q13r"} },             # q13r
+          { "type" => "radio", "ypos" => 313.2, "xposarray" => [355.1, 400.1, 449.6, 499.2, 548.7],
+                                "val" => $DBData{"q13s"} },             # q13s
+          { "type" => "textline", "ypos" => 310, "xpos" => 148, "optlist" => $basefontoptions,
+                                "text" => $DBData{"q13Other"} },                       # q13Other
+          { "type" => "radio", "ypos" => 235.4, "xposarray" => [86.4, 158.5, 230.4, 307, 383.4],
+                                "val" => $DBData{"q14"} },             # q14
+          { "type" => "radio", "ypos" => 185.6, "xposarray" => [86, 171.7, 248, 342.6, 446],
+                                "val" => $DBData{"q15"} },             # q15
+          { "type" => "radio", "ypos" => 136.3, "xposarray" => [86, 148.9, 261.6, 369.5, 495.5],
+                                "val" => $DBData{"q16"} },             # q16
+          { "type" => "radio", "ypos" => 87, "xposarray" => [86, 171.6, 248, 342.6, 446],
+                                "val" => $DBData{"q17"} },             # q17
+      ] }
+    );
+  }
+  elsif ("$table$page" eq "ClientSMFQAdult") {
+    @PageData = (
+      { "descr" => "page 1", "data" => [
+          { "type" => "check", "ypos" => 429.5, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [437, 499.7, 557.3],
+                                "val" => $DBData{"qA1"} },             # qA1
+          { "type" => "check", "ypos" => 402.8, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [437, 499.7, 557.3],
+                                "val" => $DBData{"qA2"} },             # qA2
+          { "type" => "check", "ypos" => 376.2, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [437, 499.7, 557.3],
+                                "val" => $DBData{"qA3"} },             # qA3
+          { "type" => "check", "ypos" => 349.2, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [437, 499.7, 557.3],
+                                "val" => $DBData{"qA4"} },             # qA4
+          { "type" => "check", "ypos" => 322.2, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [437, 499.7, 557.3],
+                                "val" => $DBData{"qA5"} },             # qA5
+          { "type" => "check", "ypos" => 294.8, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [437, 499.7, 557.3],
+                                "val" => $DBData{"qA6"} },             # qA6
+          { "type" => "check", "ypos" => 267.8, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [437, 499.7, 557.3],
+                                "val" => $DBData{"qA7"} },             # qA7
+          { "type" => "check", "ypos" => 240.8, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [437, 499.7, 557.3],
+                                "val" => $DBData{"qA8"} },             # qA8
+          { "type" => "check", "ypos" => 213.8, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [437, 499.7, 557.3],
+                                "val" => $DBData{"qA9"} },             # qA9
+          { "type" => "check", "ypos" => 187.2, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [437, 499.7, 557.3],
+                                "val" => $DBData{"qA10"} },             # qA10
+          { "type" => "check", "ypos" => 160.2, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [437, 499.7, 557.3],
+                                "val" => $DBData{"qA11"} },             # qA11
+          { "type" => "check", "ypos" => 133.6, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [437, 499.7, 557.3],
+                                "val" => $DBData{"qA12"} },             # qA12
+          { "type" => "check", "ypos" => 106.6, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [437, 499.7, 557.3],
+                                "val" => $DBData{"qA13"} },             # qA13
+      ] }
+    );
+  }
+  elsif ("$table$page" eq "ClientSMFQChild") {
+    @PageData = (
+      { "descr" => "page 1", "data" => [
+          { "type" => "check", "ypos" => 428.4, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [434.9, 498.2, 557.6],
+                                "val" => $DBData{"qC1"} },             # qC1
+          { "type" => "check", "ypos" => 399, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [434.9, 498.2, 557.6],
+                                "val" => $DBData{"qC2"} },             # qC2
+          { "type" => "check", "ypos" => 372.2, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [434.9, 498.2, 557.6],
+                                "val" => $DBData{"qC3"} },             # qC3
+          { "type" => "check", "ypos" => 344.5, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [434.9, 498.2, 557.6],
+                                "val" => $DBData{"qC4"} },             # qC4
+          { "type" => "check", "ypos" => 316.8, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [434.9, 498.2, 557.6],
+                                "val" => $DBData{"qC5"} },             # qC5
+          { "type" => "check", "ypos" => 289.4, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [434.9, 498.2, 557.6],
+                                "val" => $DBData{"qC6"} },             # qC6
+          { "type" => "check", "ypos" => 261.4, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [434.9, 498.2, 557.6],
+                                "val" => $DBData{"qC7"} },             # qC7
+          { "type" => "check", "ypos" => 233.6, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [434.9, 498.2, 557.6],
+                                "val" => $DBData{"qC8"} },             # qC8
+          { "type" => "check", "ypos" => 205.9, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [434.9, 498.2, 557.6],
+                                "val" => $DBData{"qC9"} },             # qC9
+          { "type" => "check", "ypos" => 177.8, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [434.9, 498.2, 557.6],
+                                "val" => $DBData{"qC10"} },             # qC10
+          { "type" => "check", "ypos" => 150.1, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [434.9, 498.2, 557.6],
+                                "val" => $DBData{"qC11"} },             # qC11
+          { "type" => "check", "ypos" => 122, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [434.9, 498.2, 557.6],
+                                "val" => $DBData{"qC12"} },             # qC12
+          { "type" => "check", "ypos" => 94.3, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [434.9, 498.2, 557.6],
+                                "val" => $DBData{"qC13"} },             # qC13
+      ] }
+    );
+  }
+  elsif ("$table$page" eq "ClientSMFQParent") {
+    @PageData = (
+      { "descr" => "page 1", "data" => [
+          { "type" => "check", "ypos" => 432, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [435.2, 500, 559.1],
+                                "val" => $DBData{"qP1"} },             # qP1
+          { "type" => "check", "ypos" => 405, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [435.2, 500, 559.1],
+                                "val" => $DBData{"qP2"} },             # qP2
+          { "type" => "check", "ypos" => 377.3, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [435.2, 500, 559.1],
+                                "val" => $DBData{"qP3"} },             # qP3
+          { "type" => "check", "ypos" => 349.6, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [435.2, 500, 559.1],
+                                "val" => $DBData{"qP4"} },             # qP4
+          { "type" => "check", "ypos" => 321.8, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [435.2, 500, 559.1],
+                                "val" => $DBData{"qP5"} },             # qP5
+          { "type" => "check", "ypos" => 294.5, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [435.2, 500, 559.1],
+                                "val" => $DBData{"qP6"} },             # qP6
+          { "type" => "check", "ypos" => 266.4, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [435.2, 500, 559.1],
+                                "val" => $DBData{"qP7"} },             # qP7
+          { "type" => "check", "ypos" => 239.4, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [435.2, 500, 559.1],
+                                "val" => $DBData{"qP8"} },             # qP8
+          { "type" => "check", "ypos" => 211.7, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [435.2, 500, 559.1],
+                                "val" => $DBData{"qP9"} },             # qP9
+          { "type" => "check", "ypos" => 184.3, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [435.2, 500, 559.1],
+                                "val" => $DBData{"qP10"} },             # qP10
+          { "type" => "check", "ypos" => 157, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [435.2, 500, 559.1],
+                                "val" => $DBData{"qP11"} },             # qP11
+          { "type" => "check", "ypos" => 129.2, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [435.2, 500, 559.1],
+                                "val" => $DBData{"qP12"} },             # qP12
+          { "type" => "check", "ypos" => 101.9, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [435.2, 500, 559.1],
+                                "val" => $DBData{"qP13"} },             # qP13
+      ] }
+    );
+  }
+  elsif ("$table$page" eq "ClientACE") {
+    @PageData = (
+      { "descr" => "page 1", "data" => [
+          { "type" => "textlinewithcond", "ypos" => 646.5, "xpos" => 475.2, "cond" => "gt0", "optlist" => "$baselargefontoptions position={center bottom}",
+                                "text" => $DBData{"q1"} },             # q1
+          { "type" => "textlinewithcond", "ypos" => 571, "xpos" => 475.2, "cond" => "gt0", "optlist" => "$baselargefontoptions position={center bottom}",
+                                "text" => $DBData{"q2"} },             # q2
+          { "type" => "textlinewithcond", "ypos" => 495.1, "xpos" => 475.2, "cond" => "gt0", "optlist" => "$baselargefontoptions position={center bottom}",
+                                "text" => $DBData{"q3"} },             # q3
+          { "type" => "textlinewithcond", "ypos" => 419.3, "xpos" => 475.2, "cond" => "gt0", "optlist" => "$baselargefontoptions position={center bottom}",
+                                "text" => $DBData{"q4"} },             # q4
+          { "type" => "textlinewithcond", "ypos" => 343.4, "xpos" => 475.2, "cond" => "gt0", "optlist" => "$baselargefontoptions position={center bottom}",
+                                "text" => $DBData{"q5"} },             # q5
+          { "type" => "textlinewithcond", "ypos" => 305.3, "xpos" => 475.2, "cond" => "gt0", "optlist" => "$baselargefontoptions position={center bottom}",
+                                "text" => $DBData{"q6"} },             # q6
+          { "type" => "textlinewithcond", "ypos" => 204.2, "xpos" => 475.2, "cond" => "gt0", "optlist" => "$baselargefontoptions position={center bottom}",
+                                "text" => $DBData{"q7"} },             # q7
+          { "type" => "textlinewithcond", "ypos" => 166.3, "xpos" => 475.2, "cond" => "gt0", "optlist" => "$baselargefontoptions position={center bottom}",
+                                "text" => $DBData{"q8"} },             # q8
+          { "type" => "textlinewithcond", "ypos" => 128.2, "xpos" => 475.2, "cond" => "gt0", "optlist" => "$baselargefontoptions position={center bottom}",
+                                "text" => $DBData{"q9"} },             # q9
+          { "type" => "textlinewithcond", "ypos" => 90.2, "xpos" => 475.2, "cond" => "gt0", "optlist" => "$baselargefontoptions position={center bottom}",
+                                "text" => $DBData{"q10"} },             # q10
+          { "type" => "textline", "ypos" => 64.3, "xpos" => 298.3, "optlist" => "$baselargefontoptions position={center bottom}",
+                                "text" => $DBData{"total"} },             # total
+      ] }
+    );
+  }
+  elsif ("$table$page" eq "ClientCATSCaregiver") {
+    @PageData = (
+      { "descr" => "page 1", "data" => [
+          { "type" => "textline", "ypos" => 712.1, "xpos" => 171.6, "optlist" => $basefontoptions,
+                                "text" => $DBData{"clientname"} },             # Child’s Name
+          { "type" => "textline", "ypos" => 689.8, "xpos" => 171.6, "optlist" => $basefontoptions,
+                                "text" => $DBData{"clinician"} },             # Caregiver Name
+          { "type" => "textline", "ypos" => 712.1, "xpos" => 487.2, "optlist" => "$basefontoptions position={center bottom}",
+                                "text" => $DBData{"testdate"} },             # Date
+          { "type" => "check", "ypos" => 612.2, "optlist" => "position={center bottom}", "xposarray" => [496.6, 419.8],
+                                "val" => $DBData{"CqA1"} },             # CqA1
+          { "type" => "check", "ypos" => 577.2, "optlist" => "position={center bottom}", "xposarray" => [496.6, 419.8],
+                                "val" => $DBData{"CqA2"} },             # CqA2
+          { "type" => "check", "ypos" => 547.2, "optlist" => "position={center bottom}", "xposarray" => [496.6, 419.8],
+                                "val" => $DBData{"CqA3"} },             # CqA3
+          { "type" => "check", "ypos" => 526.8, "optlist" => "position={center bottom}", "xposarray" => [496.6, 419.8],
+                                "val" => $DBData{"CqA4"} },             # CqA4
+          { "type" => "check", "ypos" => 506.6, "optlist" => "position={center bottom}", "xposarray" => [496.6, 419.8],
+                                "val" => $DBData{"CqA5"} },             # CqA5
+          { "type" => "check", "ypos" => 475, "optlist" => "position={center bottom}", "xposarray" => [496.6, 419.8],
+                                "val" => $DBData{"CqA6"} },             # CqA6
+          { "type" => "check", "ypos" => 443.8, "optlist" => "position={center bottom}", "xposarray" => [496.6, 419.8],
+                                "val" => $DBData{"CqA7"} },             # CqA7
+          { "type" => "check", "ypos" => 412.1, "optlist" => "position={center bottom}", "xposarray" => [496.6, 419.8],
+                                "val" => $DBData{"CqA8"} },             # CqA8
+          { "type" => "check", "ypos" => 380.6, "optlist" => "position={center bottom}", "xposarray" => [496.6, 419.8],
+                                "val" => $DBData{"CqA9"} },             # CqA9
+          { "type" => "check", "ypos" => 349, "optlist" => "position={center bottom}", "xposarray" => [496.6, 419.8],
+                                "val" => $DBData{"CqA10"} },             # CqA10
+          { "type" => "check", "ypos" => 329, "optlist" => "position={center bottom}", "xposarray" => [496.6, 419.8],
+                                "val" => $DBData{"CqA11"} },             # CqA11
+          { "type" => "check", "ypos" => 308.6, "optlist" => "position={center bottom}", "xposarray" => [496.6, 419.8],
+                                "val" => $DBData{"CqA12"} },             # CqA12
+          { "type" => "check", "ypos" => 277.2, "optlist" => "position={center bottom}", "xposarray" => [496.6, 419.8],
+                                "val" => $DBData{"CqA13"} },             # CqA13
+          { "type" => "check", "ypos" => 257, "optlist" => "position={center bottom}", "xposarray" => [496.6, 419.8],
+                                "val" => $DBData{"CqA14"} },             # CqA14
+          { "type" => "check", "ypos" => 236.6, "optlist" => "position={center bottom}", "xposarray" => [496.6, 419.8],
+                                "val" => $DBData{"CqA15"} },             # CqA15
+          { "type" => "textline", "ypos" => 211.3, "xpos" => 174, "optlist" => $basefontoptions,
+                                "text" => $DBData{"CDescribe"} },             # CDescribe
+          { "type" => "textline", "ypos" => 173.3, "xpos" => 301.7, "optlist" => $basefontoptions,
+                                "text" => $DBData{"CTopOne"} },             # Which one is bothering the child most now?
+      ] },
+      { "descr" => "page 1", "data" => [
+          { "type" => "check", "ypos" => 687.1, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [489.8, 516, 541.4, 567.4],
+                                "val" => $DBData{"CqB1"} },             # CqB1
+          { "type" => "check", "ypos" => 655.7, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [489.8, 516, 541.4, 567.4],
+                                "val" => $DBData{"CqB2"} },             # CqB2
+          { "type" => "check", "ypos" => 638.4, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [489.8, 516, 541.4, 567.4],
+                                "val" => $DBData{"CqB3"} },             # CqB3
+          { "type" => "check", "ypos" => 619.9, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [489.8, 516, 541.4, 567.4],
+                                "val" => $DBData{"CqB4"} },             # CqB4
+          { "type" => "check", "ypos" => 601.9, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [489.8, 516, 541.4, 567.4],
+                                "val" => $DBData{"CqB5"} },             # CqB5
+          { "type" => "check", "ypos" => 570.2, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [489.8, 516, 541.4, 567.4],
+                                "val" => $DBData{"CqB6"} },             # CqB6
+          { "type" => "check", "ypos" => 538.6, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [489.8, 516, 541.4, 567.4],
+                                "val" => $DBData{"CqB7"} },             # CqB7
+          { "type" => "check", "ypos" => 506.6, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [489.8, 516, 541.4, 567.4],
+                                "val" => $DBData{"CqB8"} },             # CqB8
+          { "type" => "check", "ypos" => 476.2, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [489.8, 516, 541.4, 567.4],
+                                "val" => $DBData{"CqB9"} },             # CqB9
+          { "type" => "check", "ypos" => 444.5, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [489.8, 516, 541.4, 567.4],
+                                "val" => $DBData{"CqB10"} },             # CqB10
+          { "type" => "check", "ypos" => 412.8, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [489.8, 516, 541.4, 567.4],
+                                "val" => $DBData{"CqB11"} },             # CqB11
+          { "type" => "check", "ypos" => 381.1, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [489.8, 516, 541.4, 567.4],
+                                "val" => $DBData{"CqB12"} },             # CqB12
+          { "type" => "check", "ypos" => 349.4, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [489.8, 516, 541.4, 567.4],
+                                "val" => $DBData{"CqB13"} },             # CqB13
+          { "type" => "check", "ypos" => 331.4, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [489.8, 516, 541.4, 567.4],
+                                "val" => $DBData{"CqB14"} },             # CqB14
+          { "type" => "check", "ypos" => 300.7, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [489.8, 516, 541.4, 567.4],
+                                "val" => $DBData{"CqB15"} },             # CqB15
+          { "type" => "check", "ypos" => 269, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [489.8, 516, 541.4, 567.4],
+                                "val" => $DBData{"CqB16"} },             # CqB16
+          { "type" => "check", "ypos" => 250.8, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [489.8, 516, 541.4, 567.4],
+                                "val" => $DBData{"CqB17"} },             # CqB17
+          { "type" => "check", "ypos" => 232.6, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [489.8, 516, 541.4, 567.4],
+                                "val" => $DBData{"CqB18"} },             # CqB18
+          { "type" => "check", "ypos" => 214.6, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [489.8, 516, 541.4, 567.4],
+                                "val" => $DBData{"CqB19"} },             # CqB19
+          { "type" => "check", "ypos" => 196.1, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [489.8, 516, 541.4, 567.4],
+                                "val" => $DBData{"CqB20"} },             # CqB20
+          { "type" => "check", "ypos" => 142.8, "optlist" => "position={center bottom}", "xposarray" => [210.7, 269.5],
+                                "val" => $DBData{"CqC1"} },             # CqC1
+          { "type" => "check", "ypos" => 125.8, "optlist" => "position={center bottom}", "xposarray" => [210.7, 269.5],
+                                "val" => $DBData{"CqC2"} },             # CqC2
+          { "type" => "check", "ypos" => 108.5, "optlist" => "position={center bottom}", "xposarray" => [210.7, 269.5],
+                                "val" => $DBData{"CqC3"} },             # CqC3
+          { "type" => "check", "ypos" => 142.8, "optlist" => "position={center bottom}", "xposarray" => [530.6, 481.2],
+                                "val" => $DBData{"CqC4"} },             # CqC4
+          { "type" => "check", "ypos" => 125.8, "optlist" => "position={center bottom}", "xposarray" => [530.6, 481.2],
+                                "val" => $DBData{"CqC5"} },             # CqC5
+      ] }
+    );
+  }
+  elsif ("$table$page" eq "ClientCATSYouth") {
+    @PageData = (
+      { "descr" => "page 1", "data" => [
+          { "type" => "textline", "ypos" => 712.1, "xpos" => 136.3, "optlist" => $basefontoptions,
+                                "text" => $DBData{"clientname"} },             # Child’s Name
+          { "type" => "textline", "ypos" => 712.1, "xpos" => 396.2, "optlist" => "$basefontoptions position={center bottom}",
+                                "text" => $DBData{"testdate"} },             # Date
+          { "type" => "check", "ypos" => 646.6, "optlist" => "fontsize=12 position={center bottom}", "xposarray" => [420.7, 500.9],
+                                "val" => $DBData{"qA1"} },             # qA1
+          { "type" => "check", "ypos" => 617.3, "optlist" => "fontsize=12 position={center bottom}", "xposarray" => [420.7, 500.9],
+                                "val" => $DBData{"qA2"} },             # qA2
+          { "type" => "check", "ypos" => 585.4, "optlist" => "fontsize=12 position={center bottom}", "xposarray" => [420.7, 500.9],
+                                "val" => $DBData{"qA3"} },             # qA3
+          { "type" => "check", "ypos" => 566.6, "optlist" => "fontsize=12 position={center bottom}", "xposarray" => [420.7, 500.9],
+                                "val" => $DBData{"qA4"} },             # qA4
+          { "type" => "check", "ypos" => 546.2, "optlist" => "fontsize=12 position={center bottom}", "xposarray" => [420.7, 500.9],
+                                "val" => $DBData{"qA5"} },             # qA5
+          { "type" => "check", "ypos" => 514.6, "optlist" => "fontsize=12 position={center bottom}", "xposarray" => [420.7, 500.9],
+                                "val" => $DBData{"qA6"} },             # qA6
+          { "type" => "check", "ypos" => 483.1, "optlist" => "fontsize=12 position={center bottom}", "xposarray" => [420.7, 500.9],
+                                "val" => $DBData{"qA7"} },             # qA7
+          { "type" => "check", "ypos" => 451.7, "optlist" => "fontsize=12 position={center bottom}", "xposarray" => [420.7, 500.9],
+                                "val" => $DBData{"qA8"} },             # qA8
+          { "type" => "check", "ypos" => 420, "optlist" => "fontsize=12 position={center bottom}", "xposarray" => [420.7, 500.9],
+                                "val" => $DBData{"qA9"} },             # qA9
+          { "type" => "check", "ypos" => 388.6, "optlist" => "fontsize=12 position={center bottom}", "xposarray" => [420.7, 500.9],
+                                "val" => $DBData{"qA10"} },             # qA10
+          { "type" => "check", "ypos" => 368.6, "optlist" => "fontsize=12 position={center bottom}", "xposarray" => [420.7, 500.9],
+                                "val" => $DBData{"qA11"} },             # qA11
+          { "type" => "check", "ypos" => 348.5, "optlist" => "fontsize=12 position={center bottom}", "xposarray" => [420.7, 500.9],
+                                "val" => $DBData{"qA12"} },             # qA12
+          { "type" => "check", "ypos" => 316.6, "optlist" => "fontsize=12 position={center bottom}", "xposarray" => [420.7, 500.9],
+                                "val" => $DBData{"qA13"} },             # qA13
+          { "type" => "check", "ypos" => 296.6, "optlist" => "fontsize=12 position={center bottom}", "xposarray" => [420.7, 500.9],
+                                "val" => $DBData{"qA14"} },             # qA14
+          { "type" => "check", "ypos" => 276.7, "optlist" => "fontsize=12 position={center bottom}", "xposarray" => [420.7, 500.9],
+                                "val" => $DBData{"qA15"} },             # qA15
+          { "type" => "textline", "ypos" => 248.2, "xpos" => 161.8, "optlist" => $basefontoptions,
+                                "text" => $DBData{"Describe"} },             # Describe
+          { "type" => "textline", "ypos" => 209.8, "xpos" => 292.6, "optlist" => $basefontoptions,
+                                "text" => $DBData{"TopOne"} },             # Which one is bothering the child most now?
+      ] },
+      { "descr" => "page 1", "data" => [
+          { "type" => "check", "ypos" => 666.5, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [488.6, 512.9, 535.9, 559.4],
+                                "val" => $DBData{"qB1"} },             # qB1
+          { "type" => "check", "ypos" => 643.4, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [488.6, 512.9, 535.9, 559.4],
+                                "val" => $DBData{"qB2"} },             # qB2
+          { "type" => "check", "ypos" => 625, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [488.6, 512.9, 535.9, 559.4],
+                                "val" => $DBData{"qB3"} },             # qB3
+          { "type" => "check", "ypos" => 606, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [488.6, 512.9, 535.9, 559.4],
+                                "val" => $DBData{"qB4"} },             # qB4
+          { "type" => "check", "ypos" => 587.5, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [488.6, 512.9, 535.9, 559.4],
+                                "val" => $DBData{"qB5"} },             # qB5
+          { "type" => "check", "ypos" => 558.2, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [488.6, 512.9, 535.9, 559.4],
+                                "val" => $DBData{"qB6"} },             # qB6
+          { "type" => "check", "ypos" => 526.6, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [488.6, 512.9, 535.9, 559.4],
+                                "val" => $DBData{"qB7"} },             # qB7
+          { "type" => "check", "ypos" => 494.9, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [488.6, 512.9, 535.9, 559.4],
+                                "val" => $DBData{"qB8"} },             # qB8
+          { "type" => "check", "ypos" => 475.9, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [488.6, 512.9, 535.9, 559.4],
+                                "val" => $DBData{"qB9"} },             # qB9
+          { "type" => "check", "ypos" => 445.2, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [488.6, 512.9, 535.9, 559.4],
+                                "val" => $DBData{"qB10"} },             # qB10
+          { "type" => "check", "ypos" => 413.5, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [488.6, 512.9, 535.9, 559.4],
+                                "val" => $DBData{"qB11"} },             # qB11
+          { "type" => "check", "ypos" => 394.6, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [488.6, 512.9, 535.9, 559.4],
+                                "val" => $DBData{"qB12"} },             # qB12
+          { "type" => "check", "ypos" => 376.6, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [488.6, 512.9, 535.9, 559.4],
+                                "val" => $DBData{"qB13"} },             # qB13
+          { "type" => "check", "ypos" => 357.6, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [488.6, 512.9, 535.9, 559.4],
+                                "val" => $DBData{"qB14"} },             # qB14
+          { "type" => "check", "ypos" => 339.1, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [488.6, 512.9, 535.9, 559.4],
+                                "val" => $DBData{"qB15"} },             # qB15
+          { "type" => "check", "ypos" => 320.4, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [488.6, 512.9, 535.9, 559.4],
+                                "val" => $DBData{"qB16"} },             # qB16
+          { "type" => "check", "ypos" => 301.7, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [488.6, 512.9, 535.9, 559.4],
+                                "val" => $DBData{"qB17"} },             # qB17
+          { "type" => "check", "ypos" => 279.8, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [488.6, 512.9, 535.9, 559.4],
+                                "val" => $DBData{"qB18"} },             # qB18
+          { "type" => "check", "ypos" => 261.4, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [488.6, 512.9, 535.9, 559.4],
+                                "val" => $DBData{"qB19"} },             # qB19
+          { "type" => "check", "ypos" => 242.8, "optlist" => "fontsize=15 position={center bottom}", "xposarray" => [488.6, 512.9, 535.9, 559.4],
+                                "val" => $DBData{"qB20"} },             # qB20
+          { "type" => "textline", "ypos" => 223.7, "xpos" => 548.6, "optlist" => "$basefontoptions position={center bottom}",
+                                "text" => $DBData{"total"} },             # total
+          { "type" => "check", "ypos" => 173.6, "optlist" => "fontsize=12 position={center bottom}", "xposarray" => [210, 273.1],
+                                "val" => $DBData{"qC1"} },             # qC1
+          { "type" => "check", "ypos" => 151.2, "optlist" => "fontsize=12 position={center bottom}", "xposarray" => [210, 273.1],
+                                "val" => $DBData{"qC2"} },             # qC2
+          { "type" => "check", "ypos" => 125.1, "optlist" => "fontsize=12 position={center bottom}", "xposarray" => [210, 273.1],
+                                "val" => $DBData{"qC3"} },             # qC3
+          { "type" => "check", "ypos" => 173.6, "optlist" => "fontsize=12 position={center bottom}", "xposarray" => [467.8, 534.2],
+                                "val" => $DBData{"qC4"} },             # qC4
+          { "type" => "check", "ypos" => 151.2, "optlist" => "fontsize=12 position={center bottom}", "xposarray" => [467.8, 534.2],
+                                "val" => $DBData{"qC5"} },             # qC5
+      ] }
+    );
+  }
+  elsif ("$table$page" eq "ClientCATSScore") {
+warn qq|qB1=$DBData{"qB1"}\n|;
+    @PageData = (
+      { "descr" => "page 1", "data" => [
+          { "type" => "textline", "ypos" => 700.8, "xpos" => 166.1, "optlist" => $basefontoptions,
+                                "text" => $DBData{"clientname"} },             # Child's Name
+          { "type" => "textline", "ypos" => 682.3, "xpos" => 166.1, "optlist" => $basefontoptions,
+                                "text" => $DBData{"caregiver"} },             # Caregiver’s Name
+          { "type" => "textline", "ypos" => 663.6, "xpos" => 166.1, "optlist" => $basefontoptions,
+                                "text" => $DBData{"provider"} },             # Provider’s Name
+          { "type" => "textline", "ypos" => 646.8, "xpos" => 166.1, "optlist" => $basefontoptions,
+                                "text" => $DBData{"testdate"} },             # Assessment Date
+          { "type" => "textflow", "ypos" => 581.3, "xpos_start" => 75.8, "xpos_end" => 385.4, "optlist" => "$basefontoptions leading=170% parindent=100 rightindent=10",
+                                "text" => $DBData{'CTopOne'} },                       # Trauma Exposure in Caregiver
+          { "type" => "textline", "ypos" => 528, "xpos" => 243.8, "optlist" => "$basefontoptions position={center bottom}",
+                                "text" => $DBData{"tCPTSD"} },             # tCPTSD
+          { "type" => "textline", "ypos" => 470.2, "xpos" => 290.9, "optlist" => "$basemidfontoptions position={center bottom}",
+                                "text" => $DBData{"tC1thru5"} },             # tC1thru5
+          { "type" => "check", "ypos" => 469.2, "optlist" => "fontsize=12 position={center bottom}", "xposarray" => [504, 448.1],
+                                "val" => $DBData{"tC1thru5Flag"} },             # tC1thru5Flag
+          { "type" => "textline", "ypos" => 439.4, "xpos" => 290.9, "optlist" => "$basemidfontoptions position={center bottom}",
+                                "text" => $DBData{"tC6thru7"} },             # tC6thru7
+          { "type" => "check", "ypos" => 438.4, "optlist" => "fontsize=12 position={center bottom}", "xposarray" => [504, 448.1],
+                                "val" => $DBData{"tC6thru7Flag"} },             # tC6thru7Flag
+          { "type" => "textline", "ypos" => 408.5, "xpos" => 290.9, "optlist" => "$basemidfontoptions position={center bottom}",
+                                "text" => $DBData{"tC8thru14"} },             # tC8thru14
+          { "type" => "check", "ypos" => 408, "optlist" => "fontsize=12 position={center bottom}", "xposarray" => [504, 448.1],
+                                "val" => $DBData{"tC8thru14Flag"} },             # tC8thru14Flag
+          { "type" => "textline", "ypos" => 378, "xpos" => 290.9, "optlist" => "$basemidfontoptions position={center bottom}",
+                                "text" => $DBData{"tC15thru20"} },             # tC15thru20
+          { "type" => "check", "ypos" => 377, "optlist" => "fontsize=12 position={center bottom}", "xposarray" => [504, 448.1],
+                                "val" => $DBData{"tC15thru20Flag"} },             # tC15thru20Flag
+          { "type" => "textline", "ypos" => 347.3, "xpos" => 290.9, "optlist" => "$basemidfontoptions position={center bottom}",
+                                "text" => $DBData{"tCFI"} },             # tCFI
+          { "type" => "check", "ypos" => 346.3, "optlist" => "fontsize=12 position={center bottom}", "xposarray" => [504, 448.1],
+                                "val" => $DBData{"tCFIFlag"} },             # tCFIFlag
+          { "type" => "textline", "ypos" => 281.8, "xpos" => 171.1, "optlist" => $basefontoptions,
+                                "text" => $DBData{'TopOne'} },             # Trauma Exposure in Child
+          { "type" => "textline", "ypos" => 259.4, "xpos" => 243.8, "optlist" => "$basefontoptions position={center bottom}",
+                                "text" => $DBData{"tPTSD"} },             # tPTSD
+          { "type" => "textline", "ypos" => 202.3, "xpos" => 290.9, "optlist" => "$basemidfontoptions position={center bottom}",
+                                "text" => $DBData{"t1thru5"} },             # t1thru5
+          { "type" => "check", "ypos" => 201.3, "optlist" => "fontsize=12 position={center bottom}", "xposarray" => [504, 448.1],
+                                "val" => $DBData{"t1thru5Flag"} },             # t1thru5Flag
+          { "type" => "textline", "ypos" => 171.6, "xpos" => 290.9, "optlist" => "$basemidfontoptions position={center bottom}",
+                                "text" => $DBData{"t6thru7"} },             # t6thru7
+          { "type" => "check", "ypos" => 170.6, "optlist" => "fontsize=12 position={center bottom}", "xposarray" => [504, 448.1],
+                                "val" => $DBData{"t6thru7Flag"} },             # t6thru7Flag
+          { "type" => "textline", "ypos" => 140.9, "xpos" => 290.9, "optlist" => "$basemidfontoptions position={center bottom}",
+                                "text" => $DBData{"t8thru14"} },             # t8thru14
+          { "type" => "check", "ypos" => 139.9, "optlist" => "fontsize=12 position={center bottom}", "xposarray" => [504, 448.1],
+                                "val" => $DBData{"t8thru14Flag"} },             # t8thru14Flag
+          { "type" => "textline", "ypos" => 110.2, "xpos" => 290.9, "optlist" => "$basemidfontoptions position={center bottom}",
+                                "text" => $DBData{"t15thru20"} },             # t15thru20
+          { "type" => "check", "ypos" => 109.2, "optlist" => "fontsize=12 position={center bottom}", "xposarray" => [504, 448.1],
+                                "val" => $DBData{"t15thru20Flag"} },             # t15thru20Flag
+          { "type" => "textline", "ypos" => 79.2, "xpos" => 290.9, "optlist" => "$basemidfontoptions position={center bottom}",
+                                "text" => $DBData{"tFI"} },             # tFI
+          { "type" => "check", "ypos" => 78.2, "optlist" => "fontsize=12 position={center bottom}", "xposarray" => [504, 448.1],
+                                "val" => $DBData{"tFIFlag"} },             # tFIFlag
+      ] },
+      { "descr" => "page 2", "data" => [
+          { "type" => "textline", "ypos" => 433.2, "xpos" => 174.5, "optlist" => $basefontoptions,
+                                "text" => $DBData{'MostTrauma'} },             # Most Distressing Trauma
+          { "type" => "checkvert", "xpos" => 97.9, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [360.1, 371.6, 382.8],
+                                "val" => main->getSeverityRating($DBData{'qB1'}, ([0, 0], [1, 1], [2, 3])) },             # B1
+          { "type" => "checkvert", "xpos" => 161.4, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [360.1, 371.6, 382.8],
+                                "val" => main->getSeverityRating($DBData{'qB2'}, ([0, 0], [1, 1], [2, 3])) },             # B2
+          { "type" => "checkvert", "xpos" => 217.3, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [360.1, 371.6, 382.8],
+                                "val" => main->getSeverityRating($DBData{'qB3'}, ([0, 0], [1, 1], [2, 3])) },             # B3
+          { "type" => "checkvert", "xpos" => 274.6, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [360.1, 371.6, 382.8],
+                                "val" => main->getSeverityRating($DBData{'qB4'}, ([0, 0], [1, 1], [2, 3])) },             # B4
+          { "type" => "checkvert", "xpos" => 336.2, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [360.1, 371.6, 382.8],
+                                "val" => main->getSeverityRating($DBData{'qB5'}, ([0, 0], [1, 1], [2, 3])) },             # B5
+          { "type" => "checkvert", "xpos" => 97.9, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [243.4, 254.9, 266],
+                                "val" => main->getSeverityRating($DBData{'qB6'}, ([0, 0], [1, 1], [2, 3])) },             # C1
+          { "type" => "checkvert", "xpos" => 161.4, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [243.4, 254.9, 266],
+                                "val" => main->getSeverityRating($DBData{'qB7'}, ([0, 0], [1, 1], [2, 3])) },             # C2
+          { "type" => "checkvert", "xpos" => 274.6, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [243.4, 254.9, 266],
+                                "val" => main->getSeverityRating($DBData{'qB8'}, ([0, 0], [1, 1], [2, 3])) },             # D1
+          { "type" => "checkvert", "xpos" => 336.2, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [243.4, 254.9, 266],
+                                "val" => main->getSeverityRating($DBData{'qB9'}, ([0, 0], [1, 1], [2, 3])) },             # D2
+          { "type" => "checkvert", "xpos" => 392.3, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [243.4, 254.9, 266],
+                                "val" => main->getSeverityRating($DBData{'qB10'}, ([0, 0], [1, 1], [2, 3])) },             # D3
+          { "type" => "checkvert", "xpos" => 448.3, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [243.4, 254.9, 266],
+                                "val" => main->getSeverityRating($DBData{'qB11'}, ([0, 0], [1, 1], [2, 3])) },             # D4
+          { "type" => "checkvert", "xpos" => 506.3, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [243.4, 254.9, 266],
+                                "val" => main->getSeverityRating($DBData{'qB12'}, ([0, 0], [1, 1], [2, 3])) },             # D5
+          { "type" => "checkvert", "xpos" => 564.2, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [243.4, 254.9, 266],
+                                "val" => main->getSeverityRating($DBData{'qB13'}, ([0, 0], [1, 1], [2, 3])) },             # D6
+          { "type" => "checkvert", "xpos" => 622.2, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [243.4, 254.9, 266],
+                                "val" => main->getSeverityRating($DBData{'qB14'}, ([0, 0], [1, 1], [2, 3])) },             # D7
+          { "type" => "checkvert", "xpos" => 97.9, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [138.8, 150.2, 161.4],
+                                "val" => main->getSeverityRating($DBData{'qB15'}, ([0, 0], [1, 1], [2, 3])) },             # E1
+          { "type" => "checkvert", "xpos" => 161.4, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [138.8, 150.2, 161.4],
+                                "val" => main->getSeverityRating($DBData{'qB16'}, ([0, 0], [1, 1], [2, 3])) },             # E2
+          { "type" => "checkvert", "xpos" => 217.3, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [138.8, 150.2, 161.4],
+                                "val" => main->getSeverityRating($DBData{'qB17'}, ([0, 0], [1, 1], [2, 3])) },             # E3
+          { "type" => "checkvert", "xpos" => 274.6, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [138.8, 150.2, 161.4],
+                                "val" => main->getSeverityRating($DBData{'qB18'}, ([0, 0], [1, 1], [2, 3])) },             # E4
+          { "type" => "checkvert", "xpos" => 336.2, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [138.8, 150.2, 161.4],
+                                "val" => main->getSeverityRating($DBData{'qB19'}, ([0, 0], [1, 1], [2, 3])) },             # E5
+          { "type" => "checkvert", "xpos" => 390.5, "optlist" => "fontsize=12 position={center bottom}", "yposarray" => [142.9, 154.4, 165.5],
+                                "val" => main->getSeverityRating($DBData{'qB20'}, ([0, 0], [1, 1], [2, 3])) },             # E6
+      ] }
+    );
+  }
+  elsif ("$table$page" eq "ClientMHSF") {
+    my $Program = DBA->getxref($form,'xServiceFocus',$rPHQ->{'Program'},'Descr');
+    @PageData = (
+      { "descr" => "page 1", "data" => [
+          { "type" => "checkbox", "ypos" => 507.7, "xposarray" => [507.6, 481.4], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q1"} },             # q1
+          { "type" => "checkbox", "ypos" => 475.8, "xposarray" => [507.6, 481.4], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q2"} },             # q2
+          { "type" => "checkbox", "ypos" => 444.2, "xposarray" => [507.6, 481.4], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q3"} },             # q3
+          { "type" => "checkbox", "ypos" => 412, "xposarray" => [507.6, 481.4], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q4"} },             # q4
+          { "type" => "checkbox", "ypos" => 380, "xposarray" => [507.6, 481.4], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q5"} },             # q5
+          { "type" => "checkbox", "ypos" => 348.7, "xposarray" => [507.6, 481.4], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q6a"} },             # q6a
+          { "type" => "checkbox", "ypos" => 334.9, "xposarray" => [507.6, 481.4], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q6b"} },             # q6b
+          { "type" => "checkbox", "ypos" => 290, "xposarray" => [507.6, 481.4], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q7"} },             # q7
+          { "type" => "checkbox", "ypos" => 245.8, "xposarray" => [507.6, 481.4], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q8"} },             # q8
+          { "type" => "checkbox", "ypos" => 213, "xposarray" => [507.6, 481.4], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q9"} },             # q9
+          { "type" => "checkbox", "ypos" => 181, "xposarray" => [507.6, 481.4], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q10"} },             # q10
+          { "type" => "checkbox", "ypos" => 148.4, "xposarray" => [507.6, 481.4], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q11"} },             # q11
+          { "type" => "checkbox", "ypos" => 92.5, "xposarray" => [507.6, 481.4], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q12"} },             # q12
+      ] },
+      { "descr" => "page 2", "data" => [
+          { "type" => "checkbox", "ypos" => 669.2, "xposarray" => [503.6, 477.5], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q13"} },             # q13
+          { "type" => "checkbox", "ypos" => 625.2, "xposarray" => [503.6, 477.5], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q14"} },             # q14
+          { "type" => "checkbox", "ypos" => 552.6, "xposarray" => [503.6, 477.5], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q15"} },             # q15
+          { "type" => "checkbox", "ypos" => 521.4, "xposarray" => [503.6, 477.5], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q16"} },             # q16
+          { "type" => "checkbox", "ypos" => 489.5, "xposarray" => [503.6, 477.5], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q17"} },             # q17
+          { "type" => "textline", "ypos" => 278.5, "xpos" => 161.5,
+                                "text" => $DBData{"clientname"} },     # Print client’s name
+          { "type" => "textline", "ypos" => 254.4, "xpos" => 242.2,
+                                "text" => $Program },                  # Program to which client will be assigned
+          { "type" => "textline", "ypos" => 230, "xpos" => 206.5,
+                                "text" => $DBData{""} },               # REMOVED FROM FORM Name of admissions counselor
+          { "type" => "textline", "ypos" => 230, "xpos" => 487.2, "optlist" => "position={center bottom}",
+                                "text" => $DBData{"testdate"} },       # Date
+          { "type" => "textflow", "ypos" => 199.5, "xpos_start" => 80.9, "xpos_end" => 516.7, "optlist" => "leading=130.5%",
+                                "text" => $DBData{"Comments"} },       # Reviewer’s comments
+      ] }
+    );
+  }
+  elsif ("$table$page" eq "ClientMMSE") {
+    my $Program = DBA->getxref($form,'xServiceFocus',$rPHQ->{'Program'},'Descr');
+    @PageData = (
+      { "descr" => "page 1", "data" => [
+	  { "type" => "textline", "ypos" => 640, "xpos" => 176.5, "optlist" => "fontsize=12",
+                                "text" => $DBData{"clientname"} 
+          },
+	  ,             # q3a
+	  { "type" => "textline", "ypos" => 640, "xpos" => 476.5, "optlist" => "fontsize=12",
+                                "text" => $DBData{"testdate"} 
+          }, 
+          { "type" => "textline", "ypos" => 537,  "xpos" => 156.5, "optlist" => "fontsize=12",
+                                "text" => $DBData{"q1"} 
+          },             # q1
+	  { "type" => "textline", "ypos" => 517, "xpos" => 156.5, "optlist" => "fontsize=12",
+                                "text" => $DBData{"q2"} 
+          },             # q2
+          { "type" => "textline", "ypos" => 487, "xpos" => 156.5, "optlist" => "fontsize=12",
+                                "text" => $DBData{"q3a"} 
+          },
+          { "type" => "textline", "ypos" => 463, "xpos" => 366.5, "optlist" => "fontsize=12",
+                                "text" => $DBData{"q3b"} 
+          },
+	  { "type" => "textline", "ypos" => 427, "xpos" => 156.5, "optlist" => "fontsize=12",
+                                "text" => $DBData{"q4"} 
+          },
+	  { "type" => "textline", "ypos" => 390, "xpos" => 156.5, "optlist" => "fontsize=12",
+                                "text" => $DBData{"q5"} 
+          },
+	  { "type" => "textline", "ypos" => 360, "xpos" => 156.5, "optlist" => "fontsize=12",
+                                "text" => $DBData{"q6"} 
+          },
+	  { "type" => "textline", "ypos" => 335, "xpos" => 156.5, "optlist" => "fontsize=12",
+                                "text" => $DBData{"q7"} 
+          },
+	  { "type" => "textline", "ypos" => 305, "xpos" => 156.5, "optlist" => "fontsize=12",
+                                "text" => $DBData{"q8"} 
+          },
+	  { "type" => "textline", "ypos" => 275, "xpos" => 156.5, "optlist" => "fontsize=12",
+                                "text" => $DBData{"q9"} 
+          },
+	  { "type" => "textline", "ypos" => 240, "xpos" => 156.5, "optlist" => "fontsize=12",
+                                "text" => $DBData{"q10"} 
+          },
+	  { "type" => "textline", "ypos" => 180, "xpos" => 156.5, "optlist" => "fontsize=12",
+                                "text" => $DBData{"q11"} 
+          },
+	  { "type" => "textline", "ypos" => 120, "xpos" => 156.5, "optlist" => "fontsize=12",
+                                "text" => $DBData{"q1"} + $DBData{"q2"} + $DBData{"q3a"} + $DBData{"q4"} + $DBData{"q5"} + $DBData{"q6"} + $DBData{"q7"} + $DBData{"q8"} + $DBData{"q9"} + $DBData{"q10"} + $DBData{"q11"} 
+          }            
+	  
+          
+      ] }
+    );
+  }
+  elsif ("$table$page" eq "ClientGDSS") {
+    @PageData = (
+      { "descr" => "page 1", "data" => [
+          { "type" => "checkbox", "ypos" => 658.9, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q1"} },             # q1
+          { "type" => "checkbox", "ypos" => 640.9, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q2"} },             # q2
+          { "type" => "checkbox", "ypos" => 622.4, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q3"} },             # q3
+          { "type" => "checkbox", "ypos" => 604.2, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q4"} },             # q4
+          { "type" => "checkbox", "ypos" => 585.4, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q5"} },             # q5
+          { "type" => "checkbox", "ypos" => 566.3, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q6"} },             # q6
+          { "type" => "checkbox", "ypos" => 548.3, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q7"} },             # q7
+          { "type" => "checkbox", "ypos" => 529.8, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q8"} },             # q8
+          { "type" => "checkbox", "ypos" => 511.7, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q9"} },             # q9
+          { "type" => "checkbox", "ypos" => 493.6, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q10"} },             # q10
+          { "type" => "checkbox", "ypos" => 478.1, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q11"} },             # q11
+          { "type" => "checkbox", "ypos" => 459, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q12"} },             # q12
+          { "type" => "checkbox", "ypos" => 441, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q13"} },             # q13
+          { "type" => "checkbox", "ypos" => 421, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q14"} },             # q14
+          { "type" => "checkbox", "ypos" => 403.6, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q15"} },             # q15
+          { "type" => "textline", "ypos" => 353.6, "xpos" => 499.6, "optlist" => "$basefontoptions position={center bottom}",
+                                "text" => $DBData{"Score"} },          # Total Score
+          { "type" => "textline", "ypos" => 85.2, "xpos" => 145.3, "optlist" => $basefontoptions,
+                                "text" => $DBData{"clientname"} },     # Client’s Name
+          { "type" => "textline", "ypos" => 85.2, "xpos" => 377.3, "optlist" => "$basefontoptions position={center bottom}",
+                                "text" => $DBData{"testdate"} },       # Date
+      ] },
+      { "descr" => "page 2", "data" => [
+          { "type" => "textline", "ypos" => 558.4, "xpos" => 447.7, "optlist" => "$basefontoptions position={center bottom}",
+                                "text" => $DBData{"Score"} },          # Total Score
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 507.8, "xpos" => 102.2,
+                                "data" => main->simpleCalculator("eq", $DBData{"q1"}, 0) },          # 1
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 469, "xpos" => 102.2,
+                                "data" => main->simpleCalculator("eq", $DBData{"q2"}, 1) },          # 2
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 430.2, "xpos" => 102.2,
+                                "data" => main->simpleCalculator("eq", $DBData{"q3"}, 1) },          # 3
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 391.4, "xpos" => 102.2,
+                                "data" => main->simpleCalculator("eq", $DBData{"q4"}, 1) },          # 4
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 352.8, "xpos" => 102.2,
+                                "data" => main->simpleCalculator("eq", $DBData{"q5"}, 0) },          # 5
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 507.8, "xpos" => 174.2,
+                                "data" => main->simpleCalculator("eq", $DBData{"q6"}, 1) },          # 6
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 469, "xpos" => 174.2,
+                                "data" => main->simpleCalculator("eq", $DBData{"q7"}, 0) },          # 7
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 430.2, "xpos" => 174.2,
+                                "data" => main->simpleCalculator("eq", $DBData{"q8"}, 1) },          # 8
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 391.4, "xpos" => 174.2,
+                                "data" => main->simpleCalculator("eq", $DBData{"q9"}, 1) },          # 9
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 352.8, "xpos" => 180.3,
+                                "data" => main->simpleCalculator("eq", $DBData{"q10"}, 1) },          # 10
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 507.8, "xpos" => 252.3,
+                                "data" => main->simpleCalculator("eq", $DBData{"q11"}, 0) },          # 11
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 469, "xpos" => 252.3,
+                                "data" => main->simpleCalculator("eq", $DBData{"q12"}, 1) },          # 12
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 430.2, "xpos" => 252.3,
+                                "data" => main->simpleCalculator("eq", $DBData{"q13"}, 0) },          # 13
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 391.4, "xpos" => 252.3,
+                                "data" => main->simpleCalculator("eq", $DBData{"q14"}, 1) },          # 14
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 352.8, "xpos" => 252.3,
+                                "data" => main->simpleCalculator("eq", $DBData{"q15"}, 1) },          # 15
+      ] }
+    );
+  }
+  elsif ("$table$page" eq "ClientGDSL") {
+    @PageData = (
+      { "descr" => "page 1", "data" => [
+          { "type" => "checkbox", "ypos" => 658.9, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q1"} },             # q1
+          { "type" => "checkbox", "ypos" => 641, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q2"} },             # q2
+          { "type" => "checkbox", "ypos" => 622.4, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q3"} },             # q3
+          { "type" => "checkbox", "ypos" => 604.2, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q4"} },             # q4
+          { "type" => "checkbox", "ypos" => 585.4, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q5"} },             # q5
+          { "type" => "checkbox", "ypos" => 566.3, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q6"} },             # q6
+          { "type" => "checkbox", "ypos" => 548.3, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q7"} },             # q7
+          { "type" => "checkbox", "ypos" => 529.8, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q8"} },             # q8
+          { "type" => "checkbox", "ypos" => 511.6, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q9"} },             # q9
+          { "type" => "checkbox", "ypos" => 493.6, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q10"} },             # q10
+          { "type" => "checkbox", "ypos" => 478.1, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q11"} },             # q11
+          { "type" => "checkbox", "ypos" => 459, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q12"} },             # q12
+          { "type" => "checkbox", "ypos" => 441, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q13"} },             # q13
+          { "type" => "checkbox", "ypos" => 421, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q14"} },             # q14
+          { "type" => "checkbox", "ypos" => 403.3, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q15"} },             # q15
+          { "type" => "checkbox", "ypos" => 385.2, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q16"} },             # q16
+          { "type" => "checkbox", "ypos" => 367.1, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q17"} },             # q17
+          { "type" => "checkbox", "ypos" => 349.9, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q18"} },             # q18
+          { "type" => "checkbox", "ypos" => 330.5, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q19"} },             # q19
+          { "type" => "checkbox", "ypos" => 313.2, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q20"} },             # q20
+          { "type" => "checkbox", "ypos" => 294.2, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q21"} },             # q21
+          { "type" => "checkbox", "ypos" => 276.5, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q22"} },             # q22
+          { "type" => "checkbox", "ypos" => 258.4, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q23"} },             # q23
+          { "type" => "checkbox", "ypos" => 239.5, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q24"} },             # q24
+          { "type" => "checkbox", "ypos" => 221.4, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q25"} },             # q25
+          { "type" => "checkbox", "ypos" => 203.9, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q26"} },             # q26
+          { "type" => "checkbox", "ypos" => 185.6, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q27"} },             # q27
+          { "type" => "checkbox", "ypos" => 167.5, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q28"} },             # q28
+          { "type" => "checkbox", "ypos" => 149.4, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q29"} },             # q29
+          { "type" => "checkbox", "ypos" => 131, "xposarray" => [505.6, 459.8], "optlist" => "fontsize=9", "y_offset_check" => -0.1,
+                                "val" => $DBData{"q30"} },             # q30
+          { "type" => "textline", "ypos" => 86, "xpos" => 495.1, "optlist" => "$basefontoptions position={center bottom}",
+                                "text" => $DBData{"Score"} },          # Total Score
+          { "type" => "textline", "ypos" => 55, "xpos" => 153.4, "optlist" => $basefontoptions,
+                                "text" => $DBData{"clientname"} },     # Client’s Name
+          { "type" => "textline", "ypos" => 55, "xpos" => 387, "optlist" => "$basefontoptions position={center bottom}",
+                                "text" => $DBData{"testdate"} },       # Date
+      ] },
+      { "descr" => "page 2", "data" => [
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 507.8, "xpos" => 98.2,
+                                "data" => main->simpleCalculator("eq", $DBData{"q1"}, 0) },          # 1
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 469.1, "xpos" => 98.2,
+                                "data" => main->simpleCalculator("eq", $DBData{"q2"}, 1) },          # 2
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 430.3, "xpos" => 98.2,
+                                "data" => main->simpleCalculator("eq", $DBData{"q3"}, 1) },          # 3
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 391.3, "xpos" => 98.2,
+                                "data" => main->simpleCalculator("eq", $DBData{"q4"}, 1) },          # 4
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 352.6, "xpos" => 98.2,
+                                "data" => main->simpleCalculator("eq", $DBData{"q5"}, 0) },          # 5
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 507.8, "xpos" => 170.3,
+                                "data" => main->simpleCalculator("eq", $DBData{"q6"}, 1) },          # 6
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 469.1, "xpos" => 170.3,
+                                "data" => main->simpleCalculator("eq", $DBData{"q7"}, 0) },          # 7
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 430.3, "xpos" => 170.3,
+                                "data" => main->simpleCalculator("eq", $DBData{"q8"}, 1) },          # 8
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 391.3, "xpos" => 170.3,
+                                "data" => main->simpleCalculator("eq", $DBData{"q9"}, 0) },          # 9
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 352.6, "xpos" => 176.3,
+                                "data" => main->simpleCalculator("eq", $DBData{"q10"}, 1) },          # 10
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 507.8, "xpos" => 248.3,
+                                "data" => main->simpleCalculator("eq", $DBData{"q11"}, 1) },          # 11
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 469.1, "xpos" => 248.3,
+                                "data" => main->simpleCalculator("eq", $DBData{"q12"}, 1) },          # 12
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 430.3, "xpos" => 248.3,
+                                "data" => main->simpleCalculator("eq", $DBData{"q13"}, 1) },          # 13
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 391.3, "xpos" => 248.3,
+                                "data" => main->simpleCalculator("eq", $DBData{"q14"}, 1) },          # 14
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 352.6, "xpos" => 248.3,
+                                "data" => main->simpleCalculator("eq", $DBData{"q15"}, 0) },          # 15
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 507.8, "xpos" => 320.2,
+                                "data" => main->simpleCalculator("eq", $DBData{"q16"}, 1) },          # 16
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 469.1, "xpos" => 320.2,
+                                "data" => main->simpleCalculator("eq", $DBData{"q17"}, 1) },          # 17
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 430.3, "xpos" => 320.2,
+                                "data" => main->simpleCalculator("eq", $DBData{"q18"}, 1) },          # 18
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 391.3, "xpos" => 320.2,
+                                "data" => main->simpleCalculator("eq", $DBData{"q19"}, 0) },          # 19
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 352.6, "xpos" => 320.2,
+                                "data" => main->simpleCalculator("eq", $DBData{"q20"}, 1) },          # 20
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 507.8, "xpos" => 392.2,
+                                "data" => main->simpleCalculator("eq", $DBData{"q21"}, 0) },          # 21
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 469.1, "xpos" => 392.2,
+                                "data" => main->simpleCalculator("eq", $DBData{"q22"}, 1) },          # 22
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 430.3, "xpos" => 392.2,
+                                "data" => main->simpleCalculator("eq", $DBData{"q23"}, 1) },          # 23
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 391.3, "xpos" => 392.2,
+                                "data" => main->simpleCalculator("eq", $DBData{"q24"}, 1) },          # 24
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 352.6, "xpos" => 392.2,
+                                "data" => main->simpleCalculator("eq", $DBData{"q25"}, 1) },          # 25
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 507.8, "xpos" => 464.3,
+                                "data" => main->simpleCalculator("eq", $DBData{"q26"}, 1) },          # 26
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 469.1, "xpos" => 464.3,
+                                "data" => main->simpleCalculator("eq", $DBData{"q27"}, 0) },          # 27
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 430.3, "xpos" => 464.3,
+                                "data" => main->simpleCalculator("eq", $DBData{"q28"}, 1) },          # 28
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 391.3, "xpos" => 464.3,
+                                "data" => main->simpleCalculator("eq", $DBData{"q29"}, 0) },          # 29
+          { "type" => "circlestrokewithcond", "cond" => "eq1", "ypos" => 352.6, "xpos" => 464.3,
+                                "data" => main->simpleCalculator("eq", $DBData{"q30"}, 0) },          # 30
+      ] }
+    );
+  }
+  elsif ("$table$page" eq "ClientOOWS") {
+    @PageData = (
+      { "descr" => "page 1", "data" => [
+          { "type" => "textline", "ypos" => 603.1, "xpos" => 160,
+                                "text" => $DBData{"clientname"} },                       # clientname
+          { "type" => "textline", "ypos" => 603.1, "xpos" => 370,
+                                "text" => $DBData{"clientid"} },                       # clientid
+          { "type" => "textline", "ypos" => 580.1, "xpos" => 110,
+                                "text" => $DBData{"testdate"} },                  # testdate
+          { "type" => "textline", "ypos" => 580.1, "xpos" => 250,
+                                "text" => $DBData{"testtime"} },                  # testtime
+          { "type" => "textline", "ypos" => 490.1, "xpos" => 470, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"q1"} },                       # q1
+          { "type" => "textline", "ypos" => 468.1, "xpos" => 470, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"q2"} },                       # q2
+          { "type" => "textline", "ypos" => 444.1, "xpos" => 470, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"q3"} },                       # q3
+          { "type" => "textline", "ypos" => 416.1, "xpos" => 470, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"q4"} },                       # q4
+          { "type" => "textline", "ypos" => 395.1, "xpos" => 470, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"q5"} },                       # q5
+          { "type" => "textline", "ypos" => 374.1, "xpos" => 470, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"q6"} },                       # q6
+          { "type" => "textline", "ypos" => 354.1, "xpos" => 470, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"q7"} },                       # q7
+          { "type" => "textline", "ypos" => 334.1, "xpos" => 470, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"q8"} },                       # q8
+          { "type" => "textline", "ypos" => 312.1, "xpos" => 470, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"q9"} },                       # q9
+          { "type" => "textline", "ypos" => 289.1, "xpos" => 470, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"q10"} },                       # q10
+          { "type" => "textline", "ypos" => 269.1, "xpos" => 470, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"q11"} },                       # q11
+          { "type" => "textline", "ypos" => 249.1, "xpos" => 470, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"q12"} },                       # q12
+          { "type" => "textline", "ypos" => 229.1, "xpos" => 470, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"q13"} },                       # q13
+          { "type" => "textline", "ypos" => 209.1, "xpos" => 470, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"tALL"} },                       # total
+          { "type" => "textline", "ypos" => 60.8, "xpos" => 140,
+                                "text" => $DBData{"clientname"} },                       # clientname
+          { "type" => "textline", "ypos" => 60.8, "xpos" => 320,
+                                "text" => $DBData{"clientid"} },                       # clientid
+          { "type" => "textline", "ypos" => 60.8, "xpos" => 540,
+                                "text" => $DBData{"testdate"} },                  # testdate
+      ] }
+    );
+  }
+  elsif ("$table$page" eq "ClientCSSRS") {
+    @PageData = (
+      { "descr" => "page 1", "data" => [
+          { "type" => "check", "ypos" => 550.7, "optlist" => "fontsize=8 position={center bottom}", "xposarray" => [511.4, 480],
+                                "val" => $DBData{"q1"} },              # q1
+          { "type" => "check", "ypos" => 550.7, "optlist" => "fontsize=8 position={center bottom}", "xposarray" => [570.1, 538.6],
+                                "val" => $DBData{"q1h"} },             # q1h
+          { "type" => "textflow", "ypos" => 565.8, "xpos_start" => 48.6, "xpos_end" => 458.6, "optlist" => "$basesmallfontoptions leading=115% parindent=68 rightindent=10",
+                                "text" => $DBData{"q1"} == 1
+                                          ? $DBData{"q2"}
+                                          : $DBData{"q1h"} == 1 ? $DBData{"q2h"} : '' },            # q2, q2h
+          { "type" => "check", "ypos" => 460.3, "optlist" => "fontsize=8 position={center bottom}", "xposarray" => [511.4, 480],
+                                "val" => $DBData{"q3"} },              # q3
+          { "type" => "check", "ypos" => 460.3, "optlist" => "fontsize=8 position={center bottom}", "xposarray" => [570.1, 538.6],
+                                "val" => $DBData{"q3h"} },             # q3h
+          { "type" => "textflow", "ypos" => 465.8, "xpos_start" => 48.6, "xpos_end" => 458.6, "optlist" => "$basesmallfontoptions leading=115% parindent=68 rightindent=10",
+                                "text" => $DBData{"q3"} == 1
+                                          ? $DBData{"q4"}
+                                          : $DBData{"q3h"} == 1 ? $DBData{"q4h"} : '' },            # q4, q4h
+          { "type" => "check", "ypos" => 342.2, "optlist" => "fontsize=8 position={center bottom}", "xposarray" => [511.4, 480],
+                                "val" => $DBData{"q5"} },              # q5
+          { "type" => "check", "ypos" => 342.2, "optlist" => "fontsize=8 position={center bottom}", "xposarray" => [570.1, 538.6],
+                                "val" => $DBData{"q5h"} },             # q5h
+          { "type" => "textflow", "ypos" => 346.5, "xpos_start" => 48.6, "xpos_end" => 458.6, "optlist" => "$basesmallfontoptions leading=115% parindent=68 rightindent=10",
+                                "text" => $DBData{"q5"} == 1
+                                          ? $DBData{"q6"}
+                                          : $DBData{"q5h"} == 1 ? $DBData{"q6h"} : '' },            # q6, q6h
+          { "type" => "check", "ypos" => 241, "optlist" => "fontsize=8 position={center bottom}", "xposarray" => [511.4, 480],
+                                "val" => $DBData{"q7"} },              # q7
+          { "type" => "check", "ypos" => 241, "optlist" => "fontsize=8 position={center bottom}", "xposarray" => [570.1, 538.6],
+                                "val" => $DBData{"q7h"} },             # q7h
+          { "type" => "textflow", "ypos" => 246.3, "xpos_start" => 48.6, "xpos_end" => 458.6, "optlist" => "$basesmallfontoptions leading=115% parindent=68 rightindent=10",
+                                "text" => $DBData{"q7"} == 1
+                                          ? $DBData{"q8"}
+                                          : $DBData{"q7h"} == 1 ? $DBData{"q8h"} : '' },            # q8, q8h
+          { "type" => "check", "ypos" => 152.6, "optlist" => "fontsize=8 position={center bottom}", "xposarray" => [511.4, 480],
+                                "val" => $DBData{"q9"} },              # q9
+          { "type" => "check", "ypos" => 152.6, "optlist" => "fontsize=8 position={center bottom}", "xposarray" => [570.1, 538.6],
+                                "val" => $DBData{"q9h"} },             # q9h
+          { "type" => "textflow", "ypos" => 145.2, "xpos_start" => 48.6, "xpos_end" => 458.6, "optlist" => "$basesmallfontoptions leading=115% parindent=68 rightindent=10",
+                                "text" => $DBData{"q9"} == 1
+                                          ? $DBData{"q10"}
+                                          : $DBData{"q9h"} == 1 ? $DBData{"q10h"} : '' },            # q10, q10h
+          { "type" => "textline", "ypos" => 43.9, "xpos" => 84, "optlist" => "$basesmallfontoptions position={left bottom}",
+                                "text" => $DBData{"clientname"} },     # Client’s Name
+          { "type" => "textline", "ypos" => 43.9, "xpos" => 508.2, "optlist" => "$basesmallfontoptions position={right bottom}",
+                                "text" => $DBData{"testdate"} },       # Date
+      ] },
+      { "descr" => "page 2", "data" => [
+          { "type" => "textlinewithcond", "ypos" => 634.5, "xpos" => 217.1, "cond" => "gt0", "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"q11"} },            # q11
+          { "type" => "textlinewithcond", "ypos" => 602.6, "xpos" => 217.1, "cond" => "gt0", "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"q11h"} },           # q11h
+          { "type" => "textline", "ypos" => 634.5, "xpos" => 287.3, "optlist" => $basefontoptions,
+                                "text" => $DBData{"q12"} },            # q12
+          { "type" => "textline", "ypos" => 602.6, "xpos" => 287.3, "optlist" => $basefontoptions,
+                                "text" => $DBData{"q12h"} },           # q12h
+          { "type" => "textlinewithcond", "ypos" => 540.7, "xpos" => 514.4, "cond" => "gt0", "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"q13"} },            # q13
+          { "type" => "textlinewithcond", "ypos" => 540.7, "xpos" => 559.9, "cond" => "gt0", "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"q13h"} },           # q13h
+          { "type" => "textlinewithcond", "ypos" => 467.6, "xpos" => 514.4, "cond" => "gt0", "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"q14"} },            # q14
+          { "type" => "textlinewithcond", "ypos" => 467.6, "xpos" => 559.9, "cond" => "gt0", "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"q14h"} },           # q14h
+          { "type" => "textlinewithcond", "ypos" => 389.2, "xpos" => 514.4, "cond" => "gte0", "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"q15"} },            # q15
+          { "type" => "textlinewithcond", "ypos" => 389.2, "xpos" => 559.9, "cond" => "gte0", "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"q15h"} },           # q15h
+          { "type" => "textlinewithcond", "ypos" => 305.3, "xpos" => 514.4, "cond" => "gte0", "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"q16"} },            # q16
+          { "type" => "textlinewithcond", "ypos" => 305.3, "xpos" => 559.9, "cond" => "gte0", "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"q16h"} },           # q16h
+          { "type" => "textlinewithcond", "ypos" => 189.1, "xpos" => 514.4, "cond" => "gte0", "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"q17"} },            # q17
+          { "type" => "textlinewithcond", "ypos" => 189.1, "xpos" => 559.9, "cond" => "gte0", "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"q17h"} },           # q17h
+          { "type" => "textline", "ypos" => 43.9, "xpos" => 84, "optlist" => "$basesmallfontoptions position={left bottom}",
+                                "text" => $DBData{"clientname"} },     # Client’s Name
+          { "type" => "textline", "ypos" => 43.9, "xpos" => 508.2, "optlist" => "$basesmallfontoptions position={right bottom}",
+                                "text" => $DBData{"testdate"} },       # Date
+      ] },
+      { "descr" => "page 3", "data" => [
+          { "type" => "check", "ypos" => 530.6, "optlist" => "fontsize=8 position={center bottom}", "xposarray" => [519, 501],
+                                "val" => $DBData{"q18"} },             # q18
+          { "type" => "check", "ypos" => 530.6, "optlist" => "fontsize=8 position={center bottom}", "xposarray" => [564, 546],
+                                "val" => $DBData{"q18h"} },            # q18h
+          { "type" => "textline", "ypos" => 473.8, "xpos" => 509.6, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"q19"} },            # q19
+          { "type" => "textline", "ypos" => 473.8, "xpos" => 554.8, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"q19h"} },           # q19h
+          { "type" => "check", "ypos" => 432.7, "optlist" => "fontsize=8 position={center bottom}", "xposarray" => [519, 501],
+                                "val" => $DBData{"q26"} },             # q26
+          { "type" => "check", "ypos" => 432.7, "optlist" => "fontsize=8 position={center bottom}", "xposarray" => [564, 546],
+                                "val" => $DBData{"q26h"} },            # q26h
+          { "type" => "check", "ypos" => 353.4, "optlist" => "fontsize=8 position={center bottom}", "xposarray" => [519, 501],
+                                "val" => $DBData{"q36"} },             # q36
+          { "type" => "check", "ypos" => 353.4, "optlist" => "fontsize=8 position={center bottom}", "xposarray" => [564, 546],
+                                "val" => $DBData{"q36h"} },            # q36h
+          { "type" => "textline", "ypos" => 296.7, "xpos" => 509.6, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"q20"} },            # q20
+          { "type" => "textline", "ypos" => 296.7, "xpos" => 554.8, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"q20h"} },           # q20h
+          { "type" => "textflow", "ypos" => 298.8, "xpos_start" => 34.9, "xpos_end" => 485, "optlist" => "$basefontoptions fontsize=7 leading=115% parindent=58 rightindent=10",
+                                "text" => $DBData{"q27"} },            # q27
+          { "type" => "check", "ypos" => 247.4, "optlist" => "fontsize=8 position={center bottom}", "xposarray" => [520.4, 501],
+                                "val" => $DBData{"q28"} },             # q28
+          { "type" => "check", "ypos" => 247.4, "optlist" => "fontsize=8 position={center bottom}", "xposarray" => [564, 546],
+                                "val" => $DBData{"q28h"} },            # q28h
+          { "type" => "textline", "ypos" => 181.2, "xpos" => 509.6, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"q21"} },            # q21
+          { "type" => "textline", "ypos" => 181.2, "xpos" => 554.8, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"q21h"} },           # q21h
+          { "type" => "textflow", "ypos" => 190.4, "xpos_start" => 34.9, "xpos_end" => 485, "optlist" => "$basefontoptions fontsize=7 leading=115% parindent=58 rightindent=10",
+                                "text" => $DBData{"q29"} },            # q29
+          { "type" => "check", "ypos" => 139, "optlist" => "fontsize=8 position={center bottom}", "xposarray" => [519, 501],
+                                "val" => $DBData{"q35"} },             # q35
+          { "type" => "check", "ypos" => 139, "optlist" => "fontsize=8 position={center bottom}", "xposarray" => [564, 546],
+                                "val" => $DBData{"q35h"} },            # q35h
+          { "type" => "textline", "ypos" => 82, "xpos" => 509.6, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"q30"} },            # q30
+          { "type" => "textline", "ypos" => 82, "xpos" => 554.8, "optlist" => $basefontoptions . " position={center bottom}",
+                                "text" => $DBData{"q30h"} },           # q30h
+          { "type" => "textflow", "ypos" => 81.8, "xpos_start" => 34.9, "xpos_end" => 485, "optlist" => "$basefontoptions fontsize=7 leading=115% parindent=58 rightindent=10",
+                                "text" => $DBData{"q31"} },            # q31
+          { "type" => "textline", "ypos" => 43.9, "xpos" => 84, "optlist" => "$basesmallfontoptions position={left bottom}",
+                                "text" => $DBData{"clientname"} },     # Client’s Name
+          { "type" => "textline", "ypos" => 43.9, "xpos" => 508.2, "optlist" => "$basesmallfontoptions position={right bottom}",
+                                "text" => $DBData{"testdate"} },       # Date
+      ] },
+      { "descr" => "page 4", "data" => [
+          { "type" => "textline", "ypos" => 670.3, "xpos" => 401, "optlist" => $basesmallfontoptions,
+                                "text" => DBUtil->Date($DBData{"q23"},'fmt','MM/DD/YYYY') },            # q23
+          { "type" => "textline", "ypos" => 670.3, "xpos" => 468.6, "optlist" => $basesmallfontoptions,
+                                "text" => DBUtil->Date($DBData{"q23h"},'fmt','MM/DD/YYYY') },           # q23h
+          { "type" => "textline", "ypos" => 670.3, "xpos" => 535.9, "optlist" => $basesmallfontoptions,
+                                "text" => DBUtil->Date($DBData{"q32"},'fmt','MM/DD/YYYY') },           # q32
+          { "type" => "textlinewithcond", "ypos" => 559, "xpos" => 412.8, "cond" => "gte0", "optlist" => $basesmallfontoptions . " position={center bottom}",
+                                "text" => $DBData{"q24"} },            # q24
+          { "type" => "textlinewithcond", "ypos" => 559, "xpos" => 480.5, "cond" => "gte0", "optlist" => $basesmallfontoptions . " position={center bottom}",
+                                "text" => $DBData{"q24h"} },           # q24h
+          { "type" => "textlinewithcond", "ypos" => 559, "xpos" => 545.8, "cond" => "gte0", "optlist" => $basesmallfontoptions . " position={center bottom}",
+                                "text" => $DBData{"q33"} },            # q33
+          { "type" => "textlinewithcond", "ypos" => 422.9, "xpos" => 412.8, "cond" => "gte0", "optlist" => $basesmallfontoptions . " position={center bottom}",
+                                "text" => $DBData{"q25"} },            # q25
+          { "type" => "textlinewithcond", "ypos" => 422.9, "xpos" => 480.5, "cond" => "gte0", "optlist" => $basesmallfontoptions . " position={center bottom}",
+                                "text" => $DBData{"q25h"} },           # q25h
+          { "type" => "textlinewithcond", "ypos" => 422.9, "xpos" => 545.8, "cond" => "gte0", "optlist" => $basesmallfontoptions . " position={center bottom}",
+                                "text" => $DBData{"q34"} },            # q34
+          { "type" => "textline", "ypos" => 43.9, "xpos" => 84, "optlist" => "$basesmallfontoptions position={left bottom}",
+                                "text" => $DBData{"clientname"} },     # Client’s Name
+          { "type" => "textline", "ypos" => 43.9, "xpos" => 508.2, "optlist" => "$basesmallfontoptions position={right bottom}",
+                                "text" => $DBData{"testdate"} },       # Date
+      ] },
+    );
+  }
+  elsif ("$table$page" eq "ClientCSSRSs") {
+    @PageData = (
+      { "descr" => "page 1", "data" => [
+          { "type" => "check", "ypos" => 599.4, "optlist" => "fontsize=16 position={center bottom}", "xposarray" => [569.2, 536.4],
+                                "val" => $DBData{"q1"} },            # q1
+          { "type" => "check", "ypos" => 523.8, "optlist" => "fontsize=16 position={center bottom}", "xposarray" => [569.2, 536.4],
+                                "val" => $DBData{"q2"} },            # q2
+          { "type" => "check", "ypos" => 402.5, "optlist" => "fontsize=16 position={center bottom}", "xposarray" => [569.2, 536.4],
+                                "val" => $DBData{"q3"} },            # q3
+          { "type" => "check", "ypos" => 315.4, "optlist" => "fontsize=16 position={center bottom}", "xposarray" => [569.2, 536.4],
+                                "val" => $DBData{"q4"} },            # q4
+          { "type" => "check", "ypos" => 232.2, "optlist" => "fontsize=16 position={center bottom}", "xposarray" => [569.2, 536.4],
+                                "val" => $DBData{"q5"} },            # q5
+          { "type" => "check", "ypos" => 133.9, "optlist" => "fontsize=16 position={center bottom}", "xposarray" => [569.2, 536.4],
+                                "val" => $DBData{"q6"} },            # q6
+      ] }
+    );
+  }
+  elsif ("$table$page" eq "ClientCSSRSt") {
+    @PageData = (
+      { "descr" => "page 1", "data" => [
+          { "type" => "multi-check-vert", "xpos" => 561.8, "optlist" => "fontsize=14 position={center bottom}", "yposarray" => [657.6, 624.6, 591.6, 559, 525.5],
+                                "valarray" => [$DBData{"q1"}, $DBData{"q2"}, $DBData{"q3"}, $DBData{"q4"}, $DBData{"q5"}] },             # q1, q2, q3, q4, q5
+          { "type" => "multi-check-vert", "xpos" => 561.8, "optlist" => "fontsize=14 position={center bottom}", "yposarray" => [476.6, 418.2],
+                                "valarray" => [$DBData{"q6"}, $DBData{"q7"}] },             # q6, q7
+          { "type" => "check-text-mix-vert", "xpos" => 36, "optlist" => "fontsize=8 position={center bottom}",
+            "optlist2" => $basemidfontoptions, "yposarray" => [381.2, 356.9, 344.6],
+                                "valarray" => [
+                                  { "type" => "check", "value" => $DBData{"q8"} },
+                                  { "type" => "check", "value" => $DBData{"q9"} },
+                                  { "type" => "check", "value" => $DBData{"q10"} },
+                                ] },             # q8, q9, q10
+          { "type" => "check-text-mix-vert", "xpos" => 36, "optlist" => "fontsize=8 position={center bottom}",
+            "optlist2" => $basemidfontoptions, "yposarray" => [310.6, 298.2, 286.1, 273.7, 261.6],
+                                "valarray" => [
+                                  { "type" => "check", "value" => $DBData{"q11"} },
+                                  { "type" => "check", "value" => $DBData{"q12"} },
+                                  { "type" => "check", "value" => $DBData{"q13"} },
+                                  { "type" => "check", "value" => $DBData{"q14"} },
+                                  { "type" => "check", "value" => $DBData{"q15"} },
+                                ] },             # q11, q12, q13, q14, q15
+          { "type" => "check-text-mix-vert", "xpos" => 36, "optlist" => "fontsize=8 position={center bottom}",
+            "optlist2" => $basemidfontoptions, "yposarray" => [225.1, 212.8, 200.6],
+                                "valarray" => [
+                                  { "type" => "textline", "text" => $DBData{"q16"}, "x_offset" => 5.9, "y_offset" => 0.5 },
+                                  { "type" => "textline", "text" => $DBData{"q17"}, "x_offset" => 5.9, "y_offset" => 0.5 },
+                                  { "type" => "textline", "text" => $DBData{"q18"}, "x_offset" => 5.9, "y_offset" => 0.5 },
+                                ] },             # q16, q17, q18
+          { "type" => "check-text-mix-vert", "xpos" => 310.4, "optlist" => "fontsize=8 position={center bottom}",
+            "optlist2" => $basemidfontoptions, "yposarray" => [381.2, 369.1, 356.9, 344.6, 332.3, 308, 295.9, 283.6, 271.3, 259.1, 247, 235, 222.7, 210.5],
+                                "valarray" => [
+                                  { "type" => "check", "value" => $DBData{"q19"} },
+                                  { "type" => "check", "value" => $DBData{"q20"} },
+                                  { "type" => "check", "value" => $DBData{"q21"} },
+                                  { "type" => "check", "value" => $DBData{"q22"} },
+                                  { "type" => "check", "value" => $DBData{"q23"} },
+                                  { "type" => "check", "value" => $DBData{"q24"} },
+                                  { "type" => "check", "value" => $DBData{"q25"} },
+                                  { "type" => "check", "value" => $DBData{"q26"} },
+                                  { "type" => "check", "value" => $DBData{"q27"} },
+                                  { "type" => "check", "value" => $DBData{"q28"} },
+                                  { "type" => "check", "value" => $DBData{"q29"} },
+                                  { "type" => "check", "value" => $DBData{"q30"} },
+                                  { "type" => "check", "value" => $DBData{"q31"} },
+                                  { "type" => "check", "value" => $DBData{"q32"} },
+                                ] },             # q19 ~ q32
+          { "type" => "check-text-mix-vert", "xpos" => 36, "optlist" => "fontsize=8 position={center bottom}",
+            "optlist2" => $basemidfontoptions, "yposarray" => [176],
+                                "valarray" => [
+                                  { "type" => "check", "value" => $DBData{"q33"} },
+                                ] },             # q33,
+          { "type" => "check-text-mix-vert", "xpos" => 36, "optlist" => "fontsize=8 position={center bottom}",
+            "optlist2" => $basemidfontoptions, "yposarray" => [109.2, 97.3, 85.1, 73],
+                                "valarray" => [
+                                  { "type" => "check", "value" => $DBData{"q34"} },
+                                  { "type" => "check", "value" => $DBData{"q35"} },
+                                  { "type" => "textline", "text" => $DBData{"q36"}, "x_offset" => 5.9, "y_offset" => 0.5 },
+                                  { "type" => "textline", "text" => $DBData{"q37"}, "x_offset" => 5.9, "y_offset" => 0.5 },
+                                ] },             # q34 ~ q37
+          { "type" => "check-text-mix-vert", "xpos" => 311.4, "optlist" => "fontsize=8 position={center bottom}",
+            "optlist2" => $basemidfontoptions, "yposarray" => [109.2, 97.3, 85.1, 73],
+                                "valarray" => [
+                                  { "type" => "check", "value" => $DBData{"q38"} },
+                                  { "type" => "check", "value" => $DBData{"q39"} },
+                                  { "type" => "check", "value" => $DBData{"q40"} },
+                                  { "type" => "check", "value" => $DBData{"q41"} },
+                                ] },             # q38 ~ q41
+          { "type" => "textline", "ypos" => 36, "xpos" => 84, "optlist" => "$basesmallfontoptions position={left bottom}",
+                                "text" => $DBData{"clientname"} },     # Client’s Name
+          { "type" => "textline", "ypos" => 36, "xpos" => 508.2, "optlist" => "$basesmallfontoptions position={right bottom}",
+                                "text" => $DBData{"testdate"} },       # Date
+      ] },
+      { "descr" => "page 2", "data" => [
+          { "type" => "textlinewithcond", "ypos" => 635, "xpos" => 564.1, "cond" => "gt0", "optlist" => $basemidfontoptions . " position={center bottom}",
+                                "text" => $DBData{"q42"} },            # q42
+          { "type" => "textlinewithcond", "ypos" => 573.1, "xpos" => 564.1, "cond" => "gt0", "optlist" => $basemidfontoptions . " position={center bottom}",
+                                "text" => $DBData{"q43"} },            # q43
+          { "type" => "textlinewithcond", "ypos" => 500.8, "xpos" => 564.1, "cond" => "gte0", "optlist" => $basemidfontoptions . " position={center bottom}",
+                                "text" => $DBData{"q44"} },            # q44
+          { "type" => "textlinewithcond", "ypos" => 422.6, "xpos" => 564.1, "cond" => "gte0", "optlist" => $basemidfontoptions . " position={center bottom}",
+                                "text" => $DBData{"q45"} },            # q45
+          { "type" => "textlinewithcond", "ypos" => 320.4, "xpos" => 564.1, "cond" => "gte0", "optlist" => $basemidfontoptions . " position={center bottom}",
+                                "text" => $DBData{"q46"} },            # q46
+          { "type" => "textline", "ypos" => 252.5, "xpos" => 564.1, "optlist" => $basemidfontoptions . " position={center bottom}",
+                                "text" => $DBData{"tSafeT"} },         # total score
+          { "type" => "textline", "ypos" => 36, "xpos" => 84, "optlist" => "$basesmallfontoptions position={left bottom}",
+                                "text" => $DBData{"clientname"} },     # Client’s Name
+          { "type" => "textline", "ypos" => 36, "xpos" => 508.2, "optlist" => "$basesmallfontoptions position={right bottom}",
+                                "text" => $DBData{"testdate"} },       # Date
+      ] },
+      { "descr" => "page 3", "data" => [
+          { "type" => "check-text-mix-vert", "xpos" => 36.5, "optlist" => "fontsize=8 position={center bottom}",
+            "optlist2" => $basemidfontoptions, "yposarray" => [621.4, 580.4],
+                                "valarray" => [
+                                  { "type" => "check", "value" => $DBData{"q47"}, "checkbox" => 1 },
+                                  { "type" => "check", "value" => $DBData{"q48"}, "checkbox" => 1 },
+                                ] },             # q47, q48
+          { "type" => "check-text-mix-vert", "xpos" => 332.1, "optlist" => "fontsize=8 position={center bottom}",
+            "optlist2" => $basemidfontoptions, "yposarray" => [643.7, 621.1, 587.8],
+                                "valarray" => [
+                                  { "type" => "check", "value" => $DBData{"q49"}, "checkbox" => 1 },
+                                  { "type" => "check", "value" => $DBData{"q50"}, "checkbox" => 1 },
+                                  { "type" => "check", "value" => $DBData{"q51"}, "checkbox" => 1 },
+                                ] },             # q49, q50, q51
+          { "type" => "check-text-mix-vert", "xpos" => 36.5, "optlist" => "fontsize=8 position={center bottom}",
+            "optlist2" => $basemidfontoptions, "yposarray" => [539.7, 498.7, 457.7],
+                                "valarray" => [
+                                  { "type" => "check", "value" => $DBData{"q52"}, "checkbox" => 1 },
+                                  { "type" => "check", "value" => $DBData{"q53"}, "checkbox" => 1 },
+                                  { "type" => "check", "value" => $DBData{"q54"}, "checkbox" => 1 },
+                                ] },             # q52, q53, q54
+          { "type" => "check-text-mix-vert", "xpos" => 332.1, "optlist" => "fontsize=8 position={center bottom}",
+            "optlist2" => $basemidfontoptions, "yposarray" => [520.1, 486.7],
+                                "valarray" => [
+                                  { "type" => "check", "value" => $DBData{"q55"}, "checkbox" => 1 },
+                                  { "type" => "check", "value" => $DBData{"q56"}, "checkbox" => 1 },
+                                ] },             # q55, q56
+          { "type" => "check-text-mix-vert", "xpos" => 36.5, "optlist" => "fontsize=8 position={center bottom}",
+            "optlist2" => $basemidfontoptions, "yposarray" => [418.3, 377.1, 347.2],
+                                "valarray" => [
+                                  { "type" => "check", "value" => $DBData{"q57"}, "checkbox" => 1 },
+                                  { "type" => "check", "value" => $DBData{"q58"}, "checkbox" => 1 },
+                                  { "type" => "check", "value" => $DBData{"q59"}, "checkbox" => 1 },
+                                ] },             # q57, q58, q59
+          { "type" => "check-text-mix-vert", "xpos" => 332.1, "optlist" => "fontsize=8 position={center bottom}",
+            "optlist2" => $basemidfontoptions, "yposarray" => [386.2],
+                                "valarray" => [
+                                  { "type" => "check", "value" => $DBData{"q60"}, "checkbox" => 1 },
+                                ] },             # q60
+          { "type" => "check-text-mix-vert", "xpos" => 108.2, "optlist" => "fontsize=8 position={center bottom}",
+            "optlist2" => $basemidfontoptions, "yposarray" => [284.7, 274, 263],
+                                "valarray" => [
+                                  { "type" => "check", "value" => $DBData{"q61"}, "checkbox" => 1 },
+                                  { "type" => "check", "value" => $DBData{"q62"}, "checkbox" => 1 },
+                                  { "type" => "check", "value" => $DBData{"q63"}, "checkbox" => 1 },
+                                ] },             # q61, q62, q63
+          { "type" => "check-text-mix-vert", "xpos" => 35.6, "optlist" => "fontsize=8 position={center bottom}",
+            "optlist2" => $basemidfontoptions, "yposarray" => [223.2, 211.5, 200.2, 182.6, 85, 73,4],
+                                "valarray" => [
+                                  { "type" => "check", "value" => $DBData{"q64"}, "checkbox" => 1 },
+                                  { "type" => "check", "value" => $DBData{"q65"}, "checkbox" => 1 },
+                                  { "type" => "check", "value" => $DBData{"q66"}, "checkbox" => 1 },
+                                  { "type" => "check", "value" => $DBData{"q67"}, "checkbox" => 1 },
+                                  { "type" => "check", "value" => $DBData{"q75"}, "checkbox" => 1 },
+                                  { "type" => "check", "value" => $DBData{"q76"}, "checkbox" => 1 },
+                                ] },             # q64, q65, q66, q67, q75, q76
+          { "type" => "check-text-mix-vert", "xpos" => 44.6, "optlist" => "fontsize=8 position={center bottom}",
+            "optlist2" => $basemidfontoptions, "yposarray" => [171.1, 159.8, 148.2, 136.8, 125.3, 114, 102.5],
+                                "valarray" => [
+                                  { "type" => "check", "value" => $DBData{"q68"}, "checkbox" => 1 },
+                                  { "type" => "check", "value" => $DBData{"q69"}, "checkbox" => 1 },
+                                  { "type" => "check", "value" => $DBData{"q70"}, "checkbox" => 1 },
+                                  { "type" => "check", "value" => $DBData{"q71"}, "checkbox" => 1 },
+                                  { "type" => "check", "value" => $DBData{"q72"}, "checkbox" => 1 },
+                                  { "type" => "check", "value" => $DBData{"q73"}, "checkbox" => 1 },
+                                  { "type" => "check", "value" => $DBData{"q74"}, "checkbox" => 1 },
+                                ] },             # q68, q69, q70, q71, q72, q73, q74
+          { "type" => "textline", "ypos" => 36, "xpos" => 84, "optlist" => "$basesmallfontoptions position={left bottom}",
+                                "text" => $DBData{"clientname"} },     # Client’s Name
+          { "type" => "textline", "ypos" => 36, "xpos" => 508.2, "optlist" => "$basesmallfontoptions position={right bottom}",
+                                "text" => $DBData{"testdate"} },       # Date
+      ] }
+    );
+  }
+  elsif ("$table$page" eq "ClientCANS") {
+    @PageData = (
+      { "descr" => "page 1", "data" => [
+          { "type" => "radio-mix-key", "ypos" => 711.6, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6], "ref" => { "U" => 4},
+                                "val" => $DBData{"q1"} },              # q1
+          { "type" => "radio-mix-key", "ypos" => 700.1, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6], "ref" => { "U" => 4 },
+                                "val" => $DBData{"q2"} },              # q2
+          { "type" => "radio-mix-key", "ypos" => 688.6, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6], "ref" => { "U" => 4 },
+                                "val" => $DBData{"q3"} },              # q3
+          { "type" => "radio-mix-key", "ypos" => 677.1, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6], "ref" => { "U" => 4 },
+                                "val" => $DBData{"q4"} },              # q4
+          { "type" => "radio-mix-key", "ypos" => 665.5, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6], "ref" => { "U" => 4 },
+                                "val" => $DBData{"q5"} },              # q5
+          { "type" => "radio-mix-key", "ypos" => 654.2, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6], "ref" => { "U" => 4 },
+                                "val" => $DBData{"q6"} },              # q6
+          { "type" => "radio-mix-key", "ypos" => 642.5, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6], "ref" => { "U" => 4 },
+                                "val" => $DBData{"q7"} },              # q7
+          { "type" => "radio-mix-key", "ypos" => 631, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6], "ref" => { "U" => 4 },
+                                "val" => $DBData{"q8"} },              # q8
+          { "type" => "radio-mix-key", "ypos" => 593.7, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6], "ref" => { "U" => 4 },
+                                "val" => $DBData{"q9"} },              # q9
+          { "type" => "radio-mix-key", "ypos" => 582.2, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6], "ref" => { "U" => 4 },
+                                "val" => $DBData{"q10"} },             # q10
+          { "type" => "radio-mix-key", "ypos" => 570.7, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6], "ref" => { "U" => 4 },
+                                "val" => $DBData{"q11"} },             # q11
+          { "type" => "radio-mix-key", "ypos" => 559.2, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6], "ref" => { "U" => 4 },
+                                "val" => $DBData{"q12"} },             # q12
+          { "type" => "radio-mix-key", "ypos" => 547.7, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6], "ref" => { "U" => 4 },
+                                "val" => $DBData{"q13"} },             # q13
+          { "type" => "radio-mix-key", "ypos" => 536.1, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6], "ref" => { "U" => 4 },
+                                "val" => $DBData{"q14"} },             # q14
+          { "type" => "radio-mix-key", "ypos" => 524.8, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6], "ref" => { "U" => 4 },
+                                "val" => $DBData{"q15"} },             # q15
+          { "type" => "radio-mix-key", "ypos" => 482.1, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6], "ref" => { "U" => 4 },
+                                "val" => $DBData{"q16"} },             # q16
+          { "type" => "radio-mix-key", "ypos" => 470.7, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6], "ref" => { "U" => 4 },
+                                "val" => $DBData{"q17"} },             # q17
+          { "type" => "radio-mix-key", "ypos" => 459.2, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6], "ref" => { "U" => 4 },
+                                "val" => $DBData{"q18"} },             # q18
+          { "type" => "radio-mix-key", "ypos" => 447.9, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6, 414.5], "ref" => { "U" => 4, "NA" => 5 },
+                                "val" => $DBData{"q19"} },             # q19
+          { "type" => "radio-mix-key", "ypos" => 436.4, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6], "ref" => { "U" => 4 },
+                                "val" => $DBData{"q20"} },             # q20
+          { "type" => "radio-mix-key", "ypos" => 425, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6], "ref" => { "U" => 4 },
+                                "val" => $DBData{"q21"} },             # q21
+          { "type" => "radio-mix-key", "ypos" => 413.3, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6], "ref" => { "U" => 4 },
+                                "val" => $DBData{"q22"} },             # q22
+          { "type" => "radio-mix-key", "ypos" => 401.7, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6], "ref" => { "U" => 4 },
+                                "val" => $DBData{"q23"} },             # q23
+          { "type" => "radio-mix-key", "ypos" => 359.1, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6], "ref" => { "U" => 4 },
+                                "val" => $DBData{"q24"} },             # q24
+          { "type" => "radio-mix-key", "ypos" => 347.8, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6], "ref" => { "U" => 4 },
+                                "val" => $DBData{"q25"} },             # q25
+          { "type" => "radio-mix-key", "ypos" => 336.3, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6], "ref" => { "U" => 4 },
+                                "val" => $DBData{"q26"} },             # q26
+          { "type" => "radio-mix-key", "ypos" => 324.8, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6], "ref" => { "U" => 4 },
+                                "val" => $DBData{"q27"} },             # q27
+          { "type" => "radio-mix-key", "ypos" => 284.4, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6, 414.5], "ref" => { "U" => 4, "NA" => 5 },
+                                "val" => $DBData{"q28"} },             # q28
+          { "type" => "radio-mix-key", "ypos" => 272.9, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6, 414.5], "ref" => { "U" => 4, "NA" => 5 },
+                                "val" => $DBData{"q29"} },             # q29
+          { "type" => "radio-mix-key", "ypos" => 261.5, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6, 414.5], "ref" => { "U" => 4, "NA" => 5 },
+                                "val" => $DBData{"q30"} },             # q30
+          { "type" => "radio-mix-key", "ypos" => 249.8, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6, 414.5], "ref" => { "U" => 4, "NA" => 5 },
+                                "val" => $DBData{"q31"} },             # q31
+          { "type" => "radio-mix-key", "ypos" => 238.6, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6, 414.5], "ref" => { "U" => 4, "NA" => 5 },
+                                "val" => $DBData{"q32"} },             # q32
+          { "type" => "radio-mix-key", "ypos" => 227, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6, 414.5], "ref" => { "U" => 4, "NA" => 5 },
+                                "val" => $DBData{"q33"} },             # q33
+          { "type" => "radio-mix-key", "ypos" => 215.5, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6, 414.5], "ref" => { "U" => 4, "NA" => 5 },
+                                "val" => $DBData{"q34"} },             # q34
+          { "type" => "radio-mix-key", "ypos" => 204, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6, 414.5], "ref" => { "U" => 4, "NA" => 5 },
+                                "val" => $DBData{"q35"} },             # q35
+          { "type" => "radio-mix-key", "ypos" => 171.2, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6, 414.5], "ref" => { "U" => 4, "NA" => 5 },
+                                "val" => $DBData{"q36"} },             # q36
+          { "type" => "radio-mix-key", "ypos" => 159.6, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6], "ref" => { "U" => 4 },
+                                "val" => $DBData{"q37"} },             # q37
+          { "type" => "radio-mix-key", "ypos" => 148.1, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6], "ref" => { "U" => 4 },
+                                "val" => $DBData{"q38"} },             # q38
+          { "type" => "radio-mix-key", "ypos" => 136.6, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6], "ref" => { "U" => 4 },
+                                "val" => $DBData{"q39"} },             # q39
+          { "type" => "radio-mix-key", "ypos" => 125.3, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6, 414.5], "ref" => { "U" => 4, "NA" => 5 },
+                                "val" => $DBData{"q40"} },             # q40
+          { "type" => "radio-mix-key", "ypos" => 113.7, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6], "ref" => { "U" => 4 },
+                                "val" => $DBData{"q41"} },             # q41
+          { "type" => "radio-mix-key", "ypos" => 102.1, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6], "ref" => { "U" => 4 },
+                                "val" => $DBData{"q42"} },             # q42
+          { "type" => "radio-mix-key", "ypos" => 90.7, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6], "ref" => { "U" => 4 },
+                                "val" => $DBData{"q43"} },             # q43
+          { "type" => "radio-mix-key", "ypos" => 79.2, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6], "ref" => { "U" => 4 },
+                                "val" => $DBData{"q44"} },             # q44
+          { "type" => "radio-mix-key", "ypos" => 67.6, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6], "ref" => { "U" => 4 },
+                                "val" => $DBData{"q45"} },             # q45
+          { "type" => "radio-mix-key", "ypos" => 56.1, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6], "ref" => { "U" => 4 },
+                                "val" => $DBData{"q46"} },             # q46
+          { "type" => "radio-mix-key", "ypos" => 44.2, "xposarray" => [234.5, 270.5, 306.5, 342.5, 378.6], "ref" => { "U" => 4 },
+                                "val" => $DBData{"q47"} },             # q47
+          { "type" => "textline", "ypos" => 686.4, "xpos" => 447, "optlist" => $basesmallfontoptions,
+                                "text" => $DBData{'clientnameid'} },    # Client Name/ID
+          { "type" => "textline", "ypos" => 642.7, "xpos" => 447, "optlist" => $basesmallfontoptions,
+                                "text" => $DBData{"testdate"} },        # Date of assessment
+          { "type" => "textline", "ypos" => 608.4, "xpos" => 447, "optlist" => $basesmallfontoptions,
+                                "text" => $DBData{'ethnicity'} },       # Ethnicity
+          { "type" => "textline", "ypos" => 573.4, "xpos" => 447, "optlist" => $basesmallfontoptions,
+                                "text" => $DBData{'race'} },            # Race
+          { "type" => "textline", "ypos" => 537.8, "xpos" => 447, "optlist" => $basesmallfontoptions,
+                                "text" => $DBData{'age'} },             # Age
+          { "type" => "textline", "ypos" => 503.7, "xpos" => 447, "optlist" => $basesmallfontoptions,
+                                "text" => $DBData{'gender'} },          # Gender
+          { "type" => "textflow", "ypos" => 488.5, "ypos_end" => 413.8, "xpos_start" => 447, "xpos_end" => 544.2, "optlist" => $basesmallfontoptions, "optlist2" => "verticalalign=bottom",
+                                "text" => $DBData{"agencyname"} },            # Name of clinic
+          { "type" => "textline", "ypos" => 373.4, "xpos" => 447, "optlist" => $basesmallfontoptions,
+                                "text" => $DBData{"primaryprovider"} },       # Caseworker Name
+          { "type" => "textline", "ypos" => 314.6, "xpos" => 447, "optlist" => $basesmallfontoptions,
+                                "text" => $DBData{"caregiver"} },             # Caregiver Name
+          { "type" => "textflow", "ypos" => 296.7, "ypos_end" => 254.3, "xpos_start" => 447, "xpos_end" => 544.2, "optlist" => $basesmallfontoptions, "optlist2" => "verticalalign=bottom",
+                                "text" => $DBData{"caregiveraddr"} },         # Address/Zip code
+          { "type" => "textline", "ypos" => 212.2, "xpos" => 447, "optlist" => $basesmallfontoptions,
+                                "text" => $DBData{"caregiverrel"} },          # Caregiver Relation
+      ] }
+    );
+  }
+  elsif ("$table$page" eq "ClientAUDIT") {
+    @PageData = (
+      { "descr" => "page 1", "data" => [
+          { "type" => "textline", "ypos" => 561.5, "xpos" => 62.3, "optlist" => $basemidfontoptions,
+                                "text" => $DBData{"clientname"} },          # ClientName
+          { "type" => "textline", "ypos" => 534, "xpos" => 53, "optlist" => $basemidfontoptions,
+                                "text" => $DBData{"age"} },          # Age
+          { "type" => "textline", "ypos" => 536, "xpos" => 214, "optlist" => $basecheckfontoptions . " fontsize=16",
+                                "text" => $DBData{"sex_M"} eq 'M' ? '&#x2713;' : '' },                       # Sex M
+          { "type" => "textline", "ypos" => 536, "xpos" => 277, "optlist" => $basecheckfontoptions . " fontsize=16",
+                                "text" => $DBData{"sex_F"} eq 'F' ? '&#x2713;' : '' },                       # Sex F
+          { "type" => "radio", "ypos" => 461.5, "xposarray" => [112, 216.5, 321.5, 426.5, 548.5], radius => 3.5,
+                                "val" => $DBData{"q1"} },          # q1
+          { "type" => "radio", "ypos" => 420, "xposarray" => [112, 216.5, 321.5, 426.5, 548.5], radius => 3.5,
+                                "val" => $DBData{"q2"} },          # q2
+          { "type" => "radio", "ypos" => 378.3, "xposarray" => [112, 216.5, 321.5, 426.5, 548.5], radius => 3.5,
+                                "val" => $DBData{"q3"} },          # q3
+          { "type" => "radio", "ypos" => 336.6, "xposarray" => [112, 216.5, 321.5, 426.5, 548.5], radius => 3.5,
+                                "val" => $DBData{"q4"} },          # q4
+          { "type" => "radio", "ypos" => 294.9, "xposarray" => [112, 216.5, 321.5, 426.5, 548.5], radius => 3.5,
+                                "val" => $DBData{"q5"} },          # q5
+          { "type" => "radio", "ypos" => 253.2, "xposarray" => [112, 216.5, 321.5, 426.5, 548.5], radius => 3.5,
+                                "val" => $DBData{"q6"} },          # q6
+          { "type" => "radio", "ypos" => 211.5, "xposarray" => [112, 216.5, 321.5, 426.5, 548.5], radius => 3.5,
+                                "val" => $DBData{"q7"} },          # q7
+          { "type" => "radio", "ypos" => 169.8, "xposarray" => [112, 216.5, 321.5, 426.5, 548.5], radius => 3.5,
+                                "val" => $DBData{"q8"} },          # q8
+          { "type" => "radio", "ypos" => 128.1, "xposarray" => [112, -100, 321.5, -100, 548.5], radius => 3.5,
+                                "val" => $DBData{"q9"} },          # q9
+          { "type" => "radio", "ypos" => 86.4, "xposarray" => [112, -100, 321.5, -100, 548.5], radius => 3.5,
+                                "val" => $DBData{"q10"} },         # q10
+      ] }
+    );
+  }
+  elsif ("$table$page" eq "ClientAUDITC") {
+    @PageData = (
+      { "descr" => "page 1", "data" => [
+          { "type" => "textline", "ypos" => 600, "xpos" => 37, "optlist" => $baseboldfontoptions,
+                                "text" => "Client ID:" },
+          { "type" => "textline", "ypos" => 600, "xpos" => 80, "optlist" => $basesmallfontoptions,
+                                "text" => $DBData{"clientid"} },
+
+          { "type" => "textline", "ypos" => 600, "xpos" => 120, "optlist" => $baseboldfontoptions,
+                                "text" => "Client Name:" },
+          { "type" => "textline", "ypos" => 600, "xpos" => 180, "optlist" => $basesmallfontoptions,
+                                "text" => $DBData{"clientname"} },
+
+          { "type" => "checkvertmix", "xposarray" => [105.8, 362.4], "yposarray" => [[516.2, 495.8, 476.2], [516.2, 495.8]], "optlist" => "fontsize=14 position={center bottom}",
+                                "val" => $DBData{"q1"} },             # q1
+          { "type" => "checkvertmix", "xposarray" => [105.8, 362.4], "yposarray" => [[430.6, 410.9, 391], [430.6, 410.9]], "optlist" => "fontsize=14 position={center bottom}",
+                                "val" => $DBData{"q2"} },             # q2
+          { "type" => "checkvertmix", "xposarray" => [362.4, 105.8], "yposarray" => [[325.7, 345.4], [305.8, 325.7, 345.4]], "optlist" => "fontsize=14 position={center bottom}",
+                                "val" => $DBData{"q3"} },             # q3
+      ] }
+    );
+  }
+#KLS
+#####################
+  for (my $pageno = 1; $pageno <= $no_of_input_pages; $pageno++) {
+    $p->begin_page_ext($pagewidth, $pageheight, "");
+    $p->fit_pdi_page($pagehandles[$pageno], 0, 0, "cloneboxes");
+    foreach (@{$PageData[$pageno-1]->{"data"}}) {
+      main->renderObject($p, $_);
+    }
+    $p->end_page_ext("");
+    $pagecount++;
+  }
+}
+
+############################################################################
+sub getGuarantorRelationship
+{
+  my ($self,$relation) = @_;
+  my $rel = $relation =~ /I/ ? 'Self'
+          : $relation =~ /W|H/ ? 'Spouse'
+          : $relation =~ /SON|DAU/ ? 'Child'
+          : $relation =~ /EMP/ ? 'Employer'
+          : 'Unknown';
+  return($rel);
+}
+
+sub getSeverityRating {
+  my ($self, $score, @rowscores) = @_;
+  my $rating = 0;
+  foreach (@rowscores) {
+    my $min = @{$_}[0];
+    my $max = @{$_}[1];
+
+    last if ($score >= $min && $score <= $max);
+    
+    $rating++;
+  }
+
+  return $rating;
+}
+
+sub simpleCalculator {
+  my ($self, $operator, $operand1, $operand2) = @_;
+
+  if ($operator eq "eq") {
+    return $operand1 eq $operand2;
+  }
+  elsif ($operator eq 'notnull') {
+    return $operand1 ne '';
+  }
+  elsif ($operator eq 'gt0') {
+    return int($operand1) > 0;
+  }
+  elsif ($operator eq 'gte0') {
+    return int($operand1) >= 0;
+  }
+  elsif ($operator eq 'gt_1') {
+    return int($operand1) > -1;
+  }
+  elsif ($operator eq 'eq1') {
+    return int($operand1) eq 1;
+  }
+}
+
+sub renderObject {
+  my ($self, $p, $obj) = @_;
+
+  if ($obj->{"type"} eq "textline") {
+    main->renderTextline($p,
+      $obj->{"text"}, $obj->{"xpos"}, $obj->{"ypos"}, $obj->{"optlist"});
+  }
+
+  if ($obj->{"type"} eq "textlinewithcond") {
+    main->renderTextlineWithCond($p,
+      $obj->{"text"}, $obj->{"cond"}, $obj->{"xpos"}, $obj->{"ypos"}, $obj->{"optlist"});
+  }
+
+  if ($obj->{"type"} eq "textflow") {
+    main->renderTextflow($p,
+      $obj->{"text"}, $obj->{"xpos_start"}, $obj->{"xpos_end"}, $obj->{"ypos"},
+      $obj->{"optlist"}, $obj->{"optlist2"}, $obj->{"ypos_end"});
+  }
+
+  if ($obj->{"type"} eq "check") {
+    main->renderCheck($p,
+      $obj->{"val"}, $obj->{"xposarray"}, $obj->{"ypos"}, $obj->{"optlist"}, $obj->{"text"});
+  }
+
+  if ($obj->{"type"} eq "checkbox") {
+    main->renderCheckbox($p,
+      $obj->{"val"}, $obj->{"xposarray"}, $obj->{"ypos"}, $obj->{"optlist"}, $obj->{"w_rect"}, $obj->{"h_rect"}, $obj->{"linewidth"}, $obj->{"y_offset_check"});
+  }
+
+  if ($obj->{"type"} eq "checkvert") {
+    main->renderCheckVert($p,
+      $obj->{"val"}, $obj->{"xpos"}, $obj->{"yposarray"}, $obj->{"optlist"}, $obj->{"text"});
+  }
+
+  if ($obj->{"type"} eq "checkvertmix") {
+    main->renderCheckVertMix($p,
+      $obj->{"val"}, $obj->{"xposarray"}, $obj->{"yposarray"}, $obj->{"optlist"}, $obj->{"text"});
+  }
+
+  if ($obj->{"type"} eq "chararray") {
+    main->renderCharArray($p,
+      $obj->{"text"}, $obj->{"ypos"}, $obj->{"optlist"}, @{$obj->{"xposarray"}});
+  }
+
+  if ($obj->{"type"} eq "radio") {
+    main->renderRadio($p,
+      $obj->{"val"}, $obj->{"xposarray"}, $obj->{"ypos"}, $obj->{"radius"});
+  }
+
+  if ($obj->{"type"} eq "radio-mix-key") {
+    main->renderRadioMixKey($p,
+      $obj->{"val"}, $obj->{"xposarray"}, $obj->{"ypos"}, $obj->{"radius"}, $obj->{"ref"});
+  }
+
+  if ($obj->{"type"} eq "radiovertmix") {
+    main->renderRadioVertMix($p,
+      $obj->{"val"}, $obj->{"xposarray"}, $obj->{"yposarray"}, $obj->{"radius"});
+  }
+
+  if ($obj->{"type"} eq "radiotextline") {
+    main->renderRadioTextline($p,
+      $obj->{"text"}, $obj->{"xpos"}, $obj->{"ypos"}, $obj->{"optlist"}, $obj->{"xposradio"}, $obj->{"yposradio"}, $obj->{"radius"});
+  }
+
+  if ($obj->{"type"} eq "circlestrokewithcond") {
+    main->renderCircleStrokeWithCond($p,
+      $obj->{"cond"}, $obj->{"data"}, $obj->{"xpos"}, $obj->{"ypos"}, $obj->{"radius"}, $obj->{"linewidth"});
+  }
+
+  if ($obj->{"type"} eq "multi-check-vert") {
+    main->renderMultiCheckVert($p,
+      $obj->{"valarray"}, $obj->{"xpos"}, $obj->{"yposarray"}, $obj->{"optlist"}, $obj->{"checkmark"});
+  }
+
+  if ($obj->{"type"} eq "check-text-mix-vert") {
+    main->renderCheckTextMixVert($p,
+      $obj->{"valarray"}, $obj->{"xpos"}, $obj->{"yposarray"}, $obj->{"optlist"}, $obj->{"optlist2"}, $obj->{"checkmark"});
+  }
+}
+
+sub openPdiPages {
+  my ($self, $p) = @_;
+
+#warn qq|no_of_input_pages: ${no_of_input_pages}\n|;
+  # Prepare all pages of the input document. We assume a small
+  # number of input pages and a large number of generated output
+  # pages. Therefore it makes sense to keep the input pages
+  # open instead of opening the pages again for each encounter.
+    
+  for (my $pageno = 1; $pageno <= $no_of_input_pages; $pageno++)
+  {
+    # Open the first page and clone the page size 
+    $pagehandles[$pageno] = $p->open_pdi_page($indoc, $pageno, "cloneboxes");
+    if ($pagehandles[$pageno] == -1) { die("Error: " . $p->get_errmsg()); }
+  }
+}
+
+sub closePdiPages {
+  my ($self, $p) = @_;
+
+  # Close all input pages 
+  for (my $pageno = 1; $pageno <= $no_of_input_pages; $pageno++)
+  { $p->close_pdi_page($pagehandles[$pageno]); }
+  $p->close_pdi_document($indoc);
+}
+
+#### renderTextline
+# Renders text line
+#
+## Params
+# text => string
+# xpos => x-position of text
+# ypos => y-position of text
+# optlist => option list of text
+####
+sub renderTextline {
+  my ($self, $p, $text, $xpos, $ypos, $optlist) = @_;
+
+  $p->fit_textline($text, $xpos, $ypos, $basesmallfontoptions . " " . ($optlist ? $optlist : ""));
+}
+
+#### renderTextlineWithCond
+# Renders text line if condition is match
+#
+## Params
+# text => string
+# cond => condition to render text
+# xpos => x-position of text
+# ypos => y-position of text
+# optlist => option list of text
+####
+sub renderTextlineWithCond {
+  my ($self, $p, $text, $cond, $xpos, $ypos, $optlist) = @_;
+
+  my $match = main->simpleCalculator($cond, $text);
+
+  if ($match) {
+    main->renderTextline($p, $text, $xpos, $ypos, $optlist);
+  }
+}
+
+#### renderTextflow
+# Renders text flow
+#
+## Params
+# text => string
+# xpos_start => start x-position of textflow area (left top of textflow rectangle)
+# xpos_end => end x-position of textflow area (right top of textflow rectangle)
+# ypos => top position of textflow rectangle
+# optlist => option list of create_textflow
+# optlist2 => option list of fit_textflow
+# ypos_end => end y-postion of textflow area (default: y_bottom)
+####
+sub renderTextflow {
+  my ($self, $p, $text, $xpos_start, $xpos_end, $ypos, $optlist, $optlist2, $ypos_end) = @_;
+  
+  my $tf;
+  my $result;
+
+  $ypos_end = $ypos_end ? $ypos_end : $y_bottom;
+
+  $tf = $p->create_textflow($text, $basesmallfontoptions . " leading=155% " . ($optlist ? $optlist : ""));
+  $p->fit_textflow($tf, $xpos_start, $ypos_end, $xpos_end, $ypos, ($optlist2 ? $optlist2 : ""));
+}
+
+#### renderCheck
+# Renders horizontally aligned check marks that select only one check
+#
+## Params 
+# val => index of the selected check mark
+# xposarray => x-position array of check marks
+# ypos => y-position of check marks
+# optlist => option list of check mark
+# text => check mark
+#         e.g: &#x2713; (check mark)
+#              X (X check mark)
+####
+sub renderCheck {
+  my ($self, $p, $val, $xposarray, $ypos, $optlist, $text) = @_;
+
+  if ($val ne '') {
+    $p->fit_textline(($text eq '' ? '&#x2713;' : $text), @{$xposarray}[int($val)], $ypos, $basecheckfontoptions . " " . ($optlist ? $optlist : ""));
+  }
+}
+
+#### renderCheckbox
+# Renders horizontally aligned checkboxes and check marks that select only one check
+#
+## Params
+# val => index of the selected check mark
+# xposarray => x-position array of check box (xpos of left-bottom of rectangle)
+# ypos => y-position of check box (ypos of left-bottom of rectangle)
+# optlist => option list of check mark
+# w_rect => width of checkbox (default: 6.3)
+# h_rect => height of checkbox (default: 6.3)
+# linewidth => linewidth of checkbox (default: 1)
+# y_offset_check => y-offset of check mark from ypos (default: 0)
+#
+####
+sub renderCheckbox {
+  my ($self, $p, $val, $xposarray, $ypos, $optlist, $w_rect, $h_rect, $linewidth, $y_offset_check) = @_;
+
+  $w_rect = $w_rect ? $w_rect : 6.3;
+  $h_rect = $h_rect ? $h_rect : 6.3;
+  $optlist = $optlist ? $optlist : "";
+  $linewidth = $linewidth ? $linewidth : 1;
+  $y_offset_check = $y_offset_check ? $y_offset_check : 0;
+
+  $p->setlinewidth($linewidth);
+  $p->set_graphics_option("linejoin=0");
+  $p->set_graphics_option("dasharray=none");
+
+  foreach my $xpos (@{$xposarray}) {
+    $p->rect($xpos, $ypos, $w_rect, $h_rect);
+    $p->stroke();
+  }
+  
+  if ($val ne '') {
+    $p->fit_textline('&#x2713;', @{$xposarray}[int($val)] + $w_rect / 2, $ypos + $y_offset_check, "$basecheckfontoptions position={center bottom} $optlist");
+  }
+}
+
+#### renderCheckVert
+# Renders vertically aligned check marks that select only one check
+#
+## Params 
+# val => index of the selected check mark
+# xpos => x-position of check marks
+# yposarray => y-position array of check marks
+# optlist => option list of check marks
+# text => check mark
+#         e.g: &#x2713; (check mark)
+#              X (X check mark)
+####
+sub renderCheckVert {
+  my ($self, $p, $val, $xpos, $yposarray, $optlist, $text) = @_;
+
+  if ($val ne '') {
+    $p->fit_textline(($text eq '' ? '&#x2713;' : $text), $xpos, @{$yposarray}[int($val)], $basecheckfontoptions . " " . ($optlist ? $optlist : ""));
+  }
+}
+
+#### renderCheckVertMix
+# Renders vertically aligned checkmarks having multiple columns that select only one checkmark
+#
+## Params
+# val => index of the selected checkmark
+# xposarray => x-position array of checkmarks
+# yposarray => y-position array of checkmarks (the nested array of xposarray means each column)
+#              [[...column1...], [...column2...], [...column3...], ...]
+# optlist => option list of check marks
+# text => check mark
+#         e.g: &#x2713; (check mark)
+#              X (X check mark)
+####
+sub renderCheckVertMix {
+  my ($self, $p, $val, $xposarray, $yposarray, $optlist, $text) = @_;
+
+  my @posarray = ();
+  my $i = 0;
+  foreach my $xpos (@{$xposarray}) {
+    foreach my $ypos (@{@{$yposarray}[$i]}) {
+      push(@posarray, [$xpos, $ypos]);
+    }
+    $i++;
+  }
+
+  if ($val ne '') {
+    my $pos = $posarray[int($val)];
+    $p->fit_textline(($text eq '' ? '&#x2713;' : $text), @{$pos}[0], @{$pos}[1], $basecheckfontoptions . " " . ($optlist ? $optlist : ""));
+  }
+}
+
+#### renderMultiCheckVert
+# Renders vertically aligned check marks that select multi check
+#
+## Params 
+# valarray => value array of check marks (array of 0, 1)
+# xpos => x-position of check marks
+# yposarray => y-position array of check marks
+# optlist => option list of check marks
+# checkmark => check mark
+#         e.g: &#x2713; (check mark)
+#              X (X check mark)
+####
+sub renderMultiCheckVert {
+  my ($self, $p, $valarray, $xpos, $yposarray, $optlist, $checkmark) = @_;
+
+  my $i = 0;
+  foreach my $val (@{$valarray}) {
+    if ($val ne '' && $val > 0) {
+      $p->fit_textline(($checkmark eq '' ? '&#x2713;' : $checkmark), $xpos, @{$yposarray}[$i], $basecheckfontoptions . " " . ($optlist ? $optlist : ""));
+    }
+    $i++;
+  }
+}
+
+#### renderCheckTextMixVert
+# Renders vertically aligned check marks
+# and texts with check (if text is not null)
+#
+## Params 
+# valarray => value array of object
+# object: {
+#  type: "check" or "textline", 
+#  type: "check", value: 0 or 1
+#  type: "textline", "text": "some text", "x_offset": x offset of textline, "y_offset": y offset of textline
+# }
+# xpos => x-position of check marks
+# yposarray => y-position array of check marks
+# optlist => option list of check marks
+# optlist2 => option list of text
+# checkmark => check mark
+#         e.g: &#x2713; (check mark)
+#              X (X check mark)
+# checkbox => renders checkbox if the value is 1
+# w_rect => width of checkbox
+# h_rect => height of checkbox
+# linewidth => linewidth of checkbox
+# y_offset_check => y offset of checkmark from footer line of checkbox
+####
+sub renderCheckTextMixVert {
+  my ($self, $p, $valarray, $xpos, $yposarray, $optlist, $optlist2, $checkmark) = @_;
+
+  my $i = 0;
+  my $w_rect = 4.4;
+  my $h_rect = 5.6;
+  my $linewidth = 0.1;
+  my $y_offset_check = 0;
+
+  $p->setlinewidth($linewidth);
+  $p->set_graphics_option("linejoin=0");
+  $p->set_graphics_option("dasharray=none");
+
+  foreach my $val (@{$valarray}) {
+    if ($val->{"checkbox"} eq 1) {
+      $p->rect($xpos - $w_rect/2, @{$yposarray}[$i], $w_rect, $h_rect);
+      $p->stroke();
+    }
+    if ($val->{"type"} eq "check") {
+      if ($val->{"value"} ne '' && $val->{"value"} > 0) {
+        $p->fit_textline(($checkmark eq '' ? '&#x2713;' : $checkmark), $xpos, @{$yposarray}[$i], $basecheckfontoptions . " " . ($optlist ? $optlist : ""));
+      }
+    }
+    if ($val->{"type"} eq "textline") {
+      my $x = $val->{"x_offset"} ? $xpos + $val->{"x_offset"} : $xpos;
+      my $y = $val->{"y_offset"} ? @{$yposarray}[$i] + $val->{"y_offset"} : @{$yposarray}[$i];
+      $p->fit_textline($val->{"text"}, $x, $y, $basefontoptions . " " . ($optlist2 ? $optlist2 : ""));
+      if ($val->{"text"} ne '') {
+        $p->fit_textline(($checkmark eq '' ? '&#x2713;' : $checkmark), $xpos, @{$yposarray}[$i], $basecheckfontoptions . " " . ($optlist ? $optlist : ""));
+      }
+    }
+    $i++;
+  }
+}
+
+#### renderCharArray
+# Renders text one by one with character positions
+#
+# Default option of character: basefontoption, position={center bottom}
+#
+## Params
+# text => string
+# ypos => y-position of text
+# optlist => option list of character
+# xposarray => x-position array of characters of text
+####
+sub renderCharArray {
+  my ($self, $p, $text, $ypos, $optlist, @xposarray) = @_;
+  
+  my $char;
+
+  foreach my $i (0..$#xposarray) {
+    $char = substr($text, $i, 1);
+
+    if ($char ne '') {
+      $p->fit_textline($char, $xposarray[$i], $ypos, "$basefontoptions position={center bottom} " . ($optlist ? $optlist : ""))
+    }
+  }
+}
+
+#### renderCircleFill
+# Renders black dot
+#
+## Params
+# xpos => x-position of circle center
+# ypos => y-position of circle center
+# radius => radius of circle
+#           Default: 2
+####
+sub renderCircleFill {
+  my ($self, $p, $xpos, $ypos, $radius) = @_;
+
+  $p->setcolor('fill', 'rgb', 0.0, 0.0, 0.0, 0.0);
+  $p->circle($xpos, $ypos, ($radius ? $radius : 2));
+  $p->fill();
+}
+
+#### renderCircleStroke
+# Renders circle not filled
+#
+## Params
+# xpos => x-position of circle center
+# ypos => y-position of circle center
+# radius => radius of circle
+#           Default: 10
+# linewidth => linewidth of stroke
+#           Default: 1
+####
+sub renderCircleStroke {
+  my ($self, $p, $xpos, $ypos, $radius, $linewidth) = @_;
+
+  $radius = $radius ? $radius : 10;
+  $linewidth = $linewidth ? $linewidth : 0.6;
+
+  $p->setcolor('stroke', 'rgb', 0.0, 0.0, 0.0, 0.0);
+  $p->setlinewidth($linewidth);
+  $p->circle($xpos, $ypos, $radius);
+  $p->stroke();
+}
+
+#### renderCircleStroke
+# Renders circle not filled
+#
+## Params
+# cond => condition to render circle stroke
+# operand => operand of condition
+# xpos => x-position of circle center
+# ypos => y-position of circle center
+# radius => radius of circle
+# linewidth => linewidth of stroke
+####
+sub renderCircleStrokeWithCond {
+  my ($self, $p, $cond, $operand, $xpos, $ypos, $radius, $linewidth) = @_;
+
+  my $match = main->simpleCalculator($cond, $operand);
+
+  if ($match) {
+    main->renderCircleStroke($p, $xpos, $ypos, $radius, $linewidth);
+  }
+}
+
+#### renderRadio
+# Renders horizontally aligned radios that select only one radio
+#
+## Params
+# val => index of the selected radio
+# xposarray => x-position array of radios
+# ypos => y-position of radios
+# radius => radius of radio
+#           Default: 2
+####
+sub renderRadio {
+  my ($self, $p, $val, $xposarray, $ypos, $radius) = @_;
+
+  if ($val ne '') {
+    main->renderCircleFill($p, @{$xposarray}[int($val)], $ypos, $radius);
+  }
+}
+
+#### renderRadioMixKey
+# Renders horizontally aligned radios that select only one radio
+#
+## Params
+# val => index of the selected radio (can be numbers like 0, 1, 2, 3, 4 or U, NA)
+# xposarray => x-position array of radios
+# ypos => y-position of radios
+# radius => radius of radio
+#           Default: 2
+# ref => additional information object for mix keys (indices of mix keys)
+# for example: { U => 5, NA => 6 }
+####
+sub renderRadioMixKey {
+  my ($self, $p, $val, $xposarray, $ypos, $radius, $ref) = @_;
+
+  if ($val ne '') {
+    if ($val eq 'U' || $val eq 'NA') {
+      $val = $ref->{$val};
+    }
+    main->renderCircleFill($p, @{$xposarray}[int($val)], $ypos, $radius);
+  }
+}
+
+#### renderRadioVertMix
+# Renders vertically aligned radios having multiple columns that select only one radio
+#
+## Params
+# val => index of the selected radio
+# xposarray => x-position array of radios
+# yposarray => y-position array of radios (the nested array of xposarray means each column)
+#              [[...column1...], [...column2...], [...column3...], ...]
+# radius => radius of radio
+#           Default: 2
+####
+sub renderRadioVertMix {
+  my ($self, $p, $val, $xposarray, $yposarray, $radius) = @_;
+
+  my @posarray = ();
+  my $i = 0;
+  foreach my $xpos (@{$xposarray}) {
+    foreach my $ypos (@{@{$yposarray}[$i]}) {
+      push(@posarray, [$xpos, $ypos]);
+    }
+    $i++;
+  }
+
+  if ($val ne '') {
+    my $pos = $posarray[int($val)];
+    main->renderCircleFill($p, @{$pos}[0], @{$pos}[1], $radius);
+  }
+}
+
+#### renderRadioTextline
+# Renders textline with radio if the text is not null
+# Renders radio only if text is not null
+# 
+## Params
+# xpos => x-position of text
+# ypos => y-position of text
+# optlist => option list of text
+# xposradio => x-position of radio center
+# yposradio => y-position of radio center
+# radius => radius of radio
+#           Default: 2
+####
+sub renderRadioTextline {
+  my ($self, $p, $text, $xpos, $ypos, $optlist, $xposradio, $yposradio, $radius) = @_;
+
+  if ($text ne '') {
+    main->renderTextline($p, $text, $xpos, $ypos, $optlist);
+    main->renderCircleFill($p, $xposradio, $yposradio, $radius);
+  }
+}

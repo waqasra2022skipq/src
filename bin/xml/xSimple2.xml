@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<records>
+  <record>
+    <id>51525232</id>    
+    <name>Hammy</name>    <species>Hamster</species>
+  </record>
+  <record>
+    <id>95719537</id>
+    <name>GP</name>       <species>Guinea Pig</species>
+  </record>
+  <record>
+    <id>35736747</id>
+    <name>Bamber</name>   <species>Collie</species>
+  </record>
+</records> 

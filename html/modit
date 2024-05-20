@@ -1,0 +1,53 @@
+#!/bin/bash
+# kls, 1/29/98
+# ----------------------------------
+# ---------------------------------
+if [ -f /etc/config.csi ]; then
+   . /etc/config.csi
+else
+   echo "\nServices not installed!"
+   exit 1
+fi
+
+InFile=$1
+# ---------------------------------
+  print "Processing: ${InFile}"
+  OutFile=${InFile}.mod
+
+  mv -f ${InFile} ${OutFile}
+  echo "[[myHTML->newPage(%form+ASAM)]]" > ${InFile}
+  cat ${OutFile} >> ${InFile}
+  rm -f ${OutFile}
+
+  mv -f ${InFile} ${OutFile}
+  /bin/sed "s;CLASS=\"siteheading\";CLASS=\"main fullsize\";g" ${OutFile} > ${InFile}
+
+  mv -f ${InFile} ${OutFile}
+  /bin/sed "s;CLASS=\"sitestreamer\";CLASS=\"strcol\";g" ${OutFile} > ${InFile}
+
+  mv -f ${InFile} ${OutFile}
+  /bin/sed "s;CLASS=\"sitelabel\";CLASS=\"strcol\";g" ${OutFile} > ${InFile}
+
+  mv -f ${InFile} ${OutFile}
+  /bin/sed "s;CLASS=\"sitelink\";CLASS=\"numcol\";g" ${OutFile} > ${InFile}
+
+  mv -f ${InFile} ${OutFile}
+  /bin/sed "s;CLASS=\"portlink\";CLASS=\"port numcol\";g" ${OutFile} > ${InFile}
+
+  mv -f ${InFile} ${OutFile}
+  /bin/sed "s;CLASS=\"portheading\";CLASS=\"port fullsize\";g" ${OutFile} > ${InFile}
+
+  mv -f ${InFile} ${OutFile}
+  /bin/sed "s;CLASS=\"homeheading\";CLASS=\"home fullsize\";g" ${OutFile} > ${InFile}
+
+  mv -f ${InFile} ${OutFile}
+  /bin/sed "s;CLASS=\"portlabel\";CLASS=\"port hdrtxt\";g" ${OutFile} > ${InFile}
+
+  mv -f ${InFile} ${OutFile}
+  /bin/sed "s;CLASS=\"homesublabel\";CLASS=\"strcol\";g" ${OutFile} > ${InFile}
+
+  mv -f ${InFile} ${OutFile}
+  /bin/sed "s;GenHTML;myHTML;g" ${OutFile} > ${InFile}
+
+  vi ${InFile}
+# ----------------------------------

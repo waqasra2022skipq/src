@@ -1,0 +1,6 @@
+select ProviderID, ManagerID, ProvID, LName, FName, Email, City, ChangeProvID
+#select ProvID
+  from Provider 
+  left join Manager on ProviderID=ProvID 
+  where ProviderID is null or ManagerID is null
+;

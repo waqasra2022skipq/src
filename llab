@@ -1,0 +1,4 @@
+mysqldump okmis_mms laborderheader
+mysqldump okmis_mms laborderrequest
+mysqldump okmis_mms laborderresponse
+mysqldump okmis_mms laborderresponsenotes

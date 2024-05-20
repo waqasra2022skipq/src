@@ -1,0 +1,95 @@
+ul.tab { margin: 0; font-weight: bold; }
+ul.tab li 
+{
+  display: inline;
+  padding: 3px 0.5em;
+  margin-left: 3px;
+  white-space: nowrap;
+  color: black;
+  cursor:pointer;
+  font-family: Verdana, Arial, Helvetica;
+  font-size: small;
+  font-weight: normal;
+}
+ul.tab li.tab_selected { color: white; }
+
+ul.atab {
+    margin: 0;
+    padding: 3px 0;
+    border-bottom: 1px solid white;
+    font-size: small;
+    font-weight: normal;
+    text-align: left;
+}
+ul.atab li {
+    display: inline;
+    padding: 3px 0.5em;
+    margin-left: 3px;
+    border-top: 1px solid white;
+    border-left: 1px solid white;
+    border-right: 1px solid white;
+    border-bottom: 1px solid white;
+    background: lightyellow;
+    color: black;
+    white-space: nowrap;
+    cursor:pointer;
+}
+ul.atab li.atab_selected {
+    background: top repeat-x white;
+    color: red;
+    border-bottom: 1px solid white;
+}
+
+ul.btab {
+    margin: 0;
+    padding: 3px 0;
+    border-bottom: 1px solid white;
+    font-size: small;
+    font-weight: normal;
+    text-align: left;
+}
+ul.btab li {
+    display: inline;
+    padding: 3px 0.5em;
+    margin-left: 3px;
+    border-top: 1px solid white;
+    border-left: 1px solid white;
+    border-right: 1px solid white;
+    border-bottom: 1px solid white;
+    background: lightyellow;
+    white-space: nowrap;
+    color: black;
+    cursor:pointer;
+}
+ul.btab li.btab_selected {
+    background: top repeat-x white;
+    border-bottom: 1px solid white;
+    color: red;
+}
+
+ul.ctab {
+    margin: 0;
+    padding: 3px 0;
+    border-bottom: 1px solid white;
+    font-size: small;
+    font-weight: normal;
+    text-align: left;
+}
+ul.ctab li {
+    display: inline;
+    padding: 3px 0.5em;
+    margin-left: 3px;
+    border-top: 1px solid white;
+    border-left: 1px solid white;
+    border-right: 1px solid white;
+    border-bottom: 1px solid white;
+    background: lightyellow;
+    white-space: nowrap;
+    color: black;
+    cursor:pointer;
+}
+ul.ctab li.ctab_selected {
+    background: top repeat-x white;
+    border-bottom: 1px solid white;
+    color: red;
+}

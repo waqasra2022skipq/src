@@ -1,0 +1,36 @@
+#!/usr/bin/perl
+
+#$from = qq{JavaScript" SRC="};
+#$to = qq{JavaScript" SRC="\/cgi\/js\/};
+$from = qq{include:/usr/local/www/html/};
+$to = qq{include:/usr/local/www/integris/html/};
+
+while ( $ARGV = shift )
+{
+  print "$ARGV...";
+  $org = '';
+  $new = '';
+  open(FILE, ${ARGV}) or die "Can't open $ARGV ($!)\n";
+  while ( $line = <FILE> )
+  { $org .= $line; $new .= $line; }
+  close(FILE);
+
+# CHANGE THIS LINE FOR OTHER CHANGES!
+  $new =~ s/$from/$to/g;
+print "\n";
+print "org=\n$org\n";
+print "new=\n$new\n";
+
+  if ( $org eq $new ) { print "\n"; }
+  else
+  {
+    open(FILE, ">org/${ARGV}") or die "Can't open $ARGV ($!)\n";
+    print FILE $org;
+    close(FILE);
+    open(FILE, ">${ARGV}") or die "Can't open $ARGV ($!)\n";
+    print FILE $new;
+    close(FILE);
+    print "updated.\n";
+  }
+}
+exit;

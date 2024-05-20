@@ -1,0 +1,39 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+
+use strict;
+use warnings;
+use  DBI;
+use  DBForm;
+use  DBA;
+
+############################################################################
+# This routine marks Reviewed for certain DBs
+############################################################################
+my $form = DBForm->new();
+my $dbh = $form->dbconnect();
+my $GTerr = $dbh->prepare("SELECT clientid,fname,lname,county FROM Client where instr(county,'County') > 0 and active = 1 and CreateDate > '2020-05-15'");
+
+#my $GTerr = $dbh->prepare("SELECT trid,scnum,billstatus,xBillStatus.Descr,mod4,billedamt,,amtdue FROM `Treatment` left join xSC on xSC.scid = Treatment.scid left join xBillStatus on #Treatment.BillStatus = xBillStatus.ID WHERE billdate > '2020-03-15' and xSC.SCNum in ('H0004 HE GT','H0004 HF GT','H0004 HV GT') and billstatus in (6)");
+
+print qq|DBNAME=$form->{'DBNAME'}\n|;
+#main->CTYerrors($p); 
+
+my ($self) = @_;
+$GTerr->execute() || $form->dberror("CTYerrors: ");
+
+while (my @ary = $GTerr->fetchrow_array ()) 
+{
+    my $delim = "--";
+    for (my $i = 0; $i < @ary; $i++)
+    {
+        $ary[$i] = "NULL" if !defined ($ary[$i]);   # NULL value?
+        print $delim . $ary[$i];
+        $delim = ",";
+    }
+    print "\n";
+}
+
+$GTerr->finish();
+
+exit;  

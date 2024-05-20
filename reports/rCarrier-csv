@@ -1,0 +1,12 @@
+select CONCAT(Client.FName,Client.LName) as Username
+      ,Client.Email as email
+      ,Client.FName as first_name
+      ,Client.LName as last_name
+      ,CONCAT(Client.EmCont,' ',Client.EmContPh1) as alternate_contact
+      ,Client.HmPh as phone
+      ,Client.MobPh as mobile_phone
+      ,Client.Carrier as mobile_carrier
+ from Client
+  left join xCarrier on xCarrier.ID=Client.Carrier
+ where Client.Active=1
+ order by Client.LName

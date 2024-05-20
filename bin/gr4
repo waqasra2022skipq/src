@@ -1,0 +1,210 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use myForm;
+use myDBI;
+use DBUtil;
+use NewCrop;
+use MIME::Base64;
+#use SOAP::Lite ( +trace => all, maptype => {} );
+use SOAP::Lite ( maptype => {} );
+use SOAP::DateTime;
+###################################################################################
+# takes 2 arguments: ClinicID and ProvID
+#                    SiteId is the DB
+#                    AccountId is the DB-AgencyID
+#                    LocationId is DB-AgencyID-ClinicID
+#                    PrescriberId is DB-ProvID
+# then calls NewCrop Webservice to get the Prescriber's Renewals
+# then calls parses returned xml to update the MIS database ClientRenewals table
+###################################################################################
+my $form = myForm->new();
+my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $UseProduction = 1;
+
+# NOTE:  
+my $proxy = $UseProduction 
+          ? 'https://secure.newcropaccounts.com/v7/WebServices/Update1.asmx'
+          : 'http://preproduction.newcropaccounts.com/v7/WebServices/Update1.asmx';
+
+my $soap = SOAP::Lite
+        ->readable(1)
+        ->proxy($proxy)
+        ->on_action( sub { return 'https://secure.newcropaccounts.com/V7/webservices/GetAllRenewalRequestsDetailV4' });
+
+my $method = SOAP::Data->name('GetAllRenewalRequestsDetailV4')
+        ->attr({xmlns => 'https://secure.newcropaccounts.com/V7/webservices'});
+
+my $msg = NewCrop->new($form,$form->{'ClinicID'},$form->{'ProvID'});
+my $name = $UseProduction ? NewCrop->name() : 'demo';
+my $password = $UseProduction ? NewCrop->password() : 'demo';
+my $partnerName = NewCrop->partnerName();
+my $siteID = NewCrop->siteID();
+my $AccountID = NewCrop->AccountID();
+my $LocationID = NewCrop->clinic('LocationID');
+my $PatientID = $form->{'DBNAME'}.'-'.$form->{'ClientID'};
+my $PrescriberID = $form->{'DBNAME'}.'-'.$form->{'ProvID'};
+warn qq|siteID=$siteID, AccountID=$AccountID, PrescriberID=$PrescriberID\n|;
+my $UserType = NewCrop->provider('code');
+my $UserId = NewCrop->provider('UserRoleID');
+warn qq|UserType=$UserType, UserId=$UserId\n|;
+my $EndDate = DBUtil->Date('today',0,1);
+#my $EndHistory = DBUtil->Date($EndDate,'fmt','MM/DD/YYYY').' 12:00:00 AM';
+my $EndHistory = DBUtil->Date($EndDate,'fmt','MM/DD/YYYY');
+#warn qq|EndDate=$EndDate, EndHistory=$EndHistory\n|;
+my @params = (
+        SOAP::Data->name('credentials')->value(
+                \SOAP::Data->value(
+                        SOAP::Data->name('PartnerName')->value($partnerName),
+                        SOAP::Data->name('Name')->value($name),
+                        SOAP::Data->name('Password')->value($password),
+                )
+        ),
+        SOAP::Data->name('accountRequest')->value(
+                \SOAP::Data->value(
+                        SOAP::Data->name('AccountId')->value($AccountID),
+                        SOAP::Data->name('SiteId')->value($siteID),
+                )
+        ),
+        SOAP::Data->name('locationId')->value($LocationID),
+        SOAP::Data->name('licensedPrescriberId')->value($PrescriberID),
+        SOAP::Data->name('renewalRequestDate')->value($EndDateHistory),
+);
+#        SOAP::Data->name('locationId')->value($LocationID),
+#        SOAP::Data->name('licensedPrescriberId')->value($PrescriberID),
+#        SOAP::Data->name('renewalRequestDate')->value($EndDateHistory),
+
+my $res = $soap->call($method => @params)->result;
+#foreach my $f ( sort keys %{ $res } )
+#{
+#  print qq|res-$f=$res->{$f}\n|;
+#  foreach my $a ( sort keys %{ $res->{$f} } )
+#  {
+#    print qq| res: $f-$a=$res->{$f}->{$a}\n|;
+#    foreach my $v ( @{ $res->{$f}->{$a} } )
+#    {
+#      print qq|\n  res:: $f-$a-v=$v\n|;
+#      foreach my $h ( sort keys %{ $v } )
+#      {
+#        print qq|  res::: $h=$v->{$h}\n|;
+#      }
+#    }
+#  }
+#}
+my $Status = $res->{'result'}->{'Status'};
+my $result = $res->{'result'};
+my $detail = $res->{'renewalListDetailArray'}->{'RenewalDetailV4'};
+if ( $Status eq 'OK' )
+{
+  main->prtResult($result);
+  #main->prtDetail($detail);
+  main->savDetail($detail);
+  main->processDetail($detail);
+}
+else
+{
+  print qq|ERROR: ${Status}\n|;
+  main->prtResult($result);
+}
+myDBI->cleanup();
+exit;
+
+############################################################################
+sub prtResult
+{
+  my ($self,$result) = @_;
+  my $cnt=0;
+  print qq|\nresult...\n|;
+  foreach my $f ( sort keys %{ $result } )
+  { $cnt++; print qq|${cnt}: $f=$result->{$f}\n|; }
+}
+sub prtDetail
+{
+  my ($self,$detail) = @_;
+  my $cnt=0;
+  print qq|\ndetail...\n|;
+  foreach my $a ( @{ $detail } )
+  {
+    $cnt++;
+    print qq|\n${cnt}=$a\n|;
+    foreach my $f ( sort keys %{ $a } )
+    {
+      print qq| ${cnt}: $f=$a->{$f}\n|;
+    }
+  }
+}
+sub savDetail
+{
+  my ($self,$detail) = @_;
+  my ($cnt,$out) = (0,'');
+  $out .= qq|\ndetail...\n|;
+  foreach my $a ( @{ $detail } )
+  {
+    $cnt++;
+    $out .= qq|\n${cnt}=$a\n|;
+    foreach my $f ( sort keys %{ $a } )
+    {
+      $out .= qq| ${cnt}: $f=$a->{$f}\n|;
+    }
+  }
+  my $outfile = DBUtil->genToken() . '_' . DBUtil->Date('','stamp') . '.gr4';
+  open(OUT, ">$outfile"); 
+  print OUT $out; 
+  close OUT;
+}
+sub processDetail
+{
+  my ($self,$detail) = @_;
+  my $cnt=0;
+  print qq|\ndetail...\n|;
+  foreach my $r ( @{ $detail } )
+  {
+    $cnt++;
+    my ($DB,$AgencyID,$ClinicID) = split('-',$r->{'ExternalLocationId'},3);
+    print qq|DBNAME=$form->{DBNAME}, DB=${DB}, AgencyID=${AgencyID}, ClinicID=${ClinicID}\n|;
+    my ($db,$ProvID) = split('-',$r->{'ExternalDoctorId'},2);
+    ## need?? $form = DBForm->new("DBNAME=$DB");
+    my $ClientID = main->findClient($form,$r);
+    print qq|DBNAME=$form->{DBNAME}, db=${db}, ProvID=${ProvID}, ClientID=${ClientID}\n|;
+    $r->{'ProvID'} = $ProvID;
+    $r->{'ClientID'} = $ClientID;
+    $r->{'CreateProvID'} = $form->{'LOGINPROVID'};;
+    $r->{'CreateDate'} = $form->{'TODAY'};;
+    $r->{'ChangeProvID'} = $form->{'LOGINPROVID'};;
+    $r->{'ChangeDate'} = $form->{'TODAY'};;
+    $r->{'Active'} = 1;
+# check fields exist in our tabel, NewCrop may add fields returned.
+    $r = main->chkExist($form,$r);
+#    my $q = DBA->genInsert($form,'ClientRenewals',$r);
+#print qq|q=\n$q\n|;
+    my $ID = DBA->doUpdate($form,'ClientRenewals',$r,"RenewalRequestGuid='$r->{RenewalRequestGuid}'");
+print qq|ID=$ID\n|;
+  }
+}
+sub chkExist
+{
+  my ($self,$form,$r) = @_;
+  my $ClientRenewalsFields = ();
+  my $sf = $dbh->prepare("show fields from ClientRenewals");
+  $sf->execute() || DBForm->dberror("show fields");
+  while ( my $flds = $sf->fetchrow_hashref )
+  { $ClientRenewalsFields->{$flds->{'Field'}} = 1; }   # save the field name }
+  $sf->finish();
+  foreach my $f ( sort keys %{$r} )
+  { unless ( $ClientRenewalsFields->{$f} ) { delete $r->{$f}; print qq|delete: $f\n|; } }
+  return($r);
+}
+sub findClient
+{
+  my ($self,$form,$r) = @_;
+  my $dob = $r->{'PatientDOB'};
+  my $d = substr($dob,0,4).'-'.substr($dob,4,2).'-'.substr($dob,6,2);
+  my $f = $r->{'PatientFirstName'};
+  my $l = $r->{'PatientLastName'};
+  my $g = $r->{'PatientGender'};
+  my $sClient = $dbh->prepare("select * from Client where DOB=? and FName=? and LName=? and Gend=?");
+  $sClient->execute($d,$f,$l,$g) || $form->dberror("select Client $d $f $l $g");
+  my $rClient = $sClient->fetchrow_hashref;
+  my $ClientID = $rClient->{'ClientID'};
+  return($ClientID);
+}

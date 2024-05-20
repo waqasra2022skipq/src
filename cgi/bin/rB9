@@ -1,0 +1,7 @@
+select NoteTrans.ClientID,NoteTrans.TrID,NoteTrans.BillDate,RecDate,NoteTrans.DenCode,ClientEmergency.Alert
+ from NoteTrans
+  left join ClientEmergency on ClientEmergency.ClientID=NoteTrans.ClientID
+ where NoteTrans.DenCode LIKE '%B9%'
+   and ClientEmergency.Alert NOT LIKE '%Hospice%'
+   #and (NoteTrans.ClientID!=56391 and NoteTrans.ClientID!=56894 and NoteTrans.ClientID!=60669 and NoteTrans.ClientID!=59203 and NoteTrans.ClientID!=52598 and NoteTrans.ClientID!=56068 and NoteTrans.ClientID!=60626)
+ order by NoteTrans.ClientID;

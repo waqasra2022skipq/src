@@ -1,0 +1,36 @@
+<list>
+  <entry>
+    <name><first>Thadeus</first><last>Wrigley</last></name>
+    <phone>716-505-9910</phone>
+    <address>
+      <street>105 Marsupial Court</street>
+      <city>Fairport</city><state>NY</state><zip>14450</zip>
+    </address>
+  </entry>
+  <entry>
+    <name><first>Jill</first><last>Baxter</last></name>
+    <address>
+      <street>818 S. Rengstorff Avenue</street>
+      <zip>94040</zip>
+      <city>Mountainview</city><state>CA</state>
+    </address>
+    <phone>217-302-5455</phone>
+  </entry>
+  <entry>
+    <name><last>Riccardo</last>
+    <first>Preston</first></name>
+    <address>
+      <street>707 Foobah Drive</street>
+      <city>Mudhut</city><state>OR</state><zip>32777</zip>
+    </address>
+    <phone>111-222-333</phone>
+  </entry>
+  <entry>
+    <address>
+      <street>10 Jiminy Lane</street>
+      <city>Scrapheep</city><state>PA</state><zip>99001</zip>
+    </address>
+    <name><first>Benn</first><last>Salter</last></name>
+    <phone>611-328-7578</phone>
+  </entry>
+</list>

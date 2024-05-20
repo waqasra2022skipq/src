@@ -1,0 +1,23 @@
+# rebill note
+select Treatment.TrID
+      ,Treatment.ClinicID,Treatment.ClientID,Treatment.ContLogDate
+      ,xSC.InsID,xSC.SCNum,xSC.SCName
+      ,Treatment.BillStatus,Treatment.BillDate,Treatment.DenDate
+      ,Treatment.ProvOKDate,Treatment.ProvOKTime,Treatment.RevStatus
+      ,Treatment.MgrProvID,Treatment.MgrRevDate,Treatment.MgrRevTime
+ from Treatment
+  left join xSC on xSC.SCID=Treatment.SCID
+# where Treatment.BillStatus=3      # Inprocess
+# where Treatment.BillStatus=6      # denied
+# where Treatment.BillStatus=1      # rebill
+ where xSC.InsID=212                # Medicare
+   and xSC.SCNum LIKE 'G%'          # GCodes
+   and (Treatment.ContLogDate>='2019-01-01' and Treatment.ContLogDate<='2019-12-31')
+#   and xSC.InsID=100               # Medicaid
+#   and xSC.InsID=212               # Medicare
+#   and Treatment.ProvID=104
+#   and (Treatment.ClientID=3584 or Treatment.ClientID=3341)
+#   and Treatment.ClinicID=156      # M Carpenter
+#   and Treatment.BillDate='2016-03-28'
+ order by Treatment.ClinicID,Treatment.ClientID,Treatment.ContLogDate
+;

@@ -1,0 +1,53 @@
+2. style.css
+>> core6/assets/css/style.css
+Need to add these line at the end in this file.
+============================
+#nts .hc-page-status .label-default {
+	background: white !important;
+	color: gray !important;
+	border: 0.5px gray solid !important;
+}
+#nts .panel-default>.panel-heading {
+	background-color: white !important;
+}
+
+3. core6/defaults/language/emails.xml
+Need to add these line after line 139.
+============================
+<message>
+<key>appointment-checked-in-provider</key>
+<subject>Appointment has Checked In</subject>
+<body>
+Appointment has Checked In:
+
+{APPOINTMENT.SERVICE}
+{APPOINTMENT.STARTS_AT}
+
+Customer:
+{APPOINTMENT.CUSTOMER.FIRST_NAME} {APPOINTMENT.CUSTOMER.LAST_NAME}
+</body>
+</message>
+
+4. core6/lib/ntsEmailTemplateManager.php
+Need to add this line after line number 93
+=============================
+$this->addTags( 'appointment-checked-in-provider', array('appointment' => array('STARTS_AT') ) );
+
+5. core6/model/appointment/_notifier.php
+Need to add this line after line number 28
+=============================
+'appointment-checked-in-provider',
+
+12. core6/plugins/sms/defaults/language/sms.xml
+Need to add these line after line number 86
+==========================
+<message>
+<key>appointment-checked-in-provider</key>
+<body>
+Appointment has Checked In:
+{APPOINTMENT.SERVICE}
+{APPOINTMENT.STARTS_AT}
+Customer: {APPOINTMENT.CUSTOMER.FIRST_NAME} {APPOINTMENT.CUSTOMER.LAST_NAME}
+</body>
+</message>
+

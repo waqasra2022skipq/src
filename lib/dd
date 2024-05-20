@@ -1,0 +1,14 @@
+select ClientProcedures.*
+,xProcedures.*
+,xProcedureTarget.*
+     , xProcedures.ConceptCode as ProcedureCode
+     , xProcedures.ConceptName as ProcedureName
+     , xProcedureTarget.ConceptCode as TargetCode
+     , xProcedureTarget.ConceptName as TargetName
+ from ClientProcedures 
+  left join okmis_config.xProcedures on xProcedures.ConceptCode=ClientProcedures.ProcedureID
+  left join okmis_config.xProcedureTarget on xProcedureTarget.ID=ClientProcedures.TargetID 
+ where ClientProcedures.ClientID=53159 
+ order by ClientProcedures.StartDate
+ \G
+

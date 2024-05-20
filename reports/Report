@@ -1,0 +1,1603 @@
+#!/usr/bin/perl
+############################################################################
+use lib '/home/okmis/mis/src/lib';
+use DBI;
+use DBForm;
+use DBA;
+use MgrTree;
+use DBUtil;
+use Time::Local;
+my $DT = localtime();
+############################################################################
+my $form = DBForm->new();
+foreach my $f ( sort keys %{$form} ) { warn "Report: form-$f=$form->{$f}\n"; }
+$form = DBUtil->setDates($form);
+my $DateRange = qq|from $form->{FromDateD} thru $form->{ToDateD}|;
+my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+my $multidel = chr(253);
+
+#warn qq|Report: Type=$form->{Type}, ForProvID=$ForProvID\n| if ( $form->{LOGINPROVID} == 91 );
+#######################################################
+#
+my $dbh = $form->dbconnect();
+my $report;
+my $select;
+my @header;
+my @fields;
+my @percent; my $pctcnt=();
+my @total; my $totcnt=();
+my @removelist;
+my @eliminatelist;
+my @eliminateval;
+my @trimlist;
+my @trimfrom;
+my @trimto;
+if ( $form->{Type} =~ /appointments/i )
+{
+  $ProviderSelection = DBA->getForProvID($form,$ForProvID,'where','','Appointments.ProvID');
+  $ProviderSelection .= qq| and Provider.Active=1| if ( $form->{Active} );
+  $select = qq|
+select Provider.FName, Provider.LName, Client.FName as ClientName, Client.LName as LastName, DATE_FORMAT(Appointments.ContactDate,'%m/%d/%Y') as ApptDate, Appointments.BeginTime
+  from Appointments
+    left join Provider on Provider.ProvID=Appointments.ProvID 
+    left join Client on Client.ClientID=Appointments.ClientID 
+  ${ProviderSelection} 
+    and Appointments.ContactDate between '$form->{FromDate}' and '$form->{ToDate}'
+  order by Provider.LName, Provider.FName, Appointments.ContactDate
+|;
+  @fields = ('FName', 'LName', 'ClientName', 'LastName', 'ApptDate', 'BeginTime');
+  $report .= qq|${DT}\nProvider Appointments ${DateRange}\n|;
+}
+elsif ( $form->{Type} =~ /training/i )
+{
+  $ProviderSelection = DBA->getProviderSelection($form,$ForProvID,'Provider.ProvID','where');
+  $ProviderSelection .= qq| and Provider.Active=1| if ( $form->{Active} );
+  $select = qq|
+select Provider.LName, Provider.FName, Provider.ProvID, Provider.Active, Provider.JobTitle
+      ,EmplInfo.HireDate, Training.Date, Training.Descr 
+  from Training 
+    left join Provider on Provider.ProvID=Training.ProvID 
+    left join EmplInfo on EmplInfo.ProvID=Training.ProvID 
+  ${ProviderSelection} 
+  order by Provider.LName, Provider.FName, Training.Date
+|;
+  @fields = ('LName', 'FName', 'ProvID', 'Active', 'JobTitle', 'HireDate', 'Date', 'Descr');
+  $report .= qq|${DT}\nProvider Training\n|;
+}
+elsif ( $form->{Type} =~ /equipment/i )
+{
+  $ProviderSelection = DBA->getProviderSelection($form,$ForProvID,'Provider.ProvID','where');
+  $ProviderSelection .= qq| and Provider.Active=1| if ( $form->{Active} );
+  $select = qq|
+select Provider.LName, Provider.FName, Provider.ProvID, Provider.Active, Provider.JobTitle
+      ,EmplInfo.HireDate, Equipment.Descr, Equipment.Manufacturer, Equipment.Make, Equipment.Model
+      ,Equipment.Serial, Equipment.InDate, Equipment.OutDate
+  from Equipment 
+    left join Provider on Provider.ProvID=Equipment.ProvID 
+    left join EmplInfo on EmplInfo.ProvID=Equipment.ProvID 
+  ${ProviderSelection} 
+  order by Provider.LName, Provider.FName, Equipment.Serial
+|;
+  @fields = ('LName', 'FName', 'ProvID', 'Active', 'JobTitle', 'HireDate', 'Descr', 'Manufacturer', 'Make', 'Model', 'Serial', 'InDate', 'OutDate');
+  $report .= qq|${DT}\nProvider Equipment\n|;
+}
+elsif ( $form->{Type} =~ /provclients/i )
+{
+  $ProviderSelection = DBA->getProviderSelection($form,$ForProvID,'Provider.ProvID','where');
+  $ProviderSelection .= qq| and Provider.Active=1| if ( $form->{Active} );
+  $select = qq|
+select Provider.FName,Provider.LName,Provider.Name,ClientACL.ProvID,Provider.Active
+      ,Client.FName as CFName,Client.LName as CLName,ClientACL.ClientID,Client.Active as CActive
+from ClientACL
+ left join Client on Client.ClientID=ClientACL.ClientID
+ left join Provider on Provider.ProvID=ClientACL.ProvID
+  ${ProviderSelection} 
+  and ClientACL.ProvID>0 and Provider.LName is not null
+order by Provider.LName,Provider.FName,Client.LName,Client.FName
+|;
+  @fields = ('LName', 'FName', 'ProvID', 'CFName', 'CFName', 'ClientID', 'CActive');
+  $report .= qq|${DT}\nProvider Client Access Report\n|;
+}
+elsif ( $form->{Type} =~ /logwreports/i )
+{
+  $ProviderSelection = DBA->getProviderSelection($form,$ForProvID,'Provider.ProvID','where');
+  $ProviderSelection .= qq| and Provider.Active=1| if ( $form->{Active} );
+  $select = qq|
+select xReports.Name,Provider.LName,Provider.FName,wReports.Access
+  from wReports
+    left join Provider on Provider.ProvID=wReports.ProvID
+    left join okmis_config.xReports on xReports.ID=wReports.RptID
+  ${ProviderSelection}
+|;
+  $select .= qq| order by xReports.Name, Provider.LName, Provider.FName|;
+  @fields = ('Name', 'LName', 'FName', 'Access');
+  $report = qq|${DT}\nReports Accessed by Name\n|;
+}
+elsif ( $form->{Type} =~ /providerrpts/i )
+{
+  $ProviderSelection = DBA->getProviderSelection($form,$ForProvID,'Provider.ProvID','where');
+  $ProviderSelection .= qq| and Provider.Active=1| if ( $form->{Active} );
+  $select = qq|
+select Provider.LName, Provider.FName, Provider.ProvID, Provider.Active, xReports.Name, xReports.Defn
+  from ProviderRpts
+    left join Provider on Provider.ProvID=ProviderRpts.ProvID
+    left join okmis_config.xReports on xReports.Name=ProviderRpts.Name
+  ${ProviderSelection} 
+  order by Provider.LName, Provider.FName, xReports.Name
+|;
+  @fields = ('LName', 'FName', 'ProvID', 'Active', 'Name', 'Defn');
+  $report .= qq|${DT}\nProvider Reports\n|;
+}
+elsif ( $form->{Type} =~ /providerhrs/i )
+{
+  $ProviderSelection = DBA->getProviderSelection($form,$ForProvID,'Provider.ProvID','where');
+  $ProviderSelection .= qq| and Provider.Active=1| if ( $form->{Active} );
+  $select = qq|
+select * 
+  from ProviderHrs 
+    left join Provider on Provider.ProvID=ProviderHrs.ProvID 
+  ${ProviderSelection} 
+  order by Provider.LName, Provider.FName
+|;
+  @fields = ('LName', 'FName', 'ProvID', 'Active', 'AccrRate', 'AccrHrs', 'UtilHrs', 'CredHrs', 'CoreHrs');
+  $report .= qq|${DT}\nProvider Hours Report\n|;
+}
+elsif ( $form->{Type} =~ /providerpay/i )
+{
+  $ProviderSelection = DBA->getProviderSelection($form,$ForProvID,'Provider.ProvID','where');
+  $ProviderSelection .= qq| and Provider.Active=1| if ( $form->{Active} );
+  $select = qq|
+select ProviderPay.*,Provider.LName, Provider.FName, xSC.SCNum
+  from ProviderPay 
+    left join Provider on Provider.ProvID=ProviderPay.ProvID 
+    left join xSC on xSC.SCID=ProviderPay.SCID 
+  ${ProviderSelection} 
+  order by Provider.LName, Provider.FName, xSC.SCNum
+|;
+  @fields = ('LName', 'FName', 'ProvID', 'Active', 'SCNum', 'Type', 'Rate', 'Commission', 'isMgr', 'EffDate', 'ExpDate');
+  $report .= qq|${DT}\nProvider Hours Report\n|;
+}
+elsif ( $form->{Type} =~ /privileges/i )
+{
+  $ProviderSelection = DBA->getProviderSelection($form,$ForProvID,'Provider.ProvID','where');
+  $ProviderSelection .= qq| and Provider.Active=1| if ( $form->{Active} );
+  $select = qq|
+select Provider.LName, Provider.FName, Provider.ProvID, ProviderPrivs.Type
+      ,xPrivileges.Descr, xPrivileges.Defn 
+  from ProviderPrivs 
+    left join Provider on Provider.ProvID=ProviderPrivs.ProvID 
+    left join okmis_config.xPrivileges on xPrivileges.ID=ProviderPrivs.Type 
+  ${ProviderSelection} 
+  order by Provider.LName, Provider.FName, ProviderPrivs.Type
+|;
+  @fields = ('LName', 'FName', 'ProvID', 'Type', 'Descr', 'Defn');
+  $report .= qq|${DT}\nProvider Privileges\n|;
+}
+elsif ( $form->{Type} =~ /over35/i )
+{
+  $ProviderSelection = DBA->getProviderSelection($form,$ForProvID,'Provider.ProvID','where');
+  $ProviderSelection .= qq| and Provider.Active=1| if ( $form->{Active} );
+  $select = qq|
+select Provider.LName, Provider.FName, Provider.ProvID
+      ,Over35.Year, Over35.Sunday, Over35.Week, Over35.Hours, Over35.Last4, Over35.Over
+  from Over35 
+    left join Provider on Provider.ProvID=Over35.ProvID 
+  ${ProviderSelection} 
+  order by Provider.LName, Provider.FName, Provider.ProvID, Over35.Year, Over35.Week
+|;
+  @fields = ('LName','FName','ProvID','Year','Sunday','Week','Hours','Last4','Over');
+  $report .= qq|${DT}\nProvider Over 35 Hours report (total 140 last 4 weeks) [starts week 40 Oct. 1, 2014].\n|;
+}
+elsif ( $form->{Type} =~ /renewals/i )
+{
+  $ProviderSelection = DBA->getForProvID($form,$ForProvID,'where','','Provider.ProvID');
+  $ProviderSelection .= qq| and ClientRenewals.Active=1| if ( $form->{Active} );
+  $select = qq|
+select Provider.LName, Provider.FName, Provider.ProvID 
+      ,ClientRenewals.PatientLastName, ClientRenewals.PatientFirstName
+      ,ClientRenewals.ClientID, ClientRenewals.DrugInfo, ClientRenewals.WrittenDate 
+      ,ClientRenewals.PharmacyStoreName, ClientRenewals.ChangeDate
+  from ClientRenewals 
+    left join Provider on Provider.ProvID=ClientRenewals.ProvID 
+    left join Client on Client.ClientID=ClientRenewals.ClientID 
+  ${ProviderSelection} 
+  order by Provider.LName,Provider.FName,ClientRenewals.PatientLastName,ClientRenewals.PatientFirstName
+|;
+  @fields = ('LName','FName','ProvID','PatientLastName','PatientFirstName','ClientID','DrugInfo','WrittenDate','PharmacyStoreName','ChangeDate');
+  $report .= qq|${DT}\nPhysician Client Renewals\n|;
+}
+elsif ( $form->{Type} =~ /accesslog/i )
+{
+  $ProviderSelection = DBA->getProviderSelection($form,$ForProvID,'Provider.ProvID','where');
+  $ProviderSelection .= qq| and Provider.Active=1| if ( $form->{Active} );
+  $select = qq|
+select Provider.LName, Provider.FName, Provider.ProvID, LinksLog.Date, LinksLog.Count as Pages, LinksLog.ip
+  from LinksLog
+    left join Provider on Provider.ProvID=LinksLog.ProvID
+  ${ProviderSelection} 
+  order by Provider.LName, Provider.FName, LinksLog.Date
+|;
+  @fields = ('LName', 'FName', 'ProvID', 'Date', 'Pages', 'ip');
+  $report .= qq|${DT}\nAccess Log\n|;
+}
+##
+# add some way to parse url string, for action,Type,view...and other important identifiers.
+# removelist just does program part, before the ?
+# ...move this to its own report and might try...using url =~ s/mlt=.*$//g on url field??
+##
+elsif ( $form->{Type} =~ /access/i )
+{
+  $ProviderSelection = DBA->getProviderSelection($form,$ForProvID,'Provider.ProvID','where');
+  $ProviderSelection .= qq| and Provider.Active=1| if ( $form->{Active} );
+  $select = qq|
+select Provider.LName, Provider.FName, Provider.ProvID
+     , DATE_FORMAT(Links.Access,'%m/%d/%Y') as AccessDate, TIME_FORMAT(Links.Access,'%r') as AccessTime
+     , url as screen, browser, ip
+  from Links
+    left join Provider on Provider.ProvID=Links.ProvID
+  ${ProviderSelection} 
+  order by Provider.LName, Provider.FName, Links.Access
+|;
+  @fields = ('LName', 'FName', 'ProvID', 'AccessDate', 'AccessTime', 'browser', 'ip', 'screen');
+#  @removelist = ('/cgi/bin/','\.cgi');
+  $report .= qq|${DT}\nAccess\n|;
+}
+elsif ( $form->{Type} =~ /pagroups/i )
+{
+  my $ActiveSelection = qq| where Active=1| if ( $form->{Active} );
+  $select = qq|
+select ID as PGCode,Descr,Units,AdultAmt as AdultCap,ChildAmt as ChildCap,Length1 as Type,Length2 as Period,PAlines as Count
+  from okmis_config.xPAgroups
+    ${ActiveSelection}
+  order by ID
+|;
+  @fields = ('PGCode','Descr','Units','AdultCap','ChildCap','Type','Period','Count');
+  $report .= qq|${DT}\nPA groups\n|;
+}
+elsif ( $form->{Type} =~ /currentpa/i )
+{
+  my $ActiveSelection = qq| and Client.Active=1| if ( $form->{Active} );
+  $select = qq|select Client.LName as Client, Client.FName, Client.ClientID, Client.Active 
+     ,Client.SSN, Client.DOB, Client.Gend
+     ,TIMESTAMPDIFF(YEAR, Client.DOB, CURDATE()) AS Age
+     ,Client.Addr1, Client.Addr2, Client.City, Client.ST
+     ,Client.Zip, xResidence.Descr as Residence, ClientReferrals.RefDate as ReferralDate, ClientIntake.IntDate
+     ,Provider.LName as Provider, Provider.FName as PFName
+  from Client
+    left join ClientACL on ClientACL.ClientID=Client.ClientID
+    left join Provider on Provider.ProvID=Client.ProvID
+    left join ClientIntake on ClientIntake.ClientID=Client.ClientID
+    left join ClientReferrals on ClientReferrals.ClientID=Client.ClientID
+    left join ClientRelations on ClientRelations.ClientID=Client.ClientID
+    left join ClientPrAuth on ClientPrAuth.ClientID=Client.ClientID
+    left join okmis_config.xResidence on xResidence.ID=ClientRelations.Residence
+  where ClientACL.ProvID='${ForProvID}'
+    and ClientPrAuth.PAnumber is not null
+    and curdate() between ClientPrAuth.EffDate and ClientPrAuth.ExpDate
+    ${ActiveSelection}
+  order by Client.Active, Client.LName, Client.FName
+|;
+  @fields = ('Client', 'FName', 'ClientID', 'Active', 'SSN', 'DOB', 'Age', 'Gend', 'Addr1', 'Addr2', 'City', 'ST', 'Zip', 'Residence', 'ReferralDate', 'IntDate', 'Provider', 'PFName');
+  $report = qq|${DT}\nClients with Prior Authorization within '$form->{TODAY}'\n|;
+}
+elsif ( $form->{Type} =~ /currentsapa/i )
+{
+  my $ActiveSelection = qq| and Client.Active=1| if ( $form->{Active} );
+  $select = qq|select Client.LName as Client, Client.FName, Client.ClientID, Client.Active 
+     ,Client.SSN, Client.DOB, Client.Gend
+     ,TIMESTAMPDIFF(YEAR, Client.DOB, CURDATE()) AS Age
+     ,Client.Addr1, Client.Addr2, Client.City, Client.ST
+     ,Client.Zip, xResidence.Descr as Residence, ClientReferrals.RefDate as ReferralDate, ClientIntake.IntDate
+     ,Provider.LName as Provider, Provider.FName as PFName
+  from Client
+    left join ClientACL on ClientACL.ClientID=Client.ClientID
+    left join Provider on Provider.ProvID=Client.ProvID
+    left join ClientIntake on ClientIntake.ClientID=Client.ClientID
+    left join ClientReferrals on ClientReferrals.ClientID=Client.ClientID
+    left join ClientRelations on ClientRelations.ClientID=Client.ClientID
+    left join ClientPrAuth on ClientPrAuth.ClientID=Client.ClientID
+    left join okmis_config.xResidence on xResidence.ID=ClientRelations.Residence
+  where ClientACL.ProvID='${ForProvID}'
+    and ClientPrAuth.PAnumber is not null
+    and curdate() between ClientPrAuth.EffDate and ClientPrAuth.ExpDate
+    and ClientIntake.Service IN ('02','03','06','13','19','20','21')
+    ${ActiveSelection}
+  order by Client.Active, Client.LName, Client.FName
+|;
+  @fields = ('Client', 'FName', 'ClientID', 'Active', 'SSN', 'DOB', 'Age', 'Gend', 'Addr1', 'Addr2', 'City', 'ST', 'Zip', 'Residence', 'ReferralDate', 'IntDate', 'Provider', 'PFName');
+  $report = qq|${DT}\nClients with Substance Abuse Prior Authorization within '$form->{TODAY}'\n|;
+}
+elsif ( $form->{Type} =~ /paall/i )
+{
+  my $ActiveSelection = qq| and Client.Active=1| if ( $form->{Active} );
+  $select = qq|
+select ClientPrAuth.ID, ClientPrAuth.EffDate, ClientPrAuth.ExpDate, ClientPrAuth.PAnumber
+     , ClientPrAuth.PAgroup, ClientPrAuth.TL
+     , ClientPrAuthCDC.Status, ClientPrAuthCDC.StatusDate, ClientPrAuthCDC.CDCKey, ClientPrAuthCDC.Reason
+     , Client.LName as Client, Client.FName, Client.ClientID, Client.ProvID, Client.Active
+     , Insurance.InsIDNum, xInsurance.Name as InsName
+     , Provider.LName as Provider, Provider.FName as PFName
+     , Contracts.ID as ContractID, Contracts.PIN, Contracts.OrgID
+  from ClientPrAuth
+    left join ClientPrAuthCDC on ClientPrAuthCDC.ClientPrAuthID=ClientPrAuth.ID
+    left join Client on Client.ClientID=ClientPrAuth.ClientID
+    left join ClientACL on ClientACL.ClientID=Client.ClientID
+    left join Insurance on Insurance.InsNumID=ClientPrAuth.InsuranceID
+    left join Contracts on Contracts.ProvID=Client.clinicClinicID and Contracts.InsID=Insurance.InsID
+    left join Provider on Provider.ProvID=Client.ProvID
+    left join xInsurance on xInsurance.ID=Insurance.InsID
+  where '$form->{FromDate}'<=ClientPrAuth.ExpDate and ClientPrAuth.ExpDate<='$form->{ToDate}'
+    and ClientACL.ProvID='${ForProvID}'
+    ${ActiveSelection}
+  order by xInsurance.Name, Client.LName, Client.FName, ClientPrAuth.EffDate
+|;
+# NOT JUST     and xInsurance.Descr='medicaid'
+  @fields = ('InsName','OrgID','PIN','InsIDNum','Client','FName','ClientID','Active','EffDate','ExpDate','Status','StatusDate','CDCKey','PAnumber','Reason','PAgroup','TL','Provider','PFName');
+  $report = qq|${DT}\nPrior Authorizations with Expiration Date\n${DateRange}\n|;
+  @trimlist = ('Reason');
+  @trimfrom = ('\\r\\n');
+  @trimto = ('; ');
+}
+elsif ( $form->{Type} =~ /pawait/i )
+{
+  my $ActiveSelection = qq| and Client.Active=1| if ( $form->{Active} );
+  $select = qq|
+select ClientPrAuth.ID, ClientPrAuth.EffDate, ClientPrAuth.ExpDate, ClientPrAuth.PAnumber
+     , ClientPrAuthCDC.Status, ClientPrAuthCDC.StatusDate, ClientPrAuthCDC.CDCKey, ClientPrAuthCDC.Reason
+     , Client.LName as Client, Client.FName, Client.ClientID, Client.ProvID, Client.Active
+     , Insurance.InsIDNum, xInsurance.Name as InsName
+     , Provider.LName as Provider, Provider.FName as PFName
+     , Contracts.ID as ContractID, Contracts.PIN, Contracts.OrgID
+  from ClientPrAuth
+    left join ClientPrAuthCDC on ClientPrAuthCDC.ClientPrAuthID=ClientPrAuth.ID
+    left join Client on Client.ClientID=ClientPrAuth.ClientID
+    left join ClientACL on ClientACL.ClientID=Client.ClientID
+    left join Insurance on Insurance.InsNumID=ClientPrAuth.InsuranceID
+    left join Contracts on Contracts.ProvID=Client.clinicClinicID and Contracts.InsID=Insurance.InsID
+    left join Provider on Provider.ProvID=Client.ProvID
+    left join xInsurance on xInsurance.ID=Insurance.InsID
+  where (ClientPrAuthCDC.Status IN('Waiting','Send','New','Pending') or ClientPrAuthCDC.Status is null)
+    and ClientPrAuthCDC.StatusDate between '$form->{FromDate}' and '$form->{ToDate}'
+    and ClientACL.ProvID='${ForProvID}'
+    ${ActiveSelection}
+  order by xInsurance.Name, Client.LName, Client.FName, ClientPrAuth.EffDate
+|;
+  @fields = ('InsName','OrgID','PIN','InsIDNum','Client','FName','ClientID','Active','EffDate','ExpDate','Status','StatusDate','CDCKey','PAnumber','Reason','Provider','PFName');
+  $report = qq|${DT}\nWaiting Prior Authorizations with Status Date ${DateRange} (no action taken)\n|;
+  @trimlist = ('Reason');
+  @trimfrom = ('\\r\\n');
+  @trimto = ('; ');
+}
+elsif ( $form->{Type} =~ /diswait/i )
+{
+  my $ActiveSelection = qq| and Client.Active=1| if ( $form->{Active} );
+  $select = qq|
+select ClientDischargeCDC.Status, ClientDischargeCDC.StatusDate, ClientDischargeCDC.CDCKey, ClientDischargeCDC.Reason
+     , Client.LName as Client, Client.FName, Client.ClientID, Client.ProvID, Client.Active
+     , Insurance.InsIDNum, xInsurance.Name as InsName
+     , Provider.LName as Provider, Provider.FName as PFName
+     , Contracts.ID as ContractID, Contracts.PIN, Contracts.OrgID
+  from ClientDischarge
+    left join ClientDischargeCDC on ClientDischargeCDC.ClientDischargeID=ClientDischarge.ID
+    left join Client on Client.ClientID=ClientDischarge.ClientID
+    left join ClientACL on ClientACL.ClientID=Client.ClientID
+    left join Insurance on Insurance.InsNumID=ClientDischarge.InsuranceID
+    left join Contracts on Contracts.ProvID=Client.clinicClinicID and Contracts.InsID=Insurance.InsID
+    left join Provider on Provider.ProvID=Client.ProvID
+    left join xInsurance on xInsurance.ID=Insurance.InsID
+  where (ClientDischargeCDC.Status IN('Waiting','Send','New') or ClientDischargeCDC.Status is null)
+    and ClientDischargeCDC.StatusDate between '$form->{FromDate}' and '$form->{ToDate}'
+    and ClientACL.ProvID='${ForProvID}'
+    ${ActiveSelection}
+  order by xInsurance.Name, Client.LName, Client.FName, ClientDischargeCDC.StatusDate
+|;
+  @fields = ('InsName','OrgID','PIN','InsIDNum','Client','FName','ClientID','Active','Status','StatusDate','CDCKey','Reason','Provider','PFName');
+  $report = qq|${DT}\nWaiting Discharges with Status Date ${DateRange} (no action taken)\n|;
+  @trimlist = ('Reason');
+  @trimfrom = ('\\r\\n');
+  @trimto = ('; ');
+}
+elsif ( $form->{Type} =~ /disreject/i )
+{
+  my $ActiveSelection = qq| and Client.Active=1| if ( $form->{Active} );
+  $select = qq|
+select ClientDischargeCDC.Status, ClientDischargeCDC.StatusDate, ClientDischargeCDC.CDCKey, ClientDischargeCDC.Reason
+     , Client.LName as Client, Client.FName, Client.ClientID, Client.ProvID, Client.Active
+     , Insurance.InsIDNum, xInsurance.Name as InsName
+     , Provider.LName as Provider, Provider.FName as PFName
+     , Contracts.ID as ContractID, Contracts.PIN, Contracts.OrgID
+  from ClientDischarge
+    left join ClientDischargeCDC on ClientDischargeCDC.ClientDischargeID=ClientDischarge.ID
+    left join Client on Client.ClientID=ClientDischarge.ClientID
+    left join ClientACL on ClientACL.ClientID=Client.ClientID
+    left join Insurance on Insurance.InsNumID=ClientDischarge.InsuranceID
+    left join Contracts on Contracts.ProvID=Client.clinicClinicID and Contracts.InsID=Insurance.InsID
+    left join Provider on Provider.ProvID=Client.ProvID
+    left join xInsurance on xInsurance.ID=Insurance.InsID
+  where (ClientDischargeCDC.Status IN('Rejected','Pending') or ClientDischargeCDC.Status is null)
+    and ClientDischargeCDC.StatusDate between '$form->{FromDate}' and '$form->{ToDate}'
+    and ClientACL.ProvID='${ForProvID}'
+    ${ActiveSelection}
+  order by xInsurance.Name, Client.LName, Client.FName, ClientDischargeCDC.StatusDate
+|;
+  @fields = ('InsName','OrgID','PIN','InsIDNum','Client','FName','ClientID','Active','Status','StatusDate','CDCKey','Reason','Provider','PFName');
+  $report = qq|${DT}\nRejected Discharges with Status Date ${DateRange} (no action taken)\n|;
+  @trimlist = ('Reason');
+  @trimfrom = ('\\r\\n');
+  @trimto = ('; ');
+}
+elsif ( $form->{Type} =~ /pareject/i )
+{
+  my $ActiveSelection = qq| and Client.Active=1| if ( $form->{Active} );
+  $select = qq|
+select ClientPrAuth.ID, ClientPrAuth.EffDate, ClientPrAuth.ExpDate, ClientPrAuth.PAnumber
+     , ClientPrAuthCDC.Status, ClientPrAuthCDC.StatusDate, ClientPrAuthCDC.CDCKey, ClientPrAuthCDC.Reason
+     , Client.LName as Client, Client.FName, Client.ClientID, Client.ProvID, Client.Active
+     , Insurance.InsIDNum, xInsurance.Name as InsName
+     , Provider.LName as Provider, Provider.FName as PFName
+     , Contracts.ID as ContractID, Contracts.PIN, Contracts.OrgID
+     , xCDCTransTypes.Descr as TransType
+  from ClientPrAuth
+    left join ClientPrAuthCDC on ClientPrAuthCDC.ClientPrAuthID=ClientPrAuth.ID
+    left join Client on Client.ClientID=ClientPrAuth.ClientID
+    left join ClientACL on ClientACL.ClientID=Client.ClientID
+    left join Insurance on Insurance.InsNumID=ClientPrAuth.InsuranceID
+    left join Contracts on Contracts.ProvID=Client.clinicClinicID and Contracts.InsID=Insurance.InsID
+    left join Provider on Provider.ProvID=Client.ProvID
+    left join xInsurance on xInsurance.ID=Insurance.InsID
+    left join okmis_config.xCDCTransTypes on xCDCTransTypes.ID=ClientPrAuthCDC.TransType
+  where ClientPrAuthCDC.Status IN('Pending','Rejected')
+    and ClientPrAuthCDC.StatusDate between '$form->{FromDate}' and '$form->{ToDate}'
+    and ClientACL.ProvID='${ForProvID}'
+    ${ActiveSelection}
+  order by xInsurance.Name, ClientPrAuthCDC.Status, ClientPrAuthCDC.StatusDate
+|;
+  @fields = ('InsName','OrgID','PIN','InsIDNum','Client','FName','ClientID','Active','EffDate','ExpDate','TransType','Status','StatusDate','CDCKey','PAnumber','Reason','Provider','PFName');
+  $report = qq|${DT}\nRejected Prior Authorizations with Status Date ${DateRange} (rejected for approval)\n|;
+  @trimlist = ('Reason');
+  @trimfrom = ('\\r\\n');
+  @trimto = ('; ');
+}
+elsif ( $form->{Type} =~ /pachg/i )
+{
+  my $ActiveSelection = qq| and Client.Active=1| if ( $form->{Active} );
+  $select = qq|
+select ClientPrAuth.ID, ClientPrAuth.EffDate, ClientPrAuth.ExpDate, ClientPrAuth.PAnumber
+     , ClientPrAuthCDC.Status, ClientPrAuthCDC.StatusDate, ClientPrAuthCDC.CDCKey, ClientPrAuthCDC.Reason, ClientPrAuth.PAgroup
+     , Client.LName as Client, Client.FName, Client.ClientID, Client.ProvID, Client.Active
+     , Insurance.InsIDNum, xInsurance.Name as InsName
+     , Provider.LName as Provider, Provider.FName as PFName
+     , Contracts.ID as ContractID, Contracts.PIN, Contracts.OrgID
+     , xCDCTransTypes.Descr as TransType
+  from ClientPrAuth
+    left join ClientPrAuthCDC on ClientPrAuthCDC.ClientPrAuthID=ClientPrAuth.ID
+    left join Client on Client.ClientID=ClientPrAuth.ClientID
+    left join ClientACL on ClientACL.ClientID=Client.ClientID
+    left join Insurance on Insurance.InsNumID=ClientPrAuth.InsuranceID
+    left join Contracts on Contracts.ProvID=Client.clinicClinicID and Contracts.InsID=Insurance.InsID
+    left join Provider on Provider.ProvID=Client.ProvID
+    left join xInsurance on xInsurance.ID=Insurance.InsID
+    left join okmis_config.xCDCTransTypes on xCDCTransTypes.ID=ClientPrAuthCDC.TransType
+  where ClientPrAuth.NotificationType=19
+    and ClientACL.ProvID='${ForProvID}'
+    ${ActiveSelection}
+  order by xInsurance.Name, ClientPrAuthCDC.Status, ClientPrAuthCDC.StatusDate
+|;
+  @fields = ('InsName','OrgID','PIN','InsIDNum','Client','FName','ClientID','Active','EffDate','ExpDate','TransType','Status','StatusDate','CDCKey','PAnumber','Reason','PAgroup','Provider','PFName');
+  $report = qq|${DT}\nChange Prior Authorizations from Rehab to NO REHAB\n|;
+  @trimlist = ('Reason');
+  @trimfrom = ('\\r\\n');
+  @trimto = ('; ');
+}
+elsif ( $form->{Type} =~ /pafinal/i )
+{
+  my $ActiveSelection = qq| and Client.Active=1| if ( $form->{Active} );
+  $select = qq|
+select ClientPrAuth.ID, ClientPrAuth.EffDate, ClientPrAuth.ExpDate, ClientPrAuth.PAnumber
+     , ClientPrAuth.PAgroup, ClientPrAuth.TL
+     , ClientPrAuthCDC.Status, ClientPrAuthCDC.StatusDate, ClientPrAuthCDC.CDCKey, ClientPrAuthCDC.Reason
+     , Client.LName as Client, Client.FName, Client.ClientID, Client.ProvID, Client.Active
+     , Insurance.InsIDNum, xInsurance.Name as InsName
+     , Provider.LName as Provider, Provider.FName as PFName
+     , Contracts.ID as ContractID, Contracts.PIN, Contracts.OrgID
+  from ClientPrAuth
+    left join ClientPrAuthCDC on ClientPrAuthCDC.ClientPrAuthID=ClientPrAuth.ID
+    left join Client on Client.ClientID=ClientPrAuth.ClientID
+    left join ClientACL on ClientACL.ClientID=Client.ClientID
+    left join Insurance on Insurance.InsNumID=ClientPrAuth.InsuranceID
+    left join Contracts on Contracts.ProvID=Client.clinicClinicID and Contracts.InsID=Insurance.InsID
+    left join Provider on Provider.ProvID=Client.ProvID
+    left join xInsurance on xInsurance.ID=Insurance.InsID
+  where ClientPrAuthCDC.Status IN('Approved','AUTOAUTH','CM_AUTH','Final-Approved')
+    and ClientPrAuthCDC.StatusDate between '$form->{FromDate}' and '$form->{ToDate}'
+    and ClientACL.ProvID='${ForProvID}'
+    ${ActiveSelection}
+  order by xInsurance.Name, Client.LName, Client.FName, ClientPrAuth.EffDate
+|;
+  @fields = ('InsName','OrgID','PIN','InsIDNum','Client','FName','ClientID','Active','EffDate','ExpDate','Status','StatusDate','CDCKey','PAnumber','Reason','PAgroup','TL','Provider','PFName');
+  $report = qq|${DT}\nPrior Authorizations Approved with Status Date ${DateRange} \n|;
+  @trimlist = ('Reason');
+  @trimfrom = ('\\r\\n');
+  @trimto = ('; ');
+warn qq|select=$select\n|;
+}
+elsif ( $form->{Type} =~ /childcdc/i )
+{
+  my $ActiveSelection = qq| and Client.Active=1| if ( $form->{Active} );
+  $select = qq|
+select ClientPrAuthCDC.CustodyOJA,ClientPrAuthCDC.CustodyDHS,ClientPrAuthCDC.Placement,ClientPrAuthCDC.RestrictivePlacement
+     , ClientPrAuthCDC.SelfHarm,ClientPrAuthCDC.AbsentSchool,ClientPrAuthCDC.SuspendedSchool,ClientPrAuthCDC.AbsentDayCare
+     , ClientPrAuthCDC.TransDate
+     , ClientPrAuth.ID, ClientPrAuth.EffDate, ClientPrAuth.ExpDate, ClientPrAuth.PAnumber
+     , Client.LName as Client, Client.FName, Client.ClientID, Client.ProvID, Client.Active
+     , Insurance.InsIDNum, xInsurance.Name as InsName
+     , Provider.LName as Provider, Provider.FName as PFName
+     , Contracts.ID as ContractID, Contracts.PIN, Contracts.OrgID
+  from ClientPrAuth
+    left join ClientPrAuthCDC on ClientPrAuthCDC.ClientPrAuthID=ClientPrAuth.ID
+    left join Client on Client.ClientID=ClientPrAuth.ClientID
+    left join ClientACL on ClientACL.ClientID=Client.ClientID
+    left join Insurance on Insurance.InsNumID=ClientPrAuth.InsuranceID
+    left join Contracts on Contracts.ProvID=Client.clinicClinicID and Contracts.InsID=Insurance.InsID
+    left join Provider on Provider.ProvID=Client.ProvID
+    left join xInsurance on xInsurance.ID=Insurance.InsID
+  where ClientPrAuthCDC.Age < 18
+    and xInsurance.Descr='medicaid'
+    and ClientACL.ProvID='${ForProvID}'
+    ${ActiveSelection}
+  order by xInsurance.Name, Client.LName, Client.FName, ClientPrAuth.EffDate
+|;
+  @fields = ('OrgID','PIN','Client','FName','InsIDNum','EffDate','ExpDate','TransDate','CustodyOJA','CustodyDHS','Placement','RestrictivePlacement','SelfHarm','AbsentSchool','SuspendedSchool','AbsentDayCare');
+  $report = qq|${DT}\nCDC Section IV.\n|;
+}
+elsif ( $form->{Type} =~ /eligibleother/i )
+{
+  $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID');
+  $ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+  $select = qq|select Provider.Name as Clinic
+     ,Client.LName, Client.FName, Client.ClientID, Client.Active
+     ,Eligible.InsCode,Eligible.OtherInsCode,Eligible.OtherInsName,Eligible.Benefit,Eligible.BenefitDescr
+     ,Eligible.Coverage,Eligible.ServiceType,Eligible.PlanDescr,Eligible.PolicyID,Eligible.PolicyName
+     ,Eligible.Ph,Eligible.FromDate,Eligible.ToDate
+  from Eligible
+    left join Client on Client.ClientID=Eligible.ClientID
+    left join Provider on Provider.ProvID=Client.clinicClinicID
+  where Eligible.ToDate >= '$form->{TODAY}' and Eligible.OtherInsCode is not null
+  ${ClinicSelection}
+  order by Provider.Name, Client.LName, Client.FName
+|;
+  @fields = ('Clinic','LName','FName','ClientID','Active','InsCode','OtherInsCode','OtherInsName','Benefit','BenefitDescr','Coverage','ServiceType','PlanDescr','PolicyID','PolicyName','Ph','FromDate','ToDate');
+  $report = qq|${DT}\nClient's Other Insurance Eligible as of $form->{TODAY}\n|;
+}
+elsif ( $form->{Type} =~ /eligiblerenew/i )
+{
+  $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID');
+  $ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+  $select = qq|select Provider.Name as Clinic
+     ,Client.LName, Client.FName, Client.ClientID, Client.Active
+     ,Eligible.InsCode,Eligible.Benefit,Eligible.Coverage,Eligible.ServiceType
+     ,Eligible.PlanDescr,Eligible.FromDate,Eligible.ToDate,Eligible.ReNewDate
+  from Eligible
+    left join Client on Client.ClientID=Eligible.ClientID
+    left join Provider on Provider.ProvID=Client.clinicClinicID
+  where Eligible.ToDate >= '$form->{TODAY}' and Eligible.ReNewDate is not null
+  ${ClinicSelection}
+  order by Provider.Name, Client.LName, Client.FName
+|;
+  @fields = ('Clinic','LName','FName','ClientID','Active','InsCode','Benefit','Coverage','ServiceType','PlanDescr','FromDate','ToDate','ReNewDate');
+  $report = qq|${DT}\nClient's Eligible Renewal Date gt $form->{TODAY}\n|;
+}
+elsif ( $form->{Type} =~ /newclients/i )
+{
+#     ,Counselor.LName as PLName, Counselor.FName as PFName, Counselor.ProvID
+  $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID');
+  $select = qq|select Clinic.Name as Clinic
+     ,Client.LName, Client.FName, Client.ClientID, Client.Active
+     ,ClientReferrals.RefDate, ClientAdmit.AdmitDate, Client.DOB, Client.Gend
+     ,TIMESTAMPDIFF(YEAR, Client.DOB, CURDATE()) AS Age
+     ,Client.Zip
+     ,xRaces.Descr as Race
+     ,xReligiousAffiliation.Descr as Religion, xLanguages.English as PrimaryLanguage
+     ,CONCAT(Counselor.LName,', ',Counselor.FName,' (',Counselor.ProvID,')') as Provider
+  from Client
+    left join Provider as Clinic on Clinic.ProvID=Client.clinicClinicID
+    left join Provider as Counselor on Counselor.ProvID=Client.ProvID
+    left join ClientIntake on ClientIntake.ClientID=Client.ClientID
+    left join ClientReferrals on ClientReferrals.ClientID=Client.ClientID
+    left join ClientAdmit on ClientAdmit.ClientID=Client.ClientID
+    left join ClientSocial on ClientSocial.ClientID=Client.ClientID
+    left join okmis_config.xRaces on xRaces.ID=SUBSTRING_INDEX(Client.Race,'${multidel}',1)
+    left join okmis_config.xReligiousAffiliation on xReligiousAffiliation.ID=ClientSocial.ReligionName
+    left join okmis_config.xLanguages on xLanguages.ID=ClientSocial.PreLang
+  where Client.Active=1
+    and ((ClientReferrals.RefDate >= '$form->{FromDate}' and ClientReferrals.RefDate <= '$form->{ToDate}')
+    and (ClientAdmit.AdmitDate >= '$form->{FromDate}' and ClientAdmit.AdmitDate <= '$form->{ToDate}'))
+  ${ClinicSelection}
+  order by Clinic.Name, Client.LName, Client.FName
+|;
+  @fields = ('Clinic','LName','FName','ClientID','Active','RefDate','AdmitDate','DOB','Gend','Race','Age','Zip','Religion','PrimaryLanguage','Provider');
+  $report = qq|${DT}\nActive Clients since Referral Date or Intake Date after $form->{FromDateD}\n|;
+}
+elsif ( $form->{Type} =~ /activeclients/i )
+{
+#     ,Counselor.LName as PLName, Counselor.FName as PFName, Counselor.ProvID
+  $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID');
+  $select = qq|select Clinic.Name as Clinic
+     ,Client.LName, Client.FName, Client.ClientID, Client.Active
+     ,ClientReferrals.RefDate, ClientAdmit.AdmitDate, Client.DOB, Client.Gend
+     ,TIMESTAMPDIFF(YEAR, Client.DOB, CURDATE()) AS Age
+     ,Client.Zip
+     ,xRaces.Descr as Race
+     ,xReligiousAffiliation.Descr as Religion, xLanguages.English as PrimaryLanguage
+     ,CONCAT(Counselor.LName,', ',Counselor.FName,' (',Counselor.ProvID,')') as Provider
+    ,(CASE WHEN i.priority = 1 THEN xi.Descr END) AS "PrimaryIns"
+     ,(CASE WHEN i.priority = 2 THEN xi.Descr END) AS "SecondaryIns"
+  from Client
+    left join Insurance as i on i.ClientID=Client.ClientID
+    left join xInsurance as xi on xi.ID=i.InsID
+    left join Provider as Clinic on Clinic.ProvID=Client.clinicClinicID
+    left join Provider as Counselor on Counselor.ProvID=Client.ProvID
+    left join ClientIntake on ClientIntake.ClientID=Client.ClientID
+    left join ClientReferrals on ClientReferrals.ClientID=Client.ClientID
+    left join ClientAdmit on ClientAdmit.ClientID=Client.ClientID
+    left join ClientSocial on ClientSocial.ClientID=Client.ClientID
+    left join okmis_config.xRaces on xRaces.ID=SUBSTRING_INDEX(Client.Race,'${multidel}',1)
+    left join okmis_config.xReligiousAffiliation on xReligiousAffiliation.ID=ClientSocial.ReligionName
+    left join okmis_config.xLanguages on xLanguages.ID=ClientSocial.PreLang
+  where Client.Active=1
+    and ((ClientReferrals.RefDate >= '$form->{FromDate}' and ClientReferrals.RefDate <= '$form->{ToDate}')
+    and (ClientAdmit.AdmitDate >= '$form->{FromDate}' and ClientAdmit.AdmitDate <= '$form->{ToDate}'))
+  ${ClinicSelection}
+  order by Clinic.Name, Client.LName, Client.FName
+|;
+  @fields = ('Clinic','LName','FName','ClientID','Active','Discharged Date','RefDate','AdmitDate','DOB','Gend','Race','Age','Zip', 'PrimaryIns', 'SecondaryIns','Religion','PrimaryLanguage','Provider');
+  $report = qq|${DT}\nActive Clients since Referral Date or Intake Date after $form->{FromDateD}\n|;
+}
+
+elsif ( $form->{Type} =~ /clientreview/i )
+{
+  my $ActiveSelection = qq| and Client.Active=1| if ( $form->{Active} );
+  $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID');
+  $select = qq|select Provider.Name as Clinic
+     ,Client.LName, Client.FName, Client.ClientID, Client.Active
+     ,ClientReview.RevDate, Client.DOB, Client.Gend
+     ,TIMESTAMPDIFF(YEAR, Client.DOB, CURDATE()) AS Age
+     ,Client.Zip
+     ,ClientReview.ClientInfoNeeded
+     ,ClientReview.ClientInfoComments
+     ,ClientReview.ReferralCompleted
+     ,ClientReview.ConsentNeeded
+     ,ClientReview.ConsentComments
+     ,ClientReview.PaymentAgreement
+     ,ClientReview.ConsentToTransport
+     ,ClientReview.InitialIntakeNeeded
+     ,ClientReview.InitialIntakeComments
+     ,ClientReview.ReferralReasons
+     ,ClientReview.IdentifyingInfo
+     ,ClientReview.TrPlanNeeded
+     ,ClientReview.TrPlanComments
+     ,ClientReview.ProblemsIdentified
+     ,ClientReview.ProgressNotesNeeded
+     ,ClientReview.InitialTrPlanNote
+     ,ClientReview.ProgressNotesComments
+     ,ClientReview.DischargeSummaryNeeded
+     ,ClientReview.DischargeSummaryComments
+     ,ClientReview.AdmissionDateDocumented
+     ,ClientReview.DischargeDateDocumented
+     ,ClientReview.ReasonForDischargeDocumented
+     ,ClientReview.ProgressDocumented
+     ,ClientReview.SkillsDevelopedDocumented
+     ,ClientReview.TransitionPlanDocumented
+     ,ClientReview.NeedsDocumented
+     ,ClientReview.GAFScoresDocumented
+     ,ClientReview.ReferralsDocumented
+     ,ClientReview.MedicationsDocumented
+     ,ClientReview.FollowUpDocumented
+     ,ClientReview.ProviderDocumented
+     ,ClientReview.AdditionalComments
+  from Client
+    left join Provider on Provider.ProvID=Client.clinicClinicID
+    left join ClientReview on ClientReview.ClientID=Client.ClientID
+  where (ClientReview.RevDate >= '$form->{FromDate}' or ClientReview.RevDate >= '$form->{FromDate}')
+  ${ActiveSelection}
+  ${ClinicSelection}
+  order by Provider.Name, Client.LName, Client.FName
+|;
+  @trimlist = ('ClientInfoComments','ConsentComments','InitialIntakeComments','TrPlanComments','ProgressNotesComments','DischargeSummaryComments','AdditionalComments');
+  @trimfrom = ('\\r\\n');
+  @trimto = ('; ');
+  @fields = ('Clinic', 'LName', 'FName', 'ClientID', 'Active', 'RevDate', 'ClientInfoNeeded', 'ClientInfoComments', 'ReferralCompleted', 'ConsentNeeded', 'ConsentComments', 'PaymentAgreement', 'ConsentToTransport', 'InitialIntakeNeeded', 'InitialIntakeComments', 'ReferralReasons', 'IdentifyingInfo', 'TrPlanNeeded', 'TrPlanComments', 'ProblemsIdentified', 'ProgressNotesNeeded', 'InitialTrPlanNote', 'ProgressNotesComments', 'DischargeSummaryNeeded', 'DischargeSummaryComments', 'AdmissionDateDocumented', 'DischargeDateDocumented', 'ReasonForDischargeDocumented', 'ProgressDocumented', 'SkillsDevelopedDocumented', 'TransitionPlanDocumented', 'NeedsDocumented', 'GAFScoresDocumented', 'ReferralsDocumented', 'MedicationsDocumented', 'FollowUpDocumented', 'ProviderDocumented', 'AdditionalComments');
+  $report = qq|${DT}\nClient Reviews since Review Date after $form->{FromDateD}\n|;
+}
+elsif ( $form->{Type} =~ /clientbyaddr/i )
+{
+  $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID','where');
+  $ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+  $select = qq|select Client.LName,Client.FName,Client.ClientID,Client.Active
+  ,Client.Addr1,Client.City,Client.ST,Client.Zip,Client.HmPh,Client.DOB
+  ,TIMESTAMPDIFF(YEAR, Client.DOB, CURDATE()) AS Age
+  ,SUM(TIMESTAMPDIFF(YEAR, Client.DOB, CURDATE()) < 12) AS ChildCount
+  ,SUM(TIMESTAMPDIFF(YEAR, Client.DOB, CURDATE()) >= 12) AS AdultCount
+  ,Provider.Name as ClinicName
+  from Client
+   left join Provider on Provider.ProvID=Client.clinicClinicID
+  ${ClinicSelection}
+  group by Client.Addr1,Client.City,Client.Zip,Client.LName,Client.FName
+|;
+  @fields = ('ClinicName','LName','FName','ClientID','Active','DOB','Age','Addr1','City','ST','Zip','HmPh','ChildCount','AdultCount');
+  @percent = ('ChildCount','AdultCount');
+  $report = qq|${DT}\nClients Listed by Address\n|;
+}
+elsif ( $form->{Type} =~ /clientbyzip/i )
+{
+  $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID','where');
+  $ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+  $select = qq|select Client.City,Client.ST,SUBSTR(Client.Zip,1,5) as Zip
+  ,sum(truncate((to_days(curdate()) - to_days(Client.DOB)) / 365,0) < 12) as ChildCount
+  ,sum(truncate((to_days(curdate()) - to_days(Client.DOB)) / 365,0) >= 12) as AdultCount
+  ,count(*) as TotalCount
+  ,Provider.Name as ClinicName
+  from Client
+   left join Provider on Provider.ProvID=Client.clinicClinicID
+  ${ClinicSelection}
+  group by SUBSTR(Client.Zip,1,5),ClinicName,Client.Active
+|;
+  @fields = ('ClinicName','City','ST','Zip','ChildCount','AdultCount','TotalCount');
+  $report = qq|${DT}\nClients Grouped by Zip Code\n|;
+}
+elsif ( $form->{Type} =~ /refexp/i )
+{
+  my $Days = $form->{Days} ? $form->{Days} : 45;
+  $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID');
+  $ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+  $ClinicSelection .= qq| and ClientLegal.CustAgency='$form->{CustAgency}' | if ( $form->{'CustAgency'} );
+  $select = qq|select Client.LName as Client, Client.FName, Client.ClientID
+      ,Client.Active, ClientIntake.ExpDate, Provider.LName as Provider, Provider.FName as PFName
+      ,ClientLegal.CustAgency, ClientLegalPP.Name as Worker
+  from Client
+    left join ClientIntake on ClientIntake.ClientID=Client.ClientID
+    left join ClientLegal on ClientLegal.ClientID=Client.ClientID
+    left join ClientLegalPP on ClientLegalPP.ClientID=Client.ClientID
+    left join Provider on Provider.ProvID=Client.ProvID
+  where to_days(ClientIntake.ExpDate) - to_days(curdate()) between 0 and ${Days}
+    ${ClinicSelection}
+  order by ClientLegalPP.Name, ClientLegal.CustAgency, Client.LName, Client.FName
+|;
+#    and ClientIntake.ExpDate >= curdate()
+  @fields = ('Worker', 'CustAgency', 'Client', 'FName', 'ClientID', 'Active', 'ExpDate', 'Provider', 'PFName');
+  $report = qq|${DT}\nReferrals that expire less than ${Days} days ($form->{'CustAgency'}).\n|;
+}
+elsif ( $form->{Type} =~ /discharged/i )
+{
+  $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID','where');
+  $ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+  $select = qq|select Client.LName, Client.FName, Client.ClientID, Client.Active
+      ,Provider.LName as PLName, Provider.FName as PFName, Provider.ProvID
+      ,Clinic.Name as ClinicName
+      ,xNPI.ProvOrgName as ReferredBy
+      ,DATE_FORMAT(ClientDischargeCDC.TransDate,'%m/%d/%Y') as Discharged
+      ,to_days(curdate()) - to_days(ClientDischargeCDC.TransDate) as Days
+      ,xCDCTransTypes.Descr as TransType
+      ,DATE_FORMAT(ClientDischarge.FollowUpDate,'%m/%d/%Y') as FollowUpDate, FollowUpResults
+  from ClientDischarge
+    left join ClientDischargeCDC on ClientDischargeCDC.ClientDischargeID=ClientDischarge.ID
+    left join Client on Client.ClientID=ClientDischarge.ClientID
+    left join ClientIntake on ClientIntake.ClientID=ClientDischarge.ClientID
+    left join ClientReferrals on ClientReferrals.ClientID=ClientDischarge.ClientID
+    left join Provider on Provider.ProvID=Client.ProvID
+    left join Provider as Clinic on Clinic.ProvID=Client.clinicClinicID
+    left join okmis_config.xNPI on xNPI.NPI=ClientReferrals.ReferredBy1NPI
+    left join okmis_config.xCDCTransTypes on xCDCTransTypes.ID=ClientDischargeCDC.TransType
+  ${ClinicSelection}
+  and '$form->{FromDate}'<=ClientDischargeCDC.TransDate and ClientDischargeCDC.TransDate<='$form->{ToDate}'
+  order by ClientDischargeCDC.TransDate desc, Client.LName, Client.FName
+|;
+  @fields = ('ClinicName','LName','FName','ClientID','Active','Discharged','Days','TransType','PFName','PLName','ReferredBy','FollowUpDate','FollowUpResults');
+  $report = qq|${DT}\nDischarged Client Report ${DateRange}\n|;
+  $report .= qq|Days = days at time of report since discharge\n|;
+}
+elsif ( $form->{Type} =~ /finalaudit/i )
+{
+  $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID');
+  $ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+  $select = qq|select Client.LName, Client.FName, Client.ClientID, Client.Active
+      ,Provider.LName as PLName, Provider.FName as PFName, Provider.ProvID
+      ,xNPI.ProvOrgName as ReferredBy
+      ,DATE_FORMAT(ClientDischargeCDC.TransDate,'%m/%d/%Y') as Discharged
+      ,to_days(curdate()) - to_days(ClientDischargeCDC.TransDate) as Days
+      ,xCDCTransTypes.Descr as TransType
+      ,DATE_FORMAT(ClientDischarge.FollowUpDate,'%m/%d/%Y') as FollowUpDate, FollowUpResults
+  from ClientDischarge
+    left join ClientDischargeCDC on ClientDischargeCDC.ClientDischargeID=ClientDischarge.ID
+    left join Client on Client.ClientID=ClientDischarge.ClientID
+    left join ClientIntake on ClientIntake.ClientID=ClientDischarge.ClientID
+    left join ClientReferrals on ClientReferrals.ClientID=ClientDischarge.ClientID
+    left join Provider on Provider.ProvID=Client.ProvID
+    left join okmis_config.xNPI on xNPI.NPI=ClientReferrals.ReferredBy1NPI
+    left join okmis_config.xCDCTransTypes on xCDCTransTypes.ID=ClientDischargeCDC.TransType
+  where to_days(curdate()) - to_days(ClientDischargeCDC.TransDate) < 30
+    and ClientDischarge.FollowUpResults is null
+    ${ClinicSelection}
+  order by ClientDischargeCDC.TransDate desc, Client.LName, Client.FName
+|;
+  @fields = ('LName','FName','ClientID','Discharged','Days','TransType','Assessment','PLName','PFName','ReferredBy');
+  $report = qq|${DT}\nDischarged Report (Final Audit).\nThose in the last 30 days of report. Needs Follow-Up documented\n|;
+}
+elsif ( $form->{Type} =~ /followup/i )
+{
+  $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID');
+  $ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+  $select = qq|select Client.LName, Client.FName, Client.ClientID, Client.Active
+      ,Provider.LName as PLName, Provider.FName as PFName, Provider.ProvID
+      ,xNPI.ProvOrgName as ReferredBy
+      ,DATE_FORMAT(ClientDischargeCDC.TransDate,'%m/%d/%Y') as Discharged
+      ,to_days(curdate()) - to_days(ClientDischargeCDC.TransDate) as Days
+      ,ClientDischarge.Assessment
+      ,xCDCTransTypes.Descr as TransType
+      ,DATE_FORMAT(ClientDischarge.FollowUpDate,'%m/%d/%Y') as FollowUpDate, FollowUpResults
+  from ClientDischarge
+    left join ClientDischargeCDC on ClientDischargeCDC.ClientDischargeID=ClientDischarge.ID
+    left join Client on Client.ClientID=ClientDischarge.ClientID
+    left join ClientIntake on ClientIntake.ClientID=ClientDischarge.ClientID
+    left join ClientReferrals on ClientReferrals.ClientID=ClientDischarge.ClientID
+    left join Provider on Provider.ProvID=Client.ProvID
+    left join okmis_config.xNPI on xNPI.NPI=ClientReferrals.ReferredBy1NPI
+    left join okmis_config.xCDCTransTypes on xCDCTransTypes.ID=ClientDischargeCDC.TransType
+  where to_days(curdate()) - to_days(ClientDischargeCDC.TransDate) > 50
+    and ClientDischarge.FollowUpResults is null
+    ${ClinicSelection}
+  order by ClientDischargeCDC.TransDate desc, Client.LName, Client.FName
+|;
+  @fields = ('LName','FName','ClientID','Discharged','Days','TransType','Assessment','PLName','PFName','ReferredBy');
+  $report = qq|${DT}\nDischarge Follow-Up Report.\nThose over than 50 days before report. Needs Follow-Up documented\n|;
+  $report .= qq|Days = days at time of report since discharge\n|;
+}
+elsif ( $form->{Type} =~ /vitals/i )
+{
+  $form->{Report_Clinics} = $form->{ClinicIDs};   # GenReport uses ClinicIDs.
+  $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID');
+  $ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+  $select = qq|select Client.LName, Client.FName, Client.ClientID, Client.Active
+      ,ClientVitalSigns.VDate as TestDate, ClientVitalSigns.HeightFeet, ClientVitalSigns.HeightInches, ClientVitalSigns.Weight
+      ,ClientVitalSigns.BMI, ClientVitalSigns.HbA1c
+      ,ClientVitalSigns.BPSystolic, ClientVitalSigns.BPDiastolic
+      ,ClientCDCHA.q10 as Smoker, ClientCDCHA.q11 as SmokeNumber
+      ,ClientIntake.PregnantDate
+      ,Provider.LName as PLName, Provider.FName as PFName, Provider.ProvID
+  from Client
+    left join ClientVitalSigns on ClientVitalSigns.ClientID=Client.ClientID
+    left join ClientCDCHA on ClientCDCHA.ClientID=Client.ClientID
+    left join ClientIntake on ClientIntake.ClientID=Client.ClientID
+    left join Provider on Provider.ProvID=Client.ProvID
+  where (Client.ClientID is not null)
+    ${ClinicSelection}
+  order by Client.LName, Client.FName
+|;
+  @fields = ('LName','FName','ClientID','TestDate','HeightFeet','HeightInches','Weight','BMI','HbA1c','BPSystolic','BPDiastolic','Smoker','SmokeNumber','PregnantDate','PLName','PFName');
+  $report = qq|${DT}\nClient Vitals Report.\nClients with Height/Weight and Vital Signs screening report.\n|;
+}
+elsif ( $form->{Type} =~ /noh1c/i )
+{
+  $form->{Report_Clinics} = $form->{ClinicIDs};   # GenReport uses ClinicIDs.
+  $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID');
+  $ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+  $select = qq|select Client.LName, Client.FName, Client.ClientID, Client.Active
+      ,ClientVitalSigns.VDate as TestDate, ClientVitalSigns.HeightFeet, ClientVitalSigns.HeightInches, ClientVitalSigns.Weight
+      ,ClientVitalSigns.BMI, ClientVitalSigns.HbA1c
+      ,Provider.LName as PLName, Provider.FName as PFName, Provider.ProvID
+  from Client
+    left join ClientVitalSigns on ClientVitalSigns.ClientID=Client.ClientID
+    left join Provider on Provider.ProvID=Client.ProvID
+  where (ClientVitalSigns.BMI>30 and ClientVitalSigns.HbA1c is null)
+    ${ClinicSelection}
+  order by Client.LName, Client.FName, ClientVitalSigns.VDate
+|;
+  @fields = ('LName','FName','ClientID','TestDate','HeightFeet','HeightInches','Weight','BMI','HbA1c','PLName','PFName');
+  $report = qq|${DT}\nMissing HbA1c Report.\nClients with BMI>30 and NO HbA1c from Vital Signs screening report.\n|;
+warn qq|select=$select\n|;
+}
+elsif ( $form->{Type} =~ /nophq/i )
+{
+  $form->{Report_Clinics} = $form->{ClinicIDs};   # GenReport uses ClinicIDs.
+  $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID');
+  $ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+  $select = qq|
+select Client.LName, Client.FName, Client.ClientID, Client.Active
+      ,Provider.LName as PLName, Provider.FName as PFName, Provider.ProvID
+  from Client
+    left join ClientPHQ on ClientPHQ.ClientID=Client.ClientID
+    left join ClientPHQ4 on ClientPHQ4.ClientID=Client.ClientID
+    left join ClientPHQ9 on ClientPHQ9.ClientID=Client.ClientID
+    left join ClientTPHQ9 on ClientTPHQ9.ClientID=Client.ClientID
+    left join ClientPHQ15 on ClientPHQ15.ClientID=Client.ClientID
+    left join ClientPHQBrief on ClientPHQBrief.ClientID=Client.ClientID
+    left join ClientPHQSADS on ClientPHQSADS.ClientID=Client.ClientID
+    left join Provider on Provider.ProvID=Client.ProvID
+  where ( ClientPHQ.TestDate is null 
+      and ClientPHQ4.TestDate is null 
+      and ClientPHQ9.TestDate is null 
+      and ClientTPHQ9.TestDate is null 
+      and ClientPHQ15.TestDate is null 
+      and ClientPHQBrief.TestDate is null 
+      and ClientPHQSADS.TestDate is null )
+    ${ClinicSelection}
+  order by Client.LName, Client.FName
+|;
+  @fields = ('LName','FName','ClientID','Active','PLName','PFName');
+  $report = qq|${DT}\nMissing PHQ Report.\nClients with missing any PHQ Test report.\n|;
+}
+elsif ( $form->{Type} =~ /clientallergies/i )
+{
+  $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID');
+  $ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+  $select = qq|select Client.LName, Client.FName, Client.ClientID, Client.Active
+      ,xNoAllergies.Descr as NoAllergy
+      ,xAllergies.Descr as Allergy, ClientAllergies.Comments
+  from ClientAllergies
+    left join Client on Client.ClientID=ClientAllergies.ClientID
+    left join ClientIntake on ClientIntake.ClientID=ClientAllergies.ClientID
+    left join okmis_config.xAllergies on xAllergies.ID=ClientAllergies.AID
+    left join okmis_config.xNoAllergies on xNoAllergies.ID=ClientIntake.NoAllergies
+  where ClientAllergies.AID is null and ClientAllergies.Comments is not null
+    ${ClinicSelection}
+  order by Client.LName, Client.FName
+|;
+  @fields = ('LName','FName','ClientID','Active','NoAllergy','Allergy','Comments');
+  $report = qq|${DT}\nClient Allergies Follow-Up Report.\nNeeds Allergies documented\n|;
+  @trimlist = ('Comments');
+  @trimfrom = ('\\r\\n');
+  @trimto = ('; ');
+}
+elsif ( $form->{Type} =~ /xNPI/i )     ## XXX FIX to okmis_config is ever needed.
+{
+  $select = qq|select * from xNPI |;
+  @fields = ( 'NPI','EIN','EntityTypeCode','ProvOrgName','ProvLastName','ProvFirstName','Taxonomy','Addr1','Addr2','City','ST','Zip','WkPh','Fax','LastUpdateDate');
+  $report = qq|${DT}\nNational Provider Identifiers\n|;
+}
+elsif ( $form->{Type} =~ /eft/i )
+{
+  $ProviderSelection = DBA->getClinicSelection($form,$ForProvID,'Contracts.ProvID','where');
+  $select = qq|select xi.Name as Insurance, EFT.Payer, EFT.Name
+    ,EFT.PayTo, Provider.Name as Clinic, EFT.TransDate, EFT.Amount, EFT.CheckNo, EFT.RemitFile
+  from EFT
+    left join Contracts on Contracts.PIN=EFT.PayTo
+    left join xInsurance xi on xi.ID = Contracts.InsID
+    left join Provider on Provider.ProvID=Contracts.ProvID
+  ${ProviderSelection}
+  and '$form->{FromDate}'<=EFT.TransDate and EFT.TransDate<='$form->{ToDate}'
+|;
+  $select .= qq| group by EFT.ID order by Insurance, EFT.TransDate, EFT.PayTo, EFT.Name|;
+  @fields = ('TransDate','PayTo','Clinic','Amount','Payer','Name','CheckNo','RemitFile', 'Insurance');
+  @total = ('Amount');
+  $report = qq|${DT}\nElectronic Funds Transfers ${DateRange}\n|;
+}
+elsif ( $form->{Type} =~ /unrecinspaid/i )
+{
+  $ProviderSelection = DBA->getClinicSelection($form,$ForProvID,'Provider.ProvID','where');
+  $select = qq|
+select Provider.Name as ClinicName, InsPaid.TransDate, Client.LName, Client.FName, Client.ClientID
+      ,InsPaid.StartDate ,InsPaid.EndDate ,InsPaid.InsCode ,InsPaid.RefID
+      ,InsPaid.BillAmt ,InsPaid.PaidAmt, InsPaid.RecAmt, InsPaid.DenCode ,InsPaid.ICN, InsPaid.Type
+  from InsPaid
+    left join Client on Client.ClientID=InsPaid.ClientID
+    left join Provider on Provider.ProvID=Client.clinicClinicID
+  ${ProviderSelection}
+  and InsPaid.PaidAmt != InsPaid.RecAmt
+  and '$form->{FromDate}'<=InsPaid.TransDate and InsPaid.TransDate<='$form->{ToDate}'
+  order by Client.LName, Client.FName, InsPaid.TransDate
+|;
+  @fields = ('ClinicName', 'TransDate', 'LName', 'FName', 'ClientID', 'StartDate', 'EndDate', 'InsCode', 'RefID', 'BillAmt', 'PaidAmt', 'RecAmt', 'DenCode', 'ICN', 'Type');
+  @total = ('BillAmt','PaidAmt','RecAmt');
+  $report = qq|${DT}\nUnReconciled Insurance Paid ${DateRange}\n|;
+}
+elsif ( $form->{Type} =~ /inspaid/i )
+{
+  $ProviderSelection = DBA->getClinicSelection($form,$ForProvID,'Provider.ProvID','where');
+  $select = qq|
+select Provider.Name as ClinicName, InsPaid.TransDate, Client.LName, Client.FName, Client.ClientID
+      ,InsPaid.StartDate ,InsPaid.EndDate ,InsPaid.InsCode ,InsPaid.RefID
+      ,InsPaid.BillAmt ,InsPaid.PaidAmt, InsPaid.RecAmt, InsPaid.DenCode ,InsPaid.ICN, InsPaid.Type
+  from InsPaid
+    left join Client on Client.ClientID=InsPaid.ClientID
+    left join Provider on Provider.ProvID=Client.clinicClinicID
+  ${ProviderSelection}
+  and '$form->{FromDate}'<=InsPaid.TransDate and InsPaid.TransDate<='$form->{ToDate}'
+  order by Provider.Name, InsPaid.TransDate, Client.LName, Client.FName
+|;
+  @fields = ('ClinicName', 'TransDate', 'LName', 'FName', 'ClientID', 'StartDate', 'EndDate', 'InsCode', 'RefID', 'BillAmt', 'PaidAmt', 'RecAmt', 'DenCode', 'ICN', 'Type');
+  @total = ('BillAmt','PaidAmt','RecAmt');
+  $report = qq|${DT}\nInsurance Paid ${DateRange}\n|;
+}
+elsif ( $form->{Type} =~ /835audit/i )
+{
+  $select = qq|select NoteErr.PIN, NoteErr.PayerCN, NoteErr.Date as TransDate, NoteErr.LName, NoteErr.FName, NoteErr.InsGrpNum, NoteErr.ContDate, NoteErr.SCNum, NoteErr.Billed, NoteErr.Paid, NoteErr.DenCode, NoteErr.msg
+  from NoteErr 
+  where NoteErr.Date between '$form->{FromDate}' and '$form->{ToDate}'
+  order by NoteErr.Date, NoteErr.PIN, NoteErr.LName, NoteErr.FName, NoteErr.ContDate
+|;
+  @fields = ('PIN', 'PayerCN', 'TransDate', 'LName', 'FName', 'InsGrpNum', 'ContDate', 'SCNum', 'Billed', 'Paid', 'DenCode', 'msg');
+  $report = qq|${DT}\n835 Audit ${DateRange}\n|;
+}
+elsif ( $form->{Type} =~ /noteentrydelay/i )
+{
+  $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Treatment.ClinicID');
+  $ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+  $select = qq|
+select Provider.LName as Provider, Provider.FName as PFName
+      ,Client.LName as Client, Client.FName
+      ,Treatment.TrID
+      ,DATE_FORMAT(Treatment.ContLogDate,'%m/%d/%Y') as ContactDate
+      ,DATE_FORMAT(Treatment.ProvOKDate,'%m/%d/%Y') as SignedDate
+      ,DATE_FORMAT(Treatment.CreateDate,'%m/%d/%Y') as DateEntered
+      ,TO_DAYS(Treatment.ProvOKDate) - TO_DAYS(Treatment.ContLogDate) as Days
+  from Treatment
+    left join Client on Client.ClientID=Treatment.ClientID
+    left join Provider on Provider.ProvID=Treatment.ProvID
+  where Treatment.ContLogDate > '2017-09-01' and TO_DAYS(Treatment.ProvOKDate) - TO_DAYS(Treatment.ContLogDate) > 3
+  ${ClinicSelection}
+  order by Provider.LName, Provider.FName, Treatment.ContLogDate
+|;
+  @fields = ('Provider','PFName','Client','FName','TrID','ContactDate','SignedDate','DateEntered','Days');
+  $report = qq|${DT}\nNote Entry Delay - NOT Signed within 3 days (3 Day Rule beginning 9/1/2017)\n|;
+}
+elsif ( $form->{Type} =~ /Prescription/i )
+{
+  $ClinicSelection .= qq| WHERE Client.Active=1| if ( $form->{Active} );
+  $select = qq|
+    select Provider.LName as Provider, Provider.FName as PFName
+          ,Client.LName as Client, Client.FName
+          ,Treatment.TrID
+          ,DATE_FORMAT(Treatment.ContLogDate,'%m/%d/%Y') as ContactDate
+          ,DATE_FORMAT(Treatment.ProvOKDate,'%m/%d/%Y') as SignedDate
+          ,DATE_FORMAT(Treatment.CreateDate,'%m/%d/%Y') as DateEntered
+      from NoteMeds
+        left join Client on Client.ClientID=NoteMeds.ClientID
+        left join Treatment on Treatment.TrID=NoteMeds.NoteID
+        left join Provider on Provider.ProvID=Treatment.ProvID
+      ${ClinicSelection}
+      order by Provider.LName, Provider.FName, Treatment.ContLogDate
+    |;
+  @fields = ('Provider','PFName','Client','FName','TrID','ContactDate','SignedDate','DateEntered');
+  $report = qq|${DT}\nPrescription\n|;
+}
+elsif ( $form->{Type} =~ /Assessment/i )
+{
+  $ClinicSelection .= qq| WHERE Client.Active=1| if ( $form->{Active} );
+  $select = qq|
+    select ClientRiskAssessment.*, Client.LName as Client, Client.FName, 
+      okmis_config.xRiskAssessment.ConceptName As Assessment,
+      okmis_config.xRiskAssessmentRejected.ConceptName As Rejected,
+      okmis_config.xRiskAssessmentResult.ConceptName As Result
+    from ClientRiskAssessment
+    left join Client on Client.ClientID=ClientRiskAssessment.ClientID
+    left join okmis_config.xRiskAssessment on okmis_config.xRiskAssessment.ID=ClientRiskAssessment.Assessment
+    left join okmis_config.xRiskAssessmentRejected on okmis_config.xRiskAssessmentRejected.ID=ClientRiskAssessment.Rejected
+    left join okmis_config.xRiskAssessmentResult on okmis_config.xRiskAssessmentResult.ID=ClientRiskAssessment.Result
+  |;
+  @fields = ('VisitDate','Client','FName', 'Assessment', 'Rejected', 'Result');
+  $report = qq|${DT}\nAssessment\n|;
+}
+elsif ( $form->{Type} =~ /inactivenotes/i )
+{
+  $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Treatment.ClinicID');
+  $ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+  $select = qq|
+select Treatment.ClinicID, Provider.LName as Provider, Provider.FName as PFName
+      ,Client.LName as Client, Client.FName
+      ,Treatment.TrID, Treatment.BillStatus, Treatment.StatusDate
+      ,DATE_FORMAT(Treatment.ContLogDate,'%m/%d/%Y') as ContactDate
+      ,DATE_FORMAT(Treatment.CreateDate,'%m/%d/%Y') as DateEntered
+      ,TO_DAYS(Treatment.CreateDate) - TO_DAYS(Treatment.ContLogDate) as Days
+  from Treatment
+    left join Client on Client.ClientID=Treatment.ClientID
+    left join Provider on Provider.ProvID=Treatment.ProvID
+  where Treatment.BillStatus<4 
+    and Provider.Active=0
+  ${ClinicSelection}
+  order by Treatment.ClinicID, Provider.LName, Provider.FName, Treatment.ContLogDate
+|;
+  @fields = ('ClinicID', 'Provider', 'PFName', 'Client', 'FName', 'TrID', 'BillStatus', 'StatusDate', 'ContactDate', 'DateEntered', 'Days');
+  $report = qq|${DT}\nInactive Notes\n|;
+}
+elsif ( $form->{Type} =~ /unpaid/i )
+{
+  $ProviderSelection = DBA->getForProvID($form,$ForProvID,'and','','Treatment.ProvID');
+  $ProviderSelection .= qq| and Provider.Active=1| if ( $form->{Active} );
+  $select = qq|
+select Treatment.ClinicID, Provider.LName as Provider, Provider.FName as PFName
+      ,Clinic.Name as ClinicName
+      ,Client.LName as Client, Client.FName
+      ,Treatment.TrID, xBillStatus.Descr as BillStatus, Treatment.StatusDate
+      ,xSC.SCName as Service
+      ,DATE_FORMAT(Treatment.ContLogDate,'%m/%d/%Y') as ContactDate
+      ,DATE_FORMAT(Treatment.CreateDate,'%m/%d/%Y') as DateEntered
+  from Treatment
+    left join Client on Client.ClientID=Treatment.ClientID
+    left join Provider on Provider.ProvID=Treatment.ProvID
+    left join Provider as Clinic on Clinic.ProvID=Treatment.ClinicID
+    left join xBillStatus on xBillStatus.ID=Treatment.BillStatus
+    left join xSC on xSC.SCID=Treatment.SCID
+  where Treatment.PaidDate is null 
+  ${ProviderSelection}
+  order by Treatment.ClinicID, Provider.LName, Provider.FName, Treatment.ContLogDate
+|;
+  @fields = ('ClinicName', 'Provider', 'PFName', 'Client', 'FName', 'TrID', 'BillStatus', 'StatusDate', 'Service', 'ContactDate', 'DateEntered');
+  $report = qq|${DT}\nUn-Paid to Provider Notes\n|;
+}
+elsif ( $form->{Type} =~ /manager/i )
+{
+  $ProviderSelection = DBA->getProviderSelection($form,$ForProvID,'Provider.ProvID','where');
+  $ProviderSelection .= qq| and Provider.Active=1| if ( $form->{Active} );
+  $select = qq|
+select * 
+  from Provider 
+    left join Manager on Manager.ProviderID=Provider.ProvID 
+  ${ProviderSelection}
+  order by Provider.Type, Provider.Name, Provider.LName, Provider.FName
+|;
+  @fields = ('Type', 'ProvID', 'Name', 'LName', 'FName', 'ManagerID');
+  $report = qq|${DT}\nManager Report\n|;
+}
+elsif ( $form->{Type} =~ /clientlabels/i )
+{
+  my $ReportSelection;
+  $ReportSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+  my $InsName;
+  if ( $form->{InsID} )
+  {
+    $ReportSelection .= qq| and Insurance.InsID=$form->{InsID}|;
+    my $sxInsurance = $dbh->prepare("select Name from xInsurance where ID=$form->{InsID}");
+    $sxInsurance->execute() || $form->dberror($select);
+    ($InsName) = $sxInsurance->fetchrow_array;
+    $sxInsurance->finish();
+    $InsName .= ' '; 
+  }
+  $select = qq|
+select Client.LName as "Last Name"
+      ,Client.MName as "Middle Name"
+      ,Client.FName as "First Name"
+      ,Client.Suffix
+      ,Client.DOB as "Date of Birth"
+      ,Client.HmPh as "Home Phone"
+      ,Client.WkPh as "Work Phone"
+      ,Client.Fax as "Office Fax"
+      ,Client.Email
+      ,Client.SSN as "Social Security"
+      ,xMarStat.Descr as "Marital status"
+      ,Client.Gend as Gender
+      ,Client.Addr1 as "Address 1"
+      ,Client.Addr2 as "Address 2"
+      ,Client.City
+      ,Client.ST as State
+      ,Client.Zip as "Zip Code"
+      ,ClientEmergency.Alert as Comments
+  from Insurance
+    left join Client on Client.ClientID=Insurance.ClientID
+    left join ClientEmergency on ClientEmergency.ClientID=Insurance.ClientID
+    left join ClientRelations on ClientRelations.ClientID=Insurance.ClientID
+    left join xMarStat on xMarStat.ID=ClientRelations.MarStat
+where Insurance.InsID is not null
+  ${ReportSelection}
+  order by Client.LName, Client.FName
+|;
+  @fields = ('Last Name','Middle Name','First Name','Suffix','Date of Birth','Home Phone','Work Phone','Work Phone Extension','Office Fax','Email','Social Security','Marital status','Gender','Address 1','Address 2','City','State','Zip Code','Country','Comments');
+  $report = qq|${DT}\nClient Labels ${InsName}Report\n|;
+  @trimlist = ('Comments');
+  @trimfrom = ('\\r\\n');
+  @trimto = ('; ');
+}
+elsif ( $form->{Type} =~ /xsc/i )
+{
+  my $ReportSelection;
+  my $InsName;
+  if ( $form->{InsID} )
+  {
+    $ReportSelection .= qq| and xInsurance.ID=$form->{InsID}|;
+    my $sxInsurance = $dbh->prepare("select Name from xInsurance where ID=$form->{InsID}");
+    $sxInsurance->execute() || $form->dberror($select);
+    ($InsName) = $sxInsurance->fetchrow_array;
+    $sxInsurance->finish();
+    $InsName .= ' '; 
+  }
+  $ReportSelection .= qq| and xSC.Active=1 and (xSCRates.ExpDate>curdate() or xSCRates.ExpDate is null)| if ( $form->{Active} );
+  $select = qq|
+select xSC.Active, xSC.SCID, xSC.SCNum, xSC.SCName, xSC.ServiceType, xSC.ExInv
+      ,xSCRates.ServiceRate, xSCRates.HrsPerUnit, xSCRates.UnitLbl, xSC.Type, xSCRates.RVUPct, xSCRates.EffDate, xSCRates.ExpDate
+      ,xInsurance.Name
+      ,xCredentials.Abbr as Credential
+      ,xSCRestrictions.Descr as Restriction
+      ,xPOS.Descr as PlaceOfService, xSC.PINReq, xSC.PAReq
+  from xSC
+  left join xSCRates on xSCRates.SCID=xSC.SCID
+  left join xInsurance on xInsurance.ID=xSC.InsID
+  left join okmis_config.xCredentials on xCredentials.ID=xSC.CredID
+  left join okmis_config.xSCRestrictions on xSCRestrictions.ID=xSC.Restriction
+  left join okmis_config.xPOS on xPOS.ID=xSC.POS
+where xSC.SCID is not null
+  ${ReportSelection}
+  order by xInsurance.Name, xSC.SCNum, xSC.SCID, xSCRates.EffDate, xSCRestrictions.Descr
+|;
+#and xSCRates.EffDate is not null
+  @fields = ('Active','SCID','Name','SCNum','SCName','ServiceType','Restriction','ExInv','ServiceRate','HrsPerUnit','UnitLbl','Type','RVUPct','EffDate','ExpDate','Credential','PlaceOfService','PINReq','PAReq');
+  $report = qq|${DT}\n${InsName}Service Code Report\n|;
+#warn qq|select=$select\n|;
+}
+elsif ( $form->{Type} =~ /xinsurance/i )
+{
+  $Selection .= qq| and xInsurance.Active=1| if ( $form->{Active} );
+  $select = qq|
+select *,xInsurance.Name as InsName
+ from xInsurance
+  where xInsurance.SubID is not null
+  ${Selection}
+  order by xInsurance.SubID,xInsurance.RecName
+|;
+  @fields = ('InsName','SubID','PayID','ClearingHouse','SenderID','SenderCode','InsType','Descr','Active','InsCode','ISASQ','ISARQ','ReceiverID','ReceiverCode','RecName','RecID','PayName');
+  $report = qq|${DT}\nInsurance Report (where SubID is not null).\n|;
+}
+elsif ( $form->{Type} =~ /xhl7/i )
+{
+  $dbh = $form->connectdb('okmis_config');
+  $select = qq|select * from xHL7|;
+  @fields = ('ConceptCode','ConceptName','Tag','CodeSystemOID','CodeSystemCode','CodeSystemName','ValueSetOID','ValueSetCode','ValueSetName');
+  $report = qq|${DT}\nHL7 Report.\n|;
+}
+elsif ( $form->{Type} =~ /clientedocs/i )
+{
+  $form->{Report_Clinics} = $form->{ClinicIDs};   # GenReport uses ClinicIDs.
+  $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID','where');
+  $ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+  $select = qq|
+select ClientEDocs.*, ClientEDocs.Descr as Description
+      ,DATE_FORMAT(ClientEDocs.CreateDate,'%m/%d/%Y') as DateEntered
+      ,xEDocType.Descr as Type
+      ,Provider.LName as Provider, Provider.FName as PFName
+      ,Client.clinicClinicID, Client.LName as Client, Client.FName, Client.ClientID
+      ,Clinic.Name as ClinicName
+  from ClientEDocs
+    left join Client on Client.ClientID=ClientEDocs.ClientID
+    left join okmis_config.xEDocType on xEDocType.ID=ClientEDocs.Type
+    left join Provider on Provider.ProvID=Client.ProvID
+    left join Provider as Clinic on Clinic.ProvID=Client.clinicClinicID
+  ${ClinicSelection}
+  order by Client.clinicClinicID, Client.LName, Client.FName, ClientEDocs.CreateDate
+|;
+  @fields = ('ClinicName', 'Provider', 'PFName', 'Client', 'FName', 'ClientID', 'Type', 'Title', 'Description', 'DateEntered');
+  $report = qq|${DT}\nClient Electronic Documents\n|;
+}
+elsif ( $form->{Type} =~ /alert/i )
+{
+  $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID');
+  $ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+  $select = qq|select Clinic.Name as Clinic
+     ,Client.LName, Client.FName, Client.ClientID, Client.Active
+     ,ClientEmergency.Alert, Client.HmPH, Client.WkPh
+     ,CONCAT(Counselor.LName,', ',Counselor.FName,' (',Counselor.ProvID,')') as PrimaryProvider
+  from Client
+    left join Provider as Clinic on Clinic.ProvID=Client.clinicClinicID
+    left join Provider as Counselor on Counselor.ProvID=Client.ProvID
+    left join ClientEmergency on ClientEmergency.ClientID=Client.ClientID
+  where ClientEmergency.Alert is not null
+  ${ClinicSelection}
+  order by Clinic.Name, Client.LName, Client.FName
+|;
+  @fields = ('Clinic','LName','FName','ClientID','Active','Alert','HmPh','WkPh','PrimaryProvider');
+  $report = qq|${DT}\nAlert Report\n|;
+}
+elsif ( $form->{Type} =~ /myhealth/i )
+{
+  my $addSelection = DBA->withClinicProvider($form,'and','Client.clinicClinicID','Counselor.ProvID');
+  $addSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+  $select = qq|select Clinic.Name as Clinic
+     ,Client.LName, Client.FName, Client.ClientID, Client.Active
+     ,REPLACE(REPLACE(ClientEmergency.MyHealth,'0','No'),'1','Yes') as OptOut
+     ,ClientEDocs.Title, Client.HmPH, Client.WkPh
+     ,CONCAT(Counselor.LName,', ',Counselor.FName,' (',Counselor.ProvID,')') as PrimaryProvider
+     ,Client.CreateDate
+  from Client
+    left join ClientEDocs on ClientEDocs.ClientID=Client.ClientID and ClientEDocs.Title LIKE 'MyHealth Opt%'
+    left join Provider as Clinic on Clinic.ProvID=Client.clinicClinicID
+    left join Provider as Counselor on Counselor.ProvID=Client.ProvID
+    left join ClientEmergency on ClientEmergency.ClientID=Client.ClientID
+  where Client.CreateDate < '2016-01-14'
+  ${addSelection}
+  order by Clinic.Name, Client.LName, Client.FName
+|;
+  @fields = ('Clinic','LName','FName','ClientID','Active','OptOut','Title','HmPh','WkPh','PrimaryProvider','CreateDate');
+  $report = qq|${DT}\nMyHealth Audit pre 1/14/2016 Report\n|;
+}
+# not on User Reports now.
+elsif ( $form->{Type} =~ /pdiag/i )
+{
+  my $ActiveSelection = qq| and Client.Active=1| if ( $form->{Active} );
+  $select = qq|select Client.LName as Client, Client.FName, Client.ClientID, Client.Active, Client.DOB
+     ,Axis1.DSM as Axis1DSM, Axis2.DSM as Axis2DSM, Axis3.Descr as Handicap1
+     ,CONCAT(ClientFamily.FName,' ',ClientFamily.LName) as Guardian, ClientFamily.HmPh, ClientFamily.WkPh
+     ,PDDiag.Axis5Curr, PDDiag.Axis5High
+     ,ClientPrAuth.EffDate, ClientPrAuth.ExpDate
+     ,Provider.LName as Provider, Provider.FName as PFName
+  from PDDiag
+    left join Client on Client.ClientID=PDDiag.ClientID
+    left join ClientPrAuth on ClientPrAuth.ID=PDDiag.PrAuthID
+    left join xAxis1 as Axis1 on Axis1.ID=PDDiag.Axis1ACode
+    left join xAxis2 as Axis2 on Axis2.ID=PDDiag.Axis2ACode
+    left join okmis_config.xHandicap as Axis3 on Axis3.ID=PDDiag.Axis3ACode
+    left join ClientFamily on ClientFamily.ClientID=PDDiag.ClientID and (ClientFamily.Guardian=1 or ClientFamily.EmerContact=1)
+    left join ClientACL on ClientACL.ClientID=Client.ClientID
+    left join Provider on Provider.ProvID=Client.ProvID
+  where ClientACL.ProvID='${ForProvID}'
+    and ClientPrAuth.EffDate between '$form->{FromDate}' and '$form->{ToDate}'
+    ${ActiveSelection}
+  order by Client.Active, Client.LName, Client.FName, ClientPrAuth.EffDate
+|;
+  @fields = ('Client', 'FName', 'ClientID', 'Active', 'DOB', 'Axis1DSM', 'Axis2DSM', 'Guardian', 'HmPh', 'WkPh', 'EffDate', 'ExpDate', 'Provider', 'PFName');
+  $report = qq|${DT}\nClients Primary Diagnosis ${DateRange}\n|;
+}
+elsif ( $form->{Type} =~ /smoking/i )
+{
+  $form->{Report_Clinics} = $form->{ClinicIDs};   # GenReport uses ClinicIDs.
+  $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID','where');
+  $ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+  $select = qq|
+select ClientSATobacco.ID
+      ,DATE_FORMAT(ClientSATobacco.vdate,'%m/%d/%Y') as VisitDate
+      ,xSmokingStatus.Descr as SmokeStatus
+      ,if(ClientSATobacco.quit30=1,'yes','no') as Quit30
+      ,if(ClientSATobacco.refer=1,'yes','no') as 800QuitNow
+      ,DATE_FORMAT(SAbuse.RecDOLC,'%m/%d/%Y') as LastUpdated
+      ,MedHx.DailyTobaccoUse 
+      ,Provider.LName as Provider, Provider.FName as PFName
+      ,Client.clinicClinicID, Client.LName as Client, Client.FName, Client.ClientID
+      ,TIMESTAMPDIFF(YEAR, Client.DOB, CURDATE()) AS Age
+      ,Clinic.Name as ClinicName
+  from Client
+    left join ClientSATobacco on ClientSATobacco.ClientID=Client.ClientID
+    left join okmis_config.xSmokingStatus on okmis_config.xSmokingStatus.ID=ClientSATobacco.SmokingStatus
+    left join SAbuse on SAbuse.ClientID=ClientSATobacco.ClientID and SAbuse.Drug=22
+    left join MedHx on MedHx.ClientID=ClientSATobacco.ClientID
+    left join Provider on Provider.ProvID=Client.ProvID
+    left join Provider as Clinic on Clinic.ProvID=Client.clinicClinicID
+  ${ClinicSelection}
+  order by Client.clinicClinicID, Client.LName, Client.FName, ClientSATobacco.vdate
+|;
+  @fields = ('ClinicName','Provider','PFName','Client','FName','ClientID','Age','DailyTobaccoUse','LastUpdated','VisitDate','SmokeStatus','Quit30','800QuitNow');
+  $report = qq|${DT}\nClient Smoking Cessation Report\n|;
+}
+elsif ( $form->{Type} =~ /clientproblems/i )
+{
+  $form->{Report_Clinics} = $form->{ClinicIDs};   # GenReport uses ClinicIDs.
+  $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID','where');
+  $ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+  $select = qq|
+select Client.LName as Client,Client.FName,Client.ClientID,Provider.LName as Provider,Provider.FName as PFName
+      ,(ClientProblems.Priority DIV 10) as Priority,misICD10.ICD10
+      ,misICD10.icdName, misICD10.sctName
+      ,DATE_FORMAT(ClientProblems.InitiatedDate,'%m/%d/%Y') as InitiatedDate
+      ,DATE_FORMAT(ClientProblems.ResolvedDate,'%m/%d/%Y') as ResolvedDate
+      ,CONCAT(ClientFamily.FName,' ',ClientFamily.LName) as Guardian, ClientFamily.HmPh, ClientFamily.WkPh
+ from ClientProblems 
+  left join okmis_config.misICD10 on misICD10.ID=ClientProblems.UUID
+  left join Client on Client.ClientID=ClientProblems.ClientID
+  left join ClientFamily on ClientFamily.ClientID=ClientProblems.ClientID and (ClientFamily.Guardian=1 or ClientFamily.EmerContact=1)
+  left join Provider on Provider.ProvID=Client.ProvID
+  ${ClinicSelection}
+    and ClientProblems.InitiatedDate between '$form->{FromDate}' and '$form->{ToDate}'
+ order by Client.clinicClinicID, Client.LName, Client.FName, ClientProblems.Priority
+|;
+  @fields = ('ClinicName','Provider','PFName','Client','FName','ClientID','Priority','ICD10','icdName','sctName','InitiatedDate','ResolvedDate','Guardian','HmPh','WkPh');
+  $report = qq|${DT}\nClient Primary Diagnosis Problems Report\n|;
+}
+elsif ( $form->{Type} =~ /opioid/i )
+{
+  $form->{Report_Clinics} = $form->{ClinicIDs};   # GenReport uses ClinicIDs.
+  $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID','where');
+  $ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+  $select = qq|
+select Client.LName as Client,Client.FName,Client.ClientID,Provider.LName as Provider,Provider.FName as PFName
+      ,(ClientProblems.Priority DIV 10) as Priority,misICD10.ICD10
+      ,misICD10.icdName, misICD10.sctName
+      ,DATE_FORMAT(ClientProblems.InitiatedDate,'%m/%d/%Y') as InitiatedDate
+      ,DATE_FORMAT(ClientProblems.ResolvedDate,'%m/%d/%Y') as ResolvedDate
+ from ClientProblems 
+  left join okmis_config.misICD10 on misICD10.ID=ClientProblems.UUID
+  left join Client on Client.ClientID=ClientProblems.ClientID
+  left join Provider on Provider.ProvID=Client.ProvID
+  ${ClinicSelection}
+    and ( misICD10.ICD10 = 'F11.10'
+    or misICD10.ICD10 = 'F11.20'
+    or misICD10.ICD10 = 'F11.21'
+    or misICD10.ICD10 = 'Z79.899'
+    or misICD10.ICD10 = 'F11.93' )
+ order by Client.clinicClinicID, Client.LName, Client.FName, ClientProblems.Priority
+|;
+  @fields = ('ClinicName','Provider','PFName','Client','FName','ClientID','Priority','ICD10','icdName','sctName','InitiatedDate','ResolvedDate');
+  $report = qq|${DT}\nClient Opioid Report\n|;
+}
+elsif ( $form->{Type} =~ /copay/i )
+{
+  my $ActiveSelection = qq| and Client.Active=1| if ( $form->{Active} );
+  $select = qq|select Client.LName as Client, Client.FName, Client.ClientID, Client.Active 
+     ,Provider.LName as Provider, Provider.FName as PFName
+     ,xInsurance.Descr as Insurance, Insurance.InsIDNum, Insurance.Priority
+     ,Insurance.Deductible, Insurance.Copay, Insurance.DeductionMet, Insurance.CCExpDate
+  from Insurance
+    left join Client on Client.ClientID=Insurance.ClientID
+    left join ClientACL on ClientACL.ClientID=Client.ClientID
+    left join Provider on Provider.ProvID=Client.ProvID
+    left join xInsurance on xInsurance.ID=Insurance.InsID
+  where Insurance.Copay>0
+    and ClientACL.ProvID='${ForProvID}'
+    ${ActiveSelection}
+  order by Client.Active, Client.LName, Client.FName
+|;
+  @fields = ('Client', 'FName', 'ClientID', 'Active', 'Provider', 'PFName', 'Insurance', 'InsIDNum', 'Priority', 'Deductible', 'Copay', 'DeductionMet', 'CCExpDate');
+  $report = qq|${DT}\nClients with Copay Insurance Amounts\n|;
+}
+elsif ( $form->{Type} =~ /clientjournal/i )
+{
+  my $ActiveSelection = qq| and Client.Active=1| if ( $form->{Active} );
+  $select = qq|select Client.LName as Client, Client.FName, Client.ClientID, Client.Active 
+     ,Provider.LName as Provider, Provider.FName as PFName
+     ,ClientJournals.Summary, ClientJournals.Descr, ClientJournals.Type
+     ,ClientJournals.Active, ClientJournals.EffDate, ClientJournals.ExpDate
+  from ClientJournals
+    left join Client on Client.ClientID=ClientJournals.ClientID
+    left join ClientACL on ClientACL.ClientID=Client.ClientID
+    left join Provider on Provider.ProvID=Client.ProvID
+  where ClientJournals.Active=1
+    and ClientACL.ProvID='${ForProvID}'
+    ${ActiveSelection}
+  order by Client.Active, Client.LName, Client.FName
+|;
+  @trimlist = ('Summary','Descr');
+  @trimfrom = ('\\r\\n');
+  @trimto = ('; ');
+  @fields = ('Client', 'FName', 'ClientID', 'Active', 'Provider', 'PFName', 'Summary', 'Descr', 'Type', 'Active', 'EffDate', 'ExpDate');
+  $report = qq|${DT}\nClients with Active Journal Entries\n|;
+}
+elsif ( $form->{Type} =~ /clientinvoice/i )
+{
+  $ClinicSelection = DBA->withSelection($form,'and','Client.clinicClinicID','','','');
+  $ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+  $select = qq|select Invoices.InvDate, Invoices.ID as InvNum, Invoices.TotalAmt
+     ,DATE_FORMAT(Invoices.InvDate,'%m/%d/%Y') as InvoiceDate
+     ,Clinic.Name as Clinic
+     ,Client.LName, Client.FName, Client.ClientID, Client.Active
+     ,DATE_FORMAT(Client.DOB,'%m/%d/%Y') as DOB, Client.Gend
+     ,TIMESTAMPDIFF(YEAR, Client.DOB, CURDATE()) AS Age
+     ,Client.Addr1,Client.Addr2,Client.City,Client.Zip
+     ,CONCAT(Counselor.LName,', ',Counselor.FName,' (',Counselor.ProvID,')') as Provider
+  from Invoices
+    left join Client on Client.ClientID=Invoices.ClientID
+    left join Provider as Clinic on Clinic.ProvID=Client.clinicClinicID
+    left join Provider as Counselor on Counselor.ProvID=Client.ProvID
+  where '$form->{FromDate}'<=Invoices.InvDate and Invoices.InvDate<='$form->{ToDate}'
+  ${ClinicSelection}
+  order by Clinic.Name, Client.LName, Client.FName, Invoices.InvDate
+|;
+  @fields = ('Clinic','LName','FName','ClientID','InvNum','InvoiceDate','TotalAmt','Active','DOB','Gend','Age','Addr1','Addr2','City','Zip','Provider');
+  my $header = DBA->withSelectionHeader($form);
+  $report = qq|${DT}\nClients Invoices ${DateRange} ${header}\n|;
+}
+elsif ( $form->{Type} =~ /duptrans/i )
+{
+  $select = qq|select TrID,RefID,count(*) as count,PaidDate from NoteTrans
+  where '$form->{FromDate}'<=PaidDate and PaidDate<='$form->{ToDate}'
+    and Code LIKE 'MR%'
+  group by TrID,RefID
+|;
+  @fields = ('TrID','RefID','count','PaidDate');
+  my $header = DBA->withSelectionHeader($form);
+  $report = qq|${DT}\nNotes with duplicate transaction for RefID ${DateRange} ${header}\n|;
+  @eliminatelist = ('count');
+  @eliminateval = ('1');
+}
+else { $report = qq|Bad report selection type($form->{Type})!\t${DT}\n|; print $report; exit; }
+warn qq|select=$select\n| if ( $form->{LOGINPROVID} == 91 );
+
+# heading for report...
+@header = @fields unless ( scalar(@header) );                # default header.
+foreach my $field ( @header ) { $report .= qq|$field\t|; }
+$report .= qq|\n|;
+
+# main report...
+my $cnt = 0;
+my $s = $dbh->prepare($select);
+$s->execute() || $form->dberror($select);
+
+# Initialize variables for subtotals
+my $currentInsurance = $r->{'Insurance'};
+my $subtotalAmount = 0;
+
+while (my $r = $s->fetchrow_hashref)
+{
+  my ($skip,$idx) = (0,0);
+  my $idx = 0;
+  foreach my $f ( @eliminatelist )
+  { $skip = 1 if ( $r->{$f} eq $eliminateval[$idx] ); $idx++; }
+  next if ( $skip );
+
+  $cnt++;
+
+  # Calculate subtotals by Insurance_name
+    if( $form->{Type} =~ /eft/i ) {
+      if ($currentInsurance ne $r->{'Insurance'}) {
+        if ($currentInsurance ne '') {
+          # Insert the subtotal row for the previous insurance group
+          $report .= "\t\tSubtotal\t$subtotalAmount\t\t\t\t\n";
+        }
+        $currentInsurance = $r->{'Insurance'};
+        $subtotalAmount = 0;
+      }
+    }
+
+    # Add the current row's amount to the subtotal
+    $subtotalAmount += $r->{'Amount'};
+
+
+  $report .= main->report($r,@fields);
+  foreach my $f ( @percent ) { $pctcnt->{$f} += $r->{$f}; }
+  foreach my $f ( @total ) { $totcnt->{$f} += $r->{$f}; }
+}
+
+ 
+
+# Insert the subtotal row for the last insurance group
+if( $form->{Type} =~ /eft/i ) {
+  if ($currentInsurance ne '') {
+    $report .= "\t\tSubtotal\t$subtotalAmount\t\t\t\t\n";
+  }  
+}
+
+
+foreach my $r ( @removelist ) { $report =~ s/$r//g; }
+
+## footer for report...
+my $ftr = (); my $fcnt=0;
+foreach my $f ( @percent ) { $ftr->{$f} = sprintf("%.1f",($pctcnt->{$f}/$cnt)*100).'%'; $fcnt++; } 
+foreach my $f ( @total ) { $ftr->{$f} = sprintf("%.2f",$totcnt->{$f}); $fcnt++; } 
+if ( $fcnt )
+{
+  foreach my $field ( @fields ) { $report .= qq|$ftr->{$field}\t|; }
+  $report .= qq|\n|;
+}
+$report .= qq|\n|;
+
+$s->finish();
+$form->complete();
+
+#print qq|Content-Type: application/vnd.ms-excel \n\n|;      # only diff Report & Report.cgi
+print $report;
+
+exit;
+
+############################################################################
+sub report
+{
+  my ($self,$record,@list) = @_;
+  my $line;
+  foreach my $field ( @list )
+  { 
+    my $fld = $record->{$field};
+    my $idx = 0;
+    foreach my $str ( @trimlist )
+    { my $f = $trimfrom[$idx]; my $t = $trimto[$idx]; $fld =~ s/$f/$t/g; $idx++; }
+if ( $field eq 'screen' )
+{
+    $fld =~ s/\/cgi\/bin\///g;
+    $fld =~ s/\.cgi//g;
+    $fld =~ s/mis\?MIS_Action/Action/;
+    $fld =~ s/mis\?view/Action/;
+    $fld =~ s/mis\?misPOP/Back/;
+    $fld =~ s/&mlt=.*$//g;
+    $fld =~ s/mlt=.*$//g;
+    $fld =~ s/&misLINKS=.*$//g;
+    $fld =~ s/misLINKS=.*$//g;
+    $fld = substr($fld,0,80);
+}
+    $line .= qq|${fld}\t|;
+  }
+  $line .= qq|\n|;
+  return($line);
+}
+############################################################################

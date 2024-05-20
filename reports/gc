@@ -1,0 +1,2 @@
+./genCCDAs DBNAME=okmis_mms\&submit=1\&Folder=test1\&InsID=100\&ProvIDs=2502\&ClientIDs=53159\&daterange=all
+#./genCCDAs DBNAME=okmis_mms\&submit=1\&Folder=test2\&InsID=100\&ProvIDs=2502\&ClientIDs=54635\&daterange=all

@@ -1,0 +1,56 @@
+#!/bin/sh
+#
+# Startup script for the Apache Web Server
+# kls, 07/09/99, converted to apachectl
+#
+# description: Apache is a World Wide Web server.  It is used to serve \
+#	       HTML files and CGI.
+
+HTTPDir=/usr/local/apache
+BinDir=${HTTPDir}/bin
+LogDir=${HTTPDir}/logs
+LogFile=/tmp/httpd.out
+# ---------------------------
+start_()
+{
+   /bin/ps ax | /bin/grep httpd | /bin/grep -v start | /bin/grep -v grep
+   if [ $? -eq 0 ]; then
+      echo -e "\nAppears to already be running."
+   else
+      echo -e "\nStarting apache..."
+      echo -e "Saving Logs..."
+      mv -f ${LogDir}/*log ${LogDir}/archive
+      ${BinDir}/apachectl startssl
+      /bin/sleep 1
+      /bin/ps ax | /bin/grep httpd | /bin/grep -v start | /bin/grep -v grep
+   fi
+   return
+} 
+# ---------------------------
+stop_()
+{
+   ${BinDir}/apachectl stop
+   /bin/sleep 1
+   /bin/ps ax | /bin/grep httpd | /bin/grep -v stop | /bin/grep -v grep
+   return
+} 
+# ---------------------------
+echo "$(date)" > ${LogFile}
+
+( echo "command: $*"
+# See how we were called.
+case "$1" in
+  restart) stop_
+           start_
+           ;;
+    start) start_ ;;
+     stop) stop_ ;;
+   status) ${BinDir}/apachectl status ;;
+        *) echo "Usage: $0 {start|stop|restart|status}"
+           exit 1
+           ;;
+esac
+) >> ${LogFile} 2>&1
+/bin/cat ${LogFile}
+
+exit 0

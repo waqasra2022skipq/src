@@ -1,0 +1,70 @@
+graphs.cgi: form-Browser=Mozilla/5.0
+graphs.cgi: form-DBNAME=okmis_ipi
+graphs.cgi: form-DOCBIN=/home/okmis/public_html/ipi/cgi/bin
+graphs.cgi: form-DOCPARENT=/home/okmis/public_html/
+graphs.cgi: form-DOCROOT=/home/okmis/public_html/ipi
+graphs.cgi: form-FromDate=2024-04-01
+graphs.cgi: form-FromDateD=04/01/2024
+graphs.cgi: form-HTTPSERVER=https://ipi.okmis.com
+graphs.cgi: form-InsIDs=212
+graphs.cgi: form-LINKID=1114
+graphs.cgi: form-LOGINACLID=
+graphs.cgi: form-LOGINAGENCY=91
+graphs.cgi: form-LOGINEMAIL=wade@okmis.com
+graphs.cgi: form-LOGINID=
+graphs.cgi: form-LOGINNAME=Integrity Pathways, Inc.
+graphs.cgi: form-LOGINPROVID=91
+graphs.cgi: form-LOGINSCREEN=ManagerTree.cgi
+graphs.cgi: form-LOGINTYPE=0
+graphs.cgi: form-LOGINUSERDB=okmis_ipi
+graphs.cgi: form-LOGINUSERID=91
+graphs.cgi: form-LOGINUSERNAME=  MIS 
+graphs.cgi: form-LOGINUSERTYPE=1
+graphs.cgi: form-NOW=12:49:07
+graphs.cgi: form-TODAY=2024-05-06
+graphs.cgi: form-TheDate=2024-05-06
+graphs.cgi: form-ToDate=2024-05-06
+graphs.cgi: form-ToDateD=05/06/2024
+graphs.cgi: form-USERLOGINID=okmis_ipi:91
+graphs.cgi: form-browser=Mozilla/5.0
+graphs.cgi: form-daterange=
+graphs.cgi: form-method=BilledvsIncome
+graphs.cgi: form-misLINKS=1112
+graphs.cgi: form-mlt=ZXjAQqnv74ki
+graphs.cgi: form-query=method=&value=reset&target=grapharea&InsIDs=212&sesid=20240506124431_jYkDaV
+graphs.cgi: form-sesid=20240506124431_jYkDaV
+graphs.cgi: form-target=grapharea
+graphs.cgi: form-updLINKIDnew=
+graphs.cgi: form-value=reset
+addSelection: and  (  xInsurance.ID=212  )
+sel=
+
+select 'Amt' as MyKey, DATE_FORMAT(Treatment.ContLogDate,'%Y-%m') as MyX, SUM(Treatment.BilledAmt) as MyY1
+, SUM(Treatment.IncAmt) as MyY2
+ from Client
+  left join ClientACL on ClientACL.ClientID=Client.ClientID
+  left join Treatment on Treatment.ClientID=Client.ClientID
+  left join Provider as Clinic on Clinic.ProvID=Client.clinicClinicID
+  left join xSC on xSC.SCID=Treatment.SCID
+  left join xInsurance on xInsurance.ID=xSC.InsID
+ where Treatment.ContLogDate>="2024-04-01" and Treatment.ContLogDate<="2024-05-06"
+   and  ClientACL.ProvID='91' and  (  xInsurance.ID=212  )
+ group by MyKey, MyX 
+y_values=MyY1|BillAmt:MyY2|IncAmt
+data=
+
+  data = 
+  [
+
+    {
+      key: "Amt",
+      values: [
+        { x:'2024-04 BillAmt', y:15064.31 },
+        { x:'2024-04 IncAmt', y:4595.12 },
+        { x:'2024-05 BillAmt', y:1441.31 },
+        { x:'2024-05 IncAmt', y:0 },
+      ]
+    },
+
+  ];
+

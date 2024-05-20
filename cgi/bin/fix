@@ -1,0 +1,5 @@
+# trim Windows chars in file
+mv $1.cgi ttt
+tr -d '\r' < ttt > $1.cgi
+chmod 755 $1.cgi
+chown root:adm $1.cgi

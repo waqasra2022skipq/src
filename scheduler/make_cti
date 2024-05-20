@@ -1,0 +1,12 @@
+#!/bin/bash
+old way before newest verions of scheduler
+now use demo
+echo -e "pwd=$(pwd)"
+echo "recreate scheduler_cti account"
+echo -e "Drop scheduler_cti..."
+/usr/bin/mysqladmin -f drop scheduler_cti
+echo -e "Create scheduler_cti..."
+/usr/bin/mysqladmin create scheduler_cti
+echo -e "Create scheduler_cti tables/data..."
+/usr/bin/mysql scheduler_cti < scheduler_base
+#not ready for v5 ./adduser DBNAME=okmis_cti\&AgencyID=92

@@ -1,0 +1,2361 @@
+-- MySQL dump 10.13  Distrib 5.7.27, for Linux (x86_64)
+--
+-- Host: localhost    Database: scheduler_demo
+-- ------------------------------------------------------
+-- Server version	5.7.27
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `ha45_appointments`
+--
+
+DROP TABLE IF EXISTS `ha45_appointments`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_appointments` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `service_id` int(11) NOT NULL,
+  `resource_id` int(11) NOT NULL,
+  `customer_id` int(11) NOT NULL,
+  `location_id` int(11) NOT NULL,
+  `seats` int(11) NOT NULL DEFAULT '1',
+  `created_at` int(11) NOT NULL,
+  `starts_at` int(11) NOT NULL,
+  `duration` int(11) NOT NULL,
+  `lead_in` int(11) NOT NULL,
+  `lead_out` int(11) NOT NULL,
+  `until_closed` tinyint(4) DEFAULT '0',
+  `approved` tinyint(4) NOT NULL,
+  `no_show` tinyint(4) NOT NULL,
+  `auth_code` varchar(32) NOT NULL DEFAULT '',
+  `price` varchar(16) DEFAULT '',
+  `need_reminder` int(11) NOT NULL DEFAULT '0',
+  `is_ghost` tinyint(4) NOT NULL DEFAULT '0',
+  `cancelled` tinyint(4) NOT NULL DEFAULT '0',
+  `ghost_last_access` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_appointments`
+--
+
+LOCK TABLES `ha45_appointments` WRITE;
+/*!40000 ALTER TABLE `ha45_appointments` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ha45_appointments` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_conf`
+--
+
+DROP TABLE IF EXISTS `ha45_conf`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_conf` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `value` text,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=34 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_conf`
+--
+
+LOCK TABLES `ha45_conf` WRITE;
+/*!40000 ALTER TABLE `ha45_conf` DISABLE KEYS */;
+INSERT INTO `ha45_conf` VALUES (1,'emailSentFrom','desiree@therapeuticservicesok.com');
+INSERT INTO `ha45_conf` VALUES (2,'emailSentFromName','Therapeutic Counseling/Services');
+INSERT INTO `ha45_conf` VALUES (3,'paymentGateways','offline');
+INSERT INTO `ha45_conf` VALUES (4,'currentVersion','4.5.8');
+INSERT INTO `ha45_conf` VALUES (5,'backupLastRun','9308530181');
+INSERT INTO `ha45_conf` VALUES (6,'text-Bookable Resource','Therapist');
+INSERT INTO `ha45_conf` VALUES (7,'text-Bookable Resources','Therapists');
+INSERT INTO `ha45_conf` VALUES (8,'smtpSecure','');
+INSERT INTO `ha45_conf` VALUES (9,'smtpHost','');
+INSERT INTO `ha45_conf` VALUES (10,'smtpUser','');
+INSERT INTO `ha45_conf` VALUES (11,'smtpPass','');
+INSERT INTO `ha45_conf` VALUES (12,'emailDebug','0');
+INSERT INTO `ha45_conf` VALUES (13,'emailDisabled','0');
+INSERT INTO `ha45_conf` VALUES (14,'emailCommonHeader','Therapeutic Counseling/Services (918) 742-6050');
+INSERT INTO `ha45_conf` VALUES (15,'emailCommonFooter','The information within and/or documents accompanying this email contains confidential information that may be legally privileged and protected by federal and state law. This information is intended for use only by the entity or individual to whom it is addressed. The authorized recipient is obligated to maintain the information in a safe, secure, and confidential manner. The authorized recipient is prohibited from using this information for purposes other than intended, prohibited from disclosing this information to any other party unless required to do so by law or regulation, and is required to destroy the information after its stated need has been fulfilled.\r\n\r\nIf you are in possession of this protected health information, and are not the intended recipient, you are hereby notified that any improper disclosure, copying, or distribution of the contents of this information is strictly prohibited. Please notify the owner of this information immediately and delete this email.');
+INSERT INTO `ha45_conf` VALUES (16,'daysToShowAdmin','1');
+INSERT INTO `ha45_conf` VALUES (17,'daysToShowCustomer','1');
+INSERT INTO `ha45_conf` VALUES (18,'monthsToShow','1');
+INSERT INTO `ha45_conf` VALUES (19,'timeUnit','15');
+INSERT INTO `ha45_conf` VALUES (20,'companyTimezone','America/Chicago');
+INSERT INTO `ha45_conf` VALUES (21,'dateFormat','j M Y');
+INSERT INTO `ha45_conf` VALUES (22,'timeFormat','g:i A');
+INSERT INTO `ha45_conf` VALUES (23,'weekStartsOn','1');
+INSERT INTO `ha45_conf` VALUES (24,'limitTimeMeasure','hour');
+INSERT INTO `ha45_conf` VALUES (25,'theme','blue');
+INSERT INTO `ha45_conf` VALUES (26,'allowNoEmail','0');
+INSERT INTO `ha45_conf` VALUES (27,'enableTimezones','1');
+INSERT INTO `ha45_conf` VALUES (28,'userEmailConfirmation','1');
+INSERT INTO `ha45_conf` VALUES (29,'userAdminApproval','1');
+INSERT INTO `ha45_conf` VALUES (30,'userLoginRequired','1');
+INSERT INTO `ha45_conf` VALUES (31,'enableRegistration','1');
+INSERT INTO `ha45_conf` VALUES (32,'emailAsUsername','1');
+INSERT INTO `ha45_conf` VALUES (33,'allowDuplicateEmails','0');
+/*!40000 ALTER TABLE `ha45_conf` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_emaillog`
+--
+
+DROP TABLE IF EXISTS `ha45_emaillog`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_emaillog` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `sent_at` int(11) DEFAULT NULL,
+  `to_email` varchar(128) DEFAULT NULL,
+  `from_email` varchar(128) DEFAULT NULL,
+  `from_name` varchar(128) DEFAULT NULL,
+  `subject` text,
+  `body` text,
+  `alt_body` text,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_emaillog`
+--
+
+LOCK TABLES `ha45_emaillog` WRITE;
+/*!40000 ALTER TABLE `ha45_emaillog` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ha45_emaillog` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_form_controls`
+--
+
+DROP TABLE IF EXISTS `ha45_form_controls`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_form_controls` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `form_id` int(11) NOT NULL,
+  `name` varchar(128) DEFAULT NULL,
+  `type` varchar(32) DEFAULT NULL,
+  `title` varchar(255) DEFAULT NULL,
+  `description` text,
+  `show_order` int(11) DEFAULT NULL,
+  `ext_access` varchar(32) DEFAULT NULL,
+  `attr` text,
+  `validators` text,
+  `default_value` text,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=10 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_form_controls`
+--
+
+LOCK TABLES `ha45_form_controls` WRITE;
+/*!40000 ALTER TABLE `ha45_form_controls` DISABLE KEYS */;
+INSERT INTO `ha45_form_controls` VALUES (1,1,'username','text','Username','',1,'write','a:1:{s:4:\"size\";i:24;}','a:2:{i:0;a:2:{s:4:\"code\";s:8:\"notEmpty\";s:5:\"error\";s:14:\"Required field\";}i:1;a:3:{s:4:\"code\";s:13:\"checkUsername\";s:5:\"error\";s:31:\"This username is already in use\";s:6:\"params\";a:1:{s:6:\"skipMe\";i:1;}}}','');
+INSERT INTO `ha45_form_controls` VALUES (2,1,'email','text','Email','',2,'write','a:1:{s:4:\"size\";s:2:\"32\";}','','');
+INSERT INTO `ha45_form_controls` VALUES (3,1,'first_name','text','First Name','',3,'write','a:1:{s:4:\"size\";i:32;}','a:1:{i:0;a:2:{s:4:\"code\";s:8:\"notEmpty\";s:5:\"error\";s:27:\"Please enter the first name\";}}','');
+INSERT INTO `ha45_form_controls` VALUES (4,1,'last_name','text','Last Name','',4,'write','a:1:{s:4:\"size\";i:32;}','a:1:{i:0;a:2:{s:4:\"code\";s:8:\"notEmpty\";s:5:\"error\";s:26:\"Please enter the last name\";}}','');
+INSERT INTO `ha45_form_controls` VALUES (5,1,'phone','text','Phone','Cell phone is preferred',5,'write','a:1:{s:4:\"size\";s:2:\"10\";}','a:1:{i:0;a:2:{s:4:\"code\";s:6:\"number\";s:5:\"error\";s:46:\"Please enter only numbers with no \"-\" or \"( )\"\";}}','');
+INSERT INTO `ha45_form_controls` VALUES (6,1,'emailreminder','checkbox','Email Reminder','Please select if you would like an email reminder of appointment',6,'write','','','0');
+INSERT INTO `ha45_form_controls` VALUES (7,1,'callreminder','checkbox','Phone Call Reminder','Please select if you would like to have a phone call reminder',7,'write','','','0');
+INSERT INTO `ha45_form_controls` VALUES (8,1,'nomessage','checkbox','No Messages','Please UNSELECT if you  want messages left',8,'write','a:0:{}','','1');
+INSERT INTO `ha45_form_controls` VALUES (9,1,'alternate_contact','text','Alternate Contact','Please list name of alternate contact',9,'write','a:1:{s:4:\"size\";s:2:\"30\";}','','');
+/*!40000 ALTER TABLE `ha45_form_controls` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_forms`
+--
+
+DROP TABLE IF EXISTS `ha45_forms`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_forms` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(128) DEFAULT NULL,
+  `class` varchar(32) DEFAULT NULL,
+  `details` varchar(128) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_forms`
+--
+
+LOCK TABLES `ha45_forms` WRITE;
+/*!40000 ALTER TABLE `ha45_forms` DISABLE KEYS */;
+INSERT INTO `ha45_forms` VALUES (1,'Customer Form','customer','');
+/*!40000 ALTER TABLE `ha45_forms` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_invoices`
+--
+
+DROP TABLE IF EXISTS `ha45_invoices`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_invoices` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `refno` varchar(16) DEFAULT NULL,
+  `amount` double DEFAULT NULL,
+  `currency` varchar(3) DEFAULT NULL,
+  `created_at` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_invoices`
+--
+
+LOCK TABLES `ha45_invoices` WRITE;
+/*!40000 ALTER TABLE `ha45_invoices` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ha45_invoices` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_locations`
+--
+
+DROP TABLE IF EXISTS `ha45_locations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_locations` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) DEFAULT NULL,
+  `description` text,
+  `show_order` int(11) DEFAULT '1',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_locations`
+--
+
+LOCK TABLES `ha45_locations` WRITE;
+/*!40000 ALTER TABLE `ha45_locations` DISABLE KEYS */;
+INSERT INTO `ha45_locations` VALUES (1,'My Location','Description of My Location',1);
+/*!40000 ALTER TABLE `ha45_locations` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_objectmeta`
+--
+
+DROP TABLE IF EXISTS `ha45_objectmeta`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_objectmeta` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `obj_class` varchar(32) NOT NULL,
+  `obj_id` int(11) NOT NULL,
+  `meta_name` varchar(32) NOT NULL,
+  `meta_value` text,
+  `meta_data` text,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_objectmeta`
+--
+
+LOCK TABLES `ha45_objectmeta` WRITE;
+/*!40000 ALTER TABLE `ha45_objectmeta` DISABLE KEYS */;
+INSERT INTO `ha45_objectmeta` VALUES (1,'user',1,'_role','admin','');
+INSERT INTO `ha45_objectmeta` VALUES (2,'user',1,'_timezone','America/Chicago','');
+INSERT INTO `ha45_objectmeta` VALUES (3,'user',1,'_auth_code','2883GEt7YXVs','');
+INSERT INTO `ha45_objectmeta` VALUES (4,'user',1,'_resource_schedules','1','edit');
+INSERT INTO `ha45_objectmeta` VALUES (5,'user',1,'_resource_apps','1','manage');
+INSERT INTO `ha45_objectmeta` VALUES (6,'service',1,'_permissions','group-1:allowed','');
+INSERT INTO `ha45_objectmeta` VALUES (7,'service',1,'_permissions','group0:auto_confirm','');
+/*!40000 ALTER TABLE `ha45_objectmeta` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_packs`
+--
+
+DROP TABLE IF EXISTS `ha45_packs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_packs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) DEFAULT NULL,
+  `description` text,
+  `discount` text,
+  `services` text,
+  `show_order` int(11) DEFAULT '1',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_packs`
+--
+
+LOCK TABLES `ha45_packs` WRITE;
+/*!40000 ALTER TABLE `ha45_packs` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ha45_packs` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_payments`
+--
+
+DROP TABLE IF EXISTS `ha45_payments`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_payments` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `invoice_id` int(11) DEFAULT NULL,
+  `paid_at` int(11) DEFAULT NULL,
+  `amount_gross` double DEFAULT NULL,
+  `amount_net` double DEFAULT NULL,
+  `currency` varchar(3) DEFAULT NULL,
+  `pgateway` varchar(32) DEFAULT NULL,
+  `pgateway_ref` text,
+  `pgateway_response` text,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_payments`
+--
+
+LOCK TABLES `ha45_payments` WRITE;
+/*!40000 ALTER TABLE `ha45_payments` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ha45_payments` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_resources`
+--
+
+DROP TABLE IF EXISTS `ha45_resources`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_resources` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) DEFAULT NULL,
+  `description` text,
+  `show_order` int(11) DEFAULT '1',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_resources`
+--
+
+LOCK TABLES `ha45_resources` WRITE;
+/*!40000 ALTER TABLE `ha45_resources` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ha45_resources` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_schedules`
+--
+
+DROP TABLE IF EXISTS `ha45_schedules`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_schedules` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `resource_id` int(11) NOT NULL,
+  `title` varchar(255) DEFAULT NULL,
+  `valid_from` int(11) DEFAULT '0',
+  `valid_to` int(11) DEFAULT '0',
+  `capacity` int(11) DEFAULT '1',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_schedules`
+--
+
+LOCK TABLES `ha45_schedules` WRITE;
+/*!40000 ALTER TABLE `ha45_schedules` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ha45_schedules` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_service_cats`
+--
+
+DROP TABLE IF EXISTS `ha45_service_cats`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_service_cats` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) DEFAULT NULL,
+  `description` text,
+  `show_order` int(11) DEFAULT '1',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_service_cats`
+--
+
+LOCK TABLES `ha45_service_cats` WRITE;
+/*!40000 ALTER TABLE `ha45_service_cats` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ha45_service_cats` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_services`
+--
+
+DROP TABLE IF EXISTS `ha45_services`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_services` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) DEFAULT NULL,
+  `description` text,
+  `min_from_now` int(11) DEFAULT '0',
+  `max_from_now` int(11) DEFAULT '1209600',
+  `min_cancel` int(11) DEFAULT '86400',
+  `allow_queue` tinyint(4) DEFAULT '0',
+  `pack_only` tinyint(4) DEFAULT '0',
+  `class_type` tinyint(4) DEFAULT '0',
+  `duration` int(11) DEFAULT '1800',
+  `until_closed` tinyint(4) DEFAULT '0',
+  `lead_in` int(11) DEFAULT '0',
+  `lead_out` int(11) DEFAULT '0',
+  `price` varchar(16) DEFAULT '',
+  `recur_total` int(11) DEFAULT '1',
+  `recur_options` varchar(64) DEFAULT 'd-2d-w',
+  `show_order` int(11) DEFAULT '1',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_services`
+--
+
+LOCK TABLES `ha45_services` WRITE;
+/*!40000 ALTER TABLE `ha45_services` DISABLE KEYS */;
+INSERT INTO `ha45_services` VALUES (1,'Initial Assessment - Office Visit','<p>The initial visit focuses on the assessment of the problems that bring the individual to a psychiatric consultation. At the same time, this visit includes the comprehensive evaluation from the medical perspective as well as the social environment. As part of the evaluation we ask that the patients fill out forms that will provide us general information from the health perspective and the medical and psychiatric history (you can download these and fill them out prior to your appointment). There are screening tools available as well, that can be used at the time of the evaluation, or some self administered tools that patients can do at home prior to their visit. The initial assessment and treatment plan are formulated on the first session, but they continue to be reviewed all the time as the work progresses.</p>\r\n\r\n<p>As part of the evaluation, is very important that we get the information of other medications currently taken and psychiatric medications used in the past. In order to coordinate care, we will ask for information on your other treating physicians and therapists, as well as your written authorization to share information with them. Bring the information to the appointment and whenever new medications are prescribed by other providers in the future, keep us updated with the information. </p>\r\n\r\n<p><b> Price Listed is for Non-insured</b></p>\r\n\r\n<p><i>Office Visit Insurance Copays Apply</i></p>',10800,4838400,86400,0,0,0,7200,0,0,0,'300',1,'d-2d-w',1);
+INSERT INTO `ha45_services` VALUES (2,'15 Minute Medication Follow Up - Office Visit','<p>The subsequent medication visits are planned according to individuals’ needs. If medications are initiated as part of the treatment, follow up will be in the following few days to weeks, to determine if the medications are having the expected results. Psychotherapeutic interventions are also performed throughout the treatment.<p/>\r\n\r\n<p>Most of the therapy sessions will be 15 minutes and include a brief evaluation of medications effects, side effects or other medical issues. In addition, and according to specific needs, patients may require formal intense psychotherapy with the traditional 45 minutes weekly sessions. They may also be referred to Psychologists or therapists.</p>\r\n\r\n<p><b> Price Listed is for Non-insured</b></p>\r\n\r\n<p><i>Office Visit Insurance Copays Apply</i></p>',10800,1209600,86400,0,0,0,900,0,0,0,'100',1,'d-2d-w',7);
+INSERT INTO `ha45_services` VALUES (3,'20-30 Minute Therapy Session - Office Visit','<p>At the end of the assessment, your assessing therapist will offer some preliminary feedback about what he or she has observed during the session, and will advise you as to whether or not he or she considers therapy would be beneficial. Many patients who are deemed suitable to continue as patients with us wish to make an appointment to begin work there and then, while others prefer to go away and think about it. We are more than happy that you should do this – in fact we encourage you to visit more than one potential therapist before making a firm commitment, since your relationship with your therapist will be the most important element in the potential success or failure of the work you undertake.</p>\r\n\r\n<p>We would normally expect individuals and couples to commit to an initial 6 sessions of work, usually (although not always) occurring once weekly. We find this often proves sufficient for those bringing relatively simple issues. For others, the six sessions offers a time-limited introduction to counselling and therapy, during which period, the therapist is able to assess the client’s needs and preferred style of working in more detail. For such clients, the review which takes place at the end of the initial period allows them to examine what they have achieved thus far and to consider what remains to be worked on. Having decided to continue, both patient and therapist will formulate a plan for continued work, usually in an open-ended contract</p>',10800,1209600,86400,0,0,0,1800,0,0,0,'75',1,'d-2d-w',2);
+INSERT INTO `ha45_services` VALUES (4,'45 Minute Therapy Session - Office Visit','<p>At the end of the assessment, your assessing therapist will offer some preliminary feedback about what he or she has observed during the session, and will advise you as to whether or not he or she considers therapy would be beneficial. Many patients who are deemed suitable to continue as patients with us wish to make an appointment to begin work there and then, while others prefer to go away and think about it. We are more than happy that you should do this – in fact we encourage you to visit more than one potential therapist before making a firm commitment, since your relationship with your therapist will be the most important element in the potential success or failure of the work you undertake.</p>\r\n\r\n<p>We would normally expect individuals and couples to commit to an initial 6 sessions of work, usually (although not always) occurring once weekly. We find this often proves sufficient for those bringing relatively simple issues. For others, the six sessions offers a time-limited introduction to counselling and therapy, during which period, the therapist is able to assess the client’s needs and preferred style of working in more detail. For such clients, the review which takes place at the end of the initial period allows them to examine what they have achieved thus far and to consider what remains to be worked on. Having decided to continue, both patient and therapist will formulate a plan for continued work, usually in an open-ended contract</p>',10800,1209600,86400,0,0,0,2700,0,0,0,'150',1,'d-2d-w',3);
+INSERT INTO `ha45_services` VALUES (5,'Medication Refill','<p>Medication refills are usually made at the time of the appointments. If you need refills of medications previously prescribed to you, we ask that you call your pharmacy and request the refill. They will fax a request to our office that we will authorize if appropriate; however, is much simpler and effective if patients keep track of the refills available. After hours and weekends there will not be any refills for medications, they must take place during the office hours. If needed, a short supply may be called to the pharmacy in order to avoid discontinuation in the treatment, but full prescription refill will be managed the next working day.</p>\r\n\r\n<p>Some controlled medications need to be in a written prescription every time. If it is arranged previously with your physician, you may not need to have an appointment for your written prescription. You will need to request this from our office and will be charged $25 for the service <i>(not covered by insurance)</i>. Optionally, you may prefer to come for an appointment every time you need a refill on your medication.',10800,1209600,86400,0,0,0,900,0,0,0,'25',1,'d-2d-w',8);
+INSERT INTO `ha45_services` VALUES (6,'60 Minute Therapy Session - Office Visit','<p>At the end of the assessment, your assessing therapist will offer some preliminary feedback about what he or she has observed during the session, and will advise you as to whether or not he or she considers therapy would be beneficial. Many patients who are deemed suitable to continue as patients with us wish to make an appointment to begin work there and then, while others prefer to go away and think about it. We are more than happy that you should do this – in fact we encourage you to visit more than one potential therapist before making a firm commitment, since your relationship with your therapist will be the most important element in the potential success or failure of the work you undertake.</p>\r\n\r\n<p>We would normally expect individuals and couples to commit to an initial 6 sessions of work, usually (although not always) occurring once weekly. We find this often proves sufficient for those bringing relatively simple issues. For others, the six sessions offers a time-limited introduction to counselling and therapy, during which period, the therapist is able to assess the client’s needs and preferred style of working in more detail. For such clients, the review which takes place at the end of the initial period allows them to examine what they have achieved thus far and to consider what remains to be worked on. Having decided to continue, both patient and therapist will formulate a plan for continued work, usually in an open-ended contract</p>',10800,1209600,86400,0,0,0,3600,0,0,0,'200',1,'d-2d-w',4);
+INSERT INTO `ha45_services` VALUES (7,'75 Minute Therapy Session - Office Visit','<p>At the end of the assessment, your assessing therapist will offer some preliminary feedback about what he or she has observed during the session, and will advise you as to whether or not he or she considers therapy would be beneficial. Many patients who are deemed suitable to continue as patients with us wish to make an appointment to begin work there and then, while others prefer to go away and think about it. We are more than happy that you should do this – in fact we encourage you to visit more than one potential therapist before making a firm commitment, since your relationship with your therapist will be the most important element in the potential success or failure of the work you undertake.</p>\r\n\r\n<p>We would normally expect individuals and couples to commit to an initial 6 sessions of work, usually (although not always) occurring once weekly. We find this often proves sufficient for those bringing relatively simple issues. For others, the six sessions offers a time-limited introduction to counselling and therapy, during which period, the therapist is able to assess the client’s needs and preferred style of working in more detail. For such clients, the review which takes place at the end of the initial period allows them to examine what they have achieved thus far and to consider what remains to be worked on. Having decided to continue, both patient and therapist will formulate a plan for continued work, usually in an open-ended contract</p>',10800,1209600,86400,0,0,0,4500,0,0,0,'250',1,'d-2d-w',5);
+INSERT INTO `ha45_services` VALUES (8,'90 Minute Therapy Session - Office Visit','<p>At the end of the assessment, your assessing therapist will offer some preliminary feedback about what he or she has observed during the session, and will advise you as to whether or not he or she considers therapy would be beneficial. Many patients who are deemed suitable to continue as patients with us wish to make an appointment to begin work there and then, while others prefer to go away and think about it. We are more than happy that you should do this – in fact we encourage you to visit more than one potential therapist before making a firm commitment, since your relationship with your therapist will be the most important element in the potential success or failure of the work you undertake.</p>\r\n\r\n<p>We would normally expect individuals and couples to commit to an initial 6 sessions of work, usually (although not always) occurring once weekly. We find this often proves sufficient for those bringing relatively simple issues. For others, the six sessions offers a time-limited introduction to counselling and therapy, during which period, the therapist is able to assess the client’s needs and preferred style of working in more detail. For such clients, the review which takes place at the end of the initial period allows them to examine what they have achieved thus far and to consider what remains to be worked on. Having decided to continue, both patient and therapist will formulate a plan for continued work, usually in an open-ended contract</p>',10800,1209600,86400,0,0,0,5400,0,0,0,'300',1,'d-2d-w',6);
+/*!40000 ALTER TABLE `ha45_services` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_templates`
+--
+
+DROP TABLE IF EXISTS `ha45_templates`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_templates` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `lang` varchar(16) NOT NULL,
+  `template` varchar(255) NOT NULL,
+  `subject` varchar(255) NOT NULL,
+  `body` text,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=21 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_templates`
+--
+
+LOCK TABLES `ha45_templates` WRITE;
+/*!40000 ALTER TABLE `ha45_templates` DISABLE KEYS */;
+INSERT INTO `ha45_templates` VALUES (1,'en','user-require_approval-user','Your Account Is Pending Approval','Thank you for registering!\r\n\r\nWe manually approve new accounts. We will notify you when your account is activated.');
+INSERT INTO `ha45_templates` VALUES (2,'en','user-activate-user','Your Account Is Now Active','Congratulations!\r\n\r\nYour user account is now active. Here is your login information:\r\n\r\nUsername: {USER.USERNAME}\r\nPassword: {USER.PASSWORD}\r\n');
+INSERT INTO `ha45_templates` VALUES (3,'en','user-reset_password-user','Your Password Reset','Per your request, your password has been reset. Here is your new login information:\r\n\r\nUsername: {USER.USERNAME}\r\nPassword: {USER.PASSWORD}\r\n');
+INSERT INTO `ha45_templates` VALUES (4,'en','user-require_approval-admin','New User Registered, Your Approval Required','A new user has registered at your MIS scheduler website. Please go to the admin panel to approve or reject this user.\r\n\r\nNew user information:\r\n\r\n{USER.-ALL-}\r\n');
+INSERT INTO `ha45_templates` VALUES (5,'en','appointment-require_approval-customer','Your Appointment Is Pending Approval','Thank you for your appointment request.\r\n\r\nWe kindly ask for your patience while we review your request. We will notify you when your appointment is accepted.\r\n\r\nYour appointment details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n');
+INSERT INTO `ha45_templates` VALUES (6,'en','appointment-approve-customer','Your Appointment Approved','Thank you for your appointment request. Your appointment is now approved.\r\n\r\nYour Appointment Details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n');
+INSERT INTO `ha45_templates` VALUES (7,'en','appointment-request-customer','Your Appointment Request','Thank you for your appointment request. Your appointment is now approved.\r\n\r\nYour Appointment Details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n');
+INSERT INTO `ha45_templates` VALUES (8,'en','appointment-reject-customer','Your Appointment Rejected','Thank you for your appointment request. We are sorry, your requested appointment was not abe to be scheduled.\r\n\r\nReason:\r\n\r\n{APPOINTMENT.REJECT_REASON}\r\n\r\nYour appointment details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n');
+INSERT INTO `ha45_templates` VALUES (9,'en','appointment-cancel-customer','Your Appointment Cancelled','This is the confirmation that your appointment has been cancelled by your request.\r\n\r\nCancel reason:\r\n\r\n{APPOINTMENT.CANCEL_REASON}\r\n\r\nYour appointment details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n');
+INSERT INTO `ha45_templates` VALUES (10,'en','appointment-change-customer','Your Appointment Changed','Your appointment has been changed, your new appointment details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n');
+INSERT INTO `ha45_templates` VALUES (11,'en','appointment-noshow-customer','Your Appointment Marked As No Show','We are sorry, your appointment has been marked as no show.\r\n\r\nYour appointment details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n');
+INSERT INTO `ha45_templates` VALUES (12,'en','appointment-remind-customer','Appointment Reminder','This is a reminder for your appointment.\r\n\r\nYour appointment details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n');
+INSERT INTO `ha45_templates` VALUES (13,'en','appointment-require_approval-provider','New Appointment Request Requires Approval','There is a new appointment request for you.\r\n\r\nAppointment details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n\r\nCustomer details:\r\n\r\n{APPOINTMENT.CUSTOMER.-ALL-}\r\n\r\nQuick links for this appointment:\r\n\r\n{APPOINTMENT.QUICK_LINK_APPROVE} {APPOINTMENT.QUICK_LINK_REJECT}\r\n');
+INSERT INTO `ha45_templates` VALUES (14,'en','appointment-approve-provider','Your Appointment Approved','Your appointment is now approved.\r\n\r\nYour Appointment Details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n\r\nCustomer details:\r\n\r\n{APPOINTMENT.CUSTOMER.-ALL-}\r\n');
+INSERT INTO `ha45_templates` VALUES (15,'en','appointment-request-provider','New Appointment Request','There is a new appointment request for you, it has been automatically approved.\r\n\r\nAppointment details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n\r\nCustomer details:\r\n\r\n{APPOINTMENT.CUSTOMER.-ALL-}\r\n');
+INSERT INTO `ha45_templates` VALUES (16,'en','appointment-reject-provider','Your Appointment Rejected','Your appointment request was not able to be scheduled.\r\n\r\nReason:\r\n\r\n{APPOINTMENT.REJECT_REASON}\r\n\r\nYour appointment details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n\r\nCustomer details:\r\n\r\n{APPOINTMENT.CUSTOMER.-ALL-}\r\n');
+INSERT INTO `ha45_templates` VALUES (17,'en','appointment-cancel-provider','Your Appointment Cancelled By Customer','This is the confirmation that your appointment has been cancelled by the customer.\r\n\r\nCancel reason:\r\n\r\n{APPOINTMENT.CANCEL_REASON}\r\n\r\nAppointment details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n\r\nCustomer details:\r\n\r\n{APPOINTMENT.CUSTOMER.-ALL-}\r\n');
+INSERT INTO `ha45_templates` VALUES (18,'en','appointment-change-provider','Your Appointment Changed','Your appointment has been changed, your new appointment details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n\r\nCustomer details:\r\n\r\n{APPOINTMENT.CUSTOMER.-ALL-}\r\n');
+INSERT INTO `ha45_templates` VALUES (19,'en','appointment-noshow-provider','Your Appointment Marked As No Show','Your appointment has been marked as no show.  Per your service agreement you are responsible for {APPOINTMENT.PRICE}.\r\n\r\nYour appointment details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n\r\nCustomer details:\r\n\r\n{APPOINTMENT.CUSTOMER.-ALL-}\r\n');
+INSERT INTO `ha45_templates` VALUES (20,'en','appointment-remind-provider','Appointment Reminder','This is a reminder for your appointment.\r\n\r\nYour appointment details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n');
+/*!40000 ALTER TABLE `ha45_templates` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_timeblocks`
+--
+
+DROP TABLE IF EXISTS `ha45_timeblocks`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_timeblocks` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `schedule_id` int(11) NOT NULL,
+  `starts_at` int(11) NOT NULL,
+  `ends_at` int(11) NOT NULL,
+  `selectable_every` int(11) NOT NULL,
+  `selectable_fixed` text,
+  `applied_on` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_timeblocks`
+--
+
+LOCK TABLES `ha45_timeblocks` WRITE;
+/*!40000 ALTER TABLE `ha45_timeblocks` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ha45_timeblocks` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_timeoffs`
+--
+
+DROP TABLE IF EXISTS `ha45_timeoffs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_timeoffs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `resource_id` int(11) NOT NULL,
+  `location_id` int(11) NOT NULL,
+  `starts_at` int(11) NOT NULL,
+  `ends_at` int(11) NOT NULL,
+  `description` text,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_timeoffs`
+--
+
+LOCK TABLES `ha45_timeoffs` WRITE;
+/*!40000 ALTER TABLE `ha45_timeoffs` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ha45_timeoffs` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_users`
+--
+
+DROP TABLE IF EXISTS `ha45_users`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_users` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `username` varchar(128) NOT NULL,
+  `email` varchar(128) NOT NULL,
+  `password` varchar(64) NOT NULL,
+  `first_name` varchar(128) DEFAULT NULL,
+  `last_name` varchar(128) DEFAULT NULL,
+  `created` int(11) NOT NULL,
+  `lang` varchar(16) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_users`
+--
+
+LOCK TABLES `ha45_users` WRITE;
+/*!40000 ALTER TABLE `ha45_users` DISABLE KEYS */;
+INSERT INTO `ha45_users` VALUES (1,'admin','support@okmis.com','f382e5edf264775e13ce513384e4f152','Keith','Stephenson',1308530181,'');
+/*!40000 ALTER TABLE `ha45_users` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v5_appointments`
+--
+
+DROP TABLE IF EXISTS `ha45_v5_appointments`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v5_appointments` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `service_id` int(11) DEFAULT NULL,
+  `resource_id` int(11) DEFAULT NULL,
+  `customer_id` int(11) DEFAULT NULL,
+  `location_id` int(11) DEFAULT NULL,
+  `seats` int(11) DEFAULT '1',
+  `created_at` int(11) DEFAULT NULL,
+  `starts_at` int(11) DEFAULT NULL,
+  `duration` int(11) DEFAULT NULL,
+  `lead_in` int(11) DEFAULT NULL,
+  `lead_out` int(11) DEFAULT NULL,
+  `approved` tinyint(4) DEFAULT NULL,
+  `auth_code` varchar(32) DEFAULT NULL,
+  `price` varchar(16) NOT NULL,
+  `need_reminder` int(11) DEFAULT '0',
+  `completed` tinyint(4) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v5_appointments`
+--
+
+LOCK TABLES `ha45_v5_appointments` WRITE;
+/*!40000 ALTER TABLE `ha45_v5_appointments` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ha45_v5_appointments` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v5_conf`
+--
+
+DROP TABLE IF EXISTS `ha45_v5_conf`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v5_conf` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL,
+  `value` text NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=193 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v5_conf`
+--
+
+LOCK TABLES `ha45_v5_conf` WRITE;
+/*!40000 ALTER TABLE `ha45_v5_conf` DISABLE KEYS */;
+INSERT INTO `ha45_v5_conf` VALUES (1,'emailSentFrom','support@okmis.com');
+INSERT INTO `ha45_v5_conf` VALUES (2,'emailSentFromName','An Inward Bound Family Counseling Center, LLC');
+INSERT INTO `ha45_v5_conf` VALUES (3,'paymentGateways','offline');
+INSERT INTO `ha45_v5_conf` VALUES (4,'currentVersion','5.2.9');
+INSERT INTO `ha45_v5_conf` VALUES (5,'backupLastRun','1350997919');
+INSERT INTO `ha45_v5_conf` VALUES (6,'text-Bookable Resource','Therapist');
+INSERT INTO `ha45_v5_conf` VALUES (7,'text-Bookable Resources','Therapists');
+INSERT INTO `ha45_v5_conf` VALUES (8,'smtpSecure','');
+INSERT INTO `ha45_v5_conf` VALUES (9,'smtpHost','');
+INSERT INTO `ha45_v5_conf` VALUES (10,'smtpUser','');
+INSERT INTO `ha45_v5_conf` VALUES (11,'smtpPass','');
+INSERT INTO `ha45_v5_conf` VALUES (12,'emailDebug','1');
+INSERT INTO `ha45_v5_conf` VALUES (13,'emailDisabled','0');
+INSERT INTO `ha45_v5_conf` VALUES (14,'emailCommonHeader','An Inward Bound Family Counseling Center, LLC (405) 516-0343');
+INSERT INTO `ha45_v5_conf` VALUES (15,'emailCommonFooter','The information within and/or documents accompanying this email contains confidential information that may be legally privileged and protected by federal and state law. This information is intended for use only by the entity or individual to whom it is addressed. The authorized recipient is obligated to maintain the information in a safe, secure, and confidential manner. The authorized recipient is prohibited from using this information for purposes other than intended, prohibited from disclosing this information to any other party unless required to do so by law or regulation, and is required to destroy the information after its stated need has been fulfilled.\r\n\r\nIf you are in possession of this protected health information, and are not the intended recipient, you are hereby notified that any improper disclosure, copying, or distribution of the contents of this information is strictly prohibited. Please notify the owner of this information immediately and delete this email.');
+INSERT INTO `ha45_v5_conf` VALUES (16,'daysToShowAdmin','1');
+INSERT INTO `ha45_v5_conf` VALUES (17,'daysToShowCustomer','1');
+INSERT INTO `ha45_v5_conf` VALUES (18,'monthsToShow','1');
+INSERT INTO `ha45_v5_conf` VALUES (19,'timeUnit','15');
+INSERT INTO `ha45_v5_conf` VALUES (20,'companyTimezone','America/Chicago');
+INSERT INTO `ha45_v5_conf` VALUES (21,'dateFormat','j M Y');
+INSERT INTO `ha45_v5_conf` VALUES (22,'timeFormat','g:i A');
+INSERT INTO `ha45_v5_conf` VALUES (23,'weekStartsOn','1');
+INSERT INTO `ha45_v5_conf` VALUES (24,'limitTimeMeasure','hour');
+INSERT INTO `ha45_v5_conf` VALUES (25,'theme','blue');
+INSERT INTO `ha45_v5_conf` VALUES (26,'allowNoEmail','0');
+INSERT INTO `ha45_v5_conf` VALUES (27,'enableTimezones','0');
+INSERT INTO `ha45_v5_conf` VALUES (28,'userEmailConfirmation','1');
+INSERT INTO `ha45_v5_conf` VALUES (29,'userAdminApproval','1');
+INSERT INTO `ha45_v5_conf` VALUES (30,'userLoginRequired','1');
+INSERT INTO `ha45_v5_conf` VALUES (31,'enableRegistration','1');
+INSERT INTO `ha45_v5_conf` VALUES (32,'emailAsUsername','1');
+INSERT INTO `ha45_v5_conf` VALUES (33,'allowDuplicateEmails','0');
+INSERT INTO `ha45_v5_conf` VALUES (34,'timeStarts','28800');
+INSERT INTO `ha45_v5_conf` VALUES (35,'timeEnds','75600');
+INSERT INTO `ha45_v5_conf` VALUES (36,'installationId','d61e5a433a07b8e507c2b00e2d6ea4fc');
+INSERT INTO `ha45_v5_conf` VALUES (37,'licenseCode','9b5face0');
+INSERT INTO `ha45_v5_conf` VALUES (38,'cronLastRun','1403283792');
+INSERT INTO `ha45_v5_conf` VALUES (39,'remindOfBackup','0');
+INSERT INTO `ha45_v5_conf` VALUES (126,'showCompletedAppsAdmin','1');
+INSERT INTO `ha45_v5_conf` VALUES (41,'plugin-sms-gateway','email2sms');
+INSERT INTO `ha45_v5_conf` VALUES (192,'plugin-sms-carriers','rogers');
+INSERT INTO `ha45_v5_conf` VALUES (191,'plugin-sms-carriers','us-cellular');
+INSERT INTO `ha45_v5_conf` VALUES (190,'plugin-sms-carriers','metropcs');
+INSERT INTO `ha45_v5_conf` VALUES (189,'plugin-sms-carriers','cricket');
+INSERT INTO `ha45_v5_conf` VALUES (188,'plugin-sms-carriers','tmobile');
+INSERT INTO `ha45_v5_conf` VALUES (187,'plugin-sms-carriers','sprint');
+INSERT INTO `ha45_v5_conf` VALUES (186,'plugin-sms-carriers','att');
+INSERT INTO `ha45_v5_conf` VALUES (50,'plugin-sms-from','(405) 516-0343');
+INSERT INTO `ha45_v5_conf` VALUES (51,'plugin-sms-debug','0');
+INSERT INTO `ha45_v5_conf` VALUES (52,'plugin-sms-disabled','0');
+INSERT INTO `ha45_v5_conf` VALUES (53,'plugins','sms');
+INSERT INTO `ha45_v5_conf` VALUES (54,'firstTimeSplash','');
+INSERT INTO `ha45_v5_conf` VALUES (124,'useCaptcha','1');
+INSERT INTO `ha45_v5_conf` VALUES (125,'strongPassword','0');
+INSERT INTO `ha45_v5_conf` VALUES (122,'returnAfterRequest','');
+INSERT INTO `ha45_v5_conf` VALUES (123,'requireCancelReason','1');
+INSERT INTO `ha45_v5_conf` VALUES (120,'showEndTime','1');
+INSERT INTO `ha45_v5_conf` VALUES (121,'csvDelimiter',',');
+INSERT INTO `ha45_v5_conf` VALUES (116,'appsInCart','3');
+INSERT INTO `ha45_v5_conf` VALUES (117,'attachIcal','1');
+INSERT INTO `ha45_v5_conf` VALUES (118,'selectStyle','list');
+INSERT INTO `ha45_v5_conf` VALUES (119,'showSessionDuration','1');
+INSERT INTO `ha45_v5_conf` VALUES (115,'htmlTitle','My Agency Appointment Scheduler');
+INSERT INTO `ha45_v5_conf` VALUES (178,'disabledNotifications','user-activate-admin');
+INSERT INTO `ha45_v5_conf` VALUES (127,'sendCcForAppointment','0');
+INSERT INTO `ha45_v5_conf` VALUES (128,'appointmentFlow','location:manual|service:manual|resource:manual|time:manual');
+INSERT INTO `ha45_v5_conf` VALUES (185,'plugin-sms-carriers','verizon');
+INSERT INTO `ha45_v5_conf` VALUES (177,'disabledNotifications','appointment-request-provider');
+INSERT INTO `ha45_v5_conf` VALUES (176,'disabledNotifications','appointment-approve-provider');
+INSERT INTO `ha45_v5_conf` VALUES (175,'disabledNotifications','appointment-require_approval-customer');
+INSERT INTO `ha45_v5_conf` VALUES (174,'disabledNotifications','appointment-require_approval-provider');
+INSERT INTO `ha45_v5_conf` VALUES (173,'disabledNotifications','appointment-request-customer');
+INSERT INTO `ha45_v5_conf` VALUES (172,'disabledNotifications','appointment-approve-customer');
+INSERT INTO `ha45_v5_conf` VALUES (179,'disabledNotifications','user-require_approval-user');
+INSERT INTO `ha45_v5_conf` VALUES (180,'disabledNotifications','user-require_approval-admin');
+INSERT INTO `ha45_v5_conf` VALUES (181,'cronEnabled','1');
+INSERT INTO `ha45_v5_conf` VALUES (182,'remindBefore','86400');
+INSERT INTO `ha45_v5_conf` VALUES (183,'autoComplete','0');
+INSERT INTO `ha45_v5_conf` VALUES (184,'autoReject','0');
+/*!40000 ALTER TABLE `ha45_v5_conf` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v5_coupons`
+--
+
+DROP TABLE IF EXISTS `ha45_v5_coupons`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v5_coupons` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `code` text,
+  `use_limit` int(11) DEFAULT NULL,
+  `promotion_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v5_coupons`
+--
+
+LOCK TABLES `ha45_v5_coupons` WRITE;
+/*!40000 ALTER TABLE `ha45_v5_coupons` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ha45_v5_coupons` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v5_form_controls`
+--
+
+DROP TABLE IF EXISTS `ha45_v5_form_controls`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v5_form_controls` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `form_id` int(11) DEFAULT NULL,
+  `name` varchar(128) NOT NULL,
+  `type` varchar(32) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `description` text NOT NULL,
+  `show_order` int(11) NOT NULL,
+  `ext_access` varchar(32) NOT NULL,
+  `attr` text NOT NULL,
+  `validators` text NOT NULL,
+  `default_value` text NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=16 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v5_form_controls`
+--
+
+LOCK TABLES `ha45_v5_form_controls` WRITE;
+/*!40000 ALTER TABLE `ha45_v5_form_controls` DISABLE KEYS */;
+INSERT INTO `ha45_v5_form_controls` VALUES (1,1,'username','text','Username','',1,'write','a:4:{s:4:\"cols\";s:0:\"\";s:4:\"rows\";s:0:\"\";s:4:\"size\";s:2:\"24\";s:7:\"options\";a:1:{i:0;s:0:\"\";}}','a:2:{i:0;a:2:{s:4:\"code\";s:8:\"notEmpty\";s:5:\"error\";s:14:\"Required field\";}i:1;a:2:{s:4:\"code\";s:13:\"checkUsername\";s:5:\"error\";s:31:\"This username is already in use\";}}','');
+INSERT INTO `ha45_v5_form_controls` VALUES (2,1,'email','text','Email','Please enter valid email or use support@okmis.com',2,'write','a:4:{s:4:\"cols\";s:0:\"\";s:4:\"rows\";s:0:\"\";s:4:\"size\";s:2:\"32\";s:7:\"options\";a:1:{i:0;s:0:\"\";}}','a:1:{i:0;a:2:{s:4:\"code\";s:5:\"email\";s:5:\"error\";s:49:\"Please enter valid email or use support@okmis.com\";}}','support@okmis.com');
+INSERT INTO `ha45_v5_form_controls` VALUES (3,1,'first_name','text','First Name','',3,'write','a:1:{s:4:\"size\";i:32;}','a:1:{i:0;a:2:{s:4:\"code\";s:8:\"notEmpty\";s:5:\"error\";s:27:\"Please enter the first name\";}}','');
+INSERT INTO `ha45_v5_form_controls` VALUES (4,1,'last_name','text','Last Name','',4,'write','a:1:{s:4:\"size\";i:32;}','a:1:{i:0;a:2:{s:4:\"code\";s:8:\"notEmpty\";s:5:\"error\";s:26:\"Please enter the last name\";}}','');
+INSERT INTO `ha45_v5_form_controls` VALUES (5,1,'phone','text','Phone','Primary contact number',6,'write','a:4:{s:4:\"cols\";s:0:\"\";s:4:\"rows\";s:0:\"\";s:4:\"size\";s:2:\"10\";s:7:\"options\";a:1:{i:0;s:0:\"\";}}','a:2:{i:0;a:2:{s:4:\"code\";s:7:\"phone10\";s:5:\"error\";s:48:\"Please enter a valid phone number with area code\";}i:1;a:2:{s:4:\"code\";s:8:\"notEmpty\";s:5:\"error\";s:34:\"Must have a primary contact number\";}}','');
+INSERT INTO `ha45_v5_form_controls` VALUES (8,1,'nomessage','checkbox','No Voice Mail Messages','Please UNSELECT if you  want messages left',11,'write','a:4:{s:4:\"cols\";s:0:\"\";s:4:\"rows\";s:0:\"\";s:4:\"size\";s:0:\"\";s:7:\"options\";a:1:{i:0;s:0:\"\";}}','','1');
+INSERT INTO `ha45_v5_form_controls` VALUES (9,1,'alternate_contact','text','Alternate Contact','Please list name of alternate contact',5,'write','a:1:{s:4:\"size\";s:2:\"30\";}','','');
+INSERT INTO `ha45_v5_form_controls` VALUES (10,2,'mobile_phone','mobilephone','Mobile Phone For SMS Notifications','Please make sure that you include the country code. For example, the US number (248) 123-7654 becomes +12481237654, the UK number 07777123456 becomes +447777123456.',12,'write','a:1:{s:4:\"size\";i:24;}','','');
+INSERT INTO `ha45_v5_form_controls` VALUES (11,1,'mobile_phone','mobilephone','Mobile Phone For SMS Notifications','Please make sure that you include the country code. For example, the US number (248) 123-7654 becomes +12481237654, the UK number 07777123456 becomes +447777123456.',8,'write','a:1:{s:4:\"size\";i:24;}','','');
+INSERT INTO `ha45_v5_form_controls` VALUES (13,1,'nophonereminder','checkbox','No Phone Call Reminder','Please UNSELECT if you would like to have a phone call appointment reminder',9,'write','a:4:{s:4:\"cols\";s:0:\"\";s:4:\"rows\";s:0:\"\";s:4:\"size\";s:0:\"\";s:7:\"options\";a:1:{i:0;s:0:\"\";}}','','1');
+INSERT INTO `ha45_v5_form_controls` VALUES (14,1,'noemailreminder','checkbox','No Email Reminder','Please UNSELECT if you would like an email reminder of appointment',13,'write','a:4:{s:4:\"cols\";s:0:\"\";s:4:\"rows\";s:0:\"\";s:4:\"size\";s:0:\"\";s:7:\"options\";a:1:{i:0;s:0:\"\";}}','','1');
+INSERT INTO `ha45_v5_form_controls` VALUES (15,1,'notextreminder','checkbox','No Text Reminder','Please UNSELECT if you want text message appointment reminders',14,'write','a:4:{s:4:\"cols\";s:0:\"\";s:4:\"rows\";s:0:\"\";s:4:\"size\";s:0:\"\";s:7:\"options\";a:1:{i:0;s:0:\"\";}}','','1');
+/*!40000 ALTER TABLE `ha45_v5_form_controls` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v5_forms`
+--
+
+DROP TABLE IF EXISTS `ha45_v5_forms`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v5_forms` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(128) NOT NULL,
+  `class` varchar(32) NOT NULL,
+  `details` varchar(128) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v5_forms`
+--
+
+LOCK TABLES `ha45_v5_forms` WRITE;
+/*!40000 ALTER TABLE `ha45_v5_forms` DISABLE KEYS */;
+INSERT INTO `ha45_v5_forms` VALUES (1,'Customer Form','customer','');
+INSERT INTO `ha45_v5_forms` VALUES (2,'Provider Form','provider','');
+/*!40000 ALTER TABLE `ha45_v5_forms` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v5_invoices`
+--
+
+DROP TABLE IF EXISTS `ha45_v5_invoices`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v5_invoices` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `refno` varchar(16) NOT NULL,
+  `amount` double NOT NULL,
+  `currency` varchar(3) NOT NULL,
+  `created_at` int(11) NOT NULL,
+  `due_at` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v5_invoices`
+--
+
+LOCK TABLES `ha45_v5_invoices` WRITE;
+/*!40000 ALTER TABLE `ha45_v5_invoices` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ha45_v5_invoices` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v5_locations`
+--
+
+DROP TABLE IF EXISTS `ha45_v5_locations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v5_locations` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL,
+  `description` text NOT NULL,
+  `show_order` int(11) NOT NULL DEFAULT '1',
+  `capacity` int(11) DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v5_locations`
+--
+
+LOCK TABLES `ha45_v5_locations` WRITE;
+/*!40000 ALTER TABLE `ha45_v5_locations` DISABLE KEYS */;
+INSERT INTO `ha45_v5_locations` VALUES (1,'An Inward Bound Family Counseling Center, LLC','1611 North Broadway<br>\r\nOklahoma City, OK  73103-4601<br>\r\n<p>Phone: (405) 516-0343</p>\r\n<p><b><a \r\nhref=\"http://mapq.st/SwWoX6\">Map</a></b></p>\r\n<p></p>\r\n<p><i>An Inward Bound Family Counseling Center, LLC, is a single specialty mental health group practice serving adults and children with traditional medical insurance coverage and private payment.  We are an approved Medicaid mental health provider for children. </i><br>\r\n<p></p',1,0);
+/*!40000 ALTER TABLE `ha45_v5_locations` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v5_objectmeta`
+--
+
+DROP TABLE IF EXISTS `ha45_v5_objectmeta`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v5_objectmeta` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `obj_class` varchar(32) DEFAULT NULL,
+  `obj_id` int(11) DEFAULT NULL,
+  `meta_name` varchar(32) DEFAULT NULL,
+  `meta_value` text NOT NULL,
+  `meta_data` text NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=139 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v5_objectmeta`
+--
+
+LOCK TABLES `ha45_v5_objectmeta` WRITE;
+/*!40000 ALTER TABLE `ha45_v5_objectmeta` DISABLE KEYS */;
+INSERT INTO `ha45_v5_objectmeta` VALUES (1,'user',1,'_role','admin','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (98,'user',8,'_role','admin','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (3,'user',1,'_auth_code','2883GEt7YXVs','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (6,'service',1,'_permissions','group-1:allowed','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (7,'service',1,'_permissions','group0:auto_confirm','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (97,'user',8,'_timezone','America/Chicago','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (18,'user',3,'_role','admin','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (19,'user',3,'_agenda_fields','service','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (20,'user',3,'_agenda_fields','customer','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (99,'user',8,'_created_by','0','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (100,'user',8,'_agenda_fields','service','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (101,'user',8,'_agenda_fields','customer','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (102,'user',8,'_default_calendar','0','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (103,'user',8,'_default_apps_view','calendar','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (104,'user',8,'mobile_carrier','att','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (105,'user',8,'mobile_phone','4057061226','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (106,'user',8,'_disabled_panels','admin/customers/notified','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (107,'user',8,'_disabled_panels','admin/customers/import','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (108,'user',8,'_disabled_panels','admin/forms/customers','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (109,'user',8,'_disabled_panels','admin/forms/appointments','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (110,'user',8,'_disabled_panels','admin/conf/cron','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (111,'user',8,'_disabled_panels','admin/conf/terminology','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (112,'user',8,'_disabled_panels','admin/conf/datetime','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (113,'user',8,'_disabled_panels','admin/conf/currency','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (114,'user',8,'_disabled_panels','admin/conf/plugins','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (115,'user',8,'_disabled_panels','admin/conf/misc','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (116,'user',8,'_disabled_panels','admin/conf/upgrade','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (117,'user',8,'_disabled_panels','admin/sms/settings','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (118,'user',8,'_disabled_panels','admin/sms/templates','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (119,'user',1,'_resource_schedules','2','3');
+INSERT INTO `ha45_v5_objectmeta` VALUES (120,'user',1,'_resource_apps','2','7');
+INSERT INTO `ha45_v5_objectmeta` VALUES (121,'user',9,'phone','4057061226','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (122,'user',9,'mobile_carrier','att','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (123,'user',9,'mobile_phone','4057061226','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (124,'user',9,'nophonereminder','1','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (125,'user',9,'nomessage','1','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (126,'user',9,'noemailreminder','1','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (127,'user',9,'notextreminder','1','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (128,'user',9,'captcha','999','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (129,'user',9,'_role','customer','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (130,'user',9,'_timezone','America/Chicago','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (131,'user',9,'_created_by','0','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (132,'user',9,'_agenda_fields','service','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (133,'user',9,'_agenda_fields','customer','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (134,'user',9,'_default_calendar','0','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (135,'user',9,'_default_apps_view','calendar','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (138,'user',9,'_restriction','not_approved','');
+INSERT INTO `ha45_v5_objectmeta` VALUES (137,'user',9,'_confirmKey','CkhxJKSI','');
+/*!40000 ALTER TABLE `ha45_v5_objectmeta` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v5_orders`
+--
+
+DROP TABLE IF EXISTS `ha45_v5_orders`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v5_orders` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `created_at` int(11) DEFAULT NULL,
+  `valid_from` int(11) DEFAULT NULL,
+  `valid_to` int(11) DEFAULT NULL,
+  `is_active` tinyint(4) DEFAULT '1',
+  `pack_id` int(11) NOT NULL,
+  `customer_id` int(11) NOT NULL,
+  `location_id` int(11) NOT NULL,
+  `resource_id` int(11) NOT NULL,
+  `service_id` text NOT NULL,
+  `qty` int(11) NOT NULL DEFAULT '0',
+  `amount` double NOT NULL DEFAULT '0',
+  `duration` int(11) NOT NULL DEFAULT '0',
+  `rule` text,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v5_orders`
+--
+
+LOCK TABLES `ha45_v5_orders` WRITE;
+/*!40000 ALTER TABLE `ha45_v5_orders` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ha45_v5_orders` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v5_packs`
+--
+
+DROP TABLE IF EXISTS `ha45_v5_packs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v5_packs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `service_id` text NOT NULL,
+  `location_id` int(11) NOT NULL DEFAULT '0',
+  `resource_id` int(11) NOT NULL DEFAULT '0',
+  `qty` int(11) DEFAULT NULL,
+  `duration` int(11) NOT NULL DEFAULT '0',
+  `amount` double DEFAULT NULL,
+  `price` double DEFAULT NULL,
+  `expires_in` varchar(32) NOT NULL DEFAULT '1 months',
+  `show_order` int(11) DEFAULT '1',
+  `title` varchar(255) DEFAULT NULL,
+  `rule` text,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v5_packs`
+--
+
+LOCK TABLES `ha45_v5_packs` WRITE;
+/*!40000 ALTER TABLE `ha45_v5_packs` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ha45_v5_packs` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v5_payments`
+--
+
+DROP TABLE IF EXISTS `ha45_v5_payments`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v5_payments` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `invoice_id` int(11) NOT NULL,
+  `paid_at` int(11) NOT NULL,
+  `amount_gross` double NOT NULL,
+  `amount_net` double NOT NULL,
+  `currency` varchar(3) NOT NULL,
+  `pgateway` varchar(32) NOT NULL,
+  `pgateway_ref` text NOT NULL,
+  `pgateway_response` text NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v5_payments`
+--
+
+LOCK TABLES `ha45_v5_payments` WRITE;
+/*!40000 ALTER TABLE `ha45_v5_payments` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ha45_v5_payments` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v5_promotions`
+--
+
+DROP TABLE IF EXISTS `ha45_v5_promotions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v5_promotions` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) DEFAULT NULL,
+  `rule` text,
+  `price` text,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v5_promotions`
+--
+
+LOCK TABLES `ha45_v5_promotions` WRITE;
+/*!40000 ALTER TABLE `ha45_v5_promotions` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ha45_v5_promotions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v5_resources`
+--
+
+DROP TABLE IF EXISTS `ha45_v5_resources`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v5_resources` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL,
+  `description` text NOT NULL,
+  `show_order` int(11) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v5_resources`
+--
+
+LOCK TABLES `ha45_v5_resources` WRITE;
+/*!40000 ALTER TABLE `ha45_v5_resources` DISABLE KEYS */;
+INSERT INTO `ha45_v5_resources` VALUES (2,'Todd Palmer','Licensed Professional Counselor',1);
+/*!40000 ALTER TABLE `ha45_v5_resources` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v5_service_cats`
+--
+
+DROP TABLE IF EXISTS `ha45_v5_service_cats`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v5_service_cats` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL,
+  `description` text NOT NULL,
+  `show_order` int(11) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v5_service_cats`
+--
+
+LOCK TABLES `ha45_v5_service_cats` WRITE;
+/*!40000 ALTER TABLE `ha45_v5_service_cats` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ha45_v5_service_cats` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v5_services`
+--
+
+DROP TABLE IF EXISTS `ha45_v5_services`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v5_services` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL,
+  `description` text NOT NULL,
+  `min_cancel` int(11) NOT NULL DEFAULT '86400',
+  `allow_queue` tinyint(4) NOT NULL DEFAULT '0',
+  `class_type` tinyint(4) NOT NULL DEFAULT '0',
+  `duration` int(11) NOT NULL DEFAULT '1800',
+  `lead_in` int(11) NOT NULL DEFAULT '0',
+  `lead_out` int(11) NOT NULL DEFAULT '0',
+  `price` varchar(16) NOT NULL,
+  `recur_total` int(11) NOT NULL DEFAULT '1',
+  `recur_options` varchar(64) NOT NULL DEFAULT 'd-2d-w',
+  `show_order` int(11) NOT NULL DEFAULT '1',
+  `return_url` text,
+  `blocks_location` tinyint(4) DEFAULT '0',
+  `pack_only` tinyint(4) DEFAULT '0',
+  `prepay` varchar(16) DEFAULT '',
+  `duration_max` int(11) DEFAULT '1800',
+  `duration_increment` int(11) DEFAULT '1800',
+  `price_increment` varchar(16) DEFAULT '',
+  `blocks_resource` tinyint(4) DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v5_services`
+--
+
+LOCK TABLES `ha45_v5_services` WRITE;
+/*!40000 ALTER TABLE `ha45_v5_services` DISABLE KEYS */;
+INSERT INTO `ha45_v5_services` VALUES (1,'Initial Assessment - Office Visit','<p>The initial visit focuses on the assessment of the problems that bring the individual to a psychiatric consultation. At the same time, this visit includes the comprehensive evaluation from the medical perspective as well as the social environment. As part of the evaluation we ask that the patients fill out forms that will provide us general information from the health perspective and the medical and psychiatric history (you can download these and fill them out prior to your appointment). There are screening tools available as well, that can be used at the time of the evaluation, or some self administered tools that patients can do at home prior to their visit. The initial assessment and treatment plan are formulated on the first session, but they continue to be reviewed all the time as the work progresses.</p>\r\n\r\n<p>As part of the evaluation, is very important that we get the information of other medications currently taken and psychiatric medications used in the past. In order to coordinate care, we will ask for information on your other treating physicians and therapists, as well as your written authorization to share information with them. Bring the information to the appointment and whenever new medications are prescribed by other providers in the future, keep us updated with the information. </p>\r\n\r\n<p><b> Price Listed is for Non-insured</b></p>\r\n\r\n<p><i>Office Visit Insurance Copays Apply</i></p>',86400,0,0,7200,0,0,'300',1,'d-2d-w',1,NULL,0,0,'',7200,7200,'300',0);
+INSERT INTO `ha45_v5_services` VALUES (3,'20-30 Minute Therapy Session - Office Visit','<p>At the end of the assessment, your assessing therapist will offer some preliminary feedback about what he or she has observed during the session, and will advise you as to whether or not he or she considers therapy would be beneficial. Many patients who are deemed suitable to continue as patients with us wish to make an appointment to begin work there and then, while others prefer to go away and think about it. We are more than happy that you should do this – in fact we encourage you to visit more than one potential therapist before making a firm commitment, since your relationship with your therapist will be the most important element in the potential success or failure of the work you undertake.</p>\r\n\r\n<p>We would normally expect individuals and couples to commit to an initial 6 sessions of work, usually (although not always) occurring once weekly. We find this often proves sufficient for those bringing relatively simple issues. For others, the six sessions offers a time-limited introduction to counselling and therapy, during which period, the therapist is able to assess the client’s needs and preferred style of working in more detail. For such clients, the review which takes place at the end of the initial period allows them to examine what they have achieved thus far and to consider what remains to be worked on. Having decided to continue, both patient and therapist will formulate a plan for continued work, usually in an open-ended contract</p>',86400,0,0,1800,0,0,'75',1,'d-2d-w',2,NULL,0,0,'',1800,1800,'75',0);
+INSERT INTO `ha45_v5_services` VALUES (4,'45 Minute Therapy Session - Office Visit','<p>At the end of the assessment, your assessing therapist will offer some preliminary feedback about what he or she has observed during the session, and will advise you as to whether or not he or she considers therapy would be beneficial. Many patients who are deemed suitable to continue as patients with us wish to make an appointment to begin work there and then, while others prefer to go away and think about it. We are more than happy that you should do this – in fact we encourage you to visit more than one potential therapist before making a firm commitment, since your relationship with your therapist will be the most important element in the potential success or failure of the work you undertake.</p>\r\n\r\n<p>We would normally expect individuals and couples to commit to an initial 6 sessions of work, usually (although not always) occurring once weekly. We find this often proves sufficient for those bringing relatively simple issues. For others, the six sessions offers a time-limited introduction to counselling and therapy, during which period, the therapist is able to assess the client’s needs and preferred style of working in more detail. For such clients, the review which takes place at the end of the initial period allows them to examine what they have achieved thus far and to consider what remains to be worked on. Having decided to continue, both patient and therapist will formulate a plan for continued work, usually in an open-ended contract</p>',86400,0,0,2700,0,0,'150',1,'d-2d-w',3,NULL,0,0,'',2700,2700,'150',0);
+INSERT INTO `ha45_v5_services` VALUES (6,'60 Minute Therapy Session - Office Visit','<p>At the end of the assessment, your assessing therapist will offer some preliminary feedback about what he or she has observed during the session, and will advise you as to whether or not he or she considers therapy would be beneficial. Many patients who are deemed suitable to continue as patients with us wish to make an appointment to begin work there and then, while others prefer to go away and think about it. We are more than happy that you should do this – in fact we encourage you to visit more than one potential therapist before making a firm commitment, since your relationship with your therapist will be the most important element in the potential success or failure of the work you undertake.</p>\r\n\r\n<p>We would normally expect individuals and couples to commit to an initial 6 sessions of work, usually (although not always) occurring once weekly. We find this often proves sufficient for those bringing relatively simple issues. For others, the six sessions offers a time-limited introduction to counselling and therapy, during which period, the therapist is able to assess the client’s needs and preferred style of working in more detail. For such clients, the review which takes place at the end of the initial period allows them to examine what they have achieved thus far and to consider what remains to be worked on. Having decided to continue, both patient and therapist will formulate a plan for continued work, usually in an open-ended contract</p>',86400,0,0,3600,0,0,'200',1,'d-2d-w',4,NULL,0,0,'',3600,3600,'200',0);
+INSERT INTO `ha45_v5_services` VALUES (7,'75 Minute Therapy Session - Office Visit','<p>At the end of the assessment, your assessing therapist will offer some preliminary feedback about what he or she has observed during the session, and will advise you as to whether or not he or she considers therapy would be beneficial. Many patients who are deemed suitable to continue as patients with us wish to make an appointment to begin work there and then, while others prefer to go away and think about it. We are more than happy that you should do this – in fact we encourage you to visit more than one potential therapist before making a firm commitment, since your relationship with your therapist will be the most important element in the potential success or failure of the work you undertake.</p>\r\n\r\n<p>We would normally expect individuals and couples to commit to an initial 6 sessions of work, usually (although not always) occurring once weekly. We find this often proves sufficient for those bringing relatively simple issues. For others, the six sessions offers a time-limited introduction to counselling and therapy, during which period, the therapist is able to assess the client’s needs and preferred style of working in more detail. For such clients, the review which takes place at the end of the initial period allows them to examine what they have achieved thus far and to consider what remains to be worked on. Having decided to continue, both patient and therapist will formulate a plan for continued work, usually in an open-ended contract</p>',86400,0,0,4500,0,0,'250',1,'d-2d-w',5,NULL,0,0,'',4500,4500,'250',0);
+INSERT INTO `ha45_v5_services` VALUES (8,'90 Minute Therapy Session - Office Visit','<p>At the end of the assessment, your assessing therapist will offer some preliminary feedback about what he or she has observed during the session, and will advise you as to whether or not he or she considers therapy would be beneficial. Many patients who are deemed suitable to continue as patients with us wish to make an appointment to begin work there and then, while others prefer to go away and think about it. We are more than happy that you should do this – in fact we encourage you to visit more than one potential therapist before making a firm commitment, since your relationship with your therapist will be the most important element in the potential success or failure of the work you undertake.</p>\r\n\r\n<p>We would normally expect individuals and couples to commit to an initial 6 sessions of work, usually (although not always) occurring once weekly. We find this often proves sufficient for those bringing relatively simple issues. For others, the six sessions offers a time-limited introduction to counselling and therapy, during which period, the therapist is able to assess the client’s needs and preferred style of working in more detail. For such clients, the review which takes place at the end of the initial period allows them to examine what they have achieved thus far and to consider what remains to be worked on. Having decided to continue, both patient and therapist will formulate a plan for continued work, usually in an open-ended contract</p>',86400,0,0,5400,0,0,'300',1,'d-2d-w',6,NULL,0,0,'',5400,5400,'300',0);
+/*!40000 ALTER TABLE `ha45_v5_services` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v5_smslog`
+--
+
+DROP TABLE IF EXISTS `ha45_v5_smslog`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v5_smslog` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `sent_at` int(11) DEFAULT NULL,
+  `to_number` varchar(16) DEFAULT NULL,
+  `from_number` varchar(16) DEFAULT NULL,
+  `message` text,
+  `success` tinyint(4) DEFAULT '0',
+  `gateway` varchar(16) DEFAULT NULL,
+  `response` text,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v5_smslog`
+--
+
+LOCK TABLES `ha45_v5_smslog` WRITE;
+/*!40000 ALTER TABLE `ha45_v5_smslog` DISABLE KEYS */;
+INSERT INTO `ha45_v5_smslog` VALUES (1,1399394739,'405-706-1226','(405) 516-0343','Test message from MIS',1,'email2sms','Sent email to \'405-706-1226@txt.att.net\'');
+INSERT INTO `ha45_v5_smslog` VALUES (2,1400330523,'4057061226','(405) 516-0343','Thank you for registering, please wait while we approve your account.',1,'email2sms','Sent email to \'4057061226@txt.att.net\'');
+/*!40000 ALTER TABLE `ha45_v5_smslog` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v5_templates`
+--
+
+DROP TABLE IF EXISTS `ha45_v5_templates`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v5_templates` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `lang` varchar(16) DEFAULT NULL,
+  `template` varchar(255) DEFAULT NULL,
+  `subject` varchar(255) DEFAULT NULL,
+  `body` text NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=22 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v5_templates`
+--
+
+LOCK TABLES `ha45_v5_templates` WRITE;
+/*!40000 ALTER TABLE `ha45_v5_templates` DISABLE KEYS */;
+INSERT INTO `ha45_v5_templates` VALUES (1,'en','user-require_approval-user','Your Account Is Pending Approval','Thank you for registering!\r\n\r\nWe manually approve new accounts. We will notify you when your account is activated.');
+INSERT INTO `ha45_v5_templates` VALUES (2,'en','user-activate-user','Your Account Is Now Active','Congratulations!\r\n\r\nYour user account is now active. Here is your login information:\r\n\r\nUsername: {USER.USERNAME}\r\nPassword: {USER.PASSWORD}\r\n');
+INSERT INTO `ha45_v5_templates` VALUES (3,'en','user-reset_password-user','Your Password Reset','Per your request, your password has been reset. Here is your new login information:\r\n\r\nUsername: {USER.USERNAME}\r\nPassword: {USER.PASSWORD}\r\n');
+INSERT INTO `ha45_v5_templates` VALUES (4,'en','user-require_approval-admin','New User Registered, Your Approval Required','A new user has registered at your MIS scheduler website. Please go to the admin panel to approve or reject this user.\r\n\r\nNew user information:\r\n\r\n{USER.-ALL-}\r\n');
+INSERT INTO `ha45_v5_templates` VALUES (5,'en','appointment-require_approval-customer','Your Appointment Is Pending Approval','Thank you for your appointment request.\r\n\r\nWe kindly ask for your patience while we review your request. We will notify you when your appointment is accepted.\r\n\r\nYour appointment details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n');
+INSERT INTO `ha45_v5_templates` VALUES (6,'en','appointment-approve-customer','Your Appointment Approved','Thank you for your appointment request. Your appointment is now approved.\r\n\r\nYour Appointment Details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n');
+INSERT INTO `ha45_v5_templates` VALUES (7,'en','appointment-request-customer','Your Appointment Request','Thank you for your appointment request. Your appointment is now approved.\r\n\r\nYour Appointment Details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n');
+INSERT INTO `ha45_v5_templates` VALUES (8,'en','appointment-reject-customer','Your Appointment Rejected','Thank you for your appointment request. We are sorry, your requested appointment was not abe to be scheduled.\r\n\r\nReason:\r\n\r\n{APPOINTMENT.REJECT_REASON}\r\n\r\nYour appointment details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n');
+INSERT INTO `ha45_v5_templates` VALUES (9,'en','appointment-cancel-customer','Your Appointment Cancelled','This is the confirmation that your appointment has been cancelled by your request.\r\n\r\nCancel reason:\r\n\r\n{APPOINTMENT.CANCEL_REASON}\r\n\r\nYour appointment details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n');
+INSERT INTO `ha45_v5_templates` VALUES (10,'en','appointment-change-customer','Your Appointment Changed','Your appointment has been changed, your new appointment details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n');
+INSERT INTO `ha45_v5_templates` VALUES (11,'en','appointment-noshow-customer','Your Appointment Marked As No Show','We are sorry, your appointment has been marked as no show.\r\n\r\nYour appointment details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n');
+INSERT INTO `ha45_v5_templates` VALUES (12,'en','appointment-remind-customer','Appointment Reminder','This is a reminder for your appointment.\r\n\r\nYour appointment details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n');
+INSERT INTO `ha45_v5_templates` VALUES (13,'en','appointment-require_approval-provider','New Appointment Request Requires Approval','There is a new appointment request for you.\r\n\r\nAppointment details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n\r\nCustomer details:\r\n\r\n{APPOINTMENT.CUSTOMER.-ALL-}\r\n\r\nQuick links for this appointment:\r\n\r\n{APPOINTMENT.QUICK_LINK_APPROVE} {APPOINTMENT.QUICK_LINK_REJECT}\r\n');
+INSERT INTO `ha45_v5_templates` VALUES (14,'en','appointment-approve-provider','Your Appointment Approved','Your appointment is now approved.\r\n\r\nYour Appointment Details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n\r\nCustomer details:\r\n\r\n{APPOINTMENT.CUSTOMER.-ALL-}\r\n');
+INSERT INTO `ha45_v5_templates` VALUES (15,'en','appointment-request-provider','New Appointment Request','There is a new appointment request for you, it has been automatically approved.\r\n\r\nAppointment details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n\r\nCustomer details:\r\n\r\n{APPOINTMENT.CUSTOMER.-ALL-}\r\n');
+INSERT INTO `ha45_v5_templates` VALUES (16,'en','appointment-reject-provider','Your Appointment Rejected','Your appointment request was not able to be scheduled.\r\n\r\nReason:\r\n\r\n{APPOINTMENT.REJECT_REASON}\r\n\r\nYour appointment details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n\r\nCustomer details:\r\n\r\n{APPOINTMENT.CUSTOMER.-ALL-}\r\n');
+INSERT INTO `ha45_v5_templates` VALUES (17,'en','appointment-cancel-provider','Your Appointment Cancelled By Customer','This is the confirmation that your appointment has been cancelled by the customer.\r\n\r\nCancel reason:\r\n\r\n{APPOINTMENT.CANCEL_REASON}\r\n\r\nAppointment details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n\r\nCustomer details:\r\n\r\n{APPOINTMENT.CUSTOMER.-ALL-}\r\n');
+INSERT INTO `ha45_v5_templates` VALUES (18,'en','appointment-change-provider','Your Appointment Changed','Your appointment has been changed, your new appointment details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n\r\nCustomer details:\r\n\r\n{APPOINTMENT.CUSTOMER.-ALL-}\r\n');
+INSERT INTO `ha45_v5_templates` VALUES (19,'en','appointment-noshow-provider','Your Appointment Marked As No Show','Your appointment has been marked as no show.  Per your service agreement you are responsible for {APPOINTMENT.PRICE}.\r\n\r\nYour appointment details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n\r\nCustomer details:\r\n\r\n{APPOINTMENT.CUSTOMER.-ALL-}\r\n');
+INSERT INTO `ha45_v5_templates` VALUES (20,'en','appointment-remind-provider','Appointment Reminder','This is a reminder for your appointment.\r\n\r\nYour appointment details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n');
+INSERT INTO `ha45_v5_templates` VALUES (21,'en','user-activate-admin','New User Account Active','A new user account is now active in your appointment system.\r\n\r\nNew user information:\r\n{USER.-ALL-}\r\n');
+/*!40000 ALTER TABLE `ha45_v5_templates` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v5_timeblocks`
+--
+
+DROP TABLE IF EXISTS `ha45_v5_timeblocks`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v5_timeblocks` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `starts_at` int(11) DEFAULT NULL,
+  `ends_at` int(11) DEFAULT NULL,
+  `selectable_every` int(11) DEFAULT NULL,
+  `applied_on` int(11) DEFAULT NULL,
+  `location_id` int(11) NOT NULL,
+  `resource_id` int(11) NOT NULL,
+  `service_id` int(11) NOT NULL,
+  `valid_from` int(11) NOT NULL,
+  `valid_to` int(11) NOT NULL,
+  `capacity` int(11) DEFAULT '1',
+  `group_id` int(11) NOT NULL,
+  `min_from_now` int(11) NOT NULL DEFAULT '10800',
+  `max_from_now` int(11) NOT NULL DEFAULT '4838400',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v5_timeblocks`
+--
+
+LOCK TABLES `ha45_v5_timeblocks` WRITE;
+/*!40000 ALTER TABLE `ha45_v5_timeblocks` DISABLE KEYS */;
+INSERT INTO `ha45_v5_timeblocks` VALUES (1,28800,68400,900,1,1,2,0,20140506,20150506,1,1,10800,1209600);
+INSERT INTO `ha45_v5_timeblocks` VALUES (2,28800,68400,900,2,1,2,0,20140506,20150506,1,1,10800,1209600);
+INSERT INTO `ha45_v5_timeblocks` VALUES (3,28800,68400,900,3,1,2,0,20140506,20150506,1,1,10800,1209600);
+INSERT INTO `ha45_v5_timeblocks` VALUES (4,28800,68400,900,4,1,2,0,20140506,20150506,1,1,10800,1209600);
+INSERT INTO `ha45_v5_timeblocks` VALUES (5,28800,68400,900,5,1,2,0,20140506,20150506,1,1,10800,1209600);
+/*!40000 ALTER TABLE `ha45_v5_timeblocks` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v5_timeoffs`
+--
+
+DROP TABLE IF EXISTS `ha45_v5_timeoffs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v5_timeoffs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `resource_id` int(11) DEFAULT NULL,
+  `location_id` int(11) DEFAULT NULL,
+  `starts_at` int(11) DEFAULT NULL,
+  `ends_at` int(11) DEFAULT NULL,
+  `description` text NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v5_timeoffs`
+--
+
+LOCK TABLES `ha45_v5_timeoffs` WRITE;
+/*!40000 ALTER TABLE `ha45_v5_timeoffs` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ha45_v5_timeoffs` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v5_transactions`
+--
+
+DROP TABLE IF EXISTS `ha45_v5_transactions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v5_transactions` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `from_account` int(11) DEFAULT NULL,
+  `to_account` int(11) DEFAULT NULL,
+  `amount` double DEFAULT NULL,
+  `created_at` int(11) DEFAULT NULL,
+  `invoice_id` int(11) NOT NULL,
+  `amount_net` double DEFAULT NULL,
+  `pgateway` varchar(32) DEFAULT NULL,
+  `pgateway_ref` text,
+  `pgateway_response` text,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v5_transactions`
+--
+
+LOCK TABLES `ha45_v5_transactions` WRITE;
+/*!40000 ALTER TABLE `ha45_v5_transactions` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ha45_v5_transactions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v5_users`
+--
+
+DROP TABLE IF EXISTS `ha45_v5_users`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v5_users` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `username` varchar(128) DEFAULT NULL,
+  `email` varchar(128) DEFAULT NULL,
+  `password` varchar(64) DEFAULT NULL,
+  `first_name` varchar(128) NOT NULL,
+  `last_name` varchar(128) NOT NULL,
+  `created` int(11) DEFAULT NULL,
+  `lang` varchar(16) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=10 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v5_users`
+--
+
+LOCK TABLES `ha45_v5_users` WRITE;
+/*!40000 ALTER TABLE `ha45_v5_users` DISABLE KEYS */;
+INSERT INTO `ha45_v5_users` VALUES (1,'admin','support@okmis.com','f382e5edf264775e13ce513384e4f152','Keith','Stephenson',1308530181,'');
+INSERT INTO `ha45_v5_users` VALUES (3,'help@okmis.com','help@okmis.com','39c27ff7c45eaf7ae7b3e5245e3dd754','Help','Desk',1364992061,'');
+INSERT INTO `ha45_v5_users` VALUES (8,'tpalmerlpc@yahoo.com','tpalmerlpc@yahoo.com','f14b996322af7b039041d2b1979bfdf5','Todd','Palmer',1399394163,'');
+INSERT INTO `ha45_v5_users` VALUES (9,'ibfcounseling@gmail.com','ibfcounseling@gmail.com','f14b996322af7b039041d2b1979bfdf5','Todd','Palmer',1400330512,'');
+/*!40000 ALTER TABLE `ha45_v5_users` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v6_accounting_assets`
+--
+
+DROP TABLE IF EXISTS `ha45_v6_accounting_assets`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v6_accounting_assets` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `asset` text,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v6_accounting_assets`
+--
+
+LOCK TABLES `ha45_v6_accounting_assets` WRITE;
+/*!40000 ALTER TABLE `ha45_v6_accounting_assets` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ha45_v6_accounting_assets` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v6_accounting_journal`
+--
+
+DROP TABLE IF EXISTS `ha45_v6_accounting_journal`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v6_accounting_journal` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `created_at` int(11) NOT NULL,
+  `obj_class` varchar(32) NOT NULL,
+  `obj_id` int(11) NOT NULL,
+  `action` varchar(32) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v6_accounting_journal`
+--
+
+LOCK TABLES `ha45_v6_accounting_journal` WRITE;
+/*!40000 ALTER TABLE `ha45_v6_accounting_journal` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ha45_v6_accounting_journal` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v6_accounting_posting`
+--
+
+DROP TABLE IF EXISTS `ha45_v6_accounting_posting`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v6_accounting_posting` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `journal_id` int(11) NOT NULL,
+  `expires_at` int(11) NOT NULL,
+  `account_type` varchar(32) NOT NULL,
+  `account_id` int(11) NOT NULL,
+  `asset_id` int(11) NOT NULL,
+  `asset_value` double NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v6_accounting_posting`
+--
+
+LOCK TABLES `ha45_v6_accounting_posting` WRITE;
+/*!40000 ALTER TABLE `ha45_v6_accounting_posting` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ha45_v6_accounting_posting` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v6_appointments`
+--
+
+DROP TABLE IF EXISTS `ha45_v6_appointments`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v6_appointments` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `service_id` int(11) NOT NULL,
+  `resource_id` int(11) NOT NULL,
+  `customer_id` int(11) NOT NULL,
+  `location_id` int(11) NOT NULL,
+  `seats` int(11) NOT NULL DEFAULT '1',
+  `created_at` int(11) NOT NULL,
+  `starts_at` int(11) NOT NULL,
+  `duration` int(11) NOT NULL,
+  `lead_in` int(11) NOT NULL,
+  `lead_out` int(11) NOT NULL,
+  `approved` tinyint(4) NOT NULL,
+  `auth_code` varchar(32) NOT NULL,
+  `price` varchar(16) DEFAULT NULL,
+  `need_reminder` int(11) NOT NULL DEFAULT '0',
+  `completed` tinyint(4) DEFAULT '0',
+  `group_ref` varchar(32) NOT NULL DEFAULT '',
+  `duration_break` int(11) NOT NULL DEFAULT '0',
+  `duration2` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v6_appointments`
+--
+
+LOCK TABLES `ha45_v6_appointments` WRITE;
+/*!40000 ALTER TABLE `ha45_v6_appointments` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ha45_v6_appointments` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v6_conf`
+--
+
+DROP TABLE IF EXISTS `ha45_v6_conf`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v6_conf` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `value` text,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=194 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v6_conf`
+--
+
+LOCK TABLES `ha45_v6_conf` WRITE;
+/*!40000 ALTER TABLE `ha45_v6_conf` DISABLE KEYS */;
+INSERT INTO `ha45_v6_conf` VALUES (1,'emailSentFrom','support@okmis.com');
+INSERT INTO `ha45_v6_conf` VALUES (2,'emailSentFromName','My Company, LLC');
+INSERT INTO `ha45_v6_conf` VALUES (3,'paymentGateways','offline');
+INSERT INTO `ha45_v6_conf` VALUES (4,'currentVersion','6.3.2');
+INSERT INTO `ha45_v6_conf` VALUES (5,'backupLastRun','1350997919');
+INSERT INTO `ha45_v6_conf` VALUES (8,'smtpSecure','');
+INSERT INTO `ha45_v6_conf` VALUES (9,'smtpHost','');
+INSERT INTO `ha45_v6_conf` VALUES (10,'smtpUser','');
+INSERT INTO `ha45_v6_conf` VALUES (11,'smtpPass','');
+INSERT INTO `ha45_v6_conf` VALUES (12,'emailDebug','1');
+INSERT INTO `ha45_v6_conf` VALUES (13,'emailDisabled','0');
+INSERT INTO `ha45_v6_conf` VALUES (14,'emailCommonHeader','My Company, LLC (405) 333-4444');
+INSERT INTO `ha45_v6_conf` VALUES (15,'emailCommonFooter','The information within and/or documents accompanying this email contains confidential information that may be legally privileged and protected by federal and state law. This information is intended for use only by the entity or individual to whom it is addressed. The authorized recipient is obligated to maintain the information in a safe, secure, and confidential manner. The authorized recipient is prohibited from using this information for purposes other than intended, prohibited from disclosing this information to any other party unless required to do so by law or regulation, and is required to destroy the information after its stated need has been fulfilled.\r\n\r\nIf you are in possession of this protected health information, and are not the intended recipient, you are hereby notified that any improper disclosure, copying, or distribution of the contents of this information is strictly prohibited. Please notify the owner of this information immediately and delete this email.');
+INSERT INTO `ha45_v6_conf` VALUES (16,'daysToShowAdmin','1');
+INSERT INTO `ha45_v6_conf` VALUES (17,'daysToShowCustomer','1');
+INSERT INTO `ha45_v6_conf` VALUES (18,'monthsToShow','1');
+INSERT INTO `ha45_v6_conf` VALUES (19,'timeUnit','15');
+INSERT INTO `ha45_v6_conf` VALUES (20,'companyTimezone','America/Chicago');
+INSERT INTO `ha45_v6_conf` VALUES (21,'dateFormat','j M Y');
+INSERT INTO `ha45_v6_conf` VALUES (22,'timeFormat','g:i A');
+INSERT INTO `ha45_v6_conf` VALUES (23,'weekStartsOn','1');
+INSERT INTO `ha45_v6_conf` VALUES (24,'limitTimeMeasure','hour');
+INSERT INTO `ha45_v6_conf` VALUES (25,'theme','blue');
+INSERT INTO `ha45_v6_conf` VALUES (26,'allowNoEmail','0');
+INSERT INTO `ha45_v6_conf` VALUES (27,'enableTimezones','0');
+INSERT INTO `ha45_v6_conf` VALUES (28,'userEmailConfirmation','1');
+INSERT INTO `ha45_v6_conf` VALUES (29,'userAdminApproval','1');
+INSERT INTO `ha45_v6_conf` VALUES (30,'userLoginRequired','1');
+INSERT INTO `ha45_v6_conf` VALUES (31,'enableRegistration','1');
+INSERT INTO `ha45_v6_conf` VALUES (32,'emailAsUsername','1');
+INSERT INTO `ha45_v6_conf` VALUES (33,'allowDuplicateEmails','0');
+INSERT INTO `ha45_v6_conf` VALUES (34,'timeStarts','28800');
+INSERT INTO `ha45_v6_conf` VALUES (35,'timeEnds','75600');
+INSERT INTO `ha45_v6_conf` VALUES (38,'cronLastRun','1432051251');
+INSERT INTO `ha45_v6_conf` VALUES (39,'remindOfBackup','0');
+INSERT INTO `ha45_v6_conf` VALUES (126,'showCompletedAppsAdmin','1');
+INSERT INTO `ha45_v6_conf` VALUES (41,'plugin-sms-gateway','email2sms');
+INSERT INTO `ha45_v6_conf` VALUES (192,'plugin-sms-carriers','rogers');
+INSERT INTO `ha45_v6_conf` VALUES (191,'plugin-sms-carriers','us-cellular');
+INSERT INTO `ha45_v6_conf` VALUES (190,'plugin-sms-carriers','metropcs');
+INSERT INTO `ha45_v6_conf` VALUES (189,'plugin-sms-carriers','cricket');
+INSERT INTO `ha45_v6_conf` VALUES (188,'plugin-sms-carriers','tmobile');
+INSERT INTO `ha45_v6_conf` VALUES (187,'plugin-sms-carriers','sprint');
+INSERT INTO `ha45_v6_conf` VALUES (186,'plugin-sms-carriers','att');
+INSERT INTO `ha45_v6_conf` VALUES (50,'plugin-sms-from','(405) 516-0343');
+INSERT INTO `ha45_v6_conf` VALUES (51,'plugin-sms-debug','0');
+INSERT INTO `ha45_v6_conf` VALUES (52,'plugin-sms-disabled','0');
+INSERT INTO `ha45_v6_conf` VALUES (53,'plugins','sms');
+INSERT INTO `ha45_v6_conf` VALUES (54,'firstTimeSplash','');
+INSERT INTO `ha45_v6_conf` VALUES (124,'useCaptcha','1');
+INSERT INTO `ha45_v6_conf` VALUES (125,'strongPassword','0');
+INSERT INTO `ha45_v6_conf` VALUES (122,'returnAfterRequest','');
+INSERT INTO `ha45_v6_conf` VALUES (123,'requireCancelReason','1');
+INSERT INTO `ha45_v6_conf` VALUES (120,'showEndTime','1');
+INSERT INTO `ha45_v6_conf` VALUES (121,'csvDelimiter',',');
+INSERT INTO `ha45_v6_conf` VALUES (116,'appsInCart','3');
+INSERT INTO `ha45_v6_conf` VALUES (117,'attachIcal','1');
+INSERT INTO `ha45_v6_conf` VALUES (118,'selectStyle','list');
+INSERT INTO `ha45_v6_conf` VALUES (119,'showSessionDuration','1');
+INSERT INTO `ha45_v6_conf` VALUES (115,'htmlTitle','My Agency Appointment Scheduler');
+INSERT INTO `ha45_v6_conf` VALUES (178,'disabledNotifications','user-activate-admin');
+INSERT INTO `ha45_v6_conf` VALUES (127,'sendCcForAppointment','0');
+INSERT INTO `ha45_v6_conf` VALUES (128,'appointmentFlow','location:manual|service:manual|resource:manual|time:manual');
+INSERT INTO `ha45_v6_conf` VALUES (185,'plugin-sms-carriers','verizon');
+INSERT INTO `ha45_v6_conf` VALUES (177,'disabledNotifications','appointment-request-provider');
+INSERT INTO `ha45_v6_conf` VALUES (176,'disabledNotifications','appointment-approve-provider');
+INSERT INTO `ha45_v6_conf` VALUES (175,'disabledNotifications','appointment-require_approval-customer');
+INSERT INTO `ha45_v6_conf` VALUES (174,'disabledNotifications','appointment-require_approval-provider');
+INSERT INTO `ha45_v6_conf` VALUES (173,'disabledNotifications','appointment-request-customer');
+INSERT INTO `ha45_v6_conf` VALUES (172,'disabledNotifications','appointment-approve-customer');
+INSERT INTO `ha45_v6_conf` VALUES (179,'disabledNotifications','user-require_approval-user');
+INSERT INTO `ha45_v6_conf` VALUES (180,'disabledNotifications','user-require_approval-admin');
+INSERT INTO `ha45_v6_conf` VALUES (181,'cronEnabled','1');
+INSERT INTO `ha45_v6_conf` VALUES (182,'remindBefore','86400');
+INSERT INTO `ha45_v6_conf` VALUES (183,'autoComplete','0');
+INSERT INTO `ha45_v6_conf` VALUES (184,'autoReject','0');
+INSERT INTO `ha45_v6_conf` VALUES (193,'installationId','19072e39069258c720b538c08d618adc');
+/*!40000 ALTER TABLE `ha45_v6_conf` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v6_coupons`
+--
+
+DROP TABLE IF EXISTS `ha45_v6_coupons`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v6_coupons` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `code` text NOT NULL,
+  `use_limit` int(11) NOT NULL,
+  `promotion_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v6_coupons`
+--
+
+LOCK TABLES `ha45_v6_coupons` WRITE;
+/*!40000 ALTER TABLE `ha45_v6_coupons` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ha45_v6_coupons` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v6_form_controls`
+--
+
+DROP TABLE IF EXISTS `ha45_v6_form_controls`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v6_form_controls` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `form_id` int(11) NOT NULL,
+  `name` varchar(128) DEFAULT NULL,
+  `type` varchar(32) DEFAULT NULL,
+  `title` varchar(255) DEFAULT NULL,
+  `description` text,
+  `show_order` int(11) DEFAULT NULL,
+  `ext_access` varchar(32) DEFAULT NULL,
+  `attr` text,
+  `validators` text,
+  `default_value` text,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=16 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v6_form_controls`
+--
+
+LOCK TABLES `ha45_v6_form_controls` WRITE;
+/*!40000 ALTER TABLE `ha45_v6_form_controls` DISABLE KEYS */;
+INSERT INTO `ha45_v6_form_controls` VALUES (1,1,'username','text','Username','',1,'write','a:4:{s:4:\"cols\";s:0:\"\";s:4:\"rows\";s:0:\"\";s:4:\"size\";s:2:\"24\";s:7:\"options\";a:1:{i:0;s:0:\"\";}}','a:2:{i:0;a:2:{s:4:\"code\";s:8:\"notEmpty\";s:5:\"error\";s:14:\"Required field\";}i:1;a:2:{s:4:\"code\";s:13:\"checkUsername\";s:5:\"error\";s:31:\"This username is already in use\";}}','');
+INSERT INTO `ha45_v6_form_controls` VALUES (2,1,'email','text','Email','Please enter valid email or use support@okmis.com',2,'write','a:4:{s:4:\"cols\";s:0:\"\";s:4:\"rows\";s:0:\"\";s:4:\"size\";s:2:\"32\";s:7:\"options\";a:1:{i:0;s:0:\"\";}}','a:1:{i:0;a:2:{s:4:\"code\";s:5:\"email\";s:5:\"error\";s:49:\"Please enter valid email or use support@okmis.com\";}}','support@okmis.com');
+INSERT INTO `ha45_v6_form_controls` VALUES (3,1,'first_name','text','First Name','',3,'write','a:1:{s:4:\"size\";i:32;}','a:1:{i:0;a:2:{s:4:\"code\";s:8:\"notEmpty\";s:5:\"error\";s:27:\"Please enter the first name\";}}','');
+INSERT INTO `ha45_v6_form_controls` VALUES (4,1,'last_name','text','Last Name','',4,'write','a:1:{s:4:\"size\";i:32;}','a:1:{i:0;a:2:{s:4:\"code\";s:8:\"notEmpty\";s:5:\"error\";s:26:\"Please enter the last name\";}}','');
+INSERT INTO `ha45_v6_form_controls` VALUES (5,1,'phone','text','Phone','Primary contact number',6,'write','a:4:{s:4:\"cols\";s:0:\"\";s:4:\"rows\";s:0:\"\";s:4:\"size\";s:2:\"10\";s:7:\"options\";a:1:{i:0;s:0:\"\";}}','a:2:{i:0;a:2:{s:4:\"code\";s:7:\"phone10\";s:5:\"error\";s:48:\"Please enter a valid phone number with area code\";}i:1;a:2:{s:4:\"code\";s:8:\"notEmpty\";s:5:\"error\";s:34:\"Must have a primary contact number\";}}','');
+INSERT INTO `ha45_v6_form_controls` VALUES (8,1,'nomessage','checkbox','No Voice Mail Messages','Please UNSELECT if you  want messages left',11,'write','a:4:{s:4:\"cols\";s:0:\"\";s:4:\"rows\";s:0:\"\";s:4:\"size\";s:0:\"\";s:7:\"options\";a:1:{i:0;s:0:\"\";}}','','1');
+INSERT INTO `ha45_v6_form_controls` VALUES (9,1,'alternate_contact','text','Alternate Contact','Please list name of alternate contact',5,'write','a:1:{s:4:\"size\";s:2:\"30\";}','','');
+INSERT INTO `ha45_v6_form_controls` VALUES (10,2,'mobile_phone','mobilephone','Mobile Phone For SMS Notifications','Please make sure that you include the country code. For example, the US number (248) 123-7654 becomes +12481237654, the UK number 07777123456 becomes +447777123456.',12,'write','a:1:{s:4:\"size\";i:24;}','','');
+INSERT INTO `ha45_v6_form_controls` VALUES (11,1,'mobile_phone','mobilephone','Mobile Phone For SMS Notifications','Please make sure that you include the country code. For example, the US number (248) 123-7654 becomes +12481237654, the UK number 07777123456 becomes +447777123456.',8,'write','a:1:{s:4:\"size\";i:24;}','','');
+INSERT INTO `ha45_v6_form_controls` VALUES (13,1,'nophonereminder','checkbox','No Phone Call Reminder','Please UNSELECT if you would like to have a phone call appointment reminder',9,'write','a:4:{s:4:\"cols\";s:0:\"\";s:4:\"rows\";s:0:\"\";s:4:\"size\";s:0:\"\";s:7:\"options\";a:1:{i:0;s:0:\"\";}}','','1');
+INSERT INTO `ha45_v6_form_controls` VALUES (14,1,'noemailreminder','checkbox','No Email Reminder','Please UNSELECT if you would like an email reminder of appointment',13,'write','a:4:{s:4:\"cols\";s:0:\"\";s:4:\"rows\";s:0:\"\";s:4:\"size\";s:0:\"\";s:7:\"options\";a:1:{i:0;s:0:\"\";}}','','1');
+INSERT INTO `ha45_v6_form_controls` VALUES (15,1,'notextreminder','checkbox','No Text Reminder','Please UNSELECT if you want text message appointment reminders',14,'write','a:4:{s:4:\"cols\";s:0:\"\";s:4:\"rows\";s:0:\"\";s:4:\"size\";s:0:\"\";s:7:\"options\";a:1:{i:0;s:0:\"\";}}','','1');
+/*!40000 ALTER TABLE `ha45_v6_form_controls` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v6_forms`
+--
+
+DROP TABLE IF EXISTS `ha45_v6_forms`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v6_forms` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(128) DEFAULT NULL,
+  `class` varchar(32) DEFAULT NULL,
+  `details` varchar(128) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v6_forms`
+--
+
+LOCK TABLES `ha45_v6_forms` WRITE;
+/*!40000 ALTER TABLE `ha45_v6_forms` DISABLE KEYS */;
+INSERT INTO `ha45_v6_forms` VALUES (1,'Customer Form','customer','');
+INSERT INTO `ha45_v6_forms` VALUES (2,'Provider Form','provider','');
+/*!40000 ALTER TABLE `ha45_v6_forms` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v6_invoice_items`
+--
+
+DROP TABLE IF EXISTS `ha45_v6_invoice_items`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v6_invoice_items` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `invoice_id` int(11) NOT NULL,
+  `amount` decimal(11,2) NOT NULL DEFAULT '0.00',
+  `qty` decimal(7,2) NOT NULL DEFAULT '1.00',
+  `taxable` int(1) NOT NULL DEFAULT '1',
+  `title` text,
+  `obj_class` varchar(32) NOT NULL DEFAULT '',
+  `obj_id` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v6_invoice_items`
+--
+
+LOCK TABLES `ha45_v6_invoice_items` WRITE;
+/*!40000 ALTER TABLE `ha45_v6_invoice_items` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ha45_v6_invoice_items` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v6_invoices`
+--
+
+DROP TABLE IF EXISTS `ha45_v6_invoices`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v6_invoices` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `refno` varchar(16) DEFAULT NULL,
+  `amount` double DEFAULT NULL,
+  `currency` varchar(3) DEFAULT NULL,
+  `created_at` int(11) DEFAULT NULL,
+  `due_at` int(11) NOT NULL,
+  `customer_id` int(11) DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v6_invoices`
+--
+
+LOCK TABLES `ha45_v6_invoices` WRITE;
+/*!40000 ALTER TABLE `ha45_v6_invoices` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ha45_v6_invoices` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v6_languages`
+--
+
+DROP TABLE IF EXISTS `ha45_v6_languages`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v6_languages` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `lang` varchar(16) NOT NULL,
+  `original` text,
+  `custom` text,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v6_languages`
+--
+
+LOCK TABLES `ha45_v6_languages` WRITE;
+/*!40000 ALTER TABLE `ha45_v6_languages` DISABLE KEYS */;
+INSERT INTO `ha45_v6_languages` VALUES (1,'en','Bookable Resource','Therapist');
+INSERT INTO `ha45_v6_languages` VALUES (2,'en','Bookable Resources','Therapists');
+/*!40000 ALTER TABLE `ha45_v6_languages` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v6_locations`
+--
+
+DROP TABLE IF EXISTS `ha45_v6_locations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v6_locations` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) DEFAULT NULL,
+  `description` text,
+  `show_order` int(11) DEFAULT '1',
+  `capacity` int(11) NOT NULL DEFAULT '0',
+  `archive` tinyint(4) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v6_locations`
+--
+
+LOCK TABLES `ha45_v6_locations` WRITE;
+/*!40000 ALTER TABLE `ha45_v6_locations` DISABLE KEYS */;
+INSERT INTO `ha45_v6_locations` VALUES (1,'Location1','1611 North Broadway<br>\r\nOklahoma City, OK  73103-4601<br>\r\n<p>Phone: (405) 516-0343</p>\r\n<p><b><a \r\nhref=\"http://mapq.st/SwWoX6\">Map</a></b></p>\r\n<p></p>\r\n<p><i>An Inward Bound Family Counseling Center, LLC, is a single specialty mental health group practice serving adults and children with traditional medical insurance coverage and private payment.  We are an approved Medicaid mental health provider for children. </i><br>\r\n<p></p',1,0,0);
+/*!40000 ALTER TABLE `ha45_v6_locations` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v6_logaudit`
+--
+
+DROP TABLE IF EXISTS `ha45_v6_logaudit`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v6_logaudit` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `action_time` int(11) NOT NULL,
+  `obj_class` varchar(32) NOT NULL DEFAULT '',
+  `obj_id` int(11) NOT NULL DEFAULT '0',
+  `property_name` varchar(32) NOT NULL DEFAULT '',
+  `old_value` text,
+  `description` text,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v6_logaudit`
+--
+
+LOCK TABLES `ha45_v6_logaudit` WRITE;
+/*!40000 ALTER TABLE `ha45_v6_logaudit` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ha45_v6_logaudit` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v6_objectmeta`
+--
+
+DROP TABLE IF EXISTS `ha45_v6_objectmeta`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v6_objectmeta` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `obj_class` varchar(32) NOT NULL,
+  `obj_id` int(11) NOT NULL,
+  `meta_name` varchar(32) NOT NULL,
+  `meta_value` text,
+  `meta_data` text,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=160 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v6_objectmeta`
+--
+
+LOCK TABLES `ha45_v6_objectmeta` WRITE;
+/*!40000 ALTER TABLE `ha45_v6_objectmeta` DISABLE KEYS */;
+INSERT INTO `ha45_v6_objectmeta` VALUES (1,'user',1,'_role','admin','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (98,'user',8,'_role','admin','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (3,'user',1,'_auth_code','2883GEt7YXVs','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (6,'service',1,'_permissions','group-1:allowed','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (7,'service',1,'_permissions','group0:auto_confirm','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (97,'user',8,'_timezone','America/Chicago','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (18,'user',3,'_role','admin','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (99,'user',8,'_created_by','0','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (104,'user',8,'mobile_carrier','att','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (105,'user',8,'mobile_phone','4051112222','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (119,'user',1,'_resource_schedules','2','3');
+INSERT INTO `ha45_v6_objectmeta` VALUES (120,'user',1,'_resource_apps','2','7');
+INSERT INTO `ha45_v6_objectmeta` VALUES (121,'user',9,'phone','4052223333','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (122,'user',9,'mobile_carrier','att','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (123,'user',9,'mobile_phone','4052223333','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (124,'user',9,'nophonereminder','1','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (125,'user',9,'nomessage','1','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (126,'user',9,'noemailreminder','1','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (127,'user',9,'notextreminder','1','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (128,'user',9,'captcha','999','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (129,'user',9,'_role','customer','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (130,'user',9,'_timezone','America/Chicago','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (131,'user',9,'_created_by','0','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (138,'user',9,'_restriction','not_approved','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (137,'user',9,'_confirmKey','CkhxJKSI','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (139,'user',8,'_admin_level','staff','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (142,'resource',2,'_internal','0','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (143,'user',10,'phone','405-696-9848','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (144,'user',10,'mobile_carrier','att','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (145,'user',10,'nophonereminder','1','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (146,'user',10,'nomessage','1','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (147,'user',10,'noemailreminder','1','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (148,'user',10,'notextreminder','1','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (149,'user',10,'captcha','887','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (150,'user',10,'_role','customer','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (151,'user',10,'_timezone','America/Chicago','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (152,'user',10,'_created_by','0','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (153,'user',10,'_admin_level','admin','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (154,'user',10,'_assign_resource_only','0','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (155,'user',10,'_assign_service_only','0','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (156,'user',10,'_assign_location_only','0','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (157,'user',10,'_restriction','email_not_confirmed','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (158,'user',10,'_confirmKey','gJGeJzop','');
+INSERT INTO `ha45_v6_objectmeta` VALUES (159,'user',1,'_preferences','a:1:{s:14:\"calendar_range\";s:4:\"week\";}','');
+/*!40000 ALTER TABLE `ha45_v6_objectmeta` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v6_orders`
+--
+
+DROP TABLE IF EXISTS `ha45_v6_orders`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v6_orders` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `created_at` int(11) NOT NULL,
+  `is_active` tinyint(4) NOT NULL DEFAULT '1',
+  `pack_id` int(11) DEFAULT NULL,
+  `customer_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v6_orders`
+--
+
+LOCK TABLES `ha45_v6_orders` WRITE;
+/*!40000 ALTER TABLE `ha45_v6_orders` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ha45_v6_orders` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v6_packs`
+--
+
+DROP TABLE IF EXISTS `ha45_v6_packs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v6_packs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `price` double NOT NULL,
+  `expires_in` varchar(32) DEFAULT '1 months',
+  `show_order` int(11) NOT NULL DEFAULT '1',
+  `title` varchar(255) NOT NULL,
+  `asset_id` int(11) NOT NULL DEFAULT '0',
+  `asset_value` double NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v6_packs`
+--
+
+LOCK TABLES `ha45_v6_packs` WRITE;
+/*!40000 ALTER TABLE `ha45_v6_packs` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ha45_v6_packs` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v6_payments`
+--
+
+DROP TABLE IF EXISTS `ha45_v6_payments`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v6_payments` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `invoice_id` int(11) DEFAULT NULL,
+  `paid_at` int(11) DEFAULT NULL,
+  `amount_gross` double DEFAULT NULL,
+  `amount_net` double DEFAULT NULL,
+  `currency` varchar(3) DEFAULT NULL,
+  `pgateway` varchar(32) DEFAULT NULL,
+  `pgateway_ref` text,
+  `pgateway_response` text,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v6_payments`
+--
+
+LOCK TABLES `ha45_v6_payments` WRITE;
+/*!40000 ALTER TABLE `ha45_v6_payments` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ha45_v6_payments` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v6_promotions`
+--
+
+DROP TABLE IF EXISTS `ha45_v6_promotions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v6_promotions` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL,
+  `rule` text NOT NULL,
+  `price` text NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v6_promotions`
+--
+
+LOCK TABLES `ha45_v6_promotions` WRITE;
+/*!40000 ALTER TABLE `ha45_v6_promotions` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ha45_v6_promotions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v6_resources`
+--
+
+DROP TABLE IF EXISTS `ha45_v6_resources`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v6_resources` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) DEFAULT NULL,
+  `description` text,
+  `show_order` int(11) DEFAULT '1',
+  `archive` tinyint(4) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v6_resources`
+--
+
+LOCK TABLES `ha45_v6_resources` WRITE;
+/*!40000 ALTER TABLE `ha45_v6_resources` DISABLE KEYS */;
+INSERT INTO `ha45_v6_resources` VALUES (2,'Therapist1','Licensed Professional Counselor',1,0);
+/*!40000 ALTER TABLE `ha45_v6_resources` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v6_service_cats`
+--
+
+DROP TABLE IF EXISTS `ha45_v6_service_cats`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v6_service_cats` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) DEFAULT NULL,
+  `description` text,
+  `show_order` int(11) DEFAULT '1',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v6_service_cats`
+--
+
+LOCK TABLES `ha45_v6_service_cats` WRITE;
+/*!40000 ALTER TABLE `ha45_v6_service_cats` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ha45_v6_service_cats` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v6_services`
+--
+
+DROP TABLE IF EXISTS `ha45_v6_services`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v6_services` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) DEFAULT NULL,
+  `description` text,
+  `min_cancel` int(11) DEFAULT '86400',
+  `allow_queue` tinyint(4) DEFAULT '0',
+  `duration` int(11) DEFAULT '1800',
+  `lead_in` int(11) DEFAULT '0',
+  `lead_out` int(11) DEFAULT '0',
+  `price` varchar(16) DEFAULT NULL,
+  `recur_total` int(11) DEFAULT '1',
+  `recur_options` varchar(64) DEFAULT 'd-2d-w',
+  `show_order` int(11) DEFAULT '1',
+  `return_url` text NOT NULL,
+  `blocks_location` tinyint(4) NOT NULL DEFAULT '0',
+  `pack_only` tinyint(4) NOT NULL DEFAULT '0',
+  `prepay` varchar(16) NOT NULL,
+  `duration_max` int(11) NOT NULL DEFAULT '1800',
+  `duration_increment` int(11) NOT NULL DEFAULT '1800',
+  `price_increment` varchar(16) NOT NULL,
+  `blocks_resource` tinyint(4) NOT NULL DEFAULT '0',
+  `duration_break` int(11) NOT NULL DEFAULT '0',
+  `duration2` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v6_services`
+--
+
+LOCK TABLES `ha45_v6_services` WRITE;
+/*!40000 ALTER TABLE `ha45_v6_services` DISABLE KEYS */;
+INSERT INTO `ha45_v6_services` VALUES (1,'Initial Assessment - Office Visit','<p>The initial visit focuses on the assessment of the problems that bring the individual to a psychiatric consultation. At the same time, this visit includes the comprehensive evaluation from the medical perspective as well as the social environment. As part of the evaluation we ask that the patients fill out forms that will provide us general information from the health perspective and the medical and psychiatric history (you can download these and fill them out prior to your appointment). There are screening tools available as well, that can be used at the time of the evaluation, or some self administered tools that patients can do at home prior to their visit. The initial assessment and treatment plan are formulated on the first session, but they continue to be reviewed all the time as the work progresses.</p>\r\n\r\n<p>As part of the evaluation, is very important that we get the information of other medications currently taken and psychiatric medications used in the past. In order to coordinate care, we will ask for information on your other treating physicians and therapists, as well as your written authorization to share information with them. Bring the information to the appointment and whenever new medications are prescribed by other providers in the future, keep us updated with the information. </p>\r\n\r\n<p><b> Price Listed is for Non-insured</b></p>\r\n\r\n<p><i>Office Visit Insurance Copays Apply</i></p>',86400,0,7200,0,0,'300',1,'d-2d-w',1,'',0,0,'',7200,7200,'300',0,0,0);
+INSERT INTO `ha45_v6_services` VALUES (3,'20-30 Minute Therapy Session - Office Visit','<p>At the end of the assessment, your assessing therapist will offer some preliminary feedback about what he or she has observed during the session, and will advise you as to whether or not he or she considers therapy would be beneficial. Many patients who are deemed suitable to continue as patients with us wish to make an appointment to begin work there and then, while others prefer to go away and think about it. We are more than happy that you should do this – in fact we encourage you to visit more than one potential therapist before making a firm commitment, since your relationship with your therapist will be the most important element in the potential success or failure of the work you undertake.</p>\r\n\r\n<p>We would normally expect individuals and couples to commit to an initial 6 sessions of work, usually (although not always) occurring once weekly. We find this often proves sufficient for those bringing relatively simple issues. For others, the six sessions offers a time-limited introduction to counselling and therapy, during which period, the therapist is able to assess the client’s needs and preferred style of working in more detail. For such clients, the review which takes place at the end of the initial period allows them to examine what they have achieved thus far and to consider what remains to be worked on. Having decided to continue, both patient and therapist will formulate a plan for continued work, usually in an open-ended contract</p>',86400,0,1800,0,0,'75',1,'d-2d-w',2,'',0,0,'',1800,1800,'75',0,0,0);
+INSERT INTO `ha45_v6_services` VALUES (4,'45 Minute Therapy Session - Office Visit','<p>At the end of the assessment, your assessing therapist will offer some preliminary feedback about what he or she has observed during the session, and will advise you as to whether or not he or she considers therapy would be beneficial. Many patients who are deemed suitable to continue as patients with us wish to make an appointment to begin work there and then, while others prefer to go away and think about it. We are more than happy that you should do this – in fact we encourage you to visit more than one potential therapist before making a firm commitment, since your relationship with your therapist will be the most important element in the potential success or failure of the work you undertake.</p>\r\n\r\n<p>We would normally expect individuals and couples to commit to an initial 6 sessions of work, usually (although not always) occurring once weekly. We find this often proves sufficient for those bringing relatively simple issues. For others, the six sessions offers a time-limited introduction to counselling and therapy, during which period, the therapist is able to assess the client’s needs and preferred style of working in more detail. For such clients, the review which takes place at the end of the initial period allows them to examine what they have achieved thus far and to consider what remains to be worked on. Having decided to continue, both patient and therapist will formulate a plan for continued work, usually in an open-ended contract</p>',86400,0,2700,0,0,'150',1,'d-2d-w',3,'',0,0,'',2700,2700,'150',0,0,0);
+INSERT INTO `ha45_v6_services` VALUES (6,'60 Minute Therapy Session - Office Visit','<p>At the end of the assessment, your assessing therapist will offer some preliminary feedback about what he or she has observed during the session, and will advise you as to whether or not he or she considers therapy would be beneficial. Many patients who are deemed suitable to continue as patients with us wish to make an appointment to begin work there and then, while others prefer to go away and think about it. We are more than happy that you should do this – in fact we encourage you to visit more than one potential therapist before making a firm commitment, since your relationship with your therapist will be the most important element in the potential success or failure of the work you undertake.</p>\r\n\r\n<p>We would normally expect individuals and couples to commit to an initial 6 sessions of work, usually (although not always) occurring once weekly. We find this often proves sufficient for those bringing relatively simple issues. For others, the six sessions offers a time-limited introduction to counselling and therapy, during which period, the therapist is able to assess the client’s needs and preferred style of working in more detail. For such clients, the review which takes place at the end of the initial period allows them to examine what they have achieved thus far and to consider what remains to be worked on. Having decided to continue, both patient and therapist will formulate a plan for continued work, usually in an open-ended contract</p>',86400,0,3600,0,0,'200',1,'d-2d-w',4,'',0,0,'',3600,3600,'200',0,0,0);
+INSERT INTO `ha45_v6_services` VALUES (7,'75 Minute Therapy Session - Office Visit','<p>At the end of the assessment, your assessing therapist will offer some preliminary feedback about what he or she has observed during the session, and will advise you as to whether or not he or she considers therapy would be beneficial. Many patients who are deemed suitable to continue as patients with us wish to make an appointment to begin work there and then, while others prefer to go away and think about it. We are more than happy that you should do this – in fact we encourage you to visit more than one potential therapist before making a firm commitment, since your relationship with your therapist will be the most important element in the potential success or failure of the work you undertake.</p>\r\n\r\n<p>We would normally expect individuals and couples to commit to an initial 6 sessions of work, usually (although not always) occurring once weekly. We find this often proves sufficient for those bringing relatively simple issues. For others, the six sessions offers a time-limited introduction to counselling and therapy, during which period, the therapist is able to assess the client’s needs and preferred style of working in more detail. For such clients, the review which takes place at the end of the initial period allows them to examine what they have achieved thus far and to consider what remains to be worked on. Having decided to continue, both patient and therapist will formulate a plan for continued work, usually in an open-ended contract</p>',86400,0,4500,0,0,'250',1,'d-2d-w',5,'',0,0,'',4500,4500,'250',0,0,0);
+INSERT INTO `ha45_v6_services` VALUES (8,'90 Minute Therapy Session - Office Visit','<p>At the end of the assessment, your assessing therapist will offer some preliminary feedback about what he or she has observed during the session, and will advise you as to whether or not he or she considers therapy would be beneficial. Many patients who are deemed suitable to continue as patients with us wish to make an appointment to begin work there and then, while others prefer to go away and think about it. We are more than happy that you should do this – in fact we encourage you to visit more than one potential therapist before making a firm commitment, since your relationship with your therapist will be the most important element in the potential success or failure of the work you undertake.</p>\r\n\r\n<p>We would normally expect individuals and couples to commit to an initial 6 sessions of work, usually (although not always) occurring once weekly. We find this often proves sufficient for those bringing relatively simple issues. For others, the six sessions offers a time-limited introduction to counselling and therapy, during which period, the therapist is able to assess the client’s needs and preferred style of working in more detail. For such clients, the review which takes place at the end of the initial period allows them to examine what they have achieved thus far and to consider what remains to be worked on. Having decided to continue, both patient and therapist will formulate a plan for continued work, usually in an open-ended contract</p>',86400,0,5400,0,0,'300',1,'d-2d-w',6,'',0,0,'',5400,5400,'300',0,0,0);
+/*!40000 ALTER TABLE `ha45_v6_services` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v6_smslog`
+--
+
+DROP TABLE IF EXISTS `ha45_v6_smslog`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v6_smslog` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `sent_at` int(11) NOT NULL,
+  `to_number` varchar(16) NOT NULL,
+  `from_number` varchar(16) NOT NULL,
+  `message` text NOT NULL,
+  `success` tinyint(4) NOT NULL DEFAULT '0',
+  `gateway` varchar(16) NOT NULL,
+  `response` text NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v6_smslog`
+--
+
+LOCK TABLES `ha45_v6_smslog` WRITE;
+/*!40000 ALTER TABLE `ha45_v6_smslog` DISABLE KEYS */;
+INSERT INTO `ha45_v6_smslog` VALUES (1,1399394739,'405-706-1226','(405) 516-0343','Test message from MIS',1,'email2sms','Sent email to \'405-706-1226@txt.att.net\'');
+INSERT INTO `ha45_v6_smslog` VALUES (2,1400330523,'4057061226','(405) 516-0343','Thank you for registering, please wait while we approve your account.',1,'email2sms','Sent email to \'4057061226@txt.att.net\'');
+/*!40000 ALTER TABLE `ha45_v6_smslog` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v6_templates`
+--
+
+DROP TABLE IF EXISTS `ha45_v6_templates`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v6_templates` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `lang` varchar(16) NOT NULL,
+  `template` varchar(255) NOT NULL,
+  `subject` varchar(255) NOT NULL,
+  `body` text,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=22 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v6_templates`
+--
+
+LOCK TABLES `ha45_v6_templates` WRITE;
+/*!40000 ALTER TABLE `ha45_v6_templates` DISABLE KEYS */;
+INSERT INTO `ha45_v6_templates` VALUES (1,'en','user-require_approval-user','Your Account Is Pending Approval','Thank you for registering!\r\n\r\nWe manually approve new accounts. We will notify you when your account is activated.');
+INSERT INTO `ha45_v6_templates` VALUES (2,'en','user-activate-user','Your Account Is Now Active','Congratulations!\r\n\r\nYour user account is now active. Here is your login information:\r\n\r\nUsername: {USER.USERNAME}\r\nPassword: {USER.PASSWORD}\r\n');
+INSERT INTO `ha45_v6_templates` VALUES (3,'en','user-reset_password-user','Your Password Reset','Per your request, your password has been reset. Here is your new login information:\r\n\r\nUsername: {USER.USERNAME}\r\nPassword: {USER.PASSWORD}\r\n');
+INSERT INTO `ha45_v6_templates` VALUES (4,'en','user-require_approval-admin','New User Registered, Your Approval Required','A new user has registered at your MIS scheduler website. Please go to the admin panel to approve or reject this user.\r\n\r\nNew user information:\r\n\r\n{USER.-ALL-}\r\n');
+INSERT INTO `ha45_v6_templates` VALUES (5,'en','appointment-require_approval-customer','Your Appointment Is Pending Approval','Thank you for your appointment request.\r\n\r\nWe kindly ask for your patience while we review your request. We will notify you when your appointment is accepted.\r\n\r\nYour appointment details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n');
+INSERT INTO `ha45_v6_templates` VALUES (6,'en','appointment-approve-customer','Your Appointment Approved','Thank you for your appointment request. Your appointment is now approved.\r\n\r\nYour Appointment Details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n');
+INSERT INTO `ha45_v6_templates` VALUES (7,'en','appointment-request-customer','Your Appointment Request','Thank you for your appointment request. Your appointment is now approved.\r\n\r\nYour Appointment Details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n');
+INSERT INTO `ha45_v6_templates` VALUES (8,'en','appointment-reject-customer','Your Appointment Rejected','Thank you for your appointment request. We are sorry, your requested appointment was not abe to be scheduled.\r\n\r\nReason:\r\n\r\n{APPOINTMENT.REJECT_REASON}\r\n\r\nYour appointment details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n');
+INSERT INTO `ha45_v6_templates` VALUES (9,'en','appointment-cancel-customer','Your Appointment Cancelled','This is the confirmation that your appointment has been cancelled by your request.\r\n\r\nCancel reason:\r\n\r\n{APPOINTMENT.CANCEL_REASON}\r\n\r\nYour appointment details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n');
+INSERT INTO `ha45_v6_templates` VALUES (10,'en','appointment-change-customer','Your Appointment Changed','Your appointment has been changed, your new appointment details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n');
+INSERT INTO `ha45_v6_templates` VALUES (11,'en','appointment-noshow-customer','Your Appointment Marked As No Show','We are sorry, your appointment has been marked as no show.\r\n\r\nYour appointment details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n');
+INSERT INTO `ha45_v6_templates` VALUES (12,'en','appointment-remind-customer','Appointment Reminder','This is a reminder for your appointment.\r\n\r\nYour appointment details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n');
+INSERT INTO `ha45_v6_templates` VALUES (13,'en','appointment-require_approval-provider','New Appointment Request Requires Approval','There is a new appointment request for you.\r\n\r\nAppointment details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n\r\nCustomer details:\r\n\r\n{APPOINTMENT.CUSTOMER.-ALL-}\r\n\r\nQuick links for this appointment:\r\n\r\n{APPOINTMENT.QUICK_LINK_APPROVE} {APPOINTMENT.QUICK_LINK_REJECT}\r\n');
+INSERT INTO `ha45_v6_templates` VALUES (14,'en','appointment-approve-provider','Your Appointment Approved','Your appointment is now approved.\r\n\r\nYour Appointment Details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n\r\nCustomer details:\r\n\r\n{APPOINTMENT.CUSTOMER.-ALL-}\r\n');
+INSERT INTO `ha45_v6_templates` VALUES (15,'en','appointment-request-provider','New Appointment Request','There is a new appointment request for you, it has been automatically approved.\r\n\r\nAppointment details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n\r\nCustomer details:\r\n\r\n{APPOINTMENT.CUSTOMER.-ALL-}\r\n');
+INSERT INTO `ha45_v6_templates` VALUES (16,'en','appointment-reject-provider','Your Appointment Rejected','Your appointment request was not able to be scheduled.\r\n\r\nReason:\r\n\r\n{APPOINTMENT.REJECT_REASON}\r\n\r\nYour appointment details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n\r\nCustomer details:\r\n\r\n{APPOINTMENT.CUSTOMER.-ALL-}\r\n');
+INSERT INTO `ha45_v6_templates` VALUES (17,'en','appointment-cancel-provider','Your Appointment Cancelled By Customer','This is the confirmation that your appointment has been cancelled by the customer.\r\n\r\nCancel reason:\r\n\r\n{APPOINTMENT.CANCEL_REASON}\r\n\r\nAppointment details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n\r\nCustomer details:\r\n\r\n{APPOINTMENT.CUSTOMER.-ALL-}\r\n');
+INSERT INTO `ha45_v6_templates` VALUES (18,'en','appointment-change-provider','Your Appointment Changed','Your appointment has been changed, your new appointment details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n\r\nCustomer details:\r\n\r\n{APPOINTMENT.CUSTOMER.-ALL-}\r\n');
+INSERT INTO `ha45_v6_templates` VALUES (19,'en','appointment-noshow-provider','Your Appointment Marked As No Show','Your appointment has been marked as no show.  Per your service agreement you are responsible for {APPOINTMENT.PRICE}.\r\n\r\nYour appointment details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n\r\nCustomer details:\r\n\r\n{APPOINTMENT.CUSTOMER.-ALL-}\r\n');
+INSERT INTO `ha45_v6_templates` VALUES (20,'en','appointment-remind-provider','Appointment Reminder','This is a reminder for your appointment.\r\n\r\nYour appointment details:\r\n\r\n{APPOINTMENT.-ALL-}\r\n');
+INSERT INTO `ha45_v6_templates` VALUES (21,'en','user-activate-admin','New User Account Active','A new user account is now active in your appointment system.\r\n\r\nNew user information:\r\n{USER.-ALL-}\r\n');
+/*!40000 ALTER TABLE `ha45_v6_templates` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v6_timeblocks`
+--
+
+DROP TABLE IF EXISTS `ha45_v6_timeblocks`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v6_timeblocks` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `starts_at` int(11) NOT NULL,
+  `ends_at` int(11) NOT NULL,
+  `selectable_every` int(11) NOT NULL,
+  `applied_on` int(11) NOT NULL,
+  `location_id` int(11) DEFAULT NULL,
+  `resource_id` int(11) DEFAULT NULL,
+  `service_id` int(11) DEFAULT NULL,
+  `valid_from` int(11) DEFAULT NULL,
+  `valid_to` int(11) DEFAULT NULL,
+  `capacity` int(11) NOT NULL DEFAULT '1',
+  `group_id` int(11) DEFAULT NULL,
+  `min_from_now` int(11) DEFAULT '10800',
+  `max_from_now` int(11) DEFAULT '4838400',
+  `week_applied_on` tinyint(4) DEFAULT '0',
+  `max_capacity` int(11) DEFAULT '1',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v6_timeblocks`
+--
+
+LOCK TABLES `ha45_v6_timeblocks` WRITE;
+/*!40000 ALTER TABLE `ha45_v6_timeblocks` DISABLE KEYS */;
+INSERT INTO `ha45_v6_timeblocks` VALUES (1,28800,68400,900,1,1,2,0,20140506,20150506,1,1,10800,1209600,0,1);
+INSERT INTO `ha45_v6_timeblocks` VALUES (2,28800,68400,900,2,1,2,0,20140506,20150506,1,1,10800,1209600,0,1);
+INSERT INTO `ha45_v6_timeblocks` VALUES (3,28800,68400,900,3,1,2,0,20140506,20150506,1,1,10800,1209600,0,1);
+INSERT INTO `ha45_v6_timeblocks` VALUES (4,28800,68400,900,4,1,2,0,20140506,20150506,1,1,10800,1209600,0,1);
+INSERT INTO `ha45_v6_timeblocks` VALUES (5,28800,68400,900,5,1,2,0,20140506,20150506,1,1,10800,1209600,0,1);
+/*!40000 ALTER TABLE `ha45_v6_timeblocks` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v6_timeoffs`
+--
+
+DROP TABLE IF EXISTS `ha45_v6_timeoffs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v6_timeoffs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `resource_id` int(11) NOT NULL,
+  `location_id` int(11) NOT NULL,
+  `starts_at` int(11) NOT NULL,
+  `ends_at` int(11) NOT NULL,
+  `description` text,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v6_timeoffs`
+--
+
+LOCK TABLES `ha45_v6_timeoffs` WRITE;
+/*!40000 ALTER TABLE `ha45_v6_timeoffs` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ha45_v6_timeoffs` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v6_transactions`
+--
+
+DROP TABLE IF EXISTS `ha45_v6_transactions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v6_transactions` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `amount` double NOT NULL,
+  `created_at` int(11) NOT NULL,
+  `invoice_id` int(11) DEFAULT NULL,
+  `amount_net` double NOT NULL,
+  `pgateway` varchar(32) NOT NULL,
+  `pgateway_ref` text NOT NULL,
+  `pgateway_response` text NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v6_transactions`
+--
+
+LOCK TABLES `ha45_v6_transactions` WRITE;
+/*!40000 ALTER TABLE `ha45_v6_transactions` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ha45_v6_transactions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ha45_v6_users`
+--
+
+DROP TABLE IF EXISTS `ha45_v6_users`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ha45_v6_users` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `username` varchar(128) NOT NULL,
+  `email` varchar(128) NOT NULL,
+  `password` varchar(64) NOT NULL,
+  `first_name` varchar(128) DEFAULT NULL,
+  `last_name` varchar(128) DEFAULT NULL,
+  `created` int(11) NOT NULL,
+  `lang` varchar(16) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ha45_v6_users`
+--
+
+LOCK TABLES `ha45_v6_users` WRITE;
+/*!40000 ALTER TABLE `ha45_v6_users` DISABLE KEYS */;
+INSERT INTO `ha45_v6_users` VALUES (1,'admin','support@okmis.com','f382e5edf264775e13ce513384e4f152','Keith','Stephenson',1308530181,'');
+INSERT INTO `ha45_v6_users` VALUES (3,'help@okmis.com','help@okmis.com','70f8cb17e74cde7d89558dcbaf43f7ec','Help','Desk',1364992061,'');
+INSERT INTO `ha45_v6_users` VALUES (8,'tpalmerlpc@yahoo.com','demo@okmis.com','fe01ce2a7fbac8fafaed7c982a04e229','Therapist','Demo',1399394163,'');
+INSERT INTO `ha45_v6_users` VALUES (9,'ibfcounseling@gmail.com','client1@gmail.com','f14b996322af7b039041d2b1979bfdf5','Client','1',1400330512,'');
+INSERT INTO `ha45_v6_users` VALUES (10,'support@okmis.com','gregorylynnruch@gmail.com','53dc54b8fee25ade4e42c923a0ea6657','Lynn','Ruch',1432042187,'');
+/*!40000 ALTER TABLE `ha45_v6_users` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2019-08-08 20:12:09

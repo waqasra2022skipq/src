@@ -1,0 +1,56 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use Accounts;
+use myConfig;
+use Cwd;
+use DBI;
+use DBForm;
+############################################################################
+# usage: ExpLogin            
+#        Expire Login tokens over 60 minutes old
+############################################################################
+# get the command name...
+my ($pw,$cmd) = $0 =~ m/(.*\/)(.*)$/;
+# the accounts to work with
+my @DBS = $ARGV[0] eq 'test' ? Accounts->dbs('test')
+        : $ARGV[0] eq 'live' ? Accounts->dbs('live')
+        : $ARGV[0] eq 'active' ? Accounts->dbs('active')
+        : $ARGV[0] eq 'all' ? Accounts->dbs('all')
+        : scalar(@ARGV) ? @ARGV : Accounts->dbs('active'); 
+chdir(myConfig->cfg('WORKDIR'));
+my $pwd=cwd();
+print qq|${cmd}: Started: |.localtime().qq|\n|;
+print qq|${cmd}: pwd=$pwd\n|;
+print qq|${cmd}: DBS=@DBS\n|;
+print qq|======================================\n|;
+foreach my $dbname ( @DBS )
+{
+  print qq|Database: $dbname\n|;
+  my $form = DBForm->new("DBNAME=$dbname");
+  ##
+  # Note - the SQL statement below requires MySQL 3.22 or greater (date_sub)
+  $MinutesToWatch = 60;
+  my $dbh = $form->dbconnect();
+  $sHistory = $dbh->prepare("delete from History where Token=?"); 
+  $sAccess = $dbh->prepare("select * from Login where Last<date_format(date_sub(now(),INTERVAL $MinutesToWatch MINUTE) ,'%Y%m%d%H%i%S') order by Last"); 
+  $sAccess->execute();
+  ##
+  print qq|$DT\n|;
+  print qq|Token\tProvID\tLast\n|;
+  while ( my $r = $sAccess->fetchrow_hashref )
+  {
+    print qq|$r->{Token}\t$r->{ProvID}\t$r->{Last}\n|;
+    $sHistory->execute($r->{Token});
+  }
+  $sAccess->finish();
+  $sHistory->finish();
+  $sDelete = $dbh->prepare("delete from Login where Last<date_format(date_sub(now(),INTERVAL $MinutesToWatch MINUTE) ,'%Y%m%d%H%i%S')"); 
+  $sDelete->execute();
+  $sDelete->finish();
+  $form->complete();
+  print qq|\n|;
+}
+print qq|======================================\n\n|;
+print qq|${cmd}: Completed: |.localtime().qq|\n|;
+############################################################################
+exit;

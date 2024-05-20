@@ -1,0 +1,1 @@
+select Client.FName,Client.LName,ClientPrAuthCDC.ClientID,ClientPrAuth.PAgroup,ClientPrAuthCDC.Reason from ClientPrAuthCDC left join ClientPrAuth on ClientPrAuth.ID=ClientPrAuthCDC.ClientPrAuthID left join Client on Client.ClientID=ClientPrAuth.ClientID where ClientPrAuth.NotificationType=19;

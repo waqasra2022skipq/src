@@ -1,0 +1,25 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use Accounts;
+use myConfig;
+############################################################################
+# usage: SetACL DB
+############################################################################
+my $form = DBForm->new();
+my $BIN = myConfig->cfg('BIN');
+############################################################################
+print qq|<PRE>\n|;
+print qq|Started: |.localtime().qq|\n\n|;
+print qq|======================================\n\n|;
+print qq|\n--------------------------------------\n|;
+print qq|  setSiteACL... \n|;
+system("${BIN}/setSiteACL DBNAME=$form->{DBNAME}\\&rebuild=0");
+#sleep(5);
+print qq|  setManagerTree... \n|;
+system("${BIN}/setManagerTree DBNAME=$form->{DBNAME}");
+#sleep(5);
+print qq|\n\n======================================\n|;
+print qq|Completed: |.localtime().qq|\n|;
+print qq|</PRE>\n|;
+exit;
+############################################################################

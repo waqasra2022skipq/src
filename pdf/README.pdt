@@ -1,0 +1,123 @@
+Newest pdf/pdt process:
+"c:\Program Files\Ghostscript\gs8.50\bin\gswin32c.exe" -q -dBATCH -dNOPAUSE -sDEVICE=pdfwrite -sOutputFile=out.pdf -dCompressPages=false -dSubsetFonts=false final_1500.pdf
+
+
+
+character count in pdt:
+
+to count the characters in the pdt remove upto and including the 
+stream
+and delete the last 2 lines
+endstream
+endobj
+
+example pdt lines:
+
+box:
+ET Q 10 w 320 6375 90 90 re S q 10 0 0 10 0 0 cm BT
+
+line:
+     x   y   len  width
+ET Q 700 300 1800 40 re f q 10 0 0 10 0 0 cm BT
+
+
+cm = cursor movement (use like a td)
+tj = show multiple lines of text
+
+
+Creating PDF templates
+05/05/2007
+"c:\Program Files\Ghostscript\gs8.50\bin\gswin32c.exe" -q -dBATCH -dNOPAUSE -sDEVICE=pdfwrite -sOutputFile=out.pdf -dCompressPages=false -dSubsetFonts=false final_1500.pdf
+
+06/15/2003
+
+BT = begin text
+ a BT always needs to set a font: /R10 10 Tf
+ET Q = end text
+
+
+Sometime in 2000
+
+Create a good pdf file to use.  
+We need to reduce the pdf down to a workable pdf with only 1 Content object.  
+
+1. Create your 1 page PDF with Adobe Acrobat.  
+   Currently the cgi routines only work on a 1 page template.
+2. Create a postscript file to use in the GhostScript conversion by Exporting as a PostScript or EPS.
+3. Convert the postscript file back to a pdf file.  
+   GhostScript converts the postscript file into a pdf which has only 1 Content object.  
+   I used a Windows version of GhostScript 6.50.  
+   The older linux version did not create a clean pdf.
+      C:\gs\gs6.50\bin>gswin32 -sDEVICE=pdfwrite -sOutputFile=out.pdf in.ps
+4. Now move the out.pdf file to the linux server and run the inflate script on it.  
+   This script converts the out.pdf into a non-binary, uncompressed version that is 
+   easier to work with turning into a template.
+     /usr/local/hsrts/ubin/inflate out.pdf > out.pdt
+   I use the extension .pdt for Portable Document Template.  
+   This template is not a working pdf because it has length attributes in it that were 
+   previously length associated with the binary or compressed version which are much shorter.  
+   These lengths we will change.
+5. Remove the catalog, resource, and page objects.  
+   Keep the Content and Font objects (and any other object references import to the Content 
+   or Font objects).  This means going through the pdt and verifying all the object references.  
+6. Dereference objects whereever possible.  An object is referenced using X 0 R where X is the 
+   object number; 8 0 R references object 8.  Often an object is ONLY a reference.  
+   To dereference the object use the code between the 8 0 obj<<>>endobj.
+     /Length 8 0 R				can be changed to /Length 4438
+     8 0 obj 4438 endobj	
+   or
+     /ExtGState 12 0 R			can be change to /ExtGState <</R4 3 0 R>>
+     12 0 obj <</R4 3 0 R>> endobj
+7. Dereference the Content /Length object. Use the actual length of the object now.
+     /Length 8 0 R				should be changed to /Length 4438
+     8 0 obj 
+     4438 
+     endobj	
+   The only length we are concerned with is the Content object.  
+   The length is only the length of the content itself, without the 8 0 obj or the <</Length 4438>> 
+   or the endobj.
+   The Content object MUST be the last object in the template!
+8. Keep the Font objects referenced in the Content object.  
+   These are referenced by the use of the Name, such as <</Type/Font/Name/R5>> 
+   where R5 is the reference.
+   These should be moved to be objects 1,2,3.  
+   The Content object will be the last object in the template.
+   Start by looking for Fonts used in the Content object.  
+   Include objects referenced in the Font objects. 
+   Stop the references at the Resources object ; 
+   which can be identified because it contains 
+   /Page/Mediabox, /Rotate, /Resources, /ExtGState, /Font, /Contents.  
+   This object is build by the cgi routines from the Object placed at the top of the template.
+   The Fonts & Content objects are all that is needed.
+9. Once that is done, within the generated pdf file we identify the content object. 
+   In mine it was object 6 0. 
+   It referenced object 7 0 R as the length (ie /Length 7 0 R). 
+   I took the length (1255) and replace the reference to object 7 0 R and put in 1255 
+   followed by a space to overlay the 7 0 R. 
+   Then take the content object 6 0 obj (everything from <</Length to the endobj) and copy it)
+10.Then made that object the third object within the note98.pdf.1 file.
+11.The content object we moved has dependencies listed within the pages object. 
+   The two dependencies were font resources: r10 and r5. 
+   These were defined in objects 1 and 2 in note98.pdf.1 so these need to be changed.
+
+Changes to note98pdf.pm
+
+1. Modify it so it would match the newly created note98.pdf.1 file. 
+   This means that we need to have the byte offsets changed so that they are correct. 
+   The xref table needs to be initialized with the correct byte offsets to the new objects 
+   1, 2, 3, and 4. Number 4 is the length in bytes of the file.
+
+   In HexEdit place the cursor at the end of each obj (just after the 0A) and read the length.
+   This change was made to line 369:
+   my @xref = (15, 88, 160, 1486);			 my @xref = (15, 89, 161, 1486);
+
+2. The font references, which prior to our changes were r7 and r6, needed to be modified 
+   to r10 and r5. There were 2 references to r7 which needed to be changed. 
+   There was a single reference to r6.
+
+Note: Tm= text move, Tj=text justify?
+
+
+Microworks
+Joel		joel@mw-inc.com		208.375.1234
+Daniel 		dposey@mw-inc.com		208.895.0293

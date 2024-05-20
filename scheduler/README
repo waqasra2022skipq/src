@@ -1,0 +1,69 @@
+LICENCE: 9bae9f43     https://www.hitcode.com/customers/
+UPGRADE:
+ upload the new "core6" folder, then open the hitAppoint page, not necessary the admin panel. There are no database schema changes since 6.3.2 to 6.4.0 so there should be no issues.
+ If anyway any glitches occur, you can again force the database upgrade by going to this address:
+   www.yoursite.com/bookingpage/?nts-force-upgrade=1
+
+
+see: sh fix
+Your hitAppoint Pro license code(s): June 5, 2013
+9b5face0
+9b5face1
+9b5face2
+Your hitAppoint Pro license code(s): May 23, 2014
+9b5face0
+9b5face1
+9b5face2
+
+changes to core6/model/init.php... BELOW NTS_LIB_DIR...
+18a19,20
+> define( 'NTS_DB_CONF_FILE', dirname(NTS_LIB_DIR) . '/' . basename(dirname($_SERVER['SCRIPT_FILENAME'])) . '.cfg'  );
+> 
+35c37
+< 	( file_exists(NTS_APP_DIR . '/../db.php') )
+---
+> 	( file_exists(NTS_DB_CONF_FILE) )
+38c40
+< 	include_once( NTS_APP_DIR . '/../db.php' );
+---
+> 	include_once( NTS_DB_CONF_FILE );
+181c183
+< ?>
+\ No newline at end of file
+---
+> ?>
+changes to core6/setup/form.php...
+107c107
+< <INPUT TYPE="text" NAME="admin_email" VALUE="admin@yoursiteaddress.com" SIZE="36" TABINDEX="6">
+---
+> <INPUT TYPE="text" NAME="admin_email" VALUE="support@okmis.com" SIZE="36" TABINDEX="6">
+changes to core6/panels/admin/footer.php...
+27c27
+< 	&copy; 2010-<?php echo $currentYear; ?> <a href="http://www.hitappoint.com/"><b>hitAppoint <?php echo ucfirst(NTS_APP_LEVEL); ?></b></a> ver. <?php echo $app['current_version']; ?>
+---
+> 	&copy; 2010-<?php echo $currentYear; ?> ver. <?php echo $app['current_version']; ?>
+39c39
+< </div>
+\ No newline at end of file
+---
+> </div>
+changes to core6/plugins/sms/panels/admin/sms/logs/action.php...
+4c4
+< $NTS_VIEW['showPerPage'] = 20;
+---
+> $NTS_VIEW['showPerPage'] = 50;
+37c37
+< ?>
+\ No newline at end of file
+---
+> ?>
+changes to core6/panels/admin/payments/orders/browse/action.php...
+23c23
+< $showPerPage = 20;
+---
+> $showPerPage = 50;
+68c68
+< ?>
+\ No newline at end of file
+---
+> ?>

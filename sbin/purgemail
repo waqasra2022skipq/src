@@ -1,0 +1,1 @@
+update ProviderMail set Flag='deleted' where ProvID=946 and Flag='read'

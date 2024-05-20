@@ -1,0 +1,537 @@
+#!/usr/bin/perl
+use lib '/home/okmis/mis/src/lib';
+use Cwd;
+use DBI;
+use DBForm;
+use SysAccess;
+use DBUtil;
+use cBill;
+use Time::Local;
+my $DT = localtime();
+############################################################################
+# to rerun and reset NotePaid
+#  Payroll DBNAME=okmis_oays\&ForProvID=102\&PayDate=2009-06-01
+############################################################################
+$form = DBForm->new();
+
+my $debug=0;
+print qq|\n\n\n|;
+#######################################################
+# ALWAYS FOR TODAY!!! AND SAME AS STAMP
+# ah, but I can run it for an earlier date.
+my $PayDate = $form->{TODAY};
+my $InsDate = $form->{TODAY};
+my $BillDate = $form->{TODAY};
+my $ForPayDate = 0;
+if ( $form->{PayDate} )
+{ $PayDate = $form->{PayDate}; $InsDate = $PayDate; $ForPayDate = 1; }
+($FromDate, $ToDate) = DBUtil->Date($InsDate,'monthly',-1);
+print qq|PayDate ${ForPayDate}: ${PayDate}\nInsurance: ${FromDate} thru ${ToDate}\n|;
+# Rule set for payroll select?
+my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+$ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Treatment.ClinicID');
+$ProviderSelection = DBA->getProviderSelection($form,$ForProvID,'Provider.ProvID');
+#print qq|\nPayroll: ENTER: ForProvID=$ForProvID\nClinicSelection=$ClinicSelection\nProviderSelection=$ProviderSelection\n|;
+my $ByBillDate = SysAccess->getRule($form,'PayrollByBillDate',$ForProvID);
+
+#######################################################
+# open the files
+chdir("$form->{DOCROOT}/reports2");
+$pwd=cwd();
+my $Stamp = DBUtil->Date('','stamp');
+my $Token = DBUtil->genToken();
+my $SUMMARYFILE = $ForProvID . '_Payroll_Summary_' . $Stamp . '_' . $Token . '.xls';
+#print qq|pwd=$pwd, S=$SUMMARYFILE\n|;
+open PAY, ">${SUMMARYFILE}" or die "Couldn't open 'SUMMARY' file: $!";
+my $DETAILFILE = $ForProvID . '_Payroll_Detail_' . $Stamp . '_' . $Token . '.xls';
+open DET, ">${DETAILFILE}" or die "Couldn't open 'DETAIL' file: $!";
+my $MARKPAIDFILE = $ForProvID . '_Payroll_MarkPaid_' . $Stamp . '_' . $Token . '.sql';
+
+#######################################################
+# Initialize table lookups
+$dbh = $form->dbconnect();
+
+$sProvider = $dbh->prepare('select * from Provider');
+$sProvider->execute();
+while (my $r = $sProvider->fetchrow_hashref) { $rProvider{$r->{ProvID}} = $r; }
+$sProvider->finish();
+$xref='ClinicList';
+  $s= $dbh->prepare("select * from Provider where Type=3");
+  $s->execute();
+  while (my $r = $s->fetchrow_hashref) { $$xref{$r->{ProvID}} = $r; }
+$xref='ProviderIns';
+  $s= $dbh->prepare("select * from $xref");
+  $s->execute();
+  while (my $r = $s->fetchrow_hashref) { $$xref{$r->{ID}} = $r; }
+$s->finish();
+
+#######################################################
+# Initialize SQL statements
+$sPay = $dbh->prepare("
+   select * from ProviderPay
+   where ProviderPay.ProvID = ?
+     and ProviderPay.SCID is NULL and ProviderPay.isMgr!=1
+     and ProviderPay.EffDate <= ? 
+     and (ProviderPay.ExpDate >= ? or ProviderPay.ExpDate is null)
+");
+$sPaySCID = $dbh->prepare("
+   select * from ProviderPay
+   where ProviderPay.ProvID = ?
+     and ProviderPay.SCID = ?
+     and ProviderPay.EffDate <= ? 
+     and (ProviderPay.ExpDate >= ? or ProviderPay.ExpDate is null)
+");
+$sPayMgr = $dbh->prepare("select * from ProviderPay where ID = ?");
+$sProgNotes = $dbh->prepare("select * from ProgNotes where NoteID = ?");
+#                    ? qq|delete from NotePaid where TrID=? and PaidDate='${PayDate}'|
+my $qDeleteNotePaid = $ForPayDate
+                    ? qq|delete from NotePaid where TrID=? |
+                    : qq|delete from NotePaid where TrID=? and PaidDate is null|;
+$sDeletePaidNotes = $dbh->prepare($qDeleteNotePaid);
+my $qAddNotePaid = $ForPayDate
+                 ? qq|insert into NotePaid (TrID,ClientID,ProvID,Rate,HoursWorked,NF,MgmtAmt,PaidDate,CreateProvID,CreateDate,ChangeProvID) values (?,?,?,?,?,?,?,'${PayDate}',?,?,?)|
+                 : qq|insert into NotePaid (TrID,ClientID,ProvID,Rate,HoursWorked,NF,MgmtAmt,CreateProvID,CreateDate,ChangeProvID) values (?,?,?,?,?,?,?,?,?,?)|;
+$sAddNotePaid = $dbh->prepare($qAddNotePaid);
+
+#######################################################
+# start the payroll report
+# 1st run the numbers for hours worked to calculate Insurance rates
+##
+my ($DirectHrs, $ManageHrs) = &InsCalc($FromDate,$ToDate);
+#foreach my $f ( sort keys %{$DirectHrs} ) { print "$f=$DirectHrs->{$f}\n"; }
+#print qq|DirectHrs=$DirectHrs\n|;
+my ($Salaries) = &SalaryCalc($InsDate);
+print qq|\n|;
+#foreach my $f ( sort keys %{$Salaries} ) { print "$f=$Salaries->{$f}\n"; }
+##
+# Initialize variables
+##
+%PaidService = ();
+%PaidCommission = ();
+%PaidTrIDs = ();
+@PaidTrans = ();
+%TotalTrIDs = ();
+%TotalUnits = ();
+%Detail = ();
+$TotalTrans = 0;
+$TotalNotes = 0;
+##
+# run the report
+##
+print PAY qq|$DT\nPayroll Report for ${PayDate} [run using notes BILLED 'NOT YET RECONCILED' (BillDate)]\n| if ( $ByBillDate );
+print PAY qq|$DT\nPayroll Report for ${PayDate} [run using notes Reconciled (RecDate)]\n| unless ( $ByBillDate );
+print DET qq|$DT\nPayroll Detail Report for ${PayDate} [run using notes BILLED 'NOT YET RECONCILED' (BillDate)]\n| if ( $ByBillDate );
+print DET qq|$DT\nPayroll Detail Report for ${PayDate} [run using notes Reconciled (RecDate)]\n| unless ( $ByBillDate );
+# TEST WITH THIS FIRST, THEN ABOVE
+&genPayroll();
+##
+# output reports
+##
+&PrintRpt;
+#######################################################
+# output totals
+##
+print qq|
+
+Payroll for ${PayDate}
+Payroll completed: ${DT}
+Both Detail and Summary reports are on the menu option: Reports->User Reports->Payroll Detail/Summary/MarkPaid Files
+
+DO NOT FORGET TO MARK PAID WHEN COMPLETE.
+
+Total Notes: ${TotalNotes}
+|;
+#######################################################
+# generate MarkPaid file for these TrIDs (as Paid).
+##
+unless ( $ForPayDate )
+{
+  if ( scalar(@PaidTrans) )
+  {
+    open SQL, ">${MARKPAIDFILE}" or die "Couldn't open 'MARKPAID' file: $!";
+    print SQL qq|TRANSACTIONS:\n|;
+    foreach my $ID ( @PaidTrans ) { print SQL qq|${ID}\n|; }
+    print SQL qq|TREATMENTS:\n|;
+    foreach my $skey ( sort keys %{$PaidTrIDs} ) 
+    { my ($ContDate,$TrID) = split(':',$skey); print SQL qq|${TrID}\n|; }
+    close(SQL);
+  }
+}
+##
+print qq|</PRE>|;
+#######################################################
+# finish up
+##
+close(PAY);
+close(DET);
+$sPay->finish();
+$sPaySCID->finish();
+$sPayMgr->finish();
+$sProgNotes->finish();
+$sDeletePaidNotes->finish();
+$sAddNotePaid->finish();
+$form->complete();
+exit;
+#######################################################
+#######################################################
+sub InsCalc()
+{
+  my ($FromDate, $ToDate) = @_;
+
+  my %DirectHrs = ();
+  my %ManageHrs = ();
+
+  my $q = qq|
+select *, Treatment.ProvID as ProvID, Provider.Type as Type
+        , Client.ProvID as PrimaryProvID
+  from Treatment
+    left join Provider on Provider.ProvID=Treatment.ProvID
+    left join Client on Client.ClientID=Treatment.ClientID
+  where Treatment.ContLogDate>='$FromDate' and Treatment.ContLogDate<='${ToDate}'
+    ${ClinicSelection}
+  order by Treatment.ContLogDate
+|;
+#print "q=\n$q\n";
+  my $s = $dbh->prepare($q);
+  $s->execute() || $form->dberror($q);
+  while ( $r = $s->fetchrow_hashref )
+  {
+#    ($code,$msg,$rxSC) = cBill->ChkSC($form,$r);
+#    if ( $code ) { print qq|WARNING: $r->{TrID}, $r->{ContLogDate}, $r->{SCID}, $rxSC->{SCName}: ${msg}\n|; }
+    $rxSC = cBill->getServiceCode($form,$r->{SCID},$r->{ContLogDate},$r->{ContLogBegTime},$r->{ContLogEndTime},$r->{TrID},$r->{BillDate});
+
+    next if ( $rxSC->{UnitLbl} eq 'NonBill' );         # Check for non-billable.
+    my $key = $r->{Type} == 4 ? $r->{SSN} : $r->{ProvID};
+    $DirectHrs->{$key} += $r->{Units} * $rxSC->{HrsPerUnit}; 
+    $ManageHrs->{$key} += ($r->{Units} * $rxSC->{HrsPerUnit}) / 6; 
+#print qq|$key, $DirectHrs->{$key}, $r->{Units}, $rxSC->{HrsPerUnit}\n|;
+  }
+  $s->finish();
+  print qq|Completed Insurance Calculations from ${FromDate} thru ${ToDate}\n|;
+  return($DirectHrs,$ManageHrs);
+}
+#######################################################
+sub SalaryCalc()
+{
+  my ($MyDate) = @_;
+  my %Salarys = ();
+
+  my $q = qq|
+select *, Provider.Type as Type from ProviderPay
+    left join Provider on Provider.ProvID=ProviderPay.ProvID
+  where ProviderPay.Type='Salary'
+    and ProviderPay.EffDate <= ? 
+    and (ProviderPay.ExpDate >= ? or ProviderPay.ExpDate is null)
+    ${ProviderSelection}
+  group by Provider.SSN
+|;
+#print "q=\n$q\n";
+  my $s = $dbh->prepare($q);
+  $s->execute($MyDate,$MyDate) || $form->dberror($q);
+  while ( $r = $s->fetchrow_hashref )
+  {
+    my $key = $r->{Type} == 4 ? $r->{SSN} : $r->{ProvID};
+    $Salarys->{$key} = $r->{Rate};
+  }
+  $s->finish();
+  print qq|Completed Salary Calculations for ${MyDate}\n|;
+  return($Salarys);
+}
+#######################################################
+sub genPayroll()
+{
+##
+# selection on both Treatment and NoteTrans RecDate because
+# 1) if a transaction is reconciled RecDate is set in Treatment record
+# 2) unReconciled transactions: genBilling and Partial Bills
+##
+# Payroll by Billed, for YST and others.
+  print qq|Payroll being run using notes BILLED 'NOT YET RECONCILED' (BillDate)\n| if ( $ByBillDate );
+  print qq|Payroll being run using notes Reconciled (RecDate)\n| unless ( $ByBillDate );
+  my $RecBillSelection = $ByBillDate 
+     ? qq|where Treatment.BillDate is not null |
+     : qq|where Treatment.RecDate is not null and NoteTrans.RecDate is not null |;
+  $RecBillSelection .= $ForPayDate 
+     ? qq|and NoteTrans.PaidDate='${PayDate}' |
+     : qq|and NoteTrans.PaidDate is null |;
+  my $qNoteTrans = qq|
+select Treatment.TrID, Treatment.ContLogDate, NoteTrans.ID, NoteTrans.PaidAmt
+  from Treatment
+    left join Client on Client.ClientID=Treatment.ClientID
+    left join NoteTrans on NoteTrans.TrID=Treatment.TrID
+    ${RecBillSelection}
+    ${ClinicSelection}
+  order by Treatment.ContLogDate
+|;
+###
+## NEED A WAY TO MARK RECOUPMENTS TO SUBTRACT FROM PAYROLL.
+## ONLY IF RECOUPMENT WAS FOR TOTAL NOTE TRANSAMT.
+## USE METHOD THAT IF -IncomeAmt THEN USE -ProvServiceAmt
+## CHECK IF RECOUPMENT IS NEGATIVE??
+## THINK WE ALREADY BACKOUT MGMT FEES??
+###
+print qq|qNoteTrans=\n$qNoteTrans\n| if ( $debug );
+  $sNoteTrans = $dbh->prepare($qNoteTrans);
+  $sNoteTrans->execute();
+  while ( $rNoteTrans = $sNoteTrans->fetchrow_hashref )
+  {
+    $TotalTrans++;
+    my $skey = $rNoteTrans->{ContLogDate} . ':' . $rNoteTrans->{TrID};
+    $PaidTrIDs->{$skey}->{IncomeAmt} += $rNoteTrans->{PaidAmt};
+#print qq|$NoteTrans->{TrID},$rNoteTrans->{PaidAmt}, $PaidTrIDs->{$skey}->{IncomeAmt}\n| if ( $rNotes->{TrID} == 529477 );
+    push(@PaidTrans,$rNoteTrans->{ID});
+  }
+  $sNoteTrans->finish();
+
+  my $qNotes = qq|
+select Treatment.*, Client.LName, Client.FName, Client.Suffix
+  from Treatment
+    left join Client on Client.ClientID=Treatment.ClientID
+  where Treatment.TrID=?
+|;
+#print "qNotes=\n$qNotes\n";
+  $sNotes = $dbh->prepare($qNotes);
+  foreach my $skey ( sort keys %{$PaidTrIDs} )
+  {
+    my ($ContDate,$TrID) = split(':',$skey);
+#print qq|ContDate=$ContDate,TrID=$TrID\n| if ( $TrID == $debug );
+    $sNotes->execute($TrID);
+    if ( $rNotes = $sNotes->fetchrow_hashref )
+    {
+      $TotalNotes++;
+#      ($code,$msg,$rxSC) = cBill->ChkSC($form,$rNotes,1);
+#      if ( $code ) { print qq|WARNING: $rNotes->{TrID}, $rNotes->{ContLogDate}, $rNotes->{SCID}, $rxSC->{SCName}: ${msg}\n|; }
+      $rxSC = cBill->getServiceCode($form,$rNotes->{SCID},$rNotes->{ContLogDate},$rNotes->{ContLogBegTime},$rNotes->{ContLogEndTime},$rNotes->{TrID},$rNotes->{BillDate});
+      next if ( $rxSC->{UnitLbl} eq 'NonBill' );                # Check for non-billable.
+#print qq|\n$rNotes->{TrID}, $rNotes->{ContLogDate}, $rNotes->{ContLogBegTime}, $rNotes->{ContLogEndTime}, $rNotes->{SCID}, $rxSC->{SCNum}, $rxSC->{SCName}\n| if ( $TrID == $debug );
+      &getPay;
+#print qq|PaidTrIDs: ProvID=$rNotes->{ProvID}, TrID=$rNotes->{TrID}, IncomeAmt=$PaidTrIDs->{$skey}->{IncomeAmt}\n| if ( $rNotes->{TrID} == $debug );
+    }
+    else { print "WARNING: Could not read TrID=$TrID!\n"; }
+  }
+  $sNotes->finish();
+  return(1);
+}
+#######################################################
+sub getPay()
+{
+  $Client_Name = $rNotes->{LName};
+  $Client_Name .= ", $rNotes->{FName}" if ( $rNotes->{FName} );
+  $Client_Name .= " $rNotes->{Suffix}" if ( $rNotes->{Suffix} );
+  $Clinic_Name = $ClinicList{$rNotes->{ClinicID}}{Name};
+
+  $ContLogDate = $rNotes->{ContLogDate};
+  $sPaySCID->execute($rNotes->{ProvID}, $rNotes->{SCID}, $ContLogDate, $ContLogDate);
+  my $rPay = $sPaySCID->fetchrow_hashref;
+#print qq|rPay: ProvID=$rPay->{ProvID}, ID=$rPay->{ID}, Type=$rPay->{Type}, Rate=$rPay->{Rate}, Commission=$rPay->{Commission}\n| if ( $rNotes->{TrID} == $debug );
+  $Found_Rate = '';
+  if ( ! $rPay->{ID} )
+  { 
+    $sPay->execute($rNotes->{ProvID}, $ContLogDate, $ContLogDate);
+    $rPay = $sPay->fetchrow_hashref;
+    if ( ! $rPay->{ID} )
+    { 
+      my $ProviderName = qq|$rProvider{$rNotes->{ProvID}}{FName} $rProvider{$rNotes->{ProvID}}{LName}|;
+      print "WARNING: NO Provider Pay Rate for ServiceDate! ${ProviderName} (${rNotes->{ProvID}}), SCID: $rxSC->{SCNum} ($rNotes->{SCID}), ContLogDate: ${ContLogDate}, TrID: $rNotes->{TrID}\n"; 
+      return(1);
+    }
+    $Found_Rate = '~default';
+  }
+#print qq|rPay: ProvID=$rPay->{ProvID}, ID=$rPay->{ID}, Type=$rPay->{Type}, Rate=$rPay->{Rate}, Commission=$rPay->{Commission}\n| if ( $rNotes->{TrID} == $debug );
+# zero out payroll for this note (temp because PaidDate=NULL)
+  $sDeletePaidNotes->execute($rNotes->{TrID});
+  my ($Rate, $HoursWorked) = (0,0);
+  my $skey = $rNotes->{ContLogDate} . ':' . $rNotes->{TrID};
+  my $IncomeAmt = $PaidTrIDs->{$skey}->{IncomeAmt};
+#print qq|set: skey=$skey, IncomeAmt=$IncomeAmt\n| if ( $rNotes->{TrID} == $debug );
+#print qq|START: PaidDate=$rNotes->{PaidDate}, Type=$rPay->{Type}, rPayRate=$rPay->{Rate}\n| if ( $rNotes->{TrID} == $debug );
+# These notes already paid. Only paying commission to managers.
+# Picked up note transactions for additional payments on note.
+  if ( $rNotes->{PaidDate} ne '' && !$ForPayDate )
+  { 
+    $Rate = 0; $HoursWorked = 0;
+    print "INFO: Note already paid, secondary payment commission only \$${IncomeAmt}: ${ProviderName} (${rNotes->{ProvID}}), SCID: $rxSC->{SCNum} ($rNotes->{SCID}), ContLogDate: ${ContLogDate}, TrID: $rNotes->{TrID}\n"; 
+  }
+  elsif ( $rPay->{Type} eq 'Each' )
+  { 
+    $Rate = $rPay->{Rate};
+    $HoursWorked = $rNotes->{Units};
+  }
+  elsif ( $rPay->{Type} eq 'Hour' )
+  { 
+    $Rate = $rPay->{Rate};
+    $HoursWorked = $rxSC->{Duration} / 3600;
+##
+#   Take into account the number in the Group session.
+#   Each note for each person in the group gets reduced.
+##
+    if ( $rxSC->{Type} eq 'GC' || $rxSC->{Type} eq 'GR' )
+    { 
+      $sProgNotes->execute($rNotes->{TrID});
+      my $rProgNotes = $sProgNotes->fetchrow_hashref;
+      my $GrpSize = $rProgNotes->{GrpSize} ? $rProgNotes->{GrpSize} : 1;
+      $HoursWorked = $HoursWorked / ${GrpSize};
+    }
+  }
+  elsif ( $rPay->{Type} eq 'Salary' )
+  {
+    $Rate = 0; $HoursWorked = 0;
+  }
+  else
+  {
+    print "WARNING: Provider Pay Type INVALID! ${ProviderName} (${rNotes->{ProvID}}), Type: $rPay->{Type}, ContLogDate: ${ContLogDate}, TrID: $rNotes->{TrID}\n"; 
+    return(1);
+  }
+  my $ProvServiceAmt = sprintf("%.2f",$Rate * $HoursWorked);
+  my $TransAmt = $IncomeAmt;                 # starts off as Income Amount.
+#print qq|START: $rPay->{ProvID}, ID=$rPay->{ID}, T=$rPay->{Type}, R=$Rate, HW=$HoursWorked, U=$rNotes->{Units}, SR=$rxSC->{ServiceRate}, HPU=$rxSC->{HrsPerUnit}, D=$rxSC->{Duration}\n| if ( $rNotes->{TrID} == $debug );
+#print qq|START: ProvServiceAmt=$ProvServiceAmt= R=$Rate '*' HW=$HoursWorked\n| if ( $rNotes->{TrID} == $debug );
+  my $LoopFlag = 1;
+  while ( $LoopFlag )
+  {
+    $LoopFlag = 0 if ( $rPay->{MgrID} == 0 );         # till top of pay tree.
+    my $SSN = $rProvider{$rPay->{ProvID}}{SSN};
+    my $Type = $rProvider{$rPay->{ProvID}}{Type};
+    my $ProviderName = qq|$rProvider{$rPay->{ProvID}}{FName} $rProvider{$rPay->{ProvID}}{LName}|;
+    if ( $SSN eq '' )
+    {
+      print "WARNING: NO SSN for: ${ProviderName} ($rPay->{ProvID})\n";
+      $SSN = '999-99-9999';
+    }
+    my $key = $Type == 4 ? $SSN : $rPay->{ProvID};
+    $PaidService{$key} += $ProvServiceAmt;            # set this then zero, see below.
+#print qq|ID: $rPay->{ID}, rPay->ProvID: $rPay->{ProvID}, ProviderName: ${ProviderName}, key: ${key} \n|;
+##
+# Calculate off unPaid transactions [IncomeAmt]
+#   (was Direct Service [AmtProvServiceAmt])
+#   (then PaidAmt from all trans [rxSC->{RecAmt}])
+#   now NoteTrans->{PaidAmt}
+    my $PaidCommissionAmt = sprintf("%.2f",($rxSC->{CommissionPct} * ($rPay->{Commission}/100)) * $IncomeAmt);
+#print qq|getPay: rPay ID: $rPay->{ID}, ProvID: $rPay->{ProvID}, Commission:$rPay->{Commission}\n|;
+#print qq|LoopFlag: ProviderName=$ProviderName, rPay-ID: $rPay->{ID}\n| if ( $rNotes->{TrID} == $debug );
+#print qq|LoopFlag: CommissionPct=$rxSC->{CommissionPct}, PayCommission=$rPay->{Commission}, IncomeAmt=$IncomeAmt\n| if ( $rNotes->{TrID} == $debug );
+#print qq|LoopFlag: ProvServiceAmt=$ProvServiceAmt, PaidCommissionAmt=$PaidCommissionAmt\n| if ( $rNotes->{TrID} == $debug );
+#print qq|LoopFlag: key=$key\n| if ( $rNotes->{TrID} == $debug );
+##
+#print qq|PaidCommissionAmt = rxSC->CommissionPct, rPay->Commission, IncomeAmt\n|;
+#print qq|${PaidCommissionAmt} = $rxSC->{CommissionPct}, $rPay->{Commission}, $IncomeAmt\n|;
+    $PaidCommission{$key} += $PaidCommissionAmt;
+    $TotalTrIDs{$key} += 1;
+    $TotalUnits{$key} += $rNotes->{Units};
+    $Detail{$key} .= "$rNotes->{TrID}\t";
+    $Detail{$key} .= "$Client_Name\t";
+    $Detail{$key} .= "$ContLogDate\t";
+    $Detail{$key} .= "$rxSC->{SCNum}\t";
+    $Detail{$key} .= sprintf("%.2f",$rNotes->{Units}) . "\t";
+    $Detail{$key} .=  "\$" . ${ProvServiceAmt} . "\t";
+    $Detail{$key} .=  "\$" . ${PaidCommissionAmt} . "\t";
+    $Detail{$key} .= "$rNotes->{BillDate}\t";
+    $Detail{$key} .= "$rNotes->{RecDate}\t";
+    $Detail{$key} .= "$rNotes->{PaidDate}\t";
+    $Detail{$key} .= "$TransAmt\t";
+    $Detail{$key} .= "$Clinic_Name\t";
+    $Detail{$key} .= "$Found_Rate\n";
+    my $NF = $Found_Rate eq '' ? 0 : $Found_Rate eq "~default" ? 1 : -1;
+    $sAddNotePaid->execute($rNotes->{TrID},$rNotes->{ClientID},$rPay->{ProvID},$Rate,$HoursWorked,$NF,$PaidCommissionAmt,$form->{LOGINPROVID},$form->{TODAY},$form->{LOGINPROVID});
+
+    # zero this so Managers don't get paid service amounts.
+    ($Rate, $HoursWorked) = (0,0);
+    $ProvServiceAmt = 0;   # Rate * HoursWorked.
+    $TransAmt = 0;
+##
+
+#print qq|getPay: PayMgr=$rPay->{MgrID}, LoopFlag=$LoopFlag\n|;
+    if ( $LoopFlag )       # this continues till all the Managers up the pay tree are paid.
+    {
+      $sPayMgr->execute($rPay->{MgrID});
+      $rPay = $sPayMgr->fetchrow_hashref;
+      if ( ! $rPay->{ID} )
+      {
+        print "WARNING: No Manager PayRate for: ${ProviderName} ($rPay->{ProvID}), MgrID: $rPay->{MgrID}, ContLogDate: $ContLogDate\n";
+        $LoopFlag = 0;     # STOP we got an ERROR!
+      }
+#print qq|getPay: rPay ID: $rPay->{ID}, ProvID: $rPay->{ProvID}, Commission:$rPay->{Commission}\n| if ( $rNotes->{TrID} == $debug );
+    }
+  }
+  return(1);
+}
+#######################################################
+sub PrintRpt()
+{
+#print qq|\nPrintRpt\n|;
+  print PAY "Provider\tIEs\tInsurance Cost\tInsurance Benefit\tMonthly Premium\tTotal Service\tTotal Management\tDirect Hours\tManage Hours\tMonthly IEs\tMonthly Employee\tMonthly Employer\tSalary\n";
+##
+# Since this is group by SSN the Group/Agency/Clinic will not separate because they all have no SSN.
+#  ODD situation where Wade had Provider in one Agency and doing notes in another Agency.
+#  The notes were gathered and paid but because the below select did not pick up the Provider
+#  (BECAUSE PERSON RUNNING PAYROLL DID NOT HAVE ACCESS TO THE OTHER AGENCY)
+#  to output/report/print the paid notes, so they don't show up on payroll.
+##
+  my $qSort = qq|
+select * from Provider left join EmplInfo on EmplInfo.ProvID=Provider.ProvID
+  where Provider.ProvID is not null
+  ${ProviderSelection}
+   group by SSN order by LName, FName, Suffix
+|;
+#print qq|qSort=\n$qSort\n| if ( $debug );
+  my $sSort = $dbh->prepare($qSort);
+##
+# Since this is group by SSN the Group/Agency/Clinic will not separate because they all have no SSN.
+##
+  $sSort->execute();
+  while (my $rSort = $sSort->fetchrow_hashref)
+  {
+    my $ProvID = $rSort->{ProvID};
+    my $Provider_Name = $rSort->{LName};
+    $Provider_Name .= ", $rSort->{FName}" if ( $rSort->{FName} );
+    $Provider_Name .= " $rSort->{Suffix}" if ( $rSort->{Suffix} );
+    my $key = $rSort->{Type} == 4 ? $rSort->{SSN} : $rSort->{ProvID};
+#print qq|$Provider_Name, $key, $Salaries->{$key}\n| if ( $debug );
+    next if ( $key eq '' );
+    my $Salary = sprintf("%.2f",($Salaries->{$key} / 26 ));
+
+    my $ThresInd50 = $rSort->{ThresInd50};
+    my $ThresInd100 = $rSort->{ThresInd100};
+    my $Thres100 = $rSort->{Thres100};
+    my $Insurance = $rSort->{Insurance};
+    my $Premium=$ProviderIns{$Insurance}{Premium};
+    my $BaseCost=$ProviderIns{$Insurance}{BaseCost};
+    my $PaidServAmt = sprintf("%.2f",$PaidService{$key});
+    my $PaidCommAmt = sprintf("%.2f",$PaidCommission{$key});
+#print qq|$Provider_Name, $key, $PaidServAmt, $PaidCommAmt\n| if ( $debug );
+    next if ( $Salary == 0 && $PaidServAmt == 0 && $PaidCommAmt == 0 );
+
+    my $DirectHours = $DirectHrs->{$key};
+    $DirectHours = sprintf("%.2f",$DirectHours);
+    my $ManageHours = $ManageHrs->{$key};
+    $ManageHours = sprintf("%.2f",$ManageHours);
+    my $IEs = $DirectHours + $ManageHours;
+    $IEs = sprintf("%.2f",$IEs);
+
+    $WeeklyIEs = sprintf("%.2f",$IEs / 4);
+#print qq|$key, $DirectHours, $ManageHours, $IEs, $WeeklyIEs\n| if ( $debug );
+    # Not enough hours or Cobra Insurance
+    if ( $WeeklyIEs < $ThresInd50 || $Insurance eq 'COBRA' )
+    { $AgentCost = sprintf("%.2f",0); }
+    elsif ( $WeeklyIEs >= $ThresInd50 && $WeeklyIEs < $ThresInd75 )
+    { $AgentCost = sprintf("%.2f",$BaseCost * .5); }
+    elsif ( $WeeklyIEs >= $ThresInd75 && $WeeklyIEs < $ThresInd100 )
+    { $AgentCost = sprintf("%.2f",$BaseCost * .75); }
+    elsif ( $WeeklyIEs >= $ThresInd100 && $WeeklyIEs < $Thres100 )
+    { $AgentCost = $BaseCost; }
+    elsif ( $WeeklyIEs >= $Thres100 )
+    { $AgentCost = $Premium; }
+    $EmplyCost = sprintf("%.2f",$Premium - $AgentCost);
+    $BiAgentCost = sprintf("%.2f",$AgentCost / 2);
+    $BiEmplyCost = sprintf("%.2f",$EmplyCost / 2);
+
+    print DET qq|\n$Provider_Name\nTrID\tClient\tContact Date\tService Code\tUnits\tTotal Service\t Total Management\tBilled Date\tReconcile Date\tPaid Date\tTrans Amount\tClinic\tPayRate\n|;
+    print DET $Detail{$key};
+    print DET qq|Provider\tIEs\tInsurance Cost\tInsurance Benefit\tMonthly Premium\tTotal Service\tTotal Management\tDirect Hours\tManage Hours\tMonthly IEs\tMonthly Employee\tMonthly Company\tSalary\n|;
+    print DET qq|${Provider_Name}\t${WeeklyIEs}\t\$${BiEmplyCost}\t\$${BiAgentCost}\t\$${Premium}\t\$${PaidServAmt}\t\$${PaidCommAmt}\t${DirectHours}\t${ManageHours}\t${IEs}\t\$${EmplyCost}\t\$${AgentCost}\t${Salary}\n|;
+    print PAY qq|${Provider_Name}\t${WeeklyIEs}\t\$${BiEmplyCost}\t\$${BiAgentCost}\t\$${Premium}\t\$${PaidServAmt}\t\$${PaidCommAmt}\t${DirectHours}\t${ManageHours}\t${IEs}\t\$${EmplyCost}\t\$${AgentCost}\t${Salary}\n|;
+  }
+  $sSort->finish();
+  return(1);
+}
+#######################################################
