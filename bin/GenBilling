@@ -20,6 +20,7 @@ my $Mark = 0; if ( $ARGV[0] eq 'mark' ) { $Mark = 1; shift; }
 my @DBS = $ARGV[0] eq 'test' ? Accounts->dbs('test') : scalar(@ARGV) ? @ARGV : Accounts->dbs('active'); 
 my $BILLDIR = myConfig->cfg('BILLDIR');
 my $BIN = myConfig->cfg('BIN');
+# $form->{'debug'} = 1;
 
 ############################################################################
 print qq|${cmd} Started: |.localtime().qq|\n\n|;

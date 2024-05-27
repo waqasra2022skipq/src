@@ -55,13 +55,6 @@ unless ( $form->{InsDescr} )
   warn qq|\n>>>ERROR! NO InsDescr! Abort!\n\n|;
   exit;
 }
-
-if((1 ne $wday && '1' ne $wday) && ('medicaid' eq $form->{InsDescr} || 'dmhsas' eq $form->{InsDescr})) {
-  # If it's not monday then dont generate for dmhsas and medicaid
-  warn qq|\n>>>Not monday !!!! SO SKIP generating 837 for dmhsas and medicaid!\n\n|;
-  exit; 
-}
-
 chdir("$form->{DOCROOT}/billing");
 my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
 my ($BillDate,$NEXTBILLDATE) = cBill->getBillDate();

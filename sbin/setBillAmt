@@ -23,7 +23,7 @@ my $sI = $dbh->prepare($qI);
 my @Dates = main->getDates($form,$form->{BillDate});
 foreach my $BillDate ( @Dates )
 {
-warn "BillDate=$BillDate\n";
+  warn "BillDate=$BillDate\n";
   main->delTrans($form,$BillDate);
   main->rollupTrans($form,$BillDate,$sR,$sU,$sI);
 }
@@ -51,9 +51,9 @@ sub getDates
     my $Date = DBUtil->Date('',-1,0);
     $q = qq|select BillDate from NoteTrans where BillDate>='${Date}' group by BillDate|;
   }
-  # else
-  # { $q = qq|select BillDate from NoteTrans where BillDate='${type}' group by BillDate|; }
-warn qq|q=\n$q\n|;
+  else
+  { $q = qq|select BillDate from NoteTrans where BillDate='${type}' group by BillDate|; }
+#warn qq|q=\n$q\n|;
   my $s = $dbh->prepare($q);
   $s->execute() || $form->dberror($q);
   while ( my ($BillDate) = $s->fetchrow_array ) { push(@list,$BillDate); }
@@ -67,7 +67,7 @@ sub delTrans
   my ($self,$form,$BillDate) = @_;
   my $dbh = $form->dbconnect();
   (my $Date = $BillDate) =~ s/-//g;
-warn "delete from BillAmt where BillDate = '$Date'\n";
+#warn "delete from BillAmt where BillDate = '$Date'\n";
   $sDelete = $dbh->prepare("delete from BillAmt where BillDate = '$Date'");
   $sDelete->execute() || $form->dberror("delete from BillAmt where BillDate = '$Date'");
   $sDelete->finish();
@@ -97,8 +97,8 @@ sub rollupTrans
     where NoteTrans.BillDate = '${BillDate}'
     order by NoteTrans.BillDate, Treatment.ClinicID, xInsurance.Name
 |;
-warn qq|qNoteTrans=$qNoteTrans\n|;
-  print qq|key....................\tBillAmt\tReBillAmt\tIncAmt\tRecAmt\tSchAmt\tAmtDue\tCode\tSRC\tRecDate\n|;
+#warn qq|qNoteTrans=$qNoteTrans\n|;
+  #print qq|key....................\tBillAmt\tReBillAmt\tIncAmt\tRecAmt\tSchAmt\tAmtDue\tCode\tSRC\tRecDate\n|;
   $sNoteTrans = $dbh->prepare($qNoteTrans);
   $sNoteTrans->execute() || $form->dberror($qNoteTrans);
   while ( my $rNoteTrans = $sNoteTrans->fetchrow_hashref )
@@ -134,7 +134,7 @@ warn qq|qNoteTrans=$qNoteTrans\n|;
     $TotalSchAmt+=$SchAmt;
     $TotalAmtDue+=$AmtDue;
 #warn qq|    sR->execute($BD,$Assoc,$AID,$CID,$Ins)\n|;
-    print qq|${key}\t${BillAmt}\t${ReBillAmt}\t${IncAmt}\t${RecAmt}\t${SchAmt}\t${AmtDue}\t$rNoteTrans->{Code}\t$rNoteTrans->{SRC}\t$rNoteTrans->{RecDate}\n|;
+    #print qq|${key}\t${BillAmt}\t${ReBillAmt}\t${IncAmt}\t${RecAmt}\t${SchAmt}\t${AmtDue}\t$rNoteTrans->{Code}\t$rNoteTrans->{SRC}\t$rNoteTrans->{RecDate}\n|;
     $sR->execute($BD,$Assoc,$AID,$CID,$Ins) || $form->dberror($qR);
     if ( my $r = $sR->fetchrow_hashref )
     { 

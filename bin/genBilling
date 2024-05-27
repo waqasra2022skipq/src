@@ -28,19 +28,12 @@ my $dbh = myDBI->dbconnect($form->{'DBNAME'});
 $s=$dbh->prepare("select * from Provider where Type=3");
   $s->execute();
   while (my $r = $s->fetchrow_hashref) { $ClinicList{$r->{ProvID}} = $r; }
-
-$s=$dbh->prepare("select * from xInsurance where Descr != 'dmhsas' AND Descr != 'medicaid'");
-
-if(1 eq $wday || '1' eq $wday) {
-  # If it's monday then run it for all insurances
-  $s=$dbh->prepare("select * from xInsurance");
-}
-
-$s->execute();
-while (my $r = $s->fetchrow_hashref) { $xInsurance{$r->{ID}} = $r; }
-$xInsurance{0}{ID} = 0;
-$xInsurance{0}{Name} = 'No Insurance';
-$xInsurance{0}{Descr} = 'none';
+$s=$dbh->prepare("select * from xInsurance");
+  $s->execute();
+  while (my $r = $s->fetchrow_hashref) { $xInsurance{$r->{ID}} = $r; }
+  $xInsurance{0}{ID} = 0;
+  $xInsurance{0}{Name} = 'No Insurance';
+  $xInsurance{0}{Descr} = 'none';
 $s->finish();
 
 my ($MarkDate,$NEXTBILLDATE) = cBill->getBillDate();
