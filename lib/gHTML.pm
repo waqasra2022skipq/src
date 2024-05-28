@@ -747,7 +747,6 @@ sub setNoteTxt3
 {
   my ($self, $form, $Locked) = @_;
   my $html = '';
-  $html .= $self->setSCID2($form,$Locked);
   $html .= $self->setIntComp($form,$Locked);
 # XXX
 #===== ASSESSMENT SECTION ==========================
