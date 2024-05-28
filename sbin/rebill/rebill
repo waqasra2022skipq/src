@@ -21,7 +21,6 @@ my $form = myForm->new();
 my $dbh = myDBI->dbconnect($form->{'DBNAME'});
 my $AgencyID = $form->{'AgencyID'};
 
-print qq|DBNAME = $form->{'DBNAME'} STARTED\n|;
 
 $AgencyID_Check = '';
 
@@ -33,17 +32,30 @@ if($AgencyID ne '') {
 # rebill DBNAME={dbname}&AgencyID={AgencyID}
 ############################################################################
 
-my $query = "UPDATE Treatment 
-  SET BillStatus = 1, StatusDate = '$curdate', StatusMsg = 'Rebill Again Next Monday', CIPDate = NULL, DenDate = NULL, DenCode = NULL 
-  WHERE Treatment.RecDate IS NULL AND BillDate >= '2024-04-01' AND BillStatus = 3 AND Type=1 
-  AND EXISTS ( SELECT 1 FROM xSC WHERE xSC.SCID = Treatment.SCID AND xSC.InsID = 100 )";
+my $query = "UPDATE Treatment
+  SET
+    BillStatus = 1,
+    StatusDate = '${curdate}',
+    StatusMsg = 'Rebill Again Next Monday',
+    CIPDate = NULL,
+    DenDate = NULL,
+    DenCode = NULL
+  WHERE
+    Treatment.RecDate IS NULL
+    ${AgencyID_Check}
+    AND BillDate = '${LastMonday}'
+    AND BillStatus = 3
+    AND EXISTS (
+      SELECT 1
+      FROM xSC
+      WHERE xSC.SCID = Treatment.SCID
+        AND xSC.InsID = 100
+  )";
 
 my $sUpdTreatment = $dbh->prepare($query);
 $sUpdTreatment->execute();
 
 $sUpdTreatment->finish();
-
-print qq|DBNAME = $form->{'DBNAME'} DONE\n|;
 
 exit;
 ############################################################################
