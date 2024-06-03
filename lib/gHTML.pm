@@ -860,49 +860,84 @@ sub setNoteTxt5      # return null
   my $out = '';
   return($out);
 }
-sub setSCID2
-{
-  my ($self, $form, $Locked) = @_;
+sub setAddional_SCID {
+  my ($self, $form, $Locked, $SCID_Num) = @_;
+  my $desc = '';
+  my $column = '';
+  my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+
+  my $stmt = qq|select InsID from Insurance where ClientID=? and Priority=1|;
+  my $sInsurance = $dbh->prepare($stmt);
+  $sInsurance->execute($form->{Client_ClientID_1});
+  my $rInsurance = $sInsurance->fetchrow_hashref;
+  if($rInsurance->{InsID} ne '212') {
+    # Bail If not Medicare
+    return;
+  }
+
+
+  if($SCID_Num eq '2') {
+    $column = 'Treatment_SCID2_1';
+    $desc = 'Secondary Service Code - Service Name';
+  }
+
+  if($SCID_Num eq '4') {
+    $column = 'Treatment_SCID4_1';
+    $desc = 'Quaternary Service Code - Service Name';
+  }
+
+  if($SCID_Num eq '5') {
+    $column = 'Treatment_SCID5_1';
+    $desc = 'Quinary Service Code - Service Name';
+  }
+
+  if($SCID_Num eq '6') {
+    $column = 'Treatment_SCID6_1';
+    $desc = 'Senary Service Code - Service Name';
+  }
+
   my $out = qq|
-<TABLE CLASS="home fullsize" >
-  <TR >
-    <TD CLASS="hdrtxt" COLSPAN="3" >Secondary Service Code - Service Name</TD>
-  </TR>
-|;
+  <TABLE CLASS="home fullsize" >
+    <TR >
+      <TD CLASS="hdrtxt" COLSPAN="3" >$desc</TD>
+    </TR>
+  |;
   if ( $Locked )
   {
-    my $SCNum = DBA->getxref($form,'xSC',$form->{Treatment_SCID2_1},'SCNum');
-    my $Mod4 = DBA->getxref($form,'xSCMod4',$form->{Treatment_Mod4_1},'Descr');
-#warn qq| Mod4=$form->{Treatment_Mod4_1}/${Mod4}\n|;
-    my $SCName = DBA->getxref($form,'xSC',$form->{Treatment_SCID2_1},'SCName');
-    my $InsID = DBA->getxref($form,'xSC',$form->{Treatment_SCID2_1},'InsID');
+    my $SCNum = DBA->getxref($form,'xSC',$form->{$column},'SCNum');
+    my $SCName = DBA->getxref($form,'xSC',$form->{$column},'SCName');
+    my $InsID = DBA->getxref($form,'xSC',$form->{$column},'InsID');
     my $InsName = DBA->getxref($form,'xInsurance',$InsID,'Name');
-    my $CredID = DBA->getxref($form,'xSC',$form->{Treatment_SCID2_1},'CredID');
+    my $CredID = DBA->getxref($form,'xSC',$form->{$column},'CredID');
     my $CredAbbr = DBA->getxref($form,'xCredentials',$CredID,'Abbr');
-    my $RestID = DBA->getxref($form,'xSC',$form->{Treatment_SCID2_1},'Restriction');
+    my $RestID = DBA->getxref($form,'xSC',$form->{$column},'Restriction');
     my $ResDescr = DBA->getxref($form,'xSCRestrictions',$RestID,'Descr');
     $out .= qq|
-  <TR >
-    <TD >
-      <INPUT TYPE="hidden" NAME="Treatment_SCID2_1" VALUE="$form->{Treatment_SCID2_1}" > ${InsName} ${SCNum} ${Mod4} ${SCName} (${CredAbbr}) (${ResDescr}) &nbsp;
-    </TD>
-  </TR>
-|;
+      <TR >
+        <TD >
+          <INPUT TYPE="hidden" NAME="$column" VALUE="$form->{$column}" > ${InsName} ${SCNum} ${SCName} (${CredAbbr}) (${ResDescr}) &nbsp;
+        </TD>
+      </TR>
+    |;
   }
   else
   {
-    my $SCIDSel = DBA->selServiceCodes($form,$form->{'Treatment_SCID2_1'},0,$form->{'LOGINPROVID'},$form->{'Client_ClientID_1'},'Agent',"and xSC.SCNum NOT LIKE 'X%'");
+    my $add_SC_IDS = "(15970, 12785, 12789, 12788, 15888, 21483, 15756)";
+    my $SCIDSel = DBA->selServiceCodes($form,$form->{$column},0,$form->{'LOGINPROVID'},$form->{'Client_ClientID_1'},'Agent',"and xSC.SCNum NOT LIKE 'X%' and xSC.SCID IN $add_SC_IDS");
     $out .= qq|
-  <TR >
-    <TD >
-      <SELECT NAME="Treatment_SCID2_1" > ${SCIDSel} </SELECT> 
-    </TD>
-  </TR>
-|;
+      <TR >
+        <TD >
+          <SELECT NAME="$column" ONCHANGE="callAjax('vSCID',this.value,this.id,'&p='+document.Treatment.Treatment_ProvID_1.value+'&c=$form->{Treatment_ClientID_1}&id=$form->{Treatment_TrID_1}&d='+document.Treatment.Treatment_ContLogDate_1.value+'&b='+document.Treatment.Treatment_ContLogBegTime_1.value+'&e='+document.Treatment.Treatment_ContLogEndTime_1.value,'validateNote.pl');"> ${SCIDSel} </SELECT> 
+        </TD>
+      </TR>
+    |;
+
   }
   $out .= qq|</TABLE>|;
   return($out);
+
 }
+
 sub setIntComp
 {
   my ($self, $form, $Locked, $inClientID, $inProvID) = @_;
@@ -1326,7 +1361,10 @@ sub setPhysNote
   $html .= $self->setNoteMsg($form);
   $html .= $self->setNoteRev($form);
   $html .= $self->setNoteBillInfo($form,2);
-  $html .= $self->setSCID2($form,$Locked);
+  $html .= $self->setAddional_SCID($form,$Locked,2);
+  $html .= $self->setAddional_SCID($form,$Locked,4);
+  $html .= $self->setAddional_SCID($form,$Locked,5);
+  $html .= $self->setAddional_SCID($form,$Locked,6);
   $html .= $self->setIntComp($form,$Locked);
   $html .= qq|
 <TABLE CLASS="home fullsize" >
