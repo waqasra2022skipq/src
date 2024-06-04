@@ -676,6 +676,10 @@ sub setNoteTxt1
 {
   my ($self, $form, $Locked) = @_;
   my $out = $self->setIntComp($form,$Locked);
+  $out .= $self->setAddional_SCID($form,$Locked,2);
+  $out .= $self->setAddional_SCID($form,$Locked,4);
+  $out .= $self->setAddional_SCID($form,$Locked,5);
+  $out .= $self->setAddional_SCID($form,$Locked,6);
   $out .= qq|
 <TABLE CLASS="home fullsize" >
   <TR ><TD CLASS="port hdrtxt" >Methods Used to Address Problems<BR>(What techniques or activities were used to work on problems?)</TD></TR>
@@ -748,6 +752,10 @@ sub setNoteTxt3
   my ($self, $form, $Locked) = @_;
   my $html = '';
   $html .= $self->setIntComp($form,$Locked);
+  $html .= $self->setAddional_SCID($form,$Locked,2);
+  $html .= $self->setAddional_SCID($form,$Locked,4);
+  $html .= $self->setAddional_SCID($form,$Locked,5);
+  $html .= $self->setAddional_SCID($form,$Locked,6);
 # XXX
 #===== ASSESSMENT SECTION ==========================
   $html .= qq|
@@ -767,6 +775,10 @@ sub setNoteTxt4
   my ($self, $form, $Locked) = @_;
   my $out = '';
   $out .= $self->setIntComp($form,$Locked);
+  $out .= $self->setAddional_SCID($form,$Locked,2);
+  $out .= $self->setAddional_SCID($form,$Locked,4);
+  $out .= $self->setAddional_SCID($form,$Locked,5);
+  $out .= $self->setAddional_SCID($form,$Locked,6);
   $out .= qq|
 <TABLE CLASS="home fullsize" >
   <TR ><TD CLASS="port hdrtxt" >Content/Topics Discussed</TD></TR>
@@ -1361,11 +1373,11 @@ sub setPhysNote
   $html .= $self->setNoteMsg($form);
   $html .= $self->setNoteRev($form);
   $html .= $self->setNoteBillInfo($form,2);
+  $html .= $self->setIntComp($form,$Locked);
   $html .= $self->setAddional_SCID($form,$Locked,2);
   $html .= $self->setAddional_SCID($form,$Locked,4);
   $html .= $self->setAddional_SCID($form,$Locked,5);
   $html .= $self->setAddional_SCID($form,$Locked,6);
-  $html .= $self->setIntComp($form,$Locked);
   $html .= qq|
 <TABLE CLASS="home fullsize" >
   <TR >

@@ -33,10 +33,7 @@
 [[[gHTML->setNoteMsg(%form)]]]
 [[[gHTML->setNoteRev(%form)]]]
 [[[gHTML->setNoteBillInfo(%form+3)]]]
-[[[gHTML->setAddional_SCID(%form+0+2)]]]
-[[[gHTML->setAddional_SCID(%form+0+4)]]]
-[[[gHTML->setAddional_SCID(%form+0+5)]]]
-[[[gHTML->setAddional_SCID(%form+0+6)]]]
+
 <HR WIDTH="90%" >
 [[[gHTML->setNoteTrPlan(%form]]]
 <HR WIDTH="90%" >
