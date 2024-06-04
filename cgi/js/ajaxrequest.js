@@ -148,3 +148,29 @@ function AjaxRequest()
     }
   }
 }
+
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  //When The Document is fully Loaded
+  const checkboxes = document.querySelectorAll('.IC_CHECKBOX')
+  checkboxes.forEach(checkbox =>{
+    checkbox.addEventListener('change', toggleSelectBox)
+  })
+
+})
+
+const toggleSelectBox = () =>{
+
+  const checkboxes = document.querySelectorAll('.IC_CHECKBOX')
+  const selectBox = document.getElementById('Treatment_SCID2_1')
+
+  // Check if any checkbox is checked
+  const anyChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
+
+  selectBox.disabled = anyChecked
+
+  if(anyChecked) {
+    // If any of the checkbox is checked reset the value of the Secodary service code selectBox
+    selectBox.value = ""
+  }
+}

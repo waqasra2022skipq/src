@@ -939,7 +939,7 @@ sub setAddional_SCID {
     $out .= qq|
       <TR >
         <TD >
-          <SELECT NAME="$column" ONCHANGE="callAjax('vSCID',this.value,this.id,'&p='+document.Treatment.Treatment_ProvID_1.value+'&c=$form->{Treatment_ClientID_1}&id=$form->{Treatment_TrID_1}&d='+document.Treatment.Treatment_ContLogDate_1.value+'&b='+document.Treatment.Treatment_ContLogBegTime_1.value+'&e='+document.Treatment.Treatment_ContLogEndTime_1.value,'validateNote.pl');"> ${SCIDSel} </SELECT> 
+          <SELECT ID="$column" NAME="$column" ONCHANGE="callAjax('vSCID',this.value,this.id,'&p='+document.Treatment.Treatment_ProvID_1.value+'&c=$form->{Treatment_ClientID_1}&id=$form->{Treatment_TrID_1}&d='+document.Treatment.Treatment_ContLogDate_1.value+'&b='+document.Treatment.Treatment_ContLogBegTime_1.value+'&e='+document.Treatment.Treatment_ContLogEndTime_1.value,'validateNote.pl');"> ${SCIDSel} </SELECT> 
         </TD>
       </TR>
     |;
@@ -970,7 +970,7 @@ sub setIntComp
     <TD CLASS="strcol" >|;
   $out .= ${Locked} 
     ? qq| <INPUT TYPE="hidden" NAME="Treatment_Maladaptive_1" VALUE="<<Treatment_Maladaptive_1>>" > <<Treatment_Maladaptive_1>>| 
-    : qq| <INPUT TYPE="checkbox" NAME="Treatment_Maladaptive_1" VALUE="1" <<Treatment_Maladaptive_1=checkbox>> >|;
+    : qq| <INPUT TYPE="checkbox" class="IC_CHECKBOX" NAME="Treatment_Maladaptive_1" VALUE="1" <<Treatment_Maladaptive_1=checkbox>> >|;
   $out .= qq|
     </TD>
     <TD CLASS="strcol" >
@@ -981,7 +981,7 @@ sub setIntComp
     <TD CLASS="strcol" >|;
   $out .= ${Locked} 
     ? qq| <INPUT TYPE="hidden" NAME="Treatment_Interfere_1" VALUE="<<Treatment_Interfere_1>>" > <<Treatment_Interfere_1>>| 
-    : qq| <INPUT TYPE="checkbox" NAME="Treatment_Interfere_1" VALUE="1" <<Treatment_Interfere_1=checkbox>> >|;
+    : qq| <INPUT TYPE="checkbox" class="IC_CHECKBOX" NAME="Treatment_Interfere_1" VALUE="1" <<Treatment_Interfere_1=checkbox>> >|;
   $out .= qq|
     </TD>
     <TD CLASS="strcol" >
@@ -992,7 +992,7 @@ sub setIntComp
     <TD CLASS="strcol" >|;
   $out .= ${Locked} 
     ? qq| <INPUT TYPE="hidden" NAME="Treatment_Sentinel_1" VALUE="<<Treatment_Sentinel_1>>" > <<Treatment_Sentinel_1>>| 
-    : qq| <INPUT TYPE="checkbox" NAME="Treatment_Sentinel_1" VALUE="1" <<Treatment_Sentinel_1=checkbox>> >|;
+    : qq| <INPUT TYPE="checkbox" class="IC_CHECKBOX" NAME="Treatment_Sentinel_1" VALUE="1" <<Treatment_Sentinel_1=checkbox>> >|;
   $out .= qq|
     </TD>
     <TD CLASS="strcol" >
@@ -1003,7 +1003,7 @@ sub setIntComp
     <TD CLASS="strcol" >|;
   $out .= ${Locked} 
     ? qq| <INPUT TYPE="hidden" NAME="Treatment_PlayOvercome_1" VALUE="<<Treatment_PlayOvercome_1>>" > <<Treatment_PlayOvercome_1>>| 
-    : qq| <INPUT TYPE="checkbox" NAME="Treatment_PlayOvercome_1" VALUE="1" <<Treatment_PlayOvercome_1=checkbox>> >|;
+    : qq| <INPUT TYPE="checkbox" class="IC_CHECKBOX" NAME="Treatment_PlayOvercome_1" VALUE="1" <<Treatment_PlayOvercome_1=checkbox>> >|;
   $out .= qq|
     </TD>
     <TD CLASS="strcol" >
