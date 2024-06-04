@@ -890,7 +890,7 @@ sub setAddional_SCID {
 
   if($SCID_Num eq '2') {
     $column = 'Treatment_SCID2_1';
-    $desc = 'Secondary Service Code - Service Name';
+    $desc = 'Alternative Secondary Service Code - Service Name (use ONLY if Interactive Therapy is NOT selected)';
   }
 
   if($SCID_Num eq '4') {
@@ -965,7 +965,7 @@ sub setIntComp
   return('') unless ( $isSet || $LoginProvID || $IndPrimaryProvID );
   my $out = qq|
 <TABLE CLASS="home fullsize" >
-  <TR ><TD CLASS="port hdrtxt" COLSPAN="2" >Interactive Complexity</TD></TR>
+  <TR ><TD CLASS="port hdrtxt" COLSPAN="2" >Interactive Therapy (Secondary Service Code)</TD></TR>
   <TR>
     <TD CLASS="strcol" >|;
   $out .= ${Locked} 
