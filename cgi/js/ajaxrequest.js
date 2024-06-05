@@ -152,14 +152,22 @@ function AjaxRequest()
 
 document.addEventListener('DOMContentLoaded', ()=>{
   //When The Document is fully Loaded
+  
+  // Check on the first Load/referesh
+  toggleSelectBox();
+
   const checkboxes = document.querySelectorAll('.IC_CHECKBOX')
   checkboxes.forEach(checkbox =>{
     checkbox.addEventListener('change', toggleSelectBox)
   })
+  const selectBox = document.getElementById('Treatment_SCID2_1')
+  selectBox.addEventListener('change', ()=>{
+    toggleSelectBox('selectChange')
+  })
 
 })
 
-const toggleSelectBox = () =>{
+const toggleSelectBox = (selectChange) =>{
 
   const checkboxes = document.querySelectorAll('.IC_CHECKBOX')
   const selectBox = document.getElementById('Treatment_SCID2_1')
@@ -167,10 +175,13 @@ const toggleSelectBox = () =>{
   // Check if any checkbox is checked
   const anyChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
 
-  selectBox.disabled = anyChecked
-
   if(anyChecked) {
     // If any of the checkbox is checked reset the value of the Secodary service code selectBox
     selectBox.value = ""
+
+    if(selectChange == 'selectChange') {
+      // If the call is from the change of Secondary Service Code Select Box
+      alert("Cannot Select This Service Code as Interactive Therapy is already checked")
+    }
   }
 }
