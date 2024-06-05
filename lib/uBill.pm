@@ -21,7 +21,7 @@ sub setBilledAmt
   my $rAddon4 = cBill->getServiceCode($form,$rTreatment->{SCID4},$rTreatment->{ContLogDate},$rTreatment->{ContLogBegTime},$rTreatment->{ContLogEndTime},$rTreatment->{TrID},$rTreatment->{BillDate});
   my $rAddon5 = cBill->getServiceCode($form,$rTreatment->{SCID5},$rTreatment->{ContLogDate},$rTreatment->{ContLogBegTime},$rTreatment->{ContLogEndTime},$rTreatment->{TrID},$rTreatment->{BillDate});
   my $rAddon6 = cBill->getServiceCode($form,$rTreatment->{SCID6},$rTreatment->{ContLogDate},$rTreatment->{ContLogBegTime},$rTreatment->{ContLogEndTime},$rTreatment->{TrID},$rTreatment->{BillDate});
-  my $BilledAmt = $rBilled->{'BillAmt'}+$rAddon1->{'BillAmt'}+$rAddon2->{'BillAmt'}+$rAddo4->{'BillAmt'}+$rAddon5->{'BillAmt'}+$rAddon6->{'BillAmt'};
+  my $BilledAmt = $rBilled->{'BillAmt'}+$rAddon1->{'BillAmt'}+$rAddon2->{'BillAmt'}+$rAddon4->{'BillAmt'}+$rAddon5->{'BillAmt'}+$rAddon6->{'BillAmt'};
 #warn qq|setBilledAmt: BilledAmt=$BilledAmt\n|;
 #warn qq|setBilledAmt: BillAmt=$rBilled->{BillAmt}\n|;
 #warn qq|setBilledAmt: BillAmt1=$rAddon1->{BillAmt}\n|;
