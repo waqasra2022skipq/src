@@ -192,25 +192,50 @@ foreach my $TrID ( split(' ',$form->{TrIDs}) )
   my $ICD9 = $rNotes->{'ContLogDate'} lt '2015-10-01' ? 1 : 0;
   my $InsPAID = "${ClinicID}_${InsuranceID}_${PrAuthID}_${ICD9}_";
   my $NoteStr = qq|$rNotes->{'TrID'}_$rNotes->{'ContLogDate'}_$rNotes->{'ContLogBegTime'}_$rNotes->{'ContLogEndTime'}_$rNotes->{'SCID'}_$rNotes->{'BillDate'}_$rNotes->{'POS'}_$rNotes->{'Units'}_$rNotes->{'Mod4'}|;
-warn qq|1: ProviderKey=$ProviderKey, ClientKey=$ClientKey, InsPAID=$InsPAID, TrID=$TrID\n| if ( $debug );
-warn qq|1: NoteStr=$NoteStr\n| if ( $debug );
+  warn qq|1: ProviderKey=$ProviderKey, ClientKey=$ClientKey, InsPAID=$InsPAID, TrID=$TrID\n| if ( $debug );
+  warn qq|1: NoteStr=$NoteStr\n| if ( $debug );
   $Claims{$ProviderKey}{$ClientKey}{$InsPAID}{$TrID} = $NoteStr;
   if ( $rNotes->{'SCID2'} ne '' )
   {
     my $TrID2 = $TrID.'.2';
     my $NoteStr = qq|$rNotes->{'TrID'}_$rNotes->{'ContLogDate'}_$rNotes->{'ContLogBegTime'}_$rNotes->{'ContLogEndTime'}_$rNotes->{'SCID2'}_$rNotes->{'BillDate'}_$rNotes->{'POS'}_$rNotes->{'Units'}_|;
-warn qq|2: ProviderKey=$ProviderKey, ClientKey=$ClientKey, InsPAID=$InsPAID, TrID=$TrID2\n| if ( $debug );
-warn qq|2: NoteStr=$NoteStr\n| if ( $debug );
+    warn qq|2: ProviderKey=$ProviderKey, ClientKey=$ClientKey, InsPAID=$InsPAID, TrID=$TrID2\n| if ( $debug );
+    warn qq|2: NoteStr=$NoteStr\n| if ( $debug );
     $Claims{$ProviderKey}{$ClientKey}{$InsPAID}{$TrID2} = $NoteStr;
   }
   if ( $rNotes->{'SCID3'} ne '' )
   {
     my $TrID3 = $TrID.'.3';
     my $NoteStr = qq|$rNotes->{'TrID'}_$rNotes->{'ContLogDate'}_$rNotes->{'ContLogBegTime'}_$rNotes->{'ContLogEndTime'}_$rNotes->{'SCID3'}_$rNotes->{'BillDate'}_$rNotes->{'POS'}_$rNotes->{'Units'}_|;
-warn qq|3: ProviderKey=$ProviderKey, ClientKey=$ClientKey, InsPAID=$InsPAID, TrID=$TrID3\n| if ( $debug );
-warn qq|3: NoteStr=$NoteStr\n| if ( $debug );
+    warn qq|3: ProviderKey=$ProviderKey, ClientKey=$ClientKey, InsPAID=$InsPAID, TrID=$TrID3\n| if ( $debug );
+    warn qq|3: NoteStr=$NoteStr\n| if ( $debug );
     $Claims{$ProviderKey}{$ClientKey}{$InsPAID}{$TrID3} = $NoteStr;
   }
+  if ( $rNotes->{'SCID4'} ne '' )
+  {
+    my $TrID4 = $TrID.'.4';
+    my $NoteStr = qq|$rNotes->{'TrID'}_$rNotes->{'ContLogDate'}_$rNotes->{'ContLogBegTime'}_$rNotes->{'ContLogEndTime'}_$rNotes->{'SCID4'}_$rNotes->{'BillDate'}_$rNotes->{'POS'}_$rNotes->{'Units'}_|;
+    warn qq|3: ProviderKey=$ProviderKey, ClientKey=$ClientKey, InsPAID=$InsPAID, TrID=$TrID4\n| if ( $debug );
+    warn qq|3: NoteStr=$NoteStr\n| if ( $debug );
+    $Claims{$ProviderKey}{$ClientKey}{$InsPAID}{$TrID4} = $NoteStr;
+  }
+  if ( $rNotes->{'SCID5'} ne '' )
+  {
+    my $TrID5 = $TrID.'.5';
+    my $NoteStr = qq|$rNotes->{'TrID'}_$rNotes->{'ContLogDate'}_$rNotes->{'ContLogBegTime'}_$rNotes->{'ContLogEndTime'}_$rNotes->{'SCID5'}_$rNotes->{'BillDate'}_$rNotes->{'POS'}_$rNotes->{'Units'}_|;
+    warn qq|3: ProviderKey=$ProviderKey, ClientKey=$ClientKey, InsPAID=$InsPAID, TrID=$TrID5\n| if ( $debug );
+    warn qq|3: NoteStr=$NoteStr\n| if ( $debug );
+    $Claims{$ProviderKey}{$ClientKey}{$InsPAID}{$TrID5} = $NoteStr;
+  }
+  if ( $rNotes->{'SCID6'} ne '' )
+  {
+    my $TrID6 = $TrID.'.6';
+    my $NoteStr = qq|$rNotes->{'TrID'}_$rNotes->{'ContLogDate'}_$rNotes->{'ContLogBegTime'}_$rNotes->{'ContLogEndTime'}_$rNotes->{'SCID6'}_$rNotes->{'BillDate'}_$rNotes->{'POS'}_$rNotes->{'Units'}_|;
+    warn qq|3: ProviderKey=$ProviderKey, ClientKey=$ClientKey, InsPAID=$InsPAID, TrID=$TrID6\n| if ( $debug );
+    warn qq|3: NoteStr=$NoteStr\n| if ( $debug );
+    $Claims{$ProviderKey}{$ClientKey}{$InsPAID}{$TrID6} = $NoteStr;
+  }
+
 }
 my $TotalServices = 0;
 my $TotalBalance = 0;
