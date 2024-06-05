@@ -18,7 +18,10 @@ sub setBilledAmt
   my $rBilled = cBill->getServiceCode($form,$rTreatment->{SCID},$rTreatment->{ContLogDate},$rTreatment->{ContLogBegTime},$rTreatment->{ContLogEndTime},$rTreatment->{TrID},$rTreatment->{BillDate});
   my $rAddon1 = cBill->getServiceCode($form,$rTreatment->{SCID2},$rTreatment->{ContLogDate},$rTreatment->{ContLogBegTime},$rTreatment->{ContLogEndTime},$rTreatment->{TrID},$rTreatment->{BillDate});
   my $rAddon2 = cBill->getServiceCode($form,$rTreatment->{SCID3},$rTreatment->{ContLogDate},$rTreatment->{ContLogBegTime},$rTreatment->{ContLogEndTime},$rTreatment->{TrID},$rTreatment->{BillDate});
-  my $BilledAmt = $rBilled->{'BillAmt'}+$rAddon1->{'BillAmt'}+$rAddon2->{'BillAmt'};
+  my $rAddon4 = cBill->getServiceCode($form,$rTreatment->{SCID4},$rTreatment->{ContLogDate},$rTreatment->{ContLogBegTime},$rTreatment->{ContLogEndTime},$rTreatment->{TrID},$rTreatment->{BillDate});
+  my $rAddon5 = cBill->getServiceCode($form,$rTreatment->{SCID5},$rTreatment->{ContLogDate},$rTreatment->{ContLogBegTime},$rTreatment->{ContLogEndTime},$rTreatment->{TrID},$rTreatment->{BillDate});
+  my $rAddon6 = cBill->getServiceCode($form,$rTreatment->{SCID6},$rTreatment->{ContLogDate},$rTreatment->{ContLogBegTime},$rTreatment->{ContLogEndTime},$rTreatment->{TrID},$rTreatment->{BillDate});
+  my $BilledAmt = $rBilled->{'BillAmt'}+$rAddon1->{'BillAmt'}+$rAddon2->{'BillAmt'}+$rAddo4->{'BillAmt'}+$rAddon5->{'BillAmt'}+$rAddon6->{'BillAmt'};
 #warn qq|setBilledAmt: BilledAmt=$BilledAmt\n|;
 #warn qq|setBilledAmt: BillAmt=$rBilled->{BillAmt}\n|;
 #warn qq|setBilledAmt: BillAmt1=$rAddon1->{BillAmt}\n|;
