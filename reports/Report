@@ -957,11 +957,11 @@ elsif ( $form->{Type} =~ /xNPI/i )     ## XXX FIX to okmis_config is ever needed
 elsif ( $form->{Type} =~ /eft/i )
 {
   $ProviderSelection = DBA->getClinicSelection($form,$ForProvID,'Contracts.ProvID','where');
-  $select = qq|select xi.Name as Insurance, EFT.Payer, EFT.Name
-    ,EFT.PayTo, Provider.Name as Clinic, EFT.TransDate, EFT.Amount, EFT.CheckNo, EFT.RemitFile
+  $select = qq|select DISTINCT EFT.CheckNo, xi.Name as Insurance, EFT.Payer, EFT.Name
+    ,EFT.PayTo, Provider.Name as Clinic, EFT.TransDate, EFT.Amount, EFT.RemitFile
   from EFT
-    left join Contracts on Contracts.PIN=EFT.PayTo
-    left join xInsurance xi on xi.ID = Contracts.InsID
+    left join xInsurance xi on xi.PayName = EFT.Name
+    left join Contracts on Contracts.InsID=xi.ID
     left join Provider on Provider.ProvID=Contracts.ProvID
   ${ProviderSelection}
   and '$form->{FromDate}'<=EFT.TransDate and EFT.TransDate<='$form->{ToDate}'
