@@ -935,7 +935,7 @@ sub setAddional_SCID {
   else
   {
     my $add_SC_IDS = "(15970, 12785, 12789, 12788, 15888, 21483, 15756, 21500, 21501, 21502, 21503, 21504, 21505, 21506)";
-    my $SCIDSel = DBA->selServiceCodes($form,$form->{$column},0,$form->{'LOGINPROVID'},$form->{'Client_ClientID_1'},'Agent',"and xSC.SCNum NOT LIKE 'X%' and xSC.SCID IN $add_SC_IDS");
+    my $SCIDSel = DBA->selServiceCodes($form,$form->{$column},0,$form->{'LOGINPROVID'},$form->{'Client_ClientID_1'},'Agent',"and xSC.SCNum NOT LIKE 'X%' and (xSC.SCID IN $add_SC_IDS OR `SCNum` LIKE '%90833%')");
     $out .= qq|
       <TR >
         <TD >
