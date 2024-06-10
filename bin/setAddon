@@ -53,6 +53,65 @@ while ( my $rNote = $sNote->fetchrow_hashref )
   }
 }
 $sNote->finish();
+
+$sNote = $dbh->prepare("select NoteTrans.*,Treatment.ContLogDate,Treatment.ContLogBegTime,Treatment.ContLogEndTime,Treatment.BilledAmt,Treatment.SCID4,Treatment.Mod4 from NoteTrans left join Treatment on Treatment.TrID=NoteTrans.TrID where NoteTrans.BillDate=? and Treatment.SCID4 is not null");
+$sNote->execute($BillDate) || $form->dberror("select NoteTrans: $BillDate");
+while ( my $rNote = $sNote->fetchrow_hashref )
+{
+#foreach my $f ( sort keys %{$rNote} ) { warn "tt: rNote-$f=$rNote->{$f}\n"; }
+  my $TrID = $rNote->{'TrID'};
+  my $SCID4 = $rNote->{'SCID4'};
+  print qq|\nTrID=$TrID, SCID4=$SCID4\n|;
+  unless ( main->CheckPaid($form,$TrID,$SCID4) )
+  {
+    my $raddON = $rNote;
+    $raddON->{'SCID'} = $SCID4;
+    my $r = main->setTrans($form,$raddON,'BI','BI');
+#foreach my $f ( sort keys %{$r} ) { warn ": r-$f=$r->{$f}\n"; }
+  }
+}
+$sNote->finish();
+
+
+$sNote = $dbh->prepare("select NoteTrans.*,Treatment.ContLogDate,Treatment.ContLogBegTime,Treatment.ContLogEndTime,Treatment.BilledAmt,Treatment.SCID5,Treatment.Mod4 from NoteTrans left join Treatment on Treatment.TrID=NoteTrans.TrID where NoteTrans.BillDate=? and Treatment.SCID5 is not null");
+$sNote->execute($BillDate) || $form->dberror("select NoteTrans: $BillDate");
+while ( my $rNote = $sNote->fetchrow_hashref )
+{
+#foreach my $f ( sort keys %{$rNote} ) { warn "tt: rNote-$f=$rNote->{$f}\n"; }
+  my $TrID = $rNote->{'TrID'};
+  my $SCID5 = $rNote->{'SCID5'};
+  print qq|\nTrID=$TrID, SCID5=$SCID5\n|;
+  unless ( main->CheckPaid($form,$TrID,$SCID5) )
+  {
+    my $raddON = $rNote;
+    $raddON->{'SCID'} = $SCID5;
+    my $r = main->setTrans($form,$raddON,'BI','BI');
+#foreach my $f ( sort keys %{$r} ) { warn ": r-$f=$r->{$f}\n"; }
+  }
+}
+$sNote->finish();
+
+
+
+$sNote = $dbh->prepare("select NoteTrans.*,Treatment.ContLogDate,Treatment.ContLogBegTime,Treatment.ContLogEndTime,Treatment.BilledAmt,Treatment.SCID6,Treatment.Mod4 from NoteTrans left join Treatment on Treatment.TrID=NoteTrans.TrID where NoteTrans.BillDate=? and Treatment.SCID6 is not null");
+$sNote->execute($BillDate) || $form->dberror("select NoteTrans: $BillDate");
+while ( my $rNote = $sNote->fetchrow_hashref )
+{
+#foreach my $f ( sort keys %{$rNote} ) { warn "tt: rNote-$f=$rNote->{$f}\n"; }
+  my $TrID = $rNote->{'TrID'};
+  my $SCID6 = $rNote->{'SCID6'};
+  print qq|\nTrID=$TrID, SCID6=$SCID6\n|;
+  unless ( main->CheckPaid($form,$TrID,$SCID6) )
+  {
+    my $raddON = $rNote;
+    $raddON->{'SCID'} = $SCID6;
+    my $r = main->setTrans($form,$raddON,'BI','BI');
+#foreach my $f ( sort keys %{$r} ) { warn ": r-$f=$r->{$f}\n"; }
+  }
+}
+$sNote->finish();
+
+
 exit;
 ############################################################################
 sub CheckPaid
