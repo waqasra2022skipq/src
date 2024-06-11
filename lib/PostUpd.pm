@@ -399,7 +399,8 @@ sub updNote
     my $Interfere=$form->{'Treatment_Interfere_1'};
     my $Sentinel=$form->{'Treatment_Sentinel_1'};
     my $PlayOvercome=$form->{'Treatment_PlayOvercome_1'};
-    my $SCID3 = '';
+    # my $SCID3 = '';
+    my $SCID3 = $form->{'Treatment_SCID3_1'};
     if ( $Maladaptive || $Interfere || $Sentinel || $PlayOvercome )
     {
 #warn qq|PostUpd: updNote: check SCID3=${Maladaptive},${Interfere},${Sentinel},${PlayOvercome}\n|;

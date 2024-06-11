@@ -677,6 +677,7 @@ sub setNoteTxt1
   my ($self, $form, $Locked) = @_;
   my $out = $self->setIntComp($form,$Locked);
   $out .= $self->setAddional_SCID($form,$Locked,2);
+  $out .= $self->setAddional_SCID($form,$Locked,3);
   $out .= $self->setAddional_SCID($form,$Locked,4);
   $out .= $self->setAddional_SCID($form,$Locked,5);
   $out .= $self->setAddional_SCID($form,$Locked,6);
@@ -753,6 +754,7 @@ sub setNoteTxt3
   my $html = '';
   $html .= $self->setIntComp($form,$Locked);
   $html .= $self->setAddional_SCID($form,$Locked,2);
+  $html .= $self->setAddional_SCID($form,$Locked,3);
   $html .= $self->setAddional_SCID($form,$Locked,4);
   $html .= $self->setAddional_SCID($form,$Locked,5);
   $html .= $self->setAddional_SCID($form,$Locked,6);
@@ -776,6 +778,7 @@ sub setNoteTxt4
   my $out = '';
   $out .= $self->setIntComp($form,$Locked);
   $out .= $self->setAddional_SCID($form,$Locked,2);
+  $out .= $self->setAddional_SCID($form,$Locked,3);
   $out .= $self->setAddional_SCID($form,$Locked,4);
   $out .= $self->setAddional_SCID($form,$Locked,5);
   $out .= $self->setAddional_SCID($form,$Locked,6);
@@ -872,6 +875,7 @@ sub setNoteTxt5      # return null
   my $out = '';
   return($out);
 }
+
 sub setAddional_SCID {
   my ($self, $form, $Locked, $SCID_Num) = @_;
   my $desc = '';
@@ -891,6 +895,11 @@ sub setAddional_SCID {
   if($SCID_Num eq '2') {
     $column = 'Treatment_SCID2_1';
     $desc = 'Alternative Secondary Service Code - Service Name (use ONLY if Interactive Therapy is NOT selected)';
+  }
+
+  if($SCID_Num eq '3') {
+    $column = 'Treatment_SCID3_1';
+    $desc = 'Tertiary Service Code - Service Name';
   }
 
   if($SCID_Num eq '4') {
@@ -949,6 +958,7 @@ sub setAddional_SCID {
   return($out);
 
 }
+
 
 sub setIntComp
 {
@@ -1375,6 +1385,7 @@ sub setPhysNote
   $html .= $self->setNoteBillInfo($form,2);
   $html .= $self->setIntComp($form,$Locked);
   $html .= $self->setAddional_SCID($form,$Locked,2);
+  $html .= $self->setAddional_SCID($form,$Locked,3);
   $html .= $self->setAddional_SCID($form,$Locked,4);
   $html .= $self->setAddional_SCID($form,$Locked,5);
   $html .= $self->setAddional_SCID($form,$Locked,6);
