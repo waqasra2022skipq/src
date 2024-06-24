@@ -23,6 +23,7 @@ sub new
   # get the login information and set the Access
   ##
 
+
   ###if access token in param that means it is coming from office 365
   if( exists $FORM->{'code'} && $FORM->{'code'} !~ /^\s*$/ ) {
     #Generate Signature
@@ -241,6 +242,7 @@ sub getRoot
     $FORM->{'HTTPSERVER'} = 'https://' . $p2 . '.' . $p1 . '.com';
   }
   else { $FORM->{HTTPSERVER} = qq|https://$ENV{SERVER_NAME}|; }
+  $FORM->{'DBNAME'} = 'okmis_dev';
   return($FORM);
 }
 sub setUserLogin 

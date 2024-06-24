@@ -7,9 +7,6 @@ sub dbconnect               # this is the new dbh.
 {
   my ($self,$dbname,$user,$pswd) = @_;
 
-  if($dbname ne 'okmis_config') {
-    $dbname = 'okmis_dev';
-  }
 #warn qq|myDBI: ENTER: dbconnect: $dbname=${dbname}, user=${user}, pswd=${pswd}\n|;
 #warn qq|CHECK CONNECTIONS 1: \n|;
 #foreach my $f ( sort keys %{$CONNECTIONS} ) { foreach my $a ( sort keys %{$CONNECTIONS->{$f}} ) { warn qq|CONNECTIONS: $f-$a=$CONNECTIONS->{$f}->{$a}\n|; } }
