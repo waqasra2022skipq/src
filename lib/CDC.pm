@@ -1430,7 +1430,7 @@ sub listPAStatus
   my $view = qq|view=CDC${listCARS}.cgi&fwdTABLE=ClientPrAuthCDC&ClientPrAuthCDC_ID=${ID}&ClientPrAuth_ID=${PrAuthID}&${links}&pushID=$form->{'LINKID'}&UpdateTables=all|;
 #warn qq|listPAStatus: PrAuthID=${PrAuthID}, Agent=|.SysAccess->chkPriv($form,'Agent')."\n";
 #warn qq|listPAStatus: PrAuthID=${PrAuthID}, Locked=${Locked}\n|;
-  my $auth = SysAccess->chkPriv($form,'Agent') && !$Locked 
+  my $auth = (SysAccess->chkPriv($form,'ClinicManager') ||  SysAccess->chkPriv($form,'Agent')) && !$Locked 
            ? qq|<A HREF="javascript:ReportWindow('/cgi/bin/authPA.cgi?PrAuthID=${PrAuthID}&mlt=$form->{mlt}','PrintWindow')" TITLE="Click here to manually authorize this PA" ><IMG SRC="/img/tab-lock.png" ALT="" BORDER="0" HEIGHT="20" WIDTH="20" ></A>|
            : '';
   my $button = $fail eq ''

@@ -10,7 +10,7 @@ use SysAccess;
 my $form = myForm->new();
 my $dbh = myDBI->dbconnect($form->{'DBNAME'});
 #foreach my $f ( sort keys %{$form} ) { warn "authPA: form-$f=$form->{$f}\n"; }
-if ( ! SysAccess->chkPriv($form,'Agent') )
+if ( ! ( SysAccess->chkPriv($form,'ClinicManager') || SysAccess->chkPriv($form,'Agent') ) )
 { myDBI->error("Manual Auth / Access Denied!"); }
 if ( $form->{'PrAuthID'} eq '' )
 { myDBI->error("Manual Auth / NO ID!"); }
