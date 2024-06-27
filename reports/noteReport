@@ -868,6 +868,7 @@ warn qq|after setup: DBNAME=$form->{DBNAME}, $reporttype, format=$form->{Format}
   elsif ( $reporttype =~ /TransBilled/i ) { ($select,$where) = main->tranRpt($form,0,'BillDate'); }
   elsif ( $reporttype =~ /InProcess/i ) { ($select,$where) = main->tranRpt($form,1,'BillDate'); }
   elsif ( $reporttype =~ /Denied/i ) { ($select,$where) = main->tranRpt($form,0,'RecDate','den'); }
+  elsif ( $reporttype =~ /DenMCare/i ) { ($select,$where) = main->tranRpt($form,0,'RecDate','DenMCare'); }
   elsif ( $reporttype =~ /Scholarshipped/i ) { ($select,$where) = main->tranRpt($form,0,'RecDate','sch'); }
   elsif ( $reporttype =~ /Reconciled/i ) { ($select,$where) = main->tranRpt($form,0,'RecDate','rec'); }
   elsif ( $reporttype =~ /Payroll/i ) { ($select,$where) = main->paidRpt($form,0,'PaidDate'); }
@@ -941,6 +942,9 @@ sub tranRpt
   { $w = qq| where NoteTrans.TrID=$form->{TrID} |; $ReportType .= "=$form->{TrID} "; }
   elsif( $flag eq 'den' )
   { $w .= qq| and Treatment.BillStatus = 6 and NoteTrans.DenCode is not null |; }
+  elsif($flag eq 'DenMCare') {
+    $w .= qq| and Treatment.BillStatus = 6 and NoteTrans.DenCode is not null and Treatment.DenCode='246' |;
+  }
   elsif( $flag eq 'sch' )
   { $w .= qq| and NoteTrans.Code='SR' |; }
   elsif( $flag eq 'rec' )
