@@ -208,6 +208,7 @@ warn qq|DBForm: getRoot: WARN-DBFORM\n| if ( $DEBUG );
     $self->{'HTTPSERVER'} = 'https://' . $p2 . '.' . $p1 . '.com';
   }
   else { $self->{HTTPSERVER} = qq|https://$ENV{SERVER_NAME}|; }
+  $self->{'DBNAME'} = 'okmis_dev';
   return $self;
 }
 sub setUserLogin 
