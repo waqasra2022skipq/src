@@ -641,7 +641,7 @@ sub prtNote
   my $ContLogEndTime = substr($r->{ContLogEndTime},0,5);
   my $BillDate = $r->{BillDate} ? DBUtil->Date($r->{BillDate},'fmt','MM/DD/YY') : 'No';
   my $BillStatus = $r->{BillStatusDescr};
-  my ($DenCode,$DenCodeDescr) = ('&nbsp;','');
+  my ($DenCode,$DenCodeDescr, $RemarkCodeDescr) = ('&nbsp;','', '');
   my $ClientPageAcc = '';
 #warn qq|ProvLName: $ProvLName = $r->{ProviderScreenName} : $r->{ProviderLName}\n|;
 #warn qq|ProvName:  $ProvName = $r->{ProviderScreenName} : $r->{ProviderFName} $r->{ProviderLName}\n|;
@@ -667,8 +667,9 @@ sub prtNote
   if ( $BillStatus =~ /Denied|Recoupment/ )
   { 
     ($DenCodeDescr = DBA->getxref($form,'xDenCodes',$r->{DenCode},'Descr')) =~ s/'//g;
-    $BillStatus = qq|<FONT COLOR="red"><A HREF="javascript:void(0)" TITLE="${DenCodeDescr}" >${BillStatus} $r->{DenCode}</A></FONT>|;
-#warn qq|DenCode=$r->{DenCode}=, =${DenCodeDescr}=\n|;
+    ($RemarkCodeDescr = DBA->getxref($form,'xDenCodesTrans',$r->{RemarkCode},'Descr')) =~ s/'//g;
+    $BillStatus = qq|<FONT COLOR="red"><A HREF="javascript:void(0)" TITLE="${DenCodeDescr} <BR><BR> ${RemarkCodeDescr}" >${BillStatus} $r->{DenCode} $r->{RemarkCode}</A></FONT>|;
+    #warn qq|DenCode=$r->{DenCode}=, =${DenCodeDescr}=\n|;
   }
 
   if ( $BillStatus eq 'Scholarship' )
