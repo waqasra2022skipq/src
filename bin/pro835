@@ -971,6 +971,7 @@ if ( $debug ) { foreach my $f ( sort keys %{$CLP} ) { print "CLP: $f=$CLP->{$f}\
       # this resets our BilledAmt in Treatment-see uBill-setBilledAmt
       $r835->{'BillAmt'}    = $SVC->{'Billed'};    # ok, first Trans? or zero?
       $r835->{'DenCode'}    = $SVC->{'DenCode'};
+      $r835->{'RemarkCode'}    = $SVC->{'RemarkCode'};
 	  $r835->{'ReasonCode'} = $CLP->{'ReasonCode'};
 #      $r835->{'ReasonCode'} = $SVC->{'ReasonCode'} eq '' ? $CLP->{'ReasonCode'};
 #                            : $CLP->{'ReasonCode'} eq '' ? $SVC->{'ReasonCode'};

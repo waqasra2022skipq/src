@@ -310,6 +310,7 @@ sub postClaim
   $r->{'PayerID'} = $record->{'PayerID'};         # must be given.
   $r->{'ICN'} = $record->{'ICN'};                 # must be given.
   $r->{'DenCode'} = $record->{'DenCode'};         # must be given.
+  $r->{'RemarkCode'} = $record->{'RemarkCode'};   
   $r->{'ReasonCode'} = $record->{'ReasonCode'};   # must be given.
   $r->{'AdjCode'} = $record->{'AdjCode'};         # must be given.
   $r->{'RenProvID'} = $record->{'RenProvID'};     # must be given.
@@ -329,6 +330,7 @@ sub postClaim
   my $SCID = $r->{'SCID'};
   my $RecDate = $r->{'RecDate'};
   my $DenCode = $r->{'DenCode'};
+  my $RemarkCode = $r->{'RemarkCode'};  
   my $PaidAmt = $r->{'PaidAmt'};
   my $BS;
 #print qq|postClaim: PaidAmt=$r->{'PaidAmt'}\n|;
@@ -337,7 +339,7 @@ sub postClaim
        $r->{'Code'} eq 'SR' || 
        $r->{'Code'} eq 'AR' ) { $BS = $self->reconcileClaim($form,$TrID,$RecDate,$r->{'Code'},$StatusMsg); }
   elsif ( $r->{PaidAmt} < 0 ) { $BS = $self->voidClaim($form,$TrID,$RecDate,$DenCode,$StatusMsg); }
-  else                        { $BS = $self->denyClaim($form,$TrID,$RecDate,$DenCode,$StatusMsg); }
+  else                        { $BS = $self->denyClaim($form,$TrID,$RecDate,$DenCode,$StatusMsg, $RemarkCode); }
   my ($BilledAmt,$IncAmt,$SchAmt,$AmtDue) = $self->setBilledAmt($form,$TrID);
 # return these...
   my $Msg = $self->claimMessage($BS,$AmtDue,$PaidAmt,$DenCode);
@@ -544,11 +546,12 @@ sub reconcileClaim
 }
 sub denyClaim
 {
-  my ($self,$form,$TrID,$RecDate,$DenCode,$StatusMsg) = @_;
+  my ($self,$form,$TrID,$RecDate,$DenCode,$StatusMsg, $RemarkCode) = @_;
   my $rUpdate = ();
   $rUpdate->{'TrID'} = $TrID;
   $rUpdate->{'DenDate'} = $RecDate;
   $rUpdate->{'DenCode'} = $DenCode;
+  $rUpdate->{'RemarkCode'} = $RemarkCode;
 #foreach my $f ( sort keys %{$rUpdate} ) { warn "denyClaim: $f=$rUpdate->{$f}\n"; }
   my $UID = DBA->doUpdate($form,'Treatment',$rUpdate,"TrID=$TrID and RecDate is null",'',1);
 #warn qq|denyClaim: TrID: ${TrID}: DenDate=${RecDate}\n|;
