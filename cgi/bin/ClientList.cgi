@@ -482,6 +482,7 @@ sub setEligibility
 	{ 
 	  $str = $Title19str . $EHAPstr . ' ' .$SCCstr; # . ' isDMH-' . $isDMH .' - '.$rInsurance->{Descr}.' '.$InsColor; 
 		# $StatusColor = '#00CC00';  # Set color Green
+		$InsColor = '#00CC00';  # Set color Green
 		$EBColor = '#00CC00';
 	}
 	elsif ( ($Title19 || $EHAP || $SCC) && $isDMH )         # T19 and has DMH contract
