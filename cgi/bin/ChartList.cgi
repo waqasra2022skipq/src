@@ -668,7 +668,10 @@ sub prtNote
   { 
     ($DenCodeDescr = DBA->getxref($form,'xDenCodes',$r->{DenCode},'Descr')) =~ s/'//g;
     ($RemarkCodeDescr = DBA->getxref($form,'xDenCodesTrans',$r->{RemarkCode},'Descr')) =~ s/'//g;
-    $BillStatus = qq|<FONT COLOR="red"><A HREF="javascript:void(0)" TITLE="${DenCodeDescr} <BR><BR> ${RemarkCodeDescr}" >${BillStatus} $r->{DenCode} $r->{RemarkCode}</A></FONT>|;
+    my $sNoteTransType = $dbh->prepare("SELECT TransType FROM NoteTrans WHERE TrID='$r->{TrID}' AND TransType IS NOT NULL");
+    $sNoteTransType->execute(); 
+    my $rTransType = $sNoteTransType->fetchrow_array;
+    $BillStatus = qq|<FONT COLOR="red"><A HREF="javascript:void(0)" TITLE="CAG CODE: ${rTransType}<BR><BR>${DenCodeDescr}<BR><BR>${RemarkCodeDescr}" >${BillStatus} $r->{DenCode} $r->{RemarkCode}</A></FONT>|;
     #warn qq|DenCode=$r->{DenCode}=, =${DenCodeDescr}=\n|;
   }
 
