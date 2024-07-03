@@ -343,6 +343,7 @@ function initAutocomplete() {
   <TR>
     <TD CLASS="numcol" >
       <INPUT TYPE="submit" ONCLICK="return validate(this.form);" NAME="UpdateTables=all&misPOP=1" VALUE="Add/Update">
+      <INPUT TYPE="submit" ONCLICK="return vDELETE('Are you sure you want to delete this record?');" NAME="Insurance_DELETE_1=1&UpdateTables=all&misPOP=1" VALUE="Delete">
     </TD>
   </TR>
 </TABLE>
