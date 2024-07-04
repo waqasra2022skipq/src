@@ -570,7 +570,7 @@ sub Process_CLPCAS
    my $lenTmp = length(@adjArray);
    my $finalLenTmp = length(@final_array);
    print "CLPCAS::adjArrLen: $lenTmp :  finalLenTmp: $finalLenTmp : CASGroup : $CASGroup\n" if ( $debug );
-  
+  $CLP->{TransType} = $CASGroup;
   print "Process_CLPCAS: ReasonCode=$CLP->{ReasonCode}, CASReason=$CASReason\n" if ( $debug );
   if ( $CASGroup eq 'CO' )                  # Contractual Obligations
   { $CLP->{ReasonCode}=$CLP->{ReasonCode} ? $CLP->{ReasonCode}.'/'.$CASReason : $CASReason; }
@@ -842,6 +842,7 @@ sub Process_SVCCAS
      my $lenTmp = length(@adjArray);
    my $finalLenTmp = length(@final_array);
    print "SVCCAS::adjArrLen: $lenTmp :  finalLenTmp: $finalLenTmp : CASGroup : $CASGroup : $final_array[0][3]: $final_array[0][1]\n" if ( $debug );
+  $SVC->{TransType} = $CASGroup;
   
   if ( $CASGroup eq 'CO' )                  # Contractual Obligations
   { $SVC->{ReasonCode}=$SVC->{ReasonCode} ? $SVC->{ReasonCode}.'/'.$CASReason : $CASReason; }
@@ -977,7 +978,7 @@ if ( $debug ) { foreach my $f ( sort keys %{$CLP} ) { print "CLP: $f=$CLP->{$f}\
 #                            : $CLP->{'ReasonCode'} eq '' ? $SVC->{'ReasonCode'};
 #                            : $CLP->{'ReasonCode'}.'/'.$SVC->{'ReasonCode'};
 	  $r835->{'AdjAmt'} 	= 0;
-	  $r835->{'TransType'}    = $SVC->{'Paid'} < 0 ?'ARV' : 'AMT';
+	  $r835->{'TransType'}    = $SVC->{'TransType'} ne '' ? $SVC->{'TransType'}: $CLP->{'TransType'};
       $r835->{'PayerID'}    = $RecID;
       my ($TrID,$SCID,$code,$type) = uBill->postClaim($form,$r835,'ER');
 
