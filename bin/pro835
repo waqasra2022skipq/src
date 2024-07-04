@@ -93,6 +93,7 @@ my $lCnt = 0;
 my $HDR = '';
 my $SE = '';
 my @final_array=(['','','','']);
+$debug = 1;
 
 my $sEFT=$dbh->prepare("select * from EFT where CheckNo=? and RemitFile=?");
 #### my $sContract=$dbh->prepare("select Contracts.PIN,Contracts.InsID,Provider.ProvID,Provider.Name as ClinicName,ProviderControl.NPI,xInsurance.Name as InsName from Contracts left join Provider on Provider.ProvID=Contracts.ProvID left join ProviderControl on ProviderControl.ProvID=Contracts.ProvID left join xInsurance on xInsurance.ID=Contracts.InsID where xInsurance.RecID=? and ProviderControl.NPI=? and Contracts.PIN is not null");
@@ -280,7 +281,16 @@ sub Process_N1
   my $rtnstr = '';
   my ($N1_Code,$N1_Name,$N1_Qual,$N1_ID,$rest) = split('\*',$str,5);
   print "Process_N1: ENTER: str=$str, $N1_Code, $N1_Name, $N1_Qual, $N1_ID\n" if ( $debug );
-  if ( $N1_Code eq 'PR' ) { $ThePayerName = $N1_Name; }
+  if ( $N1_Code eq 'PR' ) { $ThePayerName = $N1_Name; 
+    # Get the Rec ID from the Payer and set it $RecID
+    my $xInsRecID=$dbh->prepare("select * from xInsurance where Name Like ? OR PayName LIKE ?");
+    $xInsRecID->execute("%$ThePayerName%", "%$ThePayerName%");
+    if(my $RecInsID = $xInsRecID->fetchrow_hashref) {
+      $RecID = $RecInsID->{'RecID'};
+      print "Process_N1: RECID FROM Payer Name: $RecID\n" if ( $debug );
+    }
+
+  }
   if ( $N1_Code eq 'PE' )
   {
     $ThePayeeName = $N1_Name;
@@ -304,7 +314,7 @@ sub Process_MAINREF
   print "Process_MAINREF: ENTER: str=$str (REFID=$REFID)\n" if ( $debug );
   if ( $REFQual eq 'EV' )                    # Receiver Identification pg 57
   { $ThePayee = $REFID; }                       # used by medicaid, sometimes, is OfficeAlly number.
-  elsif ( $REFQual eq '2U' )                 # Additional Payer Identification pg 67
+  elsif ( $REFQual eq '2U')                 # Additional Payer Identification pg 67
   { ($RecID = $REFID) =~ s/^\s*(.*?)\s*$/$1/g; }  # trim spaces.
   elsif ( $REFQual eq 'EO' )                 # Additional Payer Identification pg 67
   { $ThePayer = $REFID; }
@@ -467,7 +477,7 @@ sub Process_LX
 # got here with an 'CLP' RecType
 sub Process_CLP
 {
-	my $final_array=();
+  my $final_array=();
   my ($self, $Type, $str) = @_;
   print "Process_CLP: ENTER: str=$str\n" if ( $debug );
   $CLP = ();
@@ -558,7 +568,7 @@ sub Process_CLP
 # got here with an 'CLPCAS' RecType
 sub Process_CLPCAS
 {
-		my @adjArray = ();
+    my @adjArray = ();
   my ($self, $Type, $str) = @_;
   print "Process_CLPCAS: ENTER: str=$str\n" if ( $debug );
   
@@ -569,8 +579,9 @@ sub Process_CLPCAS
   
    my $lenTmp = length(@adjArray);
    my $finalLenTmp = length(@final_array);
+   $CLP->{TransType} = $CASGroup;
    print "CLPCAS::adjArrLen: $lenTmp :  finalLenTmp: $finalLenTmp : CASGroup : $CASGroup\n" if ( $debug );
-  $CLP->{TransType} = $CASGroup;
+  
   print "Process_CLPCAS: ReasonCode=$CLP->{ReasonCode}, CASReason=$CASReason\n" if ( $debug );
   if ( $CASGroup eq 'CO' )                  # Contractual Obligations
   { $CLP->{ReasonCode}=$CLP->{ReasonCode} ? $CLP->{ReasonCode}.'/'.$CASReason : $CASReason; }
@@ -683,7 +694,7 @@ sub Process_CLPDTM
 # got here with an 'SVC' RecType
 sub Process_SVC
 {
-	  my ($self, $Type, $str) = @_;
+    my ($self, $Type, $str) = @_;
   my $UpdateFlag = 0;
   $SVC = ();
   my ($SVCProcedure,$SVCCharge,$SVCPaid,$SVCRevCode,$SVCUnitsPaid,$SVCProcCode,$SVCUnitsBilled,$rest) = split('\*',$str,8);
@@ -828,7 +839,7 @@ sub Process_SVCREF
 # got here with an 'CAS' RecType
 sub Process_SVCCAS
 {
-	my @adjArray = ();
+  my @adjArray = ();
   my ($self, $Type, $str) = @_;
   print "Process_SVCCAS: ENTER: str=$str\n" if ( $debug );
   my ($CASGroup,$CASReason,$CASAmt,$CASQty,$rest) = split('\*',$str,5);
@@ -899,23 +910,23 @@ if ( $debug ) { foreach my $f ( sort keys %{$CLP} ) { print "CLP: $f=$CLP->{$f}\
     {
 
 #$string_len = length(@final_array); 
-#		print "array length: , $string_len\n";
-		
-	#	  $final_array = main->cleanArray();
-#	  for (my $f = 0 ; $f < $final_array ; $f++) {
-#		$string_len = length($final_array[$f][0]); 
-#		print "adjCode: , $string_len\n";
-#		print "$f\n";
-#		splice($final_array,$f, 1) if ( $string_len==0); 
+#   print "array length: , $string_len\n";
+    
+  #   $final_array = main->cleanArray();
+#   for (my $f = 0 ; $f < $final_array ; $f++) {
+#   $string_len = length($final_array[$f][0]); 
+#   print "adjCode: , $string_len\n";
+#   print "$f\n";
+#   splice($final_array,$f, 1) if ( $string_len==0); 
 #
-#		}
-		print "final_array0: @final_array";
-		$string_len = length(@final_array); 
-   print "lenArray0: , $string_len\n";
-	my $adjAmtTotal =0;
-	  for (my $f = 0 ; $f < @final_array ; $f++) { 
-		print "finalArray1:$final_array[$f][0] ,$final_array[$f][2] \n";
-	if($final_array[$f][0] != NULL && $final_array[$f][0] ne '') {
+#   }
+    # print "final_array0: @final_array";
+    $string_len = length(@final_array); 
+   # print "lenArray0: , $string_len\n";
+  my $adjAmtTotal =0;
+    for (my $f = 0 ; $f < @final_array ; $f++) { 
+    print "finalArray1:$final_array[$f][0] ,$final_array[$f][2] \n";
+  if($final_array[$f][0] != NULL && $final_array[$f][0] ne '') {
       my $r835 = ();
       $r835->{'TransID'}    = substr($SVC->{'RefID'},0,1) eq 'T' 
                             ? substr($SVC->{'RefID'},1) : '';
@@ -927,36 +938,36 @@ if ( $debug ) { foreach my $f ( sort keys %{$CLP} ) { print "CLP: $f=$CLP->{$f}\
       $r835->{'ICN'}        = $CLP->{'PayerCN'};
       $r835->{'InsCode'}    = $CLP->{'InsCode'};
 #      Adjustments do not have paid amount
-	  $r835->{'PaidAmt'}    = 0;
+    $r835->{'PaidAmt'}    = 0;
       $r835->{'Units'}      = $SVC->{'UnitsBilled'};
       # this resets our BilledAmt in Treatment-see uBill-setBilledAmt
-	  
+    
       $r835->{'BillAmt'}    = $SVC->{'Billed'};    # ok, first Trans? or zero?
-#	  $r835->{'DenCode'}    = $SVC->{'DenCode'};
-	  $r835->{'DenCode'}    = '';
+#   $r835->{'DenCode'}    = $SVC->{'DenCode'};
+    $r835->{'DenCode'}    = '';
       $r835->{'ReasonCode'} = $final_array[$f][0];
-	  $r835->{'AdjAmt'}    = $final_array[$f][1];
-	  $r835->{'TransType'}    = $final_array[$f][3];
+    $r835->{'AdjAmt'}    = $final_array[$f][1];
+    $r835->{'TransType'}    = $final_array[$f][3];
 #.$final_array[$f][1] < 0 ?'R' : ''
       $r835->{'PayerID'}    = $RecID;
-	  
-#	  if($final_array[$f][0] != 2) {
-			$adjAmtTotal += $final_array[$f][1];
-#	  }
-	  
+    
+#   if($final_array[$f][0] != 2) {
+      $adjAmtTotal += $final_array[$f][1];
+#   }
+    
       my ($TrID,$SCID,$code,$type) = uBill->postClaim($form,$r835,'ER') if ( length($final_array[$f][0]) >0 );
 
       print qq|POSTCLAIM0: TrID=$SVC->{TrID}, SCID=$SVC->{SCID}\n| if ( $debug );
       print qq|POSTCLAIM0: TrID=${TrID}, SCID=${SCID}\n| if ( $debug );
       print qq|POSTCLAIM0: code=${code}, type=${type}\n| if ( $debug );
-	  print qq|POSTCLAIM0: code=$final_array[$f][0], amt=$final_array[$f][1]\n| if ( $debug );
-	}
-	  
-	  }	
-	  
-	  print qq|adjAmtTotal: $adjAmtTotal\n| if ( $debug );
-	  
-		@final_array =();
+    print qq|POSTCLAIM0: code=$final_array[$f][0], amt=$final_array[$f][1]\n| if ( $debug );
+  }
+    
+    } 
+    
+    print qq|adjAmtTotal: $adjAmtTotal\n| if ( $debug );
+    
+    @final_array =();
       my $r835 = ();
       $r835->{'TransID'}    = substr($SVC->{'RefID'},0,1) eq 'T' 
                             ? substr($SVC->{'RefID'},1) : '';
@@ -973,19 +984,19 @@ if ( $debug ) { foreach my $f ( sort keys %{$CLP} ) { print "CLP: $f=$CLP->{$f}\
       $r835->{'BillAmt'}    = $SVC->{'Billed'};    # ok, first Trans? or zero?
       $r835->{'DenCode'}    = $SVC->{'DenCode'};
       $r835->{'RemarkCode'}    = $SVC->{'RemarkCode'};
-	  $r835->{'ReasonCode'} = $CLP->{'ReasonCode'};
+    $r835->{'ReasonCode'} = $CLP->{'ReasonCode'};
 #      $r835->{'ReasonCode'} = $SVC->{'ReasonCode'} eq '' ? $CLP->{'ReasonCode'};
 #                            : $CLP->{'ReasonCode'} eq '' ? $SVC->{'ReasonCode'};
 #                            : $CLP->{'ReasonCode'}.'/'.$SVC->{'ReasonCode'};
-	  $r835->{'AdjAmt'} 	= 0;
-	  $r835->{'TransType'}    = $SVC->{'TransType'} ne '' ? $SVC->{'TransType'}: $CLP->{'TransType'};
+    $r835->{'AdjAmt'}   = 0;
+    $r835->{'TransType'}    = $SVC->{'TransType'} ne '' ? $SVC->{'TransType'}: $CLP->{'TransType'};
       $r835->{'PayerID'}    = $RecID;
       my ($TrID,$SCID,$code,$type) = uBill->postClaim($form,$r835,'ER');
 
       print qq|POSTCLAIM: TrID=$SVC->{TrID}, SCID=$SVC->{SCID}\n| if ( $debug );
       print qq|POSTCLAIM: TrID=${TrID}, SCID=${SCID}\n| if ( $debug );
       print qq|POSTCLAIM: code=${code}, type=${type}\n| if ( $debug );
-	  
+    
      if ( $TrID )                   # set these for messages...
       {
         print qq|POSTCLAIM: GOOD: TrID=${TrID}\n| if ( $debug );
@@ -998,8 +1009,8 @@ if ( $debug ) { foreach my $f ( sort keys %{$CLP} ) { print "CLP: $f=$CLP->{$f}\
         $claiminfo = qq|${type}\t$SVC->{TrID}\t$SVC->{ContDate}\t${TransDate}\t$SVC->{Billed}\t$SVC->{Paid}\t$SVC->{SCNum}\t$SVC->{DenCode}\t$CLP->{PayerCN}\t${Message}\t${code}|;
         $CLP->{'AmtLeft'} = sprintf("%.2f",$CLP->{'AmtLeft'}-($SVC->{'Paid'}+$adjAmtTotal));
         print qq|POSTCLAIM: GOOD: CLPAmtLeft=$CLP->{AmtLeft}\n| if ( $debug );
-	  }
-	  
+    }
+    
       else                           # Transaction NOT FOUND, add to InsPaid table?
      {
         print qq|POSTCLAIM: before: CLPAmtLeft=$CLP->{AmtLeft}, Paid=$SVC->{Paid}\n| if ( $debug );
