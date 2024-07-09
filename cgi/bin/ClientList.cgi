@@ -520,6 +520,7 @@ sub setEligibility
 	#  $ActiveStatus = qq|$rEligible->{InsCode}: $rEligible->{Descr} ${EBDates}|;
   if($str =~ /Mental Health and Substance Abuse/i) {
 		$EBColor = 'brown';
+		$InsColor = '#CC9966';
   }elsif($str =~ /Expansion Healthy Adult Program/i) {
 		$EBColor = '#00CC00';
   }
