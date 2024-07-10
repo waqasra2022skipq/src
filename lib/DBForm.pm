@@ -1177,7 +1177,7 @@ warn qq|DBForm: setDefaults: WARN-DBFORM\n| if ( $DEBUG );
         delete $self->{"${inTable}_${ID}_1"};
       }
       # refresh these from main tables on each new record.
-      my $multidel = chr(253);
+      my $multidel = 'ý';
       my $q = qq|select SSN,Gend,DOB,SUBSTRING_INDEX(Race,'${multidel}',1) as Race from Client where ClientID='$ClientID'|;
       my $s = $dbh->prepare($q);
       $s->execute() || $self->dberror($q);
@@ -1260,7 +1260,7 @@ warn qq|DBForm: setDefaults: WARN-DBFORM\n| if ( $DEBUG );
         delete $self->{"${inTable}_${ID}_1"};
       }
       # refresh these from main tables on each new record.
-      my $multidel = chr(253);
+      my $multidel = 'ý';
       my $q = qq|select Client.*,SUBSTRING_INDEX(Client.Race,'${multidel}',1) as Race,ClientSocial.ReligionName from Client left join ClientSocial on ClientSocial.ClientID=Client.ClientID where Client.ClientID=?|;
       my $s = $dbh->prepare($q);
       $s->execute($ClientID) || $self->dberror($q);

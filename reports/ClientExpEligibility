@@ -14,7 +14,7 @@ my $form = DBForm->new();
 my $dbh = $form->dbconnect();
 
 my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
-my $multidel = chr(253);
+my $multidel = 'ý';
 
 my ($FromDate,$ToDate) = DBUtil->Date($form->{TODAY},'monthly');
 my ($LastFrom,$LastTo) = DBUtil->Date($form->{TODAY},'monthly',-1);

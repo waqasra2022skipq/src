@@ -20,7 +20,7 @@ $form = DBUtil->setDates($form);
 if ( ! SysAccess->verify($form,'Privilege=BillingReports') )
 { $form->error("Access Denied! / BillingReports Privilege"); }
 
-my $multidel = chr(253);
+my $multidel = 'ý';
 #  # Quarters are Jul-Sep, Oct-Dec, Jan-Mar, Apr-Jun
 #  @BegQTRs = ( '07-01', '10-01', '01-01', '04-01' );
 #  @EndQTRs = ( '09-30', '12-31', '03-31', '06-30' );

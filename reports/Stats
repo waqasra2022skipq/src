@@ -17,7 +17,7 @@ $DT = localtime();
 # report runs 7/1-6/30
 ############################################################################
 my $form = DBForm->new();
-my $multidel = chr(253);
+my $multidel = 'ý';
 #foreach my $f ( sort keys %{$form} ) { warn "form-$f=$form->{$f}\n"; }
 if ( $form->{FromDate} eq '' && $form->{ToDate} eq '' )
 {

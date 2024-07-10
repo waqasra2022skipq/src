@@ -12,7 +12,7 @@ $DT = localtime();
 ############################################################################
 my $form = DBForm->new();
 my $dbh = $form->dbconnect();
-my $multidel = chr(253);
+my $multidel = 'ý';
 my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
 my $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID','where');
 $ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );

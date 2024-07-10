@@ -12,7 +12,7 @@ my $DT = localtime();
 ############################################################################
 my $form = DBForm->new();
 my $dbh = $form->dbconnect();
-my $multidel = chr(253);
+my $multidel = 'ý';
 my $ShowAmountsFlag = SysAccess->chkPriv($form,'ShowAmounts');
 
 my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};

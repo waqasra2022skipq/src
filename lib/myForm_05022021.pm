@@ -1141,7 +1141,7 @@ sub setDefaults
         delete $FORM->{"${inTable}_${ID}_1"};
       }
       # refresh these from main tables on each new record.
-      my $multidel = chr(253);
+      my $multidel = 'ý';
       my $q = qq|select SSN,Gend,DOB,SUBSTRING_INDEX(Race,'${multidel}',1) as Race from Client where ClientID='$ClientID'|;
       my $s = $dbh->prepare($q);
       $s->execute() || myDBI->dberror($q);
@@ -1224,7 +1224,7 @@ sub setDefaults
         delete $FORM->{"${inTable}_${ID}_1"};
       }
       # refresh these from main tables on each new record.
-      my $multidel = chr(253);
+      my $multidel = 'ý';
       my $q = qq|select Client.*,SUBSTRING_INDEX(Client.Race,'${multidel}',1) as Race,ClientSocial.ReligionName from Client left join ClientSocial on ClientSocial.ClientID=Client.ClientID where Client.ClientID=?|;
       my $s = $dbh->prepare($q);
       $s->execute($ClientID) || myDBI->dberror($q);

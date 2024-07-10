@@ -20,7 +20,7 @@ $form->{'ToDate'} = '2019-12-31';
 $form = DBUtil->setDates($form);
 my $DateRange = qq|from $form->{FromDateD} thru $form->{ToDateD}|;
 
-my $multidel = chr(253);
+my $multidel = 'ý';
 my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
 # join xInsurance needed for withSelection
 my $withSelection = DBA->withSelection($form,'and','Client.clinicClinicID','Treatment.ProvID','Treatment.ClientID','Treatment.TrID');

@@ -7,7 +7,7 @@ use MgrTree;
 use uCalc;
 use Time::Local;
 my $DT = localtime();
-my $multidel = chr(253);
+my $multidel = 'ý';
 ############################################################################
 my $form = DBForm->new();
 my $dbh = $form->dbconnect();

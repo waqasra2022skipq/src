@@ -369,7 +369,7 @@ sub genReportHDR
   elsif ( $form->{'Format'} =~ /^by/i )       # client/provider code/date
   { $out .= qq|ProviderName\tProviderID\tPaid Date\tClinic\tInsurance\tClientName\tClientID\tTrID\tOriginal Bill Date\tBill Date\tReconcile Date\tService Date\tPlace of Service\tStart Time\tEnd Time\tSCNum\tUnits\tRate\tTotal${mgmt}\tIncAmt\tSort\n|; }
   else                       # /quick/
-  { $out .= qq|Clinic\tProviderName\tProviderID\tClientName\tClientID\tTrID\tInsurance\tService Type\tService Date\tPlace of Service\tStart Time\tEnd Time\tSCNum\tUnits\tRate\tCharge\tOrgBillDate\tBillDate\tDenDate\tDenCode\tPaidAmt\tAmtDue\tStatus\tStatusDate\tStatusMsg\tRecDate\tNoteRecDate\tSchDate\tCode\n|; }
+  { $out .= qq|Clinic\tProviderName\tProviderID\tClientName\tClientID\tTrID\tInsurance\tService Type\tService Date\tPlace of Service\tStart Time\tEnd Time\tSCNum\tUnits\tRate\tCharge\tOrgBillDate\tBillDate\tDenDate\tDenCode\tPaidAmt\tAmtDue\tStatus\tStatusDate\tStatusMsg\tRecDate\tNoteRecDate\tSchDate\tCode\tCAG Code\n|; }
   return($out);
 }
 sub genReportLine
@@ -716,6 +716,7 @@ warn qq|out: This=$ThisBrkID, $ThisSubID\n| if ( $debug );
   $out .= qq|\t${Display_NoteRecDate}|;
   $out .= qq|\t${Display_NoteSchDate}|;
   $out .= qq|\t$r->{Code}|;
+  $out .= qq|\t$r->{TransType}|;
   $out .= qq|\n|;
   return($out);
 }

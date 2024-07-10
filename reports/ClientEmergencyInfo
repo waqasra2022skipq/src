@@ -19,7 +19,7 @@ $sProvider = $dbh->prepare("select * from Provider where ProvID=?");
 $sClientEmergency = $dbh->prepare("select * from ClientEmergency where ClientID=?");
 $sGuardian = $dbh->prepare("select * from ClientFamily where ClientID=? and Guardian=1 and Active=1 order by RecDOLC desc");
 $sEContact = $dbh->prepare("select * from ClientFamily where ClientID=? and EmerContact=1 and Active=1 order by RecDOLC desc");
-my $multidel = chr(253);
+my $multidel = 'ý';
 ############################################################################
 my $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID','where');
 $ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );

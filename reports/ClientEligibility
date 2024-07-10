@@ -15,7 +15,7 @@ my $dbh = $form->dbconnect();
 
 my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
 my $InsCode = $form->{InsCode};
-my $multidel = chr(253);
+my $multidel = 'ý';
 ############################################################################
 $s=$dbh->prepare("select * from xInsurance");
   $s->execute();

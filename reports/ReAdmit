@@ -18,7 +18,7 @@ my $tDate = DBUtil->Date($form->{ToDate},'fmt','MM/DD/YYYY');
 my $RangeLabel = qq|$form->{FromDateD}-$form->{ToDateD}|;
 my $Stats = ();
 my $dbh = $form->dbconnect();
-my $multidel = chr(253);
+my $multidel = 'ý';
 
 ############################################################################
 print "${DT}\nReAdmittance Report\tfor Intake Date\t${RangeLabel}\n";

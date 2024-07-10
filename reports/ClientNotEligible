@@ -14,7 +14,7 @@ my $form = DBForm->new;
 my $dbh = $form->dbconnect;
 
 my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
-my $multidel = chr(253);
+my $multidel = 'ý';
 ############################################################################
 my $qInsurance = qq|
 select * 

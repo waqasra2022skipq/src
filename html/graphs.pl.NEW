@@ -11,7 +11,7 @@ use graphs;
 use Time::Local;
 use DateTime
 my $DT=localtime();
-my $multidel = chr(253);
+my $multidel = 'ý';
 
 #############################################################################
 my $form = myForm->parse();

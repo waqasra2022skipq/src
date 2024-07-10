@@ -14,7 +14,7 @@ foreach my $f ( sort keys %{$form} ) { warn "Report: form-$f=$form->{$f}\n"; }
 $form = DBUtil->setDates($form);
 my $DateRange = qq|from $form->{FromDateD} thru $form->{ToDateD}|;
 my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
-my $multidel = chr(253);
+my $multidel = 'ý';
 
 #warn qq|Report: Type=$form->{Type}, ForProvID=$ForProvID\n| if ( $form->{LOGINPROVID} == 91 );
 #######################################################
