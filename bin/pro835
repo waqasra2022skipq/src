@@ -283,7 +283,7 @@ sub Process_N1
   print "Process_N1: ENTER: str=$str, $N1_Code, $N1_Name, $N1_Qual, $N1_ID\n" if ( $debug );
   if ( $N1_Code eq 'PR' ) { $ThePayerName = $N1_Name; 
     # Get the Rec ID from the Payer and set it $RecID
-    my $xInsRecID=$dbh->prepare("select * from xInsurance where Name Like ? OR PayName LIKE ?");
+    my $xInsRecID=$dbh->prepare("select * from xInsurance where (Name Like ? OR PayName LIKE ?) AND Active=1");
     $xInsRecID->execute("%$ThePayerName%", "%$ThePayerName%");
     if(my $RecInsID = $xInsRecID->fetchrow_hashref) {
       $RecID = $RecInsID->{'RecID'};
