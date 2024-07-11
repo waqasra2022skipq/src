@@ -189,17 +189,22 @@ sub CheckClient
   }
   (my $Addr1 = uc substr($r->{Addr1},0,55)) =~ s/^\s*(.*?)\s*$/$1/g;
 # trim this weird thing from MS...
-  $Addr1 =~ s:½:1/2:g; $Addr1 =~ s:`::g;
+  $Addr1 =~ s:ï¿½:1/2:g; $Addr1 =~ s:`::g;
   if ( $Addr1 eq '' )
   { return(1,'Client Address is NULL or invalid! ',$r); }
   if ( $r->{Addr1} eq '.' )
   { return(1,'Client Address is a period! ',$r); }
-  if ( $r->{City} eq '' )
-  { return(1,'Client City is NULL! ',$r); }
-  if ( $r->{City} eq '.' )
-  { return(1,'Client City is a period! ',$r); }
-  if ( $r->{ST} eq '' )
-  { return(1,'Client State is NULL! ',$r); }
+
+  if($r->{Homeless} ne 1 && $r->{Zip} ne "99999") {
+    # Do city/state checks only if the Client is Not Homeless and Client Zip is Not 
+    if ( $r->{City} eq '' )
+    { return(1,'Client City is NULL! ',$r); }
+    if ( $r->{City} eq '.' )
+    { return(1,'Client City is a period! ',$r); }
+    if ( $r->{ST} eq '' )
+    { return(1,'Client State is NULL! ',$r); }    
+  }
+
   if ( $r->{Zip} eq '' )
   { return(1,'Client Zip is NULL! ',$r); }
   if ( $r->{Zip} !~ /^(\d{5})$/ && $r->{Zip} !~ /^(\d{5})(-)(\d{4})$/ )
