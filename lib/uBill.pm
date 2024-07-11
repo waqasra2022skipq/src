@@ -312,6 +312,7 @@ sub postClaim
   $r->{'DenCode'} = $record->{'DenCode'};         # must be given.
   $r->{'RemarkCode'} = $record->{'RemarkCode'};   
   $r->{'TransType'} = $record->{'TransType'};   
+  $r->{'AdjAmt'} = $record->{'AdjAmt'};   
   $r->{'ReasonCode'} = $record->{'ReasonCode'};   # must be given.
   $r->{'AdjCode'} = $record->{'AdjCode'};         # must be given.
   $r->{'RenProvID'} = $record->{'RenProvID'};     # must be given.
