@@ -585,6 +585,7 @@ sub hdr
     <TH >Date</TH>
     <TH >Denied</TH>
     <TH >Code</TH>
+    <TH >Adj Amt</TH>
   </TR>
 | if ( $form->{AddDetail} );
   $out .= qq|<TBODY>\n|;
@@ -828,10 +829,10 @@ sub prtNoteTrans
      $id = $id =~ /^A|^B/ ? $id : length($id) == 1 ? '00'.$id : length($id) == 2 ? '0'.$id : $id;
     (my $rcodedescr = DBA->getxref($form,'xDenCodes',$id,'Descr')) =~ s/'//g;
     $ReasonCodes .= qq|<FONT COLOR="red"><A HREF="javascript:void(0)" TITLE="${rcodedescr}" >${dlm}${id}</A></FONT>|;
-    $dlm = '<BR>';
     foreach my $rcode ( split('/',$rNoteTrans->{ReasonCode}) )
     {
       (my $id = $rcode) =~ s/^\s*(.*?)\s*$/$1/g;              # trim the spaces.
+    $dlm = '<BR>';
        $id = $id =~ /^A|^B/ ? $id : length($id) == 1 ? '00'.$id : length($id) == 2 ? '0'.$id : $id;
       (my $rcodedescr = DBA->getxref($form,'xDenCodes',$id,'Descr')) =~ s/'//g;
       $ReasonCodes .= qq|<FONT COLOR="red"><A HREF="javascript:void(0)" TITLE="${rcodedescr}" >${dlm}${id}</A></FONT>|;
@@ -847,6 +848,9 @@ sub prtNoteTrans
 ##
 # can align text in sort:      <TD STYLE="text-align:right" >${NoteTransCnt}.</TD>
 ##
+    # The AdjustedAmt
+    my $AdjustedAmt = $rNoteTrans->{AdjAmt};
+
     (my $scntpopup = qq|$rxSC->{InsDescr} <BR>$rxSC->{SCName}|) =~ s/'/\\'/g;
     $sxInsurance->execute($rNoteTrans->{PayerID});
     $rxInsurance = $sxInsurance->fetchrow_hashref;
@@ -868,6 +872,7 @@ sub prtNoteTrans
       <TD >${RecDate}</TD>
       <TD >${ReasonCodes}</TD>
       <TD >${TCode} ${DenyButton}</TD>
+      <TD>\$${AdjustedAmt}</TD>
     </TR>
 |;
     $printstr .= qq|
@@ -888,6 +893,7 @@ sub prtNoteTrans
       <TD ALIGN=center >${RecDate}</TD>
       <TD ALIGN=center >${ReasonCodes}</TD>
       <TD ALIGN=center >${TCodeDescr}</TD>
+      <TD ALIGN=center >\$${AdjustedAmt}</TD>
     </TR>
 |;
   }
