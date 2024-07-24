@@ -998,13 +998,13 @@ sub addSort
   if    ( $form->{'Format'} =~ /extended/i ) { null; }
   elsif ( $form->{'Format'} =~ /jolts/i ) { null; }
   elsif ( $form->{'Format'} =~ /byprovidercode/i )
-  { $out = qq| order by Provider.LName, Provider.FName, Provider.ProvID, xInsurance.Name, xSC.SCNum, Client.LName, Client.FName, Client.ClientID, Treatment.ContLogDate, Treatment.ContLogBegTime|; }
+  { $out = qq| order by Provider.LName, Provider.FName, Provider.ProvID, Client.LName, Client.FName, Client.ClientID, Treatment.ContLogDate, Treatment.ContLogBegTime|; }
   elsif ( $form->{'Format'} =~ /byproviderdate/i )
   { $out = qq| order by Provider.LName, Provider.FName, Provider.ProvID, ${SelByDateName}, Client.LName, Client.FName, Client.ClientID, Treatment.ContLogDate, Treatment.ContLogBegTime|; }
   elsif ( $form->{'Format'} =~ /byprovideronly/i )
   { $out = qq| order by Provider.LName, Provider.FName, Provider.ProvID, Clinic.Name, Client.LName, Client.FName, Client.ClientID, Treatment.ContLogDate, Treatment.ContLogBegTime|; }
   elsif ( $form->{'Format'} =~ /byclientcode/i )
-  { $out = qq| order by Client.LName, Client.FName, Client.ClientID, xInsurance.Name, xSC.SCNum, Provider.LName, Provider.FName, Provider.ProvID, Treatment.ContLogDate, Treatment.ContLogBegTime|; }
+  { $out = qq| order by Client.LName, Client.FName, Client.ClientID, Provider.LName, Provider.FName, Provider.ProvID, Treatment.ContLogDate, Treatment.ContLogBegTime|; }
   elsif ( $form->{'Format'} =~ /byclientdate/i )
   { $out = qq| order by Client.LName, Client.FName, Client.ClientID, ${SelByDateName}, Provider.LName, Provider.FName, Provider.ProvID, Treatment.ContLogDate, Treatment.ContLogBegTime|; }
   else                       # /quick/
