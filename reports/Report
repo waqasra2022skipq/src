@@ -1202,7 +1202,7 @@ elsif ( $form->{Type} =~ /xsc/i )
   $ReportSelection .= qq| and xSC.Active=1 and (xSCRates.ExpDate>curdate() or xSCRates.ExpDate is null)| if ( $form->{Active} );
   $select = qq|
 select xSC.Active, xSC.SCID, xSC.SCNum, xSC.SCName, xSC.ServiceType, xSC.ExInv
-      ,xSCRates.ServiceRate, xSCRates.HrsPerUnit, xSCRates.UnitLbl, xSC.Type, xSCRates.RVUPct, xSCRates.EffDate, xSCRates.ExpDate
+      ,xSCRates.ServiceRate, xSCRates.HrsPerUnit, xSCRates.UnitLbl, xSC.Type, xSCRates.RatePct as RVUPct, xSCRates.CommissionPct, xSCRates.RVUPct as RVUMultiplier, xSCRates.EffDate, xSCRates.ExpDate
       ,xInsurance.Name
       ,xCredentials.Abbr as Credential
       ,xSCRestrictions.Descr as Restriction
@@ -1218,7 +1218,7 @@ where xSC.SCID is not null
   order by xInsurance.Name, xSC.SCNum, xSC.SCID, xSCRates.EffDate, xSCRestrictions.Descr
 |;
 #and xSCRates.EffDate is not null
-  @fields = ('Active','SCID','Name','SCNum','SCName','ServiceType','Restriction','ExInv','ServiceRate','HrsPerUnit','UnitLbl','Type','RVUPct','EffDate','ExpDate','Credential','PlaceOfService','PINReq','PAReq');
+  @fields = ('Active','SCID','Name','SCNum','SCName','ServiceType','Restriction','ExInv','ServiceRate','HrsPerUnit','UnitLbl','Type','RVUPct','CommissionPct', 'RVUMultiplier','EffDate','ExpDate','Credential','PlaceOfService','PINReq','PAReq');
   $report = qq|${DT}\n${InsName}Service Code Report\n|;
 #warn qq|select=$select\n|;
 }
