@@ -39,9 +39,9 @@ sub new
     my $params = {
         "client_id" => '90499e5d-418e-4a90-81a0-946f54a25199',
         "code"  => $FORM->{'code'},
-        "redirect_uri" => "https://mms.okmms.com/cgi/bin/mis.cgi",
+        "redirect_uri" => "https://mms.okmis.com/cgi/bin/mis.cgi",
         "grant_type" => "authorization_code",
-        "client_secret" => "uq9uJk4..-vC3-W2~6Kv54NZAUFePTNXB~"
+        "client_secret" => "new_secret"
       };
 
     $obj_useragent->default_header("content_type" => "application/x-www-form-urlencoded");
