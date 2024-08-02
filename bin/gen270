@@ -112,9 +112,9 @@ if ( $form->{InsDescr} eq 'tricare' )
 
 my $ICNFLAG = 'P';                          # P=Production, T=Testing
 my ($Eof, $Eol) = ("*","~\n");              # End Of Field, End Of Line
-my $ICN = '000000270';                      # Interchange Control Number
-my $GCN = '000000270';                      # Group Control Number
-my $SCN = '000000270';                      # Segment Control Number
+my $ICN = '270';                      # Interchange Control Number
+my $GCN = '270';                      # Group Control Number
+my $SCN = '270';                      # Segment Control Number
 my $RunDate = DBUtil->Date('today','fmt', 'YYMMDD');
 my $RunDateY = DBUtil->Date('today','fmt', 'YYYYMMDD');
 $hrs = pad0s($hrs, 2);
@@ -321,9 +321,9 @@ sub Interchange_Header
 #  $fRecID = DBUtil->FmtStr($tRecID, 15, 'L');
 #  my $str = qq|ISA*00*${AuthInfo}*00*${SecuInfo}*ZZ*${tSubID}*ZZ*${fRecID}*${RunDate}*${RunTime}*U*00401*${ICN}*0*P*:${Eol}|;
 #  my $str = qq|ISA*${AuthInfoQ}*${AuthInfo}*00*${SecuInfo}*ZZ*${FmtSubID}*${ISAQ}*${FmtRecID}*${RunDate}*${RunTime}*U*00401*${ICN}*0*${ICNFLAG}*:${Eol}|;
-  my $str = qq|ISA*${AuthInfoQ}*${AuthInfo}*${SecuInfoQ}*${SecuInfo}*${ISASQ}*${FmtSubID}*${ISARQ}*${FmtRecID}*${RunDate}*${RunTime}*^*00501*${ICN}*0*${ICNFLAG}*:${Eol}|;
+  my $str = qq|ISA*${AuthInfoQ}*${AuthInfo}*${SecuInfoQ}*${SecuInfo}*${ISASQ}*${FmtSubID}*${ISARQ}*731476619*${RunDate}*${RunTime}*^*00501*${ICN}*0*${ICNFLAG}*:${Eol}|;
 #  $str .= qq|GS*HS*${SubID}*${tRecID}*${RunDateY}*${RunTime}*${GCN}*X*004010X092A1${Eol}|;
-  $str .= qq|GS*HS*${SubID}*${RecID}*${RunDateY}*${RunTime}*${GCN}*X*${Version}${Eol}|;
+  $str .= qq|GS*HS*${SubID}*731476619*${RunDateY}*${RunTime}*${GCN}*X*${Version}${Eol}|;
   return(2,$str);
 }
 sub Interchange_Footer
