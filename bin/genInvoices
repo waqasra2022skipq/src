@@ -69,12 +69,12 @@ while ( my $rClient = $sClients->fetchrow_hashref )
     my $NEWID = $sAddInv->{'mysql_insertid'};
     my $InvAmt = main->genItems($rClient->{'ClientID'},$NEWID);
     $sUpdInvoices->execute($InvAmt,$NEWID);
-    print qq|Invoice # ${NEWID} added: total: ${InvAmt}\n|;
+    print qq|Invoice # ${NEWID} added: total: ${InvAmt} <BR>|;
 #  }
 #  else
 #  { print qq|Generate Invoice TURNED OFF for Agency: ProvID/ClientID: $rClient->{'ProvID'}/$rClient->{'ClientID'}\n|; }
 }
-print qq|${cnt} . $qClients . Invoices created.\n|;
+print qq|${cnt} Invoices created |;
 
 $sClients->finish();
 $sNote->finish();
@@ -98,7 +98,7 @@ sub genItems
       ,$rxSC->{RecAmt},$PaidDate,$rNote->{AmtDue}
       ,$form->{LOGINPROVID},$form->{TODAY},$form->{LOGINPROVID});
     $TotalCharge += $rNote->{AmtDue};
-    print qq|TrID: $rNote->{TrID} for $rNote->{AmtDue}\n|;
+    print qq|TrID: $rNote->{TrID} for $rNote->{AmtDue} <BR>|;
   }
   return($TotalCharge);
 }
