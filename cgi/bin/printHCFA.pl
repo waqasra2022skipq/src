@@ -732,7 +732,7 @@ warn qq|Units=$Units\n| if ( $debug );
     my $rxSC = cBill->getServiceCode($form,$SCID,$ContDate,$BegTime,$EndTime,$TrID,$BillDate);
     $TotalCharge += $rxSC->{BillAmt};
     my $AmtPaid = $rxSC->{RecAmt};
-    $TotalPaid += $AmtPaid;
+    $TotalPaid = $AmtPaid;
 #   Box 24A.
     my ($ContY,$ContM,$ContD) = split('-',$ContDate);
     my $ContY2 = substr($ContY,2,2);
