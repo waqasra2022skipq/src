@@ -112,7 +112,7 @@ if ( $form->{InsDescr} eq 'tricare' )
 
 my $ICNFLAG = 'P';                          # P=Production, T=Testing
 my ($Eof, $Eol) = ("*","~\n");              # End Of Field, End Of Line
-my $ICN = '270';                      # Interchange Control Number
+my $ICN = '000000270';                      # Interchange Control Number
 my $GCN = '270';                      # Group Control Number
 my $SCN = '270';                      # Segment Control Number
 my $RunDate = DBUtil->Date('today','fmt', 'YYMMDD');
