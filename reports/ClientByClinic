@@ -46,7 +46,7 @@ $query = qq|select Provider.Name as Clinic
      ,SUBSTRING_INDEX(Client.Race,'${multidel}',1) as Race
      ,Client.SSN
      ,truncate((to_days(curdate()) - to_days(Client.DOB)) / 365,0) as Age
-     ,Client.Zip, Client.HmPh, Client.MobPh, Client.Email, Client.Addr1, Client.County
+     ,Client.Zip, Client.HmPh, Client.MobPh, Client.Email, Client.Addr1, Client.City,Client.County
      ,Client.ProvID as PrimaryProvID
      ,Client.clinicClinicID
      ,ClientIntake.IntDate, ClientReferrals.RefDate
@@ -80,7 +80,7 @@ $Stats->{AGE}->{CAT6} = 0;
 $Stats->{MALE} = 0;
 $Stats->{FEMALE} = 0;
 print qq|${DT}\nClient By Clinic Report\n|;
-print qq|Agency\tClinic\tLName\tFName\tID\tActive\tTreatment Level\tDOB\tGend\tRace\tSSN\tAge\tZip\tHomePh\tMobilePh\tEmail\tAddress\tCounty\tIntDate\tRefDate\tDays\tPrimary Referred By\tNPI\tSecondary Referred By\tNPI\tCustAgency\tProvider\tPrimary\tSecondary\tTertiary\tPlacement Location\tReligion\tLanguage\tAmtDue\n|;
+print qq|Agency\tClinic\tLName\tFName\tID\tActive\tTreatment Level\tDOB\tGend\tRace\tSSN\tAge\tZip\tHomePh\tMobilePh\tEmail\tAddress\tCity\tCounty\tIntDate\tRefDate\tDays\tPrimary Referred By\tNPI\tSecondary Referred By\tNPI\tCustAgency\tProvider\tPrimary\tSecondary\tTertiary\tPlacement Location\tReligion\tLanguage\tAmtDue\n|;
 my $select = $dbh->prepare($query);
 $select->execute() || $form->dberror($query);
 while ( my $record = $select->fetchrow_hashref )
@@ -156,7 +156,7 @@ while ( my $record = $select->fetchrow_hashref )
   my $AmtDueStr = $ShowAmountsFlag ? "AmtDue all Notes: \$${AmtDue}" : $AmtDue > 0 ? "Some Notes Unpaid" : "Notes Paid";
   my $AmtDueVal = $ShowAmountsFlag ? $AmtDue : $AmtDue > 0 ? 'Yes' : 'No';
 
-  print qq|$rAgency->{Name}\t$record->{Clinic}\t$record->{LName}\t$record->{FName}\t$record->{ClientID}\t$record->{Active}\t$rPrAuth->{'PAgroup'} $rPrAuth->{'TL'} $rPrAuth->{'EffDate'}\t$record->{DOB}\t$record->{Gend}\t$xRace->{$record->{Race}}{Descr}\t$record->{SSN}\t$record->{Age}\t$record->{Zip}\t$record->{HmPh}\t$record->{MobPh}\t$record->{Email}\t$record->{Addr1}\t$record->{County}\t$record->{IntDate}\t$record->{RefDate}\t$record->{Days}\t${RefBy1}\t$record->{'ReferredBy1NPI'}\t${RefBy2}\t$record->{'ReferredBy2NPI'}\t${CustAgency}\t${Primary}\t${PriIns} ${PriInsNum}\t${SecIns} ${SecInsNum}\t${TerIns} ${TerInsNum}\t${Placement}\t${Religion}\t${Language}\t${AmtDueVal}\n|;
+  print qq|$rAgency->{Name}\t$record->{Clinic}\t$record->{LName}\t$record->{FName}\t$record->{ClientID}\t$record->{Active}\t$rPrAuth->{'PAgroup'} $rPrAuth->{'TL'} $rPrAuth->{'EffDate'}\t$record->{DOB}\t$record->{Gend}\t$xRace->{$record->{Race}}{Descr}\t$record->{SSN}\t$record->{Age}\t$record->{Zip}\t$record->{HmPh}\t$record->{MobPh}\t$record->{Email}\t$record->{Addr1}\t$record->{City}\t$record->{County}\t$record->{IntDate}\t$record->{RefDate}\t$record->{Days}\t${RefBy1}\t$record->{'ReferredBy1NPI'}\t${RefBy2}\t$record->{'ReferredBy2NPI'}\t${CustAgency}\t${Primary}\t${PriIns} ${PriInsNum}\t${SecIns} ${SecInsNum}\t${TerIns} ${TerInsNum}\t${Placement}\t${Religion}\t${Language}\t${AmtDueVal}\n|;
 }
 $select->finish();
 ##
