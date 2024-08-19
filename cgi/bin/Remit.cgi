@@ -82,6 +82,7 @@ function validate(form)
   <TR CLASS="port" >
     <TH ALIGN="left" >Client</TH>
     <TH ALIGN="left" >Name</TH>
+    <TH ALIGN="left" >Client ID</TH>
     <TH ALIGN="left" >TrID</TH>
     <TH ALIGN="left" >Contact</TH>
     <TH ALIGN="left" >InProcess</TH>
@@ -132,6 +133,7 @@ select Treatment.*
   <TR ${class} >
     <TD ALIGN="left" >$rNotes->{CLName} &nbsp;</TD>
     <TD ALIGN="left" >$rNotes->{CFName} &nbsp;</TD>
+    <TD ALIGN="left" >$rNotes->{ClientID} &nbsp;</TD>
     <TD ALIGN="left" >$rNotes->{TrID} &nbsp;</TD>
     <TD ALIGN="left" >$rNotes->{ContLogDate} &nbsp;</TD>
     <TD ALIGN="left" >$rNotes->{CIPDate} &nbsp;</TD>
