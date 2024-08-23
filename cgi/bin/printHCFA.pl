@@ -899,7 +899,8 @@ warn qq|Abbr=$rCredentials->{Abbr}\n| if ( $debug );
     $billingphone = qq|${AC} ${PH}|;
     # always use Clinic for these
     $billinga = $rClinics->{NPI};
-    $billingb = qq|$rClinics->{RefID} $rClinics->{PIN}|;
+    $billingb = qq|$rClinics->{Taxonomy}|;
+
   }
   else
   {
@@ -914,7 +915,7 @@ warn qq|Abbr=$rCredentials->{Abbr}\n| if ( $debug );
     $PH = substr($PH,0,9);                            # limit to 'n' characters
     $billingphone = qq|${AC} ${PH}|;
     $billinga = $rClinics->{NPI};
-    $billingb = qq|$rClinics->{RefID} $rClinics->{PIN}|;
+    $billingb = qq|$rClinics->{Taxonomy}|;
   }
   $billingname =~ s/[^a-zA-Z0-9\s]+//g;                 # eliminate all chars but these
   $billingname =~ s/^\s*(.*?)\s*$/$1/g;                 # eliminate before/after spaces
@@ -1193,7 +1194,7 @@ warn qq|Abbr=$rCredentials->{Abbr}\n| if ( $debug );
         [$phone_33, 584.4 - $adjustLeftMargin, 741.2 - $adjustTopMargin, "fontsize=$fontsizemid"],
         [$number_33a, 423.7 - $adjustLeftMargin, 788.4 - $adjustTopMargin, "fontsize=$fontsizemid"],
         # 33b Removed: changed
-        # [$number_33b, 503.3 - $adjustLeftMargin, 788.4 - $adjustTopMargin, "fontsize=$fontsizemid"],
+        [$number_33b, 503.3 - $adjustLeftMargin, 788.4 - $adjustTopMargin, "fontsize=$fontsizemid"],
     );
     for (my $i=0; $i <= $#servicelines; $i++) {
         push(@textlines, [$servicelines[$i]->{item_info}, 0 - $adjustLeftMargin, 572.9 - $adjustTopMargin + $i * 24, "fontsize=$fontsize"]);
