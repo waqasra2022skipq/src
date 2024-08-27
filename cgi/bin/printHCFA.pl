@@ -732,7 +732,7 @@ warn qq|Units=$Units\n| if ( $debug );
     my $rxSC = cBill->getServiceCode($form,$SCID,$ContDate,$BegTime,$EndTime,$TrID,$BillDate);
     $TotalCharge += $rxSC->{BillAmt};
     my $AmtPaid = $rxSC->{RecAmt};
-    $TotalPaid = $AmtPaid;
+    $TotalPaid += $AmtPaid;
 #   Box 24A.
     my ($ContY,$ContM,$ContD) = split('-',$ContDate);
     my $ContY2 = substr($ContY,2,2);
@@ -899,7 +899,7 @@ warn qq|Abbr=$rCredentials->{Abbr}\n| if ( $debug );
     $billingphone = qq|${AC} ${PH}|;
     # always use Clinic for these
     $billinga = $rClinics->{NPI};
-    $billingb = qq|$rClinics->{Taxonomy}|;
+    $billingb = qq||;
 
   }
   else
@@ -915,7 +915,14 @@ warn qq|Abbr=$rCredentials->{Abbr}\n| if ( $debug );
     $PH = substr($PH,0,9);                            # limit to 'n' characters
     $billingphone = qq|${AC} ${PH}|;
     $billinga = $rClinics->{NPI};
-    $billingb = qq|$rClinics->{Taxonomy}|;
+    $billingb = qq||;
+
+  }
+
+  my $contInsId =$rClinics->{InsID};
+
+  if( $contInsId eq '451' || $contInsId eq '452' || $contInsId eq '453') {
+      $billingb = qq|$rClinics->{Taxonomy}|;
   }
   $billingname =~ s/[^a-zA-Z0-9\s]+//g;                 # eliminate all chars but these
   $billingname =~ s/^\s*(.*?)\s*$/$1/g;                 # eliminate before/after spaces
