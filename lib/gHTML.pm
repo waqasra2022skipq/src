@@ -418,7 +418,7 @@ sub setNoteBillInfo
   ${ServTypeSel}
   <TR >
     <TD COLSPAN="3" >
-      <SELECT ID="SCID" NAME="Treatment_SCID_1" ONCHANGE="callAjax('vSCID',this.value,this.id,'&p='+document.Treatment.Treatment_ProvID_1.value+'&c=$form->{Treatment_ClientID_1}&id=$form->{Treatment_TrID_1}&d='+document.Treatment.Treatment_ContLogDate_1.value+'&b='+document.Treatment.Treatment_ContLogBegTime_1.value+'&e='+document.Treatment.Treatment_ContLogEndTime_1.value,'validateNote.pl');" >${SCIDSel}</SELECT>
+      <SELECT ID="SCID" NAME="Treatment_SCID_1" ONCHANGE="callAjax('vSCID',this.value,this.id,'&p='+document.Treatment.Treatment_ProvID_1.value+'&c=$form->{Treatment_ClientID_1}&id=$form->{Treatment_TrID_1}&d='+document.Treatment.Treatment_ContLogDate_1.value+'&b='+document.Treatment.Treatment_ContLogBegTime_1.value+'&e='+document.Treatment.Treatment_ContLogEndTime_1.value,'validateNote.pl');" class="ServiceCodesBox">${SCIDSel}</SELECT>
       <INPUT TYPE="hidden" ID="CurType" NAME="CurType" VALUE="${CurType}" >
     </TD>
   </TR>
@@ -948,7 +948,7 @@ sub setAddional_SCID {
     $out .= qq|
       <TR >
         <TD >
-          <SELECT ID="$column" NAME="$column" > ${SCIDSel} </SELECT> 
+          <SELECT ID="$column" NAME="$column" class="ServiceCodesBox" > ${SCIDSel} </SELECT> 
         </TD>
       </TR>
     |;

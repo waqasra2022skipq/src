@@ -165,6 +165,8 @@ function AjaxRequest() {
 	};
 }
 
+let serviceCodes = {};
+
 document.addEventListener("DOMContentLoaded", () => {
 	//When The Document is fully Loaded
 
@@ -179,7 +181,34 @@ document.addEventListener("DOMContentLoaded", () => {
 	selectBox.addEventListener("change", () => {
 		toggleSelectBox("selectChange");
 	});
+
+	const ServiceCodesBoxes = document.querySelectorAll(".ServiceCodesBox");
+
+	ServiceCodesBoxes.forEach((ServiceCodesBox) => {
+		const value = ServiceCodesBox.value;
+		const name = ServiceCodesBox.name;
+		serviceCodes[name] = value;
+		ServiceCodesBox.addEventListener("change", () => {
+			preventDuplication(ServiceCodesBox);
+		});
+	});
 });
+
+const preventDuplication = (ServiceCodesBox) => {
+	const value = ServiceCodesBox.value;
+	const name = ServiceCodesBox.name;
+	const selectedValues = Object.values(serviceCodes);
+
+	if (value) {
+		if (selectedValues.includes(value)) {
+			alert("Cannot Select This Service Code as already selected");
+			ServiceCodesBox.value = "";
+			serviceCodes[name] = "";
+			return;
+		}
+	}
+	serviceCodes[name] = value;
+};
 
 const toggleSelectBox = (selectChange) => {
 	const checkboxes = document.querySelectorAll(".IC_CHECKBOX");
@@ -193,6 +222,7 @@ const toggleSelectBox = (selectChange) => {
 	if (anyChecked) {
 		// If any of the checkbox is checked reset the value of the Secodary service code selectBox
 		selectBox.value = "";
+		serviceCodes["Treatment_SCID2_1"] = "";
 
 		if (selectChange == "selectChange") {
 			// If the call is from the change of Secondary Service Code Select Box
