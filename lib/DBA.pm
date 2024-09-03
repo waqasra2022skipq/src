@@ -1858,6 +1858,8 @@ sub isIndividual
     or Descr LIKE '%LCSW%' 
     or Descr LIKE '%Physician%' 
     or Descr LIKE '%Individual%' 
+    or Descr LIKE '%LPC%' 
+    or Descr LIKE '%LMFT%'
     or Descr LIKE '%Nurse%')");
   $sIndividual->execute($ForProvID);
   my ($Individual) = $sIndividual->fetchrow_array;
