@@ -400,10 +400,10 @@ sub updNote
     my $Sentinel=$form->{'Treatment_Sentinel_1'};
     my $PlayOvercome=$form->{'Treatment_PlayOvercome_1'};
     # my $SCID3 = '';
-    my $SCID3 = $form->{'Treatment_SCID3_1'};
+    my $SCID3=$form->{'Treatment_SCID3_1'};
     if ( $Maladaptive || $Interfere || $Sentinel || $PlayOvercome )
     {
-#warn qq|PostUpd: updNote: check SCID3=${Maladaptive},${Interfere},${Sentinel},${PlayOvercome}\n|;
+        #warn qq|PostUpd: updNote: check SCID3=${Maladaptive},${Interfere},${Sentinel},${PlayOvercome}\n|;
       # Selection of any 1 of 4 boxes will ADD-ON 90785 service code to 
       #  PRIMARY PROCEDURE codes 90791, 90792, 90832, 90834, 90837, or 90853.
       if ( $rxSC->{'SCNum'} eq '90791'
@@ -414,13 +414,17 @@ sub updNote
         || $rxSC->{'SCNum'} eq '90853' )
       {
         my $sxSC = $dbh->prepare("select SCID from xSC where SCNum='90785' and InsID=? and CredID=?");
+        if($rxSC->{'CredID'} eq '') {
+            $sxSC = $dbh->prepare("select SCID from xSC where SCNum='90785' and InsID=? AND (CredID = ? OR CredID IS NULL)");
+        }
         $sxSC->execute($rxSC->{'InsID'},$rxSC->{'CredID'}) 
            || myDBI->dberror("set90785: $rxSC->{'TrID'},$rxSC->{'SCID'}");
         ($SCID3) = $sxSC->fetchrow_array;
         $sxSC->finish();
       }
     }
-#warn qq|PostUpd: updNote: check SCID3=${SCID3}=$rxSC->{SCNum}=\n|;
+
+    #warn qq|PostUpd: updNote: check SCID3=${SCID3}=$rxSC->{SCNum}=\n|;
     if ( $SCID3 )
     {
       my $sUpdate = $dbh->prepare("update Treatment set SCID3=? where TrID=?");
