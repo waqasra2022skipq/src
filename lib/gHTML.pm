@@ -886,8 +886,8 @@ sub setAddional_SCID {
   my $sInsurance = $dbh->prepare($stmt);
   $sInsurance->execute($form->{Client_ClientID_1});
   my $rInsurance = $sInsurance->fetchrow_hashref;
-  if($form->{'NoteType'} ne 2 && $rInsurance->{InsID} ne '212') {
-    # Bail If not Medicare
+  if($form->{'NoteType'} ne 2 && $form->{'NoteType'} ne 3 && $rInsurance->{InsID} ne '212') {
+    # Bail If Client Primary insurance is not Medicare and Not Physician Note and Electronic Note
     return;
   }
 
