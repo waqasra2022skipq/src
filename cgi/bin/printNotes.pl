@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 use lib '/home/okmis/mis/src/lib';
-
+use CGI::Carp qw(fatalsToBrowser);
 
 #
 # Block starter:
@@ -346,10 +346,12 @@ ${labelfont}Describe Below:\n${responsefont}|.$rNote->{'NewProblems'};
       my $result;
       my $basefontoptions = "fontname=" . $fontname . " fontsize=9 embedding encoding=unicode alignment=justify leading=120%";
 
+      $notetext =~ s/<(?=\d)/&lt;/g;
+
       $tf = $p->create_textflow($notetext, $basefontoptions);
 
       do {
-        $result = $p->fit_textflow($tf, 35, $ypos + 20, $pagewidth - 35, 30, "");
+        $result = $p->fit_textflow($tf, 35, $ypos, $pagewidth - 35, 30, "");
 
         if ($result eq "_boxfull" || $result eq "_boxempty") {
           main->createFooter($p);
@@ -377,6 +379,35 @@ ${labelfont}Describe Below:\n${responsefont}|.$rNote->{'NewProblems'};
       $str   .= qq|     ${labelfont}Date Billed:${responsefont} ${dbilled}|;
       $str   .= qq|     ${labelfont}By:${responsefont} $rClinic->{Name}|;
       $str   .= qq|     ${labelfont}Custody Agency:${responsefont} ${cagency}|;
+
+      my $prepend = qq|\n|;
+
+
+      if($rTreatment->{'SCID2'}) {
+        $str .= "$prepend" . main->prepareServiceCode($rTreatment->{'SCID2'}, $rTreatment, "Secondary");
+        $prepend = qq|    |;
+      }
+
+      if($rTreatment->{'SCID3'}) {
+        $str .= "$prepend" . main->prepareServiceCode($rTreatment->{'SCID3'}, $rTreatment, "Tertiary");
+        $prepend = qq|    |;
+      }
+
+      if($rTreatment->{'SCID4'}) {
+        $str .= "$prepend" . main->prepareServiceCode($rTreatment->{'SCID4'}, $rTreatment, "Quaternary");
+        $prepend = qq|    |;
+      }
+
+      if($rTreatment->{'SCID5'}) {
+        $str .= "$prepend" . main->prepareServiceCode($rTreatment->{'SCID5'}, $rTreatment, "Quinary");
+        $prepend = qq|    |;
+      }
+
+      if($rTreatment->{'SCID6'}) {
+        $str .= "$prepend" . main->prepareServiceCode($rTreatment->{'SCID6'}, $rTreatment, "Senary");
+        $prepend = qq|    |;
+      }
+
       if ($p->fill_textblock($pagehandles[$pageno], 'noteinfo2', $str, $optlist) == -1)
       { printf("Warning: %s\n", $p->get_errmsg()); }
       if ($p->fill_textblock($pagehandles[$pageno], 'myFooter', "Confidentiality of drug/alcohol abuse records is protected by Federal Law. Federal regulations (42 CFR, Part 2 prohibits making any further disclosure of this information unless further disclosure is expressively permitted by written consent of the person to whom it pertains or as otherwise permitted by 42 CFR, Part 2. A GENERAL AUTHORIZATION FOR RELEASE OF MEDICAL OR OTHER INFORMATION IS NOT SUFFICIENT FOR THIS PURPOSE. The Federal rules restrict any use of the information to criminally investigate or prosecute any alcohol/drug abuse client.", $optlist) == -1)
@@ -411,6 +442,16 @@ ${labelfont}Describe Below:\n${responsefont}|.$rNote->{'NewProblems'};
   }
   return();
 }
+
+sub prepareServiceCode{
+  my ($self,$SCID, $rTreatment, $codeType) = @_;
+
+  my $rxSC = cBill->getServiceCode
+                 ($form,$SCID,$rTreatment->{'ContLogDate'},$rTreatment->{'ContLogBegTime'},$rTreatment->{'ContLogEndTime'},$rTreatment->{'TrID'},$rTreatment->{'BillDate'});
+  my $str = qq|${labelfont}${codeType} Service Code:${responsefont} $rxSC->{'SCNum'}|;
+
+  return $str;
+}
 # -----------------------------------------------
 # Create and place table with ICD10/Problems list
 # -----------------------------------------------
@@ -425,6 +466,8 @@ sub getProblems
     my $str = qq|${labelfont}CLIENT PROBLEMS:\n${responsefont}None|;
     if ($p->fill_textblock($pagehandles[$pageno], 'problems', $str, $optlist) == -1)
     { printf("Warning: %s\n", $p->get_errmsg()); }
+
+    $ypos = 560;
     return();
   }
   {
