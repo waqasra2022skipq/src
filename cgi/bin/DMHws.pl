@@ -111,6 +111,7 @@ if ( $errmsg eq '' )
 # modify the cipher list because of handshake issues with ASP.net
   $soap->{_transport}->{_proxy}->{ssl_opts}->{SSL_cipher_list} = 'SHA:!NULL:!3DES:!DES:!ADH:!SRP';
 
+#   $soap->{_transport}->{_proxy}->{ssl_opts}->{SSL_ca_file} = '/etc/ssl/certs/ca-bundle.crt';
   my $method = SOAP::Data->name('CDCPAErrors')->attr({xmlns => 'http://tempuri.org/'});
 warn qq|method=$method\n|;
 warn qq|KLS: LastName=$rHDRCDC->{'LastName'}\n|;
