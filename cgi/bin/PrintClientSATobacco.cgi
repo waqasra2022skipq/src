@@ -1,102 +1,187 @@
 #!/usr/bin/perl
+############################################################################
 use lib '/home/okmis/mis/src/lib';
-use myConfig;
 use DBI;
-use DBForm;
+use myForm;
+use myDBI;
 use DBA;
 use MgrTree;
+use myConfig;
 use DBUtil;
-use PDF;
 use Time::Local;
-$DT=localtime();
+my $DT=localtime();
 
+use PDFlib::PDFlib;
+use strict;
 ############################################################################
-my $form = DBForm->new();
-my $dbh = $form->dbconnect();
-#warn "PrintClientSATobacco: IDs=$form->{'IDs'}\n";
-##
-# prepare selects...
-##
+
+my $form = myForm->new();
+my $IDs = $form->{'IDs'};
+my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+
+
 my $sClientSATobacco = $dbh->prepare("select * from ClientSATobacco where ID=?");
 my $sSATs = $dbh->prepare("select * from ClientSATobacco where ClientID=? and vdate < ? order by vdate desc");
 my $sClient = $dbh->prepare("select * from Client where ClientID=?");
 my $sProvider = $dbh->prepare("select * from Provider where ProvID=?");
 
+my $pagewidth = 612;
+my $pageheight = 692;
+
+my $searchpath = "../data";
+
+my $fontname= "Arial";
+my $boldfontname= "Arial-BoldMT";
+my $fontsizesmall = 8;
+my $fontsize = 9;
+my $fontsizemid = 10;
+my $fontsizelarge = 11;
+my $fontsizemidlarge = 12;
+my $fontsizexlarge = 13;
+my $fontsizexxlarge = 15;
+my $basefontoptions = "fontname=" . $fontname . " fontsize=" . $fontsize . " embedding encoding=unicode";
+my $baseboldfontoptions = "fontname=" . $boldfontname . " fontsize=" . $fontsize . " embedding encoding=unicode";
+my $basemidfontoptions = $basefontoptions . " fontsize=" . $fontsizemid;
+my $baseboldmidfontoptions = $baseboldfontoptions . " fontsize=" . $fontsizemid;
+my $baselargefontoptions = $basefontoptions . " fontsize=" . $fontsizelarge;
+my $baseboldlargefontoptions = $baseboldfontoptions . " fontsize=" . $fontsizelarge;
+my $baseboldlargefontoptions_u = $baseboldfontoptions . " fontsize=" . $fontsizelarge . " underline=true underlineposition=-15% underlinewidth=0.03";
+my $baseboldlargefontoptions_ui = $baseboldlargefontoptions_u . " fontstyle=italic";
+my $baseboldlargefontoptions_i = $baseboldlargefontoptions . " fontstyle=italic";
+my $basesmallfontoptions = $basefontoptions . " fontsize=" . $fontsizesmall;
+my $baseboldsmallfontoptions = $baseboldfontoptions . " fontsize=" . $fontsizesmall;
+my $baseboldmidlargefontoptions = $baseboldfontoptions . " fontsize=" . $fontsizemidlarge;
+my $baseboldxlargefontoptions = $baseboldfontoptions . " fontsize=" . $fontsizexlarge;
+my $basecheckfontoptions = "fontname={DejaVuSans} encoding=unicode fontsize=10 charref";
+
+my $marginleft = 37.5;
+my $margintop = 35;
+my $marginbottom = $pageheight - 33.8;
+my $contentwidth = $pagewidth - 2 * $marginleft;
+my $h_footer = 4 * $fontsizemid;
+my $y_footer = $marginbottom - $h_footer;
+my $margintop2 = 44.6;
+
+my $ypos = $margintop;
+my $pagecount = 0;
+my $c253 = chr(253);
+
+
+
+
+my $filename = '/tmp/'.$form->{'LOGINID'}.'_'.DBUtil->genToken().'_'.DBUtil->Date('','stamp').'.pdf';
+my $outfile = $form->{'file'} eq ''                # create and print pdf else just create.
+        ? $form->{'DOCROOT'}.$filename
+        : $form->{'file'};
+
+my %YesNoArr = ("1", "Yes", "0", "No");
+
+
 ############################################################################
-my $xdp = qq|<?xml version="1.0" encoding="UTF-8" ?> 
-<?xfa generator="XFA2_0" APIVersion="2.2.4333.0" ?>
-<xdp:xdp xmlns:xdp="http://ns.adobe.com/xdp/" >
-<xfa:datasets xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/" >
-<xfa:data>
-<root>
-|;
-foreach my $ID ( split(' ',$form->{IDs}) )
-{ 
-#warn "PrintClientSATobacco: ID=${ID}\n";
-  $sClientSATobacco->execute($ID) || $form->dberror("select ClientSATobacco: ${ID}");
-  while ( my $rClientSATobacco = $sClientSATobacco->fetchrow_hashref )
-  { $xdp .= main->printClientSATobacco($rClientSATobacco); }
+
+eval {
+
+  # create a new PDFlib object 
+  my $p = new PDFlib::PDFlib;
+
+  $p->set_option("SearchPath={{" . $searchpath . "}}");
+
+  # This mean we don't have to check error return values, but will
+  # get an exception in case of runtime problems.
+  
+  $p->set_option("errorpolicy=exception");
+
+  # all strings are expected as utf8
+  $p->set_option("stringformat=utf8");
+
+  $p->begin_document($outfile, "");
+
+  $p->set_info("Creator", "Millennium Information Services");
+  $p->set_info("Author", "Keith Stephenson");
+  $p->set_info("Title", "Client SATobacco");
+
+  main->printClientSATobacco($p);
+
+  $p->end_document("");
+
+};
+
+
+
+if ($@) {
+  die("$0: PDFlib Exception occurred:\n$@");
 }
-my $pdfpath = myConfig->cfg('FormsPrintURL')."/PrintClientSATobacco_Rev2.pdf";
-warn qq|pdfpath=$pdfpath\n|;
-$xdp .= qq|
-</root>
-</xfa:data>
-</xfa:datasets>
-<pdf href="${pdfpath}" xmlns="http://ns.adobe.com/xdp/pdf/" />
-</xdp:xdp>
-|;
-if ( $form->{LOGINPROVID} == 91 )
-{
-  open XML, ">/home/okmis/mis/src/debug/PrintClientSATobacco.out" or die "Couldn't open file: $!";
-  print XML ${xdp};
-  close(XML);
-}
-if ( $form->{file} )
-{
-  open OUT, ">$form->{file}" || die "Couldn't open '$form->{file}' file: $!"; 
-  print OUT ${xdp};
-  close(OUT);
-}
-else { print qq|Content-Type: application/vnd.adobe.xdp+xml\n\n${xdp}|; }
+
 $sClientSATobacco->finish();
 $sClient->finish();
 $sProvider->finish();
-$form->complete();
-exit;
-############################################################################
 
-sub printClientSATobacco
-{
-  my ($self,$r) = @_;
-  my $ClientID = $r->{'ClientID'};
-#warn qq|ClientID=$ClientID\n|;
-  $sClient->execute($ClientID) || $form->dberror("select Client: ${ClientID}");
-  my $rClient = $sClient->fetchrow_hashref;
-  my $ClientName = qq|$rClient->{'FName'} $rClient->{'LName'}|;
-##
-# Header info...
-  my $AgencyID = MgrTree->getAgency($form,$rClient->{clinicClinicID});
-  $sProvider->execute($AgencyID) || $form->dberror("select Provider: $AgencyID");
-  my $rAgency = $sProvider->fetchrow_hashref;
-  my $AgencyName = DBA->subxml($rAgency->{Name});
-  my $AgencyAddr = $rAgency->{Addr1};
-  $AgencyAddr .= $rAgency->{Addr2} . ', ' if ( $rAgency->{Addr2} );
-  my $AgencyCSZ .= $rAgency->{City} . ', ' . $rAgency->{ST} . '  ' . $rAgency->{Zip};
-  my $AgencyPh = 'Office: ' . $rAgency->{WkPh};
-  my $AgencyFax = 'Fax: ' . $rAgency->{Fax};
-##
-  my $TheDate = $r->{'vdate'};
+myDBI->cleanup();
+
+if ( $form->{'file'} eq '' )                # create and print pdf.
+{ print qq|Location: ${filename}\n\n|; }
+
+exit;
+
+
+
+############################################################################
+sub printClientSATobacco {
+  my ($self, $p) = @_;
+  
+
+    foreach my $ID ( split(' ',$form->{IDs}) )
+    { 
+        #warn "PrintClientSATobacco: ID=${ID}\n";
+        $sClientSATobacco->execute($ID) || $form->dberror("select ClientSATobacco: ${ID}");
+        while ( my $rClientSATobacco = $sClientSATobacco->fetchrow_hashref )
+        { 
+            $sClient->execute($rClientSATobacco->{'ClientID'});
+            my $rClient = $sClient->fetchrow_hashref;
+            main->createPages($p, $rClientSATobacco, $rClient); 
+        }
+    }
+
+  if ($pagecount) {
+    main->createPageCount($p);
+  } else {
+    main->createEmptyPage($p);
+  }
+}
+
+sub createPages {
+  my ($self, $p, $rClientSATobacco, $rClient) = @_;
+  
+  my $optlist;
+  my $tf;
+  my $h_tf;
+  my $row;
+  my $col;
+  my $tbl;
+  my $h_tbl;
+
+  main->createHeader($p, $rClient);
+
+  my $ClientName = qq|$rClient->{'FName'} $rClient->{'MName'} $rClient->{'LName'}|;
+  $p->fit_textline("Client Name:", 37, $ypos, $baseboldfontoptions);
+  $p->fit_textline($ClientName, 100, $ypos, $basefontoptions);
+
+
+  my $ClientID = $rClientSATobacco->{'ClientID'};
+  $p->fit_textline("Client ID:", 200, $ypos, $baseboldfontoptions);
+  $p->fit_textline($ClientID, 250, $ypos, $basefontoptions);
+  $ypos += 25;
+
+  my $TheDate = $rClientSATobacco->{'vdate'};
   my $cnt = 0;
   my @SATs = ();
-  push(@SATs,$r);                   # store (because of 'desc') newest to oldest.
+  push(@SATs,$rClientSATobacco);                   # store (because of 'desc') newest to oldest.
   $sSATs->execute($ClientID,$TheDate) || $form->dberror("select SATs: ${ClientID},${TheDate}");
   while ( my $rSATs = $sSATs->fetchrow_hashref )
   { $cnt++; push(@SATs,$rSATs); last if ( $cnt == 3 ); }
+
   my @REVSATs = reverse(@SATs);     # output in columns of oldest to newest.
   my $i = 0;
-  my ($row1,$row2,$row3,$row4,$row5,$row6) = ('','','','','','');
-  my ($row7,$row8,$row9,$row10,$row11) = ('','','','','');
   foreach my $rSATs ( @REVSATs )
   {
     $i++;
@@ -105,7 +190,7 @@ sub printClientSATobacco
     my $qDate = DBUtil->Date($rSATs->{'qdate'},'fmt','MMDDYY');
     my $sTime = substr($rSATs->{stime},0,2).substr($rSATs->{stime},3,2);
     my $eTime = substr($rSATs->{etime},0,2).substr($rSATs->{etime},3,2);
-# convert from SNOMED codes to 5 A's...
+    # convert from SNOMED codes to 5 A's...
     $rSATs->{'smoke'} = $rSATs->{'SmokingStatus'} == 4 || $rSATs->{'SmokingStatus'} == 6
                       ? 1 : 0;
     $rSATs->{'quit'}  = $rSATs->{'SmokingStatus'} == 3 
@@ -115,64 +200,209 @@ sub printClientSATobacco
     $rSATs->{'light'} = $rSATs->{'SmokingStatus'} == 2 || $rSATs->{'SmokingStatus'} == 5
                      || $rSATs->{'SmokingStatus'} == 7 || $rSATs->{'SmokingStatus'} == 8
                       ? 1 : 0;
-#warn qq|SmokingStatus=$rSATs->{'SmokingStatus'}\n|;
-#warn qq|smoke=$rSATs->{'smoke'}\n|;
-#warn qq|quit=$rSATs->{'quit'}\n|;
-#warn qq|light=$rSATs->{'light'}\n|;
-#warn qq|heavy=$rSATs->{'heavy'}\n|;
+
     my $qyes = $rSATs->{'quit30'} ? 1 : 0;
     my $qno = $rSATs->{'quit30'} ? 0 : 1;
-    $row1 .= qq|    <vdate${i}>${vDate}</vdate${i}>\n|;
-    $row2 .= qq|    <stime${i}>${sTime}</stime${i}>\n|;
-    $row3 .= qq|    <smoke${i}>$rSATs->{'smoke'}</smoke${i}>
-    <quit${i}>$rSATs->{'quit'}</quit${i}>
-    <light${i}>$rSATs->{'light'}</light${i}>
-    <heavy${i}>$rSATs->{'heavy'}</heavy${i}>\n|;
-    $row4 .= qq|    <benefits${i}>$rSATs->{'benefits'}</benefits${i}>
-    <harms${i}>$rSATs->{'harms'}</harms${i}>
-    <message${i}>$rSATs->{'message'}</message${i}>
-    <difficulty${i}>$rSATs->{'difficulty'}</difficulty${i}>\n|;
-    $row5 .= qq|    <reason${i}>|.DBA->subxml($rSATs->{'reason'}).qq|</reason${i}>
-    <qyes${i}>${qyes}</qyes${i}>
-    <qno${i}>${qno}</qno${i}>\n|;
-    $row6 .= qq|    <qdate${i}>${qDate}</qdate${i}>
-    <problem${i}>$rSATs->{'problem'}</problem${i}>
-    <materials${i}>$rSATs->{'materials'}</materials${i}>
-    <identify${i}>$rSATs->{'identify'}</identify${i}>
-    <refer${i}>$rSATs->{'refer'}</refer${i}>
-    <pharma${i}>$rSATs->{'pharma'}</pharma${i}>\n|;
-    $row7 .= qq|    <assess${i}>$rSATs->{'assess'}</assess${i}>
-    <ask${i}>$rSATs->{'ask'}</ask${i}>
-    <reinforce${i}>$rSATs->{'reinforce'}</reinforce${i}>
-    <encourage${i}>$rSATs->{'encourage'}</encourage${i}>
-    <set${i}>$rSATs->{'followup'}</set${i}>\n|;
-    $row8 .= qq|    <comments${i}>|.DBA->subxml($rSATs->{'comments'}).qq|</comments${i}>\n|;
-    $row9 .= qq|    <etime${i}>${eTime}</etime${i}>\n|;
-    $row10 .= qq|    <sign${i}>sign here$rSATs->{'sign'}</sign${i}>\n|;
-    $row11 .= qq|    <credentials${i}>credentials here$rSATs->{'credentials'}</credentials${i}>\n|;
+
+    $p->fit_textline("Visit Date $i:", 37, $ypos, $baseboldfontoptions);
+    $p->fit_textline($vDate, 100, $ypos, $basefontoptions);
+
+    $p->fit_textline("Start Time $i:", 150, $ypos, $baseboldfontoptions);
+    $p->fit_textline($sTime, 210, $ypos, $basefontoptions);
+
+    $p->fit_textline("smoke $i:", 240, $ypos, $baseboldfontoptions);
+    $p->fit_textline($YesNoArr{$rSATs->{'smoke'}}, 280, $ypos, $basefontoptions);
+
+    $p->fit_textline("quit $i:", 310, $ypos, $baseboldfontoptions);
+    $p->fit_textline($YesNoArr{$rSATs->{'quit'}}, 340, $ypos, $basefontoptions);
+
+    $p->fit_textline("light $i:", 370, $ypos, $baseboldfontoptions);
+    $p->fit_textline($YesNoArr{$rSATs->{'light'}}, 400, $ypos, $basefontoptions);
+
+    $p->fit_textline("heavy $i:", 430, $ypos, $baseboldfontoptions);
+    $p->fit_textline($YesNoArr{$rSATs->{'heavy'}}, 470, $ypos, $basefontoptions);
+
+    $ypos += 15;
+
+    $p->fit_textline("Benefits $i:", 37, $ypos, $baseboldfontoptions);
+    $p->fit_textline($YesNoArr{$rSATs->{'benefits'}}, 85, $ypos, $basefontoptions);
+
+    $p->fit_textline("Harms $i:", 120, $ypos, $baseboldfontoptions);
+    $p->fit_textline($YesNoArr{$rSATs->{'harms'}}, 160, $ypos, $basefontoptions);
+
+    $p->fit_textline("Message $i:", 200, $ypos, $baseboldfontoptions);
+    $p->fit_textline($YesNoArr{$rSATs->{'message'}}, 250, $ypos, $basefontoptions);
+
+    $p->fit_textline("Difficulty $i:", 280, $ypos, $baseboldfontoptions);
+    $p->fit_textline($YesNoArr{$rSATs->{'difficulty'}}, 335, $ypos, $basefontoptions);
+
+    $p->fit_textline("Quit30 $i:", 365, $ypos, $baseboldfontoptions);
+    $p->fit_textline($YesNoArr{$qyes}, 405, $ypos, $basefontoptions);
+
+
+    $tf = $p->create_textflow("<$baseboldfontoptions>Reason $i: <$basefontoptions> $rSATs->{'reason'}", $basefontoptions . " leading=120% alignment=justify");
+    $h_tf = render_textflow($p, $tf, $rClient);
+
+    $ypos += $h_tf;
+
+    $p->fit_textline("Quit Date $i:", 435, $ypos, $baseboldfontoptions);
+    $p->fit_textline($qDate, 490, $ypos, $basefontoptions);
+
+    $ypos += 15;
+
+    $p->fit_textline("Problem solving $i:", 37, $ypos, $baseboldfontoptions);
+    $p->fit_textline($YesNoArr{$rSATs->{'problem'}}, 120, $ypos, $basefontoptions);
+
+    $p->fit_textline("Provider materials $i:", 150, $ypos, $baseboldfontoptions);
+    $p->fit_textline($YesNoArr{$rSATs->{'materials'}}, 240, $ypos, $basefontoptions);
+
+    $p->fit_textline("Identify Support $i:", 270, $ypos, $baseboldfontoptions);
+    $p->fit_textline($YesNoArr{$rSATs->{'identify'}}, 360, $ypos, $basefontoptions);
+
+    $p->fit_textline("Pharmacotherapy $i:", 390, $ypos, $baseboldfontoptions);
+    $p->fit_textline($YesNoArr{$rSATs->{'pharma'}}, 480, $ypos, $basefontoptions);
+
+    $ypos += 15;
+    
+    $p->fit_textline("Refer to 1 800 QUIT NOW $i:", 37, $ypos, $baseboldfontoptions);
+    $p->fit_textline($YesNoArr{$rSATs->{'refer'}}, 170, $ypos, $basefontoptions);
+
+    $ypos += 15;
+    
+    $p->fit_textline("Assess smoking status at every visit $i:", 37, $ypos, $baseboldfontoptions);
+    $p->fit_textline($YesNoArr{$rSATs->{'assess'}}, 220, $ypos, $basefontoptions); 
+
+    $ypos += 15;
+    
+    $p->fit_textline("Ask client about the quitting process $i:", 37, $ypos, $baseboldfontoptions);
+    $p->fit_textline($YesNoArr{$rSATs->{'ask'}}, 220, $ypos, $basefontoptions);
+
+    $ypos += 15;
+    
+    $p->fit_textline("Reinforce the steps the client is taking to quit $i:", 37, $ypos, $baseboldfontoptions);
+    $p->fit_textline($YesNoArr{$rSATs->{'reinforce'}}, 280, $ypos, $basefontoptions);
+
+    $ypos += 15;
+    
+    $p->fit_textline("Provider encouragement $i:", 37, $ypos, $baseboldfontoptions);
+    $p->fit_textline($YesNoArr{$rSATs->{'encourage'}}, 160, $ypos, $basefontoptions);
+
+    $p->fit_textline("Set follow up appointment $i:", 190, $ypos, $baseboldfontoptions);
+    $p->fit_textline($YesNoArr{$rSATs->{'followup'}}, 320, $ypos, $basefontoptions);
+
+    $ypos += 15;
+    
+    $tf = $p->create_textflow("<$baseboldfontoptions>Comments $i: <$basefontoptions> $rSATs->{'comments'}", $basefontoptions . " leading=120% alignment=justify");
+    $h_tf = render_textflow($p, $tf, $rClient);
+
+    $ypos +=  25 + $h_tf;
+
+    $p->fit_textline("End Time $i:", 37, $ypos, $baseboldfontoptions);
+    $p->fit_textline($YesNoArr{$rSATs->{'etime'}}, 100, $ypos, $basefontoptions);
+
+    $ypos += 25;
+
   }
 
-  my $html = qq|
-  <record>
-   <agencyname>${AgencyName}</agencyname>
-   <agencyaddress>${AgencyAddr}</agencyaddress>
-   <agencycsz>${AgencyCSZ}</agencycsz>
-   <agencyphone>${AgencyPh}</agencyphone>
-   <clientname>${ClientName}</clientname>
-   <idnumber>${ClientID}</idnumber>
-   <row1>\n${row1}</row1>
-   <row2>\n${row2}</row2>
-   <row3>\n${row3}</row3>
-   <row4>\n${row4}</row4>
-   <row5>\n${row5}</row5>
-   <row6>\n${row6}</row6>
-   <row7>\n${row7}</row7>
-   <row8>\n${row8}</row8>
-   <row9>\n${row9}</row9>
-   <row10>\n${row10}</row10>
-   <row11>\n${row11}</row11>
-  </record>
-|;
-  return($html);
+  main->createFooter($p);
+
 }
-############################################################################
+
+sub render_textflow {
+    my ($p, $tf, $rClient) = @_;
+    my $ClientID = $rClient->{ClientID};
+    my $ClientName = qq|$rClient->{FName} $rClient->{LName}|;
+    my $result;
+    my $h_tf;
+
+    do {
+        $result = $p->fit_textflow($tf, $marginleft, $y_footer, $marginleft + $contentwidth, $ypos, "");
+        if ($result eq "_boxfull" || $result eq "_boxempty") {
+            main->createFooter($p);
+            main->createHeader($p, $rClient);
+        }
+    } while ($result ne "_stop");
+    $h_tf = $p->info_textflow($tf, "textheight");
+
+    return $h_tf;
+}
+
+
+sub createHeader {
+  my ($self, $p, $rClient) = @_;
+  my $AgencyID = MgrTree->getAgency($form,$rClient->{clinicClinicID});
+  $sProvider->execute($AgencyID) || myDBI->dberror("printClientSATobacco: select Provider AgencyID=${AgencyID}");
+  my $rProvider = $sProvider->fetchrow_hashref;
+  my $ProviderName = qq|$rProvider->{'FName'} $rProvider->{'MName'} $rProvider->{'LName'}|;
+  my $ProviderAddr = $rProvider->{'Addr1'} . ', ';
+  $ProviderAddr .= $rProvider->{'Addr2'} . ', ' if ( $rProvider->{'Addr2'} );
+  $ProviderAddr .= $rProvider->{'City'} . ', ' . $rProvider->{'ST'} . '  ' . $rProvider->{'Zip'};
+  my $ProviderPh = 'Office: ' . $rProvider->{'WkPh'} . '  Fax: ' . $rProvider->{'Fax'};
+  my $Title = "Client SATobacco";
+
+  my $Address = qq|${ProviderName}\n${ProviderAddr}\n${ProviderPh}\n${Title}|;
+
+  my $tf;
+
+  $p->begin_page_ext($pagewidth, $pageheight, "topdown");
+  $ypos = $margintop;
+
+
+  my $h_address = 5 * $fontsizexxlarge;
+  $ypos += $h_address;
+  my $w_address = 200;
+  my $x_address = $pagewidth / 2 - $w_address / 2;
+  $tf = $p->create_textflow($Address, $baselargefontoptions . " leading=110% alignment=justify lastalignment=center");
+  $p->fit_textflow($tf, $x_address, $ypos, $x_address+$w_address, $ypos - $h_address, "verticalalign=center");
+
+
+  $ypos += $fontsizexxlarge;
+}
+
+sub createFooter {
+  my ($self, $p) = @_;
+
+  my $tf;
+  my $optlist;
+
+  my $footertext = "<fontname=$boldfontname encoding=unicode>Confidentiality of drug/alcohol abuse records is protected by Federal Law." .
+    "<fontname=$fontname encoding=unicode> Federal regulations (42 CFR, Part 2 prohibits making any further disclosure of this information unless further disclosure is expressively permitted by written consent of the person to whom it pertains or as otherwise permitted by 42 CFR, Part 2. A GENERAL AUTHORIZATION FOR RELEASE OF MEDICAL OR OTHER INFORMATION IS NOT SUFFICIENT FOR THIS PURPOSE. The Federal rules restrict any use of the information to criminally investigate or prosecute any alcohol/drug abuse client.";
+
+  $optlist = $basesmallfontoptions . " leading=120% alignment=justify";
+  $tf = $p->create_textflow($footertext, $optlist);
+  $p->fit_textflow($tf, $marginleft, $marginbottom,
+      $marginleft+$contentwidth, $y_footer, "verticalalign=bottom");
+
+  $p->fit_textline("Page " . (++$pagecount), 268.4, $marginbottom + 14, $baseboldmidfontoptions);
+  $p->suspend_page("");
+}
+
+sub createPageCount {
+  my ($self, $p) = @_;
+
+  for(my $i = 1; $i < $pagecount+1; $i++) {
+    # Revisit page $i
+    $p->resume_page("pagenumber $i");
+
+    # Add the total number of pages
+    $p->fit_textline(" of " . $pagecount, 303, $marginbottom + 14, $baseboldmidfontoptions);
+    $p->end_page_ext("");
+  }
+}
+
+sub createEmptyPage {
+  my ($self, $p) = @_;
+
+  $p->begin_page_ext($pagewidth, $pageheight, "topdown");
+  $p->fit_textline("NOT FOUND", $marginleft, 50, $basefontoptions);
+  $p->end_page_ext("");
+}
+
+
+sub createEmptyPage {
+  my ($self, $p) = @_;
+
+  $p->begin_page_ext($pagewidth, $pageheight, "topdown");
+  $p->fit_textline("NOT FOUND", $marginleft, 50, $basefontoptions);
+  $p->end_page_ext("");
+}
