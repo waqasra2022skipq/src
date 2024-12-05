@@ -170,7 +170,6 @@ sub createPages {
   my $ClientID = $rClientSATobacco->{'ClientID'};
   $p->fit_textline("Client ID:", 200, $ypos, $baseboldfontoptions);
   $p->fit_textline($ClientID, 250, $ypos, $basefontoptions);
-  $ypos += 25;
 
   my $TheDate = $rClientSATobacco->{'vdate'};
   my $cnt = 0;
@@ -204,103 +203,60 @@ sub createPages {
     my $qyes = $rSATs->{'quit30'} ? 1 : 0;
     my $qno = $rSATs->{'quit30'} ? 0 : 1;
 
-    $p->fit_textline("Visit Date $i:", 37, $ypos, $baseboldfontoptions);
-    $p->fit_textline($vDate, 100, $ypos, $basefontoptions);
+    my $content = '';
 
-    $p->fit_textline("Start Time $i:", 150, $ypos, $baseboldfontoptions);
-    $p->fit_textline($sTime, 210, $ypos, $basefontoptions);
+    $content .= "<$baseboldfontoptions>Visit Date $i: <$basefontoptions>$vDate\t";
+    $content .= "<$baseboldfontoptions>Start Time $i: <$basefontoptions>$sTime\t";
+    $content .= "<$baseboldfontoptions>Smoke $i: <$basefontoptions>$YesNoArr{$rSATs->{'smoke'}}\t";
+    $content .= "<$baseboldfontoptions>Quit $i: <$basefontoptions>$YesNoArr{$rSATs->{'quit'}}\t";
+    $content .= "<$baseboldfontoptions>Light $i: <$basefontoptions>$YesNoArr{$rSATs->{'light'}}\t";
+    $content .= "<$baseboldfontoptions>Heavy $i: <$basefontoptions>$YesNoArr{$rSATs->{'heavy'}}\t";
 
-    $p->fit_textline("smoke $i:", 240, $ypos, $baseboldfontoptions);
-    $p->fit_textline($YesNoArr{$rSATs->{'smoke'}}, 280, $ypos, $basefontoptions);
-
-    $p->fit_textline("quit $i:", 310, $ypos, $baseboldfontoptions);
-    $p->fit_textline($YesNoArr{$rSATs->{'quit'}}, 340, $ypos, $basefontoptions);
-
-    $p->fit_textline("light $i:", 370, $ypos, $baseboldfontoptions);
-    $p->fit_textline($YesNoArr{$rSATs->{'light'}}, 400, $ypos, $basefontoptions);
-
-    $p->fit_textline("heavy $i:", 430, $ypos, $baseboldfontoptions);
-    $p->fit_textline($YesNoArr{$rSATs->{'heavy'}}, 470, $ypos, $basefontoptions);
-
-    $ypos += 15;
-
-    $p->fit_textline("Benefits $i:", 37, $ypos, $baseboldfontoptions);
-    $p->fit_textline($YesNoArr{$rSATs->{'benefits'}}, 85, $ypos, $basefontoptions);
-
-    $p->fit_textline("Harms $i:", 120, $ypos, $baseboldfontoptions);
-    $p->fit_textline($YesNoArr{$rSATs->{'harms'}}, 160, $ypos, $basefontoptions);
-
-    $p->fit_textline("Message $i:", 200, $ypos, $baseboldfontoptions);
-    $p->fit_textline($YesNoArr{$rSATs->{'message'}}, 250, $ypos, $basefontoptions);
-
-    $p->fit_textline("Difficulty $i:", 280, $ypos, $baseboldfontoptions);
-    $p->fit_textline($YesNoArr{$rSATs->{'difficulty'}}, 335, $ypos, $basefontoptions);
-
-    $p->fit_textline("Quit30 $i:", 365, $ypos, $baseboldfontoptions);
-    $p->fit_textline($YesNoArr{$qyes}, 405, $ypos, $basefontoptions);
-
-
-    $tf = $p->create_textflow("<$baseboldfontoptions>Reason $i: <$basefontoptions> $rSATs->{'reason'}", $basefontoptions . " leading=120% alignment=justify");
-    $h_tf = render_textflow($p, $tf, $rClient);
-
-    $ypos += $h_tf;
-
-    $p->fit_textline("Quit Date $i:", 435, $ypos, $baseboldfontoptions);
-    $p->fit_textline($qDate, 490, $ypos, $basefontoptions);
-
-    $ypos += 15;
-
-    $p->fit_textline("Problem solving $i:", 37, $ypos, $baseboldfontoptions);
-    $p->fit_textline($YesNoArr{$rSATs->{'problem'}}, 120, $ypos, $basefontoptions);
-
-    $p->fit_textline("Provider materials $i:", 150, $ypos, $baseboldfontoptions);
-    $p->fit_textline($YesNoArr{$rSATs->{'materials'}}, 240, $ypos, $basefontoptions);
-
-    $p->fit_textline("Identify Support $i:", 270, $ypos, $baseboldfontoptions);
-    $p->fit_textline($YesNoArr{$rSATs->{'identify'}}, 360, $ypos, $basefontoptions);
-
-    $p->fit_textline("Pharmacotherapy $i:", 390, $ypos, $baseboldfontoptions);
-    $p->fit_textline($YesNoArr{$rSATs->{'pharma'}}, 480, $ypos, $basefontoptions);
-
-    $ypos += 15;
     
-    $p->fit_textline("Refer to 1 800 QUIT NOW $i:", 37, $ypos, $baseboldfontoptions);
-    $p->fit_textline($YesNoArr{$rSATs->{'refer'}}, 170, $ypos, $basefontoptions);
+    my $content .= "\n";
 
-    $ypos += 15;
-    
-    $p->fit_textline("Assess smoking status at every visit $i:", 37, $ypos, $baseboldfontoptions);
-    $p->fit_textline($YesNoArr{$rSATs->{'assess'}}, 220, $ypos, $basefontoptions); 
+    $content .= "<$baseboldfontoptions>Benefits $i: <$basefontoptions>$YesNoArr{$rSATs->{'benefits'}}\t";
+    $content .= "<$baseboldfontoptions>Harms $i: <$basefontoptions>$YesNoArr{$rSATs->{'harms'}}\t";
+    $content .= "<$baseboldfontoptions>Message $i: <$basefontoptions>$YesNoArr{$rSATs->{'message'}}\t";
+    $content .= "<$baseboldfontoptions>Difficulty $i: <$basefontoptions>$YesNoArr{$rSATs->{'difficulty'}}\t";
+    $content .= "<$baseboldfontoptions>Quit30 $i: <$basefontoptions>$YesNoArr{$qyes}\t";
 
-    $ypos += 15;
-    
-    $p->fit_textline("Ask client about the quitting process $i:", 37, $ypos, $baseboldfontoptions);
-    $p->fit_textline($YesNoArr{$rSATs->{'ask'}}, 220, $ypos, $basefontoptions);
+    $content .= "\n";
+    $content .= "<$baseboldfontoptions>Reason $i: <$basefontoptions>$rSATs->{'reason'}\t";
+    $content .= "\n";
 
-    $ypos += 15;
-    
-    $p->fit_textline("Reinforce the steps the client is taking to quit $i:", 37, $ypos, $baseboldfontoptions);
-    $p->fit_textline($YesNoArr{$rSATs->{'reinforce'}}, 280, $ypos, $basefontoptions);
+    $content .= "<$baseboldfontoptions>Quit Date $i: <$basefontoptions>$qDate\t";
 
-    $ypos += 15;
-    
-    $p->fit_textline("Provider encouragement $i:", 37, $ypos, $baseboldfontoptions);
-    $p->fit_textline($YesNoArr{$rSATs->{'encourage'}}, 160, $ypos, $basefontoptions);
+    $content .= "\n";
+    $content .= "<$baseboldfontoptions>Problem solving $i: <$basefontoptions>$YesNoArr{$rSATs->{'problem'}}\t";
+    $content .= "<$baseboldfontoptions>Provider materials $i: <$basefontoptions>$YesNoArr{$rSATs->{'materials'}}\t";
+    $content .= "<$baseboldfontoptions>Identify Support $i: <$basefontoptions>$YesNoArr{$rSATs->{'identify'}}\t";
+    $content .= "<$baseboldfontoptions>Pharmacotherapy $i: <$basefontoptions>$YesNoArr{$rSATs->{'pharma'}}\t";
 
-    $p->fit_textline("Set follow up appointment $i:", 190, $ypos, $baseboldfontoptions);
-    $p->fit_textline($YesNoArr{$rSATs->{'followup'}}, 320, $ypos, $basefontoptions);
+    $content .= "\n";
+    $content .= "<$baseboldfontoptions>Refer to 1 800 QUIT NOW $i: <$basefontoptions>$YesNoArr{$rSATs->{'refer'}}\t";
+    $content .= "<$baseboldfontoptions>Assess smoking status at every visit $i: <$basefontoptions>$YesNoArr{$rSATs->{'assess'}}\t";
 
-    $ypos += 15;
-    
-    $tf = $p->create_textflow("<$baseboldfontoptions>Comments $i: <$basefontoptions> $rSATs->{'comments'}", $basefontoptions . " leading=120% alignment=justify");
+    $content .= "\n\n";
+    $content .= "<$baseboldfontoptions>Ask client about the quitting process $i: <$basefontoptions>$YesNoArr{$rSATs->{'ask'}}\t";
+    $content .= "<$baseboldfontoptions>Reinforce the steps the client is taking to quit $i: <$basefontoptions>$YesNoArr{$rSATs->{'reinforce'}}\t";
+
+    $content .= "\n\n";
+    $content .= "<$baseboldfontoptions>Provider encouragement $i: <$basefontoptions>$YesNoArr{$rSATs->{'encourage'}}\t";
+    $content .= "<$baseboldfontoptions>Set follow up appointment $i: <$basefontoptions>$YesNoArr{$rSATs->{'followup'}}\t";
+
+    $content .= "\n";
+    $content .= "<$baseboldfontoptions>Comments $i: <$basefontoptions>$rSATs->{'comments'}\t";
+    $content .= "\n";
+
+    $content .= "\n";
+    $content .= "<$baseboldfontoptions>End Time $i: <$basefontoptions>$rSATs->{'etime'}\t";
+    $content .= "\n";
+
+    $tf = $p->create_textflow($content, $basefontoptions . " leading=120% alignment=justify");
     $h_tf = render_textflow($p, $tf, $rClient);
 
     $ypos +=  25 + $h_tf;
-
-    $p->fit_textline("End Time $i:", 37, $ypos, $baseboldfontoptions);
-    $p->fit_textline($YesNoArr{$rSATs->{'etime'}}, 100, $ypos, $basefontoptions);
-
-    $ypos += 25;
 
   }
 
