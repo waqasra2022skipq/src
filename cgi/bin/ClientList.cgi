@@ -520,6 +520,8 @@ sub setEligibility
 	  else
 	  { 
 		$StatusReason .= ' Eligibility not found.'; $EBColor = 'red';
+        $isEligible = 0;
+
 		($Found,$str,$Renew) = main->chkEligibility(0,0);
 		if ( $str eq '' ) { $str = ': none '; }
 	  }
