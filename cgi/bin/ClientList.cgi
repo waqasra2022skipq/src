@@ -16,6 +16,8 @@ $DT=localtime();
 #use Time::HiRes qw(time);
 #$t_start=Time::HiRes::time;
 #warn "ChartList   curtime: $t_start\n";
+my $isEligible = 1;
+
 my $form = myForm->new();
 my $dbh = myDBI->dbconnect($form->{'DBNAME'});
 myForm->pushLINK();       # save this link/page to return to.
@@ -131,6 +133,8 @@ while ( $rClient = $sClient->fetchrow_hashref )
   $rClientLegal = $sClientLegal->fetchrow_hashref;
   $sClientReferrals->execute($rClient->{ClientID});
   $rClientReferrals = $sClientReferrals->fetchrow_hashref;
+
+  $isEligible = 1;
 
   ($ClientName = qq|$rClient->{LName}, $rClient->{FName} $rClient->{MName}|) =~ s/\"/&quot/g;
   $ClientName =~ s/\'//g;
@@ -367,6 +371,10 @@ my ($Found,$str,$Renew) = main->chkEligibility(1,0,$rInsurance->{InsCode});
 	  }	
   } else {
   	$StatusReason = '';
+  }
+
+  if(!$isEligible) {
+    $StatusColor = 'Red';
   }
   
   $ws =~ s/\'//g;
