@@ -418,8 +418,8 @@ sub setNoteBillInfo
   ${ServTypeSel}
   <TR >
     <TD COLSPAN="3" >
-      <SELECT ID="SCID" NAME="Treatment_SCID_1" ONCHANGE="callAjax('vSCID',this.value,this.id,'&p='+document.Treatment.Treatment_ProvID_1.value+'&c=$form->{Treatment_ClientID_1}&id=$form->{Treatment_TrID_1}&d='+document.Treatment.Treatment_ContLogDate_1.value+'&b='+document.Treatment.Treatment_ContLogBegTime_1.value+'&e='+document.Treatment.Treatment_ContLogEndTime_1.value,'validateNote.pl');" class="ServiceCodesBox">${SCIDSel}</SELECT>
-      <INPUT TYPE="hidden" ID="CurType" NAME="CurType" VALUE="${CurType}" >
+      <SELECT ID="SCID" NAME="Treatment_SCID_1" CLASS="ServiceCodesBox" ONCHANGE="callAjax('vSCID',this.value,this.id,'&p='+document.Treatment.Treatment_ProvID_1.value+'&c=$form->{Treatment_ClientID_1}&id=$form->{Treatment_TrID_1}&d='+document.Treatment.Treatment_ContLogDate_1.value+'&b='+document.Treatment.Treatment_ContLogBegTime_1.value+'&e='+document.Treatment.Treatment_ContLogEndTime_1.value,'validateNote.pl');" >${SCIDSel}</SELECT>
+      <INPUT TYPE="hidden" ID="CurType" NAME="CurType" VALUE="${CurType}">
     </TD>
   </TR>
   <TR> <TD COLSPAN="3" ><SPAN ID="Mod4_popup">${Mod4Sel}</SPAN></TD> </TR>
@@ -886,7 +886,10 @@ sub setAddional_SCID {
   my $sInsurance = $dbh->prepare($stmt);
   $sInsurance->execute($form->{Client_ClientID_1});
   my $rInsurance = $sInsurance->fetchrow_hashref;
-  if($form->{'NoteType'} ne 2 && $form->{'NoteType'} ne 3 && $rInsurance->{InsID} ne '212') {
+  
+  my $Physician = DBA->isPhysician($form);
+
+  if($form->{'NoteType'} ne 2 && $form->{'NoteType'} ne 3 && $rInsurance->{InsID} ne '212' && !$Physician) {
     # Bail If Client Primary insurance is not Medicare and Not Physician Note and Electronic Note
     return;
   }
@@ -943,12 +946,12 @@ sub setAddional_SCID {
   }
   else
   {
-  my $add_SC_IDS = "(15970, 12785, 12789, 12788, 15888, 21483, 15756, 21500, 21501, 21502, 21503, 21504, 21505, 21506)";
-    my $SCIDSel = DBA->selServiceCodes($form,$form->{$column},0,$form->{'LOGINPROVID'},$form->{'Client_ClientID_1'},'Agent',"and xSC.SCNum NOT LIKE 'X%' and (xSC.SCID IN $add_SC_IDS OR `SCNum` LIKE '%90833%' OR `SCNum` LIKE '%96372 25%' OR `SCNum` LIKE '%93000 25%'  OR `SCNum` LIKE '%90840%')");
+    my $add_SC_IDS = "(15970, 12785, 12789, 12788, 15888, 21483, 15756, 21500, 21501, 21502, 21503, 21504, 21505, 21506)";
+    my $SCIDSel = DBA->selServiceCodes($form,$form->{$column},0,$form->{'LOGINPROVID'},$form->{'Client_ClientID_1'},'Agent',"and xSC.SCNum NOT LIKE 'X%' and (xSC.SCID IN $add_SC_IDS OR `SCNum` LIKE '%90833%' OR `SCNum` LIKE '%96372 25%' OR `SCNum` LIKE '%93000 25%'  OR `SCNum` LIKE '%90840%' OR `SCNum` LIKE '%9920 33%')");
     $out .= qq|
       <TR >
         <TD >
-          <SELECT ID="$column" NAME="$column" class="ServiceCodesBox" > ${SCIDSel} </SELECT> 
+          <SELECT ID="$column" NAME="$column" class="ServiceCodesBox"> ${SCIDSel} </SELECT> 
         </TD>
       </TR>
     |;
