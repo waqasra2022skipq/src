@@ -164,9 +164,9 @@ elsif ( $form->{method} eq 'calcBMI' )
   $bsa = sprintf("%.2f",$bsa);
 #warn qq|validate: weight=${weight}, height=${height}, bmi=${bmi}\n|;
   $out = $err eq '' ? qq|
-  <command method="setcontent">
+  <command method="setvalue">
     <target>ClientVitalSigns_BMI_1</target>
-    <content>${bmi}</content>
+    <value>${bmi}</value>
   </command>
   <command method="setcontent">
     <target>Client_BSA</target>

@@ -59,7 +59,7 @@
       BMI
     </TD>
     <TD CLASS="strcol hotmsg" >
-      <SPAN ID="Client_BMI" ></SPAN>
+      <INPUT TYPE="text" ID="ClientVitalSigns_BMI_1" NAME="ClientVitalSigns_BMI_1" VALUE="<<ClientVitalSigns_BMI_1>>"  SIZE="10" >
     </TD>
   </TR>
   <TR >
@@ -67,7 +67,7 @@
       BSA
     </TD>
     <TD CLASS="strcol hotmsg" >
-      <SPAN ID="Client_BSA" ></SPAN>
+      <SPAN ID="Client_BSA" ><<<ClientVitalSigns_BSA_1>>></SPAN>
     </TD>
   </TR>
   <TR >
@@ -222,9 +222,6 @@ Increased risk/pre-diabetes - 5.7% to 6.4% (39-46 mmol/mol)
 <INPUT TYPE="hidden" NAME="post_update" VALUE="PostUpd->updClientVitalSigns(%form+<<<ClientVitalSigns_ID>>>)" >
 </LOADHIDDEN>
 </FORM>
-<SCRIPT LANGUAGE="JavaScript">
-document.VitalSigns.elements[0].focus();
-callAjax('calcBMI','','','&hf=<<<ClientVitalSigns_HeightFeet_1>>>&hi=<<<ClientVitalSigns_HeightInches_1>>>&w=<<<ClientVitalSigns_Weight_1>>>');
-</SCRIPT>
+
 
 [[myHTML->rightpane(%form+search)]]

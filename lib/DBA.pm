@@ -2244,10 +2244,15 @@ sub getDeductionRemaining
 sub getBMI
 {
   my ($self,$form,$rData) = @_;
+
   my $height = ($rData->{'HeightFeet'} * 12) + $rData->{'HeightInches'};
   my $bmi = 0;
   if ( $height > 0 ) { $bmi = ( $rData->{'Weight'} / ( $height * $height ) ) * 703; }
   else { $msg = 'Need Height'; }
+
+  if($rData->{'BMI'} > 0) {
+    $bmi = $rData->{'BMI'};
+  }
   $bmi = sprintf("%.2f",$bmi);
 #warn qq|getBMI: height=$height, $rData->{'Weight'}, bmi=$bmi\n|;
   return($bmi);
