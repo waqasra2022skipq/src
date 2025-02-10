@@ -974,6 +974,9 @@ warn qq|Check updGDS: table=${table}, ID=${ID}\n|;
       $score++ if ( $rClientGDS->{'q29'} == 0 );
       $score++ if ( $rClientGDS->{'q30'} == 0 );
     }
+    if($rClientGDS->{'Score'} ne "") {
+        $score = $rClientGDS->{'Score'};
+    }
 warn qq|updGDS: ${table}: YES UPDATE: Score=${score}\n|;
     my $sUpdate = $dbh->prepare("update ${table} set Score=? where ID=?");
     $sUpdate->execute($score,$ID);
