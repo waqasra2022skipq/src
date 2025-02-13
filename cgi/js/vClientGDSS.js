@@ -1,6 +1,9 @@
 <!-- Cloak
 function validate(form)
 {
+  if(!isEmpty( form.ClientGDSS_Score_1 ) && !isEmpty(form.ClientGDSS_TestDate_1)) {
+    return 1;
+  }
   return vEntry("notnull",form.ClientGDSS_TestDate_1
                          ,form.ClientGDSS_q1_1
                          ,form.ClientGDSS_q2_1
