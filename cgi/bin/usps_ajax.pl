@@ -1,198 +1,206 @@
 #!/usr/bin/perl
 use lib '/home/okmis/mis/src/lib';
+use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
+
 use strict;
+use warnings;
 use LWP::UserAgent;
-use XML::DOM;
-use DBI;
+use JSON;
+use HTTP::Request;
+use CGI qw(:standard escape);
 use DBForm;
-use DBA;
+use Try::Tiny;
 
-###################################################################################
-## Production: http://production.shippingapis.com/ShippingAPI.dll
-## Production: https://secure.shippingapis.com/ShippingAPI.dll
-## Testing: http://stg-production.shippingapis.com/ShippingAPI.dll
-## Testing: https://stg-secure.shippingapis.com/ShippingAPI.dll
 
-## https://www.usps.com/business/web-tools-apis/address-information-api.htm
-## Your Username is 773MILLE6990
-## Your Password is 282FV16XQ576
-##
 my $form = DBForm->parse();
-my $dbh = $form->dbconnect();
-my $target = $form->{'target'};
-my $value = $form->{'value'};
-my %parsedData;
-#foreach my $f ( sort keys %{$form} ) { warn ": form-$f=$form->{$f}\n"; }
 
-my $UseProduction = 1;
-my $proxy = $UseProduction 
-          ? 'http://production.shippingapis.com/ShippingAPI.dll'
-          : 'http://stg-production.shippingapis.com/ShippingAPI.dll';
-my $xml = main->uspsXML($form->{'Tag'},$form);
-#warn qq|Tag: $form->{'Tag'}\n${xml}\n|;
-my $req = new HTTP::Request 'POST', $proxy;
-$req->content_type('application/x-www-form-urlencoded');
-$req->content($xml);
-my $ua = new LWP::UserAgent;
-my $response = $ua->request($req);
-if ($response->is_success)
-{
-  %parsedData = main->parseTag($response->content,
-          'Address','Address1','Address2','City','State','Zip5','Zip4');
+# my $USPS_TOKEN = $ENV{'USPS_TOKEN'} ? $ENV{'USPS_TOKEN'} : 'eyJraWQiOiJIdWpzX2F6UnFJUzBpSE5YNEZIRk96eUwwdjE4RXJMdjNyZDBoalpNUnJFIiwidHlwIjoiSldUIiwiYWxnIjoiUlMyNTYifQ.eyJlbnRpdGxlbWVudHMiOltdLCJzdWIiOiIiLCJjcmlkIjoiIiwic3ViX2lkIjoiIiwicm9sZXMiOltdLCJwYXltZW50X2FjY291bnRzIjp7fSwiaXNzIjoiaHR0cHM6Ly9rZXljLnVzcHMuY29tL3JlYWxtcy9VU1BTIiwiY29udHJhY3RzIjp7fSwiZmFzdCI6IiIsImF6cCI6ImhUeG1HZzJ5WHJBUlh5VEFzcUtsaVVYVUFnbnRSeVcxRzNQREFXVHRZekJqWUFDaSIsIm1haWxfb3duZXJzIjpbXSwic2NvcGUiOiJkb21lc3RpYy1wcmljZXMgYWRkcmVzc2VzIGludGVybmF0aW9uYWwtcHJpY2VzIHNlcnZpY2Utc3RhbmRhcmRzIGxvY2F0aW9ucyBzaGlwbWVudHMiLCJjb21wYW55X25hbWUiOiIiLCJleHAiOjE3MzczODE1OTMsImlhdCI6MTczNzM1Mjc5MywianRpIjoiN2YyMGI0YzctMjA1Yy00MGYxLWExY2YtNjMxZmQwZDhkOGE2In0.F5TvXpsCopM7UfnU1AKUEinsVY6QMn22aOKo3t8VYKgdv_eMeWfmVX-iNRop9BgsKN-IHsPT7yHzzchD0VcXFFw2gC1UBnmi6UrAEz3ELBkzTgXH4e8HV96Cv5MzCgF40QjzlK9GnhW67t7zSV8WNkagRkNY9gNQEUwc2loI3fJ36GSrkjDLBMW1Q0vO6cGPFZBfmQVH8Mpt5ptGhiN-tNAGvL6VAgjnm92Uvp2ochnUmgT4Wn4ALP8SWjvjD4mUCHVd1nDP4z4nIpZn5CvTOwKtRlXZLdqO9NISbpUO_tZn5FGpnBnQMHhAttidIivJuHpZYoE_k8-hAqeHOzi_kA';
+my $dbh = myDBI->dbconnect('okmis_config');
+my $s=$dbh->prepare("select access_token from USPSTokens");
+$s->execute();
+my $r = $s->fetchrow_hashref;
+my $USPS_TOKEN = $r->{'access_token'};
+
+
+my $update_token_q=$dbh->prepare("Update USPSTokens set access_token=? WHERE ID = 1");
+
+# print qq|Content-type: text/xml\n\n<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<response>${USPS_TOKEN}</response>\n|;
+
+#     $form->complete();
+#     exit;
+
+my $api_url = "https://apis.usps.com/addresses/v3/address"; # New endpoint
+my $api_key = "OsIAIMJ9I76boItsLnBOeRBIrpQnNOuw42AL9tuuhUEnXmKv"; # Replace with your API key
+
+
+# OAuth 2.0 Credentials
+my $client_id = "hTxmGg2yXrARXyTAsqKliUXUAgntRyW1G3PDAWTtYzBjYACi";
+my $client_secret = "raM669vwDsm6wpoAVq3x3wX2NBPq4ikcqiq1KtWr2zlG4GANcasGR24tmNuzymrl";
+my $custreg_uid = '360287389';
+my $token_url = "https://apis.usps.com/oauth2/v3/token";
+
+# Function to get access token
+sub get_access_token {
+    my $ua = LWP::UserAgent->new;
+    my $req = HTTP::Request->new('POST', $token_url);
+    $req->header('Content-Type' => 'application/x-www-form-urlencoded');
+
+    my $body = "grant_type=client_credentials&client_id=$client_id&client_secret=$client_secret&scope=addresses";
+    $req->content($body);
+
+    my $response = $ua->request($req);
+
+    if ($response->is_success) {
+        my $token_data = decode_json($response->decoded_content);
+        $update_token_q->execute($token_data->{access_token});
+        return $token_data->{access_token};
+    } else {
+        die "Failed to get access token: " . $response->status_line . " " . $client_id . " " . $client_secret;
+    }
 }
 
-###################################################################################
-my $out = '';
-if ( $form->{method} eq 'checkAddress' )
-{
-  my $target = "$form->{'Prefix'}Check_Address_1";
-  my ($err, $script, $content) = ('', '', '');
-
-  if ((keys %parsedData) eq 0)
-  {
-    $err = 'Invalid Address';
-    $script = qq|
-document.getElementsByName('$form->{'Prefix'}addressVerified_1')[0].value = 0;
-|;
-  }
-  else
-  {
-    $script = qq|
-document.getElementsByName('$form->{'Prefix'}City_1')[0].value = "$parsedData{'City'}";
-document.getElementsByName('$form->{'Prefix'}ST_1')[0].value = "$parsedData{'State'}";
-document.getElementsByName('$form->{'Prefix'}Zip_1')[0].value = "$parsedData{'Zip5'}-$parsedData{'Zip4'}";
-document.getElementsByName('$form->{'Prefix'}addressVerified_1')[0].value = 1;
-|;
-    if ($form->{'AddrSize'} eq 2)
-    {
-      $script .= qq|
-document.getElementsByName('$form->{'Prefix'}Addr1_1')[0].value = "$parsedData{'Address2'}";
-document.getElementsByName('$form->{'Prefix'}Addr2_1')[0].value = "";
-|;
-    }
-    if ($form->{'AddrSize'} eq 1)
-    {
-      $script .= qq|
-document.getElementsByName('$form->{'Prefix'}Addr_1')[0].value = "$parsedData{'Address2'}";
-|;
-    }
-    $content = qq|
-<img src="/images/check.jpg" width="20" height="20" style="vertical-align: middle;margin-right: 8px;">
-<span>Verified</span>
-|;
-  }
-
-  $out = $err eq '' ? qq|
-  <command method="setscript">
-    <target>executeit</target>
-    <content><![CDATA[${script}]]></content>
-  </command>
-  <command method="setcontent">
-    <target>${target}</target>
-    <content><![CDATA[${content}]]></content>
-  </command>
-| : main->ierr($target,$err,$script);
+my $access_token = "";
+if($USPS_TOKEN) {
+    $access_token = $USPS_TOKEN;
+} else {
+    $access_token = get_access_token();
 }
 
-###################################################################################
-#warn qq|out=$out\n|;
-$xml = qq|<response>\n${out}</response>|;
-#warn qq|popup: xml=${xml}\n|;
-print qq|Content-type: text/xml
 
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-${xml}
-|;
+sub uspsValidateAddress {
+    my ($form) = @_;
 
-$form->complete();
-exit;
+    try {
+        my $Addr1 = $form->{'Addr1'};
+        my $City = $form->{'City'};
+        my $State = $form->{'State'} eq '' ? 'OK' : $form->{'State'};
 
-###################################################################################
+        my ($Zip5,$Zip4) = split('-',$form->{Zip});
+        $Zip5 = '00000' if ( $Zip5 eq '' );
+        $Zip4 = '0000' if ( $Zip4 eq '' );
 
-#  @details = ();
-#  $DetList = $InfoNode->getElementsByTagName('Det');
-#  $l = $DetList->getLength;
-#  for ($j = 0; $j < $l; $j++) {
-#    $details[$j] = $DetList->item($j)->getFirstChild->getNodeValue;
-#    $details[$j] =~ tr/\n/ /s;
-#  }
-#  if ($#details > 0) {
-#    $html .= " <DL>\n";
-#    $html .= " <DT>Details:\n";
-#    $LI = " <DD>";
-#    $html .= $LI . join("\n" . $LI, @details) . "\n";
-#    $html .= " </DL>\n";
-#  }
-###################################################################################
-sub uspsXML
-{
-  my ($self,$tag,$r) = @_;
-  my $USERID = "773MILLE6990";
-  my $xml;
-  if ( $tag eq 'Address' )
-  {
-    my $State = $r->{'State'} eq '' ? 'OK' : $r->{'State'};
-    my ($Zip5,$Zip4) = split('-',$r->{Zip});
-    $Zip5 = '00000' if ( $Zip5 eq '' );
-    $Zip4 = '0000' if ( $Zip4 eq '' );
-    $xml = qq|API=Verify&XML=<AddressValidateRequest USERID="${USERID}"><Address>|;
-    $xml .= qq|<Address1>$r->{'Addr1'}</Address1>|;   ## unless ( $r->{'Addr1'} eq '' );
-    $xml .= qq|<Address2>$r->{'Addr2'}</Address2>|;   ## unless ( $r->{'Addr2'} eq '' );
-    $xml .= qq|<City>$r->{'City'}</City>|;            ## unless ( $r->{'City'} eq '' );
-    $xml .= qq|<State>${State}</State>|;
-    $xml .= qq|<Zip5>${Zip5}</Zip5>|;
-    $xml .= qq|<Zip4>${Zip4}</Zip4>|;
-    $xml .= qq|</Address></AddressValidateRequest>|;
-  }
-  else { $xml = "<p>uspsXML: tag not recognized! (${tag})</p>"; }
-  #warn qq|xml=$xml\n|;
-  return($xml);
+        my $query = "?streetAddress=${Addr1}&city=${City}&state=${State}&ZIPCode=${Zip5}";
+
+        # Create a user agent
+        my $ua = LWP::UserAgent->new;
+
+        # Create a GET request
+        my $req = HTTP::Request->new(GET => $api_url . $query);
+
+        # Add headers
+        $req->header('accept' => 'application/json');
+        $req->header('x-user-id' => 'XXXXXXXXXXXX');
+        $req->header('authorization' => 'Bearer ' . $access_token); # Ensure $TOKEN is set in the environment
+
+        # Send the request
+        my $response = $ua->request($req);
+
+        # Check the response
+        if ($response->is_success) {
+            $response->decoded_content;
+        } else {
+            if($response->{'error'}->{'errors'}->{'title'} eq "token_expired") {
+                $access_token = get_access_token();
+            } else {
+                return $response->decoded_content;
+            }
+        }
+    } catch {
+            return "caught error: $_";
+    };
+
+
 }
-sub parseTag
-{
-  my ($self,$resp,$tag,@elements) = @_;
-  my %data = ();
-  my $parser = new XML::DOM::Parser;
-  my $RespDoc = $parser->parse($resp);
-  if ($RespDoc->getDocumentElement->getNodeName eq 'Error')
-  { return("<p>usps: error parsing request!</p>\n"); }
 
-  my $InfoList = $RespDoc->getElementsByTagName($tag);
-  my $n = $InfoList->getLength;
-  for (my $i = 0; $i < $n; $i++)
-  {
-    my $InfoNode = $InfoList->item($i);
+eval {
 
-    foreach my $etag ( @elements )
-    {
-      my $val = '';
-      my $el = $InfoNode->getElementsByTagName($etag)->item(0);
-      if ( defined $el ) 
-      {
-        $val = $el->getFirstChild->getNodeValue;
-        $val =~ tr/\n/ /s;
-        $val =~ s/(\w+)/\u\L$1/g if ( $etag ne 'State' );
-        $val =~ s/Po Box /PO Box /g;
-        $val =~ s/ Ne / NE /g;
-        $val =~ s/ Nw / NW /g;
-        $val =~ s/ Se / SE /g;
-        $val =~ s/ Sw / SW /g;
-        $val =~ s/ Ne/ NE/g;
-        $val =~ s/ Nw/ NW/g;
-        $val =~ s/ Se/ SE/g;
-        $val =~ s/ Sw/ SW/g;
+    my $validated_address = uspsValidateAddress($form);
+    my $target = "$form->{'Prefix'}Check_Address_1";
 
-        $data{$etag} = $val;
-      }
+    $validated_address = decode_json($validated_address);
+
+    if($validated_address->{'error'}->{'message'} eq "The access token presented with the request has expired.") {
+        $access_token = get_access_token();
+        $validated_address = "";    
+        $validated_address = uspsValidateAddress($form);
+        $validated_address = decode_json($validated_address);
+    } 
+
+    my $err = 0;
+    my $err_message = ""; 
+    my $script = "";
+    my $content = "";
+
+
+    if($validated_address->{'error'}->{'code'} ne "") {
+        $err = 1;
+        $err_message = "Invalid Address";
+    } else {
+        my $City = $validated_address->{'address'}->{'city'};
+        my $State = $validated_address->{'address'}->{'state'};
+        my $Zip = $validated_address->{'address'}->{'ZIPCode'};
+        my $ZIPPlus4 = $validated_address->{'address'}->{'ZIPPlus4'};
+        my $Addr2 = $validated_address->{'address'}->{'streetAddress'};
+
+        $script = qq|
+          document.getElementsByName('$form->{'Prefix'}City_1')[0].value = "${City}";
+          document.getElementsByName('$form->{'Prefix'}ST_1')[0].value = "${State}";
+          document.getElementsByName('$form->{'Prefix'}Zip_1')[0].value = "${Zip}-${ZIPPlus4}";
+
+          document.getElementsByName('$form->{'Prefix'}addressVerified_1')[0].value = 1;
+        |;
+
+        if ($form->{'AddrSize'} eq 2)
+        {
+          $script .= qq|
+            document.getElementsByName('$form->{'Prefix'}Addr1_1')[0].value = "${Addr2}";
+            document.getElementsByName('$form->{'Prefix'}Addr2_1')[0].value = "";
+          |;
+        }
+        if ($form->{'AddrSize'} eq 1)
+        {
+          $script .= qq|
+            document.getElementsByName('$form->{'Prefix'}Addr_1')[0].value = "${Addr2}";
+          |;
+        }
+        $content = qq|
+            <img src="/images/check.jpg" width="20" height="20" style="vertical-align: middle;margin-right: 8px;">
+            <span>Verified</span>
+            |;
     }
-  }
-  return %data;
+
+    my $out;
+
+    if($err) {
+        $out = main->ierr($target,$err_message);
+    } else {
+        $out = qq|
+          <command method="setscript">
+            <target>executeit</target>
+            <content><![CDATA[${script}]]></content>
+          </command>
+          <command method="setcontent">
+            <target>${target}</target>
+            <content><![CDATA[${content}]]></content>
+          </command>
+        |;
+    }
+
+    my $xml = qq|<response>\n${out}</response>|;
+
+    print qq|Content-type: text/xml\n\n<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n${xml}\n|;
+
+    $form->complete();
+    exit;
+};
+if ($@) {
+    print "Error: $@\n";
 }
 
 ###################################################################################
 sub ierr
 {
-  my ($self,$target,$err,$script) = @_;
+  my ($self,$target,$err) = @_;
 #warn qq|ierr: target=$target\n|;
   my $out = qq|
   <command method="setdefault">
@@ -205,13 +213,7 @@ sub ierr
     <target>${target}</target>
   </command>
 |;
-  if ($script ne '') {
-    $out .= qq|
-  <command method="setscript">
-    <target>executeit</target>
-    <content><![CDATA[${script}]]></content>
-  </command>
-|;
-  }
   return($out);
 }
+
+$s->finish();
