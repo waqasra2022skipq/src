@@ -17,7 +17,7 @@ my $dbh = myDBI->dbconnect($form->{'DBNAME'});
 
 my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
 # join xInsurance needed for withSelection
-my $ClinicSelection = DBA->withSelection($form,'and','Client.clinicClinicID','','','');
+my $ClinicSelection = DBA->withSelection($form,'and','Client.clinicClinicID','Client.ProvID','','');
 my $Header = DBA->withSelectionHeader($form);
 $ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
 my $sProvider = $dbh->prepare("select LName, FName from Provider where ProvID=?");
