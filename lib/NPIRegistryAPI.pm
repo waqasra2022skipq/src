@@ -5,11 +5,15 @@ use JSON;
 use strict;
 use warnings;
 
+use CGI::Carp qw(fatalsToBrowser);
+use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
+
 sub search_api_npi {
-    my ($terms) = @_;
-    my @json    = ();
-    my @data    = ();
-    my @codes   = ();
+    my ( $self, $terms ) = @_;
+
+    my @json  = ();
+    my @data  = ();
+    my @codes = ();
     our %ClinicTypes = ( 'NPI-1' => "Individual", 'NPI-2' => "Organization" );
 
     my $base_url = "https://npiregistry.cms.hhs.gov/api/";
@@ -89,3 +93,4 @@ sub search_api_npi {
 }
 
 1;
+
