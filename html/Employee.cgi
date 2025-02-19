@@ -71,9 +71,10 @@
   </TR>
   <TR ><TD CLASS="port hdrtxt" COLSPAN="4" >Contract Information</TD></TR>
   <TR >
-    <TD CLASS="strcol" >NPI #</TD>
+    <TD CLASS="strcol" >Primary Care Physician</TD>
     <TD CLASS="strcol" >
-      <INPUT TYPE="text" NAME="ProviderControl_NPI_1" VALUE="<<ProviderControl_NPI_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,1000000000)" MAXLENGTH="10" SIZE="10" >
+      Search: <INPUT TYPE="text" ID="SearchPhysNPI" NAME="SearchPhysNPI" VALUE="" ONFOCUS="select()" ONCHANGE="callAjax('Physicians','<<ProviderControl_NPI_1>>','selPhysNPI','&name=ProviderControl_NPI_1&pattern='+this.value,'popup.pl');" SIZE="60" >
+      <BR><SPAN ID="selPhysNPI"></SPAN>
     </TD>
     <TD CLASS="strcol" >Contract Zip</TD>
     <TD CLASS="strcol" >
@@ -566,6 +567,7 @@ document.Employee.elements[0].focus();
 <SCRIPT LANGUAGE="JavaScript" src="/cgi/onet/OnetWebService.js"></SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" src="/cgi/js/vOnetKeywordSearch.js?v=202008070756"></SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" >
+  callAjax('Physicians','<<ProviderControl_NPI_1>>','selPhysNPI','&name=ProviderControl_NPI_1','popup.pl');
 $(document).ready(function() {
   onetAutocomplete('JobClassification_onet_search', 'Provider_JobClassification_1', 'JobClassification_onet_link');
   callAjax('getOccupationInfo','<<Provider_JobClassification_1>>','JobClassification_onet_search','','onet.pl')
