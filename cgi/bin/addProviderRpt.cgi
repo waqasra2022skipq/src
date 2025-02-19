@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use myForm;
 use myDBI;
@@ -8,33 +8,40 @@ use DBA;
 
 ############################################################################
 my $form = myForm->new();
-my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $dbh  = myDBI->dbconnect( $form->{'DBNAME'} );
 my $cdbh = myDBI->dbconnect('okmis_config');
-if ( ! SysAccess->chkPriv($form,'HRReports') )
-{ myDBI->error("Add Provider Report / Access Denied!"); }
+if ( !SysAccess->chkPriv( $form, 'HRReports' ) ) {
+    myDBI->error("Add Provider Report / Access Denied!");
+}
 
 ############################################################################
 warn qq|${PGM}: begin: $form->{submit}, $form->{cancel}, $form->{mlt}\n|;
-if ( $form->{submit} ) { main->submit(); }
-else { main->check(); }
+if   ( $form->{submit} ) { main->submit(); }
+else                     { main->check(); }
 
 myDBI->cleanup();
 exit;
 
 ############################################################################
-sub check
-{
-  my $sxReports = $cdbh->prepare("select * from xReports where Name=?");
-  $sxReports->execute($form->{Name}) || myDBI->dberror("execute error: addProviderRpts/check1");
-  my $rxReports = $sxReports->fetchrow_hashref;
-  my $text;
-  my $sProviderRpts = $dbh->prepare("select * from ProviderRpts where ProvID=? and Name=?");
-  $sProviderRpts->execute($form->{LOGINPROVID},$form->{Name}) || myDBI->dberror("execute error: addProviderRpts/check2");
-  if ( my $rProviderRpts = $sProviderRpts->fetchrow_hashref )
-  { $text = qq|This report is set to run automatically. Do you wish to cancel it?|; }
-  else
-  { $text = qq|This report is not setup to run automatically. Do you wish to add it?|; }
-  print qq|Content-type: text/html\n\n
+sub check {
+    my $sxReports = $cdbh->prepare("select * from xReports where Name=?");
+    $sxReports->execute( $form->{Name} )
+      || myDBI->dberror("execute error: addProviderRpts/check1");
+    my $rxReports = $sxReports->fetchrow_hashref;
+    my $text;
+    my $sProviderRpts =
+      $dbh->prepare("select * from ProviderRpts where ProvID=? and Name=?");
+    $sProviderRpts->execute( $form->{LOGINPROVID}, $form->{Name} )
+      || myDBI->dberror("execute error: addProviderRpts/check2");
+    if ( my $rProviderRpts = $sProviderRpts->fetchrow_hashref ) {
+        $text =
+qq|This report is set to run automatically. Do you wish to cancel it?|;
+    }
+    else {
+        $text =
+qq|This report is not setup to run automatically. Do you wish to add it?|;
+    }
+    print qq|Content-type: text/html\n\n
 <HTML>
 <HEAD> <TITLE>$rxReports->{Descr}</TITLE> </HEAD>
 <BODY >
@@ -49,27 +56,29 @@ sub check
 </BODY>
 </HTML>
 |;
-  return();
+    return ();
 }
-sub submit
-{
-  my $q, $text;
-  my $sProviderRpts = $dbh->prepare("select * from ProviderRpts where ProvID=? and Name=?");
-  $sProviderRpts->execute($form->{LOGINPROVID},$form->{Name}) || myDBI->dberror("execute error: addProviderRpts/check2");
-  if ( my $rProviderRpts = $sProviderRpts->fetchrow_hashref )
-  {
-    $q = qq|delete from ProviderRpts where ProvID='$form->{LOGINPROVID}' and Name='$form->{Name}'|;
-    $text = qq|$form->{Name} report removed.|;
-  my $val = $rProviderRpts->{ID}
-  }
-  else
-  {
-    $q = qq|insert into ProviderRpts (ProvID,Name,CreateProvID,CreateDate,ChangeProvID) VALUES ('$form->{LOGINPROVID}','$form->{Name}','$form->{LOGINPROVID}','$form->{TODAY}','$form->{LOGINPROVID}')|;
-    $text = qq|$form->{Name} report added.|;
-  }
-  my $s = $dbh->prepare($q);
-  $s->execute() || myDBI->dberror("execute error: addProviderRpts/$q");
-  print qq|Content-type: text/html\n\n
+
+sub submit {
+    my $q, $text;
+    my $sProviderRpts =
+      $dbh->prepare("select * from ProviderRpts where ProvID=? and Name=?");
+    $sProviderRpts->execute( $form->{LOGINPROVID}, $form->{Name} )
+      || myDBI->dberror("execute error: addProviderRpts/check2");
+    if ( my $rProviderRpts = $sProviderRpts->fetchrow_hashref ) {
+        $q =
+qq|delete from ProviderRpts where ProvID='$form->{LOGINPROVID}' and Name='$form->{Name}'|;
+        $text = qq|$form->{Name} report removed.|;
+        my $val = $rProviderRpts->{ID};
+    }
+    else {
+        $q =
+qq|insert into ProviderRpts (ProvID,Name,CreateProvID,CreateDate,ChangeProvID) VALUES ('$form->{LOGINPROVID}','$form->{Name}','$form->{LOGINPROVID}','$form->{TODAY}','$form->{LOGINPROVID}')|;
+        $text = qq|$form->{Name} report added.|;
+    }
+    my $s = $dbh->prepare($q);
+    $s->execute() || myDBI->dberror("execute error: addProviderRpts/$q");
+    print qq|Content-type: text/html\n\n
 <HTML>
 <HEAD> <TITLE>$rxReports->{Descr}</TITLE> 
 <script language="JavaScript">
@@ -85,5 +94,5 @@ window.opener.location.href = window.opener.location.href;
 </BODY>
 </HTML>
 |;
-  return();
+    return ();
 }

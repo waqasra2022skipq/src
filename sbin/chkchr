@@ -1,20 +1,19 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBForm;
 $form = DBForm->new();
 my $dbh = $form->dbconnect;
-my $q = qq|select * from $form->{t} where $form->{k}=$form->{v}|;
+my $q   = qq|select * from $form->{t} where $form->{k}=$form->{v}|;
 warn qq|q=$q\n|;
 my $s = $dbh->prepare($q);
 $s->execute() || $form->dberror($q);
-while ( my $r = $s->fetchrow_hashref )
-{
-  print qq|$form->{k}=$r->{$form->{k}}, $form->{f}=$r->{$form->{f}}\n|;
-  foreach $c ( split('',$r->{$form->{f}}) )
-  {
-    my $a=chr(80);
-    my $o=ord($c);
-    print qq|c=$c, a=$a, o=$o\n|;
-  }
+
+while ( my $r = $s->fetchrow_hashref ) {
+    print qq|$form->{k}=$r->{$form->{k}}, $form->{f}=$r->{$form->{f}}\n|;
+    foreach $c ( split( '', $r->{ $form->{f} } ) ) {
+        my $a = chr(80);
+        my $o = ord($c);
+        print qq|c=$c, a=$a, o=$o\n|;
+    }
 }
 exit;

@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 use DBA;
@@ -8,24 +8,31 @@ my $DT = localtime();
 
 ############################################################################
 my $form = DBForm->new();
-my $dbh = $form->dbconnect();
-my $qProvider = qq|select * from Provider where Active=1 and (Provider.ProvID=$form->{LOGINPROVID}|;
-foreach $p ( DBA->getAgencyProvs($form,$form->{ForProvID}) ) { $qProvider .= qq| or Provider.ProvID='${p}' |; }
+my $dbh  = $form->dbconnect();
+my $qProvider =
+qq|select * from Provider where Active=1 and (Provider.ProvID=$form->{LOGINPROVID}|;
+foreach $p ( DBA->getAgencyProvs( $form, $form->{ForProvID} ) ) {
+    $qProvider .= qq| or Provider.ProvID='${p}' |;
+}
 $qProvider .= qq|) order by LName, FName|;
 my $sProvider = $dbh->prepare($qProvider);
-my $sClinic = $dbh->prepare("select * from Provider where ProvID=?");
+my $sClinic   = $dbh->prepare("select * from Provider where ProvID=?");
 print qq|${DT}\nEmail Listing\n|;
-print qq|Provider\tEmail\tWork Phone\tCell\tClinic/Agency\n|; 
+print qq|Provider\tEmail\tWork Phone\tCell\tClinic/Agency\n|;
 $sProvider->execute();
-while ($rProvider = $sProvider->fetchrow_hashref)
-{
-  my $Email = $rProvider->{Email} eq '' ? '(No Email)' : $rProvider->{Email};
-  $Email = $form->{output} eq 'ss' ? $Email : qq|<A HREF=\"mailto:$Email\" >$Email</A>|;
-  my $ClinicID = MgrTree->getClinic($form,$rProvider->{ProvID});
-  $sClinic->execute($ClinicID);
-  $rClinic = $sClinic->fetchrow_hashref;
+while ( $rProvider = $sProvider->fetchrow_hashref ) {
+    my $Email = $rProvider->{Email} eq '' ? '(No Email)' : $rProvider->{Email};
+    $Email =
+        $form->{output} eq 'ss'
+      ? $Email
+      : qq|<A HREF=\"mailto:$Email\" >$Email</A>|;
+    my $ClinicID = MgrTree->getClinic( $form, $rProvider->{ProvID} );
+    $sClinic->execute($ClinicID);
+    $rClinic = $sClinic->fetchrow_hashref;
+
 #warn qq|ProvID=$rProvider->{ProvID}, ClinicID=$ClinicID, ClinicName=$rClinic->{'Name'}\n|;
-  print qq|$rProvider->{LName}, $rProvider->{FName}\t${Email}\t$rProvider->{WkPh}\t$rProvider->{MobPh}\t$rClinic->{'Name'}\n|;
+    print
+qq|$rProvider->{LName}, $rProvider->{FName}\t${Email}\t$rProvider->{WkPh}\t$rProvider->{MobPh}\t$rClinic->{'Name'}\n|;
 }
 $sProvider->finish();
 $sClinic->finish();

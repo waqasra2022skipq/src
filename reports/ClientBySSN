@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 use DBA;
@@ -10,11 +10,13 @@ $DT = localtime();
 # usage:
 #   ClientBySSN ForProvID=id
 ############################################################################
-my $form = DBForm->new();
-my $dbh = $form->dbconnect();
-my $multidel = 'ý';
+my $form      = DBForm->new();
+my $dbh       = $form->dbconnect();
+my $multidel  = 'ý';
 my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
-my $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID','where');
+my $ClinicSelection =
+  DBA->getClinicSelection( $form, $ForProvID, 'Client.clinicClinicID',
+    'where' );
 $ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
 $qClient = qq|select 
      Clinic.Name as Clinic, Client.clinicClinicID
@@ -41,25 +43,30 @@ $qClient = qq|select
   ${ClinicSelection}
   order by Client.SSN, Client.LName, Client.FName
 |;
+
 #warn qq|q=\n$qClient\n|;
 ############################################################################
-my ($SSN,$PrevSSN) = ('','');
-my ($ThisLine,$PrevLine) = ('','');
+my ( $SSN,      $PrevSSN )  = ( '', '' );
+my ( $ThisLine, $PrevLine ) = ( '', '' );
 print qq|${DT}\nDuplicate Clients By SSN Report\n|;
-print qq|Clinic\tLName\tFName\tSSN\tID\tActive\tDOB\tGend\tRace\tAge\tZip\tHomePh\tIntDate\tRefDate\tPrimary Referred By\tSecondary Referred By\tCustAgency\tProvider\tReligion\n|;
+print
+qq|Clinic\tLName\tFName\tSSN\tID\tActive\tDOB\tGend\tRace\tAge\tZip\tHomePh\tIntDate\tRefDate\tPrimary Referred By\tSecondary Referred By\tCustAgency\tProvider\tReligion\n|;
 my $sClient = $dbh->prepare($qClient);
 $sClient->execute() || $form->dberror($qClient);
-while ( my $rClient = $sClient->fetchrow_hashref )
-{
-  $SSN = $rClient->{'SSN'};
-#print qq|$PrevSSN, $SSN\n|;
-  print $PrevLine if ( $SSN eq $PrevSSN );
-  my $Client = qq|$rClient->{LName}, $rClient->{FName} ($rClient->{ClientID})|;
-  my $Provider = qq|$rClient->{ProvLName}, $rClient->{ProvFName} ($rClient->{PrimaryProvID})|;
-  $PrevLine = qq|$rClient->{'Clinic'}\t$rClient->{'LName'}\t$rClient->{'FName'}\t$rClient->{'SSN'}\t$rClient->{'ClientID'}\t$rClient->{'Active'}\t$rClient->{'DOB'}\t$rClient->{'Gend'}\t$rClient->{'Race'}\t$rClient->{'Age'}\t$rClient->{'Zip'}\t$rClient->{'HmPh'}\t$rClient->{'IntDate'}\t$rClient->{'RefDate'}\t$rClient->{'ReferredBy1NPI'}\t$rClient->{'ReferredBy2NPI'}\t$rClient->{'CustAgency'}\t${Provider}\t$rClient->{'ReligionName'}\n|;
-  print $PrevLine if ( $SSN eq $PrevSSN );
+while ( my $rClient = $sClient->fetchrow_hashref ) {
+    $SSN = $rClient->{'SSN'};
 
-  $PrevSSN = $rClient->{'SSN'};
+    #print qq|$PrevSSN, $SSN\n|;
+    print $PrevLine if ( $SSN eq $PrevSSN );
+    my $Client =
+      qq|$rClient->{LName}, $rClient->{FName} ($rClient->{ClientID})|;
+    my $Provider =
+qq|$rClient->{ProvLName}, $rClient->{ProvFName} ($rClient->{PrimaryProvID})|;
+    $PrevLine =
+qq|$rClient->{'Clinic'}\t$rClient->{'LName'}\t$rClient->{'FName'}\t$rClient->{'SSN'}\t$rClient->{'ClientID'}\t$rClient->{'Active'}\t$rClient->{'DOB'}\t$rClient->{'Gend'}\t$rClient->{'Race'}\t$rClient->{'Age'}\t$rClient->{'Zip'}\t$rClient->{'HmPh'}\t$rClient->{'IntDate'}\t$rClient->{'RefDate'}\t$rClient->{'ReferredBy1NPI'}\t$rClient->{'ReferredBy2NPI'}\t$rClient->{'CustAgency'}\t${Provider}\t$rClient->{'ReligionName'}\n|;
+    print $PrevLine if ( $SSN eq $PrevSSN );
+
+    $PrevSSN = $rClient->{'SSN'};
 }
 $sClient->finish();
 $form->complete();

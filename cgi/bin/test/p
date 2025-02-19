@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ############################################################################
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 #
 # Block starter:
 # Import a PDF page containing blocks and fill text and image
@@ -23,265 +23,440 @@ use PDFlib::PDFlib 9.1;
 use strict;
 ############################################################################
 
-my $form = myForm->new();
-my $dbh = myDBI->dbconnect($form->{'DBNAME'});
-my $sTreatment = $dbh->prepare("select * from Treatment where TrID=?");
-my $sProgNotes = $dbh->prepare("select * from ProgNotes where NoteID=?");
-my $sClient = $dbh->prepare("select * from Client where ClientID=?");
+my $form         = myForm->new();
+my $dbh          = myDBI->dbconnect( $form->{'DBNAME'} );
+my $sTreatment   = $dbh->prepare("select * from Treatment where TrID=?");
+my $sProgNotes   = $dbh->prepare("select * from ProgNotes where NoteID=?");
+my $sClient      = $dbh->prepare("select * from Client where ClientID=?");
 my $sClientLegal = $dbh->prepare("select * from ClientLegal where ClientID=?");
-my $sProvider = $dbh->prepare("select * from Provider where ProvID=?");
-my $sInsurance = $dbh->prepare("select Insurance.ClientID,Insurance.InsIDNum,Insurance.InsID,xInsurance.Name from Insurance left join xInsurance on xInsurance.ID=Insurance.InsID where Insurance.ClientID=? and Insurance.InsID=? and Insurance.InsNumEffDate<=? and (?<=Insurance.InsNumExpDate or Insurance.InsNumExpDate is NULL) order by Insurance.InsNumEffDate desc");
-my $sClientNoteProblems = $dbh->prepare("select ClientNoteProblems.ID,ClientNoteProblems.Locked,misICD10.ICD10, misICD10.icdName, misICD10.sctName, DATE_FORMAT(ClientNoteProblems.InitiatedDate,'%m/%d/%Y') as InitiatedDate, DATE_FORMAT(ClientNoteProblems.ResolvedDate,'%m/%d/%Y') as ResolvedDate, ClientNoteProblems.Priority from ClientNoteProblems left join okmis_config.misICD10 on misICD10.ID = ClientNoteProblems.UUID where ClientNoteProblems.TrID=? order by ClientNoteProblems.Priority");
-my $sClientNoteTrPlanPG = $dbh->prepare("select * from ClientNoteTrPlanPG where TrID=? order by Priority");
-my $sClientTrPlanPG = $dbh->prepare("select * from ClientTrPlanPG where ID=? order by Priority");
-my $sClientTrPlanOBJ = $dbh->prepare("select * from ClientTrPlanOBJ where TrPlanPGID=? order by Priority");
+my $sProvider    = $dbh->prepare("select * from Provider where ProvID=?");
+my $sInsurance   = $dbh->prepare(
+"select Insurance.ClientID,Insurance.InsIDNum,Insurance.InsID,xInsurance.Name from Insurance left join xInsurance on xInsurance.ID=Insurance.InsID where Insurance.ClientID=? and Insurance.InsID=? and Insurance.InsNumEffDate<=? and (?<=Insurance.InsNumExpDate or Insurance.InsNumExpDate is NULL) order by Insurance.InsNumEffDate desc"
+);
+my $sClientNoteProblems = $dbh->prepare(
+"select ClientNoteProblems.ID,ClientNoteProblems.Locked,misICD10.ICD10, misICD10.icdName, misICD10.sctName, DATE_FORMAT(ClientNoteProblems.InitiatedDate,'%m/%d/%Y') as InitiatedDate, DATE_FORMAT(ClientNoteProblems.ResolvedDate,'%m/%d/%Y') as ResolvedDate, ClientNoteProblems.Priority from ClientNoteProblems left join okmis_config.misICD10 on misICD10.ID = ClientNoteProblems.UUID where ClientNoteProblems.TrID=? order by ClientNoteProblems.Priority"
+);
+my $sClientNoteTrPlanPG = $dbh->prepare(
+    "select * from ClientNoteTrPlanPG where TrID=? order by Priority");
+my $sClientTrPlanPG =
+  $dbh->prepare("select * from ClientTrPlanPG where ID=? order by Priority");
+my $sClientTrPlanOBJ = $dbh->prepare(
+    "select * from ClientTrPlanOBJ where TrPlanPGID=? order by Priority");
 
-my @alpha = ('','a','b','c','d','e','f','g','h','i','j','l','m');
+my @alpha = ( '', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'l', 'm' );
 
-# This is where the data files are. Adjust as necessary. 
+# This is where the data files are. Adjust as necessary.
 ##use constant searchpath => "/tmp/test/data";
 ##use constant fontpath => "/usr/share/fonts/msttcore";
-use constant outfile => "printNotes2.pdf";
-use constant infile => "printNotes_Rev2.pdf";
+use constant outfile   => "printNotes2.pdf";
+use constant infile    => "printNotes_Rev2.pdf";
 use constant imagefile => "new.jpg";
 
-# Names of the encounter-specific Blocks contained on the imported page 
-my @formblocks = (
-    "b1", "b2", "b4"
-);
-# number of address blocks 
+# Names of the encounter-specific Blocks contained on the imported page
+my @formblocks = ( "b1", "b2", "b4" );
+
+# number of address blocks
 my $nblocks = @formblocks;
-# Static text simulates database-driven main contents 
+
+# Static text simulates database-driven main contents
 my @blockdata = (
-  ["b1", "Dear Paper Planes Fan,"],
-  ["b2",
-    "Our <fillcolor=red>BEST PRICE OFFER<fillcolor=black> includes today:" .
-    "\n\n" .
-    "Long Distance Glider\nWith this paper rocket you can send all your " .
-    "messages even when sitting in a hall or in the cinema pretty near " .
-    "the back.\n\n" .
-    "Giant Wing\nAn unbelievable sailplane! It is amazingly robust and " .
-    "can even do aerobatics. But it is best suited to gliding.\n\n" .
-    "Cone Head Rocket\nThis paper arrow can be thrown with big swing. " .
-    "We launched it from the roof of a hotel. It stayed in the air a " .
-    "long time and covered a considerable distance.\n\n" .
-    "Super Dart\nThe super dart can fly giant loops with a radius of 4 " .
-    "or 5 meters and cover very long distances. Its heavy cone point is " .
-    "slightly bowed upwards to get the lift required for loops.\n\n" .
-    "Visit us on our Web site at www.kraxi.com!"],
-  ["b3", "Yours sincerely,\nVictor Kraxi"]
+    [ "b1", "Dear Paper Planes Fan," ],
+    [
+        "b2",
+        "Our <fillcolor=red>BEST PRICE OFFER<fillcolor=black> includes today:"
+          . "\n\n"
+          . "Long Distance Glider\nWith this paper rocket you can send all your "
+          . "messages even when sitting in a hall or in the cinema pretty near "
+          . "the back.\n\n"
+          . "Giant Wing\nAn unbelievable sailplane! It is amazingly robust and "
+          . "can even do aerobatics. But it is best suited to gliding.\n\n"
+          . "Cone Head Rocket\nThis paper arrow can be thrown with big swing. "
+          . "We launched it from the roof of a hotel. It stayed in the air a "
+          . "long time and covered a considerable distance.\n\n"
+          . "Super Dart\nThe super dart can fly giant loops with a radius of 4 "
+          . "or 5 meters and cover very long distances. Its heavy cone point is "
+          . "slightly bowed upwards to get the lift required for loops.\n\n"
+          . "Visit us on our Web site at www.kraxi.com!"
+    ],
+    [ "b3", "Yours sincerely,\nVictor Kraxi" ]
 );
 
 my $nblockdata = @blockdata;
 
 # ClientID: 60309
 #my @TrIDs = (1059724, 1059727, 1062395);
-my @TrIDs = (1064068,1054278,1057757,1064069,1068111,1037222,1037223,1037225);
+my @TrIDs =
+  ( 1064068, 1054278, 1057757, 1064069, 1068111, 1037222, 1037223, 1037225 );
 my $nTrIDs = @TrIDs;
 
 my @pagehandles = ();
-my $pageno = 0;
-my $objtype; 
+my $pageno      = 0;
+my $objtype;
 
-eval
-{
+eval {
     my $p = new PDFlib::PDFlib;
 
 ##    $p->set_option("SearchPath={{" . searchpath . "}}");
 ##    $p->set_option("SearchPath={{" . fontpath . "}}");
 
-    # This means we must check return values of load_font() etc. 
+    # This means we must check return values of load_font() etc.
     $p->set_option("errorpolicy=return");
 
-    # all strings are expected as utf8 
+    # all strings are expected as utf8
     $p->set_option("stringformat=utf8");
 
-warn qq|create outfile: |.outfile."\n";
-    if ($p->begin_document(outfile,"destination={type=fitwindow} pagelayout=singlepage") == -1)
-    { throw new Exception("Error: " . $p->get_errmsg()); }
+    warn qq|create outfile: | . outfile . "\n";
+    if (
+        $p->begin_document( outfile,
+            "destination={type=fitwindow} pagelayout=singlepage" ) == -1
+      )
+    {
+        throw new Exception( "Error: " . $p->get_errmsg() );
+    }
 
-    $p->set_info("Creator", "PDFlib starter sample");
-    $p->set_info("Title", "starter_block");
+    $p->set_info( "Creator", "PDFlib starter sample" );
+    $p->set_info( "Title",   "starter_block" );
 
 ##    $p->set_option("enumeratefonts saveresources={filename=pdflib.upr}");
 
-    # Open the Block template which contains PDFlib Blocks 
-    my $indoc = $p->open_pdi_document(infile, "");
-    if ($indoc == -1) { die("Error: " . $p->get_errmsg()); }
+    # Open the Block template which contains PDFlib Blocks
+    my $indoc = $p->open_pdi_document( infile, "" );
+    if ( $indoc == -1 ) { die( "Error: " . $p->get_errmsg() ); }
 
-    my  $no_of_input_pages = $p->pcos_get_number($indoc, "length:pages");
+    my $no_of_input_pages = $p->pcos_get_number( $indoc, "length:pages" );
+
     # Prepare all pages of the input document. We assume a small
     # number of input pages and a large number of generated output
     # pages. Therefore it makes sense to keep the input pages
     # open instead of opening the pages again for each encounter.
-     
-    for ($pageno = 1; $pageno <= $no_of_input_pages; $pageno++)
-    {
-      # Open the first page and clone the page size 
-      $pagehandles[$pageno] = $p->open_pdi_page($indoc, $pageno, "cloneboxes");
-      if ($pagehandles[$pageno] == -1) { die("Error: " . $p->get_errmsg()); }
+
+    for ( $pageno = 1 ; $pageno <= $no_of_input_pages ; $pageno++ ) {
+
+        # Open the first page and clone the page size
+        $pagehandles[$pageno] =
+          $p->open_pdi_page( $indoc, $pageno, "cloneboxes" );
+        if ( $pagehandles[$pageno] == -1 ) {
+            die( "Error: " . $p->get_errmsg() );
+        }
     }
 
-    my $image = $p->load_image("auto", imagefile, "");
+    my $image = $p->load_image( "auto", imagefile, "" );
 
-    if ($image == -1) { die("Error: " . $p->get_errmsg()); }
-    
-    # Duplicate input pages for each encounter and fill Blocks 
+    if ( $image == -1 ) { die( "Error: " . $p->get_errmsg() ); }
 
-    for (my $i = 0; $i < $nTrIDs; $i++)
-    {
-      my $TrID = $TrIDs[$i];
-warn qq|add ID: |.$TrID."\n";
-      $sTreatment->execute($TrID) || myDBI->dberror("printNotes: select Treatment ${TrID}");
-      my $rTreatment = $sTreatment->fetchrow_hashref;
-      my $NoteType = $rTreatment->{Type};
-      my $dbilled = DBUtil->Date($rTreatment->{'BillDate'},'fmt','MM/DD/YYYY');
-      my $ClientID = $rTreatment->{'ClientID'};
-      $sClient->execute($ClientID) || myDBI->dberror("printNotes: select Client $ClientID");
-      my $rClient = $sClient->fetchrow_hashref;
-      my $rxSC = cBill->getServiceCode
-                 ($form,$rTreatment->{'SCID'},$rTreatment->{'ContLogDate'},$rTreatment->{'ContLogBegTime'},$rTreatment->{'ContLogEndTime'},$TrID,$rTreatment->{'BillDate'});
-      $sProvider->execute($rTreatment->{'ClinicID'}) || myDBI->dberror("select Clinic $rTreatment->{'ClinicID'}");
-      my $rClinic = $sProvider->fetchrow_hashref;
-      $sClientLegal->execute($ClientID) || myDBI->dberror("printNotes: select ClientLegal $ClientID");
-      my $rClientLegal = $sClientLegal->fetchrow_hashref;
-      $sInsurance->execute($rTreatment->{ClientID},$rxSC->{InsID},$rTreatment->{ContLogDate},$rTreatment->{ContLogDate}) || myDBI->dberror("select Insurance ${TrID} ${ClientID}");
-      my $rInsurance = $sInsurance->fetchrow_hashref;
+    # Duplicate input pages for each encounter and fill Blocks
 
-      my $groupno = $rInsurance->{InsIDNum} !~ /^(\d{3})-(\d{2})-(\d{4})/ ? $rInsurance->{InsIDNum} : '';
-      my $dos = DBUtil->Date($rTreatment->{ContLogDate},'fmt','MM/DD/YYYY');
-      my $stime = DBUtil->AMPM($rTreatment->{ContLogBegTime});
-      my $etime = DBUtil->AMPM($rTreatment->{ContLogEndTime});
-      my $DurationInMinutes = $rxSC->{Duration} / 60;
-    # Header info...
-      my $AgencyID = MgrTree->getAgency($form,$rClient->{clinicClinicID});
-      $sProvider->execute($AgencyID) || myDBI->dberror("execute: sProvider");
-      my $rAgency = $sProvider->fetchrow_hashref;
-      my $AgencyName = $rAgency->{Name};
-      my $AgencyAddr = $rAgency->{Addr1} . ', ';
-      $AgencyAddr .= $rAgency->{Addr2} . ', ' if ( $rAgency->{Addr2} );
-      my $AgencyCSZ .= $rAgency->{City} . ', ' . $rAgency->{ST} . '  ' . $rAgency->{Zip};
-      my $AgencyPh = 'Office: ' . $rAgency->{WkPh} . '  Fax: ' . $rAgency->{Fax};
-        
-      # Loop over all pages of the input document 
-      for ($pageno = 1; $pageno <= $no_of_input_pages; $pageno++)
-      {
-        # Start the next output page. The dummy size will be
-        # replaced with the cloned size of the input page.
-         
-        $p->begin_page_ext(10, 10, "");
+    for ( my $i = 0 ; $i < $nTrIDs ; $i++ ) {
+        my $TrID = $TrIDs[$i];
+        warn qq|add ID: | . $TrID . "\n";
+        $sTreatment->execute($TrID)
+          || myDBI->dberror("printNotes: select Treatment ${TrID}");
+        my $rTreatment = $sTreatment->fetchrow_hashref;
+        my $NoteType   = $rTreatment->{Type};
+        my $dbilled =
+          DBUtil->Date( $rTreatment->{'BillDate'}, 'fmt', 'MM/DD/YYYY' );
+        my $ClientID = $rTreatment->{'ClientID'};
+        $sClient->execute($ClientID)
+          || myDBI->dberror("printNotes: select Client $ClientID");
+        my $rClient = $sClient->fetchrow_hashref;
+        my $rxSC    = cBill->getServiceCode(
+            $form,                           $rTreatment->{'SCID'},
+            $rTreatment->{'ContLogDate'},    $rTreatment->{'ContLogBegTime'},
+            $rTreatment->{'ContLogEndTime'}, $TrID,
+            $rTreatment->{'BillDate'}
+        );
+        $sProvider->execute( $rTreatment->{'ClinicID'} )
+          || myDBI->dberror("select Clinic $rTreatment->{'ClinicID'}");
+        my $rClinic = $sProvider->fetchrow_hashref;
+        $sClientLegal->execute($ClientID)
+          || myDBI->dberror("printNotes: select ClientLegal $ClientID");
+        my $rClientLegal = $sClientLegal->fetchrow_hashref;
+        $sInsurance->execute(
+            $rTreatment->{ClientID},    $rxSC->{InsID},
+            $rTreatment->{ContLogDate}, $rTreatment->{ContLogDate}
+        ) || myDBI->dberror("select Insurance ${TrID} ${ClientID}");
+        my $rInsurance = $sInsurance->fetchrow_hashref;
 
-        # Place the imported page on the output page, and clone all
-        # page boxes which are present in the input page; this will
-        # override the dummy size used in begin_page_ext().
-         
-        $p->fit_pdi_page($pagehandles[$pageno], 0, 0, "cloneboxes");
+        my $groupno =
+            $rInsurance->{InsIDNum} !~ /^(\d{3})-(\d{2})-(\d{4})/
+          ? $rInsurance->{InsIDNum}
+          : '';
+        my $dos =
+          DBUtil->Date( $rTreatment->{ContLogDate}, 'fmt', 'MM/DD/YYYY' );
+        my $stime             = DBUtil->AMPM( $rTreatment->{ContLogBegTime} );
+        my $etime             = DBUtil->AMPM( $rTreatment->{ContLogEndTime} );
+        my $DurationInMinutes = $rxSC->{Duration} / 60;
 
-        # Option list for text blocks 
-        my $optlist = "encoding=winansi embedding";
+        # Header info...
+        my $AgencyID = MgrTree->getAgency( $form, $rClient->{clinicClinicID} );
+        $sProvider->execute($AgencyID) || myDBI->dberror("execute: sProvider");
+        my $rAgency    = $sProvider->fetchrow_hashref;
+        my $AgencyName = $rAgency->{Name};
+        my $AgencyAddr = $rAgency->{Addr1} . ', ';
+        $AgencyAddr .= $rAgency->{Addr2} . ', ' if ( $rAgency->{Addr2} );
+        my $AgencyCSZ .=
+          $rAgency->{City} . ', ' . $rAgency->{ST} . '  ' . $rAgency->{Zip};
+        my $AgencyPh =
+          'Office: ' . $rAgency->{WkPh} . '  Fax: ' . $rAgency->{Fax};
 
-        my $str = qq|${AgencyName}\n${AgencyAddr}\n${AgencyCSZ}\n${AgencyPh}|;
-        if ($p->fill_textblock($pagehandles[$pageno], 'agencyinfo', $str, $optlist) == -1)
-        { printf("Warning: %s\n", $p->get_errmsg()); }
-        if ($p->fill_textblock($pagehandles[$pageno], 'myTitle', "Progress Note # ${TrID}", $optlist) == -1)
-        { printf("Warning: %s\n", $p->get_errmsg()); }
-        my $str = qq|Name: <fontname={Arial Bold} encoding=unicode>$rClient->{'LName'}, $rClient->{'FName'} (${ClientID})|;
-        $str   .= qq|               <fontname={Times New Roman} encoding=unicode>Group #: <fontname={Arial Bold} encoding=unicode>${groupno}\n|;
-        $str   .= qq|<fontname={Times New Roman} encoding=unicode>Type Of Service: <fontname={Arial Bold} encoding=unicode>$rxSC->{SCName}\n|;
-        $str   .= qq|<fontname={Times New Roman} encoding=unicode>Date Of Service: <fontname={Arial Bold} encoding=unicode>${dos}|;
-        $str   .= qq|               <fontname={Times New Roman} encoding=unicode>Start Time: <fontname={Arial Bold} encoding=unicode>${stime}|;
-        $str   .= qq|               <fontname={Times New Roman} encoding=unicode>End Time: <fontname={Arial Bold} encoding=unicode>${etime}|;
-        $str   .= qq|               <fontname={Times New Roman} encoding=unicode>Total Minutes: <fontname={Arial Bold} encoding=unicode>${DurationInMinutes}|;
-        if ($p->fill_textblock($pagehandles[$pageno], 'noteinfo', $str, $optlist) == -1)
-        { printf("Warning: %s\n", $p->get_errmsg()); }
+        # Loop over all pages of the input document
+        for ( $pageno = 1 ; $pageno <= $no_of_input_pages ; $pageno++ ) {
 
-        if ($p->fill_textblock($pagehandles[$pageno], 'problems', 'CLIENT PROBLEMS:', $optlist) == -1)
-        { printf("Warning: %s\n", $p->get_errmsg()); }
-        main->getProblems($p,$TrID);
+            # Start the next output page. The dummy size will be
+            # replaced with the cloned size of the input page.
 
-        $str = main->getPG($p,$TrID);
-        if ($p->fill_textblock($pagehandles[$pageno], 'objectives', $str, $optlist) == -1)
-        { printf("Warning: %s\n", $p->get_errmsg()); }
+            $p->begin_page_ext( 10, 10, "" );
 
-        if ( $NoteType == 1 || $NoteType == 4 )         # progress or medicare
-        {
-          $sProgNotes->execute($TrID) || myDBI->dberror("PrintNotes: select ProgNotes ${TrID}");
-          my $rProgNotes = $sProgNotes->fetchrow_hashref;
-          $str = qq|METHODS USED TO ADDRESS PROBLEMS (What Techniques or Activities Were Used To Work On Problems): 
-<fontname={Arial Bold} encoding=unicode>|.$rProgNotes->{'Methods'};
-          if ($p->fill_textblock($pagehandles[$pageno], 'methods', $str, $optlist) == -1)
-          { printf("Warning: %s\n", $p->get_errmsg()); }
-          $str = qq|PROGRESS MADE TOWARDS GOALS: <fontname={Arial Bold} encoding=unicode>|.DBA->getxref($form,'xProgress',$rProgNotes->{Progress},'Descr').qq|
+            # Place the imported page on the output page, and clone all
+            # page boxes which are present in the input page; this will
+            # override the dummy size used in begin_page_ext().
+
+            $p->fit_pdi_page( $pagehandles[$pageno], 0, 0, "cloneboxes" );
+
+            # Option list for text blocks
+            my $optlist = "encoding=winansi embedding";
+
+            my $str =
+              qq|${AgencyName}\n${AgencyAddr}\n${AgencyCSZ}\n${AgencyPh}|;
+            if (
+                $p->fill_textblock( $pagehandles[$pageno], 'agencyinfo', $str,
+                    $optlist ) == -1
+              )
+            {
+                printf( "Warning: %s\n", $p->get_errmsg() );
+            }
+            if (
+                $p->fill_textblock(
+                    $pagehandles[$pageno],     'myTitle',
+                    "Progress Note # ${TrID}", $optlist
+                ) == -1
+              )
+            {
+                printf( "Warning: %s\n", $p->get_errmsg() );
+            }
+            my $str =
+qq|Name: <fontname={Arial Bold} encoding=unicode>$rClient->{'LName'}, $rClient->{'FName'} (${ClientID})|;
+            $str .=
+qq|               <fontname={Times New Roman} encoding=unicode>Group #: <fontname={Arial Bold} encoding=unicode>${groupno}\n|;
+            $str .=
+qq|<fontname={Times New Roman} encoding=unicode>Type Of Service: <fontname={Arial Bold} encoding=unicode>$rxSC->{SCName}\n|;
+            $str .=
+qq|<fontname={Times New Roman} encoding=unicode>Date Of Service: <fontname={Arial Bold} encoding=unicode>${dos}|;
+            $str .=
+qq|               <fontname={Times New Roman} encoding=unicode>Start Time: <fontname={Arial Bold} encoding=unicode>${stime}|;
+            $str .=
+qq|               <fontname={Times New Roman} encoding=unicode>End Time: <fontname={Arial Bold} encoding=unicode>${etime}|;
+            $str .=
+qq|               <fontname={Times New Roman} encoding=unicode>Total Minutes: <fontname={Arial Bold} encoding=unicode>${DurationInMinutes}|;
+
+            if (
+                $p->fill_textblock( $pagehandles[$pageno],
+                    'noteinfo', $str, $optlist ) == -1
+              )
+            {
+                printf( "Warning: %s\n", $p->get_errmsg() );
+            }
+
+            if (
+                $p->fill_textblock(
+                    $pagehandles[$pageno], 'problems',
+                    'CLIENT PROBLEMS:',    $optlist
+                ) == -1
+              )
+            {
+                printf( "Warning: %s\n", $p->get_errmsg() );
+            }
+            main->getProblems( $p, $TrID );
+
+            $str = main->getPG( $p, $TrID );
+            if (
+                $p->fill_textblock( $pagehandles[$pageno], 'objectives', $str,
+                    $optlist ) == -1
+              )
+            {
+                printf( "Warning: %s\n", $p->get_errmsg() );
+            }
+
+            if ( $NoteType == 1 || $NoteType == 4 )    # progress or medicare
+            {
+                $sProgNotes->execute($TrID)
+                  || myDBI->dberror("PrintNotes: select ProgNotes ${TrID}");
+                my $rProgNotes = $sProgNotes->fetchrow_hashref;
+                $str =
+qq|METHODS USED TO ADDRESS PROBLEMS (What Techniques or Activities Were Used To Work On Problems): 
+<fontname={Arial Bold} encoding=unicode>| . $rProgNotes->{'Methods'};
+                if (
+                    $p->fill_textblock( $pagehandles[$pageno],
+                        'methods', $str, $optlist ) == -1
+                  )
+                {
+                    printf( "Warning: %s\n", $p->get_errmsg() );
+                }
+                $str =
+qq|PROGRESS MADE TOWARDS GOALS: <fontname={Arial Bold} encoding=unicode>|
+                  . DBA->getxref( $form, 'xProgress', $rProgNotes->{Progress},
+                    'Descr' )
+                  . qq|
 <fontname={Times New Roman} encoding=unicode>As Evidenced By:
-<fontname={Arial Bold} encoding=unicode>|.$rProgNotes->{'ProgEvidence'};
-          if ($p->fill_textblock($pagehandles[$pageno], 'progress', $str, $optlist) == -1)
-          { printf("Warning: %s\n", $p->get_errmsg()); }
+<fontname={Arial Bold} encoding=unicode>| . $rProgNotes->{'ProgEvidence'};
+                if (
+                    $p->fill_textblock( $pagehandles[$pageno],
+                        'progress', $str, $optlist ) == -1
+                  )
+                {
+                    printf( "Warning: %s\n", $p->get_errmsg() );
+                }
 ##my $YesNo = $rProgNotes->{'NewProblems'} eq 1 ? 'Yes' : 'No';
 ##$str = qq|NEW NEED(S), GOALS AND/OR OBJECTIVES IDENTIFIED DURING SESSION: <fontname={Arial Bold} encoding=unicode>${YesNo}
 ##<fontname={Times New Roman} encoding=unicode>If Yes, Describe Below:
 ##<fontname={Arial Bold} encoding=unicode>|.$rProgNotes->{'NewProblems'};
-          my $newproblems = $rProgNotes->{'NewProblems'} eq ''
-                          ? "<fontname={Arial Bold} encoding=unicode>None"
-                          : "<fontname={Times New Roman} encoding=unicode>Describe Below:\n<fontname={Arial Bold} encoding=unicode>".$rProgNotes->{'NewProblems'};
-          $str = qq|NEW NEED(S), GOALS AND/OR OBJECTIVES IDENTIFIED DURING SESSION:\n${newproblems}|;
-          if ($p->fill_textblock($pagehandles[$pageno], 'newproblems', $str, $optlist) == -1)
-          { printf("Warning: %s\n", $p->get_errmsg()); }
-          my $cGAF = $rProgNotes->{'GAFCurrent'} eq '' ? "<fontname={Arial Bold} encoding=unicode>None"
-                                                       : "<fontname={Arial Bold} encoding=unicode>$rProgNotes->{'GAFCurrent'}";
-          my $pGAF = $rProgNotes->{'GAFRecent'} eq '' ? "<fontname={Arial Bold} encoding=unicode>None"
-                                                      : "<fontname={Arial Bold} encoding=unicode>$rProgNotes->{'GAFRecent'}";
-          $str = qq|LEVEL OF FUNCTIONING ASSESSMENT GAF: CURRENT: ${cGAF} <fontname={Times New Roman} encoding=unicode>RECENT PAST (30 DAYS): ${pGAF}
-|.$rProgNotes->{'CrisisText'};
-          if ($p->fill_textblock($pagehandles[$pageno], 'crisis', $str, $optlist) == -1)
-          { printf("Warning: %s\n", $p->get_errmsg()); }
-        }
-        my $completedby = "Electronically Signed By: ".DBA->setProvCreds($form,$rTreatment->{'ProvID'},$rxSC->{InsID},$rTreatment->{'ProvOKDate'},$rTreatment->{'ProvOKTime'});
-        #my $enteredby = $rTreatment->{'EnteredBy'} == $rTreatment->{'ProvID'} ? '' : "                      Entered By: ".DBA->setProvCreds($form,$rTreatment->{'EnteredBy'},$rxSC->{InsID},$rTreatment->{'ChartEntryDate'});
-        my $enteredby = "                      Entered By: ".DBA->setProvCreds($form,$rTreatment->{'EnteredBy'},$rxSC->{InsID},$rTreatment->{'ChartEntryDate'});
-        #my $approvedby = $rTreatment->{'MgrProvID'} == $rTreatment->{'ProvID'} ? '' : "                   Approved By: ".DBA->setProvCreds($form,$rTreatment->{'MgrProvID'},$rxSC->{InsID},$rTreatment->{'MgrRevDate'},$rTreatment->{'MgrRevTime'});
-        my $approvedby = "                   Approved By: ".DBA->setProvCreds($form,$rTreatment->{'MgrProvID'},$rxSC->{InsID},$rTreatment->{'MgrRevDate'},$rTreatment->{'MgrRevTime'});
-        $str = $completedby."\n".$enteredby."\n".$approvedby."\n";
-        if ($p->fill_textblock($pagehandles[$pageno], 'completedby', $str, $optlist) == -1)
-        { printf("Warning: %s\n", $p->get_errmsg()); }
+                my $newproblems =
+                  $rProgNotes->{'NewProblems'} eq ''
+                  ? "<fontname={Arial Bold} encoding=unicode>None"
+                  : "<fontname={Times New Roman} encoding=unicode>Describe Below:\n<fontname={Arial Bold} encoding=unicode>"
+                  . $rProgNotes->{'NewProblems'};
+                $str =
+qq|NEW NEED(S), GOALS AND/OR OBJECTIVES IDENTIFIED DURING SESSION:\n${newproblems}|;
+                if (
+                    $p->fill_textblock(
+                        $pagehandles[$pageno], 'newproblems',
+                        $str,                  $optlist
+                    ) == -1
+                  )
+                {
+                    printf( "Warning: %s\n", $p->get_errmsg() );
+                }
+                my $cGAF =
+                  $rProgNotes->{'GAFCurrent'} eq ''
+                  ? "<fontname={Arial Bold} encoding=unicode>None"
+                  : "<fontname={Arial Bold} encoding=unicode>$rProgNotes->{'GAFCurrent'}";
+                my $pGAF =
+                  $rProgNotes->{'GAFRecent'} eq ''
+                  ? "<fontname={Arial Bold} encoding=unicode>None"
+                  : "<fontname={Arial Bold} encoding=unicode>$rProgNotes->{'GAFRecent'}";
+                $str =
+qq|LEVEL OF FUNCTIONING ASSESSMENT GAF: CURRENT: ${cGAF} <fontname={Times New Roman} encoding=unicode>RECENT PAST (30 DAYS): ${pGAF}
+| . $rProgNotes->{'CrisisText'};
+                if (
+                    $p->fill_textblock( $pagehandles[$pageno],
+                        'crisis', $str, $optlist ) == -1
+                  )
+                {
+                    printf( "Warning: %s\n", $p->get_errmsg() );
+                }
+            }
+            my $completedby = "Electronically Signed By: "
+              . DBA->setProvCreds(
+                $form, $rTreatment->{'ProvID'},
+                $rxSC->{InsID},
+                $rTreatment->{'ProvOKDate'},
+                $rTreatment->{'ProvOKTime'}
+              );
 
-        # Loop over all encounter-specific Blocks. Fill each
-        # Block with the corresponding person's address data.
-        for (my $j = 0; $j < $nblocks; $j++)
-        {
-          # Check whether the Block is present on the imported page;
-          # type "dictionary" means that the Block is present.
-           
-          $objtype = $p->pcos_get_string($indoc, "type:pages[" . ($pageno-1) . "]/blocks/" . $formblocks[$j]);
-          if ($objtype eq "dict")
-          {
-            my $str = $i.' <fontname={NotoSerif-Regular} encoding=unicode fontsize=20> this is block: '.$formblocks[$j];
-            if ($p->fill_textblock($pagehandles[$pageno], $formblocks[$j], $str, $optlist) == -1)
-            { printf("Warning: %s\n", $p->get_errmsg()); }
-          }
+#my $enteredby = $rTreatment->{'EnteredBy'} == $rTreatment->{'ProvID'} ? '' : "                      Entered By: ".DBA->setProvCreds($form,$rTreatment->{'EnteredBy'},$rxSC->{InsID},$rTreatment->{'ChartEntryDate'});
+            my $enteredby = "                      Entered By: "
+              . DBA->setProvCreds(
+                $form,          $rTreatment->{'EnteredBy'},
+                $rxSC->{InsID}, $rTreatment->{'ChartEntryDate'}
+              );
+
+#my $approvedby = $rTreatment->{'MgrProvID'} == $rTreatment->{'ProvID'} ? '' : "                   Approved By: ".DBA->setProvCreds($form,$rTreatment->{'MgrProvID'},$rxSC->{InsID},$rTreatment->{'MgrRevDate'},$rTreatment->{'MgrRevTime'});
+            my $approvedby = "                   Approved By: "
+              . DBA->setProvCreds(
+                $form, $rTreatment->{'MgrProvID'},
+                $rxSC->{InsID},
+                $rTreatment->{'MgrRevDate'},
+                $rTreatment->{'MgrRevTime'}
+              );
+            $str = $completedby . "\n" . $enteredby . "\n" . $approvedby . "\n";
+            if (
+                $p->fill_textblock( $pagehandles[$pageno], 'completedby', $str,
+                    $optlist ) == -1
+              )
+            {
+                printf( "Warning: %s\n", $p->get_errmsg() );
+            }
+
+            # Loop over all encounter-specific Blocks. Fill each
+            # Block with the corresponding person's address data.
+            for ( my $j = 0 ; $j < $nblocks ; $j++ ) {
+
+                # Check whether the Block is present on the imported page;
+                # type "dictionary" means that the Block is present.
+
+                $objtype = $p->pcos_get_string( $indoc,
+                        "type:pages["
+                      . ( $pageno - 1 )
+                      . "]/blocks/"
+                      . $formblocks[$j] );
+                if ( $objtype eq "dict" ) {
+                    my $str =
+                        $i
+                      . ' <fontname={NotoSerif-Regular} encoding=unicode fontsize=20> this is block: '
+                      . $formblocks[$j];
+                    if (
+                        $p->fill_textblock(
+                            $pagehandles[$pageno], $formblocks[$j],
+                            $str,                  $optlist
+                        ) == -1
+                      )
+                    {
+                        printf( "Warning: %s\n", $p->get_errmsg() );
+                    }
+                }
+            }
+            my $CustAgency = DBA->getxref( $form, 'xCustAgency',
+                $rClientLegal->{'CustAgency'}, 'Descr' );
+            my $jolts =
+              $rClientLegal->{'JOLTS'} eq ''
+              ? ''
+              : qq|JOLTS: $rClientLegal->{'JOLTS'}|;
+            my $caseid =
+              $rClientLegal->{'CASEID'} eq ''
+              ? ''
+              : qq|CASEID: $rClientLegal->{'CASEID'}|;
+            my $cagency =
+              qq|${CustAgency} ${jolts} ${caseid}|;    # Append to CustAgency.
+
+            #$rClinic->{'Name'} .= qq|REDUCE LINE TEST|;
+            #$cagency .= qq|TEST TO REDUCE LINE|;
+            my $str =
+qq|Service Code: <fontname={Arial Bold} encoding=unicode>$rxSC->{'SCNum'}|;
+            $str .=
+qq|     <fontname={Times New Roman} encoding=unicode>Total Units: <fontname={Arial Bold} encoding=unicode>$rTreatment->{'Units'}|;
+            $str .=
+qq|     <fontname={Times New Roman} encoding=unicode>Date Billed: <fontname={Arial Bold} encoding=unicode>${dbilled}|;
+            $str .=
+qq|     <fontname={Times New Roman} encoding=unicode>By: <fontname={Arial Bold} encoding=unicode>$rClinic->{Name}|;
+            $str .=
+qq|     <fontname={Times New Roman} encoding=unicode>Custody Agency: <fontname={Arial Bold} encoding=unicode>${cagency}|;
+            if (
+                $p->fill_textblock( $pagehandles[$pageno], 'noteinfo2', $str,
+                    $optlist ) == -1
+              )
+            {
+                printf( "Warning: %s\n", $p->get_errmsg() );
+            }
+            if (
+                $p->fill_textblock(
+                    $pagehandles[$pageno],
+                    'myFooter',
+"Confidentiality of drug/alcohol abuse records is protected by Federal Law. Federal regulations (42 CFR, Part 2 prohibits making any further disclosure of this information unless further disclosure is expressively permitted by written consent of the person to whom it pertains or as otherwise permitted by 42 CFR, Part 2. A GENERAL AUTHORIZATION FOR RELEASE OF MEDICAL OR OTHER INFORMATION IS NOT SUFFICIENT FOR THIS PURPOSE. The Federal rules restrict any use of the information to criminally investigate or prosecute any alcohol/drug abuse client.",
+                    $optlist
+                ) == -1
+              )
+            {
+                printf( "Warning: %s\n", $p->get_errmsg() );
+            }
+
+            $p->end_page_ext("");
         }
-        my $CustAgency = DBA->getxref($form,'xCustAgency',$rClientLegal->{'CustAgency'},'Descr');
-        my $jolts = $rClientLegal->{'JOLTS'} eq '' ? '' : qq|JOLTS: $rClientLegal->{'JOLTS'}|;
-        my $caseid = $rClientLegal->{'CASEID'} eq '' ? '' : qq|CASEID: $rClientLegal->{'CASEID'}|;
-        my $cagency = qq|${CustAgency} ${jolts} ${caseid}|;         # Append to CustAgency.
-#$rClinic->{'Name'} .= qq|REDUCE LINE TEST|;
-#$cagency .= qq|TEST TO REDUCE LINE|;
-        my $str = qq|Service Code: <fontname={Arial Bold} encoding=unicode>$rxSC->{'SCNum'}|;
-        $str   .= qq|     <fontname={Times New Roman} encoding=unicode>Total Units: <fontname={Arial Bold} encoding=unicode>$rTreatment->{'Units'}|;
-        $str   .= qq|     <fontname={Times New Roman} encoding=unicode>Date Billed: <fontname={Arial Bold} encoding=unicode>${dbilled}|;
-        $str   .= qq|     <fontname={Times New Roman} encoding=unicode>By: <fontname={Arial Bold} encoding=unicode>$rClinic->{Name}|;
-        $str   .= qq|     <fontname={Times New Roman} encoding=unicode>Custody Agency: <fontname={Arial Bold} encoding=unicode>${cagency}|;
-        if ($p->fill_textblock($pagehandles[$pageno], 'noteinfo2', $str, $optlist) == -1)
-        { printf("Warning: %s\n", $p->get_errmsg()); }
-        if ($p->fill_textblock($pagehandles[$pageno], 'myFooter', "Confidentiality of drug/alcohol abuse records is protected by Federal Law. Federal regulations (42 CFR, Part 2 prohibits making any further disclosure of this information unless further disclosure is expressively permitted by written consent of the person to whom it pertains or as otherwise permitted by 42 CFR, Part 2. A GENERAL AUTHORIZATION FOR RELEASE OF MEDICAL OR OTHER INFORMATION IS NOT SUFFICIENT FOR THIS PURPOSE. The Federal rules restrict any use of the information to criminally investigate or prosecute any alcohol/drug abuse client.", $optlist) == -1)
-        { printf("Warning: %s\n", $p->get_errmsg()); }
-        
-        $p->end_page_ext("");
-      }
     }
 
-    # Close all input pages 
-    for ($pageno = 1; $pageno <= $no_of_input_pages; $pageno++)
-    { $p->close_pdi_page($pagehandles[$pageno]); }
+    # Close all input pages
+    for ( $pageno = 1 ; $pageno <= $no_of_input_pages ; $pageno++ ) {
+        $p->close_pdi_page( $pagehandles[$pageno] );
+    }
     $p->close_pdi_document($indoc);
     $p->close_image($image);
 
@@ -302,115 +477,156 @@ $sClientTrPlanOBJ->finish();
 myDBI->cleanup();
 exit;
 ############################################################################
-sub getProblems
-{
-  my ($self,$p,$TrID) = @_;
-  my $x_table = 35;
-  my $tablewidth = 495;
+sub getProblems {
+    my ( $self, $p, $TrID ) = @_;
+    my $x_table    = 35;
+    my $tablewidth = 495;
 
-  my $fontsize = 10;
+    my $fontsize = 10;
 
-  my $fontname= "TimesNewRomanPSMT";
-  my $basefontoptions = "";
-  my $optlist;
+    my $fontname        = "TimesNewRomanPSMT";
+    my $basefontoptions = "";
+    my $optlist;
 
-  my @headers = ( "ICD10", "NAME", "INITIATED", "RESOLVED");
-  my @alignments = ( "center", "left", "center", "center");
+    my @headers    = ( "ICD10",  "NAME", "INITIATED", "RESOLVED" );
+    my @alignments = ( "center", "left", "center",    "center" );
 
-  $basefontoptions = "fontname=" . $fontname . " fontsize=" . 
-            $fontsize . " embedding encoding=unicode";
+    $basefontoptions =
+        "fontname="
+      . $fontname
+      . " fontsize="
+      . $fontsize
+      . " embedding encoding=unicode";
 
-  # -----------------------------------
-  # Create and place table with article list
-  # -----------------------------------
-        
-  # ---------- Header row 
-  my $row = 1;
-  my $col = 1;
-  my $tbl = -1; 
-  my $buf;
+    # -----------------------------------
+    # Create and place table with article list
+    # -----------------------------------
 
-  for ($col=1; $col <= $#headers+1; $col++)
-  {
-    $optlist =  "fittextline={position={" . $alignments[$col-1] . 
-                " center} " . $basefontoptions . "} margin=2";
-    $tbl = $p->add_table_cell($tbl, $col, $row, $headers[$col-1], $optlist);
-  }
-  $row++;
+    # ---------- Header row
+    my $row = 1;
+    my $col = 1;
+    my $tbl = -1;
+    my $buf;
 
-  # ---------- Data rows: one for each article 
-  my $total = 0;
-
-  ##      for (my $i = 0; $i <  $#data+1; $i++) {
-#KLS
-  $sClientNoteProblems->execute($TrID);
-  while (my $rClientNoteProblems = $sClientNoteProblems->fetchrow_hashref) 
-  {
-    $col = 1;                      # column 1: ICD10 
-    #$buf = sprintf("%d", $i + 1);
-    $buf = $rClientNoteProblems->{'ICD10'};
-#warn qq|buf=${buf}, row=${row}, col=${col}\n|;
-    $optlist = "fittextline={position={" . $alignments[$col-1] . 
-                " center} " . $basefontoptions . "} margin=2";
-    $tbl = $p->add_table_cell($tbl, $col, $row, $buf, $optlist);
-
-    $col=2;                        # column 2: NAME 
-    $buf = $rClientNoteProblems->{'icdName'};
-#warn qq|buf=${buf}, row=${row}, col=${col}\n|;
-    $optlist = "fittextline={position={" . $alignments[$col-1] . 
-                " center} " . $basefontoptions . "} colwidth=60% margin=2";
-    $tbl = $p->add_table_cell($tbl, $col, $row, $buf, $optlist);
-
-    $col=3;                        # column 3: INITIATE DATE 
-    $buf = DBUtil->Date($rClientNoteProblems->{'InitiatedDate'},'fmt','MM/DD/YYYY');
-#warn qq|buf=${buf}, row=${row}, col=${col}\n|;
-    $optlist = "fittextline={position={" . $alignments[$col-1] . 
-                " center} " . $basefontoptions . "} margin=2";
-    $tbl = $p->add_table_cell($tbl, $col, $row, $buf, $optlist);
-
-    $col=4;                        # column 4: INITIATE DATE 
-    $buf = DBUtil->Date($rClientNoteProblems->{'ResolvedDate'},'fmt','MM/DD/YYYY');
-#warn qq|buf=${buf}, row=${row}, col=${col}\n|;
-    $optlist = "fittextline={position={" . $alignments[$col-1] . 
-                " center} " . $basefontoptions . "} margin=2";
-    $tbl = $p->add_table_cell($tbl, $col, $row, $buf, $optlist);
-
-    $row++;
-  }
-
-  my $top = 635;
-  # Place the table on the page; Shade every other row. 
-  $optlist =  "header=1 fill={{area=rowodd fillcolor={gray 0.9}}} ";
-  my $result = $p->fit_table($tbl, $x_table, $top, $x_table+$tablewidth, 20, $optlist);
-  if ($result eq "_error") { throw new Exception("Couldn't place table: " . $p->get_errmsg()); }
-  $p->delete_table($tbl, "");
-}
-sub getPG
-{
-  my ($self,$p,$TrID) = @_;
-  my $out = qq|SPECIFIC PROBLEM(S) ADDRESSED (As Identified On Comprehensive Treatment Plan):
-<fontname={Arial Bold} encoding=unicode>|;
-  $sClientNoteTrPlanPG->execute($TrID) || myDBI->dberror("printNotes: select ClientNoteTrPlanPG ${TrID}");
-  while ( my $rClientNoteTrPlanPG = $sClientNoteTrPlanPG->fetchrow_hashref )
-  {
-    $sClientTrPlanPG->execute($rClientNoteTrPlanPG->{'TrPlanPGID'}) 
-                      || myDBI->dberror("printNotes: select ClientTrPlanPG $rClientNoteTrPlanPG->{'TrPlanPGID'}");
-    while ( my $rClientTrPlanPG = $sClientTrPlanPG->fetchrow_hashref )
-    {
-      my $Priority = int($rClientTrPlanPG->{'Priority'}/10);
-      $out .= "#".$Priority.": Problem: ".$rClientTrPlanPG->{'Prob'}."\n";
-      $out .= "\tGoal: ".$rClientTrPlanPG->{'Goal'}."\n";
-      my $cnt = 0;
-      $sClientTrPlanOBJ->execute($rClientTrPlanPG->{'TrPlanPGID'}) || myDBI->dberror("printNotes: select ClientTrPlanOBJ $rClientTrPlanPG->{'ID'}");
-      while ( my $rClientTrPlanOBJ = $sClientTrPlanOBJ->fetchrow_hashref )
-      {
-        $cnt++;
-        my $ltr = @alpha[$cnt];
-#warn qq|printNotes: ClientNoteTrPlanPG: ID=$rClientNoteTrPlanPG->{ID}\n|;
-        $out = "\t\tObjective ${Priority}${ltr}: ".$rClientNoteTrPlanPG->{'Obj'}."\n";
-      }
+    for ( $col = 1 ; $col <= $#headers + 1 ; $col++ ) {
+        $optlist =
+            "fittextline={position={"
+          . $alignments[ $col - 1 ]
+          . " center} "
+          . $basefontoptions
+          . "} margin=2";
+        $tbl = $p->add_table_cell( $tbl, $col, $row, $headers[ $col - 1 ],
+            $optlist );
     }
-  }
-  return($out);
+    $row++;
+
+    # ---------- Data rows: one for each article
+    my $total = 0;
+
+    ##      for (my $i = 0; $i <  $#data+1; $i++) {
+    #KLS
+    $sClientNoteProblems->execute($TrID);
+    while ( my $rClientNoteProblems = $sClientNoteProblems->fetchrow_hashref ) {
+        $col = 1;                                 # column 1: ICD10
+                                                  #$buf = sprintf("%d", $i + 1);
+        $buf = $rClientNoteProblems->{'ICD10'};
+
+        #warn qq|buf=${buf}, row=${row}, col=${col}\n|;
+        $optlist =
+            "fittextline={position={"
+          . $alignments[ $col - 1 ]
+          . " center} "
+          . $basefontoptions
+          . "} margin=2";
+        $tbl = $p->add_table_cell( $tbl, $col, $row, $buf, $optlist );
+
+        $col = 2;                                   # column 2: NAME
+        $buf = $rClientNoteProblems->{'icdName'};
+
+        #warn qq|buf=${buf}, row=${row}, col=${col}\n|;
+        $optlist =
+            "fittextline={position={"
+          . $alignments[ $col - 1 ]
+          . " center} "
+          . $basefontoptions
+          . "} colwidth=60% margin=2";
+        $tbl = $p->add_table_cell( $tbl, $col, $row, $buf, $optlist );
+
+        $col = 3;                                   # column 3: INITIATE DATE
+        $buf = DBUtil->Date( $rClientNoteProblems->{'InitiatedDate'},
+            'fmt', 'MM/DD/YYYY' );
+
+        #warn qq|buf=${buf}, row=${row}, col=${col}\n|;
+        $optlist =
+            "fittextline={position={"
+          . $alignments[ $col - 1 ]
+          . " center} "
+          . $basefontoptions
+          . "} margin=2";
+        $tbl = $p->add_table_cell( $tbl, $col, $row, $buf, $optlist );
+
+        $col = 4;    # column 4: INITIATE DATE
+        $buf = DBUtil->Date( $rClientNoteProblems->{'ResolvedDate'},
+            'fmt', 'MM/DD/YYYY' );
+
+        #warn qq|buf=${buf}, row=${row}, col=${col}\n|;
+        $optlist =
+            "fittextline={position={"
+          . $alignments[ $col - 1 ]
+          . " center} "
+          . $basefontoptions
+          . "} margin=2";
+        $tbl = $p->add_table_cell( $tbl, $col, $row, $buf, $optlist );
+
+        $row++;
+    }
+
+    my $top = 635;
+
+    # Place the table on the page; Shade every other row.
+    $optlist = "header=1 fill={{area=rowodd fillcolor={gray 0.9}}} ";
+    my $result = $p->fit_table( $tbl, $x_table, $top, $x_table + $tablewidth,
+        20, $optlist );
+    if ( $result eq "_error" ) {
+        throw new Exception( "Couldn't place table: " . $p->get_errmsg() );
+    }
+    $p->delete_table( $tbl, "" );
+}
+
+sub getPG {
+    my ( $self, $p, $TrID ) = @_;
+    my $out =
+qq|SPECIFIC PROBLEM(S) ADDRESSED (As Identified On Comprehensive Treatment Plan):
+<fontname={Arial Bold} encoding=unicode>|;
+    $sClientNoteTrPlanPG->execute($TrID)
+      || myDBI->dberror("printNotes: select ClientNoteTrPlanPG ${TrID}");
+    while ( my $rClientNoteTrPlanPG = $sClientNoteTrPlanPG->fetchrow_hashref ) {
+        $sClientTrPlanPG->execute( $rClientNoteTrPlanPG->{'TrPlanPGID'} )
+          || myDBI->dberror(
+"printNotes: select ClientTrPlanPG $rClientNoteTrPlanPG->{'TrPlanPGID'}"
+          );
+        while ( my $rClientTrPlanPG = $sClientTrPlanPG->fetchrow_hashref ) {
+            my $Priority = int( $rClientTrPlanPG->{'Priority'} / 10 );
+            $out .= "#"
+              . $Priority
+              . ": Problem: "
+              . $rClientTrPlanPG->{'Prob'} . "\n";
+            $out .= "\tGoal: " . $rClientTrPlanPG->{'Goal'} . "\n";
+            my $cnt = 0;
+            $sClientTrPlanOBJ->execute( $rClientTrPlanPG->{'TrPlanPGID'} )
+              || myDBI->dberror(
+                "printNotes: select ClientTrPlanOBJ $rClientTrPlanPG->{'ID'}");
+            while ( my $rClientTrPlanOBJ = $sClientTrPlanOBJ->fetchrow_hashref )
+            {
+                $cnt++;
+                my $ltr = @alpha[$cnt];
+
+      #warn qq|printNotes: ClientNoteTrPlanPG: ID=$rClientNoteTrPlanPG->{ID}\n|;
+                $out = "\t\tObjective ${Priority}${ltr}: "
+                  . $rClientNoteTrPlanPG->{'Obj'} . "\n";
+            }
+        }
+    }
+    return ($out);
 }
 ############################################################################

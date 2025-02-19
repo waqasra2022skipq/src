@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ############################################################################
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 use SysAccess;
@@ -10,21 +10,22 @@ use myHTML;
 ############################################################################
 $form = DBForm->new();
 my $ClientID = $form->{'Client_ClientID'};
-unless ( SysAccess->verify($form,'hasClientAccess',$ClientID) )
-{ $form->error("List Insurance Payments Access Page / Not Client"); }
+unless ( SysAccess->verify( $form, 'hasClientAccess', $ClientID ) ) {
+    $form->error("List Insurance Payments Access Page / Not Client");
+}
 
-my $addLinks = qq|mlt=$form->{mlt}&misLINKS=$form->{misLINKS}|;
-my $BackLinks = gHTML->setLINKS($form,'back');
+my $addLinks  = qq|mlt=$form->{mlt}&misLINKS=$form->{misLINKS}|;
+my $BackLinks = gHTML->setLINKS( $form, 'back' );
 $form->{'FORMID'} = $form->getFORMID;
 
-my $dbh = $form->dbconnect();
+my $dbh     = $form->dbconnect();
 my $sClient = $dbh->prepare("select * from Client where ClientID=?");
 $sClient->execute($ClientID);
-my $rClient = $sClient->fetchrow_hashref;
+my $rClient    = $sClient->fetchrow_hashref;
 my $ClientName = qq|$rClient->{FName} $rClient->{LName} ($rClient->{ClientID})|;
-my $sProvider = $dbh->prepare("select * from Provider where ProvID=?");
+my $sProvider  = $dbh->prepare("select * from Provider where ProvID=?");
 ############################################################################
-my $html = myHTML->newPage($form,"Insurance Payments") . qq|
+my $html = myHTML->newPage( $form, "Insurance Payments" ) . qq|
 <FORM NAME="List" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
 <SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript"> function validate(form) { return(1); } </SCRIPT>
@@ -45,7 +46,7 @@ my $html = myHTML->newPage($form,"Insurance Payments") . qq|
   </TR>
 </TABLE>
 |;
-$html .= main->List($form,$ClientID);
+$html .= main->List( $form, $ClientID );
 $html .= qq|
 <INPUT TYPE="hidden" NAME="FORMID" VALUE="$form->{FORMID}" >
 <INPUT TYPE="hidden" NAME="mlt" VALUE="$form->{mlt}" >
@@ -60,21 +61,23 @@ $html .= qq|
 </TABLE>
 </FORM >
 |;
-$html .= myHTML->rightpane($form,'search');
+$html .= myHTML->rightpane( $form, 'search' );
 $sClient->finish();
 print $html;
 exit;
 
 ############################################################################
 # Output the List part of the HTML.
-sub List
-{
-  my ($self,$form,$ClientID) = @_;
-  my $dbh = $form->dbconnect();
-  my $qList = qq|select InsPaid.*, Client.LName, Client.FName from InsPaid left join Client on Client.ClientID=InsPaid.ClientID where Client.ClientID='${ClientID}' order by InsPaid.TransDate desc|;                    #  and PaidAmt!=RecAmt|;
-#warn "ListInsPaid.cgi: query=$query\n";
-  $sList = $dbh->prepare($qList);
-  my $html = qq|
+sub List {
+    my ( $self, $form, $ClientID ) = @_;
+    my $dbh = $form->dbconnect();
+    my $qList =
+qq|select InsPaid.*, Client.LName, Client.FName from InsPaid left join Client on Client.ClientID=InsPaid.ClientID where Client.ClientID='${ClientID}' order by InsPaid.TransDate desc|
+      ;    #  and PaidAmt!=RecAmt|;
+
+    #warn "ListInsPaid.cgi: query=$query\n";
+    $sList = $dbh->prepare($qList);
+    my $html = qq|
 <TABLE class="chartsort table-autosort table-stripeclass:alternate fullsize">
 <THEAD>
   <TR >
@@ -95,28 +98,32 @@ sub List
 </THEAD>
 <TBODY>
 |;
-  my ($BillTot,$PaidTot,$RecTot) = (0,0,0);
-  my $count = 0;
-  $sList->execute();
-  while ( $rList = $sList->fetchrow_hashref )
-  {
-    $count+=1;
-    my $printlink = qq|  <A HREF="javascript:ReportWindow('/cgi/bin/genReceipt.cgi?InsPaid_ID=$rList->{ID}&mlt=$form->{mlt}','PrintWindow')" ONMOUSEOVER="textMsg.show('print')" ONMOUSEOUT="textMsg.hide()" ><IMG BORDER=0 SRC="/images/icon_print.gif" ></A>|;
-    my $even = int($count/2) == $count/2 ? '1' : '0';
-    my $class = $even ? qq|CLASS="alternate"| : '';
-    my $StartDate = DBUtil->Date($rList->{StartDate},'fmt','MM/DD/YY');
-    my $EndDate = DBUtil->Date($rList->{EndDate},'fmt','MM/DD/YY');
-    my $TransDate = DBUtil->Date($rList->{TransDate},'fmt','MM/DD/YY');
-    my $TrIDs = qq|<OPTION SELECTED VALUE="" >unselected|;
-    foreach my $TrID ( sort keys %{ $Client_TrIDs->{$ClientKey} } )
-    { $TrIDs .= qq|<OPTION VALUE="$TrID" >$TrID|; }
-    my $amt = $rList->{PaidAmt} - $rList->{RecAmt};
-    $sProvider->execute($rList->{CreateProvID});
-    $rProvider = $sProvider->fetchrow_hashref;
-    my $EnteredOn = DBUtil->Date($rList->{CreateDate},'fmt','MM/DD/YY');
-    my $button = $rList->{InsCode} eq '' ?
-qq|    <INPUT TYPE="submit" ONCLICK="return validate(this.form)" ONMOUSEOVER="window.status='$rList->{ID}';return true;" ONMOUSEOUT="window.status=''" NAME="view=InsPaid.cgi&fwdTABLE=InsPaid&InsPaid_ID=$rList->{ID}&Client_ClientID=$rList->{ClientID}&UpdateTables=all&pushID=$form->{LINKID}" VALUE="View/Edit" >| : "&nbsp;";
-    $html .= qq|
+    my ( $BillTot, $PaidTot, $RecTot ) = ( 0, 0, 0 );
+    my $count = 0;
+    $sList->execute();
+    while ( $rList = $sList->fetchrow_hashref ) {
+        $count += 1;
+        my $printlink =
+qq|  <A HREF="javascript:ReportWindow('/cgi/bin/genReceipt.cgi?InsPaid_ID=$rList->{ID}&mlt=$form->{mlt}','PrintWindow')" ONMOUSEOVER="textMsg.show('print')" ONMOUSEOUT="textMsg.hide()" ><IMG BORDER=0 SRC="/images/icon_print.gif" ></A>|;
+        my $even      = int( $count / 2 ) == $count / 2 ? '1' : '0';
+        my $class     = $even ? qq|CLASS="alternate"|         : '';
+        my $StartDate = DBUtil->Date( $rList->{StartDate}, 'fmt', 'MM/DD/YY' );
+        my $EndDate   = DBUtil->Date( $rList->{EndDate},   'fmt', 'MM/DD/YY' );
+        my $TransDate = DBUtil->Date( $rList->{TransDate}, 'fmt', 'MM/DD/YY' );
+        my $TrIDs     = qq|<OPTION SELECTED VALUE="" >unselected|;
+
+        foreach my $TrID ( sort keys %{ $Client_TrIDs->{$ClientKey} } ) {
+            $TrIDs .= qq|<OPTION VALUE="$TrID" >$TrID|;
+        }
+        my $amt = $rList->{PaidAmt} - $rList->{RecAmt};
+        $sProvider->execute( $rList->{CreateProvID} );
+        $rProvider = $sProvider->fetchrow_hashref;
+        my $EnteredOn = DBUtil->Date( $rList->{CreateDate}, 'fmt', 'MM/DD/YY' );
+        my $button =
+          $rList->{InsCode} eq ''
+          ? qq|    <INPUT TYPE="submit" ONCLICK="return validate(this.form)" ONMOUSEOVER="window.status='$rList->{ID}';return true;" ONMOUSEOUT="window.status=''" NAME="view=InsPaid.cgi&fwdTABLE=InsPaid&InsPaid_ID=$rList->{ID}&Client_ClientID=$rList->{ClientID}&UpdateTables=all&pushID=$form->{LINKID}" VALUE="View/Edit" >|
+          : "&nbsp;";
+        $html .= qq|
   <TR ${class} >
     <TD >${printlink}$rList->{Type}</TD>
     <TD >${StartDate}</TD>
@@ -133,14 +140,14 @@ qq|    <INPUT TYPE="submit" ONCLICK="return validate(this.form)" ONMOUSEOVER="wi
     <TD >${button}</TD>
   </TR>
 |;
-    $BillTot += $rList->{BillAmt};
-    $PaidTot += $rList->{PaidAmt};
-    $RecTot += $rList->{RecAmt};
-  }
-  $BillTot = sprintf("%.2f",$BillTot);
-  $PaidTot = sprintf("%.2f",$PaidTot);
-  $RecTot = sprintf("%.2f",$RecTot);
-  $html .= qq|
+        $BillTot += $rList->{BillAmt};
+        $PaidTot += $rList->{PaidAmt};
+        $RecTot  += $rList->{RecAmt};
+    }
+    $BillTot = sprintf( "%.2f", $BillTot );
+    $PaidTot = sprintf( "%.2f", $PaidTot );
+    $RecTot  = sprintf( "%.2f", $RecTot );
+    $html .= qq|
 </TBODY>
   <TR CLASS="port" >
     <TD >&nbsp;</TD>
@@ -160,7 +167,7 @@ qq|    <INPUT TYPE="submit" ONCLICK="return validate(this.form)" ONMOUSEOVER="wi
 </TABLE>
 <SCRIPT LANGUAGE="JavaScript">newtextMsg('print','Click here to print this Receipt.');</SCRIPT>
 |;
-  $sList->finish();
-  return($html);
+    $sList->finish();
+    return ($html);
 }
 ############################################################################

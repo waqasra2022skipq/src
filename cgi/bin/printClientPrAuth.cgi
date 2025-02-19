@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ############################################################################
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use myForm;
 use myDBI;

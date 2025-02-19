@@ -1,8 +1,8 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
-use  DBI;
-use  DBForm;
-use  DBA;
+use lib '/var/www/okmis/src/lib';
+use DBI;
+use DBForm;
+use DBA;
 use Time::Local;
 $DT = localtime();
 ############################################################################
@@ -11,24 +11,27 @@ $DT = localtime();
 ############################################################################
 $form = DBForm->new;
 my $dbh = $form->dbconnect;
+
 #foreach my $f ( sort keys %{$form} ) { warn "form-$f=$form->{$f}\n"; }
 
 ############################################################################
 my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
-my $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID');
-my $qInsurance = qq|select * from Insurance left join Client on Client.ClientID=Insurance.ClientID where Deductible > 0 ${ClinicSelection}|;
+my $ClinicSelection =
+  DBA->getClinicSelection( $form, $ForProvID, 'Client.clinicClinicID' );
+my $qInsurance =
+qq|select * from Insurance left join Client on Client.ClientID=Insurance.ClientID where Deductible > 0 ${ClinicSelection}|;
 my $sInsurance = $dbh->prepare($qInsurance);
 
 print qq|${DT}\nDeductions Paid\n|;
 print qq|LName\tFName\tClientID\tDeductible\tPaid\tRemaining\n|;
 $sInsurance->execute() || $form->dberror($qInsurance);
-while ( my $rInsurance = $sInsurance->fetchrow_hashref )
-{
-  my $Paid = DBA->getDeductionPaid($form,$rInsurance->{ClientID});
-  my $Remaining = $rInsurance->{Deductible} - ${Paid};
-  $Paid = sprintf("%.2f", $Paid);
-  $Remaining = sprintf("%.2f", $Remaining);
-  print qq|$rInsurance->{LName}\t$rInsurance->{FName}\t$rInsurance->{ClientID}\t$rInsurance->{Deductible}\t${Paid}\t${Remaining}\n|;
+while ( my $rInsurance = $sInsurance->fetchrow_hashref ) {
+    my $Paid      = DBA->getDeductionPaid( $form, $rInsurance->{ClientID} );
+    my $Remaining = $rInsurance->{Deductible} - ${Paid};
+    $Paid      = sprintf( "%.2f", $Paid );
+    $Remaining = sprintf( "%.2f", $Remaining );
+    print
+qq|$rInsurance->{LName}\t$rInsurance->{FName}\t$rInsurance->{ClientID}\t$rInsurance->{Deductible}\t${Paid}\t${Remaining}\n|;
 }
 $sInsurance->finish;
 ############################################################################

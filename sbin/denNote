@@ -1,70 +1,82 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 use DBA;
 use uBill;
 
 ############################################################################
-# denNote DBNAME=okmis_oays\&TrIDs=381951 381952 386506 389579 391768 394354 
+# denNote DBNAME=okmis_oays\&TrIDs=381951 381952 386506 389579 391768 394354
 ############################################################################
 my $form = DBForm->new();
-foreach my $TrID ( split(' ',$form->{TrIDs}) )
-{
-  # 'A1' = Claim denied charges.
-  print qq|denNote: TrID=$TrID cnt=|;
-  my $myCode=$form->{code};
-  my $myDate=$form->{date};
-  print main->denyClaim($form,$TrID,$myCode,$myDate,0) . "\n";
+foreach my $TrID ( split( ' ', $form->{TrIDs} ) ) {
+
+    # 'A1' = Claim denied charges.
+    print qq|denNote: TrID=$TrID cnt=|;
+    my $myCode = $form->{code};
+    my $myDate = $form->{date};
+    print main->denyClaim( $form, $TrID, $myCode, $myDate, 0 ) . "\n";
 }
 ############################################################################
-sub denyClaim
-{
-  my ($self,$form,$TrID,$iDenCode,$iDenDate,$iPaidAmt,$iRefID,$iReason,$iCode,$iSRC) = @_;
-  return(0) unless ( $TrID );
-  # 'A1' = Claim denied charges, '047' = one time - bad diagnosis
-  my $DenCode = $iDenCode eq '' ? 'A1' : $iDenCode;
-  my $DenDate = $iDenDate eq '' ? $form->{TODAY} : $iDenDate;
-  my $PaidAmt = $iPaidAmt eq '' ? 0 : $iPaidAmt;
-  my $RefID = $iRefID;
-  ($RefID = 'D' . $DenDate) =~ s/-//g if ( $iRefID eq '' );
-  my $Code = $iCode eq '' ? 'MD' : $iCode; # Manual Denial
-  my $SRC = $iSRC eq '' ? 'DA' : $iSRC;    # Database Admin.
-#my $SRC = 'BD';  # one time - bad dignosis
-  my $ChangeProvID = $form->{LOGINPROVID};
-  my $Denied = 6;
+sub denyClaim {
+    my (
+        $self,     $form,   $TrID,    $iDenCode, $iDenDate,
+        $iPaidAmt, $iRefID, $iReason, $iCode,    $iSRC
+    ) = @_;
+    return (0) unless ($TrID);
 
-  my $dbh = $form->dbconnect();
-  my $qNoteTrans="select * from NoteTrans where TrID=? and RecDate is null";
-## fix to add a NoteTrans...and not care if RecDate is not null
-  #my $qNoteTrans="select * from NoteTrans where TrID=?";
-  my $sNoteTrans=$dbh->prepare($qNoteTrans);
-  my $qDenTrans="update NoteTrans set RefID=?, RecDate=?, PaidAmt=?, DenCode=?, ReasonCode=?, Code=?, SRC=?, ChangeProvID=?, ChangeDate=? where ID=?";
-  my $sDenTrans=$dbh->prepare($qDenTrans);
-  my $qDenTreatment="update Treatment set BillStatus=?, StatusDate=?, DenDate=?, DenCode=? where TrID=? and RecDate is null";
-## fix to add a NoteTrans...and not care if RecDate is not null
-  #my $qDenTreatment="update Treatment set BillStatus=?, StatusDate=?, DenDate=?, DenCode=? where TrID=?";
-  my $sDenTreatment=$dbh->prepare($qDenTreatment);
+    # 'A1' = Claim denied charges, '047' = one time - bad diagnosis
+    my $DenCode = $iDenCode eq '' ? 'A1'           : $iDenCode;
+    my $DenDate = $iDenDate eq '' ? $form->{TODAY} : $iDenDate;
+    my $PaidAmt = $iPaidAmt eq '' ? 0              : $iPaidAmt;
+    my $RefID   = $iRefID;
+    ( $RefID = 'D' . $DenDate ) =~ s/-//g if ( $iRefID eq '' );
+    my $Code = $iCode eq '' ? 'MD' : $iCode;    # Manual Denial
+    my $SRC  = $iSRC eq ''  ? 'DA' : $iSRC;     # Database Admin.
 
-  my $cnt = 0;
-  $sNoteTrans->execute($TrID) || $form->dberror($qNoteTrans);
-  while ( my $r = $sNoteTrans->fetchrow_hashref )
-  {
-#print qq|NoteTrans ID: $r->{ID}, $r->{TrID}\n|;
-    $cnt++;
-    my $BillStatus = $Denied;
-    my $Reason = $iReason;
-    if ( $PaidAmt == 0 ) { $Reason .= '/A1'; }
-    elsif ( $PaidAmt < 0 ) { $Reason .= '/B5'; $BillStatus = 9; }
-    else { $Reason .= '/B5'; }
-    $sDenTreatment->execute($BillStatus,$DenDate,$DenDate,$DenCode,$TrID) || $form->dberror($qDenTreatment);
-    $sDenTrans->execute($RefID,$DenDate,$PaidAmt,$DenCode,$Reason,$Code,$SRC,$ChangeProvID,$DenDate,$r->{ID}) || $form->dberror($qDenTrans);
-    my ($BilledAmt,$IncAmt,$SchAmt,$AmtDue) = uBill->setBilledAmt($form,$TrID);
-    uBill->setBillStatus($form,$TrID,$BillStatus,$TransDate);
-  }
-  $sNoteTrans->finish();
-  $sDenTrans->finish();
-  $sDenTreatment->finish();
-  return($cnt);
+    #my $SRC = 'BD';  # one time - bad dignosis
+    my $ChangeProvID = $form->{LOGINPROVID};
+    my $Denied       = 6;
+
+    my $dbh        = $form->dbconnect();
+    my $qNoteTrans = "select * from NoteTrans where TrID=? and RecDate is null";
+## fix to add a NoteTrans...and not care if RecDate is not null
+    #my $qNoteTrans="select * from NoteTrans where TrID=?";
+    my $sNoteTrans = $dbh->prepare($qNoteTrans);
+    my $qDenTrans =
+"update NoteTrans set RefID=?, RecDate=?, PaidAmt=?, DenCode=?, ReasonCode=?, Code=?, SRC=?, ChangeProvID=?, ChangeDate=? where ID=?";
+    my $sDenTrans = $dbh->prepare($qDenTrans);
+    my $qDenTreatment =
+"update Treatment set BillStatus=?, StatusDate=?, DenDate=?, DenCode=? where TrID=? and RecDate is null";
+## fix to add a NoteTrans...and not care if RecDate is not null
+#my $qDenTreatment="update Treatment set BillStatus=?, StatusDate=?, DenDate=?, DenCode=? where TrID=?";
+    my $sDenTreatment = $dbh->prepare($qDenTreatment);
+
+    my $cnt = 0;
+    $sNoteTrans->execute($TrID) || $form->dberror($qNoteTrans);
+    while ( my $r = $sNoteTrans->fetchrow_hashref ) {
+
+        #print qq|NoteTrans ID: $r->{ID}, $r->{TrID}\n|;
+        $cnt++;
+        my $BillStatus = $Denied;
+        my $Reason     = $iReason;
+        if    ( $PaidAmt == 0 ) { $Reason .= '/A1'; }
+        elsif ( $PaidAmt < 0 )  { $Reason .= '/B5'; $BillStatus = 9; }
+        else                    { $Reason .= '/B5'; }
+        $sDenTreatment->execute( $BillStatus, $DenDate, $DenDate, $DenCode,
+            $TrID )
+          || $form->dberror($qDenTreatment);
+        $sDenTrans->execute(
+            $RefID, $DenDate, $PaidAmt,      $DenCode, $Reason,
+            $Code,  $SRC,     $ChangeProvID, $DenDate, $r->{ID}
+        ) || $form->dberror($qDenTrans);
+        my ( $BilledAmt, $IncAmt, $SchAmt, $AmtDue ) =
+          uBill->setBilledAmt( $form, $TrID );
+        uBill->setBillStatus( $form, $TrID, $BillStatus, $TransDate );
+    }
+    $sNoteTrans->finish();
+    $sDenTrans->finish();
+    $sDenTreatment->finish();
+    return ($cnt);
 }
 ############################################################################

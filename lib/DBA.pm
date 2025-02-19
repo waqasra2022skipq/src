@@ -2959,7 +2959,7 @@ sub processNewCrop
 {
   my ($self,$form,$ClientID) = @_;
   chdir("$form->{DOCROOT}/tmp");
-  my $cmd = qq|/home/okmis/mis/src/bin/gp6 DBNAME=$form->{DBNAME}\\&mlt=$form->{mlt}\\&ClientID=${ClientID}|;
+  my $cmd = qq|/var/www/okmis/src/bin/gp6 DBNAME=$form->{DBNAME}\\&mlt=$form->{mlt}\\&ClientID=${ClientID}|;
   my $diskfile = DBUtil->ExecCmd($cmd);
   my $out = DBUtil->ReadFile($diskfile);
   return('<PRE>'.$out.'</PRE>');

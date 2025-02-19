@@ -1,35 +1,40 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 use DBA;
 use DBUtil;
 use Time::Local;
-my $DT=localtime();
-my ($sec, $min, $hrs, $day, $month, $year, $wday, $julian) = localtime();
+my $DT = localtime();
+my ( $sec, $min, $hrs, $day, $month, $year, $wday, $julian ) = localtime();
 
 ############################################################################
 $form = DBForm->new();
-$dbh = $form->dbconnect();
-my ($Cnt,$Child) = (0,0);
+$dbh  = $form->dbconnect();
+my ( $Cnt, $Child ) = ( 0, 0 );
 print qq|${DT}\nClients by Address (with Age and %Children)\n|;
-print qq|ClinicName\tFName\tLName\tClientID\tActive\tAge\tAddr1\tCity\tState\tZip\t#Children\t#Adults\n|;
+print
+qq|ClinicName\tFName\tLName\tClientID\tActive\tAge\tAddr1\tCity\tState\tZip\t#Children\t#Adults\n|;
 my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
-my $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID','where');
+my $ClinicSelection =
+  DBA->getClinicSelection( $form, $ForProvID, 'Client.clinicClinicID',
+    'where' );
 $ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
-my $q = qq|select Client.*, Provider.Name as ClinicName from Client left join Provider on Provider.ProvID=Client.clinicClinicID ${ClinicSelection}  order by Client.Addr1, Client.City, Client.Zip, Client.LName, Client.FName|;
+my $q =
+qq|select Client.*, Provider.Name as ClinicName from Client left join Provider on Provider.ProvID=Client.clinicClinicID ${ClinicSelection}  order by Client.Addr1, Client.City, Client.Zip, Client.LName, Client.FName|;
+
 #warn qq|q=\n$q\n|;
 my $s = $dbh->prepare($q);
 $s->execute();
-while ( my $r = $s->fetchrow_hashref )
-{
-  my $Age = DBUtil->Date($r->{DOB}, 'age');
-  $Cnt++;
-  $Child++ if ( $Age < 12 );
-  my ($NumChild,$NumAdult) = main->getOthers($form,$r);
-  print qq|$r->{ClinicName}\t$r->{FName}\t$r->{LName}\t$r->{ClientID}\t$r->{Active}\t$Age\t$r->{Addr1}\t$r->{City}\t$r->{ST}\t$r->{Zip}\t$NumChild\t$NumAdult\n|;
+while ( my $r = $s->fetchrow_hashref ) {
+    my $Age = DBUtil->Date( $r->{DOB}, 'age' );
+    $Cnt++;
+    $Child++ if ( $Age < 12 );
+    my ( $NumChild, $NumAdult ) = main->getOthers( $form, $r );
+    print
+qq|$r->{ClinicName}\t$r->{FName}\t$r->{LName}\t$r->{ClientID}\t$r->{Active}\t$Age\t$r->{Addr1}\t$r->{City}\t$r->{ST}\t$r->{Zip}\t$NumChild\t$NumAdult\n|;
 }
-my $Pct = sprintf("%.1f",($Child/$Cnt) * 100);
+my $Pct = sprintf( "%.1f", ( $Child / $Cnt ) * 100 );
 print qq|Total\t%Children (under 12)\n|;
 print qq|${Cnt}\t${Pct}%\n|;
 $s->finish();
@@ -37,23 +42,24 @@ $form->complete();
 exit;
 
 ############################################################################
-sub getOthers
-{
-  my ($self,$form,$in) = @_;
+sub getOthers {
+    my ( $self, $form, $in ) = @_;
 
-  my ($c,$a) = (0,0);
-  my $Addr1 = $in->{Addr1} eq '' ? 'NULL' : $dbh->quote($in->{Addr1});
-  my $qOth = qq|select * from Client where Client.Addr1=${Addr1} and Client.Zip='$in->{Zip}'|;
-  $qOth .= qq| and Client.Active=1| if ( $form->{Active} );
-#warn qq|qOth=\n$qOth\n|;
-  my $sOth = $dbh->prepare($qOth);
-  $sOth->execute();
-  while ( my $rOth = $sOth->fetchrow_hashref )
-  {
-    my $Age = DBUtil->Date($rOth->{DOB}, 'age');
-    if ( $Age < 12 ) { $c++; } else { $a++; }
-  }
-  $sOth->finish();
-  return($c,$a);
+    my ( $c, $a ) = ( 0, 0 );
+    my $Addr1 = $in->{Addr1} eq '' ? 'NULL' : $dbh->quote( $in->{Addr1} );
+    my $qOth =
+qq|select * from Client where Client.Addr1=${Addr1} and Client.Zip='$in->{Zip}'|;
+    $qOth .= qq| and Client.Active=1| if ( $form->{Active} );
+
+    #warn qq|qOth=\n$qOth\n|;
+    my $sOth = $dbh->prepare($qOth);
+    $sOth->execute();
+    while ( my $rOth = $sOth->fetchrow_hashref ) {
+        my $Age = DBUtil->Date( $rOth->{DOB}, 'age' );
+        if   ( $Age < 12 ) { $c++; }
+        else               { $a++; }
+    }
+    $sOth->finish();
+    return ( $c, $a );
 }
 ############################################################################

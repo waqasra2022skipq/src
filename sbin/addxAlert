@@ -1,33 +1,40 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBForm;
 ############################################################################
 my $form = DBForm->new();
-my $dbh = $form->dbconnect();
+my $dbh  = $form->dbconnect();
+
 #my $text = qq|Concerning the new Treatment Plan ...\nThere is now a 'Delete' button for everyone entering new Treatment Plans Problems/Goals or Objectives.|;
 #my $text = qq|Concerning the new Treatment Plan ...\nThere is now a 'Resolve' button for everyone to enter the Progress and ResolvedDate on Objectives.\nClick the 'Resolve' button to update these fields when the Objective is locked.|;
 #my $text = qq|Concerning the new Treatment Plan ...\nThe TP will be locked when signed by the Primary Provider to keep it from being changed.\nUntil it is completed and locked it WILL NOT show up on the notes.|;
 #my $text = qq|A new Prior Authorization and CDC manual for FY16 is available.\n\nCheck the MIS Links under the Medicaid tab.|;
 #my $text = qq|As a reminder: OHCA has changed daily/weekly limits for Individual, Family and Group services.\nsee Administration-Forms / Links-OHCA tab: OHCA Rule Changes for June 1, 2016|;
 #my $text = qq|Please log off.i\nSystem shutting down.|;
-my $text = qq|System will be Unavailable tonight for upgrade.\n\nPLEASE LOG OFF NOW.|;
-my $dbname = $dbh->quote($form->{DBNAME});
-my $msg = $dbh->quote($text);
+my $text =
+  qq|System will be Unavailable tonight for upgrade.\n\nPLEASE LOG OFF NOW.|;
+my $dbname   = $dbh->quote( $form->{DBNAME} );
+my $msg      = $dbh->quote($text);
 my $alertmsg = $dbh->quote($msg);
-my $cdbh = $form->connectdb('okmis_config');
+my $cdbh     = $form->connectdb('okmis_config');
 ##
 # get those logged in lately...
 ##
-my $qProvider = qq|select Links.ProvID,Provider.LName,Provider.FName from Links left join Provider on Provider.ProvID=Links.ProvID group by Links.ProvID|;
-$sProvider=$dbh->prepare($qProvider);
+my $qProvider =
+qq|select Links.ProvID,Provider.LName,Provider.FName from Links left join Provider on Provider.ProvID=Links.ProvID group by Links.ProvID|;
+$sProvider = $dbh->prepare($qProvider);
 $sProvider->execute() || $form->dberror($qProvider);
-while ( my $rProvider = $sProvider->fetchrow_hashref )
-{
-#  next if ( $rProvider->{ProvID} == 90 );
-#  next if ( $rProvider->{ProvID} == 91 );
-  print qq| Add: $rProvider->{ProvID}: $rProvider->{FName} $rProvider->{LName}\n|;
-  my $sAdd = $cdbh->prepare("insert into xAlert values ($dbname,$rProvider->{ProvID},$alertmsg,NULL)");
-  $sAdd->execute() || $form->dberror("FAILED: $rProvider->{ProvID}: xAlert add message");
+while ( my $rProvider = $sProvider->fetchrow_hashref ) {
+
+    #  next if ( $rProvider->{ProvID} == 90 );
+    #  next if ( $rProvider->{ProvID} == 91 );
+    print
+      qq| Add: $rProvider->{ProvID}: $rProvider->{FName} $rProvider->{LName}\n|;
+    my $sAdd = $cdbh->prepare(
+"insert into xAlert values ($dbname,$rProvider->{ProvID},$alertmsg,NULL)"
+    );
+    $sAdd->execute()
+      || $form->dberror("FAILED: $rProvider->{ProvID}: xAlert add message");
 }
 ############################################################################
 exit;

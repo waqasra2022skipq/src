@@ -1,25 +1,31 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use Time::Local;
-my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime();
-my $Y = $year+1900;
-my $M = $mon+1;
-$M = length($M) == 1 ? '0'.$M: $M;
-my $D = length($mday) == 1 ? '0'.$mday : $mday;
+my ( $sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst ) =
+  localtime();
+my $Y = $year + 1900;
+my $M = $mon + 1;
+$M = length($M) == 1 ? '0' . $M : $M;
+my $D       = length($mday) == 1 ? '0' . $mday : $mday;
 my $curdate = "${Y}-${M}-${D}";
-my $curtime = sprintf('%02d:%02d:%02d', $hour, $min, $sec);
+my $curtime = sprintf( '%02d:%02d:%02d', $hour, $min, $sec );
 
 ############################################################################
 # rebill trid trid trid > uu
 ############################################################################
-foreach my $TrID ( @ARGV )
-{
-# set the Provider OK'd
-  print qq|update Treatment set ProvOKDate='${curdate}', ProvOKTime='${curtime}' where TrID='${TrID}' and ProvOKDate is null and RecDate is null;\n|;
-# set the Manager OK'd
-  print qq|update Treatment set MgrProvID='90',MgrRevDate='${curdate}', MgrRevTime='${curtime}',RevStatus=3 where TrID='${TrID}' and MgrRevDate is null and RecDate is null;\n|;
-# set the not to New/Bill.
-  print qq|update Treatment set BillStatus=0, StatusDate='${curdate}', CIPDate=NULL, DenDate=NULL, DenCode=NULL where TrID='${TrID}' and RecDate is null;\n|;
+foreach my $TrID (@ARGV) {
+
+    # set the Provider OK'd
+    print
+qq|update Treatment set ProvOKDate='${curdate}', ProvOKTime='${curtime}' where TrID='${TrID}' and ProvOKDate is null and RecDate is null;\n|;
+
+    # set the Manager OK'd
+    print
+qq|update Treatment set MgrProvID='90',MgrRevDate='${curdate}', MgrRevTime='${curtime}',RevStatus=3 where TrID='${TrID}' and MgrRevDate is null and RecDate is null;\n|;
+
+    # set the not to New/Bill.
+    print
+qq|update Treatment set BillStatus=0, StatusDate='${curdate}', CIPDate=NULL, DenDate=NULL, DenCode=NULL where TrID='${TrID}' and RecDate is null;\n|;
 }
 exit;
 ############################################################################

@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use myForm;
 use myDBI;
@@ -9,32 +9,47 @@ use Time::Local;
 my $DT = localtime();
 ############################################################################
 # usage:
-#   MIPS 
+#   MIPS
 ############################################################################
 my $form = myForm->new();
-my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $dbh  = myDBI->dbconnect( $form->{'DBNAME'} );
+
 #foreach my $f ( sort keys %{$form} ) { warn "form-$f=$form->{$f}\n"; }
 my $Type = $form->{'Type'};
 
-my $withSelection = DBA->withSelection($form,'and','MIPS.ClinicID','','','');
+my $withSelection =
+  DBA->withSelection( $form, 'and', 'MIPS.ClinicID', '', '', '' );
 my $Header = DBA->withSelectionHeader($form);
+
 #warn qq|Header: ${Header}\n|;
 $withSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+
 #warn qq|withSelection: ${withSelection}\n|;
-my @Flds = ('ID:QID','Title:Title','CollectionType:CollectionType','MeasureType:MeasureType','Description:Description','Instructions:Instructions','Denominator:Denominator','Numerator:Numerator','Result:Result','Comments:Comments');
+my @Flds = (
+    'ID:QID',                        'Title:Title',
+    'CollectionType:CollectionType', 'MeasureType:MeasureType',
+    'Description:Description',       'Instructions:Instructions',
+    'Denominator:Denominator',       'Numerator:Numerator',
+    'Result:Result',                 'Comments:Comments'
+);
 my $Footer = '';
-my $count = 0;
-my $total = 0;
-my $sMIPS = $dbh->prepare("select * from MIPS order by ID");
+my $count  = 0;
+my $total  = 0;
+my $sMIPS  = $dbh->prepare("select * from MIPS order by ID");
 print qq|${DT}\n${Header}\n|;
-foreach my $f ( @Flds ) { my ($fld,$hdr) = split(':',$f); print qq|${hdr}\t|; }
+foreach my $f (@Flds) {
+    my ( $fld, $hdr ) = split( ':', $f );
+    print qq|${hdr}\t|;
+}
 print qq|\n|;
 $sMIPS->execute();
-while (my $rMIPS = $sMIPS->fetchrow_hashref)
-{ 
-  $count++;
-  foreach my $f ( @Flds ) { my ($fld,$hdr) = split(':',$f); print qq|$rMIPS->{$fld}\t|; }
-  print qq|\n|;
+while ( my $rMIPS = $sMIPS->fetchrow_hashref ) {
+    $count++;
+    foreach my $f (@Flds) {
+        my ( $fld, $hdr ) = split( ':', $f );
+        print qq|$rMIPS->{$fld}\t|;
+    }
+    print qq|\n|;
 }
 print $Footer;
 $sMIPS->finish();

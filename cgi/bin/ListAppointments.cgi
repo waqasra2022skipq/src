@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 use SysAccess;
@@ -9,11 +9,11 @@ use myHTML;
 use gHTML;
 
 ############################################################################
-my $form = DBForm->new();
-my $dbh = $form->dbconnect();
+my $form      = DBForm->new();
+my $dbh       = $form->dbconnect();
 my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
-my $BackLinks = gHTML->setLINKS($form,'back');
-my $hidden = $form->TMPwrite($skip);
+my $BackLinks = gHTML->setLINKS( $form, 'back' );
+my $hidden    = $form->TMPwrite($skip);
 
 ############################################################################
 # output the HTML
@@ -21,7 +21,7 @@ my $hidden = $form->TMPwrite($skip);
 my $html = myHTML->new($form) . qq|
 <TABLE CLASS="main" >
   <TR ALIGN="center" >
-| . myHTML->leftpane($form,'clock mail managertree collapseipad') . qq|
+| . myHTML->leftpane( $form, 'clock mail managertree collapseipad' ) . qq|
     <TD WIDTH="84%" ALIGN="center" >
 | . myHTML->hdr($form) . myHTML->menu($form) . qq|
 <SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/novalidate.js"> </SCRIPT>
@@ -51,40 +51,43 @@ my $html = myHTML->new($form) . qq|
     <TD CLASS="port hdrtxt" >Begin Time</TD>
     <TD CLASS="port" >&nbsp;</TD>
   </TR>
-|.main->genList().qq|
+| . main->genList() . qq|
 </TABLE>
     </TD>
   </TR>
 </TABLE>
 ${hidden}
 </FORM >
-|.myHTML->rightpane($form,'search');
+| . myHTML->rightpane( $form, 'search' );
 $form->complete();
 print $html;
 exit;
 
 ############################################################################
-sub genList
-{
-  my ($self) = @_;
-  my ($out,$cnt) = ('',0);
-  my $qAppointments = qq|select Appointments.*,Provider.LName,Provider.FName from Appointments left join Provider on Provider.ProvID=Appointments.ProvID |
-      . DBA->getProviderSelection($form,$ForProvID,'Appointments.ProvID','where')
+sub genList {
+    my ($self) = @_;
+    my ( $out, $cnt ) = ( '', 0 );
+    my $qAppointments =
+qq|select Appointments.*,Provider.LName,Provider.FName from Appointments left join Provider on Provider.ProvID=Appointments.ProvID |
+      . DBA->getProviderSelection( $form, $ForProvID, 'Appointments.ProvID',
+        'where' )
       . qq| order by ContactDate, LName, FName|;
-#warn qq|q=\n$qAppointments\n|;
-  my $sAppointments = $dbh->prepare($qAppointments);
-  $sAppointments->execute();
-  while ( my $r = $sAppointments->fetchrow_hashref )
-  {
-    $cnt+=1;
-    $even = int($cnt/2) == $cnt/2 ? '1' : '0';
-    my $cls = 'rptodd';
-    if ( $even ) { $cls = 'rpteven'; }
-    my $ProviderName = $r->{'FName'}.' '.$r->{'LName'};
-    my $ClientName = DBA->getxref($form,'Client',$r->{ClientID},'FName')
-                   .' '.DBA->getxref($form,'Client',$r->{'ClientID'},'LName');
-    my $ContactDate = DBUtil->Date($r->{'ContactDate'},'fmt','MM/DD/YYYY');
-    $out .= qq|
+
+    #warn qq|q=\n$qAppointments\n|;
+    my $sAppointments = $dbh->prepare($qAppointments);
+    $sAppointments->execute();
+    while ( my $r = $sAppointments->fetchrow_hashref ) {
+        $cnt += 1;
+        $even = int( $cnt / 2 ) == $cnt / 2 ? '1' : '0';
+        my $cls = 'rptodd';
+        if ($even) { $cls = 'rpteven'; }
+        my $ProviderName = $r->{'FName'} . ' ' . $r->{'LName'};
+        my $ClientName =
+            DBA->getxref( $form, 'Client', $r->{ClientID},   'FName' ) . ' '
+          . DBA->getxref( $form, 'Client', $r->{'ClientID'}, 'LName' );
+        my $ContactDate =
+          DBUtil->Date( $r->{'ContactDate'}, 'fmt', 'MM/DD/YYYY' );
+        $out .= qq|
   <TR CLASS="${cls}" >
     <TD CLASS="strcol" >${ProviderName}</TD>
     <TD CLASS="strcol" >${ClientName}</TD>
@@ -95,8 +98,8 @@ sub genList
     </TD>
   </TR>
 |;
-  }
-  $sAppointments->finish();
-  return($out);
+    }
+    $sAppointments->finish();
+    return ($out);
 }
 ############################################################################

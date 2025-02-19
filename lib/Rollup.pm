@@ -12,444 +12,477 @@ use Time::Piece;
 my $zip = Archive::Zip->new();
 
 ############################################################################
-sub addEDoc
-{
-	my ($self,$form,$Title,$ProvID, $folder_path, $Descr, $Type) = @_;
-	my $dbh = myDBI->dbconnect($form->{'DBNAME'});
-	warn qq|STARTED: Inserting ZIP Entry to DB \n|;
+sub addEDoc {
+    my ( $self, $form, $Title, $ProvID, $folder_path, $Descr, $Type ) = @_;
+    my $dbh = myDBI->dbconnect( $form->{'DBNAME'} );
+    warn qq|STARTED: Inserting ZIP Entry to DB \n|;
 
-	my $r = ();
-	$r->{ProvID} = $ProvID;
-	$r->{Title} = $Title;
-	$r->{Descr} = $Descr;
-	$r->{Path} = qq|${folder_path}/${Title}|;
-	$r->{CreateProvID} = $form->{LOGINPROVID};
-	$r->{CreateDate} = $form->{TODAY};
-	$r->{Type} = $Type;     # 
-	$r->{Public} = 0;
-	$query = DBA->genReplace($form,$dbh,'ProviderEDocs',$r,"Path='$r->{Path}'");
-	my $sql = $dbh->prepare($query);
-	$sql->execute() || myDBI->dberror($query);
-	$sql->finish();
+    my $r = ();
+    $r->{ProvID}       = $ProvID;
+    $r->{Title}        = $Title;
+    $r->{Descr}        = $Descr;
+    $r->{Path}         = qq|${folder_path}/${Title}|;
+    $r->{CreateProvID} = $form->{LOGINPROVID};
+    $r->{CreateDate}   = $form->{TODAY};
+    $r->{Type}         = $Type;                         #
+    $r->{Public}       = 0;
+    $query =
+      DBA->genReplace( $form, $dbh, 'ProviderEDocs', $r, "Path='$r->{Path}'" );
+    my $sql = $dbh->prepare($query);
+    $sql->execute() || myDBI->dberror($query);
+    $sql->finish();
 
-	warn qq|COMPLETED: Inserting ZIP Entry to DB \n|;
+    warn qq|COMPLETED: Inserting ZIP Entry to DB \n|;
 
-	return();
+    return ();
 }
 ############################################################################
 sub add_to_zip {
 
-	my ($self, $form, $folder_path, $CLPROVID) = @_;
+    my ( $self, $form, $folder_path, $CLPROVID ) = @_;
 
-	$ZIPDirectory = $form->{DOCROOT} . $folder_path;
-	warn qq|ZIP: Started: $ZIPDirectory\n|;
+    $ZIPDirectory = $form->{DOCROOT} . $folder_path;
+    warn qq|ZIP: Started: $ZIPDirectory\n|;
 
-	# Format the current timestamp
-	my $timestamp = localtime->strftime("%Y-%m-%dT%H_%M_%S");
+    # Format the current timestamp
+    my $timestamp = localtime->strftime("%Y-%m-%dT%H_%M_%S");
 
-	# Define the name for the output zip file
-	my $output_zip = "${CLPROVID}_RollUP_${timestamp}.zip";
+    # Define the name for the output zip file
+    my $output_zip = "${CLPROVID}_RollUP_${timestamp}.zip";
 
-	# Create a new Archive::Zip object
-	my $zip = Archive::Zip->new();
+    # Create a new Archive::Zip object
+    my $zip = Archive::Zip->new();
 
-	# Open the directory and add PDF files to the zip archive
-	opendir(my $dir, $ZIPDirectory) or die "Cannot open directory: $!";
-	
-	# Add the entire folder and its contents to the zip archive
-	my $pred = sub { /\.pdf|xls|xlsx/ };
-	$zip->addTree( $ZIPDirectory, '', $pred );
+    # Open the directory and add PDF files to the zip archive
+    opendir( my $dir, $ZIPDirectory ) or die "Cannot open directory: $!";
 
-	closedir($dir);
+    # Add the entire folder and its contents to the zip archive
+    my $pred = sub { /\.pdf|xls|xlsx/ };
+    $zip->addTree( $ZIPDirectory, '', $pred );
 
-	# Save the zip archive to a file
-	unless ($zip->writeToFileNamed("$ZIPDirectory/$output_zip") == AZ_OK) {
-			die "Error creating zip archive: $!";
-	}
+    closedir($dir);
 
-	warn qq|ZIP: Created \n|;
+    # Save the zip archive to a file
+    unless ( $zip->writeToFileNamed("$ZIPDirectory/$output_zip") == AZ_OK ) {
+        die "Error creating zip archive: $!";
+    }
 
-	$Descr = 'Zip Created';
-	$type = 40;
-	$self->addEDoc($form, $output_zip,$CLPROVID, $ZIPDirectory, $Descr, $type );
-	return;
+    warn qq|ZIP: Created \n|;
+
+    $Descr = 'Zip Created';
+    $type  = 40;
+    $self->addEDoc( $form, $output_zip, $CLPROVID, $ZIPDirectory, $Descr,
+        $type );
+    return;
 
 }
 
+sub Notes {
+    my ( $self, $form, $ClientID, $ProvID, $HomePath ) = @_;
+    my $dbh = myDBI->dbconnect( $form->{'DBNAME'} );
 
-sub Notes
-{
-	my ($self,$form,$ClientID,$ProvID, $HomePath) = @_;
-	my $dbh = myDBI->dbconnect($form->{'DBNAME'});
-	# THIS LOOP IS TO REMOVE THE 'OLD' NAMED FILES...
-	for (my $j = 1; $j <= 5; $j++)
-	{
-			my $NoteDef = DBA->noteNum($j);
-			#warn qq|rollupNotes: ClientID=${ClientID}, ProvID=${ProvID}, j=$j, NoteDef=$NoteDef\n|;
+    # THIS LOOP IS TO REMOVE THE 'OLD' NAMED FILES...
+    for ( my $j = 1 ; $j <= 5 ; $j++ ) {
+        my $NoteDef = DBA->noteNum($j);
 
-			my $RootPath = $form->{DOCROOT} . ${HomePath};
-			my $FileName = $ProvID ? qq|${NoteDef}Notes${ProvID}.xdp| : qq|${NoteDef}Notes${ClientID}.xdp|;
-			my $HomeName = ${HomePath} . '/' . ${FileName};
-			my $RootName = ${RootPath} . '/' . ${FileName};
-			print qq|rollupNotes: HomeName=${HomeName} \n|;
-			print qq|rollupNotes: RootName=${RootName} \n|;
-			# first delete them.
-			unlink($RootName);
-			if ( $ProvID )
-			{
-				my $sDelete = $dbh->prepare("delete from ProviderEDocs where ProvID=? and Rollup=?");
-				$sDelete->execute($ProvID,$FileName);
-				$sDelete->finish();
-			}
-			else
-			{
-				my $sDelete = $dbh->prepare("delete from ClientEDocs where ClientID=? and Rollup=?");
-				$sDelete->execute($ClientID,$FileName);
-				$sDelete->finish();
-			}
-	}
-	
-	my $RootPath = $form->{DOCROOT} . ${HomePath};
-	my $FileName = $ProvID ? qq|Notes${ProvID}.pdf| : qq|Notes${ClientID}.pdf|;
-	my $HomeName = ${HomePath} . '/' . ${FileName};
-	my $RootName = ${RootPath} . '/' . ${FileName};
-	#warn qq|rollupNotes: HomeName=${HomeName}\n|;
-	#warn qq|rollupNotes: RootName=${RootName}\n|;
-	# first delete them.
-	unlink($RootName);
-	if ( $ProvID )
-	{
-		my $sDelete = $dbh->prepare("delete from ProviderEDocs where ProvID=? and Rollup=?");
-		$sDelete->execute($ProvID,$FileName);
-		$sDelete->finish();
-	}
-	else
-	{
-		my $sDelete = $dbh->prepare("delete from ClientEDocs where ClientID=? and Rollup=?");
-		$sDelete->execute($ClientID,$FileName);
-		$sDelete->finish();
-	}
+#warn qq|rollupNotes: ClientID=${ClientID}, ProvID=${ProvID}, j=$j, NoteDef=$NoteDef\n|;
 
-	my $TrIDs='';
-	my $with = $ProvID ? qq|ProvID='${ProvID}'| : qq|ClientID='${ClientID}'|;
-	my $qNotes = qq|select TrID from Treatment where ${with} order by ClientID,ContLogDate,ContLogBegTime,ContLogEndTime|;
-	#warn "rollupNotes: qNotes=\n$qNotes\n";
-	$sNotes=$dbh->prepare($qNotes);
-	$sNotes->execute();
-	while ( my ($TrID) = $sNotes->fetchrow_array ) { $TrIDs .= qq|${TrID} |; }
+        my $RootPath = $form->{DOCROOT} . ${HomePath};
+        my $FileName =
+          $ProvID
+          ? qq|${NoteDef}Notes${ProvID}.xdp|
+          : qq|${NoteDef}Notes${ClientID}.xdp|;
+        my $HomeName = ${HomePath} . '/' . ${FileName};
+        my $RootName = ${RootPath} . '/' . ${FileName};
+        print qq|rollupNotes: HomeName=${HomeName} \n|;
+        print qq|rollupNotes: RootName=${RootName} \n|;
 
-	unless ( $TrIDs eq '' )
-	{
-		my $cmd = qq|/home/okmis/mis/src/cgi/bin/printNotes.pl DBNAME=$form->{'DBNAME'}\\&TrIDs=${TrIDs}\\&mlt=$form->{mlt}\\&file=${RootName}|;
-		#warn qq|Notes: cmd:${cmd}\n|;
-		system("${cmd}");
-		#warn qq|rollupNotes: create: ${RootName}\n|;
-		my $rEDocs = ();
-		my $table = qq|ClientEDocs|;
-		my $where = qq|ClientID='${ClientID}' and Rollup='${FileName}'|;
-		if ( $ProvID )
-		{
-			$rEDocs->{ProvID} = $ProvID; 
-			$table = qq|ProviderEDocs|;
-			$where = qq|ProvID='${ProvID}' and Rollup='${FileName}'|;
-		}
-		else { $rEDocs->{ClientID} = $ClientID; }
-		#warn qq|rollupNotes: table: ${table}\n|;
-		#warn qq|rollupNotes: where: ${where}\n|;
-		my $TODAY = DBUtil->Date($form->{TODAY},'fmt','MM/DD/YYYY');
-		my $Title = $ProvID ? qq|Rollup provider '${ProvID}' ProviderNotes: ${TODAY}|
-												: qq|Rollup client '${ClientID}' ClientNotes: ${TODAY}|;
-		$rEDocs->{Title} = $Title;
-		$rEDocs->{Descr} = qq|Rollup on ${TODAY}|;
-		$rEDocs->{Type} = '22';                       # 'Client' Type.
-		$rEDocs->{Path} = $HomeName;                  # sql Path from Home Directory
-		$rEDocs->{Rollup} = $FileName;
-		$rEDocs->{CreateDate} = $form->{TODAY};       # last time created.
-		$rEDocs->{CreateProvID} = $form->{LOGINPROVID};
-		$rEDocs->{ChangeProvID} = $form->{LOGINPROVID};
-		#foreach my $f ( sort keys %{$rEDocs} ) { warn ": rEDocs-$f=$rEDocs->{$f}\n"; }
-		my $UPDID = DBA->doUpdate($form,$table,$rEDocs,$where);
+        # first delete them.
+        unlink($RootName);
+        if ($ProvID) {
+            my $sDelete = $dbh->prepare(
+                "delete from ProviderEDocs where ProvID=? and Rollup=?");
+            $sDelete->execute( $ProvID, $FileName );
+            $sDelete->finish();
+        }
+        else {
+            my $sDelete = $dbh->prepare(
+                "delete from ClientEDocs where ClientID=? and Rollup=?");
+            $sDelete->execute( $ClientID, $FileName );
+            $sDelete->finish();
+        }
+    }
 
-	}
-	$sNotes->finish();
+    my $RootPath = $form->{DOCROOT} . ${HomePath};
+    my $FileName = $ProvID ? qq|Notes${ProvID}.pdf| : qq|Notes${ClientID}.pdf|;
+    my $HomeName = ${HomePath} . '/' . ${FileName};
+    my $RootName = ${RootPath} . '/' . ${FileName};
 
+    #warn qq|rollupNotes: HomeName=${HomeName}\n|;
+    #warn qq|rollupNotes: RootName=${RootName}\n|;
+    # first delete them.
+    unlink($RootName);
+    if ($ProvID) {
+        my $sDelete = $dbh->prepare(
+            "delete from ProviderEDocs where ProvID=? and Rollup=?");
+        $sDelete->execute( $ProvID, $FileName );
+        $sDelete->finish();
+    }
+    else {
+        my $sDelete = $dbh->prepare(
+            "delete from ClientEDocs where ClientID=? and Rollup=?");
+        $sDelete->execute( $ClientID, $FileName );
+        $sDelete->finish();
+    }
 
-	return($TrIDs);
+    my $TrIDs = '';
+    my $with  = $ProvID ? qq|ProvID='${ProvID}'| : qq|ClientID='${ClientID}'|;
+    my $qNotes =
+qq|select TrID from Treatment where ${with} order by ClientID,ContLogDate,ContLogBegTime,ContLogEndTime|;
+
+    #warn "rollupNotes: qNotes=\n$qNotes\n";
+    $sNotes = $dbh->prepare($qNotes);
+    $sNotes->execute();
+    while ( my ($TrID) = $sNotes->fetchrow_array ) { $TrIDs .= qq|${TrID} |; }
+
+    unless ( $TrIDs eq '' ) {
+        my $cmd =
+qq|/var/www/okmis/src/cgi/bin/printNotes.pl DBNAME=$form->{'DBNAME'}\\&TrIDs=${TrIDs}\\&mlt=$form->{mlt}\\&file=${RootName}|;
+
+        #warn qq|Notes: cmd:${cmd}\n|;
+        system("${cmd}");
+
+        #warn qq|rollupNotes: create: ${RootName}\n|;
+        my $rEDocs = ();
+        my $table  = qq|ClientEDocs|;
+        my $where  = qq|ClientID='${ClientID}' and Rollup='${FileName}'|;
+        if ($ProvID) {
+            $rEDocs->{ProvID} = $ProvID;
+            $table            = qq|ProviderEDocs|;
+            $where            = qq|ProvID='${ProvID}' and Rollup='${FileName}'|;
+        }
+        else { $rEDocs->{ClientID} = $ClientID; }
+
+        #warn qq|rollupNotes: table: ${table}\n|;
+        #warn qq|rollupNotes: where: ${where}\n|;
+        my $TODAY = DBUtil->Date( $form->{TODAY}, 'fmt', 'MM/DD/YYYY' );
+        my $Title =
+          $ProvID
+          ? qq|Rollup provider '${ProvID}' ProviderNotes: ${TODAY}|
+          : qq|Rollup client '${ClientID}' ClientNotes: ${TODAY}|;
+        $rEDocs->{Title} = $Title;
+        $rEDocs->{Descr} = qq|Rollup on ${TODAY}|;
+        $rEDocs->{Type}  = '22';                  # 'Client' Type.
+        $rEDocs->{Path}  = $HomeName;             # sql Path from Home Directory
+        $rEDocs->{Rollup}       = $FileName;
+        $rEDocs->{CreateDate}   = $form->{TODAY};         # last time created.
+        $rEDocs->{CreateProvID} = $form->{LOGINPROVID};
+        $rEDocs->{ChangeProvID} = $form->{LOGINPROVID};
+
+ #foreach my $f ( sort keys %{$rEDocs} ) { warn ": rEDocs-$f=$rEDocs->{$f}\n"; }
+        my $UPDID = DBA->doUpdate( $form, $table, $rEDocs, $where );
+
+    }
+    $sNotes->finish();
+
+    return ($TrIDs);
 }
 ############################################################################
-sub edocs
-{
-	my ($self,$form,$ClientID,$Table,$Legacy, $ClientPath) = @_;
-	#warn qq|edocs: ClientID=${ClientID}, Table=${Table}, Legacy=${Legacy}\n|;
-	my $dbh = myDBI->dbconnect($form->{'DBNAME'});
-	my $HomePath = qq|/Client/EDocs/${ClientID}|;
-	my $RootPath = $form->{DOCROOT} . ${HomePath};
+sub edocs {
+    my ( $self, $form, $ClientID, $Table, $Legacy, $ClientPath ) = @_;
 
-	if($ClientPath ne '') {
-		$RootPath = $form->{DOCROOT} . ${ClientPath};
-	}
+    #warn qq|edocs: ClientID=${ClientID}, Table=${Table}, Legacy=${Legacy}\n|;
+    my $dbh      = myDBI->dbconnect( $form->{'DBNAME'} );
+    my $HomePath = qq|/Client/EDocs/${ClientID}|;
+    my $RootPath = $form->{DOCROOT} . ${HomePath};
 
-	my $TODAY = DBUtil->Date($form->{TODAY},'fmt','MM/DD/YYYY');
-	my $Title = qq|Rollup client '${ClientID}' ${Table}: ${TODAY}|;
-	my $Descr = qq|Rollup on ${TODAY}|;
-	my $EType = 22;        # 'Client' Type.
-	my $RECID = myDBI->getTableConfig($Table,'RECID');
-	my $FileName = qq|${Table}${ClientID}.pdf|;
-	my $PrintRoutine = 'print'.$Table;
-	#warn qq|rollupNotes: FileName=${FileName}\n|;
-	#warn qq|rollupNotes: PrintRoutine=${PrintRoutine}\n|;
-	my $HomeName = ${HomePath} . '/' . ${FileName};
-	if($ClientPath ne '') {
-		$HomeName = $ClientPath . '/' . $FileName;
-	}
+    if ( $ClientPath ne '' ) {
+        $RootPath = $form->{DOCROOT} . ${ClientPath};
+    }
 
-	my $RootName = ${RootPath} . '/' . ${FileName};
-	
-	#warn qq|rollupNotes: HomeName=${HomeName}\n|;
-	#warn qq|rollupNotes: RootName=${RootName}\n|;
-	#warn qq|rollupNotes: OLDRootName=${OLDRootName}\n|;
-			# first delete them.
-	unlink($RootName);
-	(my $OLDRootName = $RootName) =~ s/pdf/xdp/g;
-	unlink($OLDRootName);
-	my $sDelete = $dbh->prepare("delete from ClientEDocs where ClientID=? and Rollup=?");
-	$sDelete->execute($ClientID,$FileName);
-	(my $OLDFileName = $FileName) =~ s/pdf/xdp/g;
-	$sDelete->execute($ClientID,$OLDFileName);
-	$sDelete->finish();
-	my $order = $Table eq 'ClientDischarge' ? 'ClientDischargeCDC.TransDate'
-						: $Table eq 'ClientAdmit' ? 'ClientAdmit.AdmitDate'
-						: $Table eq 'ClientPrAuth' ? 'ClientPrAuth.EffDate'
-						: $Table eq 'ClientTrPlan' ? 'ClientTrPlan.EffDate'
-						: $Table eq 'ClientLabs' ? 'ClientLabs.ChangeDate'
-						: $Table eq 'ClientCARSReview' ? 'ClientCARSReview.ChangeDate'
-						: $Table eq 'ClientEDocs' ? 'ClientEDocs.CreateDate'
-						: $Table eq 'PDMed' ? 'PDMed.StartDate'
-						: $Table eq 'ClientRiskAssessment' ? 'ClientRiskAssessment.VisitDate'
-						
-						: $Table eq 'ClientPHQ' ? 'ClientPHQ.CreateDate'
-						: $Table eq 'ClientPHQ15' ? 'ClientPHQ15.CreateDate'
-						: $Table eq 'ClientPHQ2' ? 'ClientPHQ2.CreateDate'
-						: $Table eq 'ClientPHQ4' ? 'ClientPHQ4.CreateDate'
-						: $Table eq 'ClientPHQ9' ? 'ClientPHQ9.CreateDate'
-						: $Table eq 'ClientTPHQ9' ? 'ClientTPHQ9.CreateDate'
-						: $Table eq 'ClientPHQBrief' ? 'ClientPHQBrief.CreateDate'
+    my $TODAY        = DBUtil->Date( $form->{TODAY}, 'fmt', 'MM/DD/YYYY' );
+    my $Title        = qq|Rollup client '${ClientID}' ${Table}: ${TODAY}|;
+    my $Descr        = qq|Rollup on ${TODAY}|;
+    my $EType        = 22;                                      # 'Client' Type.
+    my $RECID        = myDBI->getTableConfig( $Table, 'RECID' );
+    my $FileName     = qq|${Table}${ClientID}.pdf|;
+    my $PrintRoutine = 'print' . $Table;
 
-						: $Table eq 'ClientACE' ? 'ClientACE.CreateDate'
-						: $Table eq 'ClientGAD7' ? 'ClientGAD7.CreateDate'
-						: $Table eq 'ClientBasis32' ? 'ClientBasis32.CreateDate'
-						: $Table eq 'ClientPrAuthCDC' ? 'ClientPrAuthCDC.CreateDate'
-						: $Table eq 'ClientPHQSADS' ? 'ClientPHQSADS.CreateDate'
+    #warn qq|rollupNotes: FileName=${FileName}\n|;
+    #warn qq|rollupNotes: PrintRoutine=${PrintRoutine}\n|;
+    my $HomeName = ${HomePath} . '/' . ${FileName};
+    if ( $ClientPath ne '' ) {
+        $HomeName = $ClientPath . '/' . $FileName;
+    }
 
-						: $Table eq 'ClientTASI' ? 'ClientTASI.CreateDate'
-						
-						: $Table eq 'ClientASI' ? 'ClientASI.CreateDate'
+    my $RootName = ${RootPath} . '/' . ${FileName};
 
-						: $Table eq 'ClientASAM' ? 'ClientASAM.CreateDate'
+    #warn qq|rollupNotes: HomeName=${HomeName}\n|;
+    #warn qq|rollupNotes: RootName=${RootName}\n|;
+    #warn qq|rollupNotes: OLDRootName=${OLDRootName}\n|;
+    # first delete them.
+    unlink($RootName);
+    ( my $OLDRootName = $RootName ) =~ s/pdf/xdp/g;
+    unlink($OLDRootName);
+    my $sDelete =
+      $dbh->prepare("delete from ClientEDocs where ClientID=? and Rollup=?");
+    $sDelete->execute( $ClientID, $FileName );
+    ( my $OLDFileName = $FileName ) =~ s/pdf/xdp/g;
+    $sDelete->execute( $ClientID, $OLDFileName );
+    $sDelete->finish();
+    my $order =
+        $Table eq 'ClientDischarge'      ? 'ClientDischargeCDC.TransDate'
+      : $Table eq 'ClientAdmit'          ? 'ClientAdmit.AdmitDate'
+      : $Table eq 'ClientPrAuth'         ? 'ClientPrAuth.EffDate'
+      : $Table eq 'ClientTrPlan'         ? 'ClientTrPlan.EffDate'
+      : $Table eq 'ClientLabs'           ? 'ClientLabs.ChangeDate'
+      : $Table eq 'ClientCARSReview'     ? 'ClientCARSReview.ChangeDate'
+      : $Table eq 'ClientEDocs'          ? 'ClientEDocs.CreateDate'
+      : $Table eq 'PDMed'                ? 'PDMed.StartDate'
+      : $Table eq 'ClientRiskAssessment' ? 'ClientRiskAssessment.VisitDate'
 
-						: $Table eq 'SOGS' ? 'SOGS.CreateDate'
+      : $Table eq 'ClientPHQ'      ? 'ClientPHQ.CreateDate'
+      : $Table eq 'ClientPHQ15'    ? 'ClientPHQ15.CreateDate'
+      : $Table eq 'ClientPHQ2'     ? 'ClientPHQ2.CreateDate'
+      : $Table eq 'ClientPHQ4'     ? 'ClientPHQ4.CreateDate'
+      : $Table eq 'ClientPHQ9'     ? 'ClientPHQ9.CreateDate'
+      : $Table eq 'ClientTPHQ9'    ? 'ClientTPHQ9.CreateDate'
+      : $Table eq 'ClientPHQBrief' ? 'ClientPHQBrief.CreateDate'
 
-						: $Table eq 'SOGSGSI' ? 'SOGSGSI.CreateDate'
+      : $Table eq 'ClientACE'       ? 'ClientACE.CreateDate'
+      : $Table eq 'ClientGAD7'      ? 'ClientGAD7.CreateDate'
+      : $Table eq 'ClientBasis32'   ? 'ClientBasis32.CreateDate'
+      : $Table eq 'ClientPrAuthCDC' ? 'ClientPrAuthCDC.CreateDate'
+      : $Table eq 'ClientPHQSADS'   ? 'ClientPHQSADS.CreateDate'
 
-						: $Table eq 'ClientMeds' ? 'ClientMeds.CreateDate'
+      : $Table eq 'ClientTASI' ? 'ClientTASI.CreateDate'
 
-						: return();
-	my $join = $Table eq 'ClientDischarge'
-					 ? "left join ClientDischargeCDC on ClientDischargeCDC.ClientDischargeID=ClientDischarge.ID"
-					 : '';
-	my $daterange = '';
+      : $Table eq 'ClientASI' ? 'ClientASI.CreateDate'
 
-	if (index($Table, 'PHQ') != -1  || $Table eq "ClientGAD7" || $Table eq "ClientACE") {
-		$PrintRoutine = qq|printClientPHQ|;
-	}
-	if($Table eq "ClientPrAuthCDC") {
-		$PrintRoutine = qq|printClientCDC|;
-	} 
-	if ( $Table eq 'ClientAdmit' )
-	{
-		if ( $Legacy )      # could change to include ALL rollups with value of Legacy (see setClientRollup)
-		{
-			$daterange = qq|and ClientAdmit.AdmitDate<='${Legacy}'|;
-			$FileName = qq|ClientIntake${ClientID}.xdp|;
-			$HomeName = ${HomePath} . '/' . ${FileName};
-			$RootName = ${RootPath} . '/' . ${FileName};
-			$PrintRoutine = qq|PrintClientIntakePre2017|;
-			$Title = qq|Rollup client '${ClientID}' ClientIntake: ${TODAY}|;
-			#warn "edocs: daterange=${daterange}, FileName=${FileName}, RootName=${RootName}, PrintRoutine=${PrintRoutine}\n";
-		}
-		else
-		{
-			$daterange = qq|and ClientAdmit.AdmitDate>'2017-01-01'|;
-		}
-	}
-	my $IDs='';
-	my $q = qq|select ${Table}.${RECID} from ${Table} ${join} where ${Table}.ClientID=? ${daterange} order by ${order}|;
-	if($Table eq "ClientASI") {
-		$q = qq|select ${Table}.${RECID} from ${Table} ${join} where ${Table}.G1=? ${daterange} order by ${order}|;
-	}
-	#warn "edocs: q=\n$q\nClientID=${ClientID}, Table=${Table}, PrintRoutine=${PrintRoutine}, RECID=${RECID}\n";
-	my $s=$dbh->prepare($q);
-	$s->execute($ClientID);
-	#my $rows = $s->rows; warn qq|edocs: rows=${rows}\n|;
-	while ( my ($ID) = $s->fetchrow_array ) { $IDs .= qq|${ID} |; }
+      : $Table eq 'ClientASAM' ? 'ClientASAM.CreateDate'
 
-	
-	unless ( $IDs eq '' )
-	{
-		# Adding action parameter as required by printClientPHQ.cgi
-		my $cmd = qq|/home/okmis/mis/src/cgi/bin/${PrintRoutine}.cgi DBNAME=$form->{'DBNAME'}\\&IDs=${IDs}\\&Client_ClientID=${ClientID}\\&mlt=$form->{mlt}\\&file=${RootName}\\&action=${Table}|;
-	#warn qq|edocs: cmd:${cmd}\n|;
-		system("${cmd}");
-		my $rEDocs = ();
-		$rEDocs->{ClientID} = $ClientID;
-		$rEDocs->{Title} = $Title;
-		$rEDocs->{Descr} = $Descr;
-		$rEDocs->{Type} = $EType;
-		$rEDocs->{Path} = $HomeName;                  # sql Path from Home Directory
-		$rEDocs->{Rollup} = $FileName;
-		$rEDocs->{CreateDate} = $form->{TODAY};       # last time created.
-		$rEDocs->{CreateProvID} = $form->{LOGINPROVID};
-		$rEDocs->{ChangeProvID} = $form->{LOGINPROVID};
-		my $UPDID = DBA->doUpdate($form,'ClientEDocs',$rEDocs,"ClientID='${ClientID}' and Rollup='${FileName}'");
-	#warn qq|edocs: UPDID:${UPDID}\n|;
-	}
-	$s->finish();
-	return($IDs);
+      : $Table eq 'SOGS' ? 'SOGS.CreateDate'
+
+      : $Table eq 'SOGSGSI' ? 'SOGSGSI.CreateDate'
+
+      : $Table eq 'ClientMeds' ? 'ClientMeds.CreateDate'
+
+      : return ();
+    my $join =
+      $Table eq 'ClientDischarge'
+      ? "left join ClientDischargeCDC on ClientDischargeCDC.ClientDischargeID=ClientDischarge.ID"
+      : '';
+    my $daterange = '';
+
+    if (   index( $Table, 'PHQ' ) != -1
+        || $Table eq "ClientGAD7"
+        || $Table eq "ClientACE" )
+    {
+        $PrintRoutine = qq|printClientPHQ|;
+    }
+    if ( $Table eq "ClientPrAuthCDC" ) {
+        $PrintRoutine = qq|printClientCDC|;
+    }
+    if ( $Table eq 'ClientAdmit' ) {
+        if ($Legacy
+          ) # could change to include ALL rollups with value of Legacy (see setClientRollup)
+        {
+            $daterange    = qq|and ClientAdmit.AdmitDate<='${Legacy}'|;
+            $FileName     = qq|ClientIntake${ClientID}.xdp|;
+            $HomeName     = ${HomePath} . '/' . ${FileName};
+            $RootName     = ${RootPath} . '/' . ${FileName};
+            $PrintRoutine = qq|PrintClientIntakePre2017|;
+            $Title = qq|Rollup client '${ClientID}' ClientIntake: ${TODAY}|;
+
+#warn "edocs: daterange=${daterange}, FileName=${FileName}, RootName=${RootName}, PrintRoutine=${PrintRoutine}\n";
+        }
+        else {
+            $daterange = qq|and ClientAdmit.AdmitDate>'2017-01-01'|;
+        }
+    }
+    my $IDs = '';
+    my $q =
+qq|select ${Table}.${RECID} from ${Table} ${join} where ${Table}.ClientID=? ${daterange} order by ${order}|;
+    if ( $Table eq "ClientASI" ) {
+        $q =
+qq|select ${Table}.${RECID} from ${Table} ${join} where ${Table}.G1=? ${daterange} order by ${order}|;
+    }
+
+#warn "edocs: q=\n$q\nClientID=${ClientID}, Table=${Table}, PrintRoutine=${PrintRoutine}, RECID=${RECID}\n";
+    my $s = $dbh->prepare($q);
+    $s->execute($ClientID);
+
+    #my $rows = $s->rows; warn qq|edocs: rows=${rows}\n|;
+    while ( my ($ID) = $s->fetchrow_array ) { $IDs .= qq|${ID} |; }
+
+    unless ( $IDs eq '' ) {
+
+        # Adding action parameter as required by printClientPHQ.cgi
+        my $cmd =
+qq|/var/www/okmis/src/cgi/bin/${PrintRoutine}.cgi DBNAME=$form->{'DBNAME'}\\&IDs=${IDs}\\&Client_ClientID=${ClientID}\\&mlt=$form->{mlt}\\&file=${RootName}\\&action=${Table}|;
+
+        #warn qq|edocs: cmd:${cmd}\n|;
+        system("${cmd}");
+        my $rEDocs = ();
+        $rEDocs->{ClientID}     = $ClientID;
+        $rEDocs->{Title}        = $Title;
+        $rEDocs->{Descr}        = $Descr;
+        $rEDocs->{Type}         = $EType;
+        $rEDocs->{Path}         = $HomeName;      # sql Path from Home Directory
+        $rEDocs->{Rollup}       = $FileName;
+        $rEDocs->{CreateDate}   = $form->{TODAY}; # last time created.
+        $rEDocs->{CreateProvID} = $form->{LOGINPROVID};
+        $rEDocs->{ChangeProvID} = $form->{LOGINPROVID};
+        my $UPDID = DBA->doUpdate( $form, 'ClientEDocs', $rEDocs,
+            "ClientID='${ClientID}' and Rollup='${FileName}'" );
+
+        #warn qq|edocs: UPDID:${UPDID}\n|;
+    }
+    $s->finish();
+    return ($IDs);
 }
-
 
 # @desc Rollup provider docs for a a given table
 # @args $form, $ProvID, $Table
 # @return $ids of the generated docs
 sub ProviderEDocs {
-	my ($self,$form,$ProvID,$Table, $HomePath) = @_;
-	my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+    my ( $self, $form, $ProvID, $Table, $HomePath ) = @_;
+    my $dbh = myDBI->dbconnect( $form->{'DBNAME'} );
 
-	my $RootPath = $form->{DOCROOT} . ${HomePath};
+    my $RootPath = $form->{DOCROOT} . ${HomePath};
 
-	my $TODAY = DBUtil->Date($form->{TODAY},'fmt','MM/DD/YYYY');
-	my $Title = qq|Rollup Provider '${ProvID}' ${Table}: ${TODAY}|;
-	my $Descr = qq|Rollup on ${TODAY}|;
-	my $EType = 27;        # 'Credentialing' Type.
-	my $RECID = myDBI->getTableConfig($Table,'RECID');
-	my $FileName = qq|${Table}${ProvID}.pdf|;
-	my $PrintRoutine = 'print'.$Table;
+    my $TODAY = DBUtil->Date( $form->{TODAY}, 'fmt', 'MM/DD/YYYY' );
+    my $Title = qq|Rollup Provider '${ProvID}' ${Table}: ${TODAY}|;
+    my $Descr = qq|Rollup on ${TODAY}|;
+    my $EType = 27;                                      # 'Credentialing' Type.
+    my $RECID = myDBI->getTableConfig( $Table, 'RECID' );
+    my $FileName     = qq|${Table}${ProvID}.pdf|;
+    my $PrintRoutine = 'print' . $Table;
 
-	my $HomeName = "${HomePath}/$FileName";
-	my $RootName = ${RootPath} . '/' . ${FileName};
+    my $HomeName = "${HomePath}/$FileName";
+    my $RootName = ${RootPath} . '/' . ${FileName};
 
-	unlink($RootName);
-	(my $OLDRootName = $RootName) =~ s/pdf/xdp/g;
-	unlink($OLDRootName);
+    unlink($RootName);
+    ( my $OLDRootName = $RootName ) =~ s/pdf/xdp/g;
+    unlink($OLDRootName);
 
+    my $sDelete =
+      $dbh->prepare("delete from ProviderEDocs where ProvID=? and Rollup=?");
+    $sDelete->execute( $ProvID, $FileName );
+    ( my $OLDFileName = $FileName ) =~ s/pdf/xdp/g;
+    $sDelete->execute( $ProvID, $OLDFileName );
+    $sDelete->finish();
 
-	my $sDelete = $dbh->prepare("delete from ProviderEDocs where ProvID=? and Rollup=?");
-	$sDelete->execute($ProvID,$FileName);
-	(my $OLDFileName = $FileName) =~ s/pdf/xdp/g;
-	$sDelete->execute($ProvID,$OLDFileName);
-	$sDelete->finish();
+    if ( $RECID eq '' ) {
+        $RECID = 'ID';
+    }
+    if ( $Table eq "Treatment" ) {
+        $RECID = 'TrID';
+    }
+    my $IDs = '';
+    my $q = qq|select ${Table}.${RECID} from ${Table} where ${Table}.ProvID=?|;
+    if ( 'Billing' eq $Table ) {
+        $q =
+          qq|select ${Table}.${RECID} from ${Table} where ${Table}.ClinicID=?|;
+        $PrintRoutine = 'printProviderBilling';
+    }
 
-	if($RECID eq '') {
-		$RECID = 'ID';
-	}
-	if($Table eq "Treatment") {
-		$RECID = 'TrID';
-	}
-	my $IDs='';
-	my $q = qq|select ${Table}.${RECID} from ${Table} where ${Table}.ProvID=?|;
-	if('Billing' eq $Table) {
-		$q = qq|select ${Table}.${RECID} from ${Table} where ${Table}.ClinicID=?|;
-		$PrintRoutine = 'printProviderBilling';
-	}
+    if ( 'ProviderEDocs' eq $Table ) {
+        $q =
+qq|select ${Table}.${RECID} from ${Table} where ${Table}.ProvID=? and Type !=40|
+          ;    # Avoid Zip files
+    }
 
-	if('ProviderEDocs' eq $Table) {
-		$q = qq|select ${Table}.${RECID} from ${Table} where ${Table}.ProvID=? and Type !=40|; # Avoid Zip files
-	}
-	
-	my $s=$dbh->prepare($q);
-	$s->execute($ProvID);
+    my $s = $dbh->prepare($q);
+    $s->execute($ProvID);
 
-	while ( my ($ID) = $s->fetchrow_array ) { $IDs .= qq|${ID} |; }
+    while ( my ($ID) = $s->fetchrow_array ) { $IDs .= qq|${ID} |; }
 
-	
-	unless ( $IDs eq '' )
-	{
-		my $cmd = qq|/home/okmis/mis/src/cgi/bin/${PrintRoutine}.cgi DBNAME=$form->{'DBNAME'}\\&IDs=${IDs}\\&Provider_ProvID=${ProvID}\\&mlt=$form->{mlt}\\&file=${RootName}|;
-		if($Table eq "Treatment") {
-			$cmd = qq|/home/okmis/mis/src/cgi/bin/printHCFA.pl DBNAME=$form->{'DBNAME'}\\&TrIDs=${IDs}\\&Provider_ProvID=${ProvID}\\&mlt=$form->{mlt}\\&file=${RootName}|;
-		}
-#warn qq|edocs: cmd:${cmd}\n|;
-		system("${cmd}");
-		my $rEDocs = ();
-		$rEDocs->{ProvID} = $ProvID;
-		$rEDocs->{Title} = $Title;
-		$rEDocs->{Descr} = $Descr;
-		$rEDocs->{Type} = $EType;
-		$rEDocs->{Path} = $HomeName;                  # sql Path from Home Directory
-		$rEDocs->{Rollup} = $FileName;
-		$rEDocs->{CreateDate} = $form->{TODAY};       # last time created.
-		$rEDocs->{CreateProvID} = $form->{LOGINPROVID};
-		$rEDocs->{ChangeProvID} = $form->{LOGINPROVID};
-		my $UPDID = DBA->doUpdate($form,'ProviderEDocs',$rEDocs,"ProvID='${ProvID}' and Rollup='${FileName}'");
-#warn qq|edocs: UPDID:${UPDID}\n|;
-	}
-	$s->finish();
-	return($IDs);
+    unless ( $IDs eq '' ) {
+        my $cmd =
+qq|/var/www/okmis/src/cgi/bin/${PrintRoutine}.cgi DBNAME=$form->{'DBNAME'}\\&IDs=${IDs}\\&Provider_ProvID=${ProvID}\\&mlt=$form->{mlt}\\&file=${RootName}|;
+        if ( $Table eq "Treatment" ) {
+            $cmd =
+qq|/var/www/okmis/src/cgi/bin/printHCFA.pl DBNAME=$form->{'DBNAME'}\\&TrIDs=${IDs}\\&Provider_ProvID=${ProvID}\\&mlt=$form->{mlt}\\&file=${RootName}|;
+        }
+
+        #warn qq|edocs: cmd:${cmd}\n|;
+        system("${cmd}");
+        my $rEDocs = ();
+        $rEDocs->{ProvID}       = $ProvID;
+        $rEDocs->{Title}        = $Title;
+        $rEDocs->{Descr}        = $Descr;
+        $rEDocs->{Type}         = $EType;
+        $rEDocs->{Path}         = $HomeName;      # sql Path from Home Directory
+        $rEDocs->{Rollup}       = $FileName;
+        $rEDocs->{CreateDate}   = $form->{TODAY}; # last time created.
+        $rEDocs->{CreateProvID} = $form->{LOGINPROVID};
+        $rEDocs->{ChangeProvID} = $form->{LOGINPROVID};
+        my $UPDID = DBA->doUpdate( $form, 'ProviderEDocs', $rEDocs,
+            "ProvID='${ProvID}' and Rollup='${FileName}'" );
+
+        #warn qq|edocs: UPDID:${UPDID}\n|;
+    }
+    $s->finish();
+    return ($IDs);
 }
 
 ############################################################################
 
-sub RollupFiles{
-	my ($self,$form,$ProvID, $HomePath) = @_;
+sub RollupFiles {
+    my ( $self, $form, $ProvID, $HomePath ) = @_;
 
-	my $RootPath = $form->{DOCROOT} . ${HomePath};
-	my @commands = (
-	qq|/home/okmis/mis/src/reports/BillAmt mlt=$form->{mlt}\\&DBNAME=$form->{'DBNAME'}\\&Type=\\&hdrline=4\\&output=pdf\\&Active=\\&ClinicIDs=$ProvID\\&CustAgency=\\&Days=\\&Format=\\&FromDate=\\&InsCode=\\&InsID=\\&ProvIDs=\\&ToDate=\\&daterange=all\\&sYearMonth=\\&ReportDescr=Billed Report by Week 1> ${RootPath}/BillingRecAmt.pdf|,
-	qq|/home/okmis/mis/src/reports/BillAmt mlt=$form->{mlt}\\&DBNAME=$form->{'DBNAME'}\\&Type=\\&hdrline=4\\&output=ss\\&Active=\\&ClinicIDs=$ProvID\\&CustAgency=\\&Days=\\&Format=\\&FromDate=\\&InsCode=\\&InsID=\\&ProvIDs=\\&ToDate=\\&daterange=all\\&sYearMonth=\\&ReportDescr=Billed Report by Week 1> ${RootPath}/BillingRecAmt.xls|,
-	qq|/home/okmis/mis/src/reports/noteReport mlt=$form->{mlt}\\&DBNAME=$form->{'DBNAME'}\\&Type=BilledDate\\&hdrline=\\&output=ss\\&Active=\\&ClinicIDs=$ProvID\\&CustAgency=\\&Days=\\&Format=Extended\\&FromDate=\\&InsCode=\\&InsID=\\&ProvIDs=\\&ToDate=\\&daterange=all\\&sYearMonth=\\&ReportDescr=Note Report for BILLED Date 1> ${RootPath}/Billing.xls|,
-	qq|/home/okmis/mis/src/reports/ClientByClinic mlt=$form->{mlt}\\&DBNAME=$form->{'DBNAME'}\\&ForProvID=$ProvID\\&Type=\\&hdrline=\\&output=ss\\&Active=\\&ClinicIDs=\\&CustAgency=\\&Days=\\&Format=\\&FromDate=\\&InsCode=\\&InsID=\\&ProvIDs=\\&ToDate=\\&daterange=\\&sYearMonth=\\&ReportDescr=Client By Clinic 1> ${RootPath}/Clients.xls|,
-	qq|/home/okmis/mis/src/reports/ProvEmpl mlt=$form->{mlt}\\&DBNAME=$form->{'DBNAME'}\\&ForProvID=$ProvID\\&Type=\\&hdrline=\\&output=ss\\&Active=\\&ClinicIDs=\\&CustAgency=\\&Days=\\&Format=\\&FromDate=\\&InsCode=\\&InsID=\\&ProvIDs=\\&ToDate=\\&daterange=\\&sYearMonth=\\&ReportDescr=Provider/Employee w/Lic+Cred 1> ${RootPath}/Providers.xls|      
-	);
-		
-	foreach my $command (@commands) {
-				system("$command");
-	}
-	return;
+    my $RootPath = $form->{DOCROOT} . ${HomePath};
+    my @commands = (
+qq|/var/www/okmis/src/reports/BillAmt mlt=$form->{mlt}\\&DBNAME=$form->{'DBNAME'}\\&Type=\\&hdrline=4\\&output=pdf\\&Active=\\&ClinicIDs=$ProvID\\&CustAgency=\\&Days=\\&Format=\\&FromDate=\\&InsCode=\\&InsID=\\&ProvIDs=\\&ToDate=\\&daterange=all\\&sYearMonth=\\&ReportDescr=Billed Report by Week 1> ${RootPath}/BillingRecAmt.pdf|,
+qq|/var/www/okmis/src/reports/BillAmt mlt=$form->{mlt}\\&DBNAME=$form->{'DBNAME'}\\&Type=\\&hdrline=4\\&output=ss\\&Active=\\&ClinicIDs=$ProvID\\&CustAgency=\\&Days=\\&Format=\\&FromDate=\\&InsCode=\\&InsID=\\&ProvIDs=\\&ToDate=\\&daterange=all\\&sYearMonth=\\&ReportDescr=Billed Report by Week 1> ${RootPath}/BillingRecAmt.xls|,
+qq|/var/www/okmis/src/reports/noteReport mlt=$form->{mlt}\\&DBNAME=$form->{'DBNAME'}\\&Type=BilledDate\\&hdrline=\\&output=ss\\&Active=\\&ClinicIDs=$ProvID\\&CustAgency=\\&Days=\\&Format=Extended\\&FromDate=\\&InsCode=\\&InsID=\\&ProvIDs=\\&ToDate=\\&daterange=all\\&sYearMonth=\\&ReportDescr=Note Report for BILLED Date 1> ${RootPath}/Billing.xls|,
+qq|/var/www/okmis/src/reports/ClientByClinic mlt=$form->{mlt}\\&DBNAME=$form->{'DBNAME'}\\&ForProvID=$ProvID\\&Type=\\&hdrline=\\&output=ss\\&Active=\\&ClinicIDs=\\&CustAgency=\\&Days=\\&Format=\\&FromDate=\\&InsCode=\\&InsID=\\&ProvIDs=\\&ToDate=\\&daterange=\\&sYearMonth=\\&ReportDescr=Client By Clinic 1> ${RootPath}/Clients.xls|,
+qq|/var/www/okmis/src/reports/ProvEmpl mlt=$form->{mlt}\\&DBNAME=$form->{'DBNAME'}\\&ForProvID=$ProvID\\&Type=\\&hdrline=\\&output=ss\\&Active=\\&ClinicIDs=\\&CustAgency=\\&Days=\\&Format=\\&FromDate=\\&InsCode=\\&InsID=\\&ProvIDs=\\&ToDate=\\&daterange=\\&sYearMonth=\\&ReportDescr=Provider/Employee w/Lic+Cred 1> ${RootPath}/Providers.xls|
+    );
+
+    foreach my $command (@commands) {
+        system("$command");
+    }
+    return;
 }
 
 ############################################################################
 sub createDirectory {
-	my ($self, $form, $path, $ID, $ProvType) = @_;
-	my $NewDir = "$form->{DOCROOT}${path}$ID";
+    my ( $self, $form, $path, $ID, $ProvType ) = @_;
+    my $NewDir = "$form->{DOCROOT}${path}$ID";
 
-	if(!(-d $NewDir)) {
-		system("/bin/mkdir -pm 777 ${NewDir}");
-		warn qq|$NewDir Directory Created\n|;
-	}
-	
-	my $childDir = '';
+    if ( !( -d $NewDir ) ) {
+        system("/bin/mkdir -pm 777 ${NewDir}");
+        warn qq|$NewDir Directory Created\n|;
+    }
 
-	if($ProvType eq '2') {
-		# Create Clinics Directories inside Agency/{agencyid}/
-		$childDir = "$NewDir/Clinics";
-	}
+    my $childDir = '';
 
-	if($ProvType eq '3') {
-		# Create Clients & Providers Directories inside Agency/{agencyid}/Clinics/{ClinicID}/
-		$childDir = "$NewDir/Providers";
-	}
-	
-	if($ProvType eq '4') {
-		# Create Clients Directory inside Agency/{agencyid}/Clinics/{ClinicID}/Providers/{$ProvID}/
-		$childDir = "$NewDir/Clients";
-	}
+    if ( $ProvType eq '2' ) {
 
-	if( '' ne $childDir && !(-d $childDir)) {
-		system("/bin/mkdir -pm 777 ${childDir}");
+        # Create Clinics Directories inside Agency/{agencyid}/
+        $childDir = "$NewDir/Clinics";
+    }
 
-		warn qq|$childDir Directory Created\n|;
-	}
-	return $NewDir;
+    if ( $ProvType eq '3' ) {
+
+# Create Clients & Providers Directories inside Agency/{agencyid}/Clinics/{ClinicID}/
+        $childDir = "$NewDir/Providers";
+    }
+
+    if ( $ProvType eq '4' ) {
+
+# Create Clients Directory inside Agency/{agencyid}/Clinics/{ClinicID}/Providers/{$ProvID}/
+        $childDir = "$NewDir/Clients";
+    }
+
+    if ( '' ne $childDir && !( -d $childDir ) ) {
+        system("/bin/mkdir -pm 777 ${childDir}");
+
+        warn qq|$childDir Directory Created\n|;
+    }
+    return $NewDir;
 
 }
 

@@ -1,22 +1,27 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 ############################################################################
 $form = DBForm->new();
 my $dbh = $form->dbconnect();
-$d= $dbh->prepare("update xSCRates set ExpDate=? where ID=?");
-$s= $dbh->prepare("
+$d = $dbh->prepare("update xSCRates set ExpDate=? where ID=?");
+$s = $dbh->prepare( "
 select xSCRates.*, xSC.Active, xSC.SCNum, xSC.SCName
      , xInsurance.Descr, xInsurance.Name 
   from xSCRates left join xSC on xSC.SCID=xSCRates.SCID left join xInsurance on xInsurance.ID=xSC.InsID
  where xSCRates.ExpDate is null and xSC.Active=0
- order by xInsurance.Name, xSCRates.SCID");
-$s->execute() || print qq|ugh\n|;;
-while ( my $r = $s->fetchrow_hashref )
-{
-  my $ExpDate = substr($r->{ChangeDate},0,4) . '-' . substr($r->{ChangeDate},4,2) . '-' .  substr($r->{ChangeDate},6,2);
-  print qq|$r->{Name}, $r->{SCID}, $r->{SCNum}, $r->{SCName}, $r->{Active}, $r->{EffDate}, $r->{ExpDate}, $r->{ID}, $r->{ChangeDate}, $ExpDate\n|;
-  $d->execute($ExpDate,$r->{ID}) || print qq|update xSCRates set ExpDate='$ExpDate' where ID='$r->{ID}';\n|;;
+ order by xInsurance.Name, xSCRates.SCID" );
+$s->execute() || print qq|ugh\n|;
+while ( my $r = $s->fetchrow_hashref ) {
+    my $ExpDate =
+        substr( $r->{ChangeDate}, 0, 4 ) . '-'
+      . substr( $r->{ChangeDate}, 4, 2 ) . '-'
+      . substr( $r->{ChangeDate}, 6, 2 );
+    print
+qq|$r->{Name}, $r->{SCID}, $r->{SCNum}, $r->{SCName}, $r->{Active}, $r->{EffDate}, $r->{ExpDate}, $r->{ID}, $r->{ChangeDate}, $ExpDate\n|;
+    $d->execute( $ExpDate, $r->{ID} )
+      || print
+      qq|update xSCRates set ExpDate='$ExpDate' where ID='$r->{ID}';\n|;
 }
 exit;

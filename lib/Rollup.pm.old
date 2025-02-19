@@ -65,7 +65,7 @@ sub Notes
   while ( my ($TrID) = $sNotes->fetchrow_array ) { $TrIDs .= qq|${TrID} |; }
   unless ( $TrIDs eq '' )
   {
-    my $cmd = qq|/home/okmis/mis/src/cgi/bin/printNotes.pl DBNAME=$form->{'DBNAME'}\\&TrIDs=${TrIDs}\\&mlt=$form->{mlt}\\&file=${RootName}|;
+    my $cmd = qq|/var/www/okmis/src/cgi/bin/printNotes.pl DBNAME=$form->{'DBNAME'}\\&TrIDs=${TrIDs}\\&mlt=$form->{mlt}\\&file=${RootName}|;
 #warn qq|Notes: cmd:${cmd}\n|;
     system("${cmd}");
 #warn qq|rollupNotes: create: ${RootName}\n|;
@@ -164,7 +164,7 @@ sub edocs
   while ( my ($ID) = $s->fetchrow_array ) { $IDs .= qq|${ID} |; }
   unless ( $IDs eq '' )
   {
-    my $cmd = qq|/home/okmis/mis/src/cgi/bin/${PrintRoutine}.cgi DBNAME=$form->{'DBNAME'}\\&IDs=${IDs}\\&Client_ClientID=${ClientID}\\&mlt=$form->{mlt}\\&file=${RootName}|;
+    my $cmd = qq|/var/www/okmis/src/cgi/bin/${PrintRoutine}.cgi DBNAME=$form->{'DBNAME'}\\&IDs=${IDs}\\&Client_ClientID=${ClientID}\\&mlt=$form->{mlt}\\&file=${RootName}|;
 #warn qq|edocs: cmd:${cmd}\n|;
     system("${cmd}");
     my $rEDocs = ();

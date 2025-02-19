@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 use uBill;
@@ -14,58 +14,71 @@ use Time::Local;
 ############################################################################
 $form = DBForm->new();
 my $dbh = $form->dbconnect();
+
 #foreach my $f ( sort keys %{$form} ) { warn "form-$f=$form->{$f}\n"; }
-my $DT=localtime();
+my $DT = localtime();
 print "fixBilledAmt started @ $DT\n";
 
 ############################################################################
 my $unrec = $form->{'unrec'};
 my $qNote = qq|select * from Treatment |;
-if ( $form->{TrID} ) { $qNote .= qq| where TrID=$form->{TrID} |; }
-elsif ( $form->{TrIDs} )
-{
-  my $conj = 'where';
-  foreach $TrID ( split(' ',$form->{TrIDs}) )
-  { $qNote .= qq| ${conj} TrID=${TrID} |; $conj='or'; }
+if    ( $form->{TrID} ) { $qNote .= qq| where TrID=$form->{TrID} |; }
+elsif ( $form->{TrIDs} ) {
+    my $conj = 'where';
+    foreach $TrID ( split( ' ', $form->{TrIDs} ) ) {
+        $qNote .= qq| ${conj} TrID=${TrID} |;
+        $conj = 'or';
+    }
 }
-elsif ( $form->{FromDate} eq '' && $form->{ToDate} eq '' )
-{ $qNote .= qq| where ContLogDate >= '2005-01-01' |; }
-elsif ( $form->{FromDate} ne '' && $form->{ToDate} ne '' )
-{ $qNote .= qq| where ContLogDate >= '$form->{FromDate}' and ContLogDate <= '$form->{ToDate}'|; }
-elsif ( $form->{FromDate} ne '' )
-{ $qNote .= qq| where ContLogDate >= '$form->{FromDate}' |; }
-else
-{ $qNote .= qq| where ContLogDate <= '$form->{ToDate}'|; }
+elsif ( $form->{FromDate} eq '' && $form->{ToDate} eq '' ) {
+    $qNote .= qq| where ContLogDate >= '2005-01-01' |;
+}
+elsif ( $form->{FromDate} ne '' && $form->{ToDate} ne '' ) {
+    $qNote .=
+qq| where ContLogDate >= '$form->{FromDate}' and ContLogDate <= '$form->{ToDate}'|;
+}
+elsif ( $form->{FromDate} ne '' ) {
+    $qNote .= qq| where ContLogDate >= '$form->{FromDate}' |;
+}
+else { $qNote .= qq| where ContLogDate <= '$form->{ToDate}'|; }
 if ( $form->{ClientID} ) { $qNote .= qq| and ClientID=$form->{ClientID} |; }
-$qNote .= qq| and BillStatus NOT IN (4,5) order by ClientID, TrID, BillDate, RecDate| if ( $unrec );
+$qNote .=
+  qq| and BillStatus NOT IN (4,5) order by ClientID, TrID, BillDate, RecDate|
+  if ($unrec);
 warn "# qNote=\n# $qNote\n";
 my $sNote = $dbh->prepare($qNote);
 ############################################################################
 print qq|#Type\tClientID\tTrID\tStatus\tSC\tContDate\tWas\tNow\n|;
 
-my $upd=0;
-my $chk=0;
+my $upd     = 0;
+my $chk     = 0;
 my $SCHDate = $form->{TODAY};
-my $RefID = '0' . $form->{TODAY}; $RefID =~ s/-//g;
+my $RefID   = '0' . $form->{TODAY};
+$RefID =~ s/-//g;
 $sNote->execute() || $form->dberror($qNote);
-while ( my $rNote = $sNote->fetchrow_hashref )
-{
-#foreach my $f ( sort keys %{$rNote} ) { warn "rNote-$f=$rNote->{$f}\n"; }
-  $chk++;
-  my ($BilledAmt,$IncAmt,$SchAmt,$AmtDue) = uBill->setBilledAmt($form,$rNote->{'TrID'},$unrec);
+while ( my $rNote = $sNote->fetchrow_hashref ) {
+
+    #foreach my $f ( sort keys %{$rNote} ) { warn "rNote-$f=$rNote->{$f}\n"; }
+    $chk++;
+    my ( $BilledAmt, $IncAmt, $SchAmt, $AmtDue ) =
+      uBill->setBilledAmt( $form, $rNote->{'TrID'}, $unrec );
+
 #warn qq|=$rNote->{BilledAmt}=,=$rNote->{IncAmt}=,=$rNote->{SchAmt}=,=$rNote->{AmtDue}=\n|;
 #warn qq|=$BilledAmt=,=$IncAmt=,=$SchAmt=,=$AmtDue=\n|;
-  if ( $BilledAmt ne $rNote->{BilledAmt} || $AmtDue ne $rNote->{AmtDue} )
-  {
-    $upd++;
-    print qq|#BILLEDAMT:\t$rNote->{ClientID}\t$rNote->{TrID}\t$rNote->{BillStatus}\t$rNote->{SCID}\t$rNote->{ContLogDate}\t$rNote->{BilledAmt}\t${BilledAmt}\n| if ( $BilledAmt != $rNote->{BilledAmt} );
-    print qq|#AMTDUE:   \t$rNote->{ClientID}\t$rNote->{TrID}\t$rNote->{BillStatus}\t$rNote->{SCID}\t$rNote->{ContLogDate}\t$rNote->{AmtDue}\t${AmtDue}\n| if ( $AmtDue != $rNote->{AmtDue} );
-  }
+    if ( $BilledAmt ne $rNote->{BilledAmt} || $AmtDue ne $rNote->{AmtDue} ) {
+        $upd++;
+        print
+qq|#BILLEDAMT:\t$rNote->{ClientID}\t$rNote->{TrID}\t$rNote->{BillStatus}\t$rNote->{SCID}\t$rNote->{ContLogDate}\t$rNote->{BilledAmt}\t${BilledAmt}\n|
+          if ( $BilledAmt != $rNote->{BilledAmt} );
+        print
+qq|#AMTDUE:   \t$rNote->{ClientID}\t$rNote->{TrID}\t$rNote->{BillStatus}\t$rNote->{SCID}\t$rNote->{ContLogDate}\t$rNote->{AmtDue}\t${AmtDue}\n|
+          if ( $AmtDue != $rNote->{AmtDue} );
+    }
 }
 print "# Checked Notes=$chk, Update Count=$upd\n";
 $sNote->finish();
 $form->complete();
-my $DT=localtime();
+my $DT = localtime();
 print "fixBilledAmt ended @ $DT\n";
 exit;
 ############################################################################

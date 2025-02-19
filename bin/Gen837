@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use Accounts;
 use myConfig;
 use Cwd;
@@ -10,14 +10,18 @@ use Cwd;
 #    or: command mark acct1 acct2...to mark for 'acct1' 'acct2' ...
 ############################################################################
 # get the command name...
-my ($pw,$cmd) = $0 =~ m/(.*\/)(.*)$/;
+my ( $pw, $cmd ) = $0 =~ m/(.*\/)(.*)$/;
+
 # the databases to work with
-my @DBS = $ARGV[0] eq 'test' ? Accounts->dbs('test') : scalar(@ARGV) ? @ARGV : Accounts->dbs('active'); 
-my $BIN = myConfig->cfg('BIN');
+my @DBS =
+    $ARGV[0] eq 'test' ? Accounts->dbs('test')
+  : scalar(@ARGV)      ? @ARGV
+  :                      Accounts->dbs('active');
+my $BIN     = myConfig->cfg('BIN');
 my $BILLDIR = myConfig->cfg('BILLDIR');
 
 ############################################################################
-print qq|${cmd} Started: |.localtime().qq|\n\n|;
+print qq|${cmd} Started: | . localtime() . qq|\n\n|;
 print qq|======================================\n\n|;
 print qq|DBS=@DBS\n|;
 
@@ -27,26 +31,28 @@ my @delfiles = glob("*.837 *.837.out *.837.txt");
 print qq|\nRemove OLD Billing files: | . @delfiles . qq|...\n|;
 unlink(@delfiles);
 
-foreach my $dbname ( @DBS )
-{
-  my $pwd=cwd();
-  print qq|\n--------------------------------------\n|;
-  print qq|database: ${dbname} pwd=${pwd}\n|;
+foreach my $dbname (@DBS) {
+    my $pwd = cwd();
+    print qq|\n--------------------------------------\n|;
+    print qq|database: ${dbname} pwd=${pwd}\n|;
 
-  my $form = DBForm->new("DBNAME=$dbname");
-  my $dbh = $form->dbconnect();
-  my $sInsContracts = $dbh->prepare("select xInsurance.Descr from Contracts left join xInsurance on xInsurance.ID=Contracts.InsID where Contracts.BillFlag=1 and Contracts.BillType='EL' group by xInsurance.Descr");
-  $sInsContracts->execute();
-  while ( my $rInsContracts = $sInsContracts->fetchrow_hashref )
-  {
-    print qq|\n    generate $rInsContracts->{Descr} '837'...\n|;
-    system("${BIN}/gen837 DBNAME=${dbname}\\&InsDescr=$rInsContracts->{Descr}");
-  }
-  $sInsContracts->finish();
-  $form->complete();
+    my $form          = DBForm->new("DBNAME=$dbname");
+    my $dbh           = $form->dbconnect();
+    my $sInsContracts = $dbh->prepare(
+"select xInsurance.Descr from Contracts left join xInsurance on xInsurance.ID=Contracts.InsID where Contracts.BillFlag=1 and Contracts.BillType='EL' group by xInsurance.Descr"
+    );
+    $sInsContracts->execute();
+    while ( my $rInsContracts = $sInsContracts->fetchrow_hashref ) {
+        print qq|\n    generate $rInsContracts->{Descr} '837'...\n|;
+        system(
+            "${BIN}/gen837 DBNAME=${dbname}\\&InsDescr=$rInsContracts->{Descr}"
+        );
+    }
+    $sInsContracts->finish();
+    $form->complete();
 }
 system("${BIN}/SendBilling");
 print qq|\n\n======================================\n|;
-print qq|${cmd} Completed: |.localtime().qq|\n|;
+print qq|${cmd} Completed: | . localtime() . qq|\n|;
 exit;
 ############################################################################

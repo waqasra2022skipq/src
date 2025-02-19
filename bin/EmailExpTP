@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use myForm;
 use myDBI;
@@ -7,30 +7,35 @@ use DBA;
 use DBUtil;
 use MgrTree;
 ############################################################################
-my $form = myForm->new();
-my $dbh = myDBI->dbconnect($form->{'DBNAME'});
-my $sProviderClients = $dbh->prepare("select Client.ClientID,Provider.ProvID,Provider.LName,Provider.FName,Provider.Email from Client left join Provider on Provider.ProvID=Client.ProvID where Client.Active=1 and Provider.Active=1 and Provider.Email IS NOT NULL and Provider.NoMail=0 order by Provider.LName, Provider.FName, Client.LName, Client.FName");
-my $sClientTrPlan = $dbh->prepare("select * from ClientTrPlan where ClientID=? and (curdate() between EffDate and ExpDate) order by ID desc");
+my $form             = myForm->new();
+my $dbh              = myDBI->dbconnect( $form->{'DBNAME'} );
+my $sProviderClients = $dbh->prepare(
+"select Client.ClientID,Provider.ProvID,Provider.LName,Provider.FName,Provider.Email from Client left join Provider on Provider.ProvID=Client.ProvID where Client.Active=1 and Provider.Active=1 and Provider.Email IS NOT NULL and Provider.NoMail=0 order by Provider.LName, Provider.FName, Client.LName, Client.FName"
+);
+my $sClientTrPlan = $dbh->prepare(
+"select * from ClientTrPlan where ClientID=? and (curdate() between EffDate and ExpDate) order by ID desc"
+);
 my $sProvider = $dbh->prepare("select * from Provider where ProvID=?");
-my $cnt=0;
+my $cnt       = 0;
 $sProviderClients->execute();
-while ( my $rProviderClients = $sProviderClients->fetchrow_hashref )
-{
-  $sClientTrPlan->execute($rProviderClients->{ClientID});
-  if ( my $rClientTrPlan = $sClientTrPlan->fetchrow_hashref )
-  {
-    my $RemDays = DBUtil->Date($rClientTrPlan->{ExpDate},'diff');
-    if ( $RemDays == 15 || $RemDays == 10 )
-    { 
-      $cnt++;
-      $TPExpDate = DBUtil->Date($rClientTrPlan->{ExpDate},'fmt','MM/DD/YYYY');
 
-      my $AgencyID = MgrTree->getAgency($form,$rProviderClients->{ProvID});
-      $sProvider->execute($AgencyID);
-      my $rAgency = $sProvider->fetchrow_hashref;
-      my $Addrs = $rProviderClients->{Email};
-      my $Subject = qq|TP Expires for Client ID: $rProviderClients->{ClientID}|;
-      my $Message = qq|
+while ( my $rProviderClients = $sProviderClients->fetchrow_hashref ) {
+    $sClientTrPlan->execute( $rProviderClients->{ClientID} );
+    if ( my $rClientTrPlan = $sClientTrPlan->fetchrow_hashref ) {
+        my $RemDays = DBUtil->Date( $rClientTrPlan->{ExpDate}, 'diff' );
+        if ( $RemDays == 15 || $RemDays == 10 ) {
+            $cnt++;
+            $TPExpDate =
+              DBUtil->Date( $rClientTrPlan->{ExpDate}, 'fmt', 'MM/DD/YYYY' );
+
+            my $AgencyID =
+              MgrTree->getAgency( $form, $rProviderClients->{ProvID} );
+            $sProvider->execute($AgencyID);
+            my $rAgency = $sProvider->fetchrow_hashref;
+            my $Addrs   = $rProviderClients->{Email};
+            my $Subject =
+              qq|TP Expires for Client ID: $rProviderClients->{ClientID}|;
+            my $Message = qq|
 Agency: $rAgency->{Name}
 
 Provider: $rProviderClients->{FName} $rProviderClients->{LName},
@@ -39,10 +44,10 @@ Treatment Plan expires in ${RemDays} days on ${TPExpDate}.
 
 (Do not reply to this automated message.)
 |;
-      DBUtil->email($form,$Addrs,$Subject,$Message,'',1);
-      print qq|${Addrs},${Subject}\n${Message}\n|;
+            DBUtil->email( $form, $Addrs, $Subject, $Message, '', 1 );
+            print qq|${Addrs},${Subject}\n${Message}\n|;
+        }
     }
-  }
 }
 $sProviderClients->finish();
 $sClientTrPlan->finish();

@@ -1,53 +1,51 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 ############################################################################
 # prints delete's the multiple records.
 # usage: delEligibleDups DBNAME=okmis_xxx
 ############################################################################
-my $debug = 0;
-my $form = DBForm->new();
-my $dbh = $form->dbconnect();
+my $debug   = 0;
+my $form    = DBForm->new();
+my $dbh     = $form->dbconnect();
 my $sDelete = $dbh->prepare("delete from Eligible where ID=?");
-  open O1, ">/home/okmis/mis/src/sbin/o1" or die "Couldn't open file: $!";
-  open O2, ">/home/okmis/mis/src/sbin/o2" or die "Couldn't open file: $!";
+open O1, ">/var/www/okmis/src/sbin/o1" or die "Couldn't open file: $!";
+open O2, ">/var/www/okmis/src/sbin/o2" or die "Couldn't open file: $!";
 my @flds = (
-  'ClientID',
-  'InsCode',
-  'Benefit',
-  'BenefitDescr',
-  'Coverage',
-  'ServiceType',
-  'PlanDescr',
-  'FromDate',
-  'ToDate',
-  'OtherInsCode',
-  'OtherInsName',
-  'PolicyID',
-  'PolicyName');
-  my ($order,$dlm) = ('','');
-  foreach my $fld ( @flds ) { $order .= qq|${dlm}${fld}|; $dlm = ','; }
-  my $PrevID=''; my $PrevkID=''; my $Prevr = ''; 
-  my $sel = qq|select * from Eligible order by ${order}|;
-print qq|sel=${sel}\n| if ( $debug );
-  my $s = $dbh->prepare($sel);
-  $s->execute() || die "selection failed:".$sel;
-  while ( my $r = $s->fetchrow_hashref )
-  {
+    'ClientID', 'InsCode',      'Benefit',      'BenefitDescr',
+    'Coverage', 'ServiceType',  'PlanDescr',    'FromDate',
+    'ToDate',   'OtherInsCode', 'OtherInsName', 'PolicyID',
+    'PolicyName'
+);
+my ( $order, $dlm ) = ( '', '' );
+foreach my $fld (@flds) { $order .= qq|${dlm}${fld}|; $dlm = ','; }
+my $PrevID  = '';
+my $PrevkID = '';
+my $Prevr   = '';
+my $sel     = qq|select * from Eligible order by ${order}|;
+print qq|sel=${sel}\n| if ($debug);
+my $s = $dbh->prepare($sel);
+$s->execute() || die "selection failed:" . $sel;
+
+while ( my $r = $s->fetchrow_hashref ) {
     my $remove = 1;
-    foreach my $fld ( @flds )
-    { $remove = 0 if ( $r->{$fld} ne $Prevr->{$fld} ); }
-    if ( $remove )
-    {
-      print qq|delete from Eligible where ID='$r->{ID}';\n|;
-      $sDelete->execute($r->{ID}) || die "delete failed: ".$r->{ID};
-if ( $debug ) { foreach my $f ( sort keys %{ $r } ) { print O1 ": r-$f=$r->{$f}\n"; } }
-if ( $debug ) { foreach my $f ( sort keys %{ $Prevr } ) { print O2 ": r-$f=$Prevr->{$f}\n"; } }
+    foreach my $fld (@flds) { $remove = 0 if ( $r->{$fld} ne $Prevr->{$fld} ); }
+    if ($remove) {
+        print qq|delete from Eligible where ID='$r->{ID}';\n|;
+        $sDelete->execute( $r->{ID} ) || die "delete failed: " . $r->{ID};
+        if ($debug) {
+            foreach my $f ( sort keys %{$r} ) { print O1 ": r-$f=$r->{$f}\n"; }
+        }
+        if ($debug) {
+            foreach my $f ( sort keys %{$Prevr} ) {
+                print O2 ": r-$f=$Prevr->{$f}\n";
+            }
+        }
     }
     $Prevr = $r;
-  }
-  $s->finish();
+}
+$s->finish();
 $sDelete->finish();
 $form->complete();
 close(O1);

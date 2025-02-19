@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 
 ############################################################################
 use DBI;
@@ -9,53 +9,63 @@ use DBUtil;
 
 ############################################################################
 $form = DBForm->new;
-$dbh = $form->dbconnect;
+$dbh  = $form->dbconnect;
 
 $qFindNote = qq|select * from NoteTrans where ID=?|;
 $sFindNote = $dbh->prepare($qFindNote);
-$qFindTran = qq|select * from NoteTrans where ClientID=? and ContDate=? and SCNum=?|;
+$qFindTran =
+  qq|select * from NoteTrans where ClientID=? and ContDate=? and SCNum=?|;
 $sFindTran = $dbh->prepare($qFindTran);
 ############################################################################
 open FILE, $form->{path} or die "Couldn't open file: $!";
-my ($in,$rest,$str) = ('','','');
-my ($RecType,$ID,$ClinicName,$ClinicNum,$ClientID,$TrID,$ContDate,$SCNum,$BillAmt,$PaidAmt)
- = ('','','','','','','','','','');
-while ( $in = <FILE> )
-{ 
-#warn qq|main: in=$in\n|;
-  chomp($in); $LineCnt+=1; 
-    ($RecType,$ID,$rest) = split('\*',$in,3);
-    if ( $RecType eq 'N1' && $ID eq 'PE' )
-    { 
-      ($ClinicName,$str) = split('\*',$rest,2);
-      $ClientID = ''; $TrID = ''; $BillAmt, $PaidAmt = ''; $ClinicNum = '';
+my ( $in, $rest, $str ) = ( '', '', '' );
+my (
+    $RecType, $ID,       $ClinicName, $ClinicNum, $ClientID,
+    $TrID,    $ContDate, $SCNum,      $BillAmt,   $PaidAmt
+) = ( '', '', '', '', '', '', '', '', '', '' );
+
+while ( $in = <FILE> ) {
+
+    #warn qq|main: in=$in\n|;
+    chomp($in);
+    $LineCnt += 1;
+    ( $RecType, $ID, $rest ) = split( '\*', $in, 3 );
+    if ( $RecType eq 'N1' && $ID eq 'PE' ) {
+        ( $ClinicName, $str ) = split( '\*', $rest, 2 );
+        $ClientID = '';
+        $TrID     = '';
+        $BillAmt, $PaidAmt = '';
+        $ClinicNum = '';
     }
-    elsif ( $RecType eq 'CLP' )
-    { $ClientID = $ID; $TrID = ''; $BillAmt, $PaidAmt = ''; $ClinicNum = ''; }
-    elsif ( $RecType eq 'SVC' )
-    {
-      my ($CODE,$SCN,$SFX,$junk) = split(':',$ID,4);
-      $SCNum = $SCN . ' ' . $SFX;
-      ($BillAmt,$PaidAmt,$str) = split('\*',$rest,3);
+    elsif ( $RecType eq 'CLP' ) {
+        $ClientID = $ID;
+        $TrID     = '';
+        $BillAmt, $PaidAmt = '';
+        $ClinicNum = '';
     }
-    elsif ( $RecType eq 'DTM' && $ID eq '472' )
-    {
-      ($DD,$str) = split('\*',$rest,2);
-      $ContDate = substr($DD,0,4) . '-' . substr($DD,4,2) . '-' . substr($DD,6,2);
- 
+    elsif ( $RecType eq 'SVC' ) {
+        my ( $CODE, $SCN, $SFX, $junk ) = split( ':', $ID, 4 );
+        $SCNum = $SCN . ' ' . $SFX;
+        ( $BillAmt, $PaidAmt, $str ) = split( '\*', $rest, 3 );
     }
-    elsif ( $RecType eq 'REF' && $ID eq '6R' )
-    {
-      ($TID,$str) = split('\*',$rest,2);
-      my $TransID = substr($TID,1);
-      $sFindNote->execute($TransID) || $form->dberror($qFindNote);
-      my $r = $sFindNote->fetchrow_hashref;
-      $TrID=$r->{TrID};
+    elsif ( $RecType eq 'DTM' && $ID eq '472' ) {
+        ( $DD, $str ) = split( '\*', $rest, 2 );
+        $ContDate =
+            substr( $DD, 0, 4 ) . '-'
+          . substr( $DD, 4, 2 ) . '-'
+          . substr( $DD, 6, 2 );
+
     }
-    elsif ( $RecType eq 'REF' && $ID eq '1D' )
-    {
-      ($ClinicNum,$str) = split('\*',$rest,2);
-      main->report();
+    elsif ( $RecType eq 'REF' && $ID eq '6R' ) {
+        ( $TID, $str ) = split( '\*', $rest, 2 );
+        my $TransID = substr( $TID, 1 );
+        $sFindNote->execute($TransID) || $form->dberror($qFindNote);
+        my $r = $sFindNote->fetchrow_hashref;
+        $TrID = $r->{TrID};
+    }
+    elsif ( $RecType eq 'REF' && $ID eq '1D' ) {
+        ( $ClinicNum, $str ) = split( '\*', $rest, 2 );
+        main->report();
     }
 }
 close(FILE);
@@ -66,16 +76,16 @@ exit;
 ################################################################
 ##
 # got here with an 'ISA' RecType
-sub report
-{
-  return(0) if ( $PaidAmt <= 0 );
-  if ( $TrID eq '' )
-  {
-    $sFindTran->execute($ClientID,$ContDate,$SCNum) || $form->dberror($qFindTran);
-    my $r = $sFindTran->fetchrow_hashref;
-    $TrID = $r->{TrID};
-  }
-  print qq|$ClinicName\t$ClinicNum\t$ClientID\t$TrID\t$ContDate\t$SCNum\t$BillAmt\t$PaidAmt\n|;
-  return(1);
+sub report {
+    return (0) if ( $PaidAmt <= 0 );
+    if ( $TrID eq '' ) {
+        $sFindTran->execute( $ClientID, $ContDate, $SCNum )
+          || $form->dberror($qFindTran);
+        my $r = $sFindTran->fetchrow_hashref;
+        $TrID = $r->{TrID};
+    }
+    print
+qq|$ClinicName\t$ClinicNum\t$ClientID\t$TrID\t$ContDate\t$SCNum\t$BillAmt\t$PaidAmt\n|;
+    return (1);
 }
 ################################################################

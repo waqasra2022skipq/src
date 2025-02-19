@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 
 use CGI::Carp qw(fatalsToBrowser);
 use DBI;
@@ -10,12 +10,13 @@ use myHTML;
 my $form = myForm->new();
 
 ############################################################################
-my $CloseButton = qq|<INPUT TYPE="button" NAME="close" VALUE="close" ONCLICK="javascript: window.close()" >|;
-my $html =  myHTML->close(1,$form->{'mlt'});
+my $CloseButton =
+qq|<INPUT TYPE="button" NAME="close" VALUE="close" ONCLICK="javascript: window.close()" >|;
+my $html = myHTML->close( 1, $form->{'mlt'} );
 
 ############################################################################
 my $SBIN = myConfig->cfg('SRCSBIN');
-$cmd = qq|${SBIN}/rebill/rebill|;
+$cmd      = qq|${SBIN}/rebill/rebill|;
 $AgencyID = $form->{'AgencyID'};
 
 $cmd .= qq| "DBNAME=$form->{'DBNAME'}&mlt=$form->{'mlt'}&AgencyID=$AgencyID"|;

@@ -1,19 +1,22 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 use DBA;
 use DBUtil;
 use MgrTree;
 ############################################################################
-my $form = DBForm->new();
-my $dbh = $form->dbconnect();
-my $Type = $form->{'Type'};
+my $form      = DBForm->new();
+my $dbh       = $form->dbconnect();
+my $Type      = $form->{'Type'};
 my $sProvider = $dbh->prepare("select * from Provider where ProvID=?");
-my $Cnt=0;
-my $StatusDate = $form->{'StatusDate'} ? $form->{'StatusDate'} : $form->{'TODAY'};
-my $qType = $Type =~ /reject/i ?  qq| and ClientPrAuthCDC.Status IN ('Rejected','Pending','Skipped') |
-                               :  qq| and ClientPrAuthCDC.Status='Approved' |;
+my $Cnt       = 0;
+my $StatusDate =
+  $form->{'StatusDate'} ? $form->{'StatusDate'} : $form->{'TODAY'};
+my $qType =
+  $Type =~ /reject/i
+  ? qq| and ClientPrAuthCDC.Status IN ('Rejected','Pending','Skipped') |
+  : qq| and ClientPrAuthCDC.Status='Approved' |;
 my $qProviderClients = qq|
 select ClientPrAuth.ID as PrAuthID, ClientPrAuth.EffDate, ClientPrAuth.ExpDate
      , ClientPrAuthCDC.CreateDate, ClientPrAuthCDC.CDCKey, ClientPrAuthCDC.Status
@@ -30,19 +33,21 @@ select ClientPrAuth.ID as PrAuthID, ClientPrAuth.EffDate, ClientPrAuth.ExpDate
     ${qType}
   order by Client.LName, Client.FName, ClientPrAuth.EffDate
 |;
+
 #warn qq|q=\n$qProviderClients\n|;
 my $sProviderClients = $dbh->prepare($qProviderClients);
 $sProviderClients->execute();
-while ( my $rProviderClients = $sProviderClients->fetchrow_hashref )
-{
-  $Cnt++;
-  my $BY = ' by Reviewers' unless ( $rProviderClients->{Status} =~ /skipped/i );
-  $AgencyID = MgrTree->getAgency($form,$rProviderClients->{ProvID});
-  $sProvider->execute($AgencyID);
-  $rAgency = $sProvider->fetchrow_hashref;
-  my $Email = $rProviderClients->{Email};
-  $Subject = qq|PA $rProviderClients->{Status} for Client ID: $rProviderClients->{ClientID}|;
-  $Message = qq|
+while ( my $rProviderClients = $sProviderClients->fetchrow_hashref ) {
+    $Cnt++;
+    my $BY = ' by Reviewers'
+      unless ( $rProviderClients->{Status} =~ /skipped/i );
+    $AgencyID = MgrTree->getAgency( $form, $rProviderClients->{ProvID} );
+    $sProvider->execute($AgencyID);
+    $rAgency = $sProvider->fetchrow_hashref;
+    my $Email = $rProviderClients->{Email};
+    $Subject =
+qq|PA $rProviderClients->{Status} for Client ID: $rProviderClients->{ClientID}|;
+    $Message = qq|
 Agency: $rAgency->{Name}
 
 Provider: $rProviderClients->{FName} $rProviderClients->{LName},
@@ -57,8 +62,8 @@ Requested:\t$rProviderClients->{CreateDate}
 
 (Do not reply to this automated message.)
 |;
-  DBUtil->email($form,$Addrs,$Subject,$Message,'',1);
-  print qq|$Addrs, $Subject\n$Message\n|;
+    DBUtil->email( $form, $Addrs, $Subject, $Message, '', 1 );
+    print qq|$Addrs, $Subject\n$Message\n|;
 }
 $sProviderClients->finish();
 $sProvider->finish();

@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 use DBA;
@@ -12,123 +12,88 @@ my @IDs = ();
 ###########################################
 # get any cat or echo to email message...
 ##
-if ( ! -t STDIN ) { while (<STDIN>) { chomp($_); push(@IDs,$_); } }
+if ( !-t STDIN ) {
+    while (<STDIN>) { chomp($_); push( @IDs, $_ ); }
+}
 
 $form = DBForm->new;
 
 ##
 # either list of ProvIDs or ClientIDs
 ##
-if ( $form->{ID} )
-{ push(@IDs,split(',',$form->{ID})); }
+if ( $form->{ID} ) { push( @IDs, split( ',', $form->{ID} ) ); }
 
 @ClientTables = (
-ClientASAM,
-ClientBasis32,
-Client,
-ClientAccess,
-ClientACL,
-ClientAdmit,
-ClientDevl,
-ClientEDocs,
-ClientEmergency,
-ClientHealth,
-ClientIncome,
-ClientIntake,
-ClientMeds,
-ClientProblems,
-ClientMHProblems,
-ClientPrAuth,
-ClientPrAuthCDC,
-ClientDischarge,
-ClientDischargeCDC,
-ClientReview,
-ClientSocial,
-ClientSummary,
-ClientTrauma,
-ClientFamily,
-ClientRelations,
-ClientResources,
-ClientGAD7,
-ClientLabs,
-ClientMHSF,
-ClientNoteProblems,
-ClientNoteTrPlanPG,
-ClientAUDIT,
-ClientCRAFFT,
-ClientPCL5,
-ClientPCLC,
-ClientPHQ,
-ClientPHQ15,
-ClientPHQ4,
-ClientPHQ9,
-ClientPHQBrief,
-ClientPHQSADS,
-ClientRenewals,
-ClientTCUDS,
-ClientTPHQ9,
-ClientSBIRT,
-ClientCDCHA,
-Eligible,
-ClientGDS,
-Guarantor,
-GuardianHistory,
-Hospital,
-InsPaid,
-Insurance,
-InvItems,
-Invoices,
-ClientJournals,
-ClientLegalHx,
-MedHx,
-MentalStat,
-NoteTrans,
-NoteMeds,
-PDDiag,
-PDDom,
-PDMed,
-PDPsyStat,
-PhysNotes,
-PrAuthRVU,
-ProgNotes,
-SAbuse,
-Surveys,
-ClientTASI,
-TFCNotes,
-TFCTimes,
-Treatment,
-TrPlan,
-TrPlanIP,
-TrPlanS,
-  );
-    
+    ClientASAM,         ClientBasis32,
+    Client,             ClientAccess,
+    ClientACL,          ClientAdmit,
+    ClientDevl,         ClientEDocs,
+    ClientEmergency,    ClientHealth,
+    ClientIncome,       ClientIntake,
+    ClientMeds,         ClientProblems,
+    ClientMHProblems,   ClientPrAuth,
+    ClientPrAuthCDC,    ClientDischarge,
+    ClientDischargeCDC, ClientReview,
+    ClientSocial,       ClientSummary,
+    ClientTrauma,       ClientFamily,
+    ClientRelations,    ClientResources,
+    ClientGAD7,         ClientLabs,
+    ClientMHSF,         ClientNoteProblems,
+    ClientNoteTrPlanPG, ClientAUDIT,
+    ClientCRAFFT,       ClientPCL5,
+    ClientPCLC,         ClientPHQ,
+    ClientPHQ15,        ClientPHQ4,
+    ClientPHQ9,         ClientPHQBrief,
+    ClientPHQSADS,      ClientRenewals,
+    ClientTCUDS,        ClientTPHQ9,
+    ClientSBIRT,        ClientCDCHA,
+    Eligible,           ClientGDS,
+    Guarantor,          GuardianHistory,
+    Hospital,           InsPaid,
+    Insurance,          InvItems,
+    Invoices,           ClientJournals,
+    ClientLegalHx,      MedHx,
+    MentalStat,         NoteTrans,
+    NoteMeds,           PDDiag,
+    PDDom,              PDMed,
+    PDPsyStat,          PhysNotes,
+    PrAuthRVU,          ProgNotes,
+    SAbuse,             Surveys,
+    ClientTASI,         TFCNotes,
+    TFCTimes,           Treatment,
+    TrPlan,             TrPlanIP,
+    TrPlanS,
+);
+
 @ProviderTables = (
-Links,
-Contracts,
-Credentials,
-EmplInfo,
-Equipment,
-#Manager,
-#UserLogin,
-ProviderLicenses,
-Projects,
-Provider,
-ProviderControl,
-ProviderEDocs,
-ProviderHrs,
-ProviderIns,
-ProviderMail,
-ProviderMailLog,
-ProviderPay,
-ProviderPrivs,
-ProviderPrefs,
-ProviderRpts,
-#SiteMessages,
-Surveys,
-Timesheet,
-Training,
-Unreviewed,
-  );
+    Links,
+    Contracts,
+    Credentials,
+    EmplInfo,
+    Equipment,
+
+    #Manager,
+    #UserLogin,
+    ProviderLicenses,
+    Projects,
+    Provider,
+    ProviderControl,
+    ProviderEDocs,
+    ProviderHrs,
+    ProviderIns,
+    ProviderMail,
+    ProviderMailLog,
+    ProviderPay,
+    ProviderPrivs,
+    ProviderPrefs,
+    ProviderRpts,
+
+    #SiteMessages,
+    Surveys,
+    Timesheet,
+    Training,
+    Unreviewed,
+);
 #############################################################################
 #############################################################################
 #############################################################################
@@ -139,78 +104,74 @@ Unreviewed,
 $dbh = $form->dbconnect;
 
 # Set the statements for selects.
-$sProvider = $dbh->prepare('select * from Provider where ProvID=?');
-$sClient = $dbh->prepare('select * from Client where ClientID=?');
+$sProvider    = $dbh->prepare('select * from Provider where ProvID=?');
+$sClient      = $dbh->prepare('select * from Client where ClientID=?');
 $sClient_Prov = $dbh->prepare('select * from Client where ProvID=?');
 
 #
 # Start the process.
 #
-foreach $ID ( @IDs )
-{ 
-  $totc = $totc + 1;
-#warn "ID=$ID\n";
-  if ( $form->{Type} =~ /both/i )
-  { &delBoth($ID); }
-  elsif ( $form->{Type} =~ /provider/i )
-  { &delProvider($ID); }
-  elsif ( $form->{Type} =~ /client/i )
-  { &delClient($ID); }
-  else
-  { print "Bad command!\n"; }
+foreach $ID (@IDs) {
+    $totc = $totc + 1;
+
+    #warn "ID=$ID\n";
+    if    ( $form->{Type} =~ /both/i )     { &delBoth($ID); }
+    elsif ( $form->{Type} =~ /provider/i ) { &delProvider($ID); }
+    elsif ( $form->{Type} =~ /client/i )   { &delClient($ID); }
+    else                                   { print "Bad command!\n"; }
 }
 
 exit;
 
 #############################################################################
-sub delBoth($)
-{
-  
-  my ($ProvID) = @_;
+sub delBoth($) {
 
-#warn "ProvID=$ProvID\n";
-  &delProvider($ProvID);
+    my ($ProvID) = @_;
 
-  $sClient_Prov->execute($ProvID);
-  while ($rClient_Prov = $sClient_Prov->fetchrow_hashref)
-  { &delClient($rClient_Prov->{ClientID}); }
-  return(1);
+    #warn "ProvID=$ProvID\n";
+    &delProvider($ProvID);
 
-}
-#############################################################################
-sub delProvider($)
-{
-  
-  my ($ProvID) = @_;
-
-  $sProvider->execute($ProvID);
-  if ( $rProvider = $sProvider->fetchrow_hashref )
-  {
-    print "# delete Provider: $rProvider->{LName}, $rProvider->{FName} ($ProvID)\n";
-    foreach $Table ( @ProviderTables )
-    { print "delete from $Table where ProvID=$ProvID;\n"; }
-    print "delete from Manager where ProviderID=$ProvID;\n";
-    print "delete from UserLogin where UserID=$ProvID;\n";
-  }
-  else { print "# NOT FOUND ProvID: $ProvID\n"; }
-  return(1);
+    $sClient_Prov->execute($ProvID);
+    while ( $rClient_Prov = $sClient_Prov->fetchrow_hashref ) {
+        &delClient( $rClient_Prov->{ClientID} );
+    }
+    return (1);
 
 }
 #############################################################################
-sub delClient($)
-{
-  
-  my ($ClientID) = @_;
+sub delProvider($) {
 
-  $sClient->execute($ClientID);
-  if ( $rClient = $sClient->fetchrow_hashref )
-  {
-    print "# delete Client: $rClient->{LName}, $rClient->{FName} ($ClientID)\n";
-    foreach $Table ( @ClientTables )
-    { print "delete from $Table where ClientID=$ClientID;\n"; }
-    print "delete from ClientASI where G1=$ClientID;\n";
-  }
-  else { print "# NOT FOUND ClientID: $ClientID\n"; }
-  return(1);
+    my ($ProvID) = @_;
+
+    $sProvider->execute($ProvID);
+    if ( $rProvider = $sProvider->fetchrow_hashref ) {
+        print
+"# delete Provider: $rProvider->{LName}, $rProvider->{FName} ($ProvID)\n";
+        foreach $Table (@ProviderTables) {
+            print "delete from $Table where ProvID=$ProvID;\n";
+        }
+        print "delete from Manager where ProviderID=$ProvID;\n";
+        print "delete from UserLogin where UserID=$ProvID;\n";
+    }
+    else { print "# NOT FOUND ProvID: $ProvID\n"; }
+    return (1);
+
+}
+#############################################################################
+sub delClient($) {
+
+    my ($ClientID) = @_;
+
+    $sClient->execute($ClientID);
+    if ( $rClient = $sClient->fetchrow_hashref ) {
+        print
+          "# delete Client: $rClient->{LName}, $rClient->{FName} ($ClientID)\n";
+        foreach $Table (@ClientTables) {
+            print "delete from $Table where ClientID=$ClientID;\n";
+        }
+        print "delete from ClientASI where G1=$ClientID;\n";
+    }
+    else { print "# NOT FOUND ClientID: $ClientID\n"; }
+    return (1);
 
 }

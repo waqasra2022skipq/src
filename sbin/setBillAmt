@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 use DBA;
@@ -8,24 +8,28 @@ use DBUtil;
 # usage: setBillAmt DBNAME=db&BillDate=[all|this]
 ############################################################################
 # get the command name...
-my ($pw,$cmd) = $0 =~ m/(.*\/)(.*)$/;
-print qq|#${cmd}: Started |.localtime().qq|\n|;
+my ( $pw, $cmd ) = $0 =~ m/(.*\/)(.*)$/;
+print qq|#${cmd}: Started | . localtime() . qq|\n|;
 my $form = DBForm->new();
-my $dbh = $form->dbconnect();
+my $dbh  = $form->dbconnect();
+
 #warn qq|#BillDate=$form->{'BillDate'}\n|;
 
-my $qR = qq|select * from BillAmt where BillDate=? and Assoc=? and Agency=? and Clinic=? and Insurance=? |;
+my $qR =
+qq|select * from BillAmt where BillDate=? and Assoc=? and Agency=? and Clinic=? and Insurance=? |;
 my $sR = $dbh->prepare($qR);
-my $qU = qq|update BillAmt set Notes=?, Billed=?, ReBilled=?, Income=?, Reconciled=?, Scholarship=?, AmtDue=? where BillDate=? and Assoc=? and Agency=? and Clinic=? and Insurance=?|;
+my $qU =
+qq|update BillAmt set Notes=?, Billed=?, ReBilled=?, Income=?, Reconciled=?, Scholarship=?, AmtDue=? where BillDate=? and Assoc=? and Agency=? and Clinic=? and Insurance=?|;
 my $sU = $dbh->prepare($qU);
-my $qI = qq|insert into BillAmt (BillDate,Assoc,Agency,Clinic,Insurance,Notes,Billed,ReBilled,Income,Reconciled,Scholarship,AmtDue) values (?,?,?,?,?,?,?,?,?,?,?,?)|;
-my $sI = $dbh->prepare($qI);
-my @Dates = main->getDates($form,$form->{BillDate});
-foreach my $BillDate ( @Dates )
-{
-  warn "BillDate=$BillDate\n";
-  main->delTrans($form,$BillDate);
-  main->rollupTrans($form,$BillDate,$sR,$sU,$sI);
+my $qI =
+qq|insert into BillAmt (BillDate,Assoc,Agency,Clinic,Insurance,Notes,Billed,ReBilled,Income,Reconciled,Scholarship,AmtDue) values (?,?,?,?,?,?,?,?,?,?,?,?)|;
+my $sI    = $dbh->prepare($qI);
+my @Dates = main->getDates( $form, $form->{BillDate} );
+
+foreach my $BillDate (@Dates) {
+    warn "BillDate=$BillDate\n";
+    main->delTrans( $form, $BillDate );
+    main->rollupTrans( $form, $BillDate, $sR, $sU, $sI );
 }
 $sR->finish();
 $sU->finish();
@@ -33,60 +37,65 @@ $sI->finish();
 $form->complete();
 exit;
 ###########################################################################################
-sub getDates
-{
-  my ($self,$form,$type) = @_;
-  my $dbh = $form->dbconnect();
-  my @list = ();
-  my $q = qq|select BillDate from NoteTrans where BillDate='$form->{TODAY}' group by BillDate|;
-  if ( $type eq 'all' )
-  { $q = qq|select BillDate from NoteTrans group by BillDate|; }
-  elsif ( $type eq 'last' )
-  {
-    my $Date = DBUtil->Date('',-12,0);
-    $q = qq|select BillDate from NoteTrans where BillDate>='${Date}' group by BillDate|;
-  }
-  elsif ( $type eq 'this' )
-  {
-    my $Date = DBUtil->Date('',-1,0);
-    $q = qq|select BillDate from NoteTrans where BillDate>='${Date}' group by BillDate|;
-  }
-  else
-  { $q = qq|select BillDate from NoteTrans where BillDate='${type}' group by BillDate|; }
-#warn qq|q=\n$q\n|;
-  my $s = $dbh->prepare($q);
-  $s->execute() || $form->dberror($q);
-  while ( my ($BillDate) = $s->fetchrow_array ) { push(@list,$BillDate); }
-  return(@list);
+sub getDates {
+    my ( $self, $form, $type ) = @_;
+    my $dbh  = $form->dbconnect();
+    my @list = ();
+    my $q =
+qq|select BillDate from NoteTrans where BillDate='$form->{TODAY}' group by BillDate|;
+    if ( $type eq 'all' ) {
+        $q = qq|select BillDate from NoteTrans group by BillDate|;
+    }
+    elsif ( $type eq 'last' ) {
+        my $Date = DBUtil->Date( '', -12, 0 );
+        $q =
+qq|select BillDate from NoteTrans where BillDate>='${Date}' group by BillDate|;
+    }
+    elsif ( $type eq 'this' ) {
+        my $Date = DBUtil->Date( '', -1, 0 );
+        $q =
+qq|select BillDate from NoteTrans where BillDate>='${Date}' group by BillDate|;
+    }
+    else {
+        $q =
+qq|select BillDate from NoteTrans where BillDate='${type}' group by BillDate|;
+    }
+
+    #warn qq|q=\n$q\n|;
+    my $s = $dbh->prepare($q);
+    $s->execute() || $form->dberror($q);
+    while ( my ($BillDate) = $s->fetchrow_array ) { push( @list, $BillDate ); }
+    return (@list);
 }
 ##
 # delete/clear everything...for BillDate in BillAmt
 ##
-sub delTrans
-{
-  my ($self,$form,$BillDate) = @_;
-  my $dbh = $form->dbconnect();
-  (my $Date = $BillDate) =~ s/-//g;
-#warn "delete from BillAmt where BillDate = '$Date'\n";
-  $sDelete = $dbh->prepare("delete from BillAmt where BillDate = '$Date'");
-  $sDelete->execute() || $form->dberror("delete from BillAmt where BillDate = '$Date'");
-  $sDelete->finish();
-  return();
+sub delTrans {
+    my ( $self, $form, $BillDate ) = @_;
+    my $dbh = $form->dbconnect();
+    ( my $Date = $BillDate ) =~ s/-//g;
+
+    #warn "delete from BillAmt where BillDate = '$Date'\n";
+    $sDelete = $dbh->prepare("delete from BillAmt where BillDate = '$Date'");
+    $sDelete->execute()
+      || $form->dberror("delete from BillAmt where BillDate = '$Date'");
+    $sDelete->finish();
+    return ();
 }
-sub rollupTrans
-{
-  my ($self,$form,$BillDate,$sR,$sU,$sI) = @_;
-  my $dbh = $form->dbconnect();
-  my $Assoc = uc $form->{DBNAME};
-  my $TrIDs = (); 
-  my ($key,$Prevbrk,$brk) = ('','','');
-  my $TotalBillAmt=0;
-  my $TotalReBillAmt=0;
-  my $TotalIncAmt=0;
-  my $TotalRecAmt=0;
-  my $TotalSchAmt=0;
-  my $TotalAmtDue=0;
-  $qNoteTrans = qq|
+
+sub rollupTrans {
+    my ( $self, $form, $BillDate, $sR, $sU, $sI ) = @_;
+    my $dbh   = $form->dbconnect();
+    my $Assoc = uc $form->{DBNAME};
+    my $TrIDs = ();
+    my ( $key, $Prevbrk, $brk ) = ( '', '', '' );
+    my $TotalBillAmt   = 0;
+    my $TotalReBillAmt = 0;
+    my $TotalIncAmt    = 0;
+    my $TotalRecAmt    = 0;
+    my $TotalSchAmt    = 0;
+    my $TotalAmtDue    = 0;
+    $qNoteTrans = qq|
   select NoteTrans.*
         ,Treatment.TrID, Treatment.ClinicID, Treatment.BillDate as OrgBillDate, Treatment.BilledAmt, Treatment.AmtDue
         ,xInsurance.Name as InsName, xInsurance.ID as InsID
@@ -97,65 +106,76 @@ sub rollupTrans
     where NoteTrans.BillDate = '${BillDate}'
     order by NoteTrans.BillDate, Treatment.ClinicID, xInsurance.Name
 |;
-#warn qq|qNoteTrans=$qNoteTrans\n|;
-  #print qq|key....................\tBillAmt\tReBillAmt\tIncAmt\tRecAmt\tSchAmt\tAmtDue\tCode\tSRC\tRecDate\n|;
-  $sNoteTrans = $dbh->prepare($qNoteTrans);
-  $sNoteTrans->execute() || $form->dberror($qNoteTrans);
-  while ( my $rNoteTrans = $sNoteTrans->fetchrow_hashref )
-  {
-    my $BillAmt = $rNoteTrans->{BillAmt};
-    my $ReBillAmt = $rNoteTrans->{BillDate} eq $rNoteTrans->{OrgBillDate} ? 0 : $rNoteTrans->{BillAmt};
-    my $RecAmt = $rNoteTrans->{PaidAmt};
-    my $SchAmt = $rNoteTrans->{Code} eq 'SR' ? $rNoteTrans->{PaidAmt} : 0;
-    my $IncAmt = $RecAmt - $SchAmt;
-    my $AmtDue = $rNoteTrans->{AmtDue};
-    (my $BD = $rNoteTrans->{BillDate}) =~ s/-//g;
-    my $CID = $rNoteTrans->{ClinicID};
-    my $AID = SysAccess->getAgency($form,$CID);
-    my $Ins = $rNoteTrans->{InsID};
 
-    my $key = qq|${BD}.${CID}.${Ins}.$rNoteTrans->{TrID}|;
-    my $brk = qq|${BD}.${CID}.${Ins}|;
-    if ( $Prevbrk ne '' && $Prevbrk ne $brk )
-    {
-      print qq|${Prevbrk} ------\t${TotalBillAmt}\t${TotalReBillAmt}\t${TotalIncAmt}\t${TotalRecAmt}\t${TotalSchAmt}\t${TotalAmtDue}\t${CID}\t${AID}\t${Ins}\n|;
-      $TotalBillAmt=0;
-      $TotalReBillAmt=0;
-      $TotalIncAmt=0;
-      $TotalRecAmt=0;
-      $TotalSchAmt=0;
-      $TotalAmtDue=0;
-    }
-    $Prevbrk = $brk;
-    $TotalBillAmt+=$BillAmt;
-    $TotalReBillAmt+=$ReBillAmt;
-    $TotalIncAmt+=$IncAmt;
-    $TotalRecAmt+=$RecAmt;
-    $TotalSchAmt+=$SchAmt;
-    $TotalAmtDue+=$AmtDue;
+#warn qq|qNoteTrans=$qNoteTrans\n|;
+#print qq|key....................\tBillAmt\tReBillAmt\tIncAmt\tRecAmt\tSchAmt\tAmtDue\tCode\tSRC\tRecDate\n|;
+    $sNoteTrans = $dbh->prepare($qNoteTrans);
+    $sNoteTrans->execute() || $form->dberror($qNoteTrans);
+    while ( my $rNoteTrans = $sNoteTrans->fetchrow_hashref ) {
+        my $BillAmt = $rNoteTrans->{BillAmt};
+        my $ReBillAmt =
+          $rNoteTrans->{BillDate} eq $rNoteTrans->{OrgBillDate}
+          ? 0
+          : $rNoteTrans->{BillAmt};
+        my $RecAmt = $rNoteTrans->{PaidAmt};
+        my $SchAmt = $rNoteTrans->{Code} eq 'SR' ? $rNoteTrans->{PaidAmt} : 0;
+        my $IncAmt = $RecAmt - $SchAmt;
+        my $AmtDue = $rNoteTrans->{AmtDue};
+        ( my $BD = $rNoteTrans->{BillDate} ) =~ s/-//g;
+        my $CID = $rNoteTrans->{ClinicID};
+        my $AID = SysAccess->getAgency( $form, $CID );
+        my $Ins = $rNoteTrans->{InsID};
+
+        my $key = qq|${BD}.${CID}.${Ins}.$rNoteTrans->{TrID}|;
+        my $brk = qq|${BD}.${CID}.${Ins}|;
+        if ( $Prevbrk ne '' && $Prevbrk ne $brk ) {
+            print
+qq|${Prevbrk} ------\t${TotalBillAmt}\t${TotalReBillAmt}\t${TotalIncAmt}\t${TotalRecAmt}\t${TotalSchAmt}\t${TotalAmtDue}\t${CID}\t${AID}\t${Ins}\n|;
+            $TotalBillAmt   = 0;
+            $TotalReBillAmt = 0;
+            $TotalIncAmt    = 0;
+            $TotalRecAmt    = 0;
+            $TotalSchAmt    = 0;
+            $TotalAmtDue    = 0;
+        }
+        $Prevbrk = $brk;
+        $TotalBillAmt   += $BillAmt;
+        $TotalReBillAmt += $ReBillAmt;
+        $TotalIncAmt    += $IncAmt;
+        $TotalRecAmt    += $RecAmt;
+        $TotalSchAmt    += $SchAmt;
+        $TotalAmtDue    += $AmtDue;
+
 #warn qq|    sR->execute($BD,$Assoc,$AID,$CID,$Ins)\n|;
-    #print qq|${key}\t${BillAmt}\t${ReBillAmt}\t${IncAmt}\t${RecAmt}\t${SchAmt}\t${AmtDue}\t$rNoteTrans->{Code}\t$rNoteTrans->{SRC}\t$rNoteTrans->{RecDate}\n|;
-    $sR->execute($BD,$Assoc,$AID,$CID,$Ins) || $form->dberror($qR);
-    if ( my $r = $sR->fetchrow_hashref )
-    { 
-      # if TrID already counted then don't add one.
-      my $nCnt = $TrIDs->{$key} ? $r->{Notes} : $r->{Notes} + 1;
-      my $BAmt = $r->{Billed} + $BillAmt;
-      my $RBAmt = $r->{ReBilled} + $ReBillAmt;
-      my $IAmt = $r->{Income} + $IncAmt;
-      my $PAmt = $r->{Reconciled} + $RecAmt;
-      my $SAmt = $r->{Scholarship} + $SchAmt;
-      my $DAmt = $r->{AmtDue} + $AmtDue;
-      $sU->execute($nCnt,$BAmt,$RBAmt,$IAmt,$PAmt,$SAmt,$DAmt,$BD,$Assoc,$AID,$CID,$Ins) || $form->dberror($qU);
+#print qq|${key}\t${BillAmt}\t${ReBillAmt}\t${IncAmt}\t${RecAmt}\t${SchAmt}\t${AmtDue}\t$rNoteTrans->{Code}\t$rNoteTrans->{SRC}\t$rNoteTrans->{RecDate}\n|;
+        $sR->execute( $BD, $Assoc, $AID, $CID, $Ins ) || $form->dberror($qR);
+        if ( my $r = $sR->fetchrow_hashref ) {
+
+            # if TrID already counted then don't add one.
+            my $nCnt  = $TrIDs->{$key} ? $r->{Notes} : $r->{Notes} + 1;
+            my $BAmt  = $r->{Billed} + $BillAmt;
+            my $RBAmt = $r->{ReBilled} + $ReBillAmt;
+            my $IAmt  = $r->{Income} + $IncAmt;
+            my $PAmt  = $r->{Reconciled} + $RecAmt;
+            my $SAmt  = $r->{Scholarship} + $SchAmt;
+            my $DAmt  = $r->{AmtDue} + $AmtDue;
+            $sU->execute(
+                $nCnt, $BAmt, $RBAmt, $IAmt, $PAmt, $SAmt,
+                $DAmt, $BD,   $Assoc, $AID,  $CID,  $Ins
+            ) || $form->dberror($qU);
+        }
+        else {
+            my $nCnt = 1;
+            $sI->execute(
+                $BD,     $Assoc,  $AID,     $CID,
+                $Ins,    $nCnt,   $BillAmt, $ReBillAmt,
+                $IncAmt, $RecAmt, $SchAmt,  $AmtDue
+            ) || $form->dberror($qI);
+        }
+        $TrIDs->{$key} = 1;    # mark note as counted.
     }
-    else
-    {
-      my $nCnt = 1;
-      $sI->execute($BD,$Assoc,$AID,$CID,$Ins,$nCnt,$BillAmt,$ReBillAmt,$IncAmt,$RecAmt,$SchAmt,$AmtDue) || $form->dberror($qI);
-    }
-    $TrIDs->{$key} = 1;      # mark note as counted.
-  }
-  #if ( $Prevbrk ne '' && $Prevbrk ne $brk ) { print qq|${Prevbrk} ------\t${TotalBillAmt}\t${TotalReBillAmt}\t${TotalIncAmt}\t${TotalRecAmt}\t${TotalSchAmt}\t${TotalAmtDue}\t${CID}\t${AID}\t${Ins}\n|; }
-  $sNoteTrans->finish();
-  return();
+
+#if ( $Prevbrk ne '' && $Prevbrk ne $brk ) { print qq|${Prevbrk} ------\t${TotalBillAmt}\t${TotalReBillAmt}\t${TotalIncAmt}\t${TotalRecAmt}\t${TotalSchAmt}\t${TotalAmtDue}\t${CID}\t${AID}\t${Ins}\n|; }
+    $sNoteTrans->finish();
+    return ();
 }

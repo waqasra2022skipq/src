@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 use DBUtil;
@@ -11,77 +11,90 @@ use DBUtil;
 # otherwise set note to billed, not reconciled
 ############################################################################
 $form = DBForm->new();
-my $dbh = $form->dbconnect;
+my $dbh        = $form->dbconnect;
 my $sTreatment = $dbh->prepare("select * from Treatment where TrID=?");
 my $sNoteTrans = $dbh->prepare("select * from NoteTrans where TrID=?");
-foreach my $TrID ( split(' ',$form->{TrIDs}) )
-{
-  $sTreatment->execute($TrID) || $form->dberror("select Treatment");
-  if ( my $rTreatment = $sTreatment->fetchrow_hashref )
-  {
-    print qq|## TrID=${TrID}, Sch=$form->{Sch}, Auto=$form->{Auto}, New=$form->{New}\n|;
-    print qq|## TrID=$rTreatment->{TrID}, BillStatus=$rTreatment->{BillStatus}, RevStatus=$rTreatment->{RevStatus}\n|;
-    print qq|## TrID=$rTreatment->{TrID}, ContLogDate=$rTreatment->{ContLogDate}, BillDate=$rTreatment->{BillDate}\n|;
-    print qq|## TrID=$rTreatment->{TrID}, RecDate=$rTreatment->{RecDate}, CIPDate=$rTreatment->{CIPDate}\n|;
-    print qq|## TrID=$rTreatment->{TrID}, COPLDate=$rTreatment->{COPLDate}, DenDate=$rTreatment->{DenDate}, DenCode=$rTreatment->{DenCode}\n|;
-    my $updateTreament = '';
-    if ( $form->{Sch} )
-    { 
-       
-      $updateTreament = $dbh->prepare("update Treatment set BillStatus=0, CIPDate=NULL, DenDate=NULL, DenCode=NULL, RecDate=NULL, COPLDate=NULL, PaidDate=NULL where TrID='$TrID'");
-      print qq|update Treatment set BillStatus=0, CIPDate=NULL, DenDate=NULL, DenCode=NULL, RecDate=NULL, COPLDate=NULL, PaidDate=NULL where TrID='$TrID';\n|;
+foreach my $TrID ( split( ' ', $form->{TrIDs} ) ) {
+    $sTreatment->execute($TrID) || $form->dberror("select Treatment");
+    if ( my $rTreatment = $sTreatment->fetchrow_hashref ) {
+        print
+qq|## TrID=${TrID}, Sch=$form->{Sch}, Auto=$form->{Auto}, New=$form->{New}\n|;
+        print
+qq|## TrID=$rTreatment->{TrID}, BillStatus=$rTreatment->{BillStatus}, RevStatus=$rTreatment->{RevStatus}\n|;
+        print
+qq|## TrID=$rTreatment->{TrID}, ContLogDate=$rTreatment->{ContLogDate}, BillDate=$rTreatment->{BillDate}\n|;
+        print
+qq|## TrID=$rTreatment->{TrID}, RecDate=$rTreatment->{RecDate}, CIPDate=$rTreatment->{CIPDate}\n|;
+        print
+qq|## TrID=$rTreatment->{TrID}, COPLDate=$rTreatment->{COPLDate}, DenDate=$rTreatment->{DenDate}, DenCode=$rTreatment->{DenCode}\n|;
+        my $updateTreament = '';
+        if ( $form->{Sch} ) {
 
-    }
-    elsif ( $form->{Auto} )
-    { 
-      $updateTreament = $dbh->prepare("update Treatment set BillStatus=0, BillDate=NULL, CIPDate=NULL, DenDate=NULL, DenCode=NULL, RecDate=NULL, COPLDate=NULL, PaidDate=NULL where TrID='$TrID'");
+            $updateTreament = $dbh->prepare(
+"update Treatment set BillStatus=0, CIPDate=NULL, DenDate=NULL, DenCode=NULL, RecDate=NULL, COPLDate=NULL, PaidDate=NULL where TrID='$TrID'"
+            );
+            print
+qq|update Treatment set BillStatus=0, CIPDate=NULL, DenDate=NULL, DenCode=NULL, RecDate=NULL, COPLDate=NULL, PaidDate=NULL where TrID='$TrID';\n|;
 
-      print qq|update Treatment set BillStatus=0, BillDate=NULL, CIPDate=NULL, DenDate=NULL, DenCode=NULL, RecDate=NULL, COPLDate=NULL, PaidDate=NULL where TrID='$TrID';\n|; 
-    }
-    elsif ( $form->{New} )
-    { 
-      $updateTreament = $dbh->prepare("update Treatment set BillStatus=0, BillDate=NULL, CIPDate=NULL, DenDate=NULL, DenCode=NULL, RecDate=NULL, COPLDate=NULL, PaidDate=NULL where TrID='$TrID'");
+        }
+        elsif ( $form->{Auto} ) {
+            $updateTreament = $dbh->prepare(
+"update Treatment set BillStatus=0, BillDate=NULL, CIPDate=NULL, DenDate=NULL, DenCode=NULL, RecDate=NULL, COPLDate=NULL, PaidDate=NULL where TrID='$TrID'"
+            );
 
-      print qq|update Treatment set BillStatus=0, BillDate=NULL, CIPDate=NULL, DenDate=NULL, DenCode=NULL, RecDate=NULL, COPLDate=NULL, PaidDate=NULL where TrID='$TrID';\n|; 
-    }
-    else
-    { 
-      $updateTreament = $dbh->prepare("update Treatment set BillStatus=3, CIPDate=BillDate, AmtDue=BilledAmt, StatusDate=BillDate, DenDate=NULL, DenCode=NULL, RecDate=NULL, COPLDate=NULL, PaidDate=NULL where TrID='$TrID'");
-      print qq|update Treatment set BillStatus=3, CIPDate=BillDate, AmtDue=BilledAmt, StatusDate=BillDate, DenDate=NULL, DenCode=NULL, RecDate=NULL, COPLDate=NULL, PaidDate=NULL where TrID='$TrID';\n|; 
-    }
+            print
+qq|update Treatment set BillStatus=0, BillDate=NULL, CIPDate=NULL, DenDate=NULL, DenCode=NULL, RecDate=NULL, COPLDate=NULL, PaidDate=NULL where TrID='$TrID';\n|;
+        }
+        elsif ( $form->{New} ) {
+            $updateTreament = $dbh->prepare(
+"update Treatment set BillStatus=0, BillDate=NULL, CIPDate=NULL, DenDate=NULL, DenCode=NULL, RecDate=NULL, COPLDate=NULL, PaidDate=NULL where TrID='$TrID'"
+            );
 
-    $updateTreament->execute();
-    $updateTreament->finish();
-    $sNoteTrans->execute($TrID) || $form->dberror("select NoteTrans");
-    while ( my $rNoteTrans = $sNoteTrans->fetchrow_hashref )
-    {
-      print qq|  ## TrID=$rNoteTrans->{TrID}, SCNum=$rNoteTrans->{SCNum}, RecDate=$rNoteTrans->{RecDate}, PaidAmt=$rNoteTrans->{PaidAmt}, Code=$rNoteTrans->{Code}\n|;
+            print
+qq|update Treatment set BillStatus=0, BillDate=NULL, CIPDate=NULL, DenDate=NULL, DenCode=NULL, RecDate=NULL, COPLDate=NULL, PaidDate=NULL where TrID='$TrID';\n|;
+        }
+        else {
+            $updateTreament = $dbh->prepare(
+"update Treatment set BillStatus=3, CIPDate=BillDate, AmtDue=BilledAmt, StatusDate=BillDate, DenDate=NULL, DenCode=NULL, RecDate=NULL, COPLDate=NULL, PaidDate=NULL where TrID='$TrID'"
+            );
+            print
+qq|update Treatment set BillStatus=3, CIPDate=BillDate, AmtDue=BilledAmt, StatusDate=BillDate, DenDate=NULL, DenCode=NULL, RecDate=NULL, COPLDate=NULL, PaidDate=NULL where TrID='$TrID';\n|;
+        }
+
+        $updateTreament->execute();
+        $updateTreament->finish();
+        $sNoteTrans->execute($TrID) || $form->dberror("select NoteTrans");
+        while ( my $rNoteTrans = $sNoteTrans->fetchrow_hashref ) {
+            print
+qq|  ## TrID=$rNoteTrans->{TrID}, SCNum=$rNoteTrans->{SCNum}, RecDate=$rNoteTrans->{RecDate}, PaidAmt=$rNoteTrans->{PaidAmt}, Code=$rNoteTrans->{Code}\n|;
+        }
+        my $updateNoteTrans = '';
+        if ( $form->{Sch} ) {
+            $updateNoteTrans = $dbh->prepare(
+                "delete from NoteTrans where TrID='$TrID' and Code='SR'");
+            print qq|delete from NoteTrans where TrID='$TrID' and Code='SR';\n|;
+        }
+        elsif ( $form->{Auto} ) {
+            $updateNoteTrans = $dbh->prepare(
+                "delete from NoteTrans where TrID='$TrID' and Code='AR'");
+            print qq|delete from NoteTrans where TrID='$TrID' and Code='AR';\n|;
+        }
+        elsif ( $form->{New} ) {
+            $updateNoteTrans =
+              $dbh->prepare("delete from NoteTrans where TrID='$TrID'");
+            print qq|delete from NoteTrans where TrID='$TrID';\n|;
+        }
+        else {
+            $updateNoteTrans = $dbh->prepare(
+"update NoteTrans set Code='BI', RefID=NULL, RecDate=NULL, PaidAmt=NULL, DenCode=NULL where TrID='$TrID' and Code='AR'"
+            );
+            print
+qq|update NoteTrans set Code='BI', RefID=NULL, RecDate=NULL, PaidAmt=NULL, DenCode=NULL where TrID='$TrID' and Code='AR';\n|;
+        }
+        $updateNoteTrans->execute();
+        $updateNoteTrans->finish();
     }
-    my $updateNoteTrans = '';
-    if ( $form->{Sch} )
-    { 
-      $updateNoteTrans = $dbh->prepare("delete from NoteTrans where TrID='$TrID' and Code='SR'");
-      print qq|delete from NoteTrans where TrID='$TrID' and Code='SR';\n|; 
-    }
-    elsif ( $form->{Auto} )
-    { 
-      $updateNoteTrans = $dbh->prepare("delete from NoteTrans where TrID='$TrID' and Code='AR'");
-      print qq|delete from NoteTrans where TrID='$TrID' and Code='AR';\n|; 
-    }
-    elsif ( $form->{New} )
-    { 
-      $updateNoteTrans = $dbh->prepare("delete from NoteTrans where TrID='$TrID'");
-      print qq|delete from NoteTrans where TrID='$TrID';\n|; 
-    }
-    else
-    { 
-      $updateNoteTrans = $dbh->prepare("update NoteTrans set Code='BI', RefID=NULL, RecDate=NULL, PaidAmt=NULL, DenCode=NULL where TrID='$TrID' and Code='AR'");
-      print qq|update NoteTrans set Code='BI', RefID=NULL, RecDate=NULL, PaidAmt=NULL, DenCode=NULL where TrID='$TrID' and Code='AR';\n|; 
-    }
-    $updateNoteTrans->execute();
-    $updateNoteTrans->finish();
-  }
-  print qq|###########\n|;
+    print qq|###########\n|;
 }
 $sTreatment->finish();
 $sNoteTrans->finish();

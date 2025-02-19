@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #############################################################################
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 use DBA;
@@ -9,101 +9,132 @@ use PDF;
 use cBill;
 use graphs;
 use Time::Local;
-my $DT=localtime();
+my $DT = localtime();
 
 #############################################################################
 my $form = DBForm->new();
-if ( ! SysAccess->verify($form,'Privilege=BillingReports') )
-{ $form->error("Access Denied! / BillingReports Privilege"); }
+if ( !SysAccess->verify( $form, 'Privilege=BillingReports' ) ) {
+    $form->error("Access Denied! / BillingReports Privilege");
+}
 
 my $debug = 0;
 $debug = 0 if ( $form->{'LOGINPROVID'} == 91 );
-if ( $debug ) { foreach my $f ( sort keys %{$form} ) { warn "graphRpt: form-$f=$form->{$f}\n"; } }
+if ($debug) {
+    foreach my $f ( sort keys %{$form} ) {
+        warn "graphRpt: form-$f=$form->{$f}\n";
+    }
+}
 
 #############################################################################
 # Dates used...
 $form = DBUtil->setDates($form);
-my $fdow = DBUtil->Date($form->{FromDate},'dow');
-my $fdayname = (Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday)[$fdow];
-my $tdow = DBUtil->Date($form->{ToDate},'dow');
-my $tdayname = (Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday)[$tdow];
-my $DateRange = qq|from ${fdayname} $form->{FromDateD} - ${tdayname} $form->{ToDateD}|;
+my $fdow = DBUtil->Date( $form->{FromDate}, 'dow' );
+my $fdayname =
+  ( Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday )[$fdow];
+my $tdow = DBUtil->Date( $form->{ToDate}, 'dow' );
+my $tdayname =
+  ( Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday )[$tdow];
+my $DateRange =
+  qq|from ${fdayname} $form->{FromDateD} - ${tdayname} $form->{ToDateD}|;
 
 #############################################################################
 # Global variables...
-my $dbh = $form->dbconnect();
+my $dbh       = $form->dbconnect();
 my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
 
 # popup only selects 1, InsID.
 #   CREATE new popup! and change NoteRpt and remove addInsIDs
-my $addSelection = DBA->withClinicProvider($form,'and','Client.clinicClinicID','Treatment.ProvID');
+my $addSelection =
+  DBA->withClinicProvider( $form, 'and', 'Client.clinicClinicID',
+    'Treatment.ProvID' );
 my $ReportHeader = DBA->withSelectionHeader($form);
-my $chartname = 'stackedbar_chart';
-my $ChartStyle = '';
-my ($cHeight,$cWidth) = (500,1000);
-my ($xLabel,$xFormat) = ('Clinics',',.d0');
-my ($yLabel,$yFormat) = ('Population',',.d0');
-my ($ReportDescr,$DatesHeader,$RecordCount,$SelByDate,$SelByDateName) = ('','',0,'','');
+my $chartname    = 'stackedbar_chart';
+my $ChartStyle   = '';
+my ( $cHeight, $cWidth ) = ( 500, 1000 );
+my ( $xLabel, $xFormat ) = ( 'Clinics', ',.d0' );
+my ( $yLabel, $yFormat ) = ( 'Population', ',.d0' );
+my ( $ReportDescr, $DatesHeader, $RecordCount, $SelByDate, $SelByDateName ) =
+  ( '', '', 0, '', '' );
 
-if ( $form->{LOGINPROVID} == 91 )
-{
-  open OUT, ">/home/okmis/mis/src/debug/graphRpt.out" or die "Couldn't open file: $!";
-  foreach my $f ( sort keys %{$form} ) { print OUT ": form-$f=$form->{$f}\n"; }
-  close(OUT);
+if ( $form->{LOGINPROVID} == 91 ) {
+    open OUT, ">/var/www/okmis/src/debug/graphRpt.out"
+      or die "Couldn't open file: $!";
+    foreach my $f ( sort keys %{$form} ) {
+        print OUT ": form-$f=$form->{$f}\n";
+    }
+    close(OUT);
 }
 ############################################
 # select the data array...
-my $data = '';
+my $data       = '';
 my $reporttype = $form->{'Type'};
-if ( $reporttype =~ /amt/i ) { my $data = main->graphAmt($form); }
-elsif ( $reporttype =~ /clinicbygender/i ) { $data = main->graphClinicByGender($form); }
-elsif ( $reporttype =~ /clinicbyclient/i ) { $data = main->graphClinicByClient($form); }
-elsif ( $reporttype =~ /servicecodebyclient/i ) { $data = main->graphSCClient($form); }
-elsif ( $reporttype =~ /servicecodebynote/i ) { $data = main->graphSCNote($form); }
-elsif ( $reporttype =~ /servicecodebyunit/i ) { $data = main->graphSCUnit($form); }
-elsif ( $reporttype =~ /billedvsincome/i ) { $data = main->graphBillIncome($form); }
+if    ( $reporttype =~ /amt/i ) { my $data = main->graphAmt($form); }
+elsif ( $reporttype =~ /clinicbygender/i ) {
+    $data = main->graphClinicByGender($form);
+}
+elsif ( $reporttype =~ /clinicbyclient/i ) {
+    $data = main->graphClinicByClient($form);
+}
+elsif ( $reporttype =~ /servicecodebyclient/i ) {
+    $data = main->graphSCClient($form);
+}
+elsif ( $reporttype =~ /servicecodebynote/i ) {
+    $data = main->graphSCNote($form);
+}
+elsif ( $reporttype =~ /servicecodebyunit/i ) {
+    $data = main->graphSCUnit($form);
+}
+elsif ( $reporttype =~ /billedvsincome/i ) {
+    $data = main->graphBillIncome($form);
+}
 else { $data = main->graphAmt($form); }
 $form->complete();
 
-if ( $form->{LOGINPROVID} == 91 )
-{
-  open OUT, ">>/home/okmis/mis/src/debug/graphRpt.out" or die "Couldn't open file: $!";
-  print OUT qq|qTreatment=\n$qTreatment\n|;
-  print OUT qq|data=\n$data\n|;
-  close(OUT);
+if ( $form->{LOGINPROVID} == 91 ) {
+    open OUT, ">>/var/www/okmis/src/debug/graphRpt.out"
+      or die "Couldn't open file: $!";
+    print OUT qq|qTreatment=\n$qTreatment\n|;
+    print OUT qq|data=\n$data\n|;
+    close(OUT);
 }
 
 # create/finish the chart from data...
 my $parms = ();
 $parms->{'function'} = $chartname;
-$parms->{'style'} = $ChartStyle;
-$parms->{'title'} = qq|${ReportHeader} ${ReportDescr}|;
+$parms->{'style'}    = $ChartStyle;
+$parms->{'title'}    = qq|${ReportHeader} ${ReportDescr}|;
 $parms->{'subtitle'} = qq|${DatesHeader} ${DateRange}|;
-$parms->{'xformat'} = $xFormat;
-$parms->{'xlabel'} = $xLabel;
-$parms->{'yformat'} = $yFormat;
-$parms->{'ylabel'} = $yLabel;
-$parms->{'height'} = $cHeight;
-$parms->{'width'} = $cWidth;
+$parms->{'xformat'}  = $xFormat;
+$parms->{'xlabel'}   = $xLabel;
+$parms->{'yformat'}  = $yFormat;
+$parms->{'ylabel'}   = $yLabel;
+$parms->{'height'}   = $cHeight;
+$parms->{'width'}    = $cWidth;
+
 #print qq|parms: are...\n|;
 #foreach my $f ( keys %{$parms} ) { print ": parms-$f=$parms->{$f}\n"; }
-my $html = graphs->d3_chart($parms,$data);
+my $html = graphs->d3_chart( $parms, $data );
 print $html;
 exit;
 
 #############################################################################
-sub graphClinicByGender
-{
-  my ($self,$form,$unRecFlag,$ByDate) = @_;
-  $SelByDate = $ByDate eq '' ? "ContLogDate" : $ByDate;
-  $SelByDateName = "Treatment.${SelByDate}";
-  my $unRec = $unRecFlag ? ' and Treatment.BillDate is not null and (Treatment.RecDate is null or Treatment.AmtDue > 0) ' : '';
-  $DatesHeader .= $SelByDate eq 'ContLogDate' ? qq|Notes for ServiceDate | : qq|Notes for '${SelByDate}' |;
-  $ReportDescr = qq|Clinic by Gender|;
-  $chartname = 'stackedbar_chart';
-  $xLabel = 'Clinics';
-  $yLabel = 'Population';
-  my $s = qq|
+sub graphClinicByGender {
+    my ( $self, $form, $unRecFlag, $ByDate ) = @_;
+    $SelByDate     = $ByDate eq '' ? "ContLogDate" : $ByDate;
+    $SelByDateName = "Treatment.${SelByDate}";
+    my $unRec =
+      $unRecFlag
+      ? ' and Treatment.BillDate is not null and (Treatment.RecDate is null or Treatment.AmtDue > 0) '
+      : '';
+    $DatesHeader .=
+      $SelByDate eq 'ContLogDate'
+      ? qq|Notes for ServiceDate |
+      : qq|Notes for '${SelByDate}' |;
+    $ReportDescr = qq|Clinic by Gender|;
+    $chartname   = 'stackedbar_chart';
+    $xLabel      = 'Clinics';
+    $yLabel      = 'Population';
+    my $s = qq|
 select REPLACE(REPLACE(Client.Gend,'M','Male'),'F','Female') as MyKey, Clinic.Name as MyX, count(DISTINCT Client.ClientID) as MyY
  from Client
   left join ClientACL on ClientACL.ClientID=Client.ClientID
@@ -112,28 +143,39 @@ select REPLACE(REPLACE(Client.Gend,'M','Male'),'F','Female') as MyKey, Clinic.Na
   left join xSC on xSC.SCID=Treatment.SCID
   left join xInsurance on xInsurance.ID=xSC.InsID
  where ${SelByDateName}>="$form->{FromDate}" and ${SelByDateName}<="$form->{ToDate}" 
-   and | . DBA->withNoteAccess($form,$ForProvID,'Treatment') . $unRec . $addSelection . qq|
+   and |
+      . DBA->withNoteAccess( $form, $ForProvID, 'Treatment' )
+      . $unRec
+      . $addSelection . qq|
  group by MyKey, MyX |;
-  my $dataset = ();
-  ($cnt,$dataset) = graphs->selData($form,$s,$dataset,'MyY',$chartname);
-  my $data = graphs->setData($dataset);
-  return($data);
+    my $dataset = ();
+    ( $cnt, $dataset ) =
+      graphs->selData( $form, $s, $dataset, 'MyY', $chartname );
+    my $data = graphs->setData($dataset);
+    return ($data);
 }
-sub graphSCClient
-{
-  my ($self,$form,$unRecFlag,$ByDate) = @_;
-  $SelByDate = $ByDate eq '' ? "ContLogDate" : $ByDate;
-  $SelByDateName = "Treatment.${SelByDate}";
-  my $unRec = $unRecFlag ? ' and Treatment.BillDate is not null and (Treatment.RecDate is null or Treatment.AmtDue > 0) ' : '';
-  $DatesHeader .= $SelByDate eq 'ContLogDate' ? qq|Notes for ServiceDate | : qq|Notes for '${SelByDate}' |;
-  $ReportDescr = qq|Service Codes by Client Population|;
-  $chartname = 'bar_chart';
-  $xLabel = 'Service Codes';
-  $yLabel = 'Count';
-  $cHeight = 800;
-  $cWidth = 8000;
-  #$ChartStyle = qq|style="width: 8000; height: 800;"|;
-  my $s = qq|
+
+sub graphSCClient {
+    my ( $self, $form, $unRecFlag, $ByDate ) = @_;
+    $SelByDate     = $ByDate eq '' ? "ContLogDate" : $ByDate;
+    $SelByDateName = "Treatment.${SelByDate}";
+    my $unRec =
+      $unRecFlag
+      ? ' and Treatment.BillDate is not null and (Treatment.RecDate is null or Treatment.AmtDue > 0) '
+      : '';
+    $DatesHeader .=
+      $SelByDate eq 'ContLogDate'
+      ? qq|Notes for ServiceDate |
+      : qq|Notes for '${SelByDate}' |;
+    $ReportDescr = qq|Service Codes by Client Population|;
+    $chartname   = 'bar_chart';
+    $xLabel      = 'Service Codes';
+    $yLabel      = 'Count';
+    $cHeight     = 800;
+    $cWidth      = 8000;
+
+    #$ChartStyle = qq|style="width: 8000; height: 800;"|;
+    my $s = qq|
 select 'Service Code' as MyKey, CONCAT(Client.LName,', ',Client.FName,' ',Client.ClientID,' ',xSC.SCNum) as MyX, COUNT(xSC.SCNum) as MyY
  from Client
   left join ClientACL on ClientACL.ClientID=Client.ClientID
@@ -142,25 +184,35 @@ select 'Service Code' as MyKey, CONCAT(Client.LName,', ',Client.FName,' ',Client
   left join xSC on xSC.SCID=Treatment.SCID
   left join xInsurance on xInsurance.ID=xSC.InsID
  where ${SelByDateName}>="$form->{FromDate}" and ${SelByDateName}<="$form->{ToDate}"
-   and | . DBA->withNoteAccess($form,$ForProvID,'Treatment') . $unRec . $addSelection . qq|
+   and |
+      . DBA->withNoteAccess( $form, $ForProvID, 'Treatment' )
+      . $unRec
+      . $addSelection . qq|
  group by MyKey, MyX |;
-  my $dataset = ();
-  ($cnt,$dataset) = graphs->selData($form,$s,$dataset,'MyY',$chartname);
-  my $data = graphs->setData($dataset);
-  return($data);
+    my $dataset = ();
+    ( $cnt, $dataset ) =
+      graphs->selData( $form, $s, $dataset, 'MyY', $chartname );
+    my $data = graphs->setData($dataset);
+    return ($data);
 }
-sub graphSCNote
-{
-  my ($self,$form,$unRecFlag,$ByDate) = @_;
-  $SelByDate = $ByDate eq '' ? "ContLogDate" : $ByDate;
-  $SelByDateName = "Treatment.${SelByDate}";
-  my $unRec = $unRecFlag ? ' and Treatment.BillDate is not null and (Treatment.RecDate is null or Treatment.AmtDue > 0) ' : '';
-  $DatesHeader .= $SelByDate eq 'ContLogDate' ? qq|Notes for ServiceDate | : qq|Notes for '${SelByDate}' |;
-  $ReportDescr = qq|Service Codes by Note Count|;
-  $chartname = 'stackedbar_chart';
-  $xLabel = 'Service Codes';
-  $yLabel = 'Count';
-  my $s = qq|
+
+sub graphSCNote {
+    my ( $self, $form, $unRecFlag, $ByDate ) = @_;
+    $SelByDate     = $ByDate eq '' ? "ContLogDate" : $ByDate;
+    $SelByDateName = "Treatment.${SelByDate}";
+    my $unRec =
+      $unRecFlag
+      ? ' and Treatment.BillDate is not null and (Treatment.RecDate is null or Treatment.AmtDue > 0) '
+      : '';
+    $DatesHeader .=
+      $SelByDate eq 'ContLogDate'
+      ? qq|Notes for ServiceDate |
+      : qq|Notes for '${SelByDate}' |;
+    $ReportDescr = qq|Service Codes by Note Count|;
+    $chartname   = 'stackedbar_chart';
+    $xLabel      = 'Service Codes';
+    $yLabel      = 'Count';
+    my $s = qq|
 select xSC.SCNum as MyKey, DATE_FORMAT(Treatment.ContLogDate,'%Y-%m') as MyX, COUNT(Treatment.TrID) as MyY
  from Client
   left join ClientACL on ClientACL.ClientID=Client.ClientID
@@ -169,25 +221,35 @@ select xSC.SCNum as MyKey, DATE_FORMAT(Treatment.ContLogDate,'%Y-%m') as MyX, CO
   left join xSC on xSC.SCID=Treatment.SCID
   left join xInsurance on xInsurance.ID=xSC.InsID
  where ${SelByDateName}>="$form->{FromDate}" and ${SelByDateName}<="$form->{ToDate}"
-   and | . DBA->withNoteAccess($form,$ForProvID,'Treatment') . $unRec . $addSelection . qq|
+   and |
+      . DBA->withNoteAccess( $form, $ForProvID, 'Treatment' )
+      . $unRec
+      . $addSelection . qq|
  group by MyKey, MyX |;
-  my $dataset = ();
-  ($cnt,$dataset) = graphs->selData($form,$s,$dataset,'MyY',$chartname);
-  my $data = graphs->setData($dataset);
-  return($data);
+    my $dataset = ();
+    ( $cnt, $dataset ) =
+      graphs->selData( $form, $s, $dataset, 'MyY', $chartname );
+    my $data = graphs->setData($dataset);
+    return ($data);
 }
-sub graphClinicByClient
-{
-  my ($self,$form,$unRecFlag,$ByDate) = @_;
-  $SelByDate = $ByDate eq '' ? "ContLogDate" : $ByDate;
-  $SelByDateName = "Treatment.${SelByDate}";
-  my $unRec = $unRecFlag ? ' and Treatment.BillDate is not null and (Treatment.RecDate is null or Treatment.AmtDue > 0) ' : '';
-  $DatesHeader .= $SelByDate eq 'ContLogDate' ? qq|Notes for ServiceDate | : qq|Notes for '${SelByDate}' |;
-  $ReportDescr = qq|Clinics by Client Population|;
-  $chartname = 'stackedbar_chart';
-  $xLabel = 'Clinics';
-  $yLabel = 'Population';
-  my $s = qq|
+
+sub graphClinicByClient {
+    my ( $self, $form, $unRecFlag, $ByDate ) = @_;
+    $SelByDate     = $ByDate eq '' ? "ContLogDate" : $ByDate;
+    $SelByDateName = "Treatment.${SelByDate}";
+    my $unRec =
+      $unRecFlag
+      ? ' and Treatment.BillDate is not null and (Treatment.RecDate is null or Treatment.AmtDue > 0) '
+      : '';
+    $DatesHeader .=
+      $SelByDate eq 'ContLogDate'
+      ? qq|Notes for ServiceDate |
+      : qq|Notes for '${SelByDate}' |;
+    $ReportDescr = qq|Clinics by Client Population|;
+    $chartname   = 'stackedbar_chart';
+    $xLabel      = 'Clinics';
+    $yLabel      = 'Population';
+    my $s = qq|
 select Clinic.Name as MyKey, DATE_FORMAT(Treatment.ContLogDate,'%Y-%m') as MyX, COUNT(DISTINCT Client.ClientID) as MyY
  from Client
   left join ClientACL on ClientACL.ClientID=Client.ClientID
@@ -196,25 +258,35 @@ select Clinic.Name as MyKey, DATE_FORMAT(Treatment.ContLogDate,'%Y-%m') as MyX, 
   left join xSC on xSC.SCID=Treatment.SCID
   left join xInsurance on xInsurance.ID=xSC.InsID
  where ${SelByDateName}>="$form->{FromDate}" and ${SelByDateName}<="$form->{ToDate}"
-   and | . DBA->withNoteAccess($form,$ForProvID,'Treatment') . $unRec . $addSelection . qq|
+   and |
+      . DBA->withNoteAccess( $form, $ForProvID, 'Treatment' )
+      . $unRec
+      . $addSelection . qq|
  group by MyKey, MyX |;
-  my $dataset = ();
-  ($cnt,$dataset) = graphs->selData($form,$s,$dataset,'MyY',$chartname);
-  my $data = graphs->setData($dataset);
-  return($data);
+    my $dataset = ();
+    ( $cnt, $dataset ) =
+      graphs->selData( $form, $s, $dataset, 'MyY', $chartname );
+    my $data = graphs->setData($dataset);
+    return ($data);
 }
-sub graphSCUnit
-{
-  my ($self,$form,$unRecFlag,$ByDate) = @_;
-  $SelByDate = $ByDate eq '' ? "ContLogDate" : $ByDate;
-  $SelByDateName = "Treatment.${SelByDate}";
-  my $unRec = $unRecFlag ? ' and Treatment.BillDate is not null and (Treatment.RecDate is null or Treatment.AmtDue > 0) ' : '';
-  $DatesHeader .= $SelByDate eq 'ContLogDate' ? qq|Notes for ServiceDate | : qq|Notes for '${SelByDate}' |;
-  $ReportDescr = qq|Service Codes by Unit Summary|;
-  $chartname = 'stackedbar_chart';
-  $xLabel = 'Service Codes';
-  $yLabel = 'Count';
-  my $s = qq|
+
+sub graphSCUnit {
+    my ( $self, $form, $unRecFlag, $ByDate ) = @_;
+    $SelByDate     = $ByDate eq '' ? "ContLogDate" : $ByDate;
+    $SelByDateName = "Treatment.${SelByDate}";
+    my $unRec =
+      $unRecFlag
+      ? ' and Treatment.BillDate is not null and (Treatment.RecDate is null or Treatment.AmtDue > 0) '
+      : '';
+    $DatesHeader .=
+      $SelByDate eq 'ContLogDate'
+      ? qq|Notes for ServiceDate |
+      : qq|Notes for '${SelByDate}' |;
+    $ReportDescr = qq|Service Codes by Unit Summary|;
+    $chartname   = 'stackedbar_chart';
+    $xLabel      = 'Service Codes';
+    $yLabel      = 'Count';
+    my $s = qq|
 select xSC.SCNum as MyKey, DATE_FORMAT(Treatment.ContLogDate,'%Y-%m') as MyX, SUM(Treatment.Units) as MyY
  from Client
   left join ClientACL on ClientACL.ClientID=Client.ClientID
@@ -223,25 +295,36 @@ select xSC.SCNum as MyKey, DATE_FORMAT(Treatment.ContLogDate,'%Y-%m') as MyX, SU
   left join xSC on xSC.SCID=Treatment.SCID
   left join xInsurance on xInsurance.ID=xSC.InsID
  where ${SelByDateName}>="$form->{FromDate}" and ${SelByDateName}<="$form->{ToDate}"
-   and | . DBA->withNoteAccess($form,$ForProvID,'Treatment') . $unRec . $addSelection . qq|
+   and |
+      . DBA->withNoteAccess( $form, $ForProvID, 'Treatment' )
+      . $unRec
+      . $addSelection . qq|
  group by MyKey, MyX |;
-  my $dataset = ();
-  ($cnt,$dataset) = graphs->selData($form,$s,$dataset,'MyY',$chartname);
-  my $data = graphs->setData($dataset);
-  return($data);
+    my $dataset = ();
+    ( $cnt, $dataset ) =
+      graphs->selData( $form, $s, $dataset, 'MyY', $chartname );
+    my $data = graphs->setData($dataset);
+    return ($data);
 }
-sub graphBillIncome
-{
-  my ($self,$form,$unRecFlag,$ByDate) = @_;
-  $SelByDate = $ByDate eq '' ? "ContLogDate" : $ByDate;
-  $SelByDateName = "Treatment.${SelByDate}";
-  my $unRec = $unRecFlag ? ' and Treatment.BillDate is not null and (Treatment.RecDate is null or Treatment.AmtDue > 0) ' : '';
-  $DatesHeader .= $SelByDate eq 'ContLogDate' ? qq|Notes for ServiceDate | : qq|Notes for '${SelByDate}' |;
-  $ReportDescr = qq|Billed vs Income by Month|;
-  $chartname = 'bar_chart';
-  $xLabel = 'Billed vs Income';
-  $yLabel = 'Dollars'; $yFormat = ',.2f';
-  my $s = qq|
+
+sub graphBillIncome {
+    my ( $self, $form, $unRecFlag, $ByDate ) = @_;
+    $SelByDate     = $ByDate eq '' ? "ContLogDate" : $ByDate;
+    $SelByDateName = "Treatment.${SelByDate}";
+    my $unRec =
+      $unRecFlag
+      ? ' and Treatment.BillDate is not null and (Treatment.RecDate is null or Treatment.AmtDue > 0) '
+      : '';
+    $DatesHeader .=
+      $SelByDate eq 'ContLogDate'
+      ? qq|Notes for ServiceDate |
+      : qq|Notes for '${SelByDate}' |;
+    $ReportDescr = qq|Billed vs Income by Month|;
+    $chartname   = 'bar_chart';
+    $xLabel      = 'Billed vs Income';
+    $yLabel      = 'Dollars';
+    $yFormat     = ',.2f';
+    my $s = qq|
 select 'Amt' as MyKey, DATE_FORMAT(Treatment.ContLogDate,'%Y-%m') as MyX, SUM(Treatment.BilledAmt) as MyY1
 , SUM(Treatment.IncAmt) as MyY2
  from Client
@@ -251,20 +334,27 @@ select 'Amt' as MyKey, DATE_FORMAT(Treatment.ContLogDate,'%Y-%m') as MyX, SUM(Tr
   left join xSC on xSC.SCID=Treatment.SCID
   left join xInsurance on xInsurance.ID=xSC.InsID
  where ${SelByDateName}>="$form->{FromDate}" and ${SelByDateName}<="$form->{ToDate}" 
-   and | . DBA->withNoteAccess($form,$ForProvID,'Treatment') . $unRec . $addSelection . qq| 
+   and |
+      . DBA->withNoteAccess( $form, $ForProvID, 'Treatment' )
+      . $unRec
+      . $addSelection . qq| 
  group by MyKey, MyX |;
-#warn "s=\n$s\n";
-  my $dataset = ();
-  ($cnt,$dataset) = graphs->selData($form,$s,$dataset,'MyY1|BillAmt:MyY2|IncAmt',$chartname);
+
+    #warn "s=\n$s\n";
+    my $dataset = ();
+    ( $cnt, $dataset ) =
+      graphs->selData( $form, $s, $dataset, 'MyY1|BillAmt:MyY2|IncAmt',
+        $chartname );
+
 #warn "dataset:\n";
 #  foreach my $key ( sort keys %{$dataset} ) { foreach my $xy ( @{$dataset->{$key}} ) { warn qq|key=${key}, xy=$xy\n|; } }
 #warn "\n";
-  my $data = graphs->setData($dataset);
-  return($data);
+    my $data = graphs->setData($dataset);
+    return ($data);
 }
-sub graphAmt
-{
-  my ($self,$form,$unRecFlag,$ByDate) = @_;
-  return();
+
+sub graphAmt {
+    my ( $self, $form, $unRecFlag, $ByDate ) = @_;
+    return ();
 }
 #############################################################################

@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 use DBA;
@@ -9,31 +9,34 @@ use XML::LibXML;
 #use strict;
 #use warnings;
 ############################################################################
-my $form = DBForm->new();
-my $dbh = $form->dbconnect();
-my $Agent = SysAccess->verify($form,'Privilege=Agent');
+my $form  = DBForm->new();
+my $dbh   = $form->dbconnect();
+my $Agent = SysAccess->verify( $form, 'Privilege=Agent' );
 if ( !$Agent ) { $form->error("Import CCDA Page / denied Access"); }
 
 my $html = '';
 
-if ( $form->{submit} ) { $html = main->submit(); }
-else { $html = main->html(); }
+if   ( $form->{submit} ) { $html = main->submit(); }
+else                     { $html = main->html(); }
+
 #$sProvider->finish();
 $form->complete();
 print $html;
 exit;
 ############################################################################
-sub submit
-{
-  my ($list,$cnt) = ('',0);
-  my $XMLfile = $form->{'DOCROOT'} . $form->{'file'};
-  foreach my $rClient ( main->addClients($form,$XMLfile) )
-  {
-    $cnt++;
-    $list .= qq|Client ${cnt}: [$rClient->{'ClientID'}] $rClient->{'FName'} $rClient->{'LName'}, $rClient->{'Addr1'}, $rClient->{'Addr2'}, $rClient->{'City'}, $rClient->{'ST'}  $rClient->{'Zip'}|;
-  }
+sub submit {
+    my ( $list, $cnt ) = ( '', 0 );
+    my $XMLfile = $form->{'DOCROOT'} . $form->{'file'};
+    foreach my $rClient ( main->addClients( $form, $XMLfile ) ) {
+        $cnt++;
+        $list .=
+qq|Client ${cnt}: [$rClient->{'ClientID'}] $rClient->{'FName'} $rClient->{'LName'}, $rClient->{'Addr1'}, $rClient->{'Addr2'}, $rClient->{'City'}, $rClient->{'ST'}  $rClient->{'Zip'}|;
+    }
 
-  my $html = myHTML->newHTML($form,'Add Client',"CheckPopupWindow noclock countdown_1") . qq|
+    my $html =
+      myHTML->newHTML( $form, 'Add Client',
+        "CheckPopupWindow noclock countdown_1" )
+      . qq|
 <FORM NAME="submit" ACTION="/cgi/bin/ImportCCDA.cgi" METHOD="POST">
   <DIV CLASS="blackonwhite" >
     <DIV CLASS="blackonwhite txtleft" >
@@ -58,31 +61,36 @@ sub submit
 </BODY>
 </HTML>
 |;
-  return($html);
+    return ($html);
 }
-sub html
-{
-  my ($self) = @_;
-my $out;
-$out .= qq|\n<PRE>\n|;
-$out .= qq|\n<DIV ALIGN="left">\n|;
-foreach my $f ( sort keys %{ $form } ) { $out .= "form: $f=$form->{$f}\n"; }
-$out .= qq|\n</DIV>\n|;
-$out .= qq|\n</PRE>\n|;
+
+sub html {
+    my ($self) = @_;
+    my $out;
+    $out .= qq|\n<PRE>\n|;
+    $out .= qq|\n<DIV ALIGN="left">\n|;
+    foreach my $f ( sort keys %{$form} ) { $out .= "form: $f=$form->{$f}\n"; }
+    $out .= qq|\n</DIV>\n|;
+    $out .= qq|\n</PRE>\n|;
 
 #  my $INfile = $form->{'file'};
 #  my $XMLfile = 'XML'.$INfile;
-#  my $result = `php /home/okmis/mis/src/MU/parseCCDA.php ${INfile} > ${XMLfile} 2>${XMLfile}.err`;
+#  my $result = `php /var/www/okmis/src/MU/parseCCDA.php ${INfile} > ${XMLfile} 2>${XMLfile}.err`;
 
-  my ($list,$cnt) = ('',0);
-  my $XMLfile = $form->{'DOCROOT'} . $form->{'file'};
-  foreach my $rClient ( main->parseClients($form,$XMLfile) )
-  {
-    $cnt++;
-    $list .= qq|Client ${cnt}: $rClient->{'FName'} $rClient->{'LName'}, $rClient->{'Addr1'}, $rClient->{'Addr2'}, $rClient->{'City'}, $rClient->{'ST'}  $rClient->{'Zip'}|;
-  }
+    my ( $list, $cnt ) = ( '', 0 );
+    my $XMLfile = $form->{'DOCROOT'} . $form->{'file'};
+    foreach my $rClient ( main->parseClients( $form, $XMLfile ) ) {
+        $cnt++;
+        $list .=
+qq|Client ${cnt}: $rClient->{'FName'} $rClient->{'LName'}, $rClient->{'Addr1'}, $rClient->{'Addr2'}, $rClient->{'City'}, $rClient->{'ST'}  $rClient->{'Zip'}|;
+    }
 
-  my $html = myHTML->newHTML($form,'Import CCDA into MIS','CheckPopupWindow noclock countdown_1') . qq|
+    my $html = myHTML->newHTML(
+        $form,
+        'Import CCDA into MIS',
+        'CheckPopupWindow noclock countdown_1'
+      )
+      . qq|
 <FORM NAME="submit" ACTION="/cgi/bin/ImportCCDA.cgi" METHOD="POST">
   <DIV CLASS="blackonwhite" >
     <DIV CLASS="blackonwhite txtleft" >
@@ -109,82 +117,85 @@ $out .= qq|\n</PRE>\n|;
 </BODY>
 </HTML>
 |;
-  return($html);
+    return ($html);
 }
-sub parseClients
-{
-  my ($self,$form,$XMLfile) = @_;
-  my @list = ();
-  if ( -f $XMLfile )
-  {
-    #my $dom = XML::LibXML->load_xml(location => $XMLfile, no_blanks => 1);
-    my $dom = XML::LibXML->load_xml(location => $XMLfile);
-    foreach my $demo ($dom->findnodes('/result/demo')) 
-    {
-      my $rClient = ();
-      my $cnt = 0;
-      foreach my $street ($demo->findnodes('./addr/street')) 
-      {
-        $cnt++;
-        $rClient->{'Addr1'} = $street->findvalue('./node') if ( $cnt == 1 );
-        $rClient->{'Addr2'} = $street->findvalue('./node') if ( $cnt == 2 );
-      }
-      $rClient->{'City'} = $demo->findvalue('./addr/city');
-      $rClient->{'ST'} = $demo->findvalue('./addr/state');
-      $rClient->{'FName'} = $demo->findvalue('./name/first');
-      $rClient->{'LName'} = $demo->findvalue('./name/last');
-      push(@list,$rClient);
+
+sub parseClients {
+    my ( $self, $form, $XMLfile ) = @_;
+    my @list = ();
+    if ( -f $XMLfile ) {
+
+        #my $dom = XML::LibXML->load_xml(location => $XMLfile, no_blanks => 1);
+        my $dom = XML::LibXML->load_xml( location => $XMLfile );
+        foreach my $demo ( $dom->findnodes('/result/demo') ) {
+            my $rClient = ();
+            my $cnt     = 0;
+            foreach my $street ( $demo->findnodes('./addr/street') ) {
+                $cnt++;
+                $rClient->{'Addr1'} = $street->findvalue('./node')
+                  if ( $cnt == 1 );
+                $rClient->{'Addr2'} = $street->findvalue('./node')
+                  if ( $cnt == 2 );
+            }
+            $rClient->{'City'}  = $demo->findvalue('./addr/city');
+            $rClient->{'ST'}    = $demo->findvalue('./addr/state');
+            $rClient->{'FName'} = $demo->findvalue('./name/first');
+            $rClient->{'LName'} = $demo->findvalue('./name/last');
+            push( @list, $rClient );
+        }
     }
-  }
-  else { warn qq|\nfile: ${XMLfile} NOT FOUND!\n\n|; }
-  return(@list);
+    else { warn qq|\nfile: ${XMLfile} NOT FOUND!\n\n|; }
+    return (@list);
 }
-sub addClients
-{
-  my ($self,$form,$XMLfile) = @_;
-  $form->{'Provider_ProvID_1'} = $form->{'LOGINPROVID'};    # Primary Provider setDefaults
-  my $uData = ();                                           # not used except for call to setDefaults
-  my @list = ();
-  if ( -f $XMLfile )
-  {
-    #my $dom = XML::LibXML->load_xml(location => $XMLfile, no_blanks => 1);
-warn qq|addClients: XMLfile=${XMLfile}\n|;
-    my $dom = XML::LibXML->load_xml(location => $XMLfile);
-    foreach my $demo ($dom->findnodes('/result/demo')) 
-    {
-      my $rClient = ();
-      my $cnt = 0;
-      foreach my $street ($demo->findnodes('./addr/street')) 
-      {
-        $cnt++;
-        $rClient->{'Addr1'} = $street->findvalue('./node') if ( $cnt == 1 );
-        $rClient->{'Addr2'} = $street->findvalue('./node') if ( $cnt == 2 );
-      }
-      $rClient->{'City'} = $demo->findvalue('./addr/city');
-      $rClient->{'ST'} = $demo->findvalue('./addr/state');
-      $rClient->{'FName'} = $demo->findvalue('./name/first');
-      $rClient->{'LName'} = $demo->findvalue('./name/last');
-      DBA->setDefaults($form,'Client',$rClient,$uData);
-foreach my $f ( sort keys %{ $rClient } ) { $out .= "rClient: $f=$rClient->{$f}\n"; }
-      my $ClientID = main->insRecord($form,'Client',$rClient); 
-      $rClient->{'ClientID'} = $ClientID;
-      push(@list,$rClient);
+
+sub addClients {
+    my ( $self, $form, $XMLfile ) = @_;
+    $form->{'Provider_ProvID_1'} =
+      $form->{'LOGINPROVID'};    # Primary Provider setDefaults
+    my $uData = ();              # not used except for call to setDefaults
+    my @list  = ();
+    if ( -f $XMLfile ) {
+
+        #my $dom = XML::LibXML->load_xml(location => $XMLfile, no_blanks => 1);
+        warn qq|addClients: XMLfile=${XMLfile}\n|;
+        my $dom = XML::LibXML->load_xml( location => $XMLfile );
+        foreach my $demo ( $dom->findnodes('/result/demo') ) {
+            my $rClient = ();
+            my $cnt     = 0;
+            foreach my $street ( $demo->findnodes('./addr/street') ) {
+                $cnt++;
+                $rClient->{'Addr1'} = $street->findvalue('./node')
+                  if ( $cnt == 1 );
+                $rClient->{'Addr2'} = $street->findvalue('./node')
+                  if ( $cnt == 2 );
+            }
+            $rClient->{'City'}  = $demo->findvalue('./addr/city');
+            $rClient->{'ST'}    = $demo->findvalue('./addr/state');
+            $rClient->{'FName'} = $demo->findvalue('./name/first');
+            $rClient->{'LName'} = $demo->findvalue('./name/last');
+            DBA->setDefaults( $form, 'Client', $rClient, $uData );
+            foreach my $f ( sort keys %{$rClient} ) {
+                $out .= "rClient: $f=$rClient->{$f}\n";
+            }
+            my $ClientID = main->insRecord( $form, 'Client', $rClient );
+            $rClient->{'ClientID'} = $ClientID;
+            push( @list, $rClient );
+        }
     }
-  }
-  else { warn qq|\nfile: ${XMLfile} NOT FOUND!\n\n|; }
-  return(@list);
+    else { warn qq|\nfile: ${XMLfile} NOT FOUND!\n\n|; }
+    return (@list);
 }
-sub insRecord
-{
-  my ($self,$form,$table,$record) = @_;
-  my $dbh = $form->dbconnect();
-  my $qInsert = DBA->genInsert($form,$table,$record);
-warn qq|insRecord: qInsert=${qInsert}\n|;
-  my $sInsert = $dbh->prepare($qInsert);
-  $sInsert->execute() || $form->dberror("INSERT ERROR: ${table}: ${qInsert}");
-  my $RTNID = $sInsert->{'mysql_insertid'};
-  $sInsert->finish();
-  return($RTNID);
+
+sub insRecord {
+    my ( $self, $form, $table, $record ) = @_;
+    my $dbh     = $form->dbconnect();
+    my $qInsert = DBA->genInsert( $form, $table, $record );
+    warn qq|insRecord: qInsert=${qInsert}\n|;
+    my $sInsert = $dbh->prepare($qInsert);
+    $sInsert->execute() || $form->dberror("INSERT ERROR: ${table}: ${qInsert}");
+    my $RTNID = $sInsert->{'mysql_insertid'};
+    $sInsert->finish();
+    return ($RTNID);
 }
 ############################################################################
 #my $sClient = $dbh->prepare("select * from Client where Client.LName=?");

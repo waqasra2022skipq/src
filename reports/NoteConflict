@@ -1,37 +1,41 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 use DBA;
 use DBUtil;
 use Time::Local;
-my $DT=localtime();
-my ($sec, $min, $hrs, $day, $month, $year, $wday, $julian) = localtime();
+my $DT = localtime();
+my ( $sec, $min, $hrs, $day, $month, $year, $wday, $julian ) = localtime();
 
-my $debug=0;
+my $debug = 0;
 ############################################################################
 # usage: NoteConflict ForProvID=xxx
 ############################################################################
 $form = DBForm->new();
 $form = DBUtil->setDates($form);
 my $DateRange = qq|from $form->{FromDateD} thru $form->{ToDateD}|;
-$dbh = $form->dbconnect();
-$debug=0 if ( $form->{LOGINPROVID} == 91 );
+$dbh   = $form->dbconnect();
+$debug = 0 if ( $form->{LOGINPROVID} == 91 );
 
 ############################################################################
 my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
-my $ProviderSelection = DBA->getProviderSelection($form,$ForProvID,'Treatment.ProvID','where');
-warn qq|ProviderSelection=\n${ProviderSelection}\n| if ( $debug);
+my $ProviderSelection =
+  DBA->getProviderSelection( $form, $ForProvID, 'Treatment.ProvID', 'where' );
+warn qq|ProviderSelection=\n${ProviderSelection}\n| if ($debug);
 my $NoteDefinition = qq|by $form->{Type} all notes ${DateRange} |;
-my $NoteSelection .= qq|and '$form->{FromDate}'<=Treatment.ContLogDate and Treatment.ContLogDate<='$form->{ToDate}' |;
-my $Order = $form->{Type} =~ /client/i
-          ? qq|order by Client.LName, Client.FName, Treatment.ClientID, Treatment.ContLogDate, Treatment.ContLogBegTime|
-          : qq|order by Provider.LName, Provider.FName, Treatment.ProvID, Treatment.ContLogDate, Treatment.ContLogBegTime|;
-if ( $form->{Log} =~ /unbilled/i )
-{
-  $NoteDefinition = qq|by $form->{Type} all 'UnBilled' notes ${DateRange} |;
-  $NoteSelection .= qq| and Treatment.BillStatus<3|;
+my $NoteSelection .=
+qq|and '$form->{FromDate}'<=Treatment.ContLogDate and Treatment.ContLogDate<='$form->{ToDate}' |;
+my $Order =
+  $form->{Type} =~ /client/i
+  ? qq|order by Client.LName, Client.FName, Treatment.ClientID, Treatment.ContLogDate, Treatment.ContLogBegTime|
+  : qq|order by Provider.LName, Provider.FName, Treatment.ProvID, Treatment.ContLogDate, Treatment.ContLogBegTime|;
+
+if ( $form->{Log} =~ /unbilled/i ) {
+    $NoteDefinition = qq|by $form->{Type} all 'UnBilled' notes ${DateRange} |;
+    $NoteSelection .= qq| and Treatment.BillStatus<3|;
 }
+
 # selection (does not have to be by time order to work below.)
 my $q = qq|
 select Treatment.*
@@ -46,148 +50,168 @@ select Treatment.*
   ${NoteSelection}
   ${Order}
 |;
-warn "sNotes=$q\n" if ( $debug );
+warn "sNotes=$q\n" if ($debug);
 
 print qq|${DT}\nNote Review ${NoteDefinition}\n|;
+
 #      This function checks ${NoteDefinition} and compares for overlapping times. Each Note by Provider is looked at and if it overlaps for the same day then a message is given stating that the note conficts with another note. (It does not look at notes with the same beginning/ending times or notes that are Group Counseling)
-my @Dates = ();
-my @Notes = ();
+my @Dates        = ();
+my @Notes        = ();
 my $PrevClientID = '';
-my $PrevProvID = '';
-my $PrevDate = '';
+my $PrevProvID   = '';
+my $PrevDate     = '';
 print qq|Provider\tClient\tContact Date\tTrID\tSCNum\tConflict\n|;
 $sNotes = $dbh->prepare($q);
 $sNotes->execute();
-while ( $rNotes = $sNotes->fetchrow_hashref )
-{
-warn qq|\nLOOP: TrID=$rNotes->{TrID}, BegTime=$rNotes->{ContLogBegTime}, EndTime=$rNotes->{ContLogEndTime}\n| if ( $debug );
-warn qq|ProvID=$rNotes->{ProvID}, PrevProvID=$PrevProvID\n| if ( $debug );
-warn qq|ClientID=$rNotes->{ClientID}, PrevClientID=$PrevClientID\n| if ( $debug );
-warn qq|SCType=$rNotes->{SCType}\n| if ( $debug );
-  my $test = $form->{Type} =~ /client/i ? $rNotes->{ClientID} : $rNotes->{ProvID};
-  my $prev = $form->{Type} =~ /client/i ? $PrevClientID : $PrevProvID;
-warn qq|${test} != ${prev} [OR] $rNotes->{ContLogDate} ne ${PrevDate}  ??\n| if ( $debug );
-  if ( $test != $prev || $rNotes->{ContLogDate} ne $PrevDate )
-  {
-    my $cnt = scalar(@Dates);
-warn qq|VALIDATE: cnt=$cnt, ProvID=$rNotes->{ProvID}, PrevProvID=$PrevProvID, ClientID=$rNotes->{ClientID}, PrevClientID=$PrevClientID, Date=$rNotes->{ContLogDate}, PrevDate=$PrevDate\n| if ( $debug );
-    main->validate() if ( scalar(@Dates) );; 
-    @Dates = ();
-    @Notes = ();
-    $ContDate = DBUtil->Date($rNotes->{ContLogDate},'fmt','MM/DD/YYYY');
-warn qq|$rNotes->{FName} $rNotes->{LName} ${ContDate}\n| if ( $debug );
-  }
-  $PrevClientID = $rNotes->{ClientID};
-  $PrevProvID = $rNotes->{ProvID};
-  $PrevDate = $rNotes->{ContLogDate};
-warn qq|CHECK: Type=$form->{Type}, SCType=$rNotes->{'SCType'}, BegTime=$rNotes->{ContLogBegTime}, EndTime=$rNotes->{ContLogEndTime}\n| if ( $debug );
-  next if ( $rNotes->{ContLogBegTime} eq '' );
-  next if ( $rNotes->{ContLogEndTime} eq '' );
-  next if ( $rNotes->{ContLogBegTime} eq $rNotes->{ContLogEndTime} );
-  next if ( $form->{Type} =~ /client/i && $rNotes->{'SCType'} eq 'CM' );
-  next if ( $form->{Type} =~ /provider/i && $rNotes->{'SCType'} eq 'GR' );
-  next if ( $form->{Type} =~ /provider/i && $rNotes->{'SCType'} eq 'GC' );
-warn qq|PUSH:\n| if ( $debug );
-  push(@Dates,$rNotes->{ContLogBegTime});
-  push(@Notes,$rNotes);
-  push(@Dates,$rNotes->{ContLogEndTime});
-  push(@Notes,$rNotes);
+
+while ( $rNotes = $sNotes->fetchrow_hashref ) {
+    warn
+qq|\nLOOP: TrID=$rNotes->{TrID}, BegTime=$rNotes->{ContLogBegTime}, EndTime=$rNotes->{ContLogEndTime}\n|
+      if ($debug);
+    warn qq|ProvID=$rNotes->{ProvID}, PrevProvID=$PrevProvID\n| if ($debug);
+    warn qq|ClientID=$rNotes->{ClientID}, PrevClientID=$PrevClientID\n|
+      if ($debug);
+    warn qq|SCType=$rNotes->{SCType}\n| if ($debug);
+    my $test =
+      $form->{Type} =~ /client/i ? $rNotes->{ClientID} : $rNotes->{ProvID};
+    my $prev = $form->{Type} =~ /client/i ? $PrevClientID : $PrevProvID;
+    warn qq|${test} != ${prev} [OR] $rNotes->{ContLogDate} ne ${PrevDate}  ??\n|
+      if ($debug);
+    if ( $test != $prev || $rNotes->{ContLogDate} ne $PrevDate ) {
+        my $cnt = scalar(@Dates);
+        warn
+qq|VALIDATE: cnt=$cnt, ProvID=$rNotes->{ProvID}, PrevProvID=$PrevProvID, ClientID=$rNotes->{ClientID}, PrevClientID=$PrevClientID, Date=$rNotes->{ContLogDate}, PrevDate=$PrevDate\n|
+          if ($debug);
+        main->validate() if ( scalar(@Dates) );
+        @Dates    = ();
+        @Notes    = ();
+        $ContDate = DBUtil->Date( $rNotes->{ContLogDate}, 'fmt', 'MM/DD/YYYY' );
+        warn qq|$rNotes->{FName} $rNotes->{LName} ${ContDate}\n| if ($debug);
+    }
+    $PrevClientID = $rNotes->{ClientID};
+    $PrevProvID   = $rNotes->{ProvID};
+    $PrevDate     = $rNotes->{ContLogDate};
+    warn
+qq|CHECK: Type=$form->{Type}, SCType=$rNotes->{'SCType'}, BegTime=$rNotes->{ContLogBegTime}, EndTime=$rNotes->{ContLogEndTime}\n|
+      if ($debug);
+    next if ( $rNotes->{ContLogBegTime} eq '' );
+    next if ( $rNotes->{ContLogEndTime} eq '' );
+    next if ( $rNotes->{ContLogBegTime} eq $rNotes->{ContLogEndTime} );
+    next if ( $form->{Type} =~ /client/i   && $rNotes->{'SCType'} eq 'CM' );
+    next if ( $form->{Type} =~ /provider/i && $rNotes->{'SCType'} eq 'GR' );
+    next if ( $form->{Type} =~ /provider/i && $rNotes->{'SCType'} eq 'GC' );
+    warn qq|PUSH:\n| if ($debug);
+    push( @Dates, $rNotes->{ContLogBegTime} );
+    push( @Notes, $rNotes );
+    push( @Dates, $rNotes->{ContLogEndTime} );
+    push( @Notes, $rNotes );
 }
 my $cnt = scalar(@dates);
-warn qq|VALIDATE: cnt=$cnt, ProvID=$rNotes->{ProvID}, PrevProvID=$PrevProvID, ClientID=$rNotes->{ClientID}, PrevClientID=$PrevClientID, Date=$rNotes->{ContLogDate}, PrevDate=$PrevDate\n| if ( $debug );
-main->validate() if ( scalar(@Dates) );; 
+warn
+qq|VALIDATE: cnt=$cnt, ProvID=$rNotes->{ProvID}, PrevProvID=$PrevProvID, ClientID=$rNotes->{ClientID}, PrevClientID=$PrevClientID, Date=$rNotes->{ContLogDate}, PrevDate=$PrevDate\n|
+  if ($debug);
+main->validate() if ( scalar(@Dates) );
 $sNotes->finish();
 $form->complete();
 exit;
 #############################################################################
 #foreach my $f ( sort keys %{$rNotes} ) { warn "rNotes-$f=$rNotes->{$f}\n"; }
-sub validate
-{
-  my ($self) = @_;
-#if ( '12:30:00' ge '12:00:00' ) { $flag = 1; }
-#else { $flag = 0; }
-#warn qq|validate: flag=$flag\n|;
-#exit;
-  my $out = '';
-  my $cnt = scalar(@Dates);
-warn qq|\nvalidate: cnt=$cnt\n| if ( $debug );
-  for ($i = 0; $i < $cnt; $i++ )
-  { 
-    my $val = @Dates[$i];
-warn qq|\ni=$i, val=$val\n| if ( $debug );
-    $out .= $self->chkFields($val,$i);
-  }
-  print qq|$out| if ( $out ne '' );
-  return(1);
+sub validate {
+    my ($self) = @_;
+
+    #if ( '12:30:00' ge '12:00:00' ) { $flag = 1; }
+    #else { $flag = 0; }
+    #warn qq|validate: flag=$flag\n|;
+    #exit;
+    my $out = '';
+    my $cnt = scalar(@Dates);
+    warn qq|\nvalidate: cnt=$cnt\n| if ($debug);
+    for ( $i = 0 ; $i < $cnt ; $i++ ) {
+        my $val = @Dates[$i];
+        warn qq|\ni=$i, val=$val\n| if ($debug);
+        $out .= $self->chkFields( $val, $i );
+    }
+    print qq|$out| if ( $out ne '' );
+    return (1);
 }
-sub chkFields
-{
-  my ($self,$checktime,$idx) = @_;
-warn qq|chkFields: checktime=$checktime, idx=$idx\n| if ( $debug );
-# check Begtime to Begtimes and Endtime to Endtimes.
-  my $Results = '';
-  my $cnt = scalar(@Dates);
-  my $start = int($idx/2) == $idx/2 ? 0 : 1;
-  for ($f = $start; $f < $cnt; $f+=2 )
-  {
-warn qq|B-B & E-E: idx=$idx, f=$f, checktime=$checktime\n| if ( $debug );
-    unless ( $idx == $f ) 
-    { $Results .= $self->chkRange($idx,$checktime,$f) }
-  }
-  return($Results);
+
+sub chkFields {
+    my ( $self, $checktime, $idx ) = @_;
+    warn qq|chkFields: checktime=$checktime, idx=$idx\n| if ($debug);
+
+    # check Begtime to Begtimes and Endtime to Endtimes.
+    my $Results = '';
+    my $cnt     = scalar(@Dates);
+    my $start   = int( $idx / 2 ) == $idx / 2 ? 0 : 1;
+    for ( $f = $start ; $f < $cnt ; $f += 2 ) {
+        warn qq|B-B & E-E: idx=$idx, f=$f, checktime=$checktime\n| if ($debug);
+        unless ( $idx == $f ) {
+            $Results .= $self->chkRange( $idx, $checktime, $f );
+        }
+    }
+    return ($Results);
 }
-sub chkRange
-{
-  my ($self,$idx,$checktime,$fld) = @_;
-  my $Results = '';
-  my $r = @Notes[$idx];
-  my $ClientName = qq|$r->{CLName}, $r->{CFName} ($r->{ClientID})|;
-  my $ProviderName = qq|$r->{PLName}, $r->{PFName} ($r->{ProvID})|;
-warn qq|chkRange: idx=$idx, checktime=$checktime, fld=$fld\n| if ( $debug );
-# check idx is even, then Begin Time check
-#   otherwise End Time check
-  if ( int($idx/2) == $idx/2 )
-  { 
-    my $fld1 = @Dates[$fld];
-    my $fld2 = @Dates[$fld+1];
-    if ( $fld1 eq '' || $fld2 eq '' ) { return(''); }
-warn qq|Begin: idx=$idx, checktime=$checktime, fld=$fld, fld1=$fld1, fld2=$fld2\n| if ( $debug );
-# was...<     if ( $checktime lt $fld1 || $checktime ge $fld2 ) { return(''); }
-    if ( $checktime lt $fld1 || $checktime gt $fld2 ) { return(''); }
-    my $begTime = DBUtil->AMPM($checktime);
-    my $endTime = DBUtil->AMPM(@Dates[$idx+1]);
-    my $fld1 = DBUtil->AMPM($fld1);
-    my $fld2 = DBUtil->AMPM($fld2);
-    $Results = qq|${ProviderName}\t${ClientName}\t$r->{ContLogDate}\t$r->{TrID}\t$r->{SCNum}|;
-    $Results .= qq|\tSTART TIME CONFLICT: ${begTime}-${endTime} conflicts with ${fld1}-${fld2}\n|;
-  }
-  else
-  {
-    my $beg1 = @Dates[$idx-1];
-    my $fld1 = @Dates[$fld-1];
-    my $fld2 = @Dates[$fld];
-    if ( $beg1 eq '' ) { return(''); }
-warn qq|End: idx=$idx, checktime=$checktime, fld=$fld, beg1=$beg1, fld1=$fld1, fld2=$fld2\n| if ( $debug );
-    if ( $checktime gt $beg1 )
-    {
-      if ( $fld1 eq '' || $fld2 eq '' ) { return(''); }
+
+sub chkRange {
+    my ( $self, $idx, $checktime, $fld ) = @_;
+    my $Results      = '';
+    my $r            = @Notes[$idx];
+    my $ClientName   = qq|$r->{CLName}, $r->{CFName} ($r->{ClientID})|;
+    my $ProviderName = qq|$r->{PLName}, $r->{PFName} ($r->{ProvID})|;
+    warn qq|chkRange: idx=$idx, checktime=$checktime, fld=$fld\n| if ($debug);
+
+    # check idx is even, then Begin Time check
+    #   otherwise End Time check
+    if ( int( $idx / 2 ) == $idx / 2 ) {
+        my $fld1 = @Dates[$fld];
+        my $fld2 = @Dates[ $fld + 1 ];
+        if ( $fld1 eq '' || $fld2 eq '' ) { return (''); }
+        warn
+qq|Begin: idx=$idx, checktime=$checktime, fld=$fld, fld1=$fld1, fld2=$fld2\n|
+          if ($debug);
+
+ # was...<     if ( $checktime lt $fld1 || $checktime ge $fld2 ) { return(''); }
+        if ( $checktime lt $fld1 || $checktime gt $fld2 ) { return (''); }
+        my $begTime = DBUtil->AMPM($checktime);
+        my $endTime = DBUtil->AMPM( @Dates[ $idx + 1 ] );
+        my $fld1    = DBUtil->AMPM($fld1);
+        my $fld2    = DBUtil->AMPM($fld2);
+        $Results =
+qq|${ProviderName}\t${ClientName}\t$r->{ContLogDate}\t$r->{TrID}\t$r->{SCNum}|;
+        $Results .=
+qq|\tSTART TIME CONFLICT: ${begTime}-${endTime} conflicts with ${fld1}-${fld2}\n|;
+    }
+    else {
+        my $beg1 = @Dates[ $idx - 1 ];
+        my $fld1 = @Dates[ $fld - 1 ];
+        my $fld2 = @Dates[$fld];
+        if ( $beg1 eq '' ) { return (''); }
+        warn
+qq|End: idx=$idx, checktime=$checktime, fld=$fld, beg1=$beg1, fld1=$fld1, fld2=$fld2\n|
+          if ($debug);
+        if ( $checktime gt $beg1 ) {
+            if ( $fld1 eq '' || $fld2 eq '' ) { return (''); }
+
 # was...<       if ($checktime le $fld1 || $checktime gt $fld2 ) { return(''); }
-      if ($checktime lt $fld1 || $checktime gt $fld2 ) { return(''); }
-      my $begTime = DBUtil->AMPM(@Dates[$idx-1]);
-      my $endTime = DBUtil->AMPM($checktime);
-      my $fld1 = DBUtil->AMPM($fld1);
-      my $fld2 = DBUtil->AMPM($fld2);
-      $Results = qq|${ProviderName}\t${ClientName}\t$r->{ContLogDate}\t$r->{TrID}\t$r->{SCNum}|;
-      $Results .= qq|\tEND TIME CONFLICT: ${begTime}-${endTime} conflicts with ${fld1}-${fld2}\n|;
+            if ( $checktime lt $fld1 || $checktime gt $fld2 ) { return (''); }
+            my $begTime = DBUtil->AMPM( @Dates[ $idx - 1 ] );
+            my $endTime = DBUtil->AMPM($checktime);
+            my $fld1    = DBUtil->AMPM($fld1);
+            my $fld2    = DBUtil->AMPM($fld2);
+            $Results =
+qq|${ProviderName}\t${ClientName}\t$r->{ContLogDate}\t$r->{TrID}\t$r->{SCNum}|;
+            $Results .=
+qq|\tEND TIME CONFLICT: ${begTime}-${endTime} conflicts with ${fld1}-${fld2}\n|;
+        }
+        else {
+            my $beg1    = DBUtil->AMPM($beg1);
+            my $endTime = DBUtil->AMPM($checktime);
+            $Results =
+qq|${ProviderName}\t${ClientName}\t$r->{ContLogDate}\t$r->{TrID}\t$r->{SCNum}|;
+            $Results .=
+qq|\tCONFLICT: END TIME '${endTime}' less than or equal to '${beg1}'\n|;
+        }
     }
-    else
-    {
-      my $beg1 = DBUtil->AMPM($beg1);
-      my $endTime = DBUtil->AMPM($checktime);
-      $Results = qq|${ProviderName}\t${ClientName}\t$r->{ContLogDate}\t$r->{TrID}\t$r->{SCNum}|;
-      $Results .= qq|\tCONFLICT: END TIME '${endTime}' less than or equal to '${beg1}'\n|;
-    }
-  }
-  return($Results);
+    return ($Results);
 }
 #############################################################################

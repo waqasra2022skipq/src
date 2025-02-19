@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use Cwd;
 use DBI;
 use DBForm;
@@ -7,19 +7,20 @@ use DBA;
 use DBUtil;
 use cBill;
 use Time::Local;
-my $DT=localtime();
-my ($sec, $min, $hrs, $day, $month, $year, $wday, $julian) = localtime();
+my $DT = localtime();
+my ( $sec, $min, $hrs, $day, $month, $year, $wday, $julian ) = localtime();
 
 ############################################################################
 # chk837 DBNAME=ddd\&InsDescr=tricare\&ForProvID=ppp
 ############################################################################
 $form = DBForm->new;
-$dbh = $form->dbconnect;
+$dbh  = $form->dbconnect;
 my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
-my ($BillDate,$NEXTBILLDATE) = cBill->getBillDate();
+my ( $BillDate, $NEXTBILLDATE ) = cBill->getBillDate();
 $BillDate = $form->{BillDate} if ( $form->{BillDate} );
 
-my $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID');
+my $ClinicSelection =
+  DBA->getClinicSelection( $form, $ForProvID, 'Client.clinicClinicID' );
 my $qNotes = qq|
   select Treatment.*, Client.*
        , Treatment.ProvID as ProvID, Client.ProvID as PrimaryProvID
@@ -38,16 +39,18 @@ my $qNotes = qq|
     ${ClinicSelection}
   order by Client.clinicClinicID, Treatment.ProvID, Treatment.ClientID, Treatment.ContLogDate
 |;
+
 #warn "qNotes=$qNotes\n";
 print qq|Check notes waiting to process...not necessarialy passed checks\n|;
 $sNotes = $dbh->prepare($qNotes);
 $sNotes->execute() || $form->dberror($qNotes);
-while ( $rNotes = $sNotes->fetchrow_hashref )
-{
-  print qq|$rNotes->{TrID}, $rNotes->{ContLogDate}, $rNotes->{BillDate}, $rNotes->{FName} $rNotes->{LName}, $rNotes->{InsName}, $rNotes->{ClinicName}\n|;
+while ( $rNotes = $sNotes->fetchrow_hashref ) {
+    print
+qq|$rNotes->{TrID}, $rNotes->{ContLogDate}, $rNotes->{BillDate}, $rNotes->{FName} $rNotes->{LName}, $rNotes->{InsName}, $rNotes->{ClinicName}\n|;
 }
 
-my $Sel = DBA->getClinicProviderSelection($form,$ForProvID,'Provider.ProvID');
+my $Sel =
+  DBA->getClinicProviderSelection( $form, $ForProvID, 'Provider.ProvID' );
 my $qContracts = qq|
   select Contracts.InsID, Contracts.TaxID, Contracts.Taxonomy
         ,Contracts.ContractType, Contracts.ContractCode, Contracts.ServMeasure, Contracts.SourceCode
@@ -62,16 +65,18 @@ my $qContracts = qq|
     ${Sel}
   order by xInsurance.Descr, Provider.Name
 |;
+
 #warn "qContracts=$qContracts\n";
 print qq|\nCheck for notes ready for 837...\n|;
 $sContracts = $dbh->prepare($qContracts);
 $sContracts->execute;
-while ( $rContracts = $sContracts->fetchrow_hashref )
-{
-  my $who = qq|Client.clinicClinicID=$rContracts->{ProvID}|;
-  $who = qq|Treatment.ProvID=$rContracts->{ProvID}| if ( $form->{ByProvider} );
-print qq|$rContracts->{InsName}: who=$who, $rContracts->{Name}, $rContracts->{FName} $rContracts->{LName}\n|;
-  my $q = qq|
+while ( $rContracts = $sContracts->fetchrow_hashref ) {
+    my $who = qq|Client.clinicClinicID=$rContracts->{ProvID}|;
+    $who = qq|Treatment.ProvID=$rContracts->{ProvID}|
+      if ( $form->{ByProvider} );
+    print
+qq|$rContracts->{InsName}: who=$who, $rContracts->{Name}, $rContracts->{FName} $rContracts->{LName}\n|;
+    my $q = qq|
 select NoteTrans.*, Client.*, xSC.*
       ,Treatment.ContLogDate, Treatment.ContLogBegTime, Treatment.ContLogEndTime
       ,NoteTrans.ProvID as ProvID
@@ -87,14 +92,15 @@ select NoteTrans.*, Client.*, xSC.*
     and NoteTrans.RecDate is null
     order by NoteTrans.ProvID, NoteTrans.ClientID, NoteTrans.ContDate
 |;
-#warn "sNotes=$q\n";
-  $sNotes = $dbh->prepare($q);
-  $sNotes->execute();
-  while ( $rNotes = $sNotes->fetchrow_hashref )
-  {
-    print qq|$rNotes->{TrID}\t$rNotes->{ProvID}\t$rNotes->{clinicClinicID}\n|;
-  }
-  $sNotes->finish();
+
+    #warn "sNotes=$q\n";
+    $sNotes = $dbh->prepare($q);
+    $sNotes->execute();
+    while ( $rNotes = $sNotes->fetchrow_hashref ) {
+        print
+          qq|$rNotes->{TrID}\t$rNotes->{ProvID}\t$rNotes->{clinicClinicID}\n|;
+    }
+    $sNotes->finish();
 }
 $sContracts->finish();
 $form->complete();

@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use myForm;
 use myDBI;
@@ -7,13 +7,19 @@ use myHTML;
 
 ############################################################################
 my $form = myForm->new();
-my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $dbh  = myDBI->dbconnect( $form->{'DBNAME'} );
 
-unless ( SysAccess->chkPriv($form,'Agent') )
-{ myDBI->error("Access Denied! (List ${type} Electronic Files)"); }
+unless ( SysAccess->chkPriv( $form, 'Agent' ) ) {
+    myDBI->error("Access Denied! (List ${type} Electronic Files)");
+}
 
 # Start out the display.
-my $html = myHTML->newHTML($form,'Administration Panel','CheckPopupWindow noclock countdown_60') . qq|
+my $html = myHTML->newHTML(
+    $form,
+    'Administration Panel',
+    'CheckPopupWindow noclock countdown_60'
+  )
+  . qq|
 <DIV ALIGN="center" > 
 
 <DIV CLASS="port header hdrtxt" >Admin Panel</DIV>
@@ -44,21 +50,21 @@ print $html;
 exit;
 ############################################################################
 ############################################################################
-sub listTasks
-{
-  my ($self,$type) = @_;
-  my $html = $type eq '837' ? main->list837()
-             : $type eq '835' ? main->list835()
-             : $type eq '271' ? main->list271()
-             : $type eq 'Jobs' ? main->listJobs()
-             : 'Unknown';
-  return($html);
+sub listTasks {
+    my ( $self, $type ) = @_;
+    my $html =
+        $type eq '837'  ? main->list837()
+      : $type eq '835'  ? main->list835()
+      : $type eq '271'  ? main->list271()
+      : $type eq 'Jobs' ? main->listJobs()
+      :                   'Unknown';
+    return ($html);
 }
-sub list837
-{
-  my ($self) = @_;
-  my $html = '';
-  $html .= qq|
+
+sub list837 {
+    my ($self) = @_;
+    my $html = '';
+    $html .= qq|
     <TD WIDTH="34%" >
 
       <DIV CLASS="subtitle tophdr" >Billing</DIV>
@@ -72,14 +78,13 @@ sub list837
 
     </TD>
 |;
-  return($html);
+    return ($html);
 }
 #####################################################################
-sub list835
-{
-  my ($self) = @_;
-  my $html = '';
-  $html .= qq|
+sub list835 {
+    my ($self) = @_;
+    my $html = '';
+    $html .= qq|
     <TD WIDTH="33%" >
 
       <DIV CLASS="subtitle tophdr" >Remittances</DIV>
@@ -95,14 +100,13 @@ sub list835
 
     </TD>
 |;
-  return($html);
+    return ($html);
 }
 #####################################################################
-sub list271
-{
-  my ($self) = @_;
-  my $html = '';
-  $html .= qq|
+sub list271 {
+    my ($self) = @_;
+    my $html = '';
+    $html .= qq|
     <TD WIDTH="33%" >
 
       <DIV CLASS="subtitle tophdr" >Eligibility</DIV>
@@ -118,13 +122,13 @@ sub list271
 
     </TD>
 |;
-  return($html);
+    return ($html);
 }
-sub listJobs
-{
-  my ($self) = @_;
-  my $html = '';
-  $html .= qq|
+
+sub listJobs {
+    my ($self) = @_;
+    my $html = '';
+    $html .= qq|
     <TD WIDTH="33%" >
 
       <DIV CLASS="subtitle tophdr" >Automatic Backgroups Job Logs</DIV>
@@ -139,17 +143,18 @@ sub listJobs
 
     </TD>
 |;
-  return($html);
+    return ($html);
 }
 #####################################################################
 
 sub RebillTask {
-  my $html = '';
-  $Rebill_Button = qq|<FONT COLOR="red"><A STYLE="background-color:white; padding:0.2em;" HREF="javascript:ReportWindow('/cgi/bin/runCMDBash.pl?AgencyID=&mlt=$form->{mlt}','adjNote')"  TITLE="Click here to change In Process notes to Rebill" >Rebill Notes</A></FONT>|;
-  $Gen837_Button = qq|<FONT COLOR="red"><A STYLE="background-color:white; padding:0.2em;" id="gen837" HREF="javascript:ReportWindow('/cgi/bin/Gen837medicaid.pl?mlt=$form->{mlt}','adjNote')"  TITLE="Click here to Generate 837 files for last billing run" >Gen837 files</A></FONT>|;
+    my $html = '';
+    $Rebill_Button =
+qq|<FONT COLOR="red"><A STYLE="background-color:white; padding:0.2em;" HREF="javascript:ReportWindow('/cgi/bin/runCMDBash.pl?AgencyID=&mlt=$form->{mlt}','adjNote')"  TITLE="Click here to change In Process notes to Rebill" >Rebill Notes</A></FONT>|;
+    $Gen837_Button =
+qq|<FONT COLOR="red"><A STYLE="background-color:white; padding:0.2em;" id="gen837" HREF="javascript:ReportWindow('/cgi/bin/Gen837medicaid.pl?mlt=$form->{mlt}','adjNote')"  TITLE="Click here to Generate 837 files for last billing run" >Gen837 files</A></FONT>|;
 
-
-  $html .= qq|
+    $html .= qq|
     <TD WIDTH="33%" >
       <DIV CLASS="subtitle tophdr" >Rebill Medicaid InProcess Notes</DIV>
       <DIV CLASS="subtitle strcol" >
@@ -161,5 +166,5 @@ sub RebillTask {
     </TD>
   |;
 
-  return($html);
+    return ($html);
 }

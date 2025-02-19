@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use myForm;
 use myDBI;
@@ -24,62 +24,65 @@ use DBA;
 #        'Res=A|B|C' Restrictions A|B|C only
 #        'CredID=xx' Credential Codes only
 ############################################################################
-my $form = myForm->new();
-my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $form    = myForm->new();
+my $dbh     = myDBI->dbconnect( $form->{'DBNAME'} );
 my $EffDate = $form->{'EffDate'} eq '' ? $form->{'TODAY'} : $form->{'EffDate'};
-my $q = qq|select * from xInsurance where ID=$form->{InsID}|;
+my $q       = qq|select * from xInsurance where ID=$form->{InsID}|;
+
 #warn "s=$q\n";
 $s = $dbh->prepare($q);
 $s->execute();
-if ( $r = $s->fetchrow_hashref )
-{
-  my $InsID=$r->{ID};
-  if ( $form->{ToInsID} )
-  { $r->{ID} = $form->{ToInsID}; }
-  else
-  {
-    $r->{Descr} = $form->{Descr};
-    $r->{Name} = $form->{Name};
-    $r->{CreateProvID} = $form->{LOGINPROVID};
-    $r->{CreateDate} = $form->{TODAY};
-    $r->{ChangeProvID} = $form->{LOGINPROVID};
-    DBA->xSQL($form,'insert','xInsurance',$r);
-  }
+if ( $r = $s->fetchrow_hashref ) {
+    my $InsID = $r->{ID};
+    if ( $form->{ToInsID} ) { $r->{ID} = $form->{ToInsID}; }
+    else {
+        $r->{Descr}        = $form->{Descr};
+        $r->{Name}         = $form->{Name};
+        $r->{CreateProvID} = $form->{LOGINPROVID};
+        $r->{CreateDate}   = $form->{TODAY};
+        $r->{ChangeProvID} = $form->{LOGINPROVID};
+        DBA->xSQL( $form, 'insert', 'xInsurance', $r );
+    }
 
-  my $qxSC = qq|select xSC.* from xSC |;
-  $qxSC .= qq| left join xSCRates on xSCRates.SCID=xSC.SCID | if ( $form->{NonBill} );
-  $qxSC .= qq| left join xSCRates on xSCRates.SCID=xSC.SCID | if ( $form->{BillOnly} );
-  $qxSC .= qq| where xSC.InsID=? and xSC.Active=1 |;
-  $qxSC .= qq| and xSCRates.ExpDate is null and xSCRates.UnitLbl='NonBill' | if ( $form->{NonBill} );
-  $qxSC .= qq| and xSCRates.ExpDate is null and xSCRates.UnitLbl!='NonBill' | if ( $form->{BillOnly} );
-  $qxSC .= qq| and xSC.Restriction=1 | if ( $form->{ChildOnly} );
-  $qxSC .= qq| and xSC.Restriction=2 | if ( $form->{AdultOnly} );
-  $qxSC .= qq| and xSC.Restriction='$form->{Res}' | if ( $form->{Res} );
-  $qxSC .= qq| and xSC.CredID=$form->{CredID} | if ( $form->{CredID} );
-#  $qxSC .= qq| and (SCNum LIKE 'H0032%'
-#     or SCNum LIKE 'H0034%'
-#     or SCNum LIKE 'H0036%'
-#     or SCNum LIKE 'S0215%'
-#     or SCNum LIKE 'S5185%'
-#     or SCNum LIKE 'S9482%'
-#     or SCNum LIKE 'T1001%'
-#     or SCNum LIKE 'T1012%'
-#     or SCNum LIKE 'T1017%'
-#     or SCNum LIKE 'T1027%'
-#     or SCNum LIKE 'T1502%'
-#     or SCNum LIKE 'T2022%')
-#   and InsID=100
-#   and xSC.CredID IN (11,49,50,51,53,60,61,62,63,64)
-#|
-#;
-warn qq|q=$qxSC\n|;
-  my $cnt = 0;
-  $sxSC = $dbh->prepare($qxSC);
-  $sxSC->execute($InsID);
-  while ( my $rxSC = $sxSC->fetchrow_hashref )
-  {
-    $cnt++;
-    my $SCID=$rxSC->{SCID};
+    my $qxSC = qq|select xSC.* from xSC |;
+    $qxSC .= qq| left join xSCRates on xSCRates.SCID=xSC.SCID |
+      if ( $form->{NonBill} );
+    $qxSC .= qq| left join xSCRates on xSCRates.SCID=xSC.SCID |
+      if ( $form->{BillOnly} );
+    $qxSC .= qq| where xSC.InsID=? and xSC.Active=1 |;
+    $qxSC .= qq| and xSCRates.ExpDate is null and xSCRates.UnitLbl='NonBill' |
+      if ( $form->{NonBill} );
+    $qxSC .= qq| and xSCRates.ExpDate is null and xSCRates.UnitLbl!='NonBill' |
+      if ( $form->{BillOnly} );
+    $qxSC .= qq| and xSC.Restriction=1 |              if ( $form->{ChildOnly} );
+    $qxSC .= qq| and xSC.Restriction=2 |              if ( $form->{AdultOnly} );
+    $qxSC .= qq| and xSC.Restriction='$form->{Res}' | if ( $form->{Res} );
+    $qxSC .= qq| and xSC.CredID=$form->{CredID} |     if ( $form->{CredID} );
+
+    #  $qxSC .= qq| and (SCNum LIKE 'H0032%'
+    #     or SCNum LIKE 'H0034%'
+    #     or SCNum LIKE 'H0036%'
+    #     or SCNum LIKE 'S0215%'
+    #     or SCNum LIKE 'S5185%'
+    #     or SCNum LIKE 'S9482%'
+    #     or SCNum LIKE 'T1001%'
+    #     or SCNum LIKE 'T1012%'
+    #     or SCNum LIKE 'T1017%'
+    #     or SCNum LIKE 'T1027%'
+    #     or SCNum LIKE 'T1502%'
+    #     or SCNum LIKE 'T2022%')
+    #   and InsID=100
+    #   and xSC.CredID IN (11,49,50,51,53,60,61,62,63,64)
+    #|
+    #;
+    warn qq|q=$qxSC\n|;
+    my $cnt = 0;
+    $sxSC = $dbh->prepare($qxSC);
+    $sxSC->execute($InsID);
+    while ( my $rxSC = $sxSC->fetchrow_hashref ) {
+        $cnt++;
+        my $SCID = $rxSC->{SCID};
+
 #    next unless ( $rxSC->{SCNum} =~ /^X/ || $rxSC->{SCNum} =~ /^G9/ );
 #    next if ( $rxSC->{SCNum} =~ /^XMS/ );
 #    next unless ( $rxSC->{SCNum} =~ /^X/ || $rxSC->{SCNum} =~ /^H/ || $rxSC->{SCNum} eq 'NOSHOW' );
@@ -88,36 +91,40 @@ warn qq|q=$qxSC\n|;
 #$rxSC->{SCNum} =~ s/31/01/;
 #$rxSC->{SCNum} = $rxSC->{SCNum} . ' HF';
 #$rxSC->{SCName} = 'SA ' . $rxSC->{SCName};
-    $rxSC->{InsID} = $r->{ID};
-    $rxSC->{CreateProvID} = $form->{LOGINPROVID};
-    $rxSC->{CreateDate} = $form->{TODAY};
-    $rxSC->{ChangeProvID} = $form->{LOGINPROVID};
-    delete $rxSC->{ChangeDate};
-    DBA->xSQL($form,'insert','xSC',$rxSC);
+        $rxSC->{InsID}        = $r->{ID};
+        $rxSC->{CreateProvID} = $form->{LOGINPROVID};
+        $rxSC->{CreateDate}   = $form->{TODAY};
+        $rxSC->{ChangeProvID} = $form->{LOGINPROVID};
+        delete $rxSC->{ChangeDate};
+        DBA->xSQL( $form, 'insert', 'xSC', $rxSC );
 
-    #my $qxSCRates = qq|select * from xSCRates where SCID=? and ExpDate is null order by EffDate desc|;
-    my $qxSCRates = qq|select * from xSCRates where SCID=? and EffDate>='2019-01-01' order by EffDate desc|;
-#warn qq|q=$qxSCRates\n|;
-    print qq|add: $rxSC->{InsID}: $rxSC->{SCNum}, $rxSC->{SCName}\n|;
-    $sxSCRates = $dbh->prepare($qxSCRates);
-    $sxSCRates->execute($SCID);
-    while ( my $rxSCRates = $sxSCRates->fetchrow_hashref )
-    {
+#my $qxSCRates = qq|select * from xSCRates where SCID=? and ExpDate is null order by EffDate desc|;
+        my $qxSCRates =
+qq|select * from xSCRates where SCID=? and EffDate>='2019-01-01' order by EffDate desc|;
+
+        #warn qq|q=$qxSCRates\n|;
+        print qq|add: $rxSC->{InsID}: $rxSC->{SCNum}, $rxSC->{SCName}\n|;
+        $sxSCRates = $dbh->prepare($qxSCRates);
+        $sxSCRates->execute($SCID);
+        while ( my $rxSCRates = $sxSCRates->fetchrow_hashref ) {
+
 #foreach my $f ( sort keys %{$rxSCRates} ) { warn "rxSCRates-$f=$rxSCRates->{$f}\n"; }
-      $rxSCRates->{SCID} = $rxSC->{SCID};
-      #$rxSCRates->{EffDate} = $EffDate;
-      $rxSCRates->{EffDate} = $rxSCRates->{EffDate};
-      $rxSCRates->{CreateProvID} = $form->{LOGINPROVID};
-      $rxSCRates->{CreateDate} = $form->{TODAY};
-      $rxSCRates->{ChangeProvID} = $form->{LOGINPROVID};
-      delete $rxSCRates->{ChangeDate};
-      DBA->xSQL($form,'insert','xSCRates',$rxSCRates);
-      print qq|  rate: ($rxSCRates->{EffDate}, $rxSCRates->{ExpDate}, $rxSCRates->{ServiceRate}, $rxSCRates->{HrsPerUnit}, $rxSCRates->{UnitLbl})\n|;
+            $rxSCRates->{SCID} = $rxSC->{SCID};
+
+            #$rxSCRates->{EffDate} = $EffDate;
+            $rxSCRates->{EffDate}      = $rxSCRates->{EffDate};
+            $rxSCRates->{CreateProvID} = $form->{LOGINPROVID};
+            $rxSCRates->{CreateDate}   = $form->{TODAY};
+            $rxSCRates->{ChangeProvID} = $form->{LOGINPROVID};
+            delete $rxSCRates->{ChangeDate};
+            DBA->xSQL( $form, 'insert', 'xSCRates', $rxSCRates );
+            print
+qq|  rate: ($rxSCRates->{EffDate}, $rxSCRates->{ExpDate}, $rxSCRates->{ServiceRate}, $rxSCRates->{HrsPerUnit}, $rxSCRates->{UnitLbl})\n|;
+        }
+        $sxSCRates->finish();
+        print qq|\n|;
     }
-    $sxSCRates->finish();
-    print qq|\n|;
-  }
-  $sxSC->finish();
+    $sxSC->finish();
 }
 $s->finish();
 myDBI->cleanup();

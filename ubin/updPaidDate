@@ -1,21 +1,25 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 ############################################################################
 # set old Date to BillDate of Treatment
 ############################################################################
-my $oldPaidDate='2009-06-04';
+my $oldPaidDate = '2009-06-04';
 print qq|##TrID\tContLogDate\tBillDate\tPaidDate\tNotePaidDate\n|;
 $form = DBForm->new();
 my $dbh = $form->dbconnect();
-my $s = $dbh->prepare("select NotePaid.TrID,NotePaid.PaidDate as PaidDate,Treatment.ContLogDate,Treatment.BillDate,Treatment.PaidDate as NotePaidDate from NotePaid left join Treatment on Treatment.TrID=NotePaid.TrID where NotePaid.PaidDate='${oldPaidDate}' order by Treatment.BillDate");
+my $s   = $dbh->prepare(
+"select NotePaid.TrID,NotePaid.PaidDate as PaidDate,Treatment.ContLogDate,Treatment.BillDate,Treatment.PaidDate as NotePaidDate from NotePaid left join Treatment on Treatment.TrID=NotePaid.TrID where NotePaid.PaidDate='${oldPaidDate}' order by Treatment.BillDate"
+);
 $s->execute() || $form->dberror("select NotePaid");
-while ( my $rNote = $s->fetchrow_hashref )
-{
-  print qq|##$rNote->{TrID}\t$rNote->{ContLogDate}\t$rNote->{BillDate}\t$rNote->{PaidDate}\t$rNote->{NotePaidDate}\n|;
-  print qq|update NotePaid set PaidDate='$rNote->{BillDate}' where TrID=$rNote->{TrID} and PaidDate='${oldPaidDate}';\n|;
-  print qq|update Treatment set PaidDate='$rNote->{BillDate}' where TrID=$rNote->{TrID} and PaidDate='${oldPaidDate}';\n|;
+while ( my $rNote = $s->fetchrow_hashref ) {
+    print
+qq|##$rNote->{TrID}\t$rNote->{ContLogDate}\t$rNote->{BillDate}\t$rNote->{PaidDate}\t$rNote->{NotePaidDate}\n|;
+    print
+qq|update NotePaid set PaidDate='$rNote->{BillDate}' where TrID=$rNote->{TrID} and PaidDate='${oldPaidDate}';\n|;
+    print
+qq|update Treatment set PaidDate='$rNote->{BillDate}' where TrID=$rNote->{TrID} and PaidDate='${oldPaidDate}';\n|;
 }
 $s->finish();
 exit;

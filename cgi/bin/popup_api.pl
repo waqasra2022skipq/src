@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use login;
 use DBForm;
@@ -12,246 +12,228 @@ use strict;
 ############################################################################
 my $form = DBForm->parse();
 $form = login->chkLogin($form);
+
 #foreach my $f ( sort keys %{$form} ) { warn "popup: form-$f=$form->{$f}\n"; }
-my $dbh = $form->dbconnect();
+my $dbh  = $form->dbconnect();
 my $cdbh = $form->connectdb('okmis_config');
 
 ############################################################################
 my $json_str;
 
-if ( $form->{method} eq 'Agency' )
-{
-  my @json = ();
-  (my $terms = $form->{'terms'}) =~ s/"//g;
-  if ($terms ne '')
-  {
-    my ($FLDS,$CodeFLD,$limit,$maxLimit) = ('Type ProvOrgName Addr1 City ST Zip NPI','NPI',20,500);
+if ( $form->{method} eq 'Agency' ) {
+    my @json = ();
+    ( my $terms = $form->{'terms'} ) =~ s/"//g;
+    if ( $terms ne '' ) {
+        my ( $FLDS, $CodeFLD, $limit, $maxLimit ) =
+          ( 'Type ProvOrgName Addr1 City ST Zip NPI', 'NPI', 20, 500 );
 
-    my $SelectQ = qq|select *|;
-    my $CountQ = qq|select count(*) as cnt|;
-    my $For = qq| like "%${terms}%" |;
-    my $WhereQ = qq| and (NPI ${For} or ProvOrgName ${For} or Zip ${For}) |;
+        my $SelectQ = qq|select *|;
+        my $CountQ  = qq|select count(*) as cnt|;
+        my $For     = qq| like "%${terms}%" |;
+        my $WhereQ = qq| and (NPI ${For} or ProvOrgName ${For} or Zip ${For}) |;
 
-    my $q = qq| from xNPI where EntityTypeCode>1|;
-    $q .= qq| ${WhereQ} | if $terms ne '*';
+        my $q = qq| from xNPI where EntityTypeCode>1|;
+        $q .= qq| ${WhereQ} | if $terms ne '*';
 
-    my $sxNPICount = $cdbh->prepare(qq|${CountQ} ${q}|);
-    $sxNPICount->execute() || $form->dberror(qq|${CountQ} ${q}|);
+        my $sxNPICount = $cdbh->prepare(qq|${CountQ} ${q}|);
+        $sxNPICount->execute() || $form->dberror(qq|${CountQ} ${q}|);
 
-    if ( my $rxNPICount = $sxNPICount->fetchrow_hashref )
-    {
-      if ( $rxNPICount->{'cnt'} > 0 )
-      {
-        my $cnt = $rxNPICount->{'cnt'};
-        my (@codes,@data) = ((),());
-        push(@json, $cnt);
+        if ( my $rxNPICount = $sxNPICount->fetchrow_hashref ) {
+            if ( $rxNPICount->{'cnt'} > 0 ) {
+                my $cnt = $rxNPICount->{'cnt'};
+                my ( @codes, @data ) = ( (), () );
+                push( @json, $cnt );
 
-        $q .= qq| order by Type desc,ProvOrgName |;
-        if (exists $form->{'maxList'})
-        {
-          $q .= qq| limit $maxLimit |;
-        }
-        else
-        {
-          $q .= qq| limit $limit |;
-        }
+                $q .= qq| order by Type desc,ProvOrgName |;
+                if ( exists $form->{'maxList'} ) {
+                    $q .= qq| limit $maxLimit |;
+                }
+                else {
+                    $q .= qq| limit $limit |;
+                }
 
-        my $sxNPI = $cdbh->prepare(qq|${SelectQ} $q|);
-        $sxNPI->execute() || $form->dberror(qq|${SelectQ} $q|);
+                my $sxNPI = $cdbh->prepare(qq|${SelectQ} $q|);
+                $sxNPI->execute() || $form->dberror(qq|${SelectQ} $q|);
 
-        while ( my $rxNPI = $sxNPI->fetchrow_hashref )
-        {
-          my @row = ();
-          foreach my $fld ( split(' ',$FLDS) )
-          {
-            if ($fld eq $CodeFLD)
-            {
-              push(@codes, $rxNPI->{$fld});
+                while ( my $rxNPI = $sxNPI->fetchrow_hashref ) {
+                    my @row = ();
+                    foreach my $fld ( split( ' ', $FLDS ) ) {
+                        if ( $fld eq $CodeFLD ) {
+                            push( @codes, $rxNPI->{$fld} );
+                        }
+                        $rxNPI->{$fld} = '' if $rxNPI->{$fld} eq '';
+                        push( @row, $rxNPI->{$fld} );
+                    }
+                    push( @data, \@row );
+                }
+                push( @json, \@codes );
+                push( @json, undef );
+                push( @json, \@data );
+
+                $sxNPI->finish();
             }
-            $rxNPI->{$fld} = '' if $rxNPI->{$fld} eq '';
-            push(@row, $rxNPI->{$fld});
-          }
-          push(@data, \@row);
         }
-        push(@json, \@codes);
-        push(@json, undef);
-        push(@json, \@data);
 
-        $sxNPI->finish();
-      }
+        $json_str = encode_json \@json;
+        $sxNPICount->finish();
     }
-
-    $json_str = encode_json \@json;
-    $sxNPICount->finish();
-  }
 }
-elsif ( $form->{method} eq 'Physicians' )
-{
-  my @json = ();
-  (my $terms = $form->{'terms'}) =~ s/"//g;
-  if ($terms ne '')
-  {
-    my ($FLDS,$CodeFLD,$limit,$maxLimit) = ('ProvLastName ProvFirstName Addr1 City ST Zip NPI','NPI',20,500);
+elsif ( $form->{method} eq 'Physicians' ) {
+    my @json = ();
+    ( my $terms = $form->{'terms'} ) =~ s/"//g;
+    if ( $terms ne '' ) {
+        my ( $FLDS, $CodeFLD, $limit, $maxLimit ) = (
+            'ProvLastName ProvFirstName Addr1 City ST Zip NPI',
+            'NPI', 20, 500
+        );
 
-    my $SelectQ = qq|select *|;
-    my $CountQ = qq|select count(*) as cnt|;
-    my $For = qq| like "%${terms}%" |;
-    my $WhereQ = qq| and (NPI ${For} or ProvLastName ${For} or Zip ${For}) |;
+        my $SelectQ = qq|select *|;
+        my $CountQ  = qq|select count(*) as cnt|;
+        my $For     = qq| like "%${terms}%" |;
+        my $WhereQ =
+          qq| and (NPI ${For} or ProvLastName ${For} or Zip ${For}) |;
 
-    my $q = qq| from xNPI where EntityTypeCode=1 |;
-    $q .= qq| ${WhereQ} | if $terms ne '*';
+        my $q = qq| from xNPI where EntityTypeCode=1 |;
+        $q .= qq| ${WhereQ} | if $terms ne '*';
 
-    my $sxNPICount = $cdbh->prepare(qq|${CountQ} ${q}|);
-    $sxNPICount->execute() || $form->dberror(qq|${CountQ} ${q}|);
+        my $sxNPICount = $cdbh->prepare(qq|${CountQ} ${q}|);
+        $sxNPICount->execute() || $form->dberror(qq|${CountQ} ${q}|);
 
-    if ( my $rxNPICount = $sxNPICount->fetchrow_hashref )
-    {
-      if ( $rxNPICount->{'cnt'} > 0 )
-      {
-        my $cnt = $rxNPICount->{'cnt'};
-        my (@codes,@data) = ((),());
-        push(@json, $cnt);
+        if ( my $rxNPICount = $sxNPICount->fetchrow_hashref ) {
+            if ( $rxNPICount->{'cnt'} > 0 ) {
+                my $cnt = $rxNPICount->{'cnt'};
+                my ( @codes, @data ) = ( (), () );
+                push( @json, $cnt );
 
-        $q .= qq| order by ProvLastName, ProvFirstName |;
-        if (exists $form->{'maxList'})
-        {
-          $q .= qq| limit $maxLimit |;
-        }
-        else
-        {
-          $q .= qq| limit $limit |;
-        }
+                $q .= qq| order by ProvLastName, ProvFirstName |;
+                if ( exists $form->{'maxList'} ) {
+                    $q .= qq| limit $maxLimit |;
+                }
+                else {
+                    $q .= qq| limit $limit |;
+                }
 
-        my $sxNPI = $cdbh->prepare(qq|${SelectQ} ${q}|);
-        $sxNPI->execute() || $form->dberror(qq|${SelectQ} ${q}|);
+                my $sxNPI = $cdbh->prepare(qq|${SelectQ} ${q}|);
+                $sxNPI->execute() || $form->dberror(qq|${SelectQ} ${q}|);
 
-        while ( my $rxNPI = $sxNPI->fetchrow_hashref )
-        {
-          my @row = ();
-          foreach my $fld ( split(' ',$FLDS) )
-          {
-            if ($fld eq $CodeFLD)
-            {
-              push(@codes, $rxNPI->{$fld});
+                while ( my $rxNPI = $sxNPI->fetchrow_hashref ) {
+                    my @row = ();
+                    foreach my $fld ( split( ' ', $FLDS ) ) {
+                        if ( $fld eq $CodeFLD ) {
+                            push( @codes, $rxNPI->{$fld} );
+                        }
+                        $rxNPI->{$fld} = '' if $rxNPI->{$fld} eq '';
+                        push( @row, $rxNPI->{$fld} );
+                    }
+                    push( @data, \@row );
+                }
+                push( @json, \@codes );
+                push( @json, undef );
+                push( @json, \@data );
+
+                $sxNPI->finish();
             }
-            $rxNPI->{$fld} = '' if $rxNPI->{$fld} eq '';
-            push(@row, $rxNPI->{$fld});
-          }
-          push(@data, \@row);
         }
-        push(@json, \@codes);
-        push(@json, undef);
-        push(@json, \@data);
 
-        $sxNPI->finish();
-      }
+        $json_str = encode_json \@json;
+        $sxNPICount->finish();
     }
-
-    $json_str = encode_json \@json;
-    $sxNPICount->finish();
-  }
 }
-elsif ( $form->{method} eq 'xLDO' )
-{
-  my @json = ();
-  (my $terms = $form->{'terms'}) =~ s/"//g;
-  my $FLD = $form->{FLD};
-  my $PREVFLDS = $form->{PREVFLDS};
+elsif ( $form->{method} eq 'xLDO' ) {
+    my @json = ();
+    ( my $terms = $form->{'terms'} ) =~ s/"//g;
+    my $FLD      = $form->{FLD};
+    my $PREVFLDS = $form->{PREVFLDS};
 
-  my ($FLDS,$CodeFLD,$limit,$maxLimit,$q,$SelectQ,$CountQ) = ('Code Descr','Code',20,500,'','','');
+    my ( $FLDS, $CodeFLD, $limit, $maxLimit, $q, $SelectQ, $CountQ ) =
+      ( 'Code Descr', 'Code', 20, 500, '', '', '' );
 
-  if ($FLD ne '')
-  {
-    $SelectQ = qq|select xLDO${FLD}.Code, xLDO${FLD}.Descr| if $FLD ne 'Descr';
-    $SelectQ = qq|select xLDO.Code, xLDO.Descr| if $FLD eq 'Descr';
-    $CountQ = qq|select count(*) as cnt|;
+    if ( $FLD ne '' ) {
+        $SelectQ = qq|select xLDO${FLD}.Code, xLDO${FLD}.Descr|
+          if $FLD ne 'Descr';
+        $SelectQ = qq|select xLDO.Code, xLDO.Descr| if $FLD eq 'Descr';
+        $CountQ  = qq|select count(*) as cnt|;
 
-    $q = qq| from xLDO |;
-    $q .= qq| left join xLDO${FLD} on xLDO.${FLD}=xLDO${FLD}.Code | if $FLD ne 'Descr';
-    if ( $PREVFLDS ne '' )
-    {
-      foreach my $fv ( split(';',$PREVFLDS) )
-      {
-        my ($f,$v) = split(':',$fv);
-        $q .= qq| left join xLDO${f} on xLDO.Code=xLDO${f}.Code | if ( $f ne '' && $v ne '' && $f ne 'Descr' );
-      }
-    }
-    $q .= qq| where xLDO.Active=1 |;
-    $q .= qq| and xLDO${FLD}.Active=1 and xLDO.${FLD} is not null | if $FLD ne 'Descr';
-    $q .= qq| and xLDO${FLD}.Descr like "%${terms}%" | if ( $FLD ne 'Descr' && $terms ne '' && $terms ne '*' );
-    $q .= qq| and xLDO.Descr like "%${terms}%" | if ( $FLD eq 'Descr' && $terms ne '' && $terms ne '*' );
-    if ( $PREVFLDS ne '' )
-    {
-      foreach my $fv ( split(';',$PREVFLDS) )
-      {
-        my ($f,$v) = split(':',$fv);
-        $q .= qq| and xLDO.${f} = "${v}" | if ( $f ne '' && $v ne '' && $f ne 'Descr' );
-        $q .= qq| and xLDO.Code = "${v}" | if ( $f eq 'Descr' and $v ne '' );
-      }
-    }
-    $q .= qq| group by xLDO.${FLD} | if $FLD ne 'Descr';
-
-    my $sxLDOCount = $cdbh->prepare(qq|${CountQ} from (${SelectQ} ${q}) as ss|);
-    $sxLDOCount->execute() || $form->dberror(qq|${CountQ} $q|);
-
-    if ( my $rxLDOCount = $sxLDOCount->fetchrow_hashref )
-    {
-      if ( $rxLDOCount->{'cnt'} > 0 )
-      {
-        my $cnt = $rxLDOCount->{'cnt'};
-        my (@codes,@data) = ((),());
-        push(@json, $cnt);
-
-        if (exists $form->{'maxList'})
-        {
-          $q .= qq| limit $maxLimit |;
-        }
-        else
-        {
-          $q .= qq| limit $limit |;
-        }
-
-        my $sxLDO = $cdbh->prepare(qq|${SelectQ} ${q}|);
-        $sxLDO->execute() || $form->dberror(qq|${SelectQ} ${q}|);
-
-        while ( my $rxLDO = $sxLDO->fetchrow_hashref )
-        {
-          my @row = ();
-          foreach my $fld ( split(' ',$FLDS) )
-          {
-            if ($fld eq $CodeFLD)
-            {
-              push(@codes, $rxLDO->{$fld});
+        $q = qq| from xLDO |;
+        $q .= qq| left join xLDO${FLD} on xLDO.${FLD}=xLDO${FLD}.Code |
+          if $FLD ne 'Descr';
+        if ( $PREVFLDS ne '' ) {
+            foreach my $fv ( split( ';', $PREVFLDS ) ) {
+                my ( $f, $v ) = split( ':', $fv );
+                $q .= qq| left join xLDO${f} on xLDO.Code=xLDO${f}.Code |
+                  if ( $f ne '' && $v ne '' && $f ne 'Descr' );
             }
-            else
-            {
-              $rxLDO->{$fld} = '' if $rxLDO->{$fld} eq '';
-              push(@row, $rxLDO->{$fld});
-            }
-          }
-          push(@data, \@row);
         }
-        push(@json, \@codes);
-        push(@json, undef);
-        push(@json, \@data);
+        $q .= qq| where xLDO.Active=1 |;
+        $q .= qq| and xLDO${FLD}.Active=1 and xLDO.${FLD} is not null |
+          if $FLD ne 'Descr';
+        $q .= qq| and xLDO${FLD}.Descr like "%${terms}%" |
+          if ( $FLD ne 'Descr' && $terms ne '' && $terms ne '*' );
+        $q .= qq| and xLDO.Descr like "%${terms}%" |
+          if ( $FLD eq 'Descr' && $terms ne '' && $terms ne '*' );
+        if ( $PREVFLDS ne '' ) {
+            foreach my $fv ( split( ';', $PREVFLDS ) ) {
+                my ( $f, $v ) = split( ':', $fv );
+                $q .= qq| and xLDO.${f} = "${v}" |
+                  if ( $f ne '' && $v ne '' && $f ne 'Descr' );
+                $q .= qq| and xLDO.Code = "${v}" |
+                  if ( $f eq 'Descr' and $v ne '' );
+            }
+        }
+        $q .= qq| group by xLDO.${FLD} | if $FLD ne 'Descr';
 
-        $sxLDO->finish();
-      }
+        my $sxLDOCount =
+          $cdbh->prepare(qq|${CountQ} from (${SelectQ} ${q}) as ss|);
+        $sxLDOCount->execute() || $form->dberror(qq|${CountQ} $q|);
+
+        if ( my $rxLDOCount = $sxLDOCount->fetchrow_hashref ) {
+            if ( $rxLDOCount->{'cnt'} > 0 ) {
+                my $cnt = $rxLDOCount->{'cnt'};
+                my ( @codes, @data ) = ( (), () );
+                push( @json, $cnt );
+
+                if ( exists $form->{'maxList'} ) {
+                    $q .= qq| limit $maxLimit |;
+                }
+                else {
+                    $q .= qq| limit $limit |;
+                }
+
+                my $sxLDO = $cdbh->prepare(qq|${SelectQ} ${q}|);
+                $sxLDO->execute() || $form->dberror(qq|${SelectQ} ${q}|);
+
+                while ( my $rxLDO = $sxLDO->fetchrow_hashref ) {
+                    my @row = ();
+                    foreach my $fld ( split( ' ', $FLDS ) ) {
+                        if ( $fld eq $CodeFLD ) {
+                            push( @codes, $rxLDO->{$fld} );
+                        }
+                        else {
+                            $rxLDO->{$fld} = '' if $rxLDO->{$fld} eq '';
+                            push( @row, $rxLDO->{$fld} );
+                        }
+                    }
+                    push( @data, \@row );
+                }
+                push( @json, \@codes );
+                push( @json, undef );
+                push( @json, \@data );
+
+                $sxLDO->finish();
+            }
+        }
+
+        $json_str = encode_json \@json;
+        $sxLDOCount->finish();
     }
-
-    $json_str = encode_json \@json;
-    $sxLDOCount->finish();
-  }
 }
-elsif ( $form->{method} eq 'getxLDODetail' )
-{
-  my %json = ();
-  (my $terms = $form->{'terms'}) =~ s/"//g;
-  my $FLDS = 'SubjectMatterDomain Role Setting TypeOfService Kind';
+elsif ( $form->{method} eq 'getxLDODetail' ) {
+    my %json = ();
+    ( my $terms = $form->{'terms'} ) =~ s/"//g;
+    my $FLDS = 'SubjectMatterDomain Role Setting TypeOfService Kind';
 
-  if ( $terms ne '' )
-  {
-    my $q = qq|
+    if ( $terms ne '' ) {
+        my $q = qq|
 select xLDO.SubjectMatterDomain, xLDOSubjectMatterDomain.Descr as SubjectMatterDomainDescr,
   xLDO.Role, xLDORole.Descr as RoleDescr,
   xLDO.Setting, xLDOSetting.Descr as SettingDescr,
@@ -271,153 +253,145 @@ left join xLDOKind
 where xLDO.Active = 1 and xLDO.Code = "${terms}"
 |;
 
-    my $sxLDO = $cdbh->prepare($q);
-    $sxLDO->execute() || $form->dberror($q);
+        my $sxLDO = $cdbh->prepare($q);
+        $sxLDO->execute() || $form->dberror($q);
 
-    if ( my $rxLDO = $sxLDO->fetchrow_hashref )
-    {
-      foreach my $fld ( split(' ',$FLDS) )
-      {
-        $json{$fld} = $rxLDO->{$fld};
-        $json{$fld.'Descr'} = $rxLDO->{$fld.'Descr'};
-      }
-    }
-
-    $json_str = encode_json \%json;
-    $sxLDO->finish();
-  }
-}
-elsif ( $form->{method} eq 'xTaxonomy' )
-{
-  my @json = ();
-  (my $terms = $form->{'terms'}) =~ s/"//g;
-  if ($terms ne '')
-  {
-    my ($FLDS,$CodeFLD,$limit,$maxLimit) = ('ID Spec Class Type','ID',20,500);
-
-    my $SelectQ = qq|select *|;
-    my $CountQ = qq|select count(*) as cnt|;
-    my $For = qq| like "%${terms}%" |;
-    my $WhereQ = qq| and (ID ${For} or Spec ${For} or Class ${For} or Type ${For}) |;
-
-    my $q = qq| from xTaxonomy where Active=1 |;
-    $q .= qq| ${WhereQ} | if $terms ne '*';
-
-    my $sxTaxonomyCount = $cdbh->prepare(qq|${CountQ} ${q}|);
-    $sxTaxonomyCount->execute() || $form->dberror(qq|${CountQ} ${q}|);
-
-    if ( my $rxTaxonomyCount = $sxTaxonomyCount->fetchrow_hashref )
-    {
-      if ( $rxTaxonomyCount->{'cnt'} > 0 )
-      {
-        my $cnt = $rxTaxonomyCount->{'cnt'};
-        my (@codes,@data) = ((),());
-        push(@json, $cnt);
-
-        $q .= qq| order by ID |;
-        if (exists $form->{'maxList'})
-        {
-          $q .= qq| limit $maxLimit |;
-        }
-        else
-        {
-          $q .= qq| limit $limit |;
-        }
-
-        my $sxTaxonomy = $cdbh->prepare(qq|${SelectQ} $q|);
-        $sxTaxonomy->execute() || $form->dberror(qq|${SelectQ} $q|);
-
-        while ( my $rxTaxonomy = $sxTaxonomy->fetchrow_hashref )
-        {
-          my @row = ();
-          foreach my $fld ( split(' ',$FLDS) )
-          {
-            if ($fld eq $CodeFLD)
-            {
-              push(@codes, $rxTaxonomy->{$fld});
+        if ( my $rxLDO = $sxLDO->fetchrow_hashref ) {
+            foreach my $fld ( split( ' ', $FLDS ) ) {
+                $json{$fld} = $rxLDO->{$fld};
+                $json{ $fld . 'Descr' } = $rxLDO->{ $fld . 'Descr' };
             }
-            $rxTaxonomy->{$fld} = '' if $rxTaxonomy->{$fld} eq '';
-            push(@row, $rxTaxonomy->{$fld});
-          }
-          push(@data, \@row);
         }
-        push(@json, \@codes);
-        push(@json, undef);
-        push(@json, \@data);
 
-        $sxTaxonomy->finish();
-      }
+        $json_str = encode_json \%json;
+        $sxLDO->finish();
     }
-
-    $json_str = encode_json \@json;
-    $sxTaxonomyCount->finish();
-  }
 }
-elsif ( $form->{method} eq 'xOccupationSnomed' )
-{
-  my @json = ();
-  (my $terms = $form->{'terms'}) =~ s/"//g;
-  if ($terms ne '')
-  {
-    my ($FLDS,$CodeFLD,$limit,$maxLimit) = ('Code Description CodeSystem CodeSystemVers CodeSystemOID','Code',20,500);
+elsif ( $form->{method} eq 'xTaxonomy' ) {
+    my @json = ();
+    ( my $terms = $form->{'terms'} ) =~ s/"//g;
+    if ( $terms ne '' ) {
+        my ( $FLDS, $CodeFLD, $limit, $maxLimit ) =
+          ( 'ID Spec Class Type', 'ID', 20, 500 );
 
-    my $SelectQ = qq|select *|;
-    my $CountQ = qq|select count(*) as cnt|;
-    my $For = qq| like "%${terms}%" |;
-    my $WhereQ = qq| and (Code ${For} or Description ${For}) |;
+        my $SelectQ = qq|select *|;
+        my $CountQ  = qq|select count(*) as cnt|;
+        my $For     = qq| like "%${terms}%" |;
+        my $WhereQ =
+          qq| and (ID ${For} or Spec ${For} or Class ${For} or Type ${For}) |;
 
-    my $q = qq| from xOccupationSnomed where Active=1 |;
-    $q .= qq| ${WhereQ} | if $terms ne '*';
+        my $q = qq| from xTaxonomy where Active=1 |;
+        $q .= qq| ${WhereQ} | if $terms ne '*';
 
-    my $sxOccupationSnomedCount = $cdbh->prepare(qq|${CountQ} ${q}|);
-    $sxOccupationSnomedCount->execute() || $form->dberror(qq|${CountQ} ${q}|);
+        my $sxTaxonomyCount = $cdbh->prepare(qq|${CountQ} ${q}|);
+        $sxTaxonomyCount->execute() || $form->dberror(qq|${CountQ} ${q}|);
 
-    if ( my $rxOccupationSnomedCount = $sxOccupationSnomedCount->fetchrow_hashref )
-    {
-      if ( $rxOccupationSnomedCount->{'cnt'} > 0 )
-      {
-        my $cnt = $rxOccupationSnomedCount->{'cnt'};
-        my (@codes,@data) = ((),());
-        push(@json, $cnt);
+        if ( my $rxTaxonomyCount = $sxTaxonomyCount->fetchrow_hashref ) {
+            if ( $rxTaxonomyCount->{'cnt'} > 0 ) {
+                my $cnt = $rxTaxonomyCount->{'cnt'};
+                my ( @codes, @data ) = ( (), () );
+                push( @json, $cnt );
 
-        $q .= qq| order by Description |;
-        if (exists $form->{'maxList'})
-        {
-          $q .= qq| limit $maxLimit |;
-        }
-        else
-        {
-          $q .= qq| limit $limit |;
-        }
+                $q .= qq| order by ID |;
+                if ( exists $form->{'maxList'} ) {
+                    $q .= qq| limit $maxLimit |;
+                }
+                else {
+                    $q .= qq| limit $limit |;
+                }
 
-        my $sxOccupationSnomed = $cdbh->prepare(qq|${SelectQ} $q|);
-        $sxOccupationSnomed->execute() || $form->dberror(qq|${SelectQ} $q|);
+                my $sxTaxonomy = $cdbh->prepare(qq|${SelectQ} $q|);
+                $sxTaxonomy->execute() || $form->dberror(qq|${SelectQ} $q|);
 
-        while ( my $rxOccupationSnomed = $sxOccupationSnomed->fetchrow_hashref )
-        {
-          my @row = ();
-          foreach my $fld ( split(' ',$FLDS) )
-          {
-            if ($fld eq $CodeFLD)
-            {
-              push(@codes, $rxOccupationSnomed->{$fld});
+                while ( my $rxTaxonomy = $sxTaxonomy->fetchrow_hashref ) {
+                    my @row = ();
+                    foreach my $fld ( split( ' ', $FLDS ) ) {
+                        if ( $fld eq $CodeFLD ) {
+                            push( @codes, $rxTaxonomy->{$fld} );
+                        }
+                        $rxTaxonomy->{$fld} = '' if $rxTaxonomy->{$fld} eq '';
+                        push( @row, $rxTaxonomy->{$fld} );
+                    }
+                    push( @data, \@row );
+                }
+                push( @json, \@codes );
+                push( @json, undef );
+                push( @json, \@data );
+
+                $sxTaxonomy->finish();
             }
-            $rxOccupationSnomed->{$fld} = '' if $rxOccupationSnomed->{$fld} eq '';
-            push(@row, $rxOccupationSnomed->{$fld});
-          }
-          push(@data, \@row);
         }
-        push(@json, \@codes);
-        push(@json, undef);
-        push(@json, \@data);
 
-        $sxOccupationSnomed->finish();
-      }
+        $json_str = encode_json \@json;
+        $sxTaxonomyCount->finish();
     }
+}
+elsif ( $form->{method} eq 'xOccupationSnomed' ) {
+    my @json = ();
+    ( my $terms = $form->{'terms'} ) =~ s/"//g;
+    if ( $terms ne '' ) {
+        my ( $FLDS, $CodeFLD, $limit, $maxLimit ) = (
+            'Code Description CodeSystem CodeSystemVers CodeSystemOID',
+            'Code', 20, 500
+        );
 
-    $json_str = encode_json \@json;
-    $sxOccupationSnomedCount->finish();
-  }
+        my $SelectQ = qq|select *|;
+        my $CountQ  = qq|select count(*) as cnt|;
+        my $For     = qq| like "%${terms}%" |;
+        my $WhereQ  = qq| and (Code ${For} or Description ${For}) |;
+
+        my $q = qq| from xOccupationSnomed where Active=1 |;
+        $q .= qq| ${WhereQ} | if $terms ne '*';
+
+        my $sxOccupationSnomedCount = $cdbh->prepare(qq|${CountQ} ${q}|);
+        $sxOccupationSnomedCount->execute()
+          || $form->dberror(qq|${CountQ} ${q}|);
+
+        if ( my $rxOccupationSnomedCount =
+            $sxOccupationSnomedCount->fetchrow_hashref )
+        {
+            if ( $rxOccupationSnomedCount->{'cnt'} > 0 ) {
+                my $cnt = $rxOccupationSnomedCount->{'cnt'};
+                my ( @codes, @data ) = ( (), () );
+                push( @json, $cnt );
+
+                $q .= qq| order by Description |;
+                if ( exists $form->{'maxList'} ) {
+                    $q .= qq| limit $maxLimit |;
+                }
+                else {
+                    $q .= qq| limit $limit |;
+                }
+
+                my $sxOccupationSnomed = $cdbh->prepare(qq|${SelectQ} $q|);
+                $sxOccupationSnomed->execute()
+                  || $form->dberror(qq|${SelectQ} $q|);
+
+                while ( my $rxOccupationSnomed =
+                    $sxOccupationSnomed->fetchrow_hashref )
+                {
+                    my @row = ();
+                    foreach my $fld ( split( ' ', $FLDS ) ) {
+                        if ( $fld eq $CodeFLD ) {
+                            push( @codes, $rxOccupationSnomed->{$fld} );
+                        }
+                        $rxOccupationSnomed->{$fld} = ''
+                          if $rxOccupationSnomed->{$fld} eq '';
+                        push( @row, $rxOccupationSnomed->{$fld} );
+                    }
+                    push( @data, \@row );
+                }
+                push( @json, \@codes );
+                push( @json, undef );
+                push( @json, \@data );
+
+                $sxOccupationSnomed->finish();
+            }
+        }
+
+        $json_str = encode_json \@json;
+        $sxOccupationSnomedCount->finish();
+    }
 }
 ############################################################################
 #warn qq|json_str=$json_str\n|;

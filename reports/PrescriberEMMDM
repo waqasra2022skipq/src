@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBA;
 use myForm;
@@ -9,125 +9,159 @@ use PDF;
 use cBill;
 use Time::Local;
 
-my $DT=localtime();
+my $DT = localtime();
 
 ###########################################
 my $form = myForm->new();
-if ( ! SysAccess->verify($form,'Privilege=BillingReports') )
-{ myDBI->error("Access Denied! / BillingReports Privilege"); }
+if ( !SysAccess->verify( $form, 'Privilege=BillingReports' ) ) {
+    myDBI->error("Access Denied! / BillingReports Privilege");
+}
 
 #if ( $form->{LOGINPROVID} == 91 ) { foreach my $f ( sort keys %{$form} ) { warn "NoteRpt: form-$f=$form->{$f}\n"; } }
 my $debug = 0;
 $form = DBUtil->setDates($form);
-my $fdow = DBUtil->Date($form->{FromDate},'dow');
-my $fdayname = (Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday)[$fdow];
-my $tdow = DBUtil->Date($form->{ToDate},'dow');
-my $tdayname = (Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday)[$tdow];
-my $DateRange = qq|from ${fdayname} $form->{FromDateD} - ${tdayname} $form->{ToDateD}|;
-my $ByBillDate = SysAccess->getRule($form,'PayrollByBillDate',$form->{LOGINPROVID});
-my ($PayBegin,$PayEnd) = cBill->getPayDates($form,4,7,$form->{FromDate});
-my ($PayRange,$PayNotes) = ('','');
-if ( $form->{'Type'} =~ /payroll/i )
-{
-  my $fdow = DBUtil->Date($PayBegin,'dow');
-  my $fdayname = (Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday)[$fdow];
-  my $tdow = DBUtil->Date($PayEnd,'dow');
-  my $tdayname = (Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday)[$tdow];
-  $fPayBegin = DBUtil->Date($PayBegin,'fmt','MM/DD/YYYY');
-  $fPayEnd = DBUtil->Date($PayEnd,'fmt','MM/DD/YYYY');
-  $PayRange = qq|Pay Period ${fdayname} ${fPayBegin} - ${tdayname} ${fPayEnd}|;
-  $PayNotes = qq|Note: '~' before Rate means used default, '!' means error|;
+my $fdow = DBUtil->Date( $form->{FromDate}, 'dow' );
+my $fdayname =
+  ( Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday )[$fdow];
+my $tdow = DBUtil->Date( $form->{ToDate}, 'dow' );
+my $tdayname =
+  ( Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday )[$tdow];
+my $DateRange =
+  qq|from ${fdayname} $form->{FromDateD} - ${tdayname} $form->{ToDateD}|;
+my $ByBillDate =
+  SysAccess->getRule( $form, 'PayrollByBillDate', $form->{LOGINPROVID} );
+my ( $PayBegin, $PayEnd ) =
+  cBill->getPayDates( $form, 4, 7, $form->{FromDate} );
+my ( $PayRange, $PayNotes ) = ( '', '' );
+
+if ( $form->{'Type'} =~ /payroll/i ) {
+    my $fdow = DBUtil->Date( $PayBegin, 'dow' );
+    my $fdayname =
+      ( Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday )[$fdow];
+    my $tdow = DBUtil->Date( $PayEnd, 'dow' );
+    my $tdayname =
+      ( Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday )[$tdow];
+    $fPayBegin = DBUtil->Date( $PayBegin, 'fmt', 'MM/DD/YYYY' );
+    $fPayEnd   = DBUtil->Date( $PayEnd,   'fmt', 'MM/DD/YYYY' );
+    $PayRange =
+      qq|Pay Period ${fdayname} ${fPayBegin} - ${tdayname} ${fPayEnd}|;
+    $PayNotes = qq|Note: '~' before Rate means used default, '!' means error|;
 }
-my ($ReportType,$NoteRpt,$RecordCount,$SelByDate,$SelByDateName) = ('',0,0,'','');
-my $AOK = SysAccess->chkPriv($form,"BillingReports");
+my ( $ReportType, $NoteRpt, $RecordCount, $SelByDate, $SelByDateName ) =
+  ( '', 0, 0, '', '' );
+my $AOK       = SysAccess->chkPriv( $form, "BillingReports" );
 my $NoNonBill = $form->{'NoNonBill'};
-my $OutTrIDs = ();
+my $OutTrIDs  = ();
 
-my ($Display_ClinicName,$Display_InsName) = ('','');
-my ($Display_ProviderName,$Display_ProvID) = ('','');
-my ($Display_ClientName,$Display_ClientID,$Display_SSN,$Displan_DOB) = ('','','','');
-my ($Display_CustAgency,$Display_JOLTS,$Display_GrpSize) = ('','','');
-my ($Display_TrID,$Display_Service,$Display_ServiceName,$This_SC) = ('','','','');
-my ($Display_BillDate,$Display_OrgBillDate) = ('','');
-my ($Display_DenCode,$Display_DenDate,$Display_BillStatus) = ('','','');
-my ($Display_ContactDate,$Display_BeginTime,$Display_EndTime) = ('','','');
-my ($Display_StatusDate,$Display_StatusMsg,$Display_RecDate) = ('','','');
-my ($Display_NoteRecDate,$Display_NoteSchDate) = ('','');
-my ($Display_NotePaidDate,$Display_PaidDate,$Display_ICN) = ('','','');
-my ($Display_ServiceRate,$Display_Units,$Display_BillAmt,$Display_IncAmt,$Display_AmtDue) = (0,0,0,0,0);
-my ($Display_NF,$Display_PayRate,$Display_HoursWorked,$Display_PayTotal,$Display_MgmtAmt) = ('',0,0,0,0);
+my ( $Display_ClinicName,   $Display_InsName ) = ( '', '' );
+my ( $Display_ProviderName, $Display_ProvID )  = ( '', '' );
+my ( $Display_ClientName,   $Display_ClientID, $Display_SSN, $Displan_DOB ) =
+  ( '', '', '', '' );
+my ( $Display_CustAgency, $Display_JOLTS, $Display_GrpSize ) = ( '', '', '' );
+my ( $Display_TrID, $Display_Service, $Display_ServiceName, $This_SC ) =
+  ( '', '', '', '' );
+my ( $Display_BillDate, $Display_OrgBillDate ) = ( '', '' );
+my ( $Display_DenCode, $Display_DenDate, $Display_BillStatus ) = ( '', '', '' );
+my ( $Display_ContactDate, $Display_BeginTime, $Display_EndTime ) =
+  ( '', '', '' );
+my ( $Display_StatusDate, $Display_StatusMsg, $Display_RecDate ) =
+  ( '', '', '' );
+my ( $Display_NoteRecDate, $Display_NoteSchDate ) = ( '', '' );
+my ( $Display_NotePaidDate, $Display_PaidDate, $Display_ICN ) = ( '', '', '' );
+my (
+    $Display_ServiceRate, $Display_Units, $Display_BillAmt,
+    $Display_IncAmt,      $Display_AmtDue
+) = ( 0, 0, 0, 0, 0 );
+my (
+    $Display_NF,       $Display_PayRate, $Display_HoursWorked,
+    $Display_PayTotal, $Display_MgmtAmt
+) = ( '', 0, 0, 0, 0 );
 
-my ($SubCountLbl,$PrevSubCountLbl) = ('','');
-my ($BrkTotalNoteCount,$SubTotalNoteCount,$MaxTotalNoteCount,$MaxTotalPersonCount) = (0,0,0,0);
-my ($ThisSubID,$ThisBrkID,$PrevSubID,$PrevBrkID) = ('','','','');
-my ($BrkTotalLbl,$SubTotalLbl) = ('','');
-my ($BrkClientName,$BrkClientID) = ('','');
-my ($SubClientName,$SubClientID) = ('','');
-my ($BrkProviderName,$BrkProvID) = ('','');
-my ($SubProviderName,$SubProvID) = ('','');
-my ($BrkTotalUnits,$SubTotalUnits,$MaxTotalUnits) = (0,0,0);
-my ($BrkTotalBillAmt,$SubTotalBillAmt,$MaxTotalBillAmt) = (0,0,0);
-my ($BrkTotalIncAmt,$SubTotalIncAmt,$MaxTotalIncAmt) = (0,0,0);
-my ($BrkTotalAmtDue,$SubTotalAmtDue,$MaxTotalAmtDue) = (0,0,0);
-my ($BrkTotalMgmtAmt,$SubTotalMgmtAmt,$MaxTotalMgmtAmt) = (0,0,0);
+my ( $SubCountLbl, $PrevSubCountLbl ) = ( '', '' );
+my (
+    $BrkTotalNoteCount, $SubTotalNoteCount,
+    $MaxTotalNoteCount, $MaxTotalPersonCount
+) = ( 0, 0, 0, 0 );
+my ( $ThisSubID, $ThisBrkID, $PrevSubID, $PrevBrkID ) = ( '', '', '', '' );
+my ( $BrkTotalLbl, $SubTotalLbl )                     = ( '', '' );
+my ( $BrkClientName, $BrkClientID )                   = ( '', '' );
+my ( $SubClientName, $SubClientID )                   = ( '', '' );
+my ( $BrkProviderName, $BrkProvID )                   = ( '', '' );
+my ( $SubProviderName, $SubProvID )                   = ( '', '' );
+my ( $BrkTotalUnits, $SubTotalUnits, $MaxTotalUnits ) = ( 0, 0, 0 );
+my ( $BrkTotalBillAmt, $SubTotalBillAmt, $MaxTotalBillAmt ) = ( 0, 0, 0 );
+my ( $BrkTotalIncAmt, $SubTotalIncAmt, $MaxTotalIncAmt )    = ( 0, 0, 0 );
+my ( $BrkTotalAmtDue, $SubTotalAmtDue, $MaxTotalAmtDue )    = ( 0, 0, 0 );
+my ( $BrkTotalMgmtAmt, $SubTotalMgmtAmt, $MaxTotalMgmtAmt ) = ( 0, 0, 0 );
 ############################################################################
-my $dbh = myDBI->dbconnect($form->{'DBNAME'});
-my $sProvider = $dbh->prepare("select Provider.*, ProviderControl.FinMgrID from Provider left join ProviderControl on ProviderControl.ProvID=Provider.ProvID where Provider.ProvID=?");
-my $sNotePaid = $dbh->prepare("select * from NotePaid where TrID=? and ProvID=?");
-my $sInsurance = $dbh->prepare("select * from Insurance left join xInsurance on xInsurance.ID=Insurance.InsID where ClientID=? and Priority=?");
-my $sClientReferrals = $dbh->prepare("select * from ClientReferrals where ClientID=?");
+my $dbh       = myDBI->dbconnect( $form->{'DBNAME'} );
+my $sProvider = $dbh->prepare(
+"select Provider.*, ProviderControl.FinMgrID from Provider left join ProviderControl on ProviderControl.ProvID=Provider.ProvID where Provider.ProvID=?"
+);
+my $sNotePaid =
+  $dbh->prepare("select * from NotePaid where TrID=? and ProvID=?");
+my $sInsurance = $dbh->prepare(
+"select * from Insurance left join xInsurance on xInsurance.ID=Insurance.InsID where ClientID=? and Priority=?"
+);
+my $sClientReferrals =
+  $dbh->prepare("select * from ClientReferrals where ClientID=?");
 my $sClientLegal = $dbh->prepare("select * from ClientLegal where ClientID=?");
 
 ############################################################################
-warn qq|ForProvID=$ForProvID, ProvIDs=$form->{ProvIDs}\n| if ( $debug );
+warn qq|ForProvID=$ForProvID, ProvIDs=$form->{ProvIDs}\n| if ($debug);
 my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
 
-my $addSelection = DBA->withClinicProvider($form,'and','Treatment.ClinicID','Treatment.ProvID');
-#warn qq|addSelection=\n$addSelection\n| if ( $form->{LOGINPROVID} == 91 );
-if ( $form->{ClinicIDs} )
-{
-  $sProvider->execute($form->{'ClinicIDs'}) || myDBI->dberror("noteReport: select Provider ClinicIDs=$form->{'ClinicIDs'}");
-  my $rClinic = $sProvider->fetchrow_hashref;
-  $ReportType .= $rClinic->{'Name'} . ' ';
-}
-foreach my $InsID ( split(chr(253),$form->{InsID}) )
-{ $ReportType .= DBA->getxref($form,'xInsurance',$InsID,'Name').' '; }
+my $addSelection = DBA->withClinicProvider( $form, 'and', 'Treatment.ClinicID',
+    'Treatment.ProvID' );
 
-my ($select,$where) = main->select($form,$form->{Type});
+#warn qq|addSelection=\n$addSelection\n| if ( $form->{LOGINPROVID} == 91 );
+if ( $form->{ClinicIDs} ) {
+    $sProvider->execute( $form->{'ClinicIDs'} )
+      || myDBI->dberror(
+        "noteReport: select Provider ClinicIDs=$form->{'ClinicIDs'}");
+    my $rClinic = $sProvider->fetchrow_hashref;
+    $ReportType .= $rClinic->{'Name'} . ' ';
+}
+foreach my $InsID ( split( chr(253), $form->{InsID} ) ) {
+    $ReportType .= DBA->getxref( $form, 'xInsurance', $InsID, 'Name' ) . ' ';
+}
+
+my ( $select, $where ) = main->select( $form, $form->{Type} );
 my $qTreatment;
 my $sTreatment;
+
 #warn qq|select=\n$select\n| if ( $form->{LOGINPROVID} == 91 );
 #warn qq|where=\n$where\n| if ( $form->{LOGINPROVID} == 91 );
-warn qq|select=\n$select\n| if ( $debug );
-warn qq|where=\n$where\n| if ( $debug );
+warn qq|select=\n$select\n| if ($debug);
+warn qq|where=\n$where\n|   if ($debug);
 ############################################################################
 
 $qTreatment = $select . $where . main->addSort($form);
-warn qq|addSelection=\n$addSelection\n| if ( $debug );
-warn qq|qTreatment=\n$qTreatment\n| if ( $debug );
-if ( $form->{LOGINPROVID} == 91 )
-{
-  open OUT, ">/home/okmis/mis/src/debug/NoteRpt.out" or die "Couldn't open file: $!";
-  foreach my $f ( sort keys %{$form} ) { print OUT ": form-$f=$form->{$f}\n"; }
-  print OUT qq|qTreatment=\n$qTreatment\n|;
-  close(OUT);
-}
-  $sTreatment = $dbh->prepare($qTreatment);
-  print main->genReportHDR($form);
-  $sTreatment->execute() || myDBI->dberror($qTreatment);
-  $RecordCount = $sTreatment->rows;
-  
-  while ( my $rTreatment = $sTreatment->fetchrow_hashref )
-  { 
-    if ( main->setDisplay($form,$rTreatment) )
-    { 
-        
-            main->genReportLine($form,$rTreatment); 
-        
+warn qq|addSelection=\n$addSelection\n| if ($debug);
+warn qq|qTreatment=\n$qTreatment\n|     if ($debug);
+if ( $form->{LOGINPROVID} == 91 ) {
+    open OUT, ">/var/www/okmis/src/debug/NoteRpt.out"
+      or die "Couldn't open file: $!";
+    foreach my $f ( sort keys %{$form} ) {
+        print OUT ": form-$f=$form->{$f}\n";
     }
-    $OutTrIDs->{$rTreatment->{TrID}} = $rTreatment->{TrID};             # tag once.
-  }
-  print main->genReportFTR($form);
+    print OUT qq|qTreatment=\n$qTreatment\n|;
+    close(OUT);
+}
+$sTreatment = $dbh->prepare($qTreatment);
+print main->genReportHDR($form);
+$sTreatment->execute() || myDBI->dberror($qTreatment);
+$RecordCount = $sTreatment->rows;
+
+while ( my $rTreatment = $sTreatment->fetchrow_hashref ) {
+    if ( main->setDisplay( $form, $rTreatment ) ) {
+
+        main->genReportLine( $form, $rTreatment );
+
+    }
+    $OutTrIDs->{ $rTreatment->{TrID} } = $rTreatment->{TrID};    # tag once.
+}
+print main->genReportFTR($form);
 $sProvider->finish();
 $sTreatment->finish();
 $sNotePaid->finish();
@@ -138,580 +172,679 @@ myDBI->cleanup();
 exit;
 
 ############################################################################
-sub genReportHDR
-{
-  my ($self,$form) = @_;
-  my $out;
-  $out .= qq|${DT}\n|;
-  $out .= qq|${ReportType} ${DateRange}\n|;
-  my $mgmt = $form->{'Type'} =~ /payroll/i ? "\tMgmt" : '';
-  if    ( $form->{'Format'} =~ /extended/i )
-  { $out .= qq|Clinic\tProviderName\tProviderID\tClientName\tClientID\tSSN\tDOB\tInsGrpNum\tPAnumber\tAxis1ACode\tTrID\tService Date\tPlace of Service\tOrgBillDate\tBillDate\tBilled Insurance\tSCNum\tSCName\tUnits\tRate\tTotal\tPaidAmt\tAmtDue\tRecDate\tNoteRecDate\tSchDate\tDenDate\tDenCode\tPaidDate\tICN\tRefType\tRefName\tPrimary Insurance\tSecondary Insurance\tCustody Agency\tErrors\n|; }
-  elsif ( $form->{'Format'} =~ /jolts/i )
-  { $out .= qq|ClientName\tClientID\tJOLTS#\tService Type\tService Date\tPlace of Service\tStart Time\tEnd Time\tGrpSize\tProviderName\tProviderID\tTrID\tSCNum\tUnits\tRate\tCharge\tCharge Running Total\tPayment\tPay Source\n|; }
-  elsif ( $form->{'Format'} =~ /byprovideronly/i )
-  { $out .= qq|ProviderName\tProviderID\tClinic\tClientName\tClientID\tTrID\tInsurance\tService Type\tService Date\tPlace of Service\tStart Time\tEnd Time\tSCNum\tUnits\tRate\tCharge\tOrgBillDate\tBillDate\tDenDate\tDenCode\tPaidAmt\tAmtDue\tStatus\tStatusDate\tStatusMsg\tRecDate\tNoteRecDate\tSchDate\tCode\tSort\n|; }
-  elsif ( $form->{'Format'} =~ /^by/i )       # client/provider code/date
-  { $out .= qq|ProviderName\tProviderID\tPaid Date\tClinic\tInsurance\tClientName\tClientID\tTrID\tOriginal Bill Date\tBill Date\tReconcile Date\tService Date\tPlace of Service\tStart Time\tEnd Time\tSCNum\tUnits\tRate\tTotal${mgmt}\tIncAmt\tSort\n|; }
-  else                       # /quick/
-  { $out .= qq|Clinic\tProviderName\tProviderID\tClientName\tClientID\tTrID\tInsurance\tService Type\tService Date\tPlace of Service\tStart Time\tEnd Time\tSCNum\tUnits\tRate\tCharge\tOrgBillDate\tBillDate\tDenDate\tDenCode\tPaidAmt\tAmtDue\tStatus\tStatusDate\tStatusMsg\tRecDate\tNoteRecDate\tSchDate\tCode\n|; }
-  return($out);
+sub genReportHDR {
+    my ( $self, $form ) = @_;
+    my $out;
+    $out .= qq|${DT}\n|;
+    $out .= qq|${ReportType} ${DateRange}\n|;
+    my $mgmt = $form->{'Type'} =~ /payroll/i ? "\tMgmt" : '';
+    if ( $form->{'Format'} =~ /extended/i ) {
+        $out .=
+qq|Clinic\tProviderName\tProviderID\tClientName\tClientID\tSSN\tDOB\tInsGrpNum\tPAnumber\tAxis1ACode\tTrID\tService Date\tPlace of Service\tOrgBillDate\tBillDate\tBilled Insurance\tSCNum\tSCName\tUnits\tRate\tTotal\tPaidAmt\tAmtDue\tRecDate\tNoteRecDate\tSchDate\tDenDate\tDenCode\tPaidDate\tICN\tRefType\tRefName\tPrimary Insurance\tSecondary Insurance\tCustody Agency\tErrors\n|;
+    }
+    elsif ( $form->{'Format'} =~ /jolts/i ) {
+        $out .=
+qq|ClientName\tClientID\tJOLTS#\tService Type\tService Date\tPlace of Service\tStart Time\tEnd Time\tGrpSize\tProviderName\tProviderID\tTrID\tSCNum\tUnits\tRate\tCharge\tCharge Running Total\tPayment\tPay Source\n|;
+    }
+    elsif ( $form->{'Format'} =~ /byprovideronly/i ) {
+        $out .=
+qq|ProviderName\tProviderID\tClinic\tClientName\tClientID\tTrID\tInsurance\tService Type\tService Date\tPlace of Service\tStart Time\tEnd Time\tSCNum\tUnits\tRate\tCharge\tOrgBillDate\tBillDate\tDenDate\tDenCode\tPaidAmt\tAmtDue\tStatus\tStatusDate\tStatusMsg\tRecDate\tNoteRecDate\tSchDate\tCode\tSort\n|;
+    }
+    elsif ( $form->{'Format'} =~ /^by/i )    # client/provider code/date
+    {
+        $out .=
+qq|ProviderName\tProviderID\tPaid Date\tClinic\tInsurance\tClientName\tClientID\tTrID\tOriginal Bill Date\tBill Date\tReconcile Date\tService Date\tPlace of Service\tStart Time\tEnd Time\tSCNum\tUnits\tRate\tTotal${mgmt}\tIncAmt\tSort\n|;
+    }
+    else                                     # /quick/
+    {
+        $out .=
+qq|Clinic\tProviderName\tProviderID\tClientName\tClientID\tTrID\tInsurance\tService Type\tService Date\tPlace of Service\tStart Time\tEnd Time\tSCNum\tUnits\tRate\tCharge\tOrgBillDate\tBillDate\tDenDate\tDenCode\tPaidAmt\tAmtDue\tStatus\tStatusDate\tStatusMsg\tRecDate\tNoteRecDate\tSchDate\tCode\n|;
+    }
+    return ($out);
 }
-sub genReportLine
-{
-  my ($self,$form,$r) = @_;
-  my $out;
 
-    
-  $SubCountLbl = $form->{'Format'} =~ /byclient/i
-               ? "$r->{ClientLName}_$r->{ClientFName}_$r->{ClientID}"
-               : "$r->{ProvLName}_$r->{ProvFName}_$r->{NoteProvID}";
-  if    ( $form->{'Format'} =~ /extended/i )
-  { print main->genExtendedLine($form,$r); }
-  elsif ( $form->{'Format'} =~ /jolts/i )
-  { print main->genJoltsLine($form,$r); }
-  elsif ( $form->{'Format'} =~ /byprovideronly/i )
-  { print main->genByProvLine($form,$r); }
-  elsif ( $form->{'Format'} =~ /by/i )
-  { print main->genBySortLine($form,$r); }
-  else                       # /quick/
-  { print main->genQuickLine($form,$r); }
-  $SubTotalNoteCount = 0 if ( $PrevSubCountLbl ne $SubCountLbl );
-  $MaxTotalPersonCount++ if ( $PrevSubCountLbl ne $SubCountLbl );
-  $PrevSubCountLbl = $SubCountLbl;
-  $SubTotalNoteCount++;
-  $MaxTotalNoteCount++;
+sub genReportLine {
+    my ( $self, $form, $r ) = @_;
+    my $out;
+
+    $SubCountLbl =
+      $form->{'Format'} =~ /byclient/i
+      ? "$r->{ClientLName}_$r->{ClientFName}_$r->{ClientID}"
+      : "$r->{ProvLName}_$r->{ProvFName}_$r->{NoteProvID}";
+    if ( $form->{'Format'} =~ /extended/i ) {
+        print main->genExtendedLine( $form, $r );
+    }
+    elsif ( $form->{'Format'} =~ /jolts/i ) {
+        print main->genJoltsLine( $form, $r );
+    }
+    elsif ( $form->{'Format'} =~ /byprovideronly/i ) {
+        print main->genByProvLine( $form, $r );
+    }
+    elsif ( $form->{'Format'} =~ /by/i ) {
+        print main->genBySortLine( $form, $r );
+    }
+    else    # /quick/
+    { print main->genQuickLine( $form, $r ); }
+    $SubTotalNoteCount = 0 if ( $PrevSubCountLbl ne $SubCountLbl );
+    $MaxTotalPersonCount++ if ( $PrevSubCountLbl ne $SubCountLbl );
+    $PrevSubCountLbl = $SubCountLbl;
+    $SubTotalNoteCount++;
+    $MaxTotalNoteCount++;
+
 #warn qq|genReportLine: SubCountLbl=$SubCountLbl, SubTotalNoteCount=$SubTotalNoteCount, MaxTotalNoteCount=$MaxTotalNoteCount, MaxTotalPersonCount=$SubTotalPersonCount\n| if ( $form->{LOGINPROVID} == 91 );
-  return($out);
+    return ($out);
 }
-sub genExtendedLine
-{
-  my ($self,$form,$r) = @_;
-  my $out;
-  $MaxTotalUnits += $Display_Units;
-  $MaxTotalBillAmt += $Display_BillAmt;
-  $MaxTotalIncAmt += $Display_IncAmt;
-  $MaxTotalAmtDue += $Display_AmtDue;
-  $MaxTotalMgmtAmt += $Display_MgmtAmt;
-  my $ErrorMsg;
-  my ($code,$msg) = (0,'');
-  my $rInsurance = cBill->getInsurance($form,$r->{ClientID},$ThisSC->{InsID},$r->{ContLogDate});
-  my $rPrAuth = cBill->getAuth($form,$r->{ClientID},$ThisSC->{InsID},$r->{ContLogDate});
-  my $rPDDiag = cBill->getDiag($form,$r->{ClientID},$ThisSC->{InsID},$r->{ContLogDate});
-  my $ICD9 = DBA->getxref($form,'xAxis1',$rPDDiag->{'Axis1ACode'},'ICD9');
-  $sClientReferrals->execute($r->{ClientID}) || myDBI->dberror("select ClientReferrals $r->{'ClientID'}");
-  my $rClientReferrals = $sClientReferrals->fetchrow_hashref;
-  my $rxNPI = DBA->selxref($form,'xNPI','NPI',$rClientReferrals->{'ReferredBy1NPI'});
-  $sInsurance->execute($r->{ClientID},1) || myDBI->dberror("select Primary Insurance Primary $r->{'ClientID'}");
-  my $rPriIns = $sInsurance->fetchrow_hashref;
-  $sInsurance->execute($r->{ClientID},2) || myDBI->dberror("select Secondary Insurance Secondary $r->{'ClientID'}");
-  my $rSecIns = $sInsurance->fetchrow_hashref;
-  my $POS = DBA->getxref($form,'xPOS',$r->{'POS'},'Descr');
-  $out .= qq|${Display_ClinicName}|;
-  $out .= qq|\t${Display_ProviderName}\t${Display_ProvID}|;
-  $out .= qq|\t${Display_ClientName}\t${Display_ClientID}|;
-  $out .= qq|\t${Display_SSN}|;
-  $out .= qq|\t${Display_DOB}|;
-  $out .= qq|\t$rInsurance->{InsIDNum}|;
-  $out .= qq|\t$rPrAuth->{PAnumber}|;
-  $out .= qq|\t${ICD9}|;
-  $out .= qq|\t${Display_TrID}|;
-  $out .= qq|\t${Display_ContactDate}|;
-  $out .= qq|\t${POS}|;
-  $out .= qq|\t${Display_OrgBillDate}|;
-  $out .= qq|\t${Display_BillDate}|;
-  $out .= qq|\t${Display_InsName}|;
-  $out .= qq|\t${Display_Service}|;
-  $out .= qq|\t${Display_ServiceName}|;
-  $out .= qq|\t${Display_Units}|;
-  $out .= qq|\t${Display_ServiceRate}|;
-  $out .= qq|\t${Display_BillAmt}|;
-  $out .= qq|\t${Display_IncAmt}|;
-  $out .= qq|\t${Display_AmtDue}|;
-  $out .= qq|\t${Display_RecDate}|;
-  $out .= qq|\t${Display_NoteRecDate}|;
-  $out .= qq|\t${Display_NoteSchDate}|;
-  $out .= qq|\t${Display_DenDate}|;
-  $out .= qq|\t${Display_DenCode}|;
-  $out .= qq|\t${Display_NotePaidDate}|;
-  $out .= qq|\t${Display_ICN}|;
-  $out .= qq|\t$rxNPI->{Type}|;
-  $out .= qq|\t$rxNPI->{ProvOrgName}|;
-  $out .= qq|\t$rPriIns->{Name}|;
-  $out .= qq|\t$rSecIns->{Name}|;
-  $out .= qq|\t${Display_CustAgency}|;
-  $out .= qq|\t${ErrorMsg}|;
-  $out .= qq|\n|;
-  return($out);
+
+sub genExtendedLine {
+    my ( $self, $form, $r ) = @_;
+    my $out;
+    $MaxTotalUnits   += $Display_Units;
+    $MaxTotalBillAmt += $Display_BillAmt;
+    $MaxTotalIncAmt  += $Display_IncAmt;
+    $MaxTotalAmtDue  += $Display_AmtDue;
+    $MaxTotalMgmtAmt += $Display_MgmtAmt;
+    my $ErrorMsg;
+    my ( $code, $msg ) = ( 0, '' );
+    my $rInsurance =
+      cBill->getInsurance( $form, $r->{ClientID}, $ThisSC->{InsID},
+        $r->{ContLogDate} );
+    my $rPrAuth = cBill->getAuth( $form, $r->{ClientID}, $ThisSC->{InsID},
+        $r->{ContLogDate} );
+    my $rPDDiag = cBill->getDiag( $form, $r->{ClientID}, $ThisSC->{InsID},
+        $r->{ContLogDate} );
+    my $ICD9 =
+      DBA->getxref( $form, 'xAxis1', $rPDDiag->{'Axis1ACode'}, 'ICD9' );
+    $sClientReferrals->execute( $r->{ClientID} )
+      || myDBI->dberror("select ClientReferrals $r->{'ClientID'}");
+    my $rClientReferrals = $sClientReferrals->fetchrow_hashref;
+    my $rxNPI            = DBA->selxref( $form, 'xNPI', 'NPI',
+        $rClientReferrals->{'ReferredBy1NPI'} );
+    $sInsurance->execute( $r->{ClientID}, 1 )
+      || myDBI->dberror("select Primary Insurance Primary $r->{'ClientID'}");
+    my $rPriIns = $sInsurance->fetchrow_hashref;
+    $sInsurance->execute( $r->{ClientID}, 2 )
+      || myDBI->dberror(
+        "select Secondary Insurance Secondary $r->{'ClientID'}");
+    my $rSecIns = $sInsurance->fetchrow_hashref;
+    my $POS     = DBA->getxref( $form, 'xPOS', $r->{'POS'}, 'Descr' );
+    $out .= qq|${Display_ClinicName}|;
+    $out .= qq|\t${Display_ProviderName}\t${Display_ProvID}|;
+    $out .= qq|\t${Display_ClientName}\t${Display_ClientID}|;
+    $out .= qq|\t${Display_SSN}|;
+    $out .= qq|\t${Display_DOB}|;
+    $out .= qq|\t$rInsurance->{InsIDNum}|;
+    $out .= qq|\t$rPrAuth->{PAnumber}|;
+    $out .= qq|\t${ICD9}|;
+    $out .= qq|\t${Display_TrID}|;
+    $out .= qq|\t${Display_ContactDate}|;
+    $out .= qq|\t${POS}|;
+    $out .= qq|\t${Display_OrgBillDate}|;
+    $out .= qq|\t${Display_BillDate}|;
+    $out .= qq|\t${Display_InsName}|;
+    $out .= qq|\t${Display_Service}|;
+    $out .= qq|\t${Display_ServiceName}|;
+    $out .= qq|\t${Display_Units}|;
+    $out .= qq|\t${Display_ServiceRate}|;
+    $out .= qq|\t${Display_BillAmt}|;
+    $out .= qq|\t${Display_IncAmt}|;
+    $out .= qq|\t${Display_AmtDue}|;
+    $out .= qq|\t${Display_RecDate}|;
+    $out .= qq|\t${Display_NoteRecDate}|;
+    $out .= qq|\t${Display_NoteSchDate}|;
+    $out .= qq|\t${Display_DenDate}|;
+    $out .= qq|\t${Display_DenCode}|;
+    $out .= qq|\t${Display_NotePaidDate}|;
+    $out .= qq|\t${Display_ICN}|;
+    $out .= qq|\t$rxNPI->{Type}|;
+    $out .= qq|\t$rxNPI->{ProvOrgName}|;
+    $out .= qq|\t$rPriIns->{Name}|;
+    $out .= qq|\t$rSecIns->{Name}|;
+    $out .= qq|\t${Display_CustAgency}|;
+    $out .= qq|\t${ErrorMsg}|;
+    $out .= qq|\n|;
+    return ($out);
 }
-sub genJoltsLine
-{
-  my ($self,$form,$r) = @_;
-  my $out;
-  $MaxTotalUnits += $Display_Units;
-  $MaxTotalBillAmt += $Display_BillAmt;
-  $MaxTotalIncAmt += $Display_IncAmt;
-  $MaxTotalAmtDue += $Display_AmtDue;
-  $MaxTotalMgmtAmt += $Display_MgmtAmt;
-  $ThisBrkID = $r->{ClientID};
-  if ( $PrevBrkID ne '' && $PrevBrkID ne $ThisBrkID )
-  {
-    $BrkTotalUnits = 0;
-    $BrkTotalBillAmt = 0;
-    $BrkTotalIncAmt = 0;
-    $BrkTotalAmtDue = 0;
-    $BrkTotalMgmtAmt = 0;
-  }
-  $PrevBrkID = $ThisBrkID;
-  $BrkTotalBillAmt += $Display_BillAmt unless ( $OutTrIDs->{$r->{TrID}} );   # bump once.
-  my $RunningTotal = sprintf("%.2f",$BrkTotalBillAmt);
-warn qq|out: Prev=$PrevBrkID, $PrevSubID\n| if ( $debug );
-warn qq|out: This=$ThisBrkID, $ThisSubID\n| if ( $debug );
-  my $POS = DBA->getxref($form,'xPOS',$r->{'POS'},'Descr');
-  $out .= qq|${Display_ClientName}\t${Display_ClientID}|;
-  $out .= qq|\t${Display_JOLTS}|;
-  $out .= qq|\t${Display_ServiceName}|;
-  $out .= qq|\t${Display_ContactDate}|;
-  $out .= qq|\t${POS}|;
-  $out .= qq|\t${Display_BeginTime}|;
-  $out .= qq|\t${Display_EndTime}|;
-  $out .= qq|\t${Display_GrpSize}|;
-  $out .= qq|\t${Display_ProviderName}\t${Display_ProvID}|;
-  $out .= qq|\t${Display_TrID}|;
-  $out .= qq|\t${Display_Service}|;
-  $out .= qq|\t${Display_Units}|;
-  $out .= qq|\t${Display_ServiceRate}|;
-  $out .= qq|\t${Display_BillAmt}|;
-  $out .= qq|\t${RunningTotal}|;
-  $out .= qq|\t|;
-  $out .= qq|\t|;
-  $out .= qq|\n|;
-  return($out);
+
+sub genJoltsLine {
+    my ( $self, $form, $r ) = @_;
+    my $out;
+    $MaxTotalUnits   += $Display_Units;
+    $MaxTotalBillAmt += $Display_BillAmt;
+    $MaxTotalIncAmt  += $Display_IncAmt;
+    $MaxTotalAmtDue  += $Display_AmtDue;
+    $MaxTotalMgmtAmt += $Display_MgmtAmt;
+    $ThisBrkID = $r->{ClientID};
+
+    if ( $PrevBrkID ne '' && $PrevBrkID ne $ThisBrkID ) {
+        $BrkTotalUnits   = 0;
+        $BrkTotalBillAmt = 0;
+        $BrkTotalIncAmt  = 0;
+        $BrkTotalAmtDue  = 0;
+        $BrkTotalMgmtAmt = 0;
+    }
+    $PrevBrkID = $ThisBrkID;
+    $BrkTotalBillAmt += $Display_BillAmt
+      unless ( $OutTrIDs->{ $r->{TrID} } );    # bump once.
+    my $RunningTotal = sprintf( "%.2f", $BrkTotalBillAmt );
+    warn qq|out: Prev=$PrevBrkID, $PrevSubID\n| if ($debug);
+    warn qq|out: This=$ThisBrkID, $ThisSubID\n| if ($debug);
+    my $POS = DBA->getxref( $form, 'xPOS', $r->{'POS'}, 'Descr' );
+    $out .= qq|${Display_ClientName}\t${Display_ClientID}|;
+    $out .= qq|\t${Display_JOLTS}|;
+    $out .= qq|\t${Display_ServiceName}|;
+    $out .= qq|\t${Display_ContactDate}|;
+    $out .= qq|\t${POS}|;
+    $out .= qq|\t${Display_BeginTime}|;
+    $out .= qq|\t${Display_EndTime}|;
+    $out .= qq|\t${Display_GrpSize}|;
+    $out .= qq|\t${Display_ProviderName}\t${Display_ProvID}|;
+    $out .= qq|\t${Display_TrID}|;
+    $out .= qq|\t${Display_Service}|;
+    $out .= qq|\t${Display_Units}|;
+    $out .= qq|\t${Display_ServiceRate}|;
+    $out .= qq|\t${Display_BillAmt}|;
+    $out .= qq|\t${RunningTotal}|;
+    $out .= qq|\t|;
+    $out .= qq|\t|;
+    $out .= qq|\n|;
+    return ($out);
 }
-sub genBySortLine
-{
-  my ($self,$form,$r) = @_;
-  my $out;
-  my $newlines='';
-  my $SortBy = $form->{'Format'} =~ /date/i ? $SelByDate : 'SCNum';
-  $ThisBrkID = $form->{'Format'} =~ /byclient/i
-             ? "$r->{ClientLName}_$r->{ClientFName}_$r->{ClientID}_$r->{$SortBy}"
-             : "$r->{ProvLName}_$r->{ProvFName}_$r->{NoteProvID}_$r->{$SortBy}";
-  my $BrkClientName = $form->{'Format'} =~ /byclient/i ? $Display_ClientName : '';
-  my $BrkClientID = $form->{'Format'} =~ /byclient/i ? $Display_ClientID : '';
-  my $BrkProviderName = $form->{'Format'} =~ /byprovider/i ? $Display_ProviderName : '';
-  my $BrkProvID = $form->{'Format'} =~ /byprovider/i ? $Display_ProvID : '';
+
+sub genBySortLine {
+    my ( $self, $form, $r ) = @_;
+    my $out;
+    my $newlines = '';
+    my $SortBy   = $form->{'Format'} =~ /date/i ? $SelByDate : 'SCNum';
+    $ThisBrkID =
+      $form->{'Format'} =~ /byclient/i
+      ? "$r->{ClientLName}_$r->{ClientFName}_$r->{ClientID}_$r->{$SortBy}"
+      : "$r->{ProvLName}_$r->{ProvFName}_$r->{NoteProvID}_$r->{$SortBy}";
+    my $BrkClientName =
+      $form->{'Format'} =~ /byclient/i ? $Display_ClientName : '';
+    my $BrkClientID = $form->{'Format'} =~ /byclient/i ? $Display_ClientID : '';
+    my $BrkProviderName =
+      $form->{'Format'} =~ /byprovider/i ? $Display_ProviderName : '';
+    my $BrkProvID = $form->{'Format'} =~ /byprovider/i ? $Display_ProvID : '';
+
 #warn qq|genBySortLine: SortBy=$SortBy\nThisBrkID=$ThisBrkID\n| if ( $form->{LOGINPROVID} == 91 );
 #warn qq|genBySortLine: ProvID=$r->{ProvID}, TrID=$r->{TrID}, MgmtAmt=$r->{MgmtAmt}, NotePaidDate=$r->{NotePaidDate}, PaidDate=$r->{PaidDate}\n| if ( $form->{LOGINPROVID} == 91 );
-  if ( $PrevBrkID ne '' && $PrevBrkID ne $ThisBrkID )
-  {
-    my $Units = sprintf("%.2f",$BrkTotalUnits);
-    my $BillAmt = $AOK ? sprintf("%.2f",$BrkTotalBillAmt) : '';
-    my $IncAmt = $AOK ? sprintf("%.2f",$BrkTotalIncAmt) : '';
-    my $AmtDue = $AOK ? sprintf("%.2f",$BrkTotalAmtDue) : '';
-    my $MgmtAmt = $AOK ? sprintf("%.2f",$BrkTotalMgmtAmt) : '';
-    if ( $form->{'Type'} =~ /payroll/i )
-    { $out .= qq|${SubTotalLbl}\t${BrkTotalLbl}\t${Units}\t\t${BillAmt}\t${MgmtAmt}\t${IncAmt}\tBrkTotal\n|; }
-    else
-    { $out .= qq|${SubTotalLbl}\t${BrkTotalLbl}\t${Units}\t\t${BillAmt}\t${IncAmt}\tBrkTotal\n|; }
+    if ( $PrevBrkID ne '' && $PrevBrkID ne $ThisBrkID ) {
+        my $Units   = sprintf( "%.2f", $BrkTotalUnits );
+        my $BillAmt = $AOK ? sprintf( "%.2f", $BrkTotalBillAmt ) : '';
+        my $IncAmt  = $AOK ? sprintf( "%.2f", $BrkTotalIncAmt )  : '';
+        my $AmtDue  = $AOK ? sprintf( "%.2f", $BrkTotalAmtDue )  : '';
+        my $MgmtAmt = $AOK ? sprintf( "%.2f", $BrkTotalMgmtAmt ) : '';
+        if ( $form->{'Type'} =~ /payroll/i ) {
+            $out .=
+qq|${SubTotalLbl}\t${BrkTotalLbl}\t${Units}\t\t${BillAmt}\t${MgmtAmt}\t${IncAmt}\tBrkTotal\n|;
+        }
+        else {
+            $out .=
+qq|${SubTotalLbl}\t${BrkTotalLbl}\t${Units}\t\t${BillAmt}\t${IncAmt}\tBrkTotal\n|;
+        }
 ### |ProviderName\tProviderID\tPaid Date\tClinic\tInsurance\tClientName\tClientID\tTrID\tBill Date\tReconcile Date\tService Date\tStart Time\tEnd Time\tSCNum\tUnits\tRate\tTotal${mgmt}\tIncAmt\tSort\n|
-    $newlines = "\n\n";
-    $newlines = "\n\n";
-    $BrkTotalNoteCount = 0;
-    $BrkTotalUnits = 0;
-    $BrkTotalBillAmt = 0;
-    $BrkTotalIncAmt = 0;
-    $BrkTotalAmtDue = 0;
-    $BrkTotalMgmtAmt = 0;
-  }
+        $newlines          = "\n\n";
+        $newlines          = "\n\n";
+        $BrkTotalNoteCount = 0;
+        $BrkTotalUnits     = 0;
+        $BrkTotalBillAmt   = 0;
+        $BrkTotalIncAmt    = 0;
+        $BrkTotalAmtDue    = 0;
+        $BrkTotalMgmtAmt   = 0;
+    }
 ### |ProviderName\tProviderID\tPaid Date\tClinic\tInsurance\tClientName\tClientID\tTrID\tBill Date\tReconcile Date\tService Date\tStart Time\tEnd Time\tSCNum\tUnits\tRate\tTotal${mgmt}\tIncAmt\tSort\n|
-  $BrkTotalNoteCount++;
-  $PrevBrkID = $ThisBrkID;
-  my $POS = DBA->getxref($form,'xPOS',$r->{'POS'},'Descr');
-  $BrkTotalLbl = $SortBy eq 'BillDate'
-               ? "\t\t\t${BrkClientName}\t${BrkClientID}\t${BrkTotalNoteCount}\t\t${Display_BillDate}\t\t\t\t\t\t"
-               : $SortBy eq 'RecDate' 
-               ? "\t\t\t${BrkClientName}\t${BrkClientID}\t${BrkTotalNoteCount}\t\t\t${Display_RecDate}\t\t\t\t\t"
-               : $SortBy eq 'PaidDate' 
-               ? "${Display_NotePaidDate}\t\t\t${BrkClientName}\t${BrkClientID}\t${BrkTotalNoteCount}\t\t\t\t\t\t\t\t"
-               : $SortBy eq 'ContLogDate' 
-               ? "\t\t\t${BrkClientName}\t${BrkClientID}\t${BrkTotalNoteCount}\t\t\t\t${Display_ContactDate}\t\t\t\t"
-               : "\t\t\t${BrkClientName}\t${BrkClientID}\t${BrkTotalNoteCount}\t\t\t\t\t\t\t\t${Display_Service}"; # sortby SCNum
-  $BrkTotalUnits += $Display_Units;
-  $BrkTotalBillAmt += $Display_BillAmt;
-  $BrkTotalIncAmt += $Display_IncAmt;
-  $BrkTotalAmtDue += $Display_AmtDue;
-  $BrkTotalMgmtAmt += $Display_MgmtAmt;
-  $ThisSubID = $form->{'Format'} =~ /byclient/i
-             ? "$r->{ClientLName}_$r->{ClientFName}_$r->{ClientID}"
-             : "$r->{ProvLName}_$r->{ProvFName}_$r->{NoteProvID}";
-  if ( $PrevSubID ne '' && $PrevSubID ne $ThisSubID )
-  {
-    my $Units = sprintf("%.2f",$SubTotalUnits);
-    my $BillAmt = $AOK ? sprintf("%.2f",$SubTotalBillAmt) : '';
-    my $IncAmt = $AOK ? sprintf("%.2f",$SubTotalIncAmt) : '';
-    my $AmtDue = $AOK ? sprintf("%.2f",$SubTotalAmtDue) : '';
-    my $MgmtAmt = $AOK ? sprintf("%.2f",$SubTotalMgmtAmt) : '';
-    if ( $form->{'Type'} =~ /payroll/i )
-    { $out .= qq|${SubTotalLbl}\t\t\t\t${SubClientName}\t${SubClientID}\t${SubTotalNoteCount}\t\t\t\t\t\t\t\t\t${Units}\t\t${BillAmt}\t${MgmtAmt}\t${IncAmt}\tSubTotal\n\n\n|; }
-    else
-    { $out .= qq|${SubTotalLbl}\t\t\t\t${SubClientName}\t${SubClientID}\t${SubTotalNoteCount}\t\t\t\t\t\t\t\t\t${Units}\t\t${BillAmt}\t${IncAmt}\tSubTotal\n\n\n|; }
-    $SubTotalUnits = 0;
-    $SubTotalBillAmt = 0;
-    $SubTotalIncAmt = 0;
-    $SubTotalAmtDue = 0;
-    $SubTotalMgmtAmt = 0;
-  } else { $out .= $newlines; }
-  $PrevSubID = $ThisSubID;
-  $SubClientName = $BrkClientName;
-  $SubClientID = $BrkClientID;
-  $SubTotalLbl = qq|${BrkProviderName}\t${BrkProvID}|;
-  $SubTotalUnits += $Display_Units;
-  $SubTotalBillAmt += $Display_BillAmt;
-  $SubTotalIncAmt += $Display_IncAmt;
-  $SubTotalAmtDue += $Display_AmtDue;
-  $SubTotalMgmtAmt += $Display_MgmtAmt;
-  $MaxTotalUnits += $Display_Units;
-  $MaxTotalBillAmt += $Display_BillAmt;
-  $MaxTotalIncAmt += $Display_IncAmt;
-  $MaxTotalAmtDue += $Display_AmtDue;
-  $MaxTotalMgmtAmt += $Display_MgmtAmt;
-#warn qq|out: Prev=$PrevBrkID, $PrevSubID\n| if ( $form->{LOGINPROVID} == 91 );
-#warn qq|out: This=$ThisBrkID, $ThisSubID\n| if ( $form->{LOGINPROVID} == 91 );
-warn qq|out: Prev=$PrevBrkID, $PrevSubID\n| if ( $debug );
-warn qq|out: This=$ThisBrkID, $ThisSubID\n| if ( $debug );
-  my $POS = DBA->getxref($form,'xPOS',$r->{'POS'},'Descr');
-  $out .= qq|${Display_ProviderName}\t${Display_ProvID}|;
-  $out .= qq|\t${Display_NotePaidDate}|;
-  $out .= qq|\t${Display_ClinicName}|;
-  $out .= qq|\t${Display_InsName}|;
-  $out .= qq|\t${Display_ClientName}\t${Display_ClientID}|;
-  $out .= qq|\t${Display_TrID}|;
-  $out .= qq|\t${Display_OrgBillDate}|;
-  $out .= qq|\t${Display_BillDate}|;
-  $out .= qq|\t${Display_RecDate}|;
-  $out .= qq|\t${Display_ContactDate}|;
-  $out .= qq|\t${POS}|;
-  $out .= qq|\t${Display_BeginTime}|;
-  $out .= qq|\t${Display_EndTime}|;
-  $out .= qq|\t${Display_Service}|;
-  $out .= qq|\t${Display_Units}|;
-  $out .= qq|\t${Display_NF}${Display_ServiceRate}|;
-  $out .= qq|\t${Display_BillAmt}|;
-  if ( $form->{'Type'} =~ /payroll/i ) { $out .= qq|\t${Display_MgmtAmt}|; }
-  $out .= qq|\t${Display_IncAmt}|;
-  $out .= qq|\n|;
-  return($out);
-}
-sub genByProvLine
-{
-  my ($self,$form,$r) = @_;
-  my $out;
-  $ThisSubID = "$r->{ProvLName}_$r->{ProvFName}_$r->{NoteProvID}";
-  if ( $PrevSubID ne '' && $PrevSubID ne $ThisSubID )
-  {
-    my $Units = sprintf("%.2f",$SubTotalUnits);
-    my $BillAmt = $AOK ? sprintf("%.2f",$SubTotalBillAmt) : '';
-    my $IncAmt = $AOK ? sprintf("%.2f",$SubTotalIncAmt) : '';
-    my $AmtDue = $AOK ? sprintf("%.2f",$SubTotalAmtDue) : '';
-    $out .= qq|${SubTotalLbl}\t\t\t\t${SubTotalNoteCount}\t\t\t\t\t\t\t\t\t${Units}\t\t${BillAmt}\t\t\t\t\t${IncAmt}\t${AmtDue}\t\t\t\t\t\t\tSubTotal\n|;
-    $SubTotalUnits = 0;
-    $SubTotalBillAmt = 0;
-    $SubTotalIncAmt = 0;
-    $SubTotalAmtDue = 0;
-  }
-  $PrevSubID = $ThisSubID;
-  $SubTotalLbl = $Display_ProviderName;
-  $SubTotalUnits += $Display_Units;
-  $SubTotalBillAmt += $Display_BillAmt;
-  $SubTotalIncAmt += $Display_IncAmt;
-  $SubTotalAmtDue += $Display_AmtDue;
-  $MaxTotalUnits += $Display_Units;
-  $MaxTotalBillAmt += $Display_BillAmt;
-  $MaxTotalIncAmt += $Display_IncAmt;
-  $MaxTotalAmtDue += $Display_AmtDue;
-  $MaxTotalMgmtAmt += $Display_MgmtAmt;
-warn qq|out: Prev=$PrevBrkID, $PrevSubID\n| if ( $debug );
-warn qq|out: This=$ThisBrkID, $ThisSubID\n| if ( $debug );
-  my $POS = DBA->getxref($form,'xPOS',$r->{'POS'},'Descr');
-  $out .= qq|${Display_ProviderName}\t${Display_ProvID}|;
-  $out .= qq|\t${Display_ClinicName}|;
-  $out .= qq|\t${Display_ClientName}\t${Display_ClientID}|;
-  $out .= qq|\t${Display_TrID}|;
-  $out .= qq|\t${Display_InsName}|;
-  $out .= qq|\t${Display_ServiceName}|;
-  $out .= qq|\t${Display_ContactDate}|;
-  $out .= qq|\t${POS}|;
-  $out .= qq|\t${Display_BeginTime}|;
-  $out .= qq|\t${Display_EndTime}|;
-  $out .= qq|\t${Display_Service}|;
-  $out .= qq|\t${Display_Units}|;
-  $out .= qq|\t${Display_ServiceRate}|;
-  $out .= qq|\t${Display_BillAmt}|;
-  $out .= qq|\t${Display_OrgBillDate}|;
-  $out .= qq|\t${Display_BillDate}|;
-  $out .= qq|\t${Display_DenDate}|;
-  $out .= qq|\t${Display_DenCode}|;
-  $out .= qq|\t${Display_IncAmt}|;
-  $out .= qq|\t${Display_AmtDue}|;
-  $out .= qq|\t${Display_BillStatus}|;
-  $out .= qq|\t${Display_StatusDate}|;
-  $out .= qq|\t${Display_StatusMsg}|;
-  $out .= qq|\t${Display_RecDate}|;
-  $out .= qq|\t${Display_NoteRecDate}|;
-  $out .= qq|\t${Display_NoteSchDate}|;
-  $out .= qq|\t$r->{Code}|;
-  $out .= qq|\n|;
-  return($out);
-}
-sub genQuickLine
-{
-  my ($self,$form,$r) = @_;
-  my $out;
-  $MaxTotalUnits += $Display_Units;
-  $MaxTotalBillAmt += $Display_BillAmt;
-  $MaxTotalIncAmt += $Display_IncAmt;
-  $MaxTotalAmtDue += $Display_AmtDue;
-  $MaxTotalMgmtAmt += $Display_MgmtAmt;
-warn qq|out: Prev=$PrevBrkID, $PrevSubID\n| if ( $debug );
-warn qq|out: This=$ThisBrkID, $ThisSubID\n| if ( $debug );
-  my $POS = DBA->getxref($form,'xPOS',$r->{'POS'},'Descr');
-  $out .= qq|${Display_ClinicName}|;
-  $out .= qq|\t${Display_ProviderName}\t${Display_ProvID}|;
-  $out .= qq|\t${Display_ClientName}\t${Display_ClientID}|;
-  $out .= qq|\t${Display_TrID}|;
-  $out .= qq|\t${Display_InsName}|;
-  $out .= qq|\t${Display_ServiceName}|;
-  $out .= qq|\t${Display_ContactDate}|;
-  $out .= qq|\t${POS}|;
-  $out .= qq|\t${Display_BeginTime}|;
-  $out .= qq|\t${Display_EndTime}|;
-  $out .= qq|\t${Display_Service}|;
-  $out .= qq|\t${Display_Units}|;
-  $out .= qq|\t${Display_ServiceRate}|;
-  $out .= qq|\t${Display_BillAmt}|;
-  $out .= qq|\t${Display_OrgBillDate}|;
-  $out .= qq|\t${Display_BillDate}|;
-  $out .= qq|\t${Display_DenDate}|;
-  $out .= qq|\t${Display_DenCode}|;
-  $out .= qq|\t${Display_IncAmt}|;
-  $out .= qq|\t${Display_AmtDue}|;
-  $out .= qq|\t${Display_BillStatus}|;
-  $out .= qq|\t${Display_StatusDate}|;
-  $out .= qq|\t${Display_StatusMsg}|;
-  $out .= qq|\t${Display_RecDate}|;
-  $out .= qq|\t${Display_NoteRecDate}|;
-  $out .= qq|\t${Display_NoteSchDate}|;
-  $out .= qq|\t$r->{Code}|;
-  $out .= qq|\n|;
-  return($out);
-}
-sub genReportFTR()
-{
-  my ($self,$form) = @_;
-  my $out;
-  my $BrkUnits = sprintf("%.2f",$BrkTotalUnits);
-  my $BrkBillAmt = $AOK ? sprintf("%.2f",$BrkTotalBillAmt) : '';
-  my $BrkIncAmt = $AOK ? sprintf("%.2f",$BrkTotalIncAmt) : '';
-  my $BrkAmtDue = $AOK ? sprintf("%.2f",$BrkTotalAmtDue) : '';
-  my $SubUnits = sprintf("%.2f",$SubTotalUnits);
-  my $SubBillAmt = $AOK ? sprintf("%.2f",$SubTotalBillAmt) : '';
-  my $SubIncAmt = $AOK ? sprintf("%.2f",$SubTotalIncAmt) : '';
-  my $SubAmtDue = $AOK ? sprintf("%.2f",$SubTotalAmtDue) : '';
-  my $MaxUnits = sprintf("%.2f",$MaxTotalUnits);
-  my $MaxBillAmt = $AOK ? sprintf("%.2f",$MaxTotalBillAmt) : '';
-  my $MaxIncAmt = $AOK ? sprintf("%.2f",$MaxTotalIncAmt) : '';
-  my $MaxAmtDue = $AOK ? sprintf("%.2f",$MaxTotalAmtDue) : '';
-  $MaxTotalProviderCount = $form->{'Format'} =~ /byclient/i ? '' : $MaxTotalPersonCount;
-  $MaxTotalClientCount = $form->{'Format'} =~ /byclient/i ? $MaxTotalPersonCount : '';
-  my $AvgTotalNoteCount = $MaxTotalPersonCount ? sprintf("%.2f",$MaxTotalNoteCount / $MaxTotalPersonCount ) : 0;
-  if    ( $form->{'Format'} =~ /extended/i ) { null; }
-  elsif ( $form->{'Format'} =~ /jolts/i ) { null; }
-  elsif ( $form->{'Format'} =~ /byprovideronly/i )
-  { 
-    $out .= qq|${SubTotalLbl}\t\t\t\t\t${SubTotalNoteCount}\t\t\t\t\t\t\t\t${SubUnits}\t\t${SubBillAmt}\t\t\t\t\t${SubIncAmt}\t${SubAmtDue}\t\t\t\t\t\t\tSubTotal\n|;
-    $out .= qq|${MaxTotalProviderCount}\t\t\t\t\t${MaxTotalNoteCount}\t\t\t\t\t\t\t\t${MaxUnits}\t\t${MaxBillAmt}\t\t\t\t\t${MaxIncAmt}\t${MaxAmtDue}\t\t\t\t\t\t\tTotal\n|;
-    $out .= qq|\t\t\t\t\t${AvgTotalNoteCount}\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tAverage\n|;
-  }
-  elsif ( $form->{'Format'} =~ /by/i )
-  { 
-    my $BrkMgmtAmt = $AOK && $form->{'Type'} =~ /payroll/i ? "\t".sprintf("%.2f",$BrkTotalMgmtAmt) : '';
-    my $SubMgmtAmt = $AOK && $form->{'Type'} =~ /payroll/i ? "\t".sprintf("%.2f",$SubTotalMgmtAmt) : '';
-    my $MaxMgmtAmt = $AOK && $form->{'Type'} =~ /payroll/i ? "\t".sprintf("%.2f",$MaxTotalMgmtAmt) : '';
-    my $Avgtab = $AOK && $form->{'Type'} =~ /payroll/i ? "\t" : '';
-    $out .= qq|${SubTotalLbl}\t${BrkTotalLbl}\t${BrkUnits}\t\t${BrkBillAmt}${BrkMgmtAmt}\t${BrkIncAmt}\tBrkTotal\n|;
-    $out .= qq|${SubTotalLbl}\t\t\t\t${SubClientName}\t${SubClientID}\t${SubTotalNoteCount}\t\t\t\t\t\t\t\t\t${SubUnits}\t\t${SubBillAmt}${SubMgmtAmt}\t${SubIncAmt}\tSubTotal\n\n\n|;
-    $out .= qq|${MaxTotalProviderCount}\t\t\t\t\t${MaxTotalClientCount}\t\t${MaxTotalNoteCount}\t\t\t\t\t\t\t\t\t${MaxUnits}\t\t${MaxBillAmt}${MaxMgmtAmt}\t${MaxIncAmt}\tTotal\n|;
-    $out .= qq|\t\t\t\t\t\t\t${AvgTotalNoteCount}\t\t\t\t\t\t\t\t\t\t\t${Avgtab}\t\tAverage\n|;
-  }
-  else                       # /quick/
-  { $out .= qq|\t${MaxTotalProviderCount}\t\t${MaxTotalClientCount}\t\t\t\t\t\t\t\t\t\t${MaxUnits}\t\t${MaxBillAmt}\t\t\t\t\t${MaxIncAmt}\t${MaxAmtDue}\n|; }
-  return($out);
-}
-sub setDisplay()
-{
-  my ($self,$form,$rNote) = @_;
-#foreach my $f ( sort keys %{$rNote} ) { warn ": rNote-$f=$rNote->{$f}\n"; }
-# needed... for cBill
-#   $rNote->{ClientID}
-#  $rNote->{ContLogDate}
-#  $rNote->{SCID}
-#  $rNote->{TrID});
-#  $rNote->{BillDate};
-  $Duration = DBUtil->getDuration($rNote->{ContLogBegTime},$rNote->{ContLogEndTime});
-  my $rxSC = cBill->getServiceCode($form,$rNote->{SCID},$rNote->{ContLogDate},$rNote->{ContLogBegTime},$rNote->{ContLogEndTime},$rNote->{TrID},$rNote->{BillDate});
-#foreach my $f ( sort keys %{$rxSC} ) { warn ": rxSC-$f=$rxSC->{$f}\n"; }
+    $BrkTotalNoteCount++;
+    $PrevBrkID = $ThisBrkID;
+    my $POS = DBA->getxref( $form, 'xPOS', $r->{'POS'}, 'Descr' );
+    $BrkTotalLbl =
+      $SortBy eq 'BillDate'
+      ? "\t\t\t${BrkClientName}\t${BrkClientID}\t${BrkTotalNoteCount}\t\t${Display_BillDate}\t\t\t\t\t\t"
+      : $SortBy eq 'RecDate'
+      ? "\t\t\t${BrkClientName}\t${BrkClientID}\t${BrkTotalNoteCount}\t\t\t${Display_RecDate}\t\t\t\t\t"
+      : $SortBy eq 'PaidDate'
+      ? "${Display_NotePaidDate}\t\t\t${BrkClientName}\t${BrkClientID}\t${BrkTotalNoteCount}\t\t\t\t\t\t\t\t"
+      : $SortBy eq 'ContLogDate'
+      ? "\t\t\t${BrkClientName}\t${BrkClientID}\t${BrkTotalNoteCount}\t\t\t\t${Display_ContactDate}\t\t\t\t"
+      : "\t\t\t${BrkClientName}\t${BrkClientID}\t${BrkTotalNoteCount}\t\t\t\t\t\t\t\t${Display_Service}"
+      ;    # sortby SCNum
+    $BrkTotalUnits   += $Display_Units;
+    $BrkTotalBillAmt += $Display_BillAmt;
+    $BrkTotalIncAmt  += $Display_IncAmt;
+    $BrkTotalAmtDue  += $Display_AmtDue;
+    $BrkTotalMgmtAmt += $Display_MgmtAmt;
+    $ThisSubID =
+      $form->{'Format'} =~ /byclient/i
+      ? "$r->{ClientLName}_$r->{ClientFName}_$r->{ClientID}"
+      : "$r->{ProvLName}_$r->{ProvFName}_$r->{NoteProvID}";
 
-#print qq|$NoNonBill: UnitLbl=$rxSC->{'UnitLbl'}\n|;
-  return(0) if ( $rxSC->{'UnitLbl'} eq 'NonBill' && $NoNonBill );
-  my $reqInsurance = 0;
-#print qq|InsID: $form->{'InsID'}: InsID=$rxSC->{'InsID'}\n|;
-  foreach my $InsID ( split(chr(253),$form->{InsID}) )
-  { $reqInsurance = 1 if ( $rxSC->{'InsID'} == $InsID ); }
-#print qq|reqInsurance=$reqInsurance\n|;
-  return(0) if ( $form->{'InsID'} ne '' && $reqInsurance == 0 );
-#print qq|setDisplay: MADE IT THRU \n|;
+    if ( $PrevSubID ne '' && $PrevSubID ne $ThisSubID ) {
+        my $Units   = sprintf( "%.2f", $SubTotalUnits );
+        my $BillAmt = $AOK ? sprintf( "%.2f", $SubTotalBillAmt ) : '';
+        my $IncAmt  = $AOK ? sprintf( "%.2f", $SubTotalIncAmt )  : '';
+        my $AmtDue  = $AOK ? sprintf( "%.2f", $SubTotalAmtDue )  : '';
+        my $MgmtAmt = $AOK ? sprintf( "%.2f", $SubTotalMgmtAmt ) : '';
+        if ( $form->{'Type'} =~ /payroll/i ) {
+            $out .=
+qq|${SubTotalLbl}\t\t\t\t${SubClientName}\t${SubClientID}\t${SubTotalNoteCount}\t\t\t\t\t\t\t\t\t${Units}\t\t${BillAmt}\t${MgmtAmt}\t${IncAmt}\tSubTotal\n\n\n|;
+        }
+        else {
+            $out .=
+qq|${SubTotalLbl}\t\t\t\t${SubClientName}\t${SubClientID}\t${SubTotalNoteCount}\t\t\t\t\t\t\t\t\t${Units}\t\t${BillAmt}\t${IncAmt}\tSubTotal\n\n\n|;
+        }
+        $SubTotalUnits   = 0;
+        $SubTotalBillAmt = 0;
+        $SubTotalIncAmt  = 0;
+        $SubTotalAmtDue  = 0;
+        $SubTotalMgmtAmt = 0;
+    }
+    else { $out .= $newlines; }
+    $PrevSubID     = $ThisSubID;
+    $SubClientName = $BrkClientName;
+    $SubClientID   = $BrkClientID;
+    $SubTotalLbl   = qq|${BrkProviderName}\t${BrkProvID}|;
+    $SubTotalUnits   += $Display_Units;
+    $SubTotalBillAmt += $Display_BillAmt;
+    $SubTotalIncAmt  += $Display_IncAmt;
+    $SubTotalAmtDue  += $Display_AmtDue;
+    $SubTotalMgmtAmt += $Display_MgmtAmt;
+    $MaxTotalUnits   += $Display_Units;
+    $MaxTotalBillAmt += $Display_BillAmt;
+    $MaxTotalIncAmt  += $Display_IncAmt;
+    $MaxTotalAmtDue  += $Display_AmtDue;
+    $MaxTotalMgmtAmt += $Display_MgmtAmt;
 
-  $ThisSC = $rxSC;
-  $Display_Service = $rxSC->{'SCNum'};
+ #warn qq|out: Prev=$PrevBrkID, $PrevSubID\n| if ( $form->{LOGINPROVID} == 91 );
+ #warn qq|out: This=$ThisBrkID, $ThisSubID\n| if ( $form->{LOGINPROVID} == 91 );
+    warn qq|out: Prev=$PrevBrkID, $PrevSubID\n| if ($debug);
+    warn qq|out: This=$ThisBrkID, $ThisSubID\n| if ($debug);
+    my $POS = DBA->getxref( $form, 'xPOS', $r->{'POS'}, 'Descr' );
+    $out .= qq|${Display_ProviderName}\t${Display_ProvID}|;
+    $out .= qq|\t${Display_NotePaidDate}|;
+    $out .= qq|\t${Display_ClinicName}|;
+    $out .= qq|\t${Display_InsName}|;
+    $out .= qq|\t${Display_ClientName}\t${Display_ClientID}|;
+    $out .= qq|\t${Display_TrID}|;
+    $out .= qq|\t${Display_OrgBillDate}|;
+    $out .= qq|\t${Display_BillDate}|;
+    $out .= qq|\t${Display_RecDate}|;
+    $out .= qq|\t${Display_ContactDate}|;
+    $out .= qq|\t${POS}|;
+    $out .= qq|\t${Display_BeginTime}|;
+    $out .= qq|\t${Display_EndTime}|;
+    $out .= qq|\t${Display_Service}|;
+    $out .= qq|\t${Display_Units}|;
+    $out .= qq|\t${Display_NF}${Display_ServiceRate}|;
+    $out .= qq|\t${Display_BillAmt}|;
+    if ( $form->{'Type'} =~ /payroll/i ) { $out .= qq|\t${Display_MgmtAmt}|; }
+    $out .= qq|\t${Display_IncAmt}|;
+    $out .= qq|\n|;
+    return ($out);
+}
 
-my %sscodes_times = ('99202', '30',
-              '99204', '45',
-              '99205', '65',
-              '99211' , '1',
-              '99212' , '10',
-              '99213' , '20',
-              '99214' , '30',
-              '99215', '40',
-              '99304', '25',
-              '99305', '35',
-              '99306' , '45',
-              '99307' , '10',
-              '99308' , '15',
-              '99309' , '30',
-              '99310' , '45',
-              '99341', '15',
-              '99342' , '30',
-              '99344' , '60',
-              '99345' , '75',
-              '99347' , '20',
-              '99348' , '30',
-              '99349', '40', 
-              '99350', '60',
-            );
+sub genByProvLine {
+    my ( $self, $form, $r ) = @_;
+    my $out;
+    $ThisSubID = "$r->{ProvLName}_$r->{ProvFName}_$r->{NoteProvID}";
+    if ( $PrevSubID ne '' && $PrevSubID ne $ThisSubID ) {
+        my $Units   = sprintf( "%.2f", $SubTotalUnits );
+        my $BillAmt = $AOK ? sprintf( "%.2f", $SubTotalBillAmt ) : '';
+        my $IncAmt  = $AOK ? sprintf( "%.2f", $SubTotalIncAmt )  : '';
+        my $AmtDue  = $AOK ? sprintf( "%.2f", $SubTotalAmtDue )  : '';
+        $out .=
+qq|${SubTotalLbl}\t\t\t\t${SubTotalNoteCount}\t\t\t\t\t\t\t\t\t${Units}\t\t${BillAmt}\t\t\t\t\t${IncAmt}\t${AmtDue}\t\t\t\t\t\t\tSubTotal\n|;
+        $SubTotalUnits   = 0;
+        $SubTotalBillAmt = 0;
+        $SubTotalIncAmt  = 0;
+        $SubTotalAmtDue  = 0;
+    }
+    $PrevSubID   = $ThisSubID;
+    $SubTotalLbl = $Display_ProviderName;
+    $SubTotalUnits   += $Display_Units;
+    $SubTotalBillAmt += $Display_BillAmt;
+    $SubTotalIncAmt  += $Display_IncAmt;
+    $SubTotalAmtDue  += $Display_AmtDue;
+    $MaxTotalUnits   += $Display_Units;
+    $MaxTotalBillAmt += $Display_BillAmt;
+    $MaxTotalIncAmt  += $Display_IncAmt;
+    $MaxTotalAmtDue  += $Display_AmtDue;
+    $MaxTotalMgmtAmt += $Display_MgmtAmt;
+    warn qq|out: Prev=$PrevBrkID, $PrevSubID\n| if ($debug);
+    warn qq|out: This=$ThisBrkID, $ThisSubID\n| if ($debug);
+    my $POS = DBA->getxref( $form, 'xPOS', $r->{'POS'}, 'Descr' );
+    $out .= qq|${Display_ProviderName}\t${Display_ProvID}|;
+    $out .= qq|\t${Display_ClinicName}|;
+    $out .= qq|\t${Display_ClientName}\t${Display_ClientID}|;
+    $out .= qq|\t${Display_TrID}|;
+    $out .= qq|\t${Display_InsName}|;
+    $out .= qq|\t${Display_ServiceName}|;
+    $out .= qq|\t${Display_ContactDate}|;
+    $out .= qq|\t${POS}|;
+    $out .= qq|\t${Display_BeginTime}|;
+    $out .= qq|\t${Display_EndTime}|;
+    $out .= qq|\t${Display_Service}|;
+    $out .= qq|\t${Display_Units}|;
+    $out .= qq|\t${Display_ServiceRate}|;
+    $out .= qq|\t${Display_BillAmt}|;
+    $out .= qq|\t${Display_OrgBillDate}|;
+    $out .= qq|\t${Display_BillDate}|;
+    $out .= qq|\t${Display_DenDate}|;
+    $out .= qq|\t${Display_DenCode}|;
+    $out .= qq|\t${Display_IncAmt}|;
+    $out .= qq|\t${Display_AmtDue}|;
+    $out .= qq|\t${Display_BillStatus}|;
+    $out .= qq|\t${Display_StatusDate}|;
+    $out .= qq|\t${Display_StatusMsg}|;
+    $out .= qq|\t${Display_RecDate}|;
+    $out .= qq|\t${Display_NoteRecDate}|;
+    $out .= qq|\t${Display_NoteSchDate}|;
+    $out .= qq|\t$r->{Code}|;
+    $out .= qq|\n|;
+    return ($out);
+}
 
-            my $code_found = 0;
-            foreach my $sccode (keys %sscodes_times){
-              if($Display_Service eq $sccode) {
-                $code_found = 1;
-                $time = $sscodes_times{$sccode};
-                if( ($time * 60) <= $Duration ) {
-                  return(0);
-                }
-              }
+sub genQuickLine {
+    my ( $self, $form, $r ) = @_;
+    my $out;
+    $MaxTotalUnits   += $Display_Units;
+    $MaxTotalBillAmt += $Display_BillAmt;
+    $MaxTotalIncAmt  += $Display_IncAmt;
+    $MaxTotalAmtDue  += $Display_AmtDue;
+    $MaxTotalMgmtAmt += $Display_MgmtAmt;
+    warn qq|out: Prev=$PrevBrkID, $PrevSubID\n| if ($debug);
+    warn qq|out: This=$ThisBrkID, $ThisSubID\n| if ($debug);
+    my $POS = DBA->getxref( $form, 'xPOS', $r->{'POS'}, 'Descr' );
+    $out .= qq|${Display_ClinicName}|;
+    $out .= qq|\t${Display_ProviderName}\t${Display_ProvID}|;
+    $out .= qq|\t${Display_ClientName}\t${Display_ClientID}|;
+    $out .= qq|\t${Display_TrID}|;
+    $out .= qq|\t${Display_InsName}|;
+    $out .= qq|\t${Display_ServiceName}|;
+    $out .= qq|\t${Display_ContactDate}|;
+    $out .= qq|\t${POS}|;
+    $out .= qq|\t${Display_BeginTime}|;
+    $out .= qq|\t${Display_EndTime}|;
+    $out .= qq|\t${Display_Service}|;
+    $out .= qq|\t${Display_Units}|;
+    $out .= qq|\t${Display_ServiceRate}|;
+    $out .= qq|\t${Display_BillAmt}|;
+    $out .= qq|\t${Display_OrgBillDate}|;
+    $out .= qq|\t${Display_BillDate}|;
+    $out .= qq|\t${Display_DenDate}|;
+    $out .= qq|\t${Display_DenCode}|;
+    $out .= qq|\t${Display_IncAmt}|;
+    $out .= qq|\t${Display_AmtDue}|;
+    $out .= qq|\t${Display_BillStatus}|;
+    $out .= qq|\t${Display_StatusDate}|;
+    $out .= qq|\t${Display_StatusMsg}|;
+    $out .= qq|\t${Display_RecDate}|;
+    $out .= qq|\t${Display_NoteRecDate}|;
+    $out .= qq|\t${Display_NoteSchDate}|;
+    $out .= qq|\t$r->{Code}|;
+    $out .= qq|\n|;
+    return ($out);
+}
+
+sub genReportFTR() {
+    my ( $self, $form ) = @_;
+    my $out;
+    my $BrkUnits   = sprintf( "%.2f", $BrkTotalUnits );
+    my $BrkBillAmt = $AOK ? sprintf( "%.2f", $BrkTotalBillAmt ) : '';
+    my $BrkIncAmt  = $AOK ? sprintf( "%.2f", $BrkTotalIncAmt )  : '';
+    my $BrkAmtDue  = $AOK ? sprintf( "%.2f", $BrkTotalAmtDue )  : '';
+    my $SubUnits   = sprintf( "%.2f", $SubTotalUnits );
+    my $SubBillAmt = $AOK ? sprintf( "%.2f", $SubTotalBillAmt ) : '';
+    my $SubIncAmt  = $AOK ? sprintf( "%.2f", $SubTotalIncAmt )  : '';
+    my $SubAmtDue  = $AOK ? sprintf( "%.2f", $SubTotalAmtDue )  : '';
+    my $MaxUnits   = sprintf( "%.2f", $MaxTotalUnits );
+    my $MaxBillAmt = $AOK ? sprintf( "%.2f", $MaxTotalBillAmt ) : '';
+    my $MaxIncAmt  = $AOK ? sprintf( "%.2f", $MaxTotalIncAmt )  : '';
+    my $MaxAmtDue  = $AOK ? sprintf( "%.2f", $MaxTotalAmtDue )  : '';
+    $MaxTotalProviderCount =
+      $form->{'Format'} =~ /byclient/i ? '' : $MaxTotalPersonCount;
+    $MaxTotalClientCount =
+      $form->{'Format'} =~ /byclient/i ? $MaxTotalPersonCount : '';
+    my $AvgTotalNoteCount =
+      $MaxTotalPersonCount
+      ? sprintf( "%.2f", $MaxTotalNoteCount / $MaxTotalPersonCount )
+      : 0;
+    if    ( $form->{'Format'} =~ /extended/i ) { null; }
+    elsif ( $form->{'Format'} =~ /jolts/i )    { null; }
+    elsif ( $form->{'Format'} =~ /byprovideronly/i ) {
+        $out .=
+qq|${SubTotalLbl}\t\t\t\t\t${SubTotalNoteCount}\t\t\t\t\t\t\t\t${SubUnits}\t\t${SubBillAmt}\t\t\t\t\t${SubIncAmt}\t${SubAmtDue}\t\t\t\t\t\t\tSubTotal\n|;
+        $out .=
+qq|${MaxTotalProviderCount}\t\t\t\t\t${MaxTotalNoteCount}\t\t\t\t\t\t\t\t${MaxUnits}\t\t${MaxBillAmt}\t\t\t\t\t${MaxIncAmt}\t${MaxAmtDue}\t\t\t\t\t\t\tTotal\n|;
+        $out .=
+qq|\t\t\t\t\t${AvgTotalNoteCount}\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tAverage\n|;
+    }
+    elsif ( $form->{'Format'} =~ /by/i ) {
+        my $BrkMgmtAmt =
+          $AOK && $form->{'Type'} =~ /payroll/i
+          ? "\t" . sprintf( "%.2f", $BrkTotalMgmtAmt )
+          : '';
+        my $SubMgmtAmt =
+          $AOK && $form->{'Type'} =~ /payroll/i
+          ? "\t" . sprintf( "%.2f", $SubTotalMgmtAmt )
+          : '';
+        my $MaxMgmtAmt =
+          $AOK && $form->{'Type'} =~ /payroll/i
+          ? "\t" . sprintf( "%.2f", $MaxTotalMgmtAmt )
+          : '';
+        my $Avgtab = $AOK && $form->{'Type'} =~ /payroll/i ? "\t" : '';
+        $out .=
+qq|${SubTotalLbl}\t${BrkTotalLbl}\t${BrkUnits}\t\t${BrkBillAmt}${BrkMgmtAmt}\t${BrkIncAmt}\tBrkTotal\n|;
+        $out .=
+qq|${SubTotalLbl}\t\t\t\t${SubClientName}\t${SubClientID}\t${SubTotalNoteCount}\t\t\t\t\t\t\t\t\t${SubUnits}\t\t${SubBillAmt}${SubMgmtAmt}\t${SubIncAmt}\tSubTotal\n\n\n|;
+        $out .=
+qq|${MaxTotalProviderCount}\t\t\t\t\t${MaxTotalClientCount}\t\t${MaxTotalNoteCount}\t\t\t\t\t\t\t\t\t${MaxUnits}\t\t${MaxBillAmt}${MaxMgmtAmt}\t${MaxIncAmt}\tTotal\n|;
+        $out .=
+qq|\t\t\t\t\t\t\t${AvgTotalNoteCount}\t\t\t\t\t\t\t\t\t\t\t${Avgtab}\t\tAverage\n|;
+    }
+    else    # /quick/
+    {
+        $out .=
+qq|\t${MaxTotalProviderCount}\t\t${MaxTotalClientCount}\t\t\t\t\t\t\t\t\t\t${MaxUnits}\t\t${MaxBillAmt}\t\t\t\t\t${MaxIncAmt}\t${MaxAmtDue}\n|;
+    }
+    return ($out);
+}
+
+sub setDisplay() {
+    my ( $self, $form, $rNote ) = @_;
+
+    #foreach my $f ( sort keys %{$rNote} ) { warn ": rNote-$f=$rNote->{$f}\n"; }
+    # needed... for cBill
+    #   $rNote->{ClientID}
+    #  $rNote->{ContLogDate}
+    #  $rNote->{SCID}
+    #  $rNote->{TrID});
+    #  $rNote->{BillDate};
+    $Duration =
+      DBUtil->getDuration( $rNote->{ContLogBegTime}, $rNote->{ContLogEndTime} );
+    my $rxSC = cBill->getServiceCode(
+        $form, $rNote->{SCID}, $rNote->{ContLogDate},
+        $rNote->{ContLogBegTime},
+        $rNote->{ContLogEndTime},
+        $rNote->{TrID}, $rNote->{BillDate}
+    );
+
+    #foreach my $f ( sort keys %{$rxSC} ) { warn ": rxSC-$f=$rxSC->{$f}\n"; }
+
+    #print qq|$NoNonBill: UnitLbl=$rxSC->{'UnitLbl'}\n|;
+    return (0) if ( $rxSC->{'UnitLbl'} eq 'NonBill' && $NoNonBill );
+    my $reqInsurance = 0;
+
+    #print qq|InsID: $form->{'InsID'}: InsID=$rxSC->{'InsID'}\n|;
+    foreach my $InsID ( split( chr(253), $form->{InsID} ) ) {
+        $reqInsurance = 1 if ( $rxSC->{'InsID'} == $InsID );
+    }
+
+    #print qq|reqInsurance=$reqInsurance\n|;
+    return (0) if ( $form->{'InsID'} ne '' && $reqInsurance == 0 );
+
+    #print qq|setDisplay: MADE IT THRU \n|;
+
+    $ThisSC          = $rxSC;
+    $Display_Service = $rxSC->{'SCNum'};
+
+    my %sscodes_times = (
+        '99202', '30', '99204', '45', '99205', '65', '99211', '1',
+        '99212', '10', '99213', '20', '99214', '30', '99215', '40',
+        '99304', '25', '99305', '35', '99306', '45', '99307', '10',
+        '99308', '15', '99309', '30', '99310', '45', '99341', '15',
+        '99342', '30', '99344', '60', '99345', '75', '99347', '20',
+        '99348', '30', '99349', '40', '99350', '60',
+    );
+
+    my $code_found = 0;
+    foreach my $sccode ( keys %sscodes_times ) {
+        if ( $Display_Service eq $sccode ) {
+            $code_found = 1;
+            $time       = $sscodes_times{$sccode};
+            if ( ( $time * 60 ) <= $Duration ) {
+                return (0);
             }
+        }
+    }
 
-            if(!$code_found) {
-              return(0);
-            }  
+    if ( !$code_found ) {
+        return (0);
+    }
 
     $Display_BeginTime = $rNote->{'ContLogBegTime'};
-    $Display_EndTime = $rNote->{'ContLogEndTime'};
+    $Display_EndTime   = $rNote->{'ContLogEndTime'};
 
-    
+    $Display_ServiceName = $rxSC->{'SCName'};
+    $Display_InsName     = $rxSC->{InsName};
 
-  $Display_ServiceName = $rxSC->{'SCName'};
-  $Display_InsName = $rxSC->{InsName};
+    $sClientLegal->execute( $rNote->{ClientID} )
+      || myDBI->dberror("select ClientLegal $rNote->{'ClientID'}");
+    my $rClientLegal = $sClientLegal->fetchrow_hashref;
+    $Display_JOLTS      = $rClientLegal->{'JOLTS'};
+    $Display_CustAgency = $rClientLegal->{'CustAgency'};
 
-  $sClientLegal->execute($rNote->{ClientID}) || myDBI->dberror("select ClientLegal $rNote->{'ClientID'}");
-  my $rClientLegal = $sClientLegal->fetchrow_hashref;
-  $Display_JOLTS = $rClientLegal->{'JOLTS'};
-  $Display_CustAgency = $rClientLegal->{'CustAgency'};
+    $Display_ClinicName   = $rNote->{ClinicName};
+    $Display_ProviderName = qq|$rNote->{'ProvLName'}, $rNote->{'ProvFName'}|;
+    $Display_ProvID       = $rNote->{'NoteProvID'};
+    $Display_ClientName  = qq|$rNote->{'ClientLName'}, $rNote->{'ClientFName'}|;
+    $Display_ClientID    = $rNote->{'ClientID'};
+    $Display_SSN         = $rNote->{'SSN'};
+    $Display_DOB         = $rNote->{'DOB'};
+    $Display_GrpSize     = $rNote->{'GrpSize'};
+    $Display_TrID        = $rNote->{'TrID'};
+    $Display_ContactDate = $rNote->{'ContLogDate'};
 
-  $Display_ClinicName = $rNote->{ClinicName};
-  $Display_ProviderName = qq|$rNote->{'ProvLName'}, $rNote->{'ProvFName'}|;
-  $Display_ProvID = $rNote->{'NoteProvID'};
-  $Display_ClientName = qq|$rNote->{'ClientLName'}, $rNote->{'ClientFName'}|;
-  $Display_ClientID = $rNote->{'ClientID'};
-  $Display_SSN = $rNote->{'SSN'};
-  $Display_DOB = $rNote->{'DOB'};
-  $Display_GrpSize = $rNote->{'GrpSize'};
-  $Display_TrID = $rNote->{'TrID'};
-  $Display_ContactDate = $rNote->{'ContLogDate'};
-  
-  $Display_Units = $rxSC->{'Units'};
-  $Display_OrgBillDate = $rNote->{'OrgBillDate'};
-  $Display_BillDate = $rNote->{'BillDate'};
+    $Display_Units       = $rxSC->{'Units'};
+    $Display_OrgBillDate = $rNote->{'OrgBillDate'};
+    $Display_BillDate    = $rNote->{'BillDate'};
+
 # this ones DenDate either from RecDate in NoteTrans or DenDate in Treatment
 #   need to check DenCode to see if NoteTrans is a denial, in Treatment both lineup
-  $Display_DenDate = $rNote->{DenCode} eq '' ? '' : $rNote->{'DenDate'};
-  $Display_DenCode = $rNote->{'DenCode'};
-  $Display_BillStatus = DBA->getxref($form,'xBillStatus',$rNote->{'BillStatus'},'Descr');
-  $Display_StatusDate = $rNote->{'StatusDate'};
-  $Display_StatusMsg = $rNote->{'StatusMsg'};
-  $Display_RecDate = $rNote->{'RecDate'};
-  $Display_NoteRecDate = $rNote->{'NoteRecDate'};
-  $Display_NoteSchDate = $rNote->{'NoteSchDate'};
-  $Display_NotePaidDate = $rNote->{'NotePaidDate'};
-  $Display_PaidDate = $rNote->{'PaidDate'};
-  $Display_ICN = $rNote->{'ICN'};
-  my $Rate = $rxSC->{'ServiceRate'};
-  $Display_ServiceRate = $AOK ? sprintf("%.2f",$Rate) : $Rate > 0 ? 'yes' : 'no';
-warn qq|TrID=$rNote->{TrID}:NoteRpt=$NoteRpt,BilledAmt=$rNote->{BilledAmt},BillAmt=$rNote->{BillAmt},BillAmt=$BillAmt\n| if ( $debug );
-  my $BillAmt = $NoteRpt ? $rNote->{BilledAmt} : $rNote->{BillAmt};
-  $Display_BillAmt = $AOK ? sprintf("%.2f",$BillAmt) : $BillAmt > 0 ? 'yes' : 'no';
-# we want the actual amount paid, not scholarship (IncAmt)
-  my ($IncAmt,$RecAmt,$SchAmt) = (0,0,0);
-  if ( $NoteRpt ) { $IncAmt = $rNote->{IncAmt}; }
-  else { $IncAmt = $rNote->{PaidAmt}; }
-  $Display_IncAmt = $AOK ? sprintf("%.2f",$IncAmt) : $IncAmt > 0 ? 'yes' : 'no';
-  my $AmtDue = $rNote->{AmtDue};
-  $Display_AmtDue = $AOK ? sprintf("%.2f",$AmtDue) : $AmtDue > 0 ? 'yes' : 'no';
-# change to a while, could be multiple commissions.
-  $Display_NF = $rNote->{NF} == 0 ? '' : $rNote->{NF} > 0 ? '~' : '!';
-  $Display_PayRate = $AOK ? sprintf("%.2f",$rNote->{'Rate'}) : '';
-  $Display_HoursWorked = $AOK ? sprintf("%.2f",$rNote->{'HoursWorked'}) : '';
-  $Display_PayTotal = $AOK ? sprintf("%.2f",$rNote->{'Rate'} * $rNote->{'HoursWorked'}) : '';
-  $Display_MgmtAmt = $AOK ? sprintf("%.2f",$rNote->{'MgmtAmt'}) : '';
-warn qq|$Display_NF,$Display_PayRate,$Display_HoursWorked,$Display_PayTotal,$Display_MgmtAmt\n| if ( $debug );
-  if ( $form->{'Type'} =~ /payroll/i )
-  {
-    $Display_Units = $Display_HoursWorked;
-    $Display_ServiceRate = $Display_PayRate;
-    $Display_BillAmt = $Display_PayTotal;
-  }
-  return(1);
+    $Display_DenDate = $rNote->{DenCode} eq '' ? '' : $rNote->{'DenDate'};
+    $Display_DenCode = $rNote->{'DenCode'};
+    $Display_BillStatus =
+      DBA->getxref( $form, 'xBillStatus', $rNote->{'BillStatus'}, 'Descr' );
+    $Display_StatusDate   = $rNote->{'StatusDate'};
+    $Display_StatusMsg    = $rNote->{'StatusMsg'};
+    $Display_RecDate      = $rNote->{'RecDate'};
+    $Display_NoteRecDate  = $rNote->{'NoteRecDate'};
+    $Display_NoteSchDate  = $rNote->{'NoteSchDate'};
+    $Display_NotePaidDate = $rNote->{'NotePaidDate'};
+    $Display_PaidDate     = $rNote->{'PaidDate'};
+    $Display_ICN          = $rNote->{'ICN'};
+    my $Rate = $rxSC->{'ServiceRate'};
+    $Display_ServiceRate =
+      $AOK ? sprintf( "%.2f", $Rate ) : $Rate > 0 ? 'yes' : 'no';
+    warn
+qq|TrID=$rNote->{TrID}:NoteRpt=$NoteRpt,BilledAmt=$rNote->{BilledAmt},BillAmt=$rNote->{BillAmt},BillAmt=$BillAmt\n|
+      if ($debug);
+    my $BillAmt = $NoteRpt ? $rNote->{BilledAmt} : $rNote->{BillAmt};
+    $Display_BillAmt =
+      $AOK ? sprintf( "%.2f", $BillAmt ) : $BillAmt > 0 ? 'yes' : 'no';
+
+    # we want the actual amount paid, not scholarship (IncAmt)
+    my ( $IncAmt, $RecAmt, $SchAmt ) = ( 0, 0, 0 );
+    if   ($NoteRpt) { $IncAmt = $rNote->{IncAmt}; }
+    else            { $IncAmt = $rNote->{PaidAmt}; }
+    $Display_IncAmt =
+      $AOK ? sprintf( "%.2f", $IncAmt ) : $IncAmt > 0 ? 'yes' : 'no';
+    my $AmtDue = $rNote->{AmtDue};
+    $Display_AmtDue =
+      $AOK ? sprintf( "%.2f", $AmtDue ) : $AmtDue > 0 ? 'yes' : 'no';
+
+    # change to a while, could be multiple commissions.
+    $Display_NF      = $rNote->{NF} == 0 ? '' : $rNote->{NF} > 0 ? '~' : '!';
+    $Display_PayRate = $AOK ? sprintf( "%.2f", $rNote->{'Rate'} ) : '';
+    $Display_HoursWorked =
+      $AOK ? sprintf( "%.2f", $rNote->{'HoursWorked'} ) : '';
+    $Display_PayTotal =
+      $AOK ? sprintf( "%.2f", $rNote->{'Rate'} * $rNote->{'HoursWorked'} ) : '';
+    $Display_MgmtAmt = $AOK ? sprintf( "%.2f", $rNote->{'MgmtAmt'} ) : '';
+    warn
+qq|$Display_NF,$Display_PayRate,$Display_HoursWorked,$Display_PayTotal,$Display_MgmtAmt\n|
+      if ($debug);
+    if ( $form->{'Type'} =~ /payroll/i ) {
+        $Display_Units       = $Display_HoursWorked;
+        $Display_ServiceRate = $Display_PayRate;
+        $Display_BillAmt     = $Display_PayTotal;
+    }
+    return (1);
 }
 ############################################################################
 ############################################################################
-sub select
-{
-  my ($self,$form,$reporttype) = @_;
-warn qq|after setup: DBNAME=$form->{DBNAME}, $reporttype, format=$form->{Format}\n| if ( $debug );
-  my $select;
-  my $where;
-  my $same = $reporttype =~ /OriginalBillDate/i ? ' (OrgBillDate=BillDate) ' : '';
-  $ReportType .= $form->{'Format'} . ' ';
-  $ReportType .= $reporttype.$same.' Report';
-  if ( $reporttype =~ /trid/i ) { ($select,$where) = main->tranRpt($form); }
-  elsif ( $reporttype =~ /ServiceDate/i ) { ($select,$where) = main->noteRpt($form,0,'ContLogDate'); }
-  elsif ( $reporttype =~ /UnReconciled/i ) { ($select,$where) = main->noteRpt($form,1,'ContLogDate'); }
-  elsif ( $reporttype =~ /OriginalBillDate/i ) { ($select,$where) = main->noteRpt($form,0,'BillDate'); }
-  elsif ( $reporttype =~ /TransBilled/i ) { ($select,$where) = main->tranRpt($form,0,'BillDate'); }
-  elsif ( $reporttype =~ /InProcess/i ) { ($select,$where) = main->tranRpt($form,1,'BillDate'); }
-  elsif ( $reporttype =~ /Denied/i ) { ($select,$where) = main->tranRpt($form,0,'RecDate','den'); }
-  elsif ( $reporttype =~ /Scholarshipped/i ) { ($select,$where) = main->tranRpt($form,0,'RecDate','sch'); }
-  elsif ( $reporttype =~ /Reconciled/i ) { ($select,$where) = main->tranRpt($form,0,'RecDate','rec'); }
-  elsif ( $reporttype =~ /Payroll/i ) { ($select,$where) = main->paidRpt($form,0,'PaidDate'); }
-  else { ($select,$where) = main->tranRpt($form,0,'BillDate'); }      # default transbilled/each time billed
-my $CoreHH = qq| and (xSC.SCNum LIKE 'G9002%' or xSC.SCNum LIKE 'G9005%' or xSC.SCNum LIKE 'G9009%' or xSC.SCNum LIKE 'G9010%')|;
-my $ShadowHH .= qq| and ( xSC.SCNum LIKE '90887' or xSC.SCNum LIKE '99211' or xSC.SCNum LIKE 'A0160' or xSC.SCNum LIKE 'G8256' or xSC.SCNum LIKE 'G9001' or xSC.SCNum LIKE 'G9007' or xSC.SCNum LIKE 'G9012' or xSC.SCNum LIKE 'H0025' or xSC.SCNum LIKE 'H0032' or xSC.SCNum LIKE 'H0034' or xSC.SCNum LIKE 'H0039' or xSC.SCNum LIKE 'H2016' or xSC.SCNum LIKE 'S0215' or xSC.SCNum LIKE 'S0280' or xSC.SCNum LIKE 'S0281' or xSC.SCNum LIKE 'S5110' or xSC.SCNum LIKE 'S5185' or xSC.SCNum LIKE 'S5190' or xSC.SCNum LIKE 'S9482' or xSC.SCNum LIKE 'T1001' or xSC.SCNum LIKE 'T1002' or xSC.SCNum LIKE 'T1003' or xSC.SCNum LIKE 'T1012' or xSC.SCNum LIKE 'T1016' or xSC.SCNum LIKE 'T1017' or xSC.SCNum LIKE 'T1027' or xSC.SCNum LIKE 'T1502' or xSC.SCNum LIKE 'T2001' or xSC.SCNum LIKE 'T2022')|;
-  return($select,$where);
+sub select {
+    my ( $self, $form, $reporttype ) = @_;
+    warn
+qq|after setup: DBNAME=$form->{DBNAME}, $reporttype, format=$form->{Format}\n|
+      if ($debug);
+    my $select;
+    my $where;
+    my $same =
+      $reporttype =~ /OriginalBillDate/i ? ' (OrgBillDate=BillDate) ' : '';
+    $ReportType .= $form->{'Format'} . ' ';
+    $ReportType .= $reporttype . $same . ' Report';
+    if ( $reporttype =~ /trid/i ) {
+        ( $select, $where ) = main->tranRpt($form);
+    }
+    elsif ( $reporttype =~ /ServiceDate/i ) {
+        ( $select, $where ) = main->noteRpt( $form, 0, 'ContLogDate' );
+    }
+    elsif ( $reporttype =~ /UnReconciled/i ) {
+        ( $select, $where ) = main->noteRpt( $form, 1, 'ContLogDate' );
+    }
+    elsif ( $reporttype =~ /OriginalBillDate/i ) {
+        ( $select, $where ) = main->noteRpt( $form, 0, 'BillDate' );
+    }
+    elsif ( $reporttype =~ /TransBilled/i ) {
+        ( $select, $where ) = main->tranRpt( $form, 0, 'BillDate' );
+    }
+    elsif ( $reporttype =~ /InProcess/i ) {
+        ( $select, $where ) = main->tranRpt( $form, 1, 'BillDate' );
+    }
+    elsif ( $reporttype =~ /Denied/i ) {
+        ( $select, $where ) = main->tranRpt( $form, 0, 'RecDate', 'den' );
+    }
+    elsif ( $reporttype =~ /Scholarshipped/i ) {
+        ( $select, $where ) = main->tranRpt( $form, 0, 'RecDate', 'sch' );
+    }
+    elsif ( $reporttype =~ /Reconciled/i ) {
+        ( $select, $where ) = main->tranRpt( $form, 0, 'RecDate', 'rec' );
+    }
+    elsif ( $reporttype =~ /Payroll/i ) {
+        ( $select, $where ) = main->paidRpt( $form, 0, 'PaidDate' );
+    }
+    else {
+        ( $select, $where ) = main->tranRpt( $form, 0, 'BillDate' );
+    }    # default transbilled/each time billed
+    my $CoreHH =
+qq| and (xSC.SCNum LIKE 'G9002%' or xSC.SCNum LIKE 'G9005%' or xSC.SCNum LIKE 'G9009%' or xSC.SCNum LIKE 'G9010%')|;
+    my $ShadowHH .=
+qq| and ( xSC.SCNum LIKE '90887' or xSC.SCNum LIKE '99211' or xSC.SCNum LIKE 'A0160' or xSC.SCNum LIKE 'G8256' or xSC.SCNum LIKE 'G9001' or xSC.SCNum LIKE 'G9007' or xSC.SCNum LIKE 'G9012' or xSC.SCNum LIKE 'H0025' or xSC.SCNum LIKE 'H0032' or xSC.SCNum LIKE 'H0034' or xSC.SCNum LIKE 'H0039' or xSC.SCNum LIKE 'H2016' or xSC.SCNum LIKE 'S0215' or xSC.SCNum LIKE 'S0280' or xSC.SCNum LIKE 'S0281' or xSC.SCNum LIKE 'S5110' or xSC.SCNum LIKE 'S5185' or xSC.SCNum LIKE 'S5190' or xSC.SCNum LIKE 'S9482' or xSC.SCNum LIKE 'T1001' or xSC.SCNum LIKE 'T1002' or xSC.SCNum LIKE 'T1003' or xSC.SCNum LIKE 'T1012' or xSC.SCNum LIKE 'T1016' or xSC.SCNum LIKE 'T1017' or xSC.SCNum LIKE 'T1027' or xSC.SCNum LIKE 'T1502' or xSC.SCNum LIKE 'T2001' or xSC.SCNum LIKE 'T2022')|;
+    return ( $select, $where );
 }
-sub noteRpt
-{
-  my ($self,$form,$unRecFlag,$ByDate) = @_;
-  my $s = qq|
+
+sub noteRpt {
+    my ( $self, $form, $unRecFlag, $ByDate ) = @_;
+    my $s = qq|
   select Treatment.* 
         ,Treatment.BillDate as OrgBillDate, Treatment.ProvID as NoteProvID, Treatment.RecDate as NoteRecDate
         ,Treatment.COPLDate as NoteSchDate, Treatment.PaidDate as NotePaidDate
@@ -727,21 +860,29 @@ sub noteRpt
       left join Provider as Clinic on Clinic.ProvID=Treatment.ClinicID
       left join Client on Client.ClientID=Treatment.ClientID
 |;
-  $SelByDate = $ByDate eq '' ? "ContLogDate" : $ByDate;
-  $SelByDateName = "Treatment.${SelByDate}";
-  my $unRec = $unRecFlag ? ' and Treatment.BillDate is not null and (Treatment.RecDate is null or Treatment.AmtDue > 0) ' : '';
-  my $w = qq|where ${SelByDateName}>="$form->{FromDate}" and ${SelByDateName}<="$form->{ToDate}" | 
-        . ' and ' . DBA->withNoteAccess($form,$ForProvID,'Treatment') 
-        . $unRec 
-        . $addSelection;
-  $ReportType .= $SelByDate eq 'ContLogDate' ? qq|: Notes for ServiceDate | : qq|: Notes for '${SelByDate}' |;
-  $NoteRpt = 1;
-  return($s,$w);
+    $SelByDate     = $ByDate eq '' ? "ContLogDate" : $ByDate;
+    $SelByDateName = "Treatment.${SelByDate}";
+    my $unRec =
+      $unRecFlag
+      ? ' and Treatment.BillDate is not null and (Treatment.RecDate is null or Treatment.AmtDue > 0) '
+      : '';
+    my $w =
+qq|where ${SelByDateName}>="$form->{FromDate}" and ${SelByDateName}<="$form->{ToDate}" |
+      . ' and '
+      . DBA->withNoteAccess( $form, $ForProvID, 'Treatment' )
+      . $unRec
+      . $addSelection;
+    $ReportType .=
+      $SelByDate eq 'ContLogDate'
+      ? qq|: Notes for ServiceDate |
+      : qq|: Notes for '${SelByDate}' |;
+    $NoteRpt = 1;
+    return ( $s, $w );
 }
-sub tranRpt
-{
-  my ($self,$form,$inProcess,$ByDate,$flag) = @_;
-  my $s = qq|
+
+sub tranRpt {
+    my ( $self, $form, $inProcess, $ByDate, $flag ) = @_;
+    my $s = qq|
   select NoteTrans.*, NoteTrans.RecDate as DenDate
         ,NoteTrans.PaidDate as NotePaidDate
         ,Treatment.ClinicID
@@ -762,28 +903,38 @@ sub tranRpt
       left join Provider as Clinic on Clinic.ProvID=Treatment.ClinicID
       left join Client on Client.ClientID=Treatment.ClientID
 |;
-  $SelByDate = $ByDate eq '' ? "ContLogDate" : $ByDate;
-  $SelByDateName = "NoteTrans.${SelByDate}";
-  my $unRec = $inProcess ? ' and NoteTrans.RecDate is null ' : '';
-  my $w = qq|where ${SelByDateName}>="$form->{FromDate}" and ${SelByDateName}<="$form->{ToDate}" | 
-        . ' and ' . DBA->withNoteAccess($form,$ForProvID,'Treatment') 
-        . $unRec 
-        . $addSelection;
-  if ( $form->{TrID} )
-  { $w = qq| where NoteTrans.TrID=$form->{TrID} |; $ReportType .= "=$form->{TrID} "; }
-  elsif( $flag eq 'den' )
-  { $w .= qq| and Treatment.BillStatus = 6 and NoteTrans.DenCode is not null |; }
-  elsif( $flag eq 'sch' )
-  { $w .= qq| and NoteTrans.Code='SR' |; }
-  elsif( $flag eq 'rec' )
-  { $w .= qq| and NoteTrans.PaidAmt!=0 and NoteTrans.Code!='SR' |; }
-  $ReportType .= $SelByDate eq 'ContLogDate' ? qq|: Notes for ServiceDate | : qq|: Notes for '${SelByDate}' |;
-  return($s,$w);
+    $SelByDate     = $ByDate eq '' ? "ContLogDate" : $ByDate;
+    $SelByDateName = "NoteTrans.${SelByDate}";
+    my $unRec = $inProcess ? ' and NoteTrans.RecDate is null ' : '';
+    my $w =
+qq|where ${SelByDateName}>="$form->{FromDate}" and ${SelByDateName}<="$form->{ToDate}" |
+      . ' and '
+      . DBA->withNoteAccess( $form, $ForProvID, 'Treatment' )
+      . $unRec
+      . $addSelection;
+    if ( $form->{TrID} ) {
+        $w = qq| where NoteTrans.TrID=$form->{TrID} |;
+        $ReportType .= "=$form->{TrID} ";
+    }
+    elsif ( $flag eq 'den' ) {
+        $w .=
+          qq| and Treatment.BillStatus = 6 and NoteTrans.DenCode is not null |;
+    }
+    elsif ( $flag eq 'sch' ) { $w .= qq| and NoteTrans.Code='SR' |; }
+    elsif ( $flag eq 'rec' ) {
+        $w .= qq| and NoteTrans.PaidAmt!=0 and NoteTrans.Code!='SR' |;
+    }
+    $ReportType .=
+      $SelByDate eq 'ContLogDate'
+      ? qq|: Notes for ServiceDate |
+      : qq|: Notes for '${SelByDate}' |;
+    return ( $s, $w );
 }
-sub paidRpt      # unRecFlag not used
+
+sub paidRpt    # unRecFlag not used
 {
-  my ($self,$form,$unRecFlag,$ByDate) = @_;
-  my $s = qq|
+    my ( $self, $form, $unRecFlag, $ByDate ) = @_;
+    my $s = qq|
   select NotePaid.*, NotePaid.ProvID as NoteProvID
         ,NotePaid.PaidDate as NotePaidDate
         ,Treatment.ClinicID
@@ -805,39 +956,60 @@ sub paidRpt      # unRecFlag not used
       left join Provider as Clinic on Clinic.ProvID=Treatment.ClinicID
       left join Client on Client.ClientID=NotePaid.ClientID
 |;
-  $SelByDate = $ByDate eq '' ? "PaidDate" : $ByDate;
-  $SelByDateName = "NotePaid.${SelByDate}";
-  my $with = SysAccess->chkPriv($form,'OtherProvNotes',$ForProvID) ? '' : qq| and NotePaid.ProvID='${ForProvID}' |;
-  my $w = qq|where Provider.Type = 4 and ${SelByDateName}>="$form->{FromDate}" and ${SelByDateName}<="$form->{ToDate}" | 
-        . ' and ' . DBA->withNoteAccess($form,$ForProvID,'Treatment') 
-        . $with
-        . $addSelection;
-  $ReportType .= $SelByDate eq 'ContLogDate' ? qq|: Notes for ServiceDate | : qq|: Notes for '${SelByDate}' |;
-  $NoteRpt = 1;      # stuff from Treatment
-warn qq|paidRpt: w=$w\n| if ( $debug );
-  return($s,$w);
+    $SelByDate     = $ByDate eq '' ? "PaidDate" : $ByDate;
+    $SelByDateName = "NotePaid.${SelByDate}";
+    my $with =
+      SysAccess->chkPriv( $form, 'OtherProvNotes', $ForProvID )
+      ? ''
+      : qq| and NotePaid.ProvID='${ForProvID}' |;
+    my $w =
+qq|where Provider.Type = 4 and ${SelByDateName}>="$form->{FromDate}" and ${SelByDateName}<="$form->{ToDate}" |
+      . ' and '
+      . DBA->withNoteAccess( $form, $ForProvID, 'Treatment' )
+      . $with
+      . $addSelection;
+    $ReportType .=
+      $SelByDate eq 'ContLogDate'
+      ? qq|: Notes for ServiceDate |
+      : qq|: Notes for '${SelByDate}' |;
+    $NoteRpt = 1;    # stuff from Treatment
+    warn qq|paidRpt: w=$w\n| if ($debug);
+    return ( $s, $w );
 }
-sub addSort
-{
-  my ($self,$form) = @_;
-# default to clinic?
-  my $out = qq| order by Clinic.Name, Provider.LName, Provider.FName, Client.LName, Client.FName, Treatment.ContLogDate, Treatment.ContLogBegTime|;
-  if    ( $form->{'Format'} =~ /extended/i ) { null; }
-  elsif ( $form->{'Format'} =~ /jolts/i ) { null; }
-  elsif ( $form->{'Format'} =~ /byprovidercode/i )
-  { $out = qq| order by Provider.LName, Provider.FName, Provider.ProvID, xInsurance.Name, xSC.SCNum, Client.LName, Client.FName, Client.ClientID, Treatment.ContLogDate, Treatment.ContLogBegTime|; }
-  elsif ( $form->{'Format'} =~ /byproviderdate/i )
-  { $out = qq| order by Provider.LName, Provider.FName, Provider.ProvID, ${SelByDateName}, Client.LName, Client.FName, Client.ClientID, Treatment.ContLogDate, Treatment.ContLogBegTime|; }
-  elsif ( $form->{'Format'} =~ /byprovideronly/i )
-  { $out = qq| order by Provider.LName, Provider.FName, Provider.ProvID, Clinic.Name, Client.LName, Client.FName, Client.ClientID, Treatment.ContLogDate, Treatment.ContLogBegTime|; }
-  elsif ( $form->{'Format'} =~ /byclientcode/i )
-  { $out = qq| order by Client.LName, Client.FName, Client.ClientID, xInsurance.Name, xSC.SCNum, Provider.LName, Provider.FName, Provider.ProvID, Treatment.ContLogDate, Treatment.ContLogBegTime|; }
-  elsif ( $form->{'Format'} =~ /byclientdate/i )
-  { $out = qq| order by Client.LName, Client.FName, Client.ClientID, ${SelByDateName}, Provider.LName, Provider.FName, Provider.ProvID, Treatment.ContLogDate, Treatment.ContLogBegTime|; }
-  else                       # /quick/
-  { null; }
-#warn qq|sort=$out\n| if ( $form->{LOGINPROVID} == 91 );
-warn qq|sort=$out\n| if ( $debug );
-  return($out);
+
+sub addSort {
+    my ( $self, $form ) = @_;
+
+    # default to clinic?
+    my $out =
+qq| order by Clinic.Name, Provider.LName, Provider.FName, Client.LName, Client.FName, Treatment.ContLogDate, Treatment.ContLogBegTime|;
+    if    ( $form->{'Format'} =~ /extended/i ) { null; }
+    elsif ( $form->{'Format'} =~ /jolts/i )    { null; }
+    elsif ( $form->{'Format'} =~ /byprovidercode/i ) {
+        $out =
+qq| order by Provider.LName, Provider.FName, Provider.ProvID, xInsurance.Name, xSC.SCNum, Client.LName, Client.FName, Client.ClientID, Treatment.ContLogDate, Treatment.ContLogBegTime|;
+    }
+    elsif ( $form->{'Format'} =~ /byproviderdate/i ) {
+        $out =
+qq| order by Provider.LName, Provider.FName, Provider.ProvID, ${SelByDateName}, Client.LName, Client.FName, Client.ClientID, Treatment.ContLogDate, Treatment.ContLogBegTime|;
+    }
+    elsif ( $form->{'Format'} =~ /byprovideronly/i ) {
+        $out =
+qq| order by Provider.LName, Provider.FName, Provider.ProvID, Clinic.Name, Client.LName, Client.FName, Client.ClientID, Treatment.ContLogDate, Treatment.ContLogBegTime|;
+    }
+    elsif ( $form->{'Format'} =~ /byclientcode/i ) {
+        $out =
+qq| order by Client.LName, Client.FName, Client.ClientID, xInsurance.Name, xSC.SCNum, Provider.LName, Provider.FName, Provider.ProvID, Treatment.ContLogDate, Treatment.ContLogBegTime|;
+    }
+    elsif ( $form->{'Format'} =~ /byclientdate/i ) {
+        $out =
+qq| order by Client.LName, Client.FName, Client.ClientID, ${SelByDateName}, Provider.LName, Provider.FName, Provider.ProvID, Treatment.ContLogDate, Treatment.ContLogBegTime|;
+    }
+    else    # /quick/
+    { null; }
+
+    #warn qq|sort=$out\n| if ( $form->{LOGINPROVID} == 91 );
+    warn qq|sort=$out\n| if ($debug);
+    return ($out);
 }
 

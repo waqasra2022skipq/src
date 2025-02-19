@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 use cBill;
@@ -11,15 +11,16 @@ use File::Tee qw(tee);
 # Initilization section
 ##
 $form = DBForm->new();
-$dbh = $form->dbconnect();
+$dbh  = $form->dbconnect();
 chdir("$form->{DOCROOT}/reports4");
-my ($BillDate,$NEXTBILLDATE) = cBill->getBillDate();
+my ( $BillDate, $NEXTBILLDATE ) = cBill->getBillDate();
 $BillDate = $form->{BillDate} if ( $form->{BillDate} );
 my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
 ##
 # Clinic Selection and Loop
 ##
-my $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Provider.ProvID');
+my $ClinicSelection =
+  DBA->getClinicSelection( $form, $ForProvID, 'Provider.ProvID' );
 my $qClinics = qq|
   select Contracts.InsID, Contracts.ContractType, Contracts.ContractCode
         ,Contracts.ServMeasure, Contracts.SourceCode, xInsurance.Descr
@@ -37,27 +38,35 @@ print qq|Select Date: $BillDate\n|;
 print qq|ClinicName\tInsurance\tNoteCount\tLineCount\n|;
 $sClinics = $dbh->prepare($qClinics);
 $sClinics->execute;
-while ( $rClinics = $sClinics->fetchrow_hashref )
-{
-  my $cmd = qq|/home/okmis/mis/src/reports/NoteRpt DBNAME=$form->{DBNAME}\\&Type=TransBilled\\&Format=JOLTS\\&output=ss|;
-  $cmd .= qq|\\&ClinicIDs=$rClinics->{ProvID}|;
-  $cmd .= qq|\\&InsID=$rClinics->{InsID}|;
-  $cmd .= qq|\\&FromDate=${BillDate}\\&ToDate=${BillDate}|;
-  $cmd .= qq|\\&NoNonBill=1|;
-  my $diskfile = DBUtil->ExecCmd($cmd);
-  my $out = DBUtil->ReadFile($diskfile);
-  my $LineCount = ($out =~ tr/\n//);
-  $LineCount -= 3;      # don't count header.
-  if ( $LineCount > 0 )
-  {
-    my $stamp = DBUtil->Date('','stamp');
-    my $token = DBUtil->genToken();
-    my $newfile = 'EBT_jolts_'.$rClinics->{ProvID}.'_'.$rClinics->{Descr}.'_'.$BillDate.'_'.$LineCount.'_'.$stamp.'_'.$token.'.xls'; 
-    move($diskfile,$newfile) or print "<<<ERROR>>>: Move ${diskfile} failed: $!";;
-    print qq|$rClinics->{Name}\t$rClinics->{Descr}\t${LineCount}\n|;
-  }
-  else
-  { unlink($diskfile); }
+
+while ( $rClinics = $sClinics->fetchrow_hashref ) {
+    my $cmd =
+qq|/var/www/okmis/src/reports/NoteRpt DBNAME=$form->{DBNAME}\\&Type=TransBilled\\&Format=JOLTS\\&output=ss|;
+    $cmd .= qq|\\&ClinicIDs=$rClinics->{ProvID}|;
+    $cmd .= qq|\\&InsID=$rClinics->{InsID}|;
+    $cmd .= qq|\\&FromDate=${BillDate}\\&ToDate=${BillDate}|;
+    $cmd .= qq|\\&NoNonBill=1|;
+    my $diskfile  = DBUtil->ExecCmd($cmd);
+    my $out       = DBUtil->ReadFile($diskfile);
+    my $LineCount = ( $out =~ tr/\n// );
+    $LineCount -= 3;    # don't count header.
+
+    if ( $LineCount > 0 ) {
+        my $stamp = DBUtil->Date( '', 'stamp' );
+        my $token = DBUtil->genToken();
+        my $newfile =
+            'EBT_jolts_'
+          . $rClinics->{ProvID} . '_'
+          . $rClinics->{Descr} . '_'
+          . $BillDate . '_'
+          . $LineCount . '_'
+          . $stamp . '_'
+          . $token . '.xls';
+        move( $diskfile, $newfile )
+          or print "<<<ERROR>>>: Move ${diskfile} failed: $!";
+        print qq|$rClinics->{Name}\t$rClinics->{Descr}\t${LineCount}\n|;
+    }
+    else { unlink($diskfile); }
 }
 $form->complete();
 ############################################################################

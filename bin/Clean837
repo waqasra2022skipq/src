@@ -1,56 +1,57 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 
 use strict;
 use warnings;
-use  DBI;
-use  DBForm;
-use  DBA;
+use DBI;
+use DBForm;
+use DBA;
 
 ############################################################################
 # This routine marks Reviewed for certain DBs
 ############################################################################
 my $form = DBForm->new();
-my $dbh = $form->dbconnect();
+my $dbh  = $form->dbconnect();
 ##my $GTerr = $dbh->prepare("SELECT count(*) as GTcount,billstatus,xBillStatus.Descr FROM `Treatment` left join xSC on xSC.scid = Treatment.scid
 ##left join xBillStatus on Treatment.BillStatus = xBillStatus.ID
 ##WHERE mod4 = 'GT' and instr(scnum,'GT') > 0 and xSC.SCNum not like 'X%'
 ##group by billstatus,xBillStatus.Descr");
 
-my $GTerr = $dbh->prepare("SELECT trid,clientid,provid,billdate,billedamt,amtdue,recdolc FROM `Treatment` WHERE BillDate like '2020-04-1%' and trid in (
+my $GTerr = $dbh->prepare(
+"SELECT trid,clientid,provid,billdate,billedamt,amtdue,recdolc FROM `Treatment` WHERE BillDate like '2020-04-1%' and trid in (
     select substring_index(substring_index(claimkey,'_',2),'_',-1) as trkey from Billing837 where billdate like '2020-04-1%' and insid = 100
-    ) and recdolc like '2020-04-15%'");
-my $GTupdate = $dbh->prepare("update `Treatment` set billstatus = 1,amtdue = billedamt WHERE trid = ?");
+    ) and recdolc like '2020-04-15%'"
+);
+my $GTupdate = $dbh->prepare(
+    "update `Treatment` set billstatus = 1,amtdue = billedamt WHERE trid = ?");
 
 print qq|DBNAME=$form->{'DBNAME'}\n|;
-#main->GTerrors($p); 
+
+#main->GTerrors($p);
 my $itemCnt = 0;
 my ($self) = @_;
 $GTerr->execute() || $form->dberror("GTerrors: ");
 
-while (my @ary = $GTerr->fetchrow_array ()) 
-{
+while ( my @ary = $GTerr->fetchrow_array() ) {
     my $delim = "--";
-    for (my $i = 0; $i < @ary; $i++)
-    {
-        $ary[$i] = "NULL" if !defined ($ary[$i]);   # NULL value?
+    for ( my $i = 0 ; $i < @ary ; $i++ ) {
+        $ary[$i] = "NULL" if !defined( $ary[$i] );    # NULL value?
         print $delim . $ary[$i];
         $delim = ",";
-		$itemCnt++;
+        $itemCnt++;
     }
     print "\n";
-	
 
-	$GTupdate->execute($ary[0]) || $form->dberror("GTupdate: ");
+    $GTupdate->execute( $ary[0] ) || $form->dberror("GTupdate: ");
 }
-	print "Item Count:\n";
-	print $itemCnt;
-	
+print "Item Count:\n";
+print $itemCnt;
+
 ##	my $GTupdate = $dbh->prepare("update `Treatment` set billstatus = 1,amtdue = billedamt WHERE BillDate like '2020-04-1%' and trid in (
 ##    select substring_index(substring_index(claimkey,'_',2),'_',-1) as trkey from Billing837 where billdate like '2020-04-1%' and insid = 100
 ##    ) and recdolc like '2020-04-15%'");
 ##	$GTupdate->execute() || $form->dberror("GTupdate: ");
-	
+
 $GTerr->finish();
 $GTupdate->finish();
-exit;  
+exit;

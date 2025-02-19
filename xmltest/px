@@ -1,167 +1,184 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use gXML;
 use XML::LibXML;
 
 ############################################################################
-my $filename = 'received/20170707103854_NT_Bad_AllergyConcernElements_r11_v2.xml';
+my $filename =
+  'received/20170707103854_NT_Bad_AllergyConcernElements_r11_v2.xml';
 my $filename = 'me';
 warn "filename: ${filename}\n";
+
 # sub loadCCDA ($form,$ClientID)
 #   load_xml: initializes the parser and parse_file()
-  my $doc = '';
-  eval { $doc = XML::LibXML->load_xml(location => $filename); };
-  exit('parse_error') if ( $@ );
-  my $xml = XML::LibXML::XPathContext->new;                # No argument here!
-  $xml->registerNs('x', 'urn:hl7-org:v3');
-  my $rClient = main->getDemo($xml,$doc);
-foreach my $f ( sort keys %{$rClient} ) { warn ": rClient-$f=$rClient->{$f}\n"; }
-  for my $node ( $xml->findnodes('//x:component/x:structuredBody/x:component/x:section', $doc) )
-  {
-#warn qq|: nodeName=|.$node->nodeName."\n";
-    foreach my $tempId ( $xml->findnodes('x:templateId', $node) )
-    {
-#warn ": tempId=$tempId\n";
-      my $root = $xml->findvalue('@root', $tempId);
-      if ( $root eq '2.16.840.1.113883.10.20.22.2.1.1' )
-      {
-warn ": root=$root\n";
-        my $results = main->setMeds($xml,$doc,$node);
-      }
-      elsif ( $root eq '2.16.840.1.113883.10.20.22.2.6.1')
-      {
-warn ": root=$root\n";
-        my $results = main->setAllergies($xml,$doc,$node);
-      }
-      elsif ( $root eq '2.16.840.1.113883.10.20.22.2.5.1' || $root eq '2.16.840.1.113883.10.20.22.2.5' )
-      {
-warn ": root=$root\n";
-        my $results = main->setProblems($xml,$doc,$node);
-      }
+my $doc = '';
+eval { $doc = XML::LibXML->load_xml( location => $filename ); };
+exit('parse_error') if ($@);
+my $xml = XML::LibXML::XPathContext->new;    # No argument here!
+$xml->registerNs( 'x', 'urn:hl7-org:v3' );
+my $rClient = main->getDemo( $xml, $doc );
+foreach my $f ( sort keys %{$rClient} ) {
+    warn ": rClient-$f=$rClient->{$f}\n";
+}
+
+for my $node (
+    $xml->findnodes(
+        '//x:component/x:structuredBody/x:component/x:section', $doc
+    )
+  )
+{
+    #warn qq|: nodeName=|.$node->nodeName."\n";
+    foreach my $tempId ( $xml->findnodes( 'x:templateId', $node ) ) {
+
+        #warn ": tempId=$tempId\n";
+        my $root = $xml->findvalue( '@root', $tempId );
+        if ( $root eq '2.16.840.1.113883.10.20.22.2.1.1' ) {
+            warn ": root=$root\n";
+            my $results = main->setMeds( $xml, $doc, $node );
+        }
+        elsif ( $root eq '2.16.840.1.113883.10.20.22.2.6.1' ) {
+            warn ": root=$root\n";
+            my $results = main->setAllergies( $xml, $doc, $node );
+        }
+        elsif ($root eq '2.16.840.1.113883.10.20.22.2.5.1'
+            || $root eq '2.16.840.1.113883.10.20.22.2.5' )
+        {
+            warn ": root=$root\n";
+            my $results = main->setProblems( $xml, $doc, $node );
+        }
     }
-  }
+}
 exit;
 ############################################################################
-sub getDemo
-{
-  my ($self,$xml,$doc) = @_;
-  my ($longname,$othername) = ('','');
-  my $r = ();
-  for my $node ( $xml->findnodes('//x:patient/x:name', $doc) )
-  {
-    my $use = $xml->findvalue('@use', $node);
-    foreach my $given ( $xml->findnodes('x:given', $node) )
-    {
-      if ( $use eq 'L' ) { $longname .= $given->to_literal.' '; }
-      else               { $othername .= $given->to_literal.' '; }
+sub getDemo {
+    my ( $self, $xml, $doc ) = @_;
+    my ( $longname, $othername ) = ( '', '' );
+    my $r = ();
+    for my $node ( $xml->findnodes( '//x:patient/x:name', $doc ) ) {
+        my $use = $xml->findvalue( '@use', $node );
+        foreach my $given ( $xml->findnodes( 'x:given', $node ) ) {
+            if   ( $use eq 'L' ) { $longname  .= $given->to_literal . ' '; }
+            else                 { $othername .= $given->to_literal . ' '; }
+        }
+        for my $family ( $xml->findnodes( 'x:family', $node ) ) {
+            if   ( $use eq 'L' ) { $longname  .= $family->to_literal . ' '; }
+            else                 { $othername .= $family->to_literal . ' '; }
+        }
     }
-    for my $family ( $xml->findnodes('x:family', $node) )
-    {
-      if ( $use eq 'L' ) { $longname .= $family->to_literal.' '; }
-      else               { $othername .= $family->to_literal.' '; }
+    my $patientname = $longname eq '' ? $othername : $longname;
+    warn "patientname=$patientname\n";
+    my ( $fname, $mname, $lname ) = split( ' ', $patientname );
+    $fname =~ s/^\s*(.*?)\s*$/$1/g;    # trim both leading/trailing
+    warn "fname=$fname\n";
+    $mname =~ s/^\s*(.*?)\s*$/$1/g;    # trim both leading/trailing
+    warn "mname=$mname\n";
+    $lname =~ s/^\s*(.*?)\s*$/$1/g;    # trim both leading/trailing
+    $r->{'FName'} = $fname;
+    $r->{'MName'} = $lname ne '' ? $mname : '';
+    $r->{'LName'} = $lname eq '' ? $mname : $lname;
+    warn "lname=$lname\n";
+    $r->{'Gend'} =
+      $xml->findvalue( '//x:patient/x:administrativeGenderCode/@code', $doc );
+    warn "gender=$gender\n";
+    my $dob = $xml->findvalue( '//x:patient/x:birthTime/@value', $doc );
+    warn "dob=$dob\n";
+    $r->{'DOB'} =
+        substr( $dob, 0, 4 ) . '-'
+      . substr( $dob, 4, 2 ) . '-'
+      . substr( $dob, 6, 2 );
+
+    foreach my $node ( $xml->findnodes( '//x:patientRole/x:id', $doc ) ) {
+        my $root = $xml->findvalue( '@root', $node );
+        warn "id: root=$root\n";
+        $r->{'SSN'} = $xml->findvalue( '@extension', $node )
+          if ( $root eq "2.16.840.1.113883.4.1" );
     }
-  }
-  my $patientname = $longname eq '' ? $othername : $longname;
-warn "patientname=$patientname\n";
-  my ($fname,$mname,$lname) = split(' ',$patientname);
-  $fname =~ s/^\s*(.*?)\s*$/$1/g;   # trim both leading/trailing
-warn "fname=$fname\n";
-  $mname =~ s/^\s*(.*?)\s*$/$1/g;   # trim both leading/trailing
-warn "mname=$mname\n";
-  $lname =~ s/^\s*(.*?)\s*$/$1/g;   # trim both leading/trailing
-  $r->{'FName'} = $fname;
-  $r->{'MName'} = $lname ne '' ? $mname : '';
-  $r->{'LName'} = $lname eq '' ? $mname : $lname;
-warn "lname=$lname\n";
-  $r->{'Gend'} = $xml->findvalue('//x:patient/x:administrativeGenderCode/@code', $doc);
-warn "gender=$gender\n";
-  my $dob = $xml->findvalue('//x:patient/x:birthTime/@value', $doc);
-warn "dob=$dob\n";
-  $r->{'DOB'} = substr($dob,0,4).'-'.substr($dob,4,2).'-'.substr($dob,6,2);
-  foreach my $node ( $xml->findnodes('//x:patientRole/x:id', $doc) )
-  {
-    my $root = $xml->findvalue('@root', $node);
-warn "id: root=$root\n";
-    $r->{'SSN'} = $xml->findvalue('@extension', $node) if ( $root eq "2.16.840.1.113883.4.1" );
-  }
-  ($r->{'Addr1'},$r->{'Addr2'},$r->{'City'},$r->{'ST'},$r->{'Zip'},$r->{'Country'}) = main->getAddr($xml,$doc,'//x:patientRole/x:addr','HP');
-  my ($phtype,$ph) = split(/:/,$xml->findvalue('//x:patientRole/x:telecom/@value', $doc));
-  $ph =~ s/^\s*(.*?)\s*$/$1/g;   # trim both leading/trailing
-  ($r->{'HmPh'} = $ph) =~ s/\(//;
-  $r->{'HmPh'} =~ s/\)/-/;
-  $r->{'MarStat'} = $xml->findvalue('//x:patient/x:maritalStatusCode/@code', $doc);
-  $r->{'Race'} = $xml->findvalue('//x:patient/x:raceCode/@code', $doc);
-  $r->{'Ethniciy'} = $xml->findvalue('//x:patient/x:ethnicGroupCode/@code', $doc);
-  $r->{'Lang1'} = $xml->findvalue('//x:patient/x:languageCommunication/x:languageCode/@code', $doc);
-  $r->{'ProvOrg'} = $xml->findnodes('//x:providerOrganization/x:name', $doc)->to_literal;
-  ($phtype,$ph) = split(/:/,$xml->findvalue('//x:providerOrganization/x:telecom/@value', $doc));
-  $ph =~ s/^\s*(.*?)\s*$/$1/g;   # trim both leading/trailing
-  ($r->{'ProvOrgPh'} = $ph) =~ s/\(//;
-  $r->{'ProvOrgPh'} =~ s/\)/-/;
-  ($r->{'POAddr1'},$r->{'POAddr2'},$r->{'POCity'},$r->{'POST'},$r->{'POZip'},$r->{'POCountry'}) = main->getAddr($xml,$doc,'//x:providerOrganization/x:addr');
-  return($r);
+    (
+        $r->{'Addr1'}, $r->{'Addr2'}, $r->{'City'},
+        $r->{'ST'},    $r->{'Zip'},   $r->{'Country'}
+    ) = main->getAddr( $xml, $doc, '//x:patientRole/x:addr', 'HP' );
+    my ( $phtype, $ph ) =
+      split( /:/, $xml->findvalue( '//x:patientRole/x:telecom/@value', $doc ) );
+    $ph                    =~ s/^\s*(.*?)\s*$/$1/g; # trim both leading/trailing
+    ( $r->{'HmPh'} = $ph ) =~ s/\(//;
+    $r->{'HmPh'}           =~ s/\)/-/;
+    $r->{'MarStat'} =
+      $xml->findvalue( '//x:patient/x:maritalStatusCode/@code', $doc );
+    $r->{'Race'} = $xml->findvalue( '//x:patient/x:raceCode/@code', $doc );
+    $r->{'Ethniciy'} =
+      $xml->findvalue( '//x:patient/x:ethnicGroupCode/@code', $doc );
+    $r->{'Lang1'} = $xml->findvalue(
+        '//x:patient/x:languageCommunication/x:languageCode/@code', $doc );
+    $r->{'ProvOrg'} =
+      $xml->findnodes( '//x:providerOrganization/x:name', $doc )->to_literal;
+    ( $phtype, $ph ) = split( /:/,
+        $xml->findvalue( '//x:providerOrganization/x:telecom/@value', $doc ) );
+    $ph =~ s/^\s*(.*?)\s*$/$1/g;    # trim both leading/trailing
+    ( $r->{'ProvOrgPh'} = $ph ) =~ s/\(//;
+    $r->{'ProvOrgPh'} =~ s/\)/-/;
+    (
+        $r->{'POAddr1'}, $r->{'POAddr2'}, $r->{'POCity'},
+        $r->{'POST'},    $r->{'POZip'},   $r->{'POCountry'}
+    ) = main->getAddr( $xml, $doc, '//x:providerOrganization/x:addr' );
+    return ($r);
 }
 ############################################################################
-sub getAddr
-{
-  my ($self,$xml,$doc,$xpath,$attr) = @_;
-warn "id: xpath=${xpath}, attr=${attr}\n";
-  my @addr = ();
-  my ($City,$ST,$Zip,$Country) = ('','','','');
-  foreach my $node ( $xml->findnodes($xpath, $doc) )
-  {
-    my $use = $xml->findvalue('@use', $node);
-warn "id: use=${use}, attr=${attr}\n";
-    if ( $use eq $attr )
-    {
-      foreach my $addr ( $xml->findnodes('x:streetAddressLine', $node) )
-      { push(@addr,$addr->to_literal); }
-      $City = $xml->findnodes('x:city', $node)->to_literal;
-      $ST = $xml->findnodes('x:state', $node)->to_literal;
-      $Zip = $xml->findnodes('x:postalCode', $node)->to_literal;
-      $Country = $xml->findnodes('x:country', $node)->to_literal;
+sub getAddr {
+    my ( $self, $xml, $doc, $xpath, $attr ) = @_;
+    warn "id: xpath=${xpath}, attr=${attr}\n";
+    my @addr = ();
+    my ( $City, $ST, $Zip, $Country ) = ( '', '', '', '' );
+    foreach my $node ( $xml->findnodes( $xpath, $doc ) ) {
+        my $use = $xml->findvalue( '@use', $node );
+        warn "id: use=${use}, attr=${attr}\n";
+        if ( $use eq $attr ) {
+            foreach my $addr ( $xml->findnodes( 'x:streetAddressLine', $node ) )
+            {
+                push( @addr, $addr->to_literal );
+            }
+            $City    = $xml->findnodes( 'x:city',       $node )->to_literal;
+            $ST      = $xml->findnodes( 'x:state',      $node )->to_literal;
+            $Zip     = $xml->findnodes( 'x:postalCode', $node )->to_literal;
+            $Country = $xml->findnodes( 'x:country',    $node )->to_literal;
+        }
     }
-  }
-  my $Addr1 = $addr[0];
-  my $Addr2 = $addr[1];
-  return($Addr1,$Addr2,$City,$ST,$Zip,$Country);
+    my $Addr1 = $addr[0];
+    my $Addr2 = $addr[1];
+    return ( $Addr1, $Addr2, $City, $ST, $Zip, $Country );
 }
-sub setMeds
-{
-  my ($self,$xml,$doc,$node) = @_;
-warn qq|setMeds: nodeName=|.$node->nodeName."\n";
-  for my $entry ( $xml->findnodes('x:entry', $node) )
-  {
-warn qq|setMeds: nodeName=|.$entry->nodeName."\n";
-      my $negationInd = $xml->findvalue('@negationInd', $entry);
-      my $typeCode = $xml->findvalue('@typeCode', $entry);
-warn "setMeds: negationInd=${negationInd}, typeCode=${typeCode}\n";
-  }
-  return();
+
+sub setMeds {
+    my ( $self, $xml, $doc, $node ) = @_;
+    warn qq|setMeds: nodeName=| . $node->nodeName . "\n";
+    for my $entry ( $xml->findnodes( 'x:entry', $node ) ) {
+        warn qq|setMeds: nodeName=| . $entry->nodeName . "\n";
+        my $negationInd = $xml->findvalue( '@negationInd', $entry );
+        my $typeCode    = $xml->findvalue( '@typeCode',    $entry );
+        warn "setMeds: negationInd=${negationInd}, typeCode=${typeCode}\n";
+    }
+    return ();
 }
-sub setAllergies
-{
-  my ($self,$xml,$doc,$node) = @_;
-warn qq|setAllergies: nodeName=|.$node->nodeName."\n";
-  for my $entry ( $xml->findnodes('x:entry', $node) )
-  {
-warn qq|setAllergies: nodeName=|.$entry->nodeName."\n";
-      my $negationInd = $xml->findvalue('@negationInd', $entry);
-      my $typeCode = $xml->findvalue('@typeCode', $entry);
-warn "setAllergies: negationInd=${negationInd}, typeCode=${typeCode}\n";
-  }
-  return();
+
+sub setAllergies {
+    my ( $self, $xml, $doc, $node ) = @_;
+    warn qq|setAllergies: nodeName=| . $node->nodeName . "\n";
+    for my $entry ( $xml->findnodes( 'x:entry', $node ) ) {
+        warn qq|setAllergies: nodeName=| . $entry->nodeName . "\n";
+        my $negationInd = $xml->findvalue( '@negationInd', $entry );
+        my $typeCode    = $xml->findvalue( '@typeCode',    $entry );
+        warn "setAllergies: negationInd=${negationInd}, typeCode=${typeCode}\n";
+    }
+    return ();
 }
-sub setProblems
-{
-  my ($self,$xml,$doc,$node) = @_;
-warn qq|setProblems: nodeName=|.$node->nodeName."\n";
-  for my $entry ( $xml->findnodes('x:entry', $node) )
-  {
-warn qq|setProblems: nodeName=|.$entry->nodeName."\n";
-      my $negationInd = $xml->findvalue('@negationInd', $entry);
-      my $typeCode = $xml->findvalue('@typeCode', $entry);
-warn "setProblems: negationInd=${negationInd}, typeCode=${typeCode}\n";
-  }
-  return();
+
+sub setProblems {
+    my ( $self, $xml, $doc, $node ) = @_;
+    warn qq|setProblems: nodeName=| . $node->nodeName . "\n";
+    for my $entry ( $xml->findnodes( 'x:entry', $node ) ) {
+        warn qq|setProblems: nodeName=| . $entry->nodeName . "\n";
+        my $negationInd = $xml->findvalue( '@negationInd', $entry );
+        my $typeCode    = $xml->findvalue( '@typeCode',    $entry );
+        warn "setProblems: negationInd=${negationInd}, typeCode=${typeCode}\n";
+    }
+    return ();
 }

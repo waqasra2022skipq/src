@@ -28,20 +28,20 @@ export WORKDIR=/home/okmis/mis/upd/work
 
 export TAPEDIR=/home/okmis/mis/backups
 export DBADIR=/home/okmis/mis/
-export MISBIN=/home/okmis/mis/src/bin
-export MISSBIN=/home/okmis/mis/src/sbin
-export MISLIB=/home/okmis/mis/src/lib
+export MISBIN=/var/www/okmis/src/bin
+export MISSBIN=/var/www/okmis/src/sbin
+export MISLIB=/var/www/okmis/src/lib
 export BILLDIR=/home/okmis/mis/billing
 
 export ADMINDIR=/home/okmis/www/mms/admin
 export FTPDIR="${ADMINDIR}/downloads"
 export LOGDIR="${ADMINDIR}/logs"
 export REMITDIR="${ADMINDIR}/835"
-export SRC=/home/okmis/mis/src
-export SRCBIN=/home/okmis/mis/src/bin
-export SRCLIB=/home/okmis/mis/src/lib
-export SRCSBIN=/home/okmis/mis/src/sbin
-export SCHEDULER=/home/okmis/mis/src/scheduler
+export SRC=/var/www/okmis/src
+export SRCBIN=/var/www/okmis/src/bin
+export SRCLIB=/var/www/okmis/src/lib
+export SRCSBIN=/var/www/okmis/src/sbin
+export SCHEDULER=/var/www/okmis/src/scheduler
 umask ugo+rw
 #
 # some dates

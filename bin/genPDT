@@ -1,22 +1,24 @@
 #!/usr/bin/perl
 ############################################################################
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBForm;
 use PDF;
 use Time::Local;
-$DT=localtime();
+$DT = localtime();
 
 ###########################################
 my $acct = shift;
+
 # this is the pdf template we need
-my $name = shift;
-my $pdtpath = "/home/okmis/mis/src/pdf/${name}.pdt";
-my $form = DBForm->new("DBNAME=$acct");
-my $dbh = $form->dbconnect();
+my $name    = shift;
+my $pdtpath = "/var/www/okmis/src/pdf/${name}.pdt";
+my $form    = DBForm->new("DBNAME=$acct");
+my $dbh     = $form->dbconnect();
 ############################################################################
 $pdf = PDF->start($pdtpath);
+
 # this is just so pdf will have at least 1 page.
-$pdf->add('',"/R10 14 Tf\n1 0 0 1 40 740 Tm ( ) Tj\n");
+$pdf->add( '', "/R10 14 Tf\n1 0 0 1 40 740 Tm ( ) Tj\n" );
 $pdf->finish();
 print $pdf->{outText};
 $form->complete();

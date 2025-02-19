@@ -1,67 +1,68 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBForm;
 use myDBI;
 ######################################################################
 ##
-my $FACCT = $ARGV[0];
+my $FACCT  = $ARGV[0];
 my $ProvID = $ARGV[1];
-my $form = DBForm->new("DBNAME=$FACCT");
-my $dbh = $form->dbconnect();
+my $form   = DBForm->new("DBNAME=$FACCT");
+my $dbh    = $form->dbconnect();
 main->delProvider($ProvID);
-foreach my $rBranch ( MgrTree->getProviders($form,$ProvID) ) 
-{ main->delProvider($rBranch->{ProvID}); }
+
+foreach my $rBranch ( MgrTree->getProviders( $form, $ProvID ) ) {
+    main->delProvider( $rBranch->{ProvID} );
+}
 $form->complete();
 exit;
 ###################################################################
-sub delProvider
-{
-  my ($self,$ProvID) = @_;
-  print qq|##rm -rf Provider/EDocs/${ProvID}\n|;
-  print "delete from Provider where ProvID=${ProvID};\n";
-  main->delProviderDetail('Provider',$ProvID,0);
-  print "delete from Manager where ProviderID=${ProvID};\n";
-  print "delete from UserLogin where UserID=${ProvID};\n";
-  print "delete from ManagerTree where TreeProvID=${ProvID};\n";
-  my $sClient=$dbh->prepare("select * from Client where ProvID=?");
-  $sClient->execute($ProvID) || print qq|select from Client (${ProvID})\n|;;
-  while ( my $rClient = $sClient->fetchrow_hashref )
-  { main->delClient($rClient->{ClientID}); }
-}
-sub delProviderDetail
-{
-  my ($self,$inTable,$ProvID,$Cnt) = @_;
+sub delProvider {
+    my ( $self, $ProvID ) = @_;
+    print qq|##rm -rf Provider/EDocs/${ProvID}\n|;
+    print "delete from Provider where ProvID=${ProvID};\n";
+    main->delProviderDetail( 'Provider', $ProvID, 0 );
+    print "delete from Manager where ProviderID=${ProvID};\n";
+    print "delete from UserLogin where UserID=${ProvID};\n";
+    print "delete from ManagerTree where TreeProvID=${ProvID};\n";
+    my $sClient = $dbh->prepare("select * from Client where ProvID=?");
+    $sClient->execute($ProvID) || print qq|select from Client (${ProvID})\n|;
 
-  $Cnt++;
-  foreach my $table ( myDBI->getDetTables($inTable) )
-  {
-    next if ( $table eq 'Manager' );
-    next if ( $table eq 'UserLogin' );
-    next if ( $table eq 'ManagerTree' );
-    my $spc = ' ' x $Cnt;
-    print "${spc}delete from ${table} where ProvID=${ProvID};\n";
-    main->delProviderDetail($table,$ProvID,$Cnt);
-  }
+    while ( my $rClient = $sClient->fetchrow_hashref ) {
+        main->delClient( $rClient->{ClientID} );
+    }
 }
-sub delClient
-{
-  my ($self,$ClientID) = @_;
-  print qq|##rm -rf Client/EDocs/${ClientID}\n|;
-  print qq|##rm -rf Client/Notes/${ClientID}\n|;
-  print "delete from Client where ClientID=${ClientID};\n";
-  main->delClientDetail('Client',$ClientID,0);
-  print "delete from ClientASI where G1=${ClientID};\n";
-}
-sub delClientDetail
-{
-  my ($self,$inTable,$ClientID,$Cnt) = @_;
 
-  $Cnt++;
-  foreach my $table ( myDBI->getDetTables($inTable) )
-  {
-    next if ( $table eq 'ClientASI' );
-    my $spc = ' ' x $Cnt;
-    print "${spc}delete from ${table} where ClientID=${ClientID};\n";
-    main->delClientDetail($table,$ClientID,$Cnt);
-  }
+sub delProviderDetail {
+    my ( $self, $inTable, $ProvID, $Cnt ) = @_;
+
+    $Cnt++;
+    foreach my $table ( myDBI->getDetTables($inTable) ) {
+        next if ( $table eq 'Manager' );
+        next if ( $table eq 'UserLogin' );
+        next if ( $table eq 'ManagerTree' );
+        my $spc = ' ' x $Cnt;
+        print "${spc}delete from ${table} where ProvID=${ProvID};\n";
+        main->delProviderDetail( $table, $ProvID, $Cnt );
+    }
+}
+
+sub delClient {
+    my ( $self, $ClientID ) = @_;
+    print qq|##rm -rf Client/EDocs/${ClientID}\n|;
+    print qq|##rm -rf Client/Notes/${ClientID}\n|;
+    print "delete from Client where ClientID=${ClientID};\n";
+    main->delClientDetail( 'Client', $ClientID, 0 );
+    print "delete from ClientASI where G1=${ClientID};\n";
+}
+
+sub delClientDetail {
+    my ( $self, $inTable, $ClientID, $Cnt ) = @_;
+
+    $Cnt++;
+    foreach my $table ( myDBI->getDetTables($inTable) ) {
+        next if ( $table eq 'ClientASI' );
+        my $spc = ' ' x $Cnt;
+        print "${spc}delete from ${table} where ClientID=${ClientID};\n";
+        main->delClientDetail( $table, $ClientID, $Cnt );
+    }
 }

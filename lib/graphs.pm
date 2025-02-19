@@ -2,73 +2,84 @@ package graphs;
 use myDBI;
 
 #############################################################################
-sub selData
-{
-  my ($self,$form,$sel,$data_array,$y_values,$charttype) = @_;
-#warn qq|selData: sel=$sel, y_values=$y_values, charttype=$charttype\n|;
-  my $dbh = myDBI->dbconnect($form->{'DBNAME'});
-if ( $form->{LOGINPROVID} == 91 )
-{
-  open OUT, ">>/home/okmis/mis/src/debug/graphs.out" or die "Couldn't open file: $!";
-  print OUT qq|sel=\n$sel\n|;
-  print OUT qq|y_values=$y_values\n|;
-  close(OUT);
-}
-  my $cnt = 0;
-  my $s = $dbh->prepare($sel);
-  $s->execute() || myDBI->dberror("graph: selData: $sel");
-  my $RecordCount = $s->rows;
-#warn qq|selData: RecordCount=$RecordCount\n|;
-  while ( my $r = $s->fetchrow_hashref )
-  { 
-    $cnt++;
-#   ie: y_values=MyY1|BillAmt:MyY2|IncAmt
-    foreach my $v ( split(':',$y_values) )
-    {
-      my ($yval,$appendvalue) = split(/\|/,$v);
-#warn qq|v=$v, yval=$yval, appendvalue=$appendvalue\n|;
-      my $key = $r->{'MyKey'};
-      my $x = $appendvalue eq '' ? $r->{'MyX'} : $r->{'MyX'}.' '.$appendvalue;
-      my $y = $r->{$yval} eq '' ? '0' : $r->{$yval};
-      $key =~ s/'//g; $x =~ s/'//g; $y =~ s/'//g;
-#warn qq|key=$key, x=$x, y=$y\n|;
-      push(@{$data_array->{$key}},$x,$y);
+sub selData {
+    my ( $self, $form, $sel, $data_array, $y_values, $charttype ) = @_;
+
+    #warn qq|selData: sel=$sel, y_values=$y_values, charttype=$charttype\n|;
+    my $dbh = myDBI->dbconnect( $form->{'DBNAME'} );
+    if ( $form->{LOGINPROVID} == 91 ) {
+        open OUT, ">>/var/www/okmis/src/debug/graphs.out"
+          or die "Couldn't open file: $!";
+        print OUT qq|sel=\n$sel\n|;
+        print OUT qq|y_values=$y_values\n|;
+        close(OUT);
     }
-  }
-  $s->finish();
-  return($cnt,$data_array);
+    my $cnt = 0;
+    my $s   = $dbh->prepare($sel);
+    $s->execute() || myDBI->dberror("graph: selData: $sel");
+    my $RecordCount = $s->rows;
+
+    #warn qq|selData: RecordCount=$RecordCount\n|;
+    while ( my $r = $s->fetchrow_hashref ) {
+        $cnt++;
+
+        #   ie: y_values=MyY1|BillAmt:MyY2|IncAmt
+        foreach my $v ( split( ':', $y_values ) ) {
+            my ( $yval, $appendvalue ) = split( /\|/, $v );
+
+            #warn qq|v=$v, yval=$yval, appendvalue=$appendvalue\n|;
+            my $key = $r->{'MyKey'};
+            my $x =
+                $appendvalue eq ''
+              ? $r->{'MyX'}
+              : $r->{'MyX'} . ' ' . $appendvalue;
+            my $y = $r->{$yval} eq '' ? '0' : $r->{$yval};
+            $key =~ s/'//g;
+            $x   =~ s/'//g;
+            $y   =~ s/'//g;
+
+            #warn qq|key=$key, x=$x, y=$y\n|;
+            push( @{ $data_array->{$key} }, $x, $y );
+        }
+    }
+    $s->finish();
+    return ( $cnt, $data_array );
 }
-sub d3_chart
-{
-  my ($self,$params,$dataset) = @_;
-#print qq|params: are...\n|;
-#foreach my $f ( keys %{$params} ) { print ": params-$f=$params->{$f}\n"; }
-#  <script type="text/javascript" src="/cgi/d3lib/my.d3.js"></script>
-  my $chartfunc = $params->{'function'};
-  my $height = 500;
-  my $width = 1000;
-  if($chartfunc !~ /line_chart/){
-  $height = $params->{'height'} ? $params->{'height'} : 500;
-  $width = $params->{'width'} ? $params->{'width'} : 1000;
-  }
-  my $chartstyle = qq|STYLE="HEIGHT: ${height}; WIDTH: ${width}; $params->{'style'}"|;
-  my $html = qq|
+
+sub d3_chart {
+    my ( $self, $params, $dataset ) = @_;
+
+    #print qq|params: are...\n|;
+    #foreach my $f ( keys %{$params} ) { print ": params-$f=$params->{$f}\n"; }
+    #  <script type="text/javascript" src="/cgi/d3lib/my.d3.js"></script>
+    my $chartfunc = $params->{'function'};
+    my $height    = 500;
+    my $width     = 1000;
+    if ( $chartfunc !~ /line_chart/ ) {
+        $height = $params->{'height'} ? $params->{'height'} : 500;
+        $width  = $params->{'width'}  ? $params->{'width'}  : 1000;
+    }
+    my $chartstyle =
+      qq|STYLE="HEIGHT: ${height}; WIDTH: ${width}; $params->{'style'}"|;
+    my $html = qq|
 
   <div id="chart1" >
     <svg ${chartstyle} ></svg>
   </div>
 
-| . $self->$chartfunc($params,$dataset);
-#  my $html = $self->$chartfunc($params,$dataset);
-  return($html);
+| . $self->$chartfunc( $params, $dataset );
+
+    #  my $html = $self->$chartfunc($params,$dataset);
+    return ($html);
 }
-sub stackedbar_chart
-{
-  my ($self,$params,$dataset) = @_;
+
+sub stackedbar_chart {
+    my ( $self, $params, $dataset ) = @_;
+
 #$dataset = qq|
 #var data = [ { key: "Male", values: [ { "x" : "MCS Enid" , "y" : 507 } , { "x" : "MCS Talihina" , "y" : 436 } , { "x" : "MCS Norman" , "y" : 346 } , { "x" : "MCS Poteau" , "y" : 343 }, ] }, { key: "Female", values: [ { "x" : "MCS Enid" , "y" : 407 } , { "x" : "MCS Talihina" , "y" : 336 } , { "x" : "MCS Norman" , "y" : 246 } , { "x" : "MCS Poteau" , "y" : 243 }, ] }, ];
 #|;
-  my $html = qq|
+    my $html = qq|
 
   <script>
 
@@ -144,12 +155,12 @@ d3.select(".nv-legendWrap")
 </script>
 
 |;
-  return($html);
+    return ($html);
 }
-sub bar_chart
-{
-  my ($self,$params,$dataset) = @_;
-  my $html = qq|
+
+sub bar_chart {
+    my ( $self, $params, $dataset ) = @_;
+    my $html = qq|
   <script>
 
 ${dataset}
@@ -220,13 +231,12 @@ ${dataset}
 
   </script>
 |;
-  return($html);
+    return ($html);
 }
 
-sub line_chart
-{
-   my ($self,$params,$dataset) = @_;
-  my $html = qq|
+sub line_chart {
+    my ( $self, $params, $dataset ) = @_;
+    my $html = qq|
   <script>
 
   console.log('line chart')
@@ -334,111 +344,114 @@ ${dataset}
 
   </script>
 |;
-  return($html);
+    return ($html);
 }
 
-sub setKey
-{
-  my ($self,$r,$data) = @_;
-  my $key = $r->{'MyKey'};
-  my $x = $r->{'MyX'};
-  my $y = $r->{'MyY'};
-#warn qq|key=$key, x=$x, y=$y\n|;
-  push(@{$data->{$key}},$x,$y);
-  return($data);
+sub setKey {
+    my ( $self, $r, $data ) = @_;
+    my $key = $r->{'MyKey'};
+    my $x   = $r->{'MyX'};
+    my $y   = $r->{'MyY'};
+
+    #warn qq|key=$key, x=$x, y=$y\n|;
+    push( @{ $data->{$key} }, $x, $y );
+    return ($data);
 }
-sub setData
-{
-  my ($self,$d) = @_;
-  $d = $self->setyZero($d);
-  my $data = qq|
+
+sub setData {
+    my ( $self, $d ) = @_;
+    $d = $self->setyZero($d);
+    my $data = qq|
   data = 
   [
 |;
-  foreach my $v ( sort keys %{$d} )
-  {
-    $data .= qq|
+    foreach my $v ( sort keys %{$d} ) {
+        $data .= qq|
     {
       key: "${v}",
       values: [
 |;
-    my $val = 0;
-    foreach my $xy ( @{$d->{$v}} )
-    {
-      $val++;
-#warn qq|xy=$xy\n|;
-      if ( $val == 1 )
-      { $data .= qq|        { x:'${xy}', |; }
-      else
-      { $data .= qq|y:${xy} },\n|; $val = 0; }
-    }
-    $data .= qq|      ]
+        my $val = 0;
+        foreach my $xy ( @{ $d->{$v} } ) {
+            $val++;
+
+            #warn qq|xy=$xy\n|;
+            if   ( $val == 1 ) { $data .= qq|        { x:'${xy}', |; }
+            else               { $data .= qq|y:${xy} },\n|; $val = 0; }
+        }
+        $data .= qq|      ]
     },
 |;
-  }
-  $data .= qq|
+    }
+    $data .= qq|
   ];
 |;
-#warn qq|data=kls${data}kls\n|;
-#if ( $form->{LOGINPROVID} == 91 )
-#{
-  open OUT, ">>/home/okmis/mis/src/debug/graphs.out" or die "Couldn't open file: $!";
-  print OUT qq|data=\n${data}\n|;
-  close(OUT);
-#}
-  return($data);
+
+    #warn qq|data=kls${data}kls\n|;
+    #if ( $form->{LOGINPROVID} == 91 )
+    #{
+    open OUT, ">>/var/www/okmis/src/debug/graphs.out"
+      or die "Couldn't open file: $!";
+    print OUT qq|data=\n${data}\n|;
+    close(OUT);
+
+    #}
+    return ($data);
 }
-sub setyZero
-{
-  my ($self,$data) = @_;
-  my $keys = ();
-  my $xs = ();
-  my @xvalues = ();
-  foreach my $v ( sort keys %{$data} )
-  {
-    my ($val,$key,$x,$y) = (0,'','','');
-    foreach my $xy ( @{$data->{$v}} )
-    {
-      $val++;
-      if ( $val == 1 ) { $x = $xy; }
-      else
-      {
-        $y = $xy;
-        $key = "${v}_${x}_${y}";
-        $keys->{$key}->{'key'} = $v;
-        $keys->{$key}->{'x'} = $x;
-        $keys->{$key}->{'y'} = $xy;
-        push(@xvalues,$x);
-        $key = "${v}_${x}";
-        $xs->{$key} = $key; 
-        $val = 0;
-      }
+
+sub setyZero {
+    my ( $self, $data ) = @_;
+    my $keys    = ();
+    my $xs      = ();
+    my @xvalues = ();
+    foreach my $v ( sort keys %{$data} ) {
+        my ( $val, $key, $x, $y ) = ( 0, '', '', '' );
+        foreach my $xy ( @{ $data->{$v} } ) {
+            $val++;
+            if ( $val == 1 ) { $x = $xy; }
+            else {
+                $y                     = $xy;
+                $key                   = "${v}_${x}_${y}";
+                $keys->{$key}->{'key'} = $v;
+                $keys->{$key}->{'x'}   = $x;
+                $keys->{$key}->{'y'}   = $xy;
+                push( @xvalues, $x );
+                $key        = "${v}_${x}";
+                $xs->{$key} = $key;
+                $val        = 0;
+            }
+        }
     }
-  }
+
 #foreach my $f ( sort keys %{$keys} ) { warn "graph-setyZero: keys-$f=$keys->{$f}\n"; }
 #foreach my $f ( sort keys %{$xs} ) { warn "graph-setyZero: xs-$f=$xs->{$f}\n"; }
-  foreach my $v ( sort keys %{$data} )
-  {
-#warn qq|1. v=${v}\n|;
-    foreach my $x ( @xvalues )
-    {
-#warn qq|2. x=${x}\n|;
-      my $vxkey = "${v}_${x}";
-#warn qq|3. vxkey=${vxkey}\n|;
-      if ( $xs->{$vxkey} eq '' )
-      { my $key = "${v}_${x}_0"; $keys->{$key}->{'key'} = $v; $keys->{$key}->{'x'} = $x; $keys->{$key}->{'y'} = 0; }
+    foreach my $v ( sort keys %{$data} ) {
+
+        #warn qq|1. v=${v}\n|;
+        foreach my $x (@xvalues) {
+
+            #warn qq|2. x=${x}\n|;
+            my $vxkey = "${v}_${x}";
+
+            #warn qq|3. vxkey=${vxkey}\n|;
+            if ( $xs->{$vxkey} eq '' ) {
+                my $key = "${v}_${x}_0";
+                $keys->{$key}->{'key'} = $v;
+                $keys->{$key}->{'x'}   = $x;
+                $keys->{$key}->{'y'}   = 0;
+            }
+        }
     }
-  }
-  my $newdata = ();
-  foreach my $keyx ( sort keys %{$keys} )
-  {
+    my $newdata = ();
+    foreach my $keyx ( sort keys %{$keys} ) {
+
 #foreach my $v ( sort keys %{$keys->{$keyx}} ) { warn "graph-setyZero: keys-$keyx-$v=$keys->{$keyx}->{$v}\n"; }
-    my $key = $keys->{$keyx}->{'key'}; 
-    my $x = $keys->{$keyx}->{'x'}; 
-    my $y = $keys->{$keyx}->{'y'}; 
-    push(@{$newdata->{$key}},$x,$y);
-  }
-  return($newdata);
+        my $key = $keys->{$keyx}->{'key'};
+        my $x   = $keys->{$keyx}->{'x'};
+        my $y   = $keys->{$keyx}->{'y'};
+        push( @{ $newdata->{$key} }, $x, $y );
+    }
+    return ($newdata);
 }
 #############################################################################
 1;

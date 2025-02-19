@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use Accounts;
 use myConfig;
 use Cwd;
@@ -9,149 +9,189 @@ use DBUtil;
 # usage: command                    for okmis account
 ############################################################################
 # get the command name...
-my ($pw,$cmd) = $0 =~ m/(.*\/)(.*)$/;
+my ( $pw, $cmd ) = $0 =~ m/(.*\/)(.*)$/;
+
 # Build the list of NPI/Organizations to find dbs.
-my $NPIRECs=Accounts->NPIRECs(Accounts->dbs('active'));
-my $PINRECs=Accounts->PINRECs(Accounts->dbs('active'));
+my $NPIRECs = Accounts->NPIRECs( Accounts->dbs('active') );
+my $PINRECs = Accounts->PINRECs( Accounts->dbs('active') );
 my $BACKDIR = myConfig->cfg('BACKDIR');
-my $FTPDIR = myConfig->cfg('FTPDIR');
+my $FTPDIR  = myConfig->cfg('FTPDIR');
 
 ############################################################################
-if ( chdir($FTPDIR) )
-{
-  $Names = "*rsp *ERN *.era *_4010 *TRICARE";
-  my @Files = glob($Names);
-  foreach $file ( @Files )
-  {
-    print qq|\n  Process file: $file\n|;
-    if ( -f "${BACKDIR}/FTP/${file}" )
-    { print qq|>>>ERROR: ${file} ALREADY PROCESSED!\n|; next; }
-    my $tmpfile = main->flattenFile($file);
-    my @filenames = main->nameST($file,$tmpfile);
-#warn qq|unlink: ${tmpfile}\n|;
-    unlink($tmpfile);
-#warn qq|filenames=@filenames\n|;
-    my $bakfile = "${BACKDIR}/FTP/${file}";
-    print qq|  move to ${bakfile}...\n|;
-    move($file,$bakfile) or print "<<<ERROR>>>: move failed: $!";;
-  }
+if ( chdir($FTPDIR) ) {
+    $Names = "*rsp *ERN *.era *_4010 *TRICARE";
+    my @Files = glob($Names);
+    foreach $file (@Files) {
+        print qq|\n  Process file: $file\n|;
+        if ( -f "${BACKDIR}/FTP/${file}" ) {
+            print qq|>>>ERROR: ${file} ALREADY PROCESSED!\n|;
+            next;
+        }
+        my $tmpfile   = main->flattenFile($file);
+        my @filenames = main->nameST( $file, $tmpfile );
+
+        #warn qq|unlink: ${tmpfile}\n|;
+        unlink($tmpfile);
+
+        #warn qq|filenames=@filenames\n|;
+        my $bakfile = "${BACKDIR}/FTP/${file}";
+        print qq|  move to ${bakfile}...\n|;
+        move( $file, $bakfile ) or print "<<<ERROR>>>: move failed: $!";
+    }
 }
 else { print "Can't chdir to ${dir} $!"; }
 exit;
 ############################################################################
-sub flattenFile
-{
-  my ($self,$infile) = @_;
-  my $outfile = '';        # error returns null
-  my $newline = qq|\n|;    # add newline?
-  if ( $infile =~ /era$|TRICARE$/ ) { $newline = ''; }
-#warn qq|flattenFile: ${infile}\n|;
-  if ( open(INFILE,$infile) ) 
-  {
-    $outfile = DBUtil->Date('','stamp').'_'.DBUtil->genToken().'.flatten';
-#warn qq|outfile: ${outfile}\n|;
-    if ( open(OUTFILE,">${outfile}") )
-    {
-      while ( $in = <INFILE> )
-      {
-        foreach my $line ( split('~',$in) )
-        { $line =~ s/\r//g;
-          $line =~ s/﻿//g;
-          print OUTFILE qq|${line}${newline}|;
+sub flattenFile {
+    my ( $self, $infile ) = @_;
+    my $outfile = '';        # error returns null
+    my $newline = qq|\n|;    # add newline?
+    if ( $infile =~ /era$|TRICARE$/ ) { $newline = ''; }
+
+    #warn qq|flattenFile: ${infile}\n|;
+    if ( open( INFILE, $infile ) ) {
+        $outfile =
+          DBUtil->Date( '', 'stamp' ) . '_' . DBUtil->genToken() . '.flatten';
+
+        #warn qq|outfile: ${outfile}\n|;
+        if ( open( OUTFILE, ">${outfile}" ) ) {
+            while ( $in = <INFILE> ) {
+                foreach my $line ( split( '~', $in ) ) {
+                    $line =~ s/\r//g;
+                    $line =~ s/﻿//g;
+                    print OUTFILE qq|${line}${newline}|;
+                }
+            }
+            close(OUTFILE);
         }
-      }
-      close(OUTFILE);
-    } else { print qq|Couldn't open '$outfile' file: $!|; }
-    close(INFILE);
-  }
-  else { print qq|Couldn't open '${infile}' file: $!|; }
-  return($outfile);
+        else { print qq|Couldn't open '$outfile' file: $!|; }
+        close(INFILE);
+    }
+    else { print qq|Couldn't open '${infile}' file: $!|; }
+    return ($outfile);
 }
-sub nameST
-{
-  my ($self,$file,$infile) = @_;
-#warn qq|nameST: ${infile}\n|;
-  my ($hdr,$ftr,$sfx,$gsrid,$pin,$rid,$ds,$out) = ('','','','','','','','');
-  my @sts = ();
-  my @pins = ();
-  my @files = ();
-  if ( open(INFILE,$infile) ) 
-  {
-    while ( $in = <INFILE> )
-    {
-      chomp($in);
-#warn qq|\nin=${in}\n|;
-      my ($RecType,$Code,$Name,$QL1,$ID1,$Name2,$Name3,$Name4,$QL2,$ID2,$rest) = split('\*',$in,11);
-      if ( $RecType eq 'ISA' ) { $hdr = qq|${in}\n|; }
-      elsif ( $RecType eq 'GS' ) { $hdr .= qq|${in}\n|; $gsrid = $Name; $rid = $gsrid; $ds = qq|${ID1}${Name2}|; }
-      elsif ( $RecType eq 'REF' && $Code eq '2U' && $Name ne '' ) { $rid = $Name; $out .= qq|${in}\n|; }
-      elsif ( $RecType eq 'N1' && $Code eq 'PE' && $ID1 ne '' ) { $out .= qq|${in}\n|; $pin = $ID1; }
-      elsif ( $RecType eq 'NM1' && $Code eq '1P' && $ID2 ne '' ) { $out .= qq|${in}\n|; $pin = $ID2; }
-      elsif ( $RecType eq 'ST' ) { $out = qq|${in}*${file}\n|; $pin = ''; $sfx = $Code; $rid = $gsrid; } #<<<this is the start<<<
-      elsif ( $RecType eq 'SE' ) { $out .= qq|${in}\n|; push(@pins,"${pin}_${rid}_${ds}_${sfx}"); push(@sts,$out); }
-      elsif ( $RecType eq 'GE' ) { $ftr = qq|${in}\n|; }
-      elsif ( $RecType eq 'IEA' ) { $ftr .= qq|${in}\n|; }
-      else { $out .= qq|${in}\n|; }
-#warn qq|pin=${pin}, rid=${rid}, ds=${ds}, sfx=${sfx}\n|;
+
+sub nameST {
+    my ( $self, $file, $infile ) = @_;
+
+    #warn qq|nameST: ${infile}\n|;
+    my ( $hdr, $ftr, $sfx, $gsrid, $pin, $rid, $ds, $out ) =
+      ( '', '', '', '', '', '', '', '' );
+    my @sts   = ();
+    my @pins  = ();
+    my @files = ();
+    if ( open( INFILE, $infile ) ) {
+        while ( $in = <INFILE> ) {
+            chomp($in);
+
+            #warn qq|\nin=${in}\n|;
+            my (
+                $RecType, $Code,  $Name, $QL1, $ID1, $Name2,
+                $Name3,   $Name4, $QL2,  $ID2, $rest
+            ) = split( '\*', $in, 11 );
+            if    ( $RecType eq 'ISA' ) { $hdr = qq|${in}\n|; }
+            elsif ( $RecType eq 'GS' ) {
+                $hdr .= qq|${in}\n|;
+                $gsrid = $Name;
+                $rid   = $gsrid;
+                $ds    = qq|${ID1}${Name2}|;
+            }
+            elsif ( $RecType eq 'REF' && $Code eq '2U' && $Name ne '' ) {
+                $rid = $Name;
+                $out .= qq|${in}\n|;
+            }
+            elsif ( $RecType eq 'N1' && $Code eq 'PE' && $ID1 ne '' ) {
+                $out .= qq|${in}\n|;
+                $pin = $ID1;
+            }
+            elsif ( $RecType eq 'NM1' && $Code eq '1P' && $ID2 ne '' ) {
+                $out .= qq|${in}\n|;
+                $pin = $ID2;
+            }
+            elsif ( $RecType eq 'ST' ) {
+                $out = qq|${in}*${file}\n|;
+                $pin = '';
+                $sfx = $Code;
+                $rid = $gsrid;
+            }    #<<<this is the start<<<
+            elsif ( $RecType eq 'SE' ) {
+                $out .= qq|${in}\n|;
+                push( @pins, "${pin}_${rid}_${ds}_${sfx}" );
+                push( @sts,  $out );
+            }
+            elsif ( $RecType eq 'GE' )  { $ftr = qq|${in}\n|; }
+            elsif ( $RecType eq 'IEA' ) { $ftr .= qq|${in}\n|; }
+            else                        { $out .= qq|${in}\n|; }
+
+            #warn qq|pin=${pin}, rid=${rid}, ds=${ds}, sfx=${sfx}\n|;
+        }
+        close(INFILE);
     }
-    close(INFILE);
-  }
-  else { print qq|Couldn't open '${infile}' file: $!|; }
-#warn qq|\nhdr=${hdr}\n|;
-#warn qq|\nftr=${ftr}\n|;
-#foreach $st ( @sts ) { warn qq|\nst=${st}\n|; }
-  my $i=0;
-  foreach $pin ( @pins )
-  {
-#warn qq|pin=${pin}=\n|;
-    my ($ID,$RID,$DS,$SFX) = split('_',$pin);
-    $ID = 'ERROR' if ( $ID eq '' );
-#warn qq|ID=${ID}=, RID=${RID}=, DS=${DS}=, SFX=${SFX}=\n|;
-# change to look back for old medicare RecID...
-$RID='04312' if ( $RID eq '04302' );
-    my $key = qq|${ID}_${RID}|;          # combine NPI with RecID from Insurance
-warn qq|key=${key}=\n|;
-    my $DB = $NPIRECs->{$key}->{DB};
-    my $Descr = $NPIRECs->{$key}->{Descr};
+    else { print qq|Couldn't open '${infile}' file: $!|; }
+
+    #warn qq|\nhdr=${hdr}\n|;
+    #warn qq|\nftr=${ftr}\n|;
+    #foreach $st ( @sts ) { warn qq|\nst=${st}\n|; }
+    my $i = 0;
+    foreach $pin (@pins) {
+
+        #warn qq|pin=${pin}=\n|;
+        my ( $ID, $RID, $DS, $SFX ) = split( '_', $pin );
+        $ID = 'ERROR' if ( $ID eq '' );
+
+        #warn qq|ID=${ID}=, RID=${RID}=, DS=${DS}=, SFX=${SFX}=\n|;
+        # change to look back for old medicare RecID...
+        $RID = '04312' if ( $RID eq '04302' );
+        my $key = qq|${ID}_${RID}|;    # combine NPI with RecID from Insurance
+        warn qq|key=${key}=\n|;
+        my $DB    = $NPIRECs->{$key}->{DB};
+        my $Descr = $NPIRECs->{$key}->{Descr};
 ## next 5 lines are output/print only...
-    my $RecID = $NPIRECs->{$key}->{RecID};
-    my $SubID = $NPIRECs->{$key}->{SubID};
-    my $Name = $NPIRECs->{$key}->{Name};
-    my $NPI = $NPIRECs->{$key}->{NPI};
-    my $OrgID = $NPIRECs->{$key}->{OrgID};
-    if ( $DB eq '' )     # check the PIN_RecID
-    {
-      $DB = $PINRECs->{$key}->{DB};
-      $Descr = $PINRECs->{$key}->{Descr};
+        my $RecID = $NPIRECs->{$key}->{RecID};
+        my $SubID = $NPIRECs->{$key}->{SubID};
+        my $Name  = $NPIRECs->{$key}->{Name};
+        my $NPI   = $NPIRECs->{$key}->{NPI};
+        my $OrgID = $NPIRECs->{$key}->{OrgID};
+
+        if ( $DB eq '' )               # check the PIN_RecID
+        {
+            $DB    = $PINRECs->{$key}->{DB};
+            $Descr = $PINRECs->{$key}->{Descr};
 ## next 5 lines are output/print only...
-      $RecID = $PINRECs->{$key}->{RecID};
-      $SubID = $PINRECs->{$key}->{SubID};
-      $Name = $PINRECs->{$key}->{Name};
-      $NPI = $PINRECs->{$key}->{NPI};
-      $OrgID = $PINRECs->{$key}->{OrgID};
-    }
-    print qq|\nERROR>>> DB or Insurance missing!\n| if ( $DB eq '' || $Descr eq '' );
-    my $fn = "${DB}.${ID}.${Descr}.${DS}.".DBUtil->genToken().".${SFX}";
-#warn qq|fn=${fn}=\n|;
-# hdr is the ISA/GS, ftr is the GE/IEA.
-    push(@files,$fn) if ( main->dumpST($fn,"${hdr}$sts[$i]${ftr}") );
-    $i++;
+            $RecID = $PINRECs->{$key}->{RecID};
+            $SubID = $PINRECs->{$key}->{SubID};
+            $Name  = $PINRECs->{$key}->{Name};
+            $NPI   = $PINRECs->{$key}->{NPI};
+            $OrgID = $PINRECs->{$key}->{OrgID};
+        }
+        print qq|\nERROR>>> DB or Insurance missing!\n|
+          if ( $DB eq '' || $Descr eq '' );
+        my $fn = "${DB}.${ID}.${Descr}.${DS}." . DBUtil->genToken() . ".${SFX}";
+
+        #warn qq|fn=${fn}=\n|;
+        # hdr is the ISA/GS, ftr is the GE/IEA.
+        push( @files, $fn ) if ( main->dumpST( $fn, "${hdr}$sts[$i]${ftr}" ) );
+        $i++;
 ## next 6 lines are output/print only...
-    my $DB = DBUtil->FmtStr($DB,12,'L');
-    my $Descr = DBUtil->FmtStr($Descr,10,'L');
-    my $RecID = DBUtil->FmtStr($RecID,15,'L');
-    my $SubID = DBUtil->FmtStr($SubID,15,'L');
-    my $Name = DBUtil->FmtStr($Name,30,'L');
-    print qq|${Name} ${DB} ${Descr} ${RecID} ${SubID} (${NPI} / ${OrgID})\n|;
-  }
-  return(@files);
+        my $DB    = DBUtil->FmtStr( $DB,    12, 'L' );
+        my $Descr = DBUtil->FmtStr( $Descr, 10, 'L' );
+        my $RecID = DBUtil->FmtStr( $RecID, 15, 'L' );
+        my $SubID = DBUtil->FmtStr( $SubID, 15, 'L' );
+        my $Name  = DBUtil->FmtStr( $Name,  30, 'L' );
+        print
+          qq|${Name} ${DB} ${Descr} ${RecID} ${SubID} (${NPI} / ${OrgID})\n|;
+    }
+    return (@files);
 }
-sub dumpST
-{
-  my ($self,$outfile,$text) = @_;
-  my $code=1;
-  if ( open(OUTFILE,">${outfile}") )
-  { print OUTFILE $text; close(OUTFILE); $code=1; }
-  else { print "Couldn't open ${outfile}! $!"; $code=0; }
-  return($code);
+
+sub dumpST {
+    my ( $self, $outfile, $text ) = @_;
+    my $code = 1;
+    if ( open( OUTFILE, ">${outfile}" ) ) {
+        print OUTFILE $text;
+        close(OUTFILE);
+        $code = 1;
+    }
+    else { print "Couldn't open ${outfile}! $!"; $code = 0; }
+    return ($code);
 }

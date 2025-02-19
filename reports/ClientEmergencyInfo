@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 use DBA;
@@ -11,17 +11,25 @@ $DT = localtime();
 #   CliemtEmergencyInfo ForProvID=id
 ############################################################################
 my $form = DBForm->new();
-my $dbh = $form->dbconnect();
+my $dbh  = $form->dbconnect();
+
 #foreach my $f ( sort keys %{$form} ) { warn "ClientEmergencyInfo: form-$f=$form->{$f}\n"; }
 
 my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
 $sProvider = $dbh->prepare("select * from Provider where ProvID=?");
-$sClientEmergency = $dbh->prepare("select * from ClientEmergency where ClientID=?");
-$sGuardian = $dbh->prepare("select * from ClientFamily where ClientID=? and Guardian=1 and Active=1 order by RecDOLC desc");
-$sEContact = $dbh->prepare("select * from ClientFamily where ClientID=? and EmerContact=1 and Active=1 order by RecDOLC desc");
+$sClientEmergency =
+  $dbh->prepare("select * from ClientEmergency where ClientID=?");
+$sGuardian = $dbh->prepare(
+"select * from ClientFamily where ClientID=? and Guardian=1 and Active=1 order by RecDOLC desc"
+);
+$sEContact = $dbh->prepare(
+"select * from ClientFamily where ClientID=? and EmerContact=1 and Active=1 order by RecDOLC desc"
+);
 my $multidel = 'ý';
 ############################################################################
-my $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID','where');
+my $ClinicSelection =
+  DBA->getClinicSelection( $form, $ForProvID, 'Client.clinicClinicID',
+    'where' );
 $ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
 $qClient = qq|
   select Provider.Name as Clinic
@@ -38,46 +46,57 @@ $qClient = qq|
   ${ClinicSelection}
   order by Provider.Name, Client.LName, Client.FName
 |;
+
 # and Client.ClientID=49121
 #warn qq|q=\n$qClient\n|;
 ############################################################################
 print qq|${DT}\nClient Emergency Information Report\n|;
-print qq|Agency\tClinic\tClientID\tActive\tFName\tLName\tAddr1\tAddr2\tCity\tST\tZip\tHomePhone\tWorkPhone\tAlert\tDOB\tGend\tRace\tSSN\tAge\tPrimary Provider\tDNR\tAD\tLW\n|;
+print
+qq|Agency\tClinic\tClientID\tActive\tFName\tLName\tAddr1\tAddr2\tCity\tST\tZip\tHomePhone\tWorkPhone\tAlert\tDOB\tGend\tRace\tSSN\tAge\tPrimary Provider\tDNR\tAD\tLW\n|;
 my $sClient = $dbh->prepare($qClient);
 $sClient->execute() || $form->dberror($qClient);
-while ( my $rClient = $sClient->fetchrow_hashref )
-{
-  my $Client = "$rClient->{LName}, $rClient->{FName} ($rClient->{ClientID})";
-  my $Active = $rClient->{'Active'} == 1 ? 'yes' : 'no';
-  $sProvider->execute($rClient->{PrimaryProvID});
-  my $rProvider = $sProvider->fetchrow_hashref;
-  my $Primary = qq|$rProvider->{LName}, $rProvider->{FName} ($rProvider->{ProvID})|;
-  
-  my $AgencyID = MgrTree->getAgency($form,$rClient->{clinicClinicID});
-  $sProvider->execute($AgencyID);
-  my $rAgency = $sProvider->fetchrow_hashref;
+while ( my $rClient = $sClient->fetchrow_hashref ) {
+    my $Client = "$rClient->{LName}, $rClient->{FName} ($rClient->{ClientID})";
+    my $Active = $rClient->{'Active'} == 1 ? 'yes' : 'no';
+    $sProvider->execute( $rClient->{PrimaryProvID} );
+    my $rProvider = $sProvider->fetchrow_hashref;
+    my $Primary =
+      qq|$rProvider->{LName}, $rProvider->{FName} ($rProvider->{ProvID})|;
 
-  $sClientEmergency->execute($rClient->{ClientID});
-  my $rClientEmergency = $sClientEmergency->fetchrow_hashref;
-  my $DNR = $rClientEmergency->{'DNR'} == 1 ? 'yes' : 'no';
-  my $AD = $rClientEmergency->{'AD'} == 1 ? 'yes' : 'no';
-  my $LW = $rClientEmergency->{'LW'} == 1 ? 'yes' : 'no';
-  my $rPhysician = DBA->selxref($form,'xNPI','NPI',$rClientEmergency->{'PhysNPI'});
-  my $rHospital = DBA->selxref($form,'xNPI','NPI',$rClientEmergency->{'DesigHospNPI'});
-  my $rPharmacy = DBA->selxref($form,'xNPI','NPI',$rClientEmergency->{'PharmacyNPI'});
+    my $AgencyID = MgrTree->getAgency( $form, $rClient->{clinicClinicID} );
+    $sProvider->execute($AgencyID);
+    my $rAgency = $sProvider->fetchrow_hashref;
 
-  $sGuardian->execute($rClient->{ClientID});
-  my $rGuardian = $sGuardian->fetchrow_hashref;
+    $sClientEmergency->execute( $rClient->{ClientID} );
+    my $rClientEmergency = $sClientEmergency->fetchrow_hashref;
+    my $DNR              = $rClientEmergency->{'DNR'} == 1 ? 'yes' : 'no';
+    my $AD               = $rClientEmergency->{'AD'} == 1  ? 'yes' : 'no';
+    my $LW               = $rClientEmergency->{'LW'} == 1  ? 'yes' : 'no';
+    my $rPhysician =
+      DBA->selxref( $form, 'xNPI', 'NPI', $rClientEmergency->{'PhysNPI'} );
+    my $rHospital =
+      DBA->selxref( $form, 'xNPI', 'NPI', $rClientEmergency->{'DesigHospNPI'} );
+    my $rPharmacy =
+      DBA->selxref( $form, 'xNPI', 'NPI', $rClientEmergency->{'PharmacyNPI'} );
 
-  $sEContact->execute($rClient->{ClientID});
-  my $rEContact = $sEContact->fetchrow_hashref;
+    $sGuardian->execute( $rClient->{ClientID} );
+    my $rGuardian = $sGuardian->fetchrow_hashref;
 
-  print qq|$rAgency->{'Name'}\t$rClient->{'Clinic'}\t$rClient->{'ClientID'}\t${Active}\t$rClient->{'FName'}\t$rClient->{'LName'}\t$rClient->{'Addr1'}\t$rClient->{'Addr2'}\t$rClient->{'City'}\t$rClient->{'ST'}\t$rClient->{'Zip'}\t$rClient->{'HmPh'}\t$rClient->{'WkPh'}\t$rClientEmergency->{'Alert'}\t$rClient->{'DOB'}\t$rClient->{'Gend'}\t$rClient->{'Race'}\t$rClient->{'SSN'}\t$rClient->{'Age'}\t${Primary}\t${DNR}\t${AD}\t${LW} \n|;
-  print qq|\t\t$rClient->{'ClientID'}\tGuardian\t$rGuardian->{FName}\t$rGuardian->{LName}\t$rGuardian->{Addr1}\t$rGuardian->{Addr2}\t$rGuardian->{'City'}\t$rGuardian->{'ST'}\t$rGuardian->{'Zip'}\t$rGuardian->{'HmPh'}\t$rGuardian->{'WkPh'} \n|;
-  print qq|\t\t$rClient->{'ClientID'}\tEmergency Contact\t$rEContact->{'FName'}\t$rEContact->{'LName'}\t$rEContact->{'Addr1'}\t$rEContact->{'Addr2'}\t$rEContact->{'City'}\t$rEContact->{'ST'}\t$rEContact->{'Zip'}\t$rEContact->{'HmPh'}\t$rEContact->{'WkPh'} \n|;
-  print qq|\t\t$rClient->{'ClientID'}\tPrimary Care Physician\t$rPhysician->{'ProvFirstName'}\t$rPhysician->{'ProvLastName'}\t$rPhysician->{'Addr1'}\t$rPhysician->{'Addr2'}\t$rPhysician->{'City'}\t$rPhysician->{'ST'}\t$rPhysician->{'Zip'}\t$rPhysician->{'HmPh'}\t$rPhysician->{'WkPh'} \n|;
-  print qq|\t\t$rClient->{'ClientID'}\tDesignated Hospital\t$rHospital->{'ProvOrgName'}\t\t$rHospital->{'Addr1'}\t$rHospital->{'Addr2'}\t$rHospital->{'City'}\t$rHospital->{'ST'}\t$rHospital->{'Zip'}\t$rHospital->{'HmPh'}\t$rHospital->{'WkPh'} \n|;
-  print qq|\t\t$rClient->{'ClientID'}\tDesignated Pharmacy\t$rPharmacy->{'ProvOrgName'}\t\t$rPharmacy->{'Addr1'}\t$rPharmacy->{'Addr2'}\t$rPharmacy->{'City'}\t$rPharmacy->{'ST'}\t$rPharmacy->{'Zip'}\t$rPharmacy->{'HmPh'}\t$rPharmacy->{'WkPh'} \n|;
+    $sEContact->execute( $rClient->{ClientID} );
+    my $rEContact = $sEContact->fetchrow_hashref;
+
+    print
+qq|$rAgency->{'Name'}\t$rClient->{'Clinic'}\t$rClient->{'ClientID'}\t${Active}\t$rClient->{'FName'}\t$rClient->{'LName'}\t$rClient->{'Addr1'}\t$rClient->{'Addr2'}\t$rClient->{'City'}\t$rClient->{'ST'}\t$rClient->{'Zip'}\t$rClient->{'HmPh'}\t$rClient->{'WkPh'}\t$rClientEmergency->{'Alert'}\t$rClient->{'DOB'}\t$rClient->{'Gend'}\t$rClient->{'Race'}\t$rClient->{'SSN'}\t$rClient->{'Age'}\t${Primary}\t${DNR}\t${AD}\t${LW} \n|;
+    print
+qq|\t\t$rClient->{'ClientID'}\tGuardian\t$rGuardian->{FName}\t$rGuardian->{LName}\t$rGuardian->{Addr1}\t$rGuardian->{Addr2}\t$rGuardian->{'City'}\t$rGuardian->{'ST'}\t$rGuardian->{'Zip'}\t$rGuardian->{'HmPh'}\t$rGuardian->{'WkPh'} \n|;
+    print
+qq|\t\t$rClient->{'ClientID'}\tEmergency Contact\t$rEContact->{'FName'}\t$rEContact->{'LName'}\t$rEContact->{'Addr1'}\t$rEContact->{'Addr2'}\t$rEContact->{'City'}\t$rEContact->{'ST'}\t$rEContact->{'Zip'}\t$rEContact->{'HmPh'}\t$rEContact->{'WkPh'} \n|;
+    print
+qq|\t\t$rClient->{'ClientID'}\tPrimary Care Physician\t$rPhysician->{'ProvFirstName'}\t$rPhysician->{'ProvLastName'}\t$rPhysician->{'Addr1'}\t$rPhysician->{'Addr2'}\t$rPhysician->{'City'}\t$rPhysician->{'ST'}\t$rPhysician->{'Zip'}\t$rPhysician->{'HmPh'}\t$rPhysician->{'WkPh'} \n|;
+    print
+qq|\t\t$rClient->{'ClientID'}\tDesignated Hospital\t$rHospital->{'ProvOrgName'}\t\t$rHospital->{'Addr1'}\t$rHospital->{'Addr2'}\t$rHospital->{'City'}\t$rHospital->{'ST'}\t$rHospital->{'Zip'}\t$rHospital->{'HmPh'}\t$rHospital->{'WkPh'} \n|;
+    print
+qq|\t\t$rClient->{'ClientID'}\tDesignated Pharmacy\t$rPharmacy->{'ProvOrgName'}\t\t$rPharmacy->{'Addr1'}\t$rPharmacy->{'Addr2'}\t$rPharmacy->{'City'}\t$rPharmacy->{'ST'}\t$rPharmacy->{'Zip'}\t$rPharmacy->{'HmPh'}\t$rPharmacy->{'WkPh'} \n|;
 }
 $sClient->finish();
 $sProvider->finish();

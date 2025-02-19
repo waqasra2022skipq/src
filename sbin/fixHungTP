@@ -1,24 +1,25 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
-use  DBI;
-use  DBForm;
-use  DBA;
+use lib '/var/www/okmis/src/lib';
+use DBI;
+use DBForm;
+use DBA;
 ############################################################################
 # This routine removes the dangling TrPlanS record.
 ############################################################################
 my $form = DBForm->new();
-my $dbh = $form->dbconnect();
-my $qHungTP = qq|select TrPlanS.TrPlanID,TrPlanS.ID from TrPlanS left join TrPlan on TrPlan.TrPlanID=TrPlanS.TrPlanID where TrPlan.TrPlanID is null|;
-my $sHungTP=$dbh->prepare($qHungTP);
+my $dbh  = $form->dbconnect();
+my $qHungTP =
+qq|select TrPlanS.TrPlanID,TrPlanS.ID from TrPlanS left join TrPlan on TrPlan.TrPlanID=TrPlanS.TrPlanID where TrPlan.TrPlanID is null|;
+my $sHungTP  = $dbh->prepare($qHungTP);
 my $qHungDEL = qq|delete from TrPlanS where ID=?|;
 my $sHungDEL = $dbh->prepare($qHungDEL);
 $sHungTP->execute() || $form->dberror($qHungTP);
 my $cnt = $sHungTP->rows;
-while ( my ($TrPlanID,$ID) = $sHungTP->fetchrow_array ) 
-{ 
-  print qq|  delete ID:${ID} for TrPlanID:${TrPlanID}.\n|;
-  $sHungDEL->execute($ID) || $form->dberror($qHungDEL);
-  $sHungDEL->finish();
+
+while ( my ( $TrPlanID, $ID ) = $sHungTP->fetchrow_array ) {
+    print qq|  delete ID:${ID} for TrPlanID:${TrPlanID}.\n|;
+    $sHungDEL->execute($ID) || $form->dberror($qHungDEL);
+    $sHungDEL->finish();
 }
 $sHungDEL->finish();
 $sHungTP->finish();

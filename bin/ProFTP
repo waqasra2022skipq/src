@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ############################################################################
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use myForm;
 use myDBI;
 use SysAccess;
@@ -10,234 +10,277 @@ use File::Copy;
 use Cwd;
 
 ############################################################################
-my $form = myForm->new();
-my $dbh = myDBI->dbconnect($form->{'DBNAME'});
-my $cdbh = myDBI->dbconnect('okmis_config');
+my $form  = myForm->new();
+my $dbh   = myDBI->dbconnect( $form->{'DBNAME'} );
+my $cdbh  = myDBI->dbconnect('okmis_config');
 my $debug = $form->{'debug'};
 
-if ( $debug ) { foreach my $f ( sort keys %{$form} ) { print "ProFTP: form-$f=$form->{$f}\n"; } }
+if ($debug) {
+    foreach my $f ( sort keys %{$form} ) {
+        print "ProFTP: form-$f=$form->{$f}\n";
+    }
+}
 
-print qq|ENTER: ProFTP, DBNAME=$form->{'DBNAME'}, type=$form->{'type'}\n| if ( $debug );
+print qq|ENTER: ProFTP, DBNAME=$form->{'DBNAME'}, type=$form->{'type'}\n|
+  if ($debug);
 
 my $type = $form->{'type'};
-if ( $type eq '' )
-{ myDBI->error("ProFTP: type CANNOT be NULL!"); }
+if ( $type eq '' ) { myDBI->error("ProFTP: type CANNOT be NULL!"); }
 
 # Access Required.
-if ( ! SysAccess->chkPriv($form,'Agent') )
-{ myDBI->error("ProFTP: Access DENIED!"); }
+if ( !SysAccess->chkPriv( $form, 'Agent' ) ) {
+    myDBI->error("ProFTP: Access DENIED!");
+}
 
 # get the command name...
-my ($pw,$cmd) = $0 =~ m/(.*\/)(.*)$/;
+my ( $pw, $cmd ) = $0 =~ m/(.*\/)(.*)$/;
 
 # setup the configuration...
-my $BACKDIR = myConfig->cfg('BACKDIR');
+my $BACKDIR  = myConfig->cfg('BACKDIR');
 my $ADMINDIR = myConfig->cfg('ADMINDIR');
-my $dirpath = qq|${ADMINDIR}/${type}|;
+my $dirpath  = qq|${ADMINDIR}/${type}|;
+
 # Build the list of NPI/Organizations to find dbs.
-my $sNPIREC = $cdbh->prepare("select * from AgencyContracts where NPI=? and RecID=?");
-my $sPINREC = $cdbh->prepare("select * from AgencyContracts where PIN=? and RecID=?");
-my $sNPIPIN = $cdbh->prepare("select * from AgencyContracts where NPI=? and PIN=?");
+my $sNPIREC =
+  $cdbh->prepare("select * from AgencyContracts where NPI=? and RecID=?");
+my $sPINREC =
+  $cdbh->prepare("select * from AgencyContracts where PIN=? and RecID=?");
+my $sNPIPIN =
+  $cdbh->prepare("select * from AgencyContracts where NPI=? and PIN=?");
 
 ############################################################################
-print qq|\n${cmd} Started: |.localtime().qq|\n\n|;
+print qq|\n${cmd} Started: | . localtime() . qq|\n\n|;
 
 exit if ( $debug == 2 );
-if ( chdir($dirpath) )
-{
-  chdir($dirpath);
-  my $pwd=cwd();
-  print qq|ProFTP: pwd=${pwd}\n| if ( $debug );
-  my $cnt = 0;
-  my $Names = $type eq '835' ? "*rsp *ERN *.era *_4010 *TRICARE"
-            : $type eq '271' ? "*271.rsp"
-            : 'Unknown';
-  my @Files = glob($Names);
-  foreach $file ( @Files )
-  {
-    $cnt++;
-    print qq|\n  Process file: $file\n|;
-    if ( -f "${BACKDIR}/${type}/${file}" )
-    {
-      print qq|>>>ERROR: ${file} ALREADY PROCESSED!\n|;
-      print qq|  move to done...\n|;
-      move($file,"done") or print "<<<ERROR>>>: move failed: $!";;
-      next; 
+if ( chdir($dirpath) ) {
+    chdir($dirpath);
+    my $pwd = cwd();
+    print qq|ProFTP: pwd=${pwd}\n| if ($debug);
+    my $cnt = 0;
+    my $Names =
+        $type eq '835' ? "*rsp *ERN *.era *_4010 *TRICARE"
+      : $type eq '271' ? "*271.rsp"
+      :                  'Unknown';
+    my @Files = glob($Names);
+    foreach $file (@Files) {
+        $cnt++;
+        print qq|\n  Process file: $file\n|;
+        if ( -f "${BACKDIR}/${type}/${file}" ) {
+            print qq|>>>ERROR: ${file} ALREADY PROCESSED!\n|;
+            print qq|  move to done...\n|;
+            move( $file, "done" ) or print "<<<ERROR>>>: move failed: $!";
+            next;
+        }
+        my $tmpfile   = main->flattenFile($file);
+        my @filenames = main->nameST( $file, $tmpfile );
+
+        print qq|unlink: ${tmpfile}\n| if ($debug);
+
+        unlink($tmpfile);
+        my $bakfile = "${BACKDIR}/${type}/${file}";
+        print qq|  move to ${bakfile}...\n|;
+        move( $file, $bakfile ) or print "<<<ERROR>>>: move failed: $!";
     }
-    my $tmpfile = main->flattenFile($file);
-    my @filenames = main->nameST($file,$tmpfile);
-
-    print qq|unlink: ${tmpfile}\n| if ( $debug );
-
-    unlink($tmpfile);
-    my $bakfile = "${BACKDIR}/${type}/${file}";
-    print qq|  move to ${bakfile}...\n|;
-    move($file,$bakfile) or print "<<<ERROR>>>: move failed: $!";;
-  }
-  print qq|${cnt} files processed.\n|;
+    print qq|${cnt} files processed.\n|;
 }
 else { print "Can't chdir to ${dirpath} $!"; }
-print qq|\n${cmd} Completed: |.localtime().qq|\n|;
-  
+print qq|\n${cmd} Completed: | . localtime() . qq|\n|;
+
 $sNPIREC->finish();
 $sPINREC->finish();
 $sNPIPIN->finish();
 myDBI->cleanup();
 exit;
 ############################################################################
-sub flattenFile
-{
-  my ($self,$infile) = @_;
-  my $outfile = '';        # error returns null
-  my $newline = qq|\n|;    # add newline?
-  if ( $infile =~ /era$|TRICARE$/ ) { $newline = ''; }
+sub flattenFile {
+    my ( $self, $infile ) = @_;
+    my $outfile = '';        # error returns null
+    my $newline = qq|\n|;    # add newline?
+    if ( $infile =~ /era$|TRICARE$/ ) { $newline = ''; }
 
-  print qq|flattenFile: ${infile}\n| if ( $debug );
+    print qq|flattenFile: ${infile}\n| if ($debug);
 
-  if ( open(INFILE,$infile) ) 
-  {
-    $outfile = DBUtil->Date('','stamp').'_'.DBUtil->genToken().'.flatten';
+    if ( open( INFILE, $infile ) ) {
+        $outfile =
+          DBUtil->Date( '', 'stamp' ) . '_' . DBUtil->genToken() . '.flatten';
 
-    print qq|outfile: ${outfile}\n| if ( $debug );
+        print qq|outfile: ${outfile}\n| if ($debug);
 
-    if ( open(OUTFILE,">${outfile}") )
-    {
-      while ( $in = <INFILE> )
-      {
-        foreach my $line ( split('~',$in) )
-        { $line =~ s/\r//g;
-          $line =~ s/﻿//g;
-          print OUTFILE qq|${line}${newline}|;
+        if ( open( OUTFILE, ">${outfile}" ) ) {
+            while ( $in = <INFILE> ) {
+                foreach my $line ( split( '~', $in ) ) {
+                    $line =~ s/\r//g;
+                    $line =~ s/﻿//g;
+                    print OUTFILE qq|${line}${newline}|;
+                }
+            }
+            close(OUTFILE);
         }
-      }
-      close(OUTFILE);
-    } else { print qq|Couldn't open '$outfile' file: $!|; }
-    close(INFILE);
-  }
-  else { print qq|Couldn't open '${infile}' file: $!|; }
-  return($outfile);
+        else { print qq|Couldn't open '$outfile' file: $!|; }
+        close(INFILE);
+    }
+    else { print qq|Couldn't open '${infile}' file: $!|; }
+    return ($outfile);
 }
-sub nameST
-{
-  my ($self,$file,$infile) = @_;
 
-  print qq|nameST: ${infile}\n| if ( $debug );
+sub nameST {
+    my ( $self, $file, $infile ) = @_;
 
-  my ($hdr,$ftr,$sfx,$gsrid,$pin,$rid,$ds,$out) = ('','','','','','','','');
-  my @sts = ();
-  my @pins = ();
-  my @files = ();
-  if ( open(INFILE,$infile) ) 
-  {
-    while ( $in = <INFILE> )
-    {
-      chomp($in);
+    print qq|nameST: ${infile}\n| if ($debug);
 
-      print qq|\nin=${in}\n| if ( $debug );
+    my ( $hdr, $ftr, $sfx, $gsrid, $pin, $rid, $ds, $out ) =
+      ( '', '', '', '', '', '', '', '' );
+    my @sts   = ();
+    my @pins  = ();
+    my @files = ();
+    if ( open( INFILE, $infile ) ) {
+        while ( $in = <INFILE> ) {
+            chomp($in);
 
-      my ($RecType,$Code,$Name,$QL1,$ID1,$Name2,$Name3,$Name4,$QL2,$ID2,$rest) = split('\*',$in,11);
-      if ( $RecType eq 'ISA' ) { $hdr = qq|${in}\n|; }
-      elsif ( $RecType eq 'GS' ) { $hdr .= qq|${in}\n|; $gsrid = $Name; $rid = $gsrid; $ds = qq|${ID1}${Name2}|; }
-      elsif ( $RecType eq 'REF' && ($Code eq '2U' || $Code eq 'TJ') && $Name ne '' ) { $rid = $Name; $out .= qq|${in}\n|; }
-      elsif ( $RecType eq 'N1' && $Code eq 'PE' && $ID1 ne '' ) { $out .= qq|${in}\n|; $pin = $ID1; }
-      elsif ( $RecType eq 'NM1' && $Code eq '1P' && $ID2 ne '' ) { $out .= qq|${in}\n|; $pin = $ID2; }
-      elsif ( $RecType eq 'ST' ) { $out = qq|${in}*${file}\n|; $pin = ''; $sfx = $Code; $rid = $gsrid; } #<<<this is the start<<<
-      elsif ( $RecType eq 'SE' ) { $out .= qq|${in}\n|; push(@pins,"${pin}_${rid}_${ds}_${sfx}"); push(@sts,$out); }
-      elsif ( $RecType eq 'GE' ) { $ftr = qq|${in}\n|; }
-      elsif ( $RecType eq 'IEA' ) { $ftr .= qq|${in}\n|; }
-      else { $out .= qq|${in}\n|; }
+            print qq|\nin=${in}\n| if ($debug);
 
-      print qq|pin=${pin}, rid=${rid}, ds=${ds}, sfx=${sfx}\n| if ( $debug );
+            my (
+                $RecType, $Code,  $Name, $QL1, $ID1, $Name2,
+                $Name3,   $Name4, $QL2,  $ID2, $rest
+            ) = split( '\*', $in, 11 );
+            if    ( $RecType eq 'ISA' ) { $hdr = qq|${in}\n|; }
+            elsif ( $RecType eq 'GS' ) {
+                $hdr .= qq|${in}\n|;
+                $gsrid = $Name;
+                $rid   = $gsrid;
+                $ds    = qq|${ID1}${Name2}|;
+            }
+            elsif ( $RecType eq 'REF'
+                && ( $Code eq '2U' || $Code eq 'TJ' )
+                && $Name ne '' )
+            {
+                $rid = $Name;
+                $out .= qq|${in}\n|;
+            }
+            elsif ( $RecType eq 'N1' && $Code eq 'PE' && $ID1 ne '' ) {
+                $out .= qq|${in}\n|;
+                $pin = $ID1;
+            }
+            elsif ( $RecType eq 'NM1' && $Code eq '1P' && $ID2 ne '' ) {
+                $out .= qq|${in}\n|;
+                $pin = $ID2;
+            }
+            elsif ( $RecType eq 'ST' ) {
+                $out = qq|${in}*${file}\n|;
+                $pin = '';
+                $sfx = $Code;
+                $rid = $gsrid;
+            }    #<<<this is the start<<<
+            elsif ( $RecType eq 'SE' ) {
+                $out .= qq|${in}\n|;
+                push( @pins, "${pin}_${rid}_${ds}_${sfx}" );
+                push( @sts,  $out );
+            }
+            elsif ( $RecType eq 'GE' )  { $ftr = qq|${in}\n|; }
+            elsif ( $RecType eq 'IEA' ) { $ftr .= qq|${in}\n|; }
+            else                        { $out .= qq|${in}\n|; }
 
+            print qq|pin=${pin}, rid=${rid}, ds=${ds}, sfx=${sfx}\n|
+              if ($debug);
+
+        }
+        close(INFILE);
     }
-    close(INFILE);
-  }
-  else { print qq|Couldn't open '${infile}' file: $!|; }
+    else { print qq|Couldn't open '${infile}' file: $!|; }
 
-  print qq|\nhdr=${hdr}\n| if ( $debug );
-  print qq|\nftr=${ftr}\n| if ( $debug );
-  if ( $debug ) { foreach $st ( @sts ) { print qq|\nst=${st}\n|; } }
-
-  my $i=0;
-  foreach $pin ( @pins )
-  {
-
-    print qq|pin=${pin}=\n| if ( $debug );
-
-    my ($ID,$RID,$DS,$SFX) = split('_',$pin);
-    $ID = 'ERROR' if ( $ID eq '' );
-
-    print qq|ID=${ID}=, RID=${RID}=, DS=${DS}=, SFX=${SFX}=\n| if ( $debug );
-
-    # change to look back for old medicare RecID...
-    $RID='04312' if ( $RID eq '04302' );
-
-    # 837 submissions are sent as Humana Health Horizons (61101) and the 835 returns as Humana Claims (61101)
-    $RID='61101' if ( $RID =~ /humana/i );
-
-    # 837 submissions are sent as Oklahoma Complete Health (68069) and the 835 returns as Louisiana Health Care Co
-    $RID='68069' if ( $RID =~ /Louisiana/i );
-
-    my ($DB,$Descr,$RecID,$SubID,$Name,$NPI,$OrgID) = ('','','','','','','');
-    #   select by NPI,RecID?
-    $sNPIREC->execute($ID,$RID) || myDBI->dberror("ProFTP: select AgencyContracts: ${ID}/${RID}");
-
-    my $rAgencyContract;
-    if ( my $rNPIREC = $sNPIREC->fetchrow_hashref )
-    {
-      $rAgencyContract = $rNPIREC;
-    }
-    else
-    {
-      #     select by PIN,RecID?
-      $sPINREC->execute($ID,$RID) || myDBI->dberror("ProFTP: select AgencyContracts: ${ID}/${RID}");
-      if ( my $rPINREC = $sPINREC->fetchrow_hashref )
-      {
-        $rAgencyContract = $rPINREC;
-      } else {
-        #     select by NPI,PIN?
-        $sNPIPIN->execute($ID,$RID) || myDBI->dberror("ProFTP: select AgencyContracts: ${NPI}/${PIN}");
-        if ( my $rNPIPIN = $sNPIPIN->fetchrow_hashref )
-        {
-          $rAgencyContract = $rNPIPIN;
-        } 
-      }
+    print qq|\nhdr=${hdr}\n| if ($debug);
+    print qq|\nftr=${ftr}\n| if ($debug);
+    if ($debug) {
+        foreach $st (@sts) { print qq|\nst=${st}\n|; }
     }
 
-    if($rAgencyContract ne '') {
-      $DB = $rAgencyContract->{DB};
-      $Descr = $rAgencyContract->{Descr};
-      ## next 5 lines are output/print only...
-      $RecID = $rAgencyContract->{RecID};
-      $SubID = $rAgencyContract->{SubID};
-      $Name = $rAgencyContract->{Name};
-      $NPI = $rAgencyContract->{NPI};
-      $OrgID = $rAgencyContract->{OrgID};
+    my $i = 0;
+    foreach $pin (@pins) {
+
+        print qq|pin=${pin}=\n| if ($debug);
+
+        my ( $ID, $RID, $DS, $SFX ) = split( '_', $pin );
+        $ID = 'ERROR' if ( $ID eq '' );
+
+        print qq|ID=${ID}=, RID=${RID}=, DS=${DS}=, SFX=${SFX}=\n| if ($debug);
+
+        # change to look back for old medicare RecID...
+        $RID = '04312' if ( $RID eq '04302' );
+
+# 837 submissions are sent as Humana Health Horizons (61101) and the 835 returns as Humana Claims (61101)
+        $RID = '61101' if ( $RID =~ /humana/i );
+
+# 837 submissions are sent as Oklahoma Complete Health (68069) and the 835 returns as Louisiana Health Care Co
+        $RID = '68069' if ( $RID =~ /Louisiana/i );
+
+        my ( $DB, $Descr, $RecID, $SubID, $Name, $NPI, $OrgID ) =
+          ( '', '', '', '', '', '', '' );
+
+        #   select by NPI,RecID?
+        $sNPIREC->execute( $ID, $RID )
+          || myDBI->dberror("ProFTP: select AgencyContracts: ${ID}/${RID}");
+
+        my $rAgencyContract;
+        if ( my $rNPIREC = $sNPIREC->fetchrow_hashref ) {
+            $rAgencyContract = $rNPIREC;
+        }
+        else {
+            #     select by PIN,RecID?
+            $sPINREC->execute( $ID, $RID )
+              || myDBI->dberror("ProFTP: select AgencyContracts: ${ID}/${RID}");
+            if ( my $rPINREC = $sPINREC->fetchrow_hashref ) {
+                $rAgencyContract = $rPINREC;
+            }
+            else {
+                #     select by NPI,PIN?
+                $sNPIPIN->execute( $ID, $RID )
+                  || myDBI->dberror(
+                    "ProFTP: select AgencyContracts: ${NPI}/${PIN}");
+                if ( my $rNPIPIN = $sNPIPIN->fetchrow_hashref ) {
+                    $rAgencyContract = $rNPIPIN;
+                }
+            }
+        }
+
+        if ( $rAgencyContract ne '' ) {
+            $DB    = $rAgencyContract->{DB};
+            $Descr = $rAgencyContract->{Descr};
+            ## next 5 lines are output/print only...
+            $RecID = $rAgencyContract->{RecID};
+            $SubID = $rAgencyContract->{SubID};
+            $Name  = $rAgencyContract->{Name};
+            $NPI   = $rAgencyContract->{NPI};
+            $OrgID = $rAgencyContract->{OrgID};
+        }
+        print qq|\nERROR>>> DB or Insurance missing!=${pin}=\n|
+          if ( $DB eq '' || $Descr eq '' );
+        my $fn = "${DB}.${ID}.${Descr}.${DS}." . DBUtil->genToken() . ".${SFX}";
+
+        print qq|fn=${fn}=\n| if ($debug);
+
+        # hdr is the ISA/GS, ftr is the GE/IEA.
+        push( @files, $fn ) if ( main->dumpST( $fn, "${hdr}$sts[$i]${ftr}" ) );
+        $i++;
+        ## next 6 lines are output/print only...
+        my $DB    = DBUtil->FmtStr( $DB,    12, 'L' );
+        my $Descr = DBUtil->FmtStr( $Descr, 10, 'L' );
+        my $RecID = DBUtil->FmtStr( $RecID, 15, 'L' );
+        my $SubID = DBUtil->FmtStr( $SubID, 15, 'L' );
+        my $Name  = DBUtil->FmtStr( $Name,  30, 'L' );
+        print
+qq|${Name} ${DB} ${Descr} ${RecID} ${SubID} (${NPI} / ${OrgID}) ${fn}\n|;
     }
-    print qq|\nERROR>>> DB or Insurance missing!=${pin}=\n| if ( $DB eq '' || $Descr eq '' );
-    my $fn = "${DB}.${ID}.${Descr}.${DS}.".DBUtil->genToken().".${SFX}";
-
-    print qq|fn=${fn}=\n| if ( $debug );
-
-    # hdr is the ISA/GS, ftr is the GE/IEA.
-    push(@files,$fn) if ( main->dumpST($fn,"${hdr}$sts[$i]${ftr}") );
-    $i++;
-    ## next 6 lines are output/print only...
-    my $DB = DBUtil->FmtStr($DB,12,'L');
-    my $Descr = DBUtil->FmtStr($Descr,10,'L');
-    my $RecID = DBUtil->FmtStr($RecID,15,'L');
-    my $SubID = DBUtil->FmtStr($SubID,15,'L');
-    my $Name = DBUtil->FmtStr($Name,30,'L');
-    print qq|${Name} ${DB} ${Descr} ${RecID} ${SubID} (${NPI} / ${OrgID}) ${fn}\n|;
-  }
-  return(@files);
+    return (@files);
 }
-sub dumpST
-{
-  my ($self,$outfile,$text) = @_;
-  my $code=1;
-  if ( open(OUTFILE,">${outfile}") )
-  { print OUTFILE $text; close(OUTFILE); $code=1; }
-  else { print "Couldn't open ${outfile}! $!"; $code=0; }
-  return($code);
+
+sub dumpST {
+    my ( $self, $outfile, $text ) = @_;
+    my $code = 1;
+    if ( open( OUTFILE, ">${outfile}" ) ) {
+        print OUTFILE $text;
+        close(OUTFILE);
+        $code = 1;
+    }
+    else { print "Couldn't open ${outfile}! $!"; $code = 0; }
+    return ($code);
 }

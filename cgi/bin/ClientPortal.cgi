@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use myForm;
 use myDBI;
@@ -9,87 +9,116 @@ use myHTML;
 
 ############################################################################
 my $form = myForm->new();
-my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $dbh  = myDBI->dbconnect( $form->{'DBNAME'} );
+
 # incoming or USERID?
-my $THEUSER = $form->{'THEUSER'} eq '' ? $form->{'USERLOGINID'} : $form->{'THEUSER'};
+my $THEUSER =
+  $form->{'THEUSER'} eq '' ? $form->{'USERLOGINID'} : $form->{'THEUSER'};
 warn qq|\nENTER ClientPortal: THEUSER=${THEUSER}\n|;
+
 #foreach my $f ( sort keys %{$form} ) { warn "ClientPortal: form-$f=$form->{$f}\n"; }
-my ($DBNAME,$USERID) = split(':',$THEUSER);
+my ( $DBNAME, $USERID ) = split( ':', $THEUSER );
 warn qq|ClientPortal: DBNAME=${DBNAME}, USERID=${USERID}\n|;
 $form->{'Client_ClientID'} = $USERID unless $form->{'Client_ClientID'};
 my $ClientID = $form->{'Client_ClientID'};
 warn qq|ClientPortal: ClientID=${ClientID}\n|;
-my $MailList = myHTML->ListSel($form,'ShowClientMail',$ClientID,$form->{'LINKID'},0);
+my $MailList =
+  myHTML->ListSel( $form, 'ShowClientMail', $ClientID, $form->{'LINKID'}, 0 );
 
 # change to the client's database...
 $form->{'DBNAME'} = $DBNAME;
-warn qq|ClientPortal: DBNAME=$form->{DBNAME}, ClientID=$form->{Client_ClientID}/${ClientID}\n|;
-my $sClient = $dbh->prepare("select Client.*,ClientLegal.JOLTS,ClientEmergency.Alert from Client left join ClientLegal on ClientLegal.ClientID=Client.ClientID left join ClientEmergency on ClientEmergency.ClientID=Client.ClientID where Client.ClientID=?");
+warn
+qq|ClientPortal: DBNAME=$form->{DBNAME}, ClientID=$form->{Client_ClientID}/${ClientID}\n|;
+my $sClient = $dbh->prepare(
+"select Client.*,ClientLegal.JOLTS,ClientEmergency.Alert from Client left join ClientLegal on ClientLegal.ClientID=Client.ClientID left join ClientEmergency on ClientEmergency.ClientID=Client.ClientID where Client.ClientID=?"
+);
 $sClient->execute($ClientID);
 my $rClient = $sClient->fetchrow_hashref;
-my $Alert = $rClient->{Active} ? '' : qq|<FONT COLOR="red" >Discharged Client</FONT>|;
-$Alert .= $rClient->{Alert} eq '' ? '' : qq|<BR><FONT COLOR="red" >Alert: $rClient->{Alert}</FONT>|;
-my $Age = DBUtil->Date( $rClient->{DOB}, 'age' );
+my $Alert =
+  $rClient->{Active} ? '' : qq|<FONT COLOR="red" >Discharged Client</FONT>|;
+$Alert .=
+  $rClient->{Alert} eq ''
+  ? ''
+  : qq|<BR><FONT COLOR="red" >Alert: $rClient->{Alert}</FONT>|;
+my $Age        = DBUtil->Date( $rClient->{DOB}, 'age' );
 my $ClientName = $rClient->{Pref};
-$ClientName .= " $rClient->{FName}" if ( $rClient->{FName} );
-$ClientName .= " $rClient->{MName}" if ( $rClient->{MName} );
-$ClientName .= " $rClient->{LName}" if ( $rClient->{LName} );
+$ClientName .= " $rClient->{FName}"  if ( $rClient->{FName} );
+$ClientName .= " $rClient->{MName}"  if ( $rClient->{MName} );
+$ClientName .= " $rClient->{LName}"  if ( $rClient->{LName} );
 $ClientName .= " $rClient->{Suffix}" if ( $rClient->{Suffix} );
 $ClientName =~ s/'//g;
 my $Addr2 = "$rClient->{City}, $rClient->{ST} $rClient->{Zip}";
-my $CSZ = '';
-if ( $rClient->{Addr2} )
-{ $Addr2 = $rClient->{Addr2}; $CSZ = "$rClient->{City}, $rClient->{ST} $rClient->{Zip}"; }
+my $CSZ   = '';
+
+if ( $rClient->{Addr2} ) {
+    $Addr2 = $rClient->{Addr2};
+    $CSZ   = "$rClient->{City}, $rClient->{ST} $rClient->{Zip}";
+}
+
 # get Clinic Name
 my $sClinic = $dbh->prepare('select * from Provider where ProvID=?');
-$sClinic->execute($rClient->{clinicClinicID});
+$sClinic->execute( $rClient->{clinicClinicID} );
 my $rClinic = $sClinic->fetchrow_hashref;
-my $Clinic_Name = $rClinic->{Name} ? $rClinic->{Name} : "<FONT COLOR=red>NO CLINIC ASSIGNED</FONT>";
+my $Clinic_Name =
+    $rClinic->{Name}
+  ? $rClinic->{Name}
+  : "<FONT COLOR=red>NO CLINIC ASSIGNED</FONT>";
 
 # Set Guardian Information
-my $sGuardian = $dbh->prepare("select * from ClientFamily where ClientID=? and Guardian=1");
+my $sGuardian =
+  $dbh->prepare("select * from ClientFamily where ClientID=? and Guardian=1");
 $sGuardian->execute($ClientID);
-my $rGuardian = $sGuardian->fetchrow_hashref;
+my $rGuardian    = $sGuardian->fetchrow_hashref;
 my $GuardianName = $rGuardian->{Pref};
-$GuardianName .= " $rGuardian->{FName}" if ( $rGuardian->{FName} );
-$GuardianName .= " $rGuardian->{MName}" if ( $rGuardian->{MName} );
-$GuardianName .= " $rGuardian->{LName}" if ( $rGuardian->{LName} );
+$GuardianName .= " $rGuardian->{FName}"  if ( $rGuardian->{FName} );
+$GuardianName .= " $rGuardian->{MName}"  if ( $rGuardian->{MName} );
+$GuardianName .= " $rGuardian->{LName}"  if ( $rGuardian->{LName} );
 $GuardianName .= " $rGuardian->{Suffix}" if ( $rGuardian->{Suffix} );
-my $GuardianRel = DBA->getxref($form,'xRelationship',$rGuardian->{Rel},'Descr');
-$GuardianName .= '/'.$GuardianRel unless ( $GuardianRel eq '' );
+my $GuardianRel =
+  DBA->getxref( $form, 'xRelationship', $rGuardian->{Rel}, 'Descr' );
+$GuardianName .= '/' . $GuardianRel unless ( $GuardianRel eq '' );
 $GuardianNName = $rGuardian->{NName} if ( $rGuardian->{NName} );
 
 # get Primary Provider.
 my $sProvider = $dbh->prepare("select * from Provider where ProvID=?");
-$sProvider->execute($rClient->{ProvID});
+$sProvider->execute( $rClient->{ProvID} );
 my $rProvider = $sProvider->fetchrow_hashref;
-#my $PrimaryProvider = $rProvider->{ScreenName} eq '' ? qq|$rProvider->{'FName'} $rProvider->{'LName'} $rProvider->{'Suffix'}| 
+
+#my $PrimaryProvider = $rProvider->{ScreenName} eq '' ? qq|$rProvider->{'FName'} $rProvider->{'LName'} $rProvider->{'Suffix'}|
 #                                                     : $rProvider->{'ScreenName'};;
-my $PrimaryProvider = qq|$rProvider->{'FName'} $rProvider->{'LName'} $rProvider->{'Suffix'}|;
+my $PrimaryProvider =
+  qq|$rProvider->{'FName'} $rProvider->{'LName'} $rProvider->{'Suffix'}|;
 my $MailLink = qq|
 <A HREF="/cgi/bin/ClientMail.cgi?Client_ClientID=${ClientID}&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}">
   <IMG ALT="send mail" SRC="/cgi/images/user-mail.png">
 </A>
 |;
 
-my $ClientPortalMenu = myHTML->getHTML($form,'ClientPortal.menu',1);
-my $ClientDataInfo = $form->{'LOGINUSERID'} == 91 ? $THEUSER : '';
+my $ClientPortalMenu = myHTML->getHTML( $form, 'ClientPortal.menu', 1 );
+my $ClientDataInfo   = $form->{'LOGINUSERID'} == 91 ? $THEUSER : '';
 $form->{'FORMID'} = $form->getFORMID;
+
 # Start out the display.
 ## TEST NEW html = CALL
 ## TEST NEW html = CALL
 ## TEST NEW html = CALL
-my $html = myHTML->new($form,$title,'noclock accordion') . qq|
+my $html = myHTML->new( $form, $title, 'noclock accordion' ) . qq|
 <TABLE CLASS="main normsize" >
   <TR ALIGN="center" >
     <TD WIDTH="84%" >
 | . myHTML->hdr($form) . qq|
-<LINK HREF="|.myConfig->cfgfile('menuV2.css',1).qq|" REL="stylesheet" TYPE="text/css" >
+<LINK HREF="|
+  . myConfig->cfgfile( 'menuV2.css', 1 )
+  . qq|" REL="stylesheet" TYPE="text/css" >
 <script src="/cgi/menu/js/menuV2.js" type="text/javascript"></script>
 <SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/ajaxrequest.js"> </SCRIPT>
-<LINK HREF="|.myConfig->cfgfile('tabcontent/template6/tabcontent.css',1).qq|" REL="stylesheet" TYPE="text/css" >
-<SCRIPT SRC="|.myConfig->cfgfile('tabcontent/tabcontent.js',1).qq|" TYPE="text/javascript" ></SCRIPT>
+<LINK HREF="|
+  . myConfig->cfgfile( 'tabcontent/template6/tabcontent.css', 1 )
+  . qq|" REL="stylesheet" TYPE="text/css" >
+<SCRIPT SRC="|
+  . myConfig->cfgfile( 'tabcontent/tabcontent.js', 1 )
+  . qq|" TYPE="text/javascript" ></SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript" SRC="/cgi/js/tabs.js"></SCRIPT>
 <LINK REL="STYLESHEET" TYPE="text/css" HREF="/cgi/css/tabs.css" />
 <FORM NAME="ClientPage" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
@@ -144,7 +173,10 @@ my $html = myHTML->new($form,$title,'noclock accordion') . qq|
     <h2>Problems<IMG ALT="down" ID="accordionImageProblems" CLASS="accordionImage" SRC="/images/sorted_down.gif" ></h2>
     <div>
 <SPAN ID="ShowClientProblems" >
-|.myHTML->ListSel($form,'ShowClientProblems',$ClientID,$form->{'LINKID'},0).qq|
+|
+  . myHTML->ListSel( $form, 'ShowClientProblems', $ClientID, $form->{'LINKID'},
+    0 )
+  . qq|
 </SPAN>
     </div>
   </div>
@@ -157,7 +189,10 @@ my $html = myHTML->new($form,$title,'noclock accordion') . qq|
     <h2>Vital Signs<IMG ALT="down" ID="accordionImageVitalSigns" CLASS="accordionImage" SRC="/images/sorted_down.gif" ></h2>
     <div>
 <SPAN ID="ShowClientVitalSigns" >
-|.myHTML->ListSel($form,'ShowClientVitalSigns',$ClientID,$form->{'LINKID'},0).qq|
+|
+  . myHTML->ListSel( $form, 'ShowClientVitalSigns', $ClientID,
+    $form->{'LINKID'}, 0 )
+  . qq|
 </SPAN>
     </div>
   </div>
@@ -170,7 +205,9 @@ my $html = myHTML->new($form,$title,'noclock accordion') . qq|
     <h2>Past Visit Summaries<IMG ALT="down" ID="accordionImageVisit" CLASS="accordionImage" SRC="/images/sorted_down.gif" ></h2>
     <div>
 <SPAN ID="ShowClientNotes" >
-|.myHTML->ListSel($form,'ShowClientNotes',$ClientID,$form->{'LINKID'},0).qq|
+|
+  . myHTML->ListSel( $form, 'ShowClientNotes', $ClientID, $form->{'LINKID'}, 0 )
+  . qq|
 </SPAN>
     </div>
   </div>
@@ -183,7 +220,7 @@ my $html = myHTML->new($form,$title,'noclock accordion') . qq|
     <h2>Secure Mail to Provider<IMG ALT="down" ID="accordionImageMail" CLASS="accordionImage" SRC="/images/sorted_down.gif" ></h2>
     <div>
 <SPAN ID="ShowClientMail" >
-|.${MailList}.qq|
+| . ${MailList} . qq|
 </SPAN>
     </div>
   </div>

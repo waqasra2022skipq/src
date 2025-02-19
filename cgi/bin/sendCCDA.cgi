@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use Cwd;
 use DBI;
 use DBForm;
@@ -15,38 +15,37 @@ use Time::Local;
 ############################################################################
 my $form = DBForm->new();
 foreach my $f ( sort keys %{$form} ) { warn ": form-$f=$form->{$f}\n"; }
-my $Agent = SysAccess->verify($form,'Privilege=Agent');
-unless ( $Agent ) { $form->error("Page DENIED!"); }
-my $To = $form->{'To'};
+my $Agent = SysAccess->verify( $form, 'Privilege=Agent' );
+unless ($Agent) { $form->error("Page DENIED!"); }
+my $To       = $form->{'To'};
 my $sendfile = $form->{'sendfile'};
 
-  my $pathname = '/tmp/phimail:'.DBUtil->genToken();
-  if ( open(TEMPLATE, ">$pathname") ) 
-  { print TEMPLATE qq|${sendfile}\n${To}\n|; }
-  close(TEMPLATE);
+my $pathname = '/tmp/phimail:' . DBUtil->genToken();
+if ( open( TEMPLATE, ">$pathname" ) ) {
+    print TEMPLATE qq|${sendfile}\n${To}\n|;
+}
+close(TEMPLATE);
 
-  (my $outfile = $pathname) =~ s/phimail/phistat/g;
-  my $str = '';
-  my $outtext = '';
-  for (my $i=0; $i <= 10; $i++)
-  {
+( my $outfile = $pathname ) =~ s/phimail/phistat/g;
+my $str     = '';
+my $outtext = '';
+for ( my $i = 0 ; $i <= 10 ; $i++ ) {
     sleep 6;
-    if ( -e $outfile )
-    {
-      $str .= qq|i=${i}:|;
-      $outtext = DBUtil->ReadFile($outfile);
-      last;
+    if ( -e $outfile ) {
+        $str .= qq|i=${i}:|;
+        $outtext = DBUtil->ReadFile($outfile);
+        last;
     }
-  }
-  $outtext = qq|failed to send!| if ( $outtext eq '' );
+}
+$outtext = qq|failed to send!| if ( $outtext eq '' );
 
-#  my $cmd = qq|php /home/okmis/mis/src/phimail/PhiMail.php ${sendfile} ${to}|;
+#  my $cmd = qq|php /var/www/okmis/src/phimail/PhiMail.php ${sendfile} ${to}|;
 #warn qq|cmd:${cmd}\n|;
 #  my $outfile = $form->{DOCROOT}.$sendfile.'.out';
 #  system("${cmd} > ${outfile} 2>${outfile}");
 #  my $outtext = DBUtil->ReadFile($outfile);
 
-  print qq|Content-Type: text/html \n\n
+print qq|Content-Type: text/html \n\n
 <BR>
 <pre>
 ${outtext}

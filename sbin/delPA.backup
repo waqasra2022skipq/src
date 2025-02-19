@@ -1,128 +1,128 @@
 #!/usr/bin/perl
 ############################################################################
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 use Time::Local;
 ############################################################################
-$DT = localtime();
+$DT   = localtime();
 $form = DBForm->new;
-if ( !$form->{ID} )
-{
-  warn qq|\nUsage: delPA ID=[PrAuthID]\n\n|;
-  $form->complete();
-  exit;
+if ( !$form->{ID} ) {
+    warn qq|\nUsage: delPA ID=[PrAuthID]\n\n|;
+    $form->complete();
+    exit;
 }
 ############################################################################
-my $dbh = $form->dbconnect;
+my $dbh        = $form->dbconnect;
 my $qPrAuthRVU = qq|select * from PrAuthRVU where PrAuthRVU.PrAuthID=?|;
 my $sPrAuthRVU = $dbh->prepare($qPrAuthRVU);
-my $qTrPlan = qq|select * from TrPlan where TrPlan.PrAuthID=?|;
-my $sTrPlan = $dbh->prepare($qTrPlan);
-my $qTrPlanIP = qq|select * from TrPlanIP where TrPlanIP.TrPlanID=?|;
-my $sTrPlanIP = $dbh->prepare($qTrPlanIP);
-my $qTrPlanS = qq|select * from TrPlanS where TrPlanS.TrPlanID=?|;
-my $sTrPlanS = $dbh->prepare($qTrPlanS);
-my $qPDDiag = qq|select * from PDDiag where PDDiag.PrAuthID=?|;
-my $sPDDiag = $dbh->prepare($qPDDiag);
-my $qPDDom = qq|select * from PDDom where PDDom.PrAuthID=?|;
-my $sPDDom = $dbh->prepare($qPDDom);
-my $qClientPrAuthCDC = qq|select * from ClientPrAuthCDC where ClientPrAuthCDC.ClientPrAuthID=?|;
+my $qTrPlan    = qq|select * from TrPlan where TrPlan.PrAuthID=?|;
+my $sTrPlan    = $dbh->prepare($qTrPlan);
+my $qTrPlanIP  = qq|select * from TrPlanIP where TrPlanIP.TrPlanID=?|;
+my $sTrPlanIP  = $dbh->prepare($qTrPlanIP);
+my $qTrPlanS   = qq|select * from TrPlanS where TrPlanS.TrPlanID=?|;
+my $sTrPlanS   = $dbh->prepare($qTrPlanS);
+my $qPDDiag    = qq|select * from PDDiag where PDDiag.PrAuthID=?|;
+my $sPDDiag    = $dbh->prepare($qPDDiag);
+my $qPDDom     = qq|select * from PDDom where PDDom.PrAuthID=?|;
+my $sPDDom     = $dbh->prepare($qPDDom);
+my $qClientPrAuthCDC =
+  qq|select * from ClientPrAuthCDC where ClientPrAuthCDC.ClientPrAuthID=?|;
 my $sClientPrAuthCDC = $dbh->prepare($qClientPrAuthCDC);
-my $qClientPrAuthCDCSent = qq|select * from ClientPrAuthCDCSent where ClientPrAuthCDCSent.ClientPrAuthCDCID=?|;
+my $qClientPrAuthCDCSent =
+qq|select * from ClientPrAuthCDCSent where ClientPrAuthCDCSent.ClientPrAuthCDCID=?|;
 my $sClientPrAuthCDCSent = $dbh->prepare($qClientPrAuthCDCSent);
 ############################################################################
-my $q = qq|select * from ClientPrAuth left join Client on Client.ClientID=ClientPrAuth.ClientID where ClientPrAuth.ID=?|;
+my $q =
+qq|select * from ClientPrAuth left join Client on Client.ClientID=ClientPrAuth.ClientID where ClientPrAuth.ID=?|;
 my $s = $dbh->prepare($q);
 print qq|\n#FName\tLName\tClientID\tID\tPAnumber\n|;
-$s->execute($form->{ID}) || $form->dberror($q);
-while ( my $r = $s->fetchrow_hashref )
-{
-  my $PrAuthID = $r->{ID};
-  print qq|#$r->{FName}\t$r->{LName}\t$r->{ClientID}\t$PrAuthID\t$r->{PAnumber}\n|;
+$s->execute( $form->{ID} ) || $form->dberror($q);
 
-  print qq|#TP-->\tTrPlanID\tTrPlanType\tChangeProvID\tRecDOLC\n|;
-  my $cnt=0;
-  $sTrPlan->execute($PrAuthID) || $form->dberror($qTrPlan);
-  while ( my $rTrPlan = $sTrPlan->fetchrow_hashref )
-  { 
-    $cnt+=1; 
-    my $TrPlanID=$rTrPlan->{TrPlanID};
-    print qq|#\t$rTrPlan->{TrPlanID}\t$rTrPlan->{TrPlanType}\t$rTrPlan->{ChangeProvID}\t$rTrPlan->{RecDOLC}\n|;
-    print qq|#\tIP-->\tProbNum\tSCID\tInit\tTarget\n|;
-    my $cnt2=0;
-    $sTrPlanIP->execute($TrPlanID) || $form->dberror($qTrPlanIP);
-    while ( my $rTrPlanIP = $sTrPlanIP->fetchrow_hashref )
-    { 
-      $cnt2+=1; 
-      print qq|#\t\t$rTrPlanIP->{ProbNum}\t$rTrPlanIP->{Serv1}\t$rTrPlanIP->{Init1}\t$rTrPlanIP->{Date1}\n|;
+while ( my $r = $s->fetchrow_hashref ) {
+    my $PrAuthID = $r->{ID};
+    print
+qq|#$r->{FName}\t$r->{LName}\t$r->{ClientID}\t$PrAuthID\t$r->{PAnumber}\n|;
+
+    print qq|#TP-->\tTrPlanID\tTrPlanType\tChangeProvID\tRecDOLC\n|;
+    my $cnt = 0;
+    $sTrPlan->execute($PrAuthID) || $form->dberror($qTrPlan);
+    while ( my $rTrPlan = $sTrPlan->fetchrow_hashref ) {
+        $cnt += 1;
+        my $TrPlanID = $rTrPlan->{TrPlanID};
+        print
+qq|#\t$rTrPlan->{TrPlanID}\t$rTrPlan->{TrPlanType}\t$rTrPlan->{ChangeProvID}\t$rTrPlan->{RecDOLC}\n|;
+        print qq|#\tIP-->\tProbNum\tSCID\tInit\tTarget\n|;
+        my $cnt2 = 0;
+        $sTrPlanIP->execute($TrPlanID) || $form->dberror($qTrPlanIP);
+        while ( my $rTrPlanIP = $sTrPlanIP->fetchrow_hashref ) {
+            $cnt2 += 1;
+            print
+qq|#\t\t$rTrPlanIP->{ProbNum}\t$rTrPlanIP->{Serv1}\t$rTrPlanIP->{Init1}\t$rTrPlanIP->{Date1}\n|;
+        }
+        if ( $cnt2 == 0 ) { print qq|#\tMISSING Problems\n|; }
+        else {
+            print qq|delete from TrPlanIP where TrPlanID=${TrPlanID};\n|;
+        }
+        print qq|#\tTrPlanS-->\tProvID\tDate\n|;
+        my $cnt3 = 0;
+        $sTrPlanS->execute($TrPlanID) || $form->dberror($qTrPlanS);
+        while ( my $rTrPlanS = $sTrPlanS->fetchrow_hashref ) {
+            $cnt3 += 1;
+            print qq|#\t\t$rTrPlanS->{ProvID}\t$rTrPlanS->{SignDate}\n|;
+        }
+        if ( $cnt3 == 0 ) { print qq|#\tNo signatures\n|; }
+        else {
+            print qq|delete from TrPlanS where TrPlanID=${TrPlanID};\n|;
+        }
+        print qq|delete from TrPlan where PrAuthID=${PrAuthID};\n|;
     }
-    if ( $cnt2 == 0 )
-    { print qq|#\tMISSING Problems\n|; }
-    else
-    {
-print qq|delete from TrPlanIP where TrPlanID=${TrPlanID};\n|;
+    print qq|#\tMISSING TrPlans\n| if ( $cnt == 0 );
+
+    print qq|#Diag-->\tAxis1\tAxis2\tCurr\tHigh\n|;
+    $cnt = 0;
+    $sPDDiag->execute($PrAuthID) || $form->dberror($qPDDiag);
+    while ( my $rPDDiag = $sPDDiag->fetchrow_hashref ) {
+        $cnt += 1;
+        print
+qq|#\t$rPDDiag->{Axis1ACode}\t$rPDDiag->{Axis2ACode}\t$rPDDiag->{Axis5Curr}\t$rPDDiag->{Axis5High}\n|;
+        print qq|delete from PDDiag where PrAuthID=${PrAuthID};\n|;
     }
-    print qq|#\tTrPlanS-->\tProvID\tDate\n|;
-    my $cnt3=0;
-    $sTrPlanS->execute($TrPlanID) || $form->dberror($qTrPlanS);
-    while ( my $rTrPlanS = $sTrPlanS->fetchrow_hashref )
-    { 
-      $cnt3+=1; 
-      print qq|#\t\t$rTrPlanS->{ProvID}\t$rTrPlanS->{SignDate}\n|;
+    print qq|#\tMISSING Diagnosis\n| if ( $cnt == 0 );
+
+    print qq|#Dom-->\tDom1\tDom2\tDom3\tDom4\tDom5\tDom6\tDom7\n|;
+    $cnt = 0;
+    $sPDDom->execute($PrAuthID) || $form->dberror($qPDDom);
+    while ( my $rPDDom = $sPDDom->fetchrow_hashref ) {
+        $cnt += 1;
+        print
+qq|#\t$rPDDom->{Dom1Score}\t$rPDDom->{Dom2Score}\t$rPDDom->{Dom3Score}\t$rPDDom->{Dom4Score}\t$rPDDom->{Dom5Score}\t$rPDDom->{Dom6Score}\t$rPDDom->{Dom7Score}\n|;
+        print qq|delete from PDDom where PrAuthID=${PrAuthID};\n|;
     }
-    if ( $cnt3 == 0 )
-    { print qq|#\tNo signatures\n|; }
-    else
-    {
-print qq|delete from TrPlanS where TrPlanID=${TrPlanID};\n|;
+    print qq|#\tMISSING CARS\n| if ( $cnt == 0 );
+
+    print qq|#PrAuthRVU-->\tSCID\tAuthRVU\tEffDate\tExpDate\n|;
+    $sPrAuthRVU->execute($PrAuthID) || $form->dberror($qPrAuthRVU);
+    $cnt = 0;
+    while ( my $rPrAuthRVU = $sPrAuthRVU->fetchrow_hashref ) {
+        $cnt += 1;
+        print
+qq|#\t$rPrAuthRVU->{SCID}\t$rPrAuthRVU->{AuthRVU}\t$rPrAuthRVU->{EffDate}\t$rPrAuthRVU->{ExpDate}\n|;
+        print qq|delete from PrAuthRVU where PrAuthID=${PrAuthID};\n|;
     }
-print qq|delete from TrPlan where PrAuthID=${PrAuthID};\n|;
-  }
-  print qq|#\tMISSING TrPlans\n| if ( $cnt == 0 );
-
-  print qq|#Diag-->\tAxis1\tAxis2\tCurr\tHigh\n|;
-  $cnt=0;
-  $sPDDiag->execute($PrAuthID) || $form->dberror($qPDDiag);
-  while ( my $rPDDiag = $sPDDiag->fetchrow_hashref )
-  { $cnt+=1; 
-    print qq|#\t$rPDDiag->{Axis1ACode}\t$rPDDiag->{Axis2ACode}\t$rPDDiag->{Axis5Curr}\t$rPDDiag->{Axis5High}\n|;
-print qq|delete from PDDiag where PrAuthID=${PrAuthID};\n|;
-  }
-  print qq|#\tMISSING Diagnosis\n| if ( $cnt == 0 );
-
-
-  print qq|#Dom-->\tDom1\tDom2\tDom3\tDom4\tDom5\tDom6\tDom7\n|;
-  $cnt=0;
-  $sPDDom->execute($PrAuthID) || $form->dberror($qPDDom);
-  while ( my $rPDDom = $sPDDom->fetchrow_hashref )
-  { $cnt+=1; 
-    print qq|#\t$rPDDom->{Dom1Score}\t$rPDDom->{Dom2Score}\t$rPDDom->{Dom3Score}\t$rPDDom->{Dom4Score}\t$rPDDom->{Dom5Score}\t$rPDDom->{Dom6Score}\t$rPDDom->{Dom7Score}\n|;
-print qq|delete from PDDom where PrAuthID=${PrAuthID};\n|;
-  }
-  print qq|#\tMISSING CARS\n| if ( $cnt == 0 );
-
-
-  print qq|#PrAuthRVU-->\tSCID\tAuthRVU\tEffDate\tExpDate\n|;
-  $sPrAuthRVU->execute($PrAuthID) || $form->dberror($qPrAuthRVU);
-  $cnt=0;
-  while ( my $rPrAuthRVU = $sPrAuthRVU->fetchrow_hashref )
-  { $cnt+=1; 
-    print qq|#\t$rPrAuthRVU->{SCID}\t$rPrAuthRVU->{AuthRVU}\t$rPrAuthRVU->{EffDate}\t$rPrAuthRVU->{ExpDate}\n|;
-print qq|delete from PrAuthRVU where PrAuthID=${PrAuthID};\n|;
-  }
-  print qq|#\tMISSING RVUs\n| if ( $cnt == 0 );
-  print qq|#CDCSent-->\tID\tClientID\n|;
-  $cnt=0;
-  $sClientPrAuthCDC->execute($PrAuthID) || $form->dberror($qClientPrAuthCDC);
-  while ( my $rClientPrAuthCDC = $sClientPrAuthCDC->fetchrow_hashref )
-  { $cnt+=1; 
-print qq|#\t$rClientPrAuthCDC->{ID}\t$rClientPrAuthCDC->{ClientID}\n|;
-print qq|delete from ClientPrAuthCDCSent where ClientPrAuthCDCID=$rClientPrAuthCDC->{ID};\n|;
-  }
-  print qq|#\tMISSING CDC\n| if ( $cnt == 0 );
-print qq|delete from ClientPrAuthCDC where ClientPrAuthID=${PrAuthID};\n|;
-print qq|delete from ClientPrAuth where ID=${PrAuthID};\n|;
+    print qq|#\tMISSING RVUs\n| if ( $cnt == 0 );
+    print qq|#CDCSent-->\tID\tClientID\n|;
+    $cnt = 0;
+    $sClientPrAuthCDC->execute($PrAuthID) || $form->dberror($qClientPrAuthCDC);
+    while ( my $rClientPrAuthCDC = $sClientPrAuthCDC->fetchrow_hashref ) {
+        $cnt += 1;
+        print qq|#\t$rClientPrAuthCDC->{ID}\t$rClientPrAuthCDC->{ClientID}\n|;
+        print
+qq|delete from ClientPrAuthCDCSent where ClientPrAuthCDCID=$rClientPrAuthCDC->{ID};\n|;
+    }
+    print qq|#\tMISSING CDC\n| if ( $cnt == 0 );
+    print qq|delete from ClientPrAuthCDC where ClientPrAuthID=${PrAuthID};\n|;
+    print qq|delete from ClientPrAuth where ID=${PrAuthID};\n|;
 
 }
 $s->finish();

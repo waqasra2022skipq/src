@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 use DBA;
@@ -9,17 +9,17 @@ use CGI qw(:standard escape);
 
 ############################################################################
 $form = DBForm->new();
-$dbh = $form->dbconnect();
+$dbh  = $form->dbconnect();
 
 my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
-my $BackLinks = gHTML->setLINKS($form,'back');
-my $hidden = $form->TMPwrite($skip);
+my $BackLinks = gHTML->setLINKS( $form, 'back' );
+my $hidden    = $form->TMPwrite($skip);
 
 # set the cross references
-$xref='ClinicList';
-  $s=$dbh->prepare("select * from Provider where Type=3");
-  $s->execute();
-  while (my $r = $s->fetchrow_hashref) { $$xref{$r->{ProvID}} = $r; }
+$xref = 'ClinicList';
+$s    = $dbh->prepare("select * from Provider where Type=3");
+$s->execute();
+while ( my $r = $s->fetchrow_hashref ) { $$xref{ $r->{ProvID} } = $r; }
 $s->finish;
 
 ############################################################################
@@ -28,7 +28,7 @@ my $html = myHTML->new($form) . qq|
 <SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/novalidate.js"> </SCRIPT>
 <TABLE CLASS="main" >
   <TR ALIGN="center" >
-| . myHTML->leftpane($form,'clock mail managertree collapseipad') . qq|
+| . myHTML->leftpane( $form, 'clock mail managertree collapseipad' ) . qq|
     <TD WIDTH="84%" ALIGN="center" >
 | . myHTML->hdr($form) . myHTML->menu($form) . qq|
 <FORM NAME="Surveys" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
@@ -69,22 +69,24 @@ my $html = myHTML->new($form) . qq|
 |;
 
 my $cls = '';
-my $qSurveys = qq|select Surveys.*,Provider.LName,Provider.FName from Surveys left join Provider on Provider.ProvID=Surveys.CreateProvID |
-              . DBA->getProviderSelection($form,$ForProvID,'Surveys.CreateProvID','where')
-              . qq| order by Date, LName, FName|;
+my $qSurveys =
+qq|select Surveys.*,Provider.LName,Provider.FName from Surveys left join Provider on Provider.ProvID=Surveys.CreateProvID |
+  . DBA->getProviderSelection( $form, $ForProvID, 'Surveys.CreateProvID',
+    'where' )
+  . qq| order by Date, LName, FName|;
 my $sSurveys = $dbh->prepare($qSurveys);
+
 #warn "qSurveys=\n$qSurveys\n";
 $sSurveys->execute();
-while ($rSurveys = $sSurveys->fetchrow_hashref)
-{
-  if ( $cls eq 'rptodd' )
-  { $cls = qq|rpteven|; } else { $cls = qq|rptodd|; }
+while ( $rSurveys = $sSurveys->fetchrow_hashref ) {
+    if   ( $cls eq 'rptodd' ) { $cls = qq|rpteven|; }
+    else                      { $cls = qq|rptodd|; }
 
-  my $ClinicID = MgrTree->getClinic($form,$rSurveys->{ProvID});
-  my $Exp = $rSurveys->{RightsExp} == 1 ? 'yes' : 'no';
-  my $Rec = $rSurveys->{RightsRec} == 1 ? 'yes' : 'no';
-  $ClinicName = $ClinicList{$ClinicID}{Name};
-  $html .= qq|
+    my $ClinicID = MgrTree->getClinic( $form, $rSurveys->{ProvID} );
+    my $Exp      = $rSurveys->{RightsExp} == 1 ? 'yes' : 'no';
+    my $Rec      = $rSurveys->{RightsRec} == 1 ? 'yes' : 'no';
+    $ClinicName = $ClinicList{$ClinicID}{Name};
+    $html .= qq|
   <TR CLASS="$cls" >
     <TD ALIGN="center" >$rSurveys->{Date}</TD>
     <TD ALIGN="left" >$rSurveys->{FName} $rSurveys->{LName}</TD>
@@ -107,7 +109,7 @@ $html .= qq|
 </TABLE>
 ${hidden}
 </FORM>
-|.myHTML->rightpane($form,'search');
+| . myHTML->rightpane( $form, 'search' );
 
 $form->complete();
 print $html;

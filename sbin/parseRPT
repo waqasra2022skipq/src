@@ -1,85 +1,90 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBForm;
 use DBUtil;
 use Accounts;
 use myConfig;
+
 # Build the list of NPI/Organizations to find dbs.
-my $NPIs=Accounts->NPIRECs(Accounts->dbs('active'));
-my $WWW = myConfig->cfg('WWW');
+my $NPIs = Accounts->NPIRECs( Accounts->dbs('active') );
+my $WWW  = myConfig->cfg('WWW');
+
 #foreach my $key ( sort keys %{$NPIs} ) { warn qq|key=$key,DB=$NPIs->{$key}->{DB}\n|; }
-my $linecount=0;
+my $linecount = 0;
 ############################################################################
-foreach my $file ( @ARGV )
-{
-  print qq|\nparse file: $file\n|;
-  if ( open(FILE,$file) ) 
-  {
-    my $section = 0;
-    my ($NPI,$RECID,$ProcessDate,$Header) = main->getHeader();
-print qq|after: NPI=$NPI,RECID=$RECID,ProcessDate=$ProcessDate,Header=$Header\n|;
-    while ( $NPI )
-    {
-      ($Lines,$Count) = main->getRPT();
-      my $out = main->gText($Header,$Lines,$Count);
-      main->wFile($NPI,$RECID,$ProcessDate,$Count,$out);
-     ($NPI,$RECID,$ProcessDate,$Header) = main->getHeader();
-print qq|after: NPI=$NPI,RECID=$RECID,ProcessDate=$ProcessDate,Header=$Header\n|;
+foreach my $file (@ARGV) {
+    print qq|\nparse file: $file\n|;
+    if ( open( FILE, $file ) ) {
+        my $section = 0;
+        my ( $NPI, $RECID, $ProcessDate, $Header ) = main->getHeader();
+        print
+qq|after: NPI=$NPI,RECID=$RECID,ProcessDate=$ProcessDate,Header=$Header\n|;
+        while ($NPI) {
+            ( $Lines, $Count ) = main->getRPT();
+            my $out = main->gText( $Header, $Lines, $Count );
+            main->wFile( $NPI, $RECID, $ProcessDate, $Count, $out );
+            ( $NPI, $RECID, $ProcessDate, $Header ) = main->getHeader();
+            print
+qq|after: NPI=$NPI,RECID=$RECID,ProcessDate=$ProcessDate,Header=$Header\n|;
+        }
+        close(FILE);
     }
-    close(FILE);
-  } else { print qq|>>>ERROR: open ${file} $!\n|; }
+    else { print qq|>>>ERROR: open ${file} $!\n|; }
 }
 exit;
 ################################################################
-sub getHeader
-{
-  my ($npi,$rid,$pd,$h) = ('','','','');
-print qq|getHeader:\n|;
-  while ( $in = <FILE> )
-  {
-    $linecount++;
-    next if ( $linecount < 3 );    # skip first 2 lines in file.
-    chomp($in);
-    $in =~ s/\r//g;               # carriage return
-    $in =~ s// /g;              # new line
-    $in =~ s/\n/ /g;              # new line
-    if ( $in =~ /^BILLING PROVIDER  :/ )
-    { $npi = substr($in,20,10); chomp($npi); }
-    elsif ( $in =~ /^PROCESSOR         :/ )
-    { $rid = substr($in,20,9); chomp($rid); }
-    elsif ( $in =~ /^PROCESS DATE      :/ )
-    { $pd = substr($in,20,10); chomp($pd); }
-    $h .= $in."\n";
-    return($npi,$rid,$pd,$h) if ( $in =~ /^TRANSACTION\/TYPE  :/ );
-  }
-  return(0);            # end of file
+sub getHeader {
+    my ( $npi, $rid, $pd, $h ) = ( '', '', '', '' );
+    print qq|getHeader:\n|;
+    while ( $in = <FILE> ) {
+        $linecount++;
+        next if ( $linecount < 3 );    # skip first 2 lines in file.
+        chomp($in);
+        $in =~ s/\r//g;                # carriage return
+        $in =~ s/
+/ /g;                                  # new line
+        $in =~ s/\n/ /g;               # new line
+        if ( $in =~ /^BILLING PROVIDER  :/ ) {
+            $npi = substr( $in, 20, 10 );
+            chomp($npi);
+        }
+        elsif ( $in =~ /^PROCESSOR         :/ ) {
+            $rid = substr( $in, 20, 9 );
+            chomp($rid);
+        }
+        elsif ( $in =~ /^PROCESS DATE      :/ ) {
+            $pd = substr( $in, 20, 10 );
+            chomp($pd);
+        }
+        $h .= $in . "\n";
+        return ( $npi, $rid, $pd, $h ) if ( $in =~ /^TRANSACTION\/TYPE  :/ );
+    }
+    return (0);    # end of file
 }
-sub getRPT
-{
-#print qq|getRPT:\n|;
-  my ($l,$c) = ('',0);
-  while ( $in = <FILE> )
-  {
-    chomp($in);
-    $in =~ s/\r//g;               # carriage return
-    $in =~ s// /g;              # new line
-    $in =~ s/\n/ /g;              # new line
-    if ( $in =~ /^SUBSCRIBER/ )
-    { my $colhdr1 = $in; }
-    elsif ( $in =~ /^MEMBER ID/ )
-    { my $colhdr2 = $in; }
-    elsif ( $in ne '' )
-    { $c++; }
-    $l .= $in."\n";
-    return($l,$c) if ( $in =~ / BCBSSC EDI GATEWAY / );     # next section
-  }
-  return($l,$c);        # end of file
+
+sub getRPT {
+
+    #print qq|getRPT:\n|;
+    my ( $l, $c ) = ( '', 0 );
+    while ( $in = <FILE> ) {
+        chomp($in);
+        $in =~ s/\r//g;    # carriage return
+        $in =~ s/
+/ /g;                                                             # new line
+        $in =~ s/\n/ /g;                                          # new line
+        if    ( $in =~ /^SUBSCRIBER/ ) { my $colhdr1 = $in; }
+        elsif ( $in =~ /^MEMBER ID/ )  { my $colhdr2 = $in; }
+        elsif ( $in ne '' )            { $c++; }
+        $l .= $in . "\n";
+        return ( $l, $c ) if ( $in =~ / BCBSSC EDI GATEWAY / );   # next section
+    }
+    return ( $l, $c );                                            # end of file
 }
-sub gText
-{
-  my ($self,$hdr,$out,$c) = @_;
-  my $claims = length($c) < 3 ? '0' x int(3-length($c)) . $c : $c;
-  my $text = qq|<PRE>
+
+sub gText {
+    my ( $self, $hdr, $out, $c ) = @_;
+    my $claims = length($c) < 3 ? '0' x int( 3 - length($c) ) . $c : $c;
+    my $text   = qq|<PRE>
 Electronic Batch Report
 ----------------------------------------------------------------------------------------
 ${hdr}
@@ -87,32 +92,45 @@ Claims:       ${claims}
 ${out}----------------------------------------------------------------------------------------
 </PRE>
 |;
-  return($text);
+    return ($text);
 }
-sub wFile
-{
-  my ($self,$npi,$rid,$dt,$cnt,$text) = @_;
-print qq|wFile: npi=$npi, rid=$rid, dt=$dt, cnt=$cnt\n|;
-  my $npirid = $npi.'_'.$rid;
-  my $pdate = substr($dt,6,4).'-'.substr($dt,0,2).'-'.substr($dt,3,2);
-  my $dbname = $NPIs->{$npirid}->{DB};
-  my ($domain,$subdomain) = split('_',$dbname);
-print qq|wFile: dbname=$dbname\n|;
-  my $form = DBForm->new("DBNAME=$dbname");
-  my $dbh = $form->dbconnect();
-  my $sProvider = $dbh->prepare("select Provider.ProvID from Provider left join ProviderControl on ProviderControl.ProvID=Provider.ProvID where Provider.Type=3 and ProviderControl.NPI=?");
-  $sProvider->execute($npi) || $form->dberror("parseRPT: select Clinic $npi");
-  my $rProvider = $sProvider->fetchrow_hashref;
-  my $rptDir = $WWW.'/'.$subdomain.'/reports4';
-  my $fileName = 'EBT_resp_'.$rProvider->{ProvID}.'_tricare_'.$pdate.'_'.$cnt.'_'.DBUtil->Date('','stamp').'_'.DBUtil->genToken().'.htm';
-  if ( open(OUT,">${rptDir}/${fileName}") ) 
-  {
-    print OUT $text;
-    close(OUT);
-  } else { print qq|>>>ERROR: open ${fileName} $!\n|; }
-print qq|wFile: fileName=$fileName\n|;
-  $sProvider->finish();
-  $form->complete();
-  return();
+
+sub wFile {
+    my ( $self, $npi, $rid, $dt, $cnt, $text ) = @_;
+    print qq|wFile: npi=$npi, rid=$rid, dt=$dt, cnt=$cnt\n|;
+    my $npirid = $npi . '_' . $rid;
+    my $pdate =
+        substr( $dt, 6, 4 ) . '-'
+      . substr( $dt, 0, 2 ) . '-'
+      . substr( $dt, 3, 2 );
+    my $dbname = $NPIs->{$npirid}->{DB};
+    my ( $domain, $subdomain ) = split( '_', $dbname );
+    print qq|wFile: dbname=$dbname\n|;
+    my $form      = DBForm->new("DBNAME=$dbname");
+    my $dbh       = $form->dbconnect();
+    my $sProvider = $dbh->prepare(
+"select Provider.ProvID from Provider left join ProviderControl on ProviderControl.ProvID=Provider.ProvID where Provider.Type=3 and ProviderControl.NPI=?"
+    );
+    $sProvider->execute($npi) || $form->dberror("parseRPT: select Clinic $npi");
+    my $rProvider = $sProvider->fetchrow_hashref;
+    my $rptDir    = $WWW . '/' . $subdomain . '/reports4';
+    my $fileName =
+        'EBT_resp_'
+      . $rProvider->{ProvID}
+      . '_tricare_'
+      . $pdate . '_'
+      . $cnt . '_'
+      . DBUtil->Date( '', 'stamp' ) . '_'
+      . DBUtil->genToken() . '.htm';
+
+    if ( open( OUT, ">${rptDir}/${fileName}" ) ) {
+        print OUT $text;
+        close(OUT);
+    }
+    else { print qq|>>>ERROR: open ${fileName} $!\n|; }
+    print qq|wFile: fileName=$fileName\n|;
+    $sProvider->finish();
+    $form->complete();
+    return ();
 }
 ################################################################

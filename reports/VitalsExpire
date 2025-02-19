@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 use DBA;
@@ -12,18 +12,23 @@ my $DT = localtime();
 #                               dd=15,30,45...
 ############################################################################
 my $form = DBForm->new();
+
 #foreach my $f ( sort keys %{$form} ) { print "form-$f=$form->{$f}\n"; }
-my $dbh = $form->dbconnect();
-my $BackDate = DBUtil->Date('',-6);
-$BackDate = DBUtil->Date($BackDate,'fmt','YYYYMMDD');
+my $dbh      = $form->dbconnect();
+my $BackDate = DBUtil->Date( '', -6 );
+$BackDate = DBUtil->Date( $BackDate, 'fmt', 'YYYYMMDD' );
 
 my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+
 #my $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID');
-my $ClinicSelection = DBA->withSelection($form,'and','Client.clinicClinicID','','','');
+my $ClinicSelection =
+  DBA->withSelection( $form, 'and', 'Client.clinicClinicID', '', '', '' );
 $ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
-my $sProvider = $dbh->prepare("select LName, FName from Provider where ProvID=?");
-my $sClientVitalSigns = $dbh->prepare("select * from ClientVitalSigns where ClientID=? order by VDate");
-my $sClient = $dbh->prepare("
+my $sProvider =
+  $dbh->prepare("select LName, FName from Provider where ProvID=?");
+my $sClientVitalSigns = $dbh->prepare(
+    "select * from ClientVitalSigns where ClientID=? order by VDate");
+my $sClient = $dbh->prepare( "
 select Client.LName, Client.FName, Client.ClientID, Client.DOB, Client.ProvID, Client.Active, Client.RecDOLC as LastContDate
       ,ClientVitalSigns.ID, ClientVitalSigns.VDate
       ,ClientVitalSigns.HeightFeet, ClientVitalSigns.HeightInches, ClientVitalSigns.Weight
@@ -34,50 +39,60 @@ select Client.LName, Client.FName, Client.ClientID, Client.DOB, Client.ProvID, C
   where ClientACL.ProvID='${ForProvID}'
   ${ClinicSelection}
   group by Client.LName, Client.FName, Client.ClientID
-");
+" );
 ##my $records = main->getLastLineOfReport($form,$sel,"ClientID");
 ##foreach $ClientID ( keys %{ $records } )
-print qq|${DT}\nMissing BMI Report.\nClients with Height/Weight missing from Vital Signs screening report.\n|;
-print qq|Client Name\tActive\tDOB\tAge\tTestDate\tHeight\tWeight\tBMI\tHbA1c\tProvider Name\tMessage\tLast Contact Date\n|;
+print
+qq|${DT}\nMissing BMI Report.\nClients with Height/Weight missing from Vital Signs screening report.\n|;
+print
+qq|Client Name\tActive\tDOB\tAge\tTestDate\tHeight\tWeight\tBMI\tHbA1c\tProvider Name\tMessage\tLast Contact Date\n|;
+
 #print qq|ClinicSelection=${ClinicSelection}\n|;
 #print qq|with=${with}\n|;
 $sClient->execute();
-while (my $rClient = $sClient->fetchrow_hashref)
-{ 
+while ( my $rClient = $sClient->fetchrow_hashref ) {
+
 #foreach my $f ( sort keys %{$rClient} ) { print "rClient-$f=$rClient->{$f}\n"; }
-  my $ClientID = $rClient->{'ClientID'};
-  my $ActiveFlag = $rClient->{'Active'} ? 'Yes' : 'No';
-  my $LastContDate = $rClient->{'LastContDate'};
-  my $ClientName = qq|$rClient->{'LName'}, $rClient->{'FName'} ($rClient->{'ClientID'})|;
-  my $Age = DBUtil->Date($rClient->{DOB}, 'age');
-  $sProvider->execute($rClient->{ProvID});
-  my ($ProvLName, $ProvFName) = $sProvider->fetchrow_array;
-  my $ProvName = qq|$ProvLName, $ProvFName ($rClient->{ProvID})|; 
-#print qq|\nClientID=${ClientID}, ClientName=${ClientName}, Age=${Age}\n|;
-  if ( $rClient->{ID} eq '' )
-  {
-    my $msg = $Age < 18 ? 'CHILD: NO VITALS' : 'ADULT: NO VITALS';
-    my $Height = qq|$rClient->{'HeightFeet'}ft $rClient->{'HeightInches'}in| 
-               if ( $rClient->{'HeightFeet'} ne '' || $rClient->{'HeightInches'} ne '' );
-    my $Weight = qq|$rClient->{'Weight'}lbs| if ( $rClient->{'Weight'} ne '' );
-    print qq|${ClientName}\t${ActiveFlag}\t$rClient->{'DOB'}\t${Age}\t$rClient->{'VDate'}\t${Height}\t${Weight}\t$rClient->{'BMI'}\t$rClient->{'HbA1c'}\t${ProvName}\t${msg}\t${LastContDate}\n|;
-  }
-  elsif ( $Age < 18 )
-  {
-    my ($r,$msg) = main->getVitals($form,$ClientID,'CHILD');
-    my $LastHeight = qq|$r->{'HeightFeet'}ft $r->{'HeightInches'}in| 
-                   if ( $r->{'HeightFeet'} ne '' || $r->{'HeightInches'} ne '' );
-    my $LastWeight = qq|$r->{'Weight'}lbs| if ( $r->{'Weight'} ne '' );
-    print qq|${ClientName}\t${ActiveFlag}\t$rClient->{'DOB'}\t${Age}\t$r->{'VDate'}\t${LastHeight}\t${LastWeight}\t$r->{'BMI'}\t$r->{'HbA1c'}\t${ProvName}\t${msg}\t${LastContDate}\n| if ( $msg ne '' );
-  }
-  elsif ( $Age > 17 )
-  {
-    my ($r,$msg) = main->getVitals($form,$ClientID,'ADULT');
-    my $LastHeight = qq|$r->{'HeightFeet'}ft $r->{'HeightInches'}in| 
-                   if ( $r->{'HeightFeet'} ne '' || $r->{'HeightInches'} ne '' );
-    my $LastWeight = qq|$r->{'Weight'}lbs| if ( $r->{'Weight'} ne '' );
-    print qq|${ClientName}\t${ActiveFlag}\t$rClient->{'DOB'}\t${Age}\t$r->{'VDate'}\t${LastHeight}\t${LastWeight}\t$r->{'BMI'}\t$r->{'HbA1c'}\t${ProvName}\t${msg}\t${LastContDate}\n| if ( $msg ne '' );
-  }
+    my $ClientID     = $rClient->{'ClientID'};
+    my $ActiveFlag   = $rClient->{'Active'} ? 'Yes' : 'No';
+    my $LastContDate = $rClient->{'LastContDate'};
+    my $ClientName =
+      qq|$rClient->{'LName'}, $rClient->{'FName'} ($rClient->{'ClientID'})|;
+    my $Age = DBUtil->Date( $rClient->{DOB}, 'age' );
+    $sProvider->execute( $rClient->{ProvID} );
+    my ( $ProvLName, $ProvFName ) = $sProvider->fetchrow_array;
+    my $ProvName = qq|$ProvLName, $ProvFName ($rClient->{ProvID})|;
+
+    #print qq|\nClientID=${ClientID}, ClientName=${ClientName}, Age=${Age}\n|;
+    if ( $rClient->{ID} eq '' ) {
+        my $msg = $Age < 18 ? 'CHILD: NO VITALS' : 'ADULT: NO VITALS';
+        my $Height =
+          qq|$rClient->{'HeightFeet'}ft $rClient->{'HeightInches'}in|
+          if ( $rClient->{'HeightFeet'} ne ''
+            || $rClient->{'HeightInches'} ne '' );
+        my $Weight = qq|$rClient->{'Weight'}lbs|
+          if ( $rClient->{'Weight'} ne '' );
+        print
+qq|${ClientName}\t${ActiveFlag}\t$rClient->{'DOB'}\t${Age}\t$rClient->{'VDate'}\t${Height}\t${Weight}\t$rClient->{'BMI'}\t$rClient->{'HbA1c'}\t${ProvName}\t${msg}\t${LastContDate}\n|;
+    }
+    elsif ( $Age < 18 ) {
+        my ( $r, $msg ) = main->getVitals( $form, $ClientID, 'CHILD' );
+        my $LastHeight = qq|$r->{'HeightFeet'}ft $r->{'HeightInches'}in|
+          if ( $r->{'HeightFeet'} ne '' || $r->{'HeightInches'} ne '' );
+        my $LastWeight = qq|$r->{'Weight'}lbs| if ( $r->{'Weight'} ne '' );
+        print
+qq|${ClientName}\t${ActiveFlag}\t$rClient->{'DOB'}\t${Age}\t$r->{'VDate'}\t${LastHeight}\t${LastWeight}\t$r->{'BMI'}\t$r->{'HbA1c'}\t${ProvName}\t${msg}\t${LastContDate}\n|
+          if ( $msg ne '' );
+    }
+    elsif ( $Age > 17 ) {
+        my ( $r, $msg ) = main->getVitals( $form, $ClientID, 'ADULT' );
+        my $LastHeight = qq|$r->{'HeightFeet'}ft $r->{'HeightInches'}in|
+          if ( $r->{'HeightFeet'} ne '' || $r->{'HeightInches'} ne '' );
+        my $LastWeight = qq|$r->{'Weight'}lbs| if ( $r->{'Weight'} ne '' );
+        print
+qq|${ClientName}\t${ActiveFlag}\t$rClient->{'DOB'}\t${Age}\t$r->{'VDate'}\t${LastHeight}\t${LastWeight}\t$r->{'BMI'}\t$r->{'HbA1c'}\t${ProvName}\t${msg}\t${LastContDate}\n|
+          if ( $msg ne '' );
+    }
 }
 
 $sProvider->finish();
@@ -86,45 +101,47 @@ $sClient->finish();
 $form->complete();
 exit;
 ############################################################################
-sub getVitals
-{
-  my ($self,$form,$ClientID,$type) = @_;
-#print qq|getChild: ClientID=${ClientID}\n|;
-  my $dbh = $form->dbconnect();
-  my $YesHeight, $YesWeight, $YesDate;
-  my $NoHeight, $NoWeight;
-  my $rLast = ();
-  $sClientVitalSigns->execute($ClientID);
-  while (my $r = $sClientVitalSigns->fetchrow_hashref)
-  {
-    my $TestDate = DBUtil->Date($r->{'VDate'},'fmt','YYYYMMDD');
-    my $Height = qq|$r->{'HeightFeet'} $r->{'HeightInches'}|; $Height =~ s/\s+//g;
-    $NoHeight = $Height if ( $Height ne '' );
-    $NoWeight = $r->{'Weight'} if ( $r->{'Weight'} ne '' );
-    $YesHeight = $Height if ( $Height ne '' && $TestDate > $BackDate );
-    $YesWeight = $r->{'Weight'} if ( $r->{'Weight'} ne '' && $TestDate > $BackDate );
-#print qq|Height=${Height}, Weight=$r->{Weight}, VDate=$r->{VDate}\n|;
-#print qq|NoHeight=${NoHeight}, NoWeight=${NoWeight}\n|;
-#print qq|YesHeight=${YesHeight}, YesWeight=${YesWeight}\n|;
-    $rLast = $r;
-  }
-  my $rtnmsg = $NoHeight eq '' ? $type.': NO HEIGHT ENTERED'
-             : $NoWeight eq '' ? $type.': NO WEIGHT ENTERED'
-             : $YesWeight eq '' ? $type.': NO WEIGHT LAST 6 MONTHS'
-             : $type eq 'ADULT' ? ''       # skip NO HEIGHT LAST 6 MONTHS for ADULT
-             : $YesHeight eq '' ? $type.': NO HEIGHT LAST 6 MONTHS'
-             : '';
-  return($rLast,$rtnmsg);
+sub getVitals {
+    my ( $self, $form, $ClientID, $type ) = @_;
+
+    #print qq|getChild: ClientID=${ClientID}\n|;
+    my $dbh = $form->dbconnect();
+    my $YesHeight, $YesWeight, $YesDate;
+    my $NoHeight, $NoWeight;
+    my $rLast = ();
+    $sClientVitalSigns->execute($ClientID);
+    while ( my $r = $sClientVitalSigns->fetchrow_hashref ) {
+        my $TestDate = DBUtil->Date( $r->{'VDate'}, 'fmt', 'YYYYMMDD' );
+        my $Height   = qq|$r->{'HeightFeet'} $r->{'HeightInches'}|;
+        $Height =~ s/\s+//g;
+        $NoHeight  = $Height        if ( $Height ne '' );
+        $NoWeight  = $r->{'Weight'} if ( $r->{'Weight'} ne '' );
+        $YesHeight = $Height if ( $Height ne '' && $TestDate > $BackDate );
+        $YesWeight = $r->{'Weight'}
+          if ( $r->{'Weight'} ne '' && $TestDate > $BackDate );
+
+        #print qq|Height=${Height}, Weight=$r->{Weight}, VDate=$r->{VDate}\n|;
+        #print qq|NoHeight=${NoHeight}, NoWeight=${NoWeight}\n|;
+        #print qq|YesHeight=${YesHeight}, YesWeight=${YesWeight}\n|;
+        $rLast = $r;
+    }
+    my $rtnmsg =
+        $NoHeight eq ''  ? $type . ': NO HEIGHT ENTERED'
+      : $NoWeight eq ''  ? $type . ': NO WEIGHT ENTERED'
+      : $YesWeight eq '' ? $type . ': NO WEIGHT LAST 6 MONTHS'
+      : $type eq 'ADULT' ? ''    # skip NO HEIGHT LAST 6 MONTHS for ADULT
+      : $YesHeight eq '' ? $type . ': NO HEIGHT LAST 6 MONTHS'
+      :                    '';
+    return ( $rLast, $rtnmsg );
 }
-sub getLastLineOfReport
-{
-  my ($self,$form,$select,$GroupID) = @_;
-  my $dbh = $form->dbconnect();
-  my $s = $dbh->prepare($select);
-  $s->execute();
-  my $list = ();
-  while (my $r = $s->fetchrow_hashref)
-  { $list->{$r->{$GroupID}} = $r; }
-  $s->finish();
-  return($list);
+
+sub getLastLineOfReport {
+    my ( $self, $form, $select, $GroupID ) = @_;
+    my $dbh = $form->dbconnect();
+    my $s   = $dbh->prepare($select);
+    $s->execute();
+    my $list = ();
+    while ( my $r = $s->fetchrow_hashref ) { $list->{ $r->{$GroupID} } = $r; }
+    $s->finish();
+    return ($list);
 }

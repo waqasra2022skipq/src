@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use myForm;
 use myDBI;
@@ -8,38 +8,40 @@ use myHTML;
 
 ############################################################################
 my $form = myForm->new();
-my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $dbh  = myDBI->dbconnect( $form->{'DBNAME'} );
 
 #foreach my $f ( sort keys %ENV ) { $data .= qq|ENV: $f=$ENV{$f}\n|; }
 #foreach my $f ( sort keys %{$form} ) { $data .= qq|form: $f=$form->{$f}\n|; }
 
-if ( $form->{'action'} eq 'putlogin' )
-{
-  my $data = qq|
+if ( $form->{'action'} eq 'putlogin' ) {
+    my $data = qq|
   {
     "access_token" : "$form->{'mlt'}",
     "token_type" : "bearer"
     "expires_in" : "3600"
   }
 |;
-  print main->htmljson('application/json',$data);
+    print main->htmljson( 'application/json', $data );
 }
-elsif ( $form->{'action'} eq 'search' )
-{
-  print main->htmlpost();
+elsif ( $form->{'action'} eq 'search' ) {
+    print main->htmlpost();
 }
-elsif ( $form->{'action'} eq 'putsearch' )
-{
-  my $data = '[';
-  $sInsurance=$dbh->prepare("select * from Insurance where ClientID=? and Priority=1");
-  $s=$dbh->prepare("select * from Client where (LName=? or FName=? or DOB=?) and (Gend=?)");
-  $s->execute($form->{'lastname'},$form->{'firstname'},$form->{'dob'},$form->{'gender'});
-  while (my $r = $s->fetchrow_hashref)
-  {
-    $sInsurance->execute($r->{'ClientID'});
-    my $rInsurance = $sInsurance->fetchrow_hashref;
-    (my $DOB = $r->{'DOB'}) =~ s/-//g;
-    $data .= qq|
+elsif ( $form->{'action'} eq 'putsearch' ) {
+    my $data = '[';
+    $sInsurance =
+      $dbh->prepare("select * from Insurance where ClientID=? and Priority=1");
+    $s = $dbh->prepare(
+        "select * from Client where (LName=? or FName=? or DOB=?) and (Gend=?)"
+    );
+    $s->execute(
+        $form->{'lastname'}, $form->{'firstname'},
+        $form->{'dob'},      $form->{'gender'}
+    );
+    while ( my $r = $s->fetchrow_hashref ) {
+        $sInsurance->execute( $r->{'ClientID'} );
+        my $rInsurance = $sInsurance->fetchrow_hashref;
+        ( my $DOB = $r->{'DOB'} ) =~ s/-//g;
+        $data .= qq|
         {
             "MRN" : "$rInsurance->{'InsIDNum'}",
             "id" : "$r->{'ClientID'}"
@@ -49,15 +51,14 @@ elsif ( $form->{'action'} eq 'putsearch' )
             "Gender" : "$r->{'Gend'}"
         },
 |;
-  }
-  $data .= ']';
-  $s->finish();
-  $sInsurance->finish();
-  print main->htmljson('application/json',$data);
+    }
+    $data .= ']';
+    $s->finish();
+    $sInsurance->finish();
+    print main->htmljson( 'application/json', $data );
 }
-elsif ( $form->{'action'} eq 'encounters' )
-{
-  $data = qq|
+elsif ( $form->{'action'} eq 'encounters' ) {
+    $data = qq|
         {
             "title" : "Millennium Information API Access",
             "author" : "Keith Stephenson"
@@ -67,9 +68,8 @@ elsif ( $form->{'action'} eq 'encounters' )
         }
     |;
 }
-elsif ( $form->{'mlt'} ne '' )
-{
-  $data = qq|
+elsif ( $form->{'mlt'} ne '' ) {
+    $data = qq|
         {
             "token" : "$form->{'mlt'}",
         }
@@ -78,16 +78,15 @@ elsif ( $form->{'mlt'} ne '' )
 myDBI->cleanup();
 exit;
 ############################################################################
-sub htmljson
-{
-  my ($self,$header,$data) = @_;
-  my $html = qq|Content-type: ${header}\n\n${data}|;
-  return($html);
+sub htmljson {
+    my ( $self, $header, $data ) = @_;
+    my $html = qq|Content-type: ${header}\n\n${data}|;
+    return ($html);
 }
-sub htmlpost
-{
-  my ($self) = @_;
-  my $html = myHTML->new($form,"Search Patient").qq|
+
+sub htmlpost {
+    my ($self) = @_;
+    my $html = myHTML->new( $form, "Search Patient" ) . qq|
 <SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/NoEnter.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vClientInfo.js?v=20190501"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vDate.js"> </SCRIPT>
@@ -121,7 +120,7 @@ sub htmlpost
     <TD CLASS="strcol" >Birth Gender</TD>
     <TD CLASS="strcol" >
       <SELECT NAME="gender">
-        |.DBA->selxTable($form,'xGend',$form->{'gender'},'Descr').qq|
+        | . DBA->selxTable( $form, 'xGend', $form->{'gender'}, 'Descr' ) . qq|
       </SELECT> 
     </TD>
   </TR>
@@ -145,7 +144,7 @@ sub htmlpost
 </TABLE>
 </FORM>
 |;
-  return($html);
+    return ($html);
 }
 ############################################################################
 #  print qq|Content-type: text/html\n\n

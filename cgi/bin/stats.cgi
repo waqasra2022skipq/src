@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ############################################################################
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBA;
 use myForm;
@@ -9,17 +9,27 @@ use DBUtil;
 
 ############################################################################
 my $form = myForm->new();
+
 #foreach my $f ( sort keys %{$form} ) { warn "vitals.cgi: 2: form-$f=$form->{$f}\n"; }
-my $dbh = myDBI->dbconnect($form->{'DBNAME'});
-if ( $form->{LOGINPROVID} == 91 )
-{
-  open OUT, ">/home/okmis/mis/src/debug/stats.out" or die "Couldn't open file: $!";
-  foreach my $f ( sort keys %{$form} ) { print OUT "vitals.cgi: form-$f=$form->{$f}\n"; }
-  close(OUT);
+my $dbh = myDBI->dbconnect( $form->{'DBNAME'} );
+if ( $form->{LOGINPROVID} == 91 ) {
+    open OUT, ">/var/www/okmis/src/debug/stats.out"
+      or die "Couldn't open file: $!";
+    foreach my $f ( sort keys %{$form} ) {
+        print OUT "vitals.cgi: form-$f=$form->{$f}\n";
+    }
+    close(OUT);
 }
-my $CloseButton = qq|<INPUT TYPE="button" NAME="close" VALUE="close" ONCLICK="javascript: window.close()" >|;
-my $userdata = main->setuser($form,$ClientID);
-my $html = myHTML->new($form,'Millennium Client Statistics','CheckPopupWindow SetD3lib','STYLE="background-color: white"') . qq|
+my $CloseButton =
+qq|<INPUT TYPE="button" NAME="close" VALUE="close" ONCLICK="javascript: window.close()" >|;
+my $userdata = main->setuser( $form, $ClientID );
+my $html     = myHTML->new(
+    $form,
+    'Millennium Client Statistics',
+    'CheckPopupWindow SetD3lib',
+    'STYLE="background-color: white"'
+  )
+  . qq|
 <head>
         <title>hGraph - Health Score Graphing</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
@@ -121,9 +131,8 @@ myDBI->cleanup();
 print $html;
 exit;
 #############################################################################
-sub setuser
-{
-  my ($self,$form,$ClientID) = @_;
-  my $data = '';
-  return($data);
+sub setuser {
+    my ( $self, $form, $ClientID ) = @_;
+    my $data = '';
+    return ($data);
 }

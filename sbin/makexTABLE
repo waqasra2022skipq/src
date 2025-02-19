@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 use DBA;
@@ -8,66 +8,72 @@ use DBA;
 # usage: makexTABLE table Category
 #        create xTABLE=table from xVALUESET
 ############################################################################
-my $debug=0;
-my $table = shift;
+my $debug    = 0;
+my $table    = shift;
 my $Category = shift;
-if ( $table eq '' || $Category eq '' )
-{
-  print qq|\n\nusage: makexTABLE table Category\nERROR>> Missing table or Category!!\n\n|;
-  exit;
+if ( $table eq '' || $Category eq '' ) {
+    print
+qq|\n\nusage: makexTABLE table Category\nERROR>> Missing table or Category!!\n\n|;
+    exit;
 }
 my $form = DBForm->new("DBNAME=okmis_dev");
-if ( $debug ) { foreach my $f ( sort keys %{ $form } ) { print ": form-$f=$form->{$f}\n"; } }
-my $dbh = $form->dbconnect();
+if ($debug) {
+    foreach my $f ( sort keys %{$form} ) { print ": form-$f=$form->{$f}\n"; }
+}
+my $dbh  = $form->dbconnect();
 my $cdbh = $form->connectdb('okmis_config');
 warn qq|table=${table}\n|;
 warn qq|Category=${Category}\n|;
 
-  main->reCreate($cdbh,$table);
+main->reCreate( $cdbh, $table );
 
-  my $sVALUESET = $cdbh->prepare("select * from xVALUESET where Category=? group by Concept order by Concept");
-  $sVALUESET->execute($Category);
-  my $rows = $sVALUESET->rows;
+my $sVALUESET = $cdbh->prepare(
+    "select * from xVALUESET where Category=? group by Concept order by Concept"
+);
+$sVALUESET->execute($Category);
+my $rows = $sVALUESET->rows;
 print qq|## selected ${rows} for xVALUESET Category=${Category}=\n|;
-  while ( $rVALUESET = $sVALUESET->fetchrow_hashref )
-  {
-if ( $debug ) { foreach my $f ( sort keys %{ $rVALUESET } ) { print ": rVALUESET-$f=$rVALUESET->{$f}\n"; } }
+while ( $rVALUESET = $sVALUESET->fetchrow_hashref ) {
+    if ($debug) {
+        foreach my $f ( sort keys %{$rVALUESET} ) {
+            print ": rVALUESET-$f=$rVALUESET->{$f}\n";
+        }
+    }
     my $r = ();
-    $r->{'ID'} = $rVALUESET->{'CodeSystem'}.'_'.$rVALUESET->{'Concept'};
-    $r->{'Category'} = $rVALUESET->{'Category'};
-    $r->{'SubCategory'} = $rVALUESET->{'QualityDataElement'};
-    $r->{'ConceptCode'} = $rVALUESET->{'Concept'};
-    $r->{'ConceptName'} = $rVALUESET->{'ConceptDescription'};
-    $r->{'CodeSystem'} = $rVALUESET->{'CodeSystem'};
-    $r->{'CodeSystemOID'} = $rVALUESET->{'CodeSystemOID'};
+    $r->{'ID'} = $rVALUESET->{'CodeSystem'} . '_' . $rVALUESET->{'Concept'};
+    $r->{'Category'}          = $rVALUESET->{'Category'};
+    $r->{'SubCategory'}       = $rVALUESET->{'QualityDataElement'};
+    $r->{'ConceptCode'}       = $rVALUESET->{'Concept'};
+    $r->{'ConceptName'}       = $rVALUESET->{'ConceptDescription'};
+    $r->{'CodeSystem'}        = $rVALUESET->{'CodeSystem'};
+    $r->{'CodeSystemOID'}     = $rVALUESET->{'CodeSystemOID'};
     $r->{'CodeSystemVersion'} = $rVALUESET->{'CodeSystemVersion'};
-    $r->{'ValueSetName'} = $rVALUESET->{'ValueSetName'};
-    $r->{'ValueSetOID'} = $rVALUESET->{'ValueSetOID'};
-    $r->{'ValueSetVersion'} = $rVALUESET->{'ValueSetVersion'};
-    $r->{'Active'} = 1;
-    my $qInsert = DBA->genInsert($form,$table,$r);
-print qq|insRecord: qInsert=${qInsert}\n| if ( $debug );
+    $r->{'ValueSetName'}      = $rVALUESET->{'ValueSetName'};
+    $r->{'ValueSetOID'}       = $rVALUESET->{'ValueSetOID'};
+    $r->{'ValueSetVersion'}   = $rVALUESET->{'ValueSetVersion'};
+    $r->{'Active'}            = 1;
+    my $qInsert = DBA->genInsert( $form, $table, $r );
+    print qq|insRecord: qInsert=${qInsert}\n| if ($debug);
     my $sInsert = $cdbh->prepare($qInsert);
     $sInsert->execute() || $form->dberror("INSERT ERROR: ${table}: ${qInsert}");
     my $RTNID = $sInsert->{'mysql_insertid'};
     $sInsert->finish();
-print qq|insRecord: ${table}: RTNID=${RTNID}\n| if ( $debug );
-  }
-  $sVALUESET->finish();
+    print qq|insRecord: ${table}: RTNID=${RTNID}\n| if ($debug);
+}
+$sVALUESET->finish();
 
 $cdbh->disconnect();
 $form->complete();
 exit;
 ############################################################################
-sub reCreate
-{
-  my ($self,$dbh,$table) = @_;
+sub reCreate {
+    my ( $self, $dbh, $table ) = @_;
 ##
-# recreate table...
-  my $sDrop=$dbh->prepare("DROP TABLE IF EXISTS ${table}");
-  $sDrop->execute();
-  $sDrop->finish();
-  my $sCreate=$dbh->prepare("
+    # recreate table...
+    my $sDrop = $dbh->prepare("DROP TABLE IF EXISTS ${table}");
+    $sDrop->execute();
+    $sDrop->finish();
+    my $sCreate = $dbh->prepare( "
 CREATE TABLE `${table}` (
   `ID` varchar(64) NOT NULL,
   `Category` varchar(100) NOT NULL DEFAULT '',
@@ -83,8 +89,8 @@ CREATE TABLE `${table}` (
   `Active` char(1) NOT NULL DEFAULT '',
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-");
-  $sCreate->execute();
-  $sCreate->finish();
-  return();
+" );
+    $sCreate->execute();
+    $sCreate->finish();
+    return ();
 }

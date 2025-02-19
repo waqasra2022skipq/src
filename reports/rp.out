@@ -1,7 +1,7 @@
 
 ======================================
 alldb Started: Tue Feb 4 20:31:41 CST 2020
-Load SQL okmis_adv db pwd=/home/okmis/mis/src/reports...
+Load SQL okmis_adv db pwd=/var/www/okmis/src/reports...
 Active	Type	ProvID	Name	LName	FName	Email	NoMail
 1	4	363	NULL	Ackerman	Lawrence	lawrence.ackerman3@gmail.com	0
 1	2	92	Advance Counseling Agency	Agency	Advance	AdvanceMIS1732@gmail.com	0
@@ -399,7 +399,7 @@ okmis_adv	144	vernellirby
 okmis_adv	100	waterwoodclinic
 okmis_adv	394	yolandaboyles
 okmis_adv	332	zabrinacarroll
-Load SQL okmis_anv db pwd=/home/okmis/mis/src/reports...
+Load SQL okmis_anv db pwd=/var/www/okmis/src/reports...
 Active	Type	ProvID	Name	LName	FName	Email	NoMail
 1	2	92	A New View, Inc.	Agency	ANV	wtaylor19@cox.net	0
 0	4	410	NULL	Alexander, BHRS	Yolanda	ydalexander@yahoo.com	0
@@ -429,7 +429,7 @@ okmis_anv	415	jenniferladd
 okmis_anv	413	ritaparker
 okmis_anv	91	root
 okmis_anv	94	whitneykaupke
-Load SQL okmis_anw db pwd=/home/okmis/mis/src/reports...
+Load SQL okmis_anw db pwd=/var/www/okmis/src/reports...
 Active	Type	ProvID	Name	LName	FName	Email	NoMail
 0	4	127	NULL	Abodakpi	Wonder	wonder.abodakpi@anewwaycenter.com	0
 0	4	177	NULL	Acosta	Viola	NULL	0
@@ -713,7 +713,7 @@ okmis_anw	235	whitneyferguson
 okmis_anw	151	yahairabrown
 okmis_anw	222	zacharytedder
 okmis_anw	154	zsaolson
-Load SQL okmis_base db pwd=/home/okmis/mis/src/reports...
+Load SQL okmis_base db pwd=/var/www/okmis/src/reports...
 Active	Type	ProvID	Name	LName	FName	Email	NoMail
 1	2	92	Your Agency Inc.	Board of Directors	MIS	keith@okmis.com	0
 1	4	90	Help Desk	Desk	Help	autumn@okmis.com	1
@@ -721,7 +721,7 @@ Active	Type	ProvID	Name	LName	FName	Email	NoMail
 dbname	UserID	loginid
 okmis_mms	90	helpdesk
 okmis_mms	91	root
-Load SQL okmis_ccc db pwd=/home/okmis/mis/src/reports...
+Load SQL okmis_ccc db pwd=/var/www/okmis/src/reports...
 Active	Type	ProvID	Name	LName	FName	Email	NoMail
 1	4	342	NULL	1	Administrator	choicesok@gmail.com	0
 0	4	360	NULL	Acers	Kulwadee	leekanok@flash.net	0
@@ -873,7 +873,7 @@ okmis_ccc	339	shetinabunn
 okmis_ccc	479	talinadent
 okmis_ccc	486	zeinabmoravejnia
 okmis_ccc	485	zoegarcia
-Load SQL okmis_ccs db pwd=/home/okmis/mis/src/reports...
+Load SQL okmis_ccs db pwd=/var/www/okmis/src/reports...
 Active	Type	ProvID	Name	LName	FName	Email	NoMail
 0	4	112	NULL	Bowman	Wednesday	wednesdaybowman@gmail.com	0
 0	4	124	NULL	Brown	Joseph	NULL	0
@@ -934,7 +934,7 @@ okmis_ccs	114	payroll
 okmis_ccs	91	root
 okmis_ccs	129	shaegilbert
 okmis_ccs	105	tammyhoward
-Load SQL okmis_csl db pwd=/home/okmis/mis/src/reports...
+Load SQL okmis_csl db pwd=/var/www/okmis/src/reports...
 Active	Type	ProvID	Name	LName	FName	Email	NoMail
 0	4	108	NULL	Adeyiga	Oyeyemi	yemiadeyiga@yahoo.com	0
 0	4	111	NULL	Anwanwan	Comfort	sparkiestar@sbcglobal.net	0
@@ -980,7 +980,7 @@ okmis_csl	104	patrickutin
 okmis_csl	91	root
 okmis_csl	119	sundayatolagbe
 okmis_csl	103	teresahenson
-Load SQL okmis_cti db pwd=/home/okmis/mis/src/reports...
+Load SQL okmis_cti db pwd=/var/www/okmis/src/reports...
 Active	Type	ProvID	Name	LName	FName	Email	NoMail
 0	4	142	NULL	Aafedt	Sarah	saafedt@ctitulsa.org	0
 0	4	137	NULL	Adams	Shawna	sadams@ctitulsa.org	0
@@ -1281,7 +1281,7 @@ okmis_cti	262	taylorhawkins
 okmis_cti	269	theresehogge
 okmis_cti	294	waynewashington
 okmis_cti	303	weatherhaag
-Load SQL okmis_demo db pwd=/home/okmis/mis/src/reports...
+Load SQL okmis_demo db pwd=/var/www/okmis/src/reports...
 Active	Type	ProvID	Name	LName	FName	Email	NoMail
 1	2	92	Family Counseling	1	Agency	support@okmis.com	NULL
 1	2	953	Trek Counseling	2	Agency	support@okmis.com	NULL
@@ -1379,7 +1379,7 @@ okmis_demo	808	staffmanager
 okmis_demo	452	staffnurse
 okmis_demo	956	surescripts
 okmis_demo	943	who
-Load SQL okmis_elf db pwd=/home/okmis/mis/src/reports...
+Load SQL okmis_elf db pwd=/var/www/okmis/src/reports...
 Active	Type	ProvID	Name	LName	FName	Email	NoMail
 1	2	175	Gilfeather Psychiatric Services	Agency	Gilfeather	briangilfeather@gmail.com	1
 0	4	127	NULL	Armstrong	Mandy	gatsmomma@gmail.com	0
@@ -1544,7 +1544,7 @@ okmis_elf	213	secilycleere
 okmis_elf	218	staceymarchino
 okmis_elf	184	stephenbarton
 okmis_elf	221	tonyafinch
-Load SQL okmis_eti db pwd=/home/okmis/mis/src/reports...
+Load SQL okmis_eti db pwd=/var/www/okmis/src/reports...
 Active	Type	ProvID	Name	LName	FName	Email	NoMail
 1	2	92	Effective Transitions, Inc. - Beyond the Bell	Agency	ETI	eti@etiok.com	0
 0	4	132	NULL	Alberson	Frank	falberson@etiok.com	0
@@ -1660,7 +1660,7 @@ okmis_eti	94	myronmayberry
 okmis_eti	91	root
 okmis_eti	101	stefanjohnson
 okmis_eti	95	taushamayberry
-Load SQL okmis_fho db pwd=/home/okmis/mis/src/reports...
+Load SQL okmis_fho db pwd=/var/www/okmis/src/reports...
 Active	Type	ProvID	Name	LName	FName	Email	NoMail
 1	2	92	Future & Hope Outreach, L.L.C. Board of Directors	Agency	FHO	NULL	1
 0	4	114	NULL	ALLEN	SHEILA	NULL	1
@@ -1702,7 +1702,7 @@ okmis_fho	117	josephpetty
 okmis_fho	121	robinwatson
 okmis_fho	91	root
 okmis_fho	114	sheilaallen
-Load SQL okmis_foh db pwd=/home/okmis/mis/src/reports...
+Load SQL okmis_foh db pwd=/var/www/okmis/src/reports...
 Active	Type	ProvID	Name	LName	FName	Email	NoMail
 1	2	92	Fountain of Hope Family Services, Inc.	Board of Directors	MIS	NULL	0
 1	4	116	NULL	Campbell	Mirlande	mimicampbell@sbcglobal.net	0
@@ -1748,7 +1748,7 @@ okmis_foh	105	temiloluwaoladipo
 okmis_foh	111	temitoperotimi
 okmis_foh	120	thaliagarcia
 okmis_foh	109	yaknodouglas
-Load SQL okmis_gcs db pwd=/home/okmis/mis/src/reports...
+Load SQL okmis_gcs db pwd=/var/www/okmis/src/reports...
 Active	Type	ProvID	Name	LName	FName	Email	NoMail
 0	2	106	Gilfeather Psychiatric Services	Agency	Gilfeather	briangilfeather@gmail.com	0
 0	4	120	NULL	Belle	Stephanie	NULL	0
@@ -1826,7 +1826,7 @@ okmis_gcs	136	teresabiffle
 okmis_gcs	101	traciegillispie
 okmis_gcs	140	wendytunnessen
 okmis_gcs	133	williamstraily
-Load SQL okmis_gpr db pwd=/home/okmis/mis/src/reports...
+Load SQL okmis_gpr db pwd=/var/www/okmis/src/reports...
 Active	Type	ProvID	Name	LName	FName	Email	NoMail
 1	4	257	NULL	Allen	Hershel 'Wayne'	wallen@gatewaytoprevention.org	1
 0	4	134	NULL	Allison	Kelsie	kallison@gatewaytoprevention.org	0
@@ -2072,7 +2072,7 @@ okmis_gpr	224	thomasfleming
 okmis_gpr	227	timothyflanagan
 okmis_gpr	169	tishyork
 okmis_gpr	229	troybecker
-Load SQL okmis_ibf db pwd=/home/okmis/mis/src/reports...
+Load SQL okmis_ibf db pwd=/var/www/okmis/src/reports...
 Active	Type	ProvID	Name	LName	FName	Email	NoMail
 1	2	92	IBFCC Agency	Agency	IBFCC	tpalmerlpc@yahoo.com	0
 1	4	90	Help Desk	Desk	Help	autumn@okmis.com	1
@@ -2105,7 +2105,7 @@ okmis_ibf	113	temporaryprovider
 okmis_ibf	106	todd.palmer
 okmis_ibf	101	toddpalmer
 okmis_ibf	112	tonyleonard
-Load SQL okmis_ipi db pwd=/home/okmis/mis/src/reports...
+Load SQL okmis_ipi db pwd=/var/www/okmis/src/reports...
 Active	Type	ProvID	Name	LName	FName	Email	NoMail
 1	4	207	NULL	Anderson	Peggy	Peggy.Anderson@integritypathways.com	0
 0	4	173	NULL	Ayers	Chasity	NULL	1
@@ -2285,7 +2285,7 @@ okmis_ipi	162	terahfinney
 okmis_ipi	176	toddcrawford
 okmis_ipi	200	zeretatravis
 okmis_ipi	190	zohethtorres
-Load SQL okmis_kca db pwd=/home/okmis/mis/src/reports...
+Load SQL okmis_kca db pwd=/var/www/okmis/src/reports...
 Active	Type	ProvID	Name	LName	FName	Email	NoMail
 1	2	92	Kiamichi Council on Alcoholism and Other Drug Abuse, Inc.	Agency	KIAMICHI 	support@okmis.com	0
 0	4	133	NULL	Banfill	Ashley	NULL	0
@@ -2360,7 +2360,7 @@ okmis_kca	120	sandimoore
 okmis_kca	125	sequoiabrown
 okmis_kca	137	shelbywhite
 okmis_kca	124	susanterryball
-Load SQL okmis_kcs db pwd=/home/okmis/mis/src/reports...
+Load SQL okmis_kcs db pwd=/var/www/okmis/src/reports...
 Active	Type	ProvID	Name	LName	FName	Email	NoMail
 1	4	111	NULL	Alva	Keri	kerialva@keystonecounseling.net	0
 1	4	115	NULL	Bray	Sherry	sherrybray@keystonecounseling.net	0
@@ -2404,7 +2404,7 @@ okmis_kcs	120	sarahhubbard
 okmis_kcs	115	sherrybray
 okmis_kcs	103	susanreed
 okmis_kcs	107	tammytillman
-Load SQL okmis_lbhp db pwd=/home/okmis/mis/src/reports...
+Load SQL okmis_lbhp db pwd=/var/www/okmis/src/reports...
 Active	Type	ProvID	Name	LName	FName	Email	NoMail
 0	4	223	NULL	Adamson	Lacinda	NULL	0
 0	2	164	Boswell Agency	Agency	Boswell	support@okmis.com	0
@@ -2685,7 +2685,7 @@ okmis_lbhp	252	trishawwhite
 okmis_lbhp	210	tulsatherapyagency, pllc.agency
 okmis_lbhp	211	tulsatherapyclinic, pllc.clinic
 okmis_lbhp	171	valkenburgagency
-Load SQL okmis_lkt db pwd=/home/okmis/mis/src/reports...
+Load SQL okmis_lkt db pwd=/var/www/okmis/src/reports...
 Active	Type	ProvID	Name	LName	FName	Email	NoMail
 1	2	92	Love & Kare Treatment Services, LLC	Agency	LTK	love.kare.llc@gmail.com	0
 0	4	109	NULL	Asberry	Chemica	chemicaasberry1@cox.net	0
@@ -2763,7 +2763,7 @@ okmis_lkt	135	tishabradford
 okmis_lkt	125	tony knauls
 okmis_lkt	123	tyronestreet
 okmis_lkt	127	vercillajones
-Load SQL okmis_mms db pwd=/home/okmis/mis/src/reports...
+Load SQL okmis_mms db pwd=/var/www/okmis/src/reports...
 Active	Type	ProvID	Name	LName	FName	Email	NoMail
 0	4	2130	NULL	 Fragoso 2	Gricelda	dr.g.psyd@gmail.com	1
 0	4	2796	NULL	1	Contractor	NULL	0
@@ -4047,7 +4047,7 @@ okmis_mms	2729	yolandamartinez
 okmis_mms	2736	zacharyabbott
 okmis_mms	2785	zacharyjohnson
 okmis_mms	2185	zachwoodson
-Load SQL okmis_oays db pwd=/home/okmis/mis/src/reports...
+Load SQL okmis_oays db pwd=/var/www/okmis/src/reports...
 Active	Type	ProvID	Name	LName	FName	Email	NoMail
 0	4	1319	NULL	Aaa	1	cd@iytd	0
 0	4	1211	NULL	Abshere	Jodi	JodiAbshere@hotmail.com	0
@@ -4925,7 +4925,7 @@ okmis_oays	1383	yfsscclinic
 okmis_oays	1382	ysst
 okmis_oays	92	yst
 okmis_oays	1320	yst school- based
-Load SQL okmis_opa db pwd=/home/okmis/mis/src/reports...
+Load SQL okmis_opa db pwd=/var/www/okmis/src/reports...
 Active	Type	ProvID	Name	LName	FName	Email	NoMail
 0	2	119	Susan Howard PhD, PLLC	Agency	Howard	susanhowardphd@aol.com	0
 1	2	124	William J. Shaw, Psy.D.	Agency	Shaw	dr.billshaw@gmail.com	0
@@ -4977,7 +4977,7 @@ okmis_opa	91	root
 okmis_opa	124	shawagency
 okmis_opa	125	shawclinic
 okmis_opa	126	williamshaw
-Load SQL okmis_pcd db pwd=/home/okmis/mis/src/reports...
+Load SQL okmis_pcd db pwd=/var/www/okmis/src/reports...
 Active	Type	ProvID	Name	LName	FName	Email	NoMail
 1	4	105	NULL	Bagwell	April	abagwell@pcdcinc.net	0
 1	3	100	Payne County Drug Court Clinic	Bagwell	Noel	pcdcdirector@brightok.net	0
@@ -5006,7 +5006,7 @@ okmis_pcd	113	michellehix
 okmis_pcd	102	noelbagwell
 okmis_pcd	100	pcdclinic
 okmis_pcd	91	root
-Load SQL okmis_scs db pwd=/home/okmis/mis/src/reports...
+Load SQL okmis_scs db pwd=/var/www/okmis/src/reports...
 Active	Type	ProvID	Name	LName	FName	Email	NoMail
 1	2	101	Syd-LYFE Counseling Service, LLC	Agency	SCS	nscott@sydlyfe.com	1
 0	4	127	NULL	Anderson	Rayshinda	NULL	0
@@ -5140,7 +5140,7 @@ okmis_scs	142	traceywesson
 okmis_scs	151	traiscott
 okmis_scs	166	vosiawilson
 okmis_scs	141	yolandajackson-colbert
-Load SQL okmis_tccp db pwd=/home/okmis/mis/src/reports...
+Load SQL okmis_tccp db pwd=/var/www/okmis/src/reports...
 Active	Type	ProvID	Name	LName	FName	Email	NoMail
 1	4	152	NULL	Aafedt	Sarah 	saafedt@tc4cp.com	0
 0	4	142	NULL	Asher Beckett	Carly	NULL	0
@@ -5233,7 +5233,7 @@ okmis_tccp	139	sarahills
 okmis_tccp	107	sarahjones
 okmis_tccp	103	tarapyle
 okmis_tccp	140	tiffanywierzbicki
-Load SQL okmis_tsi db pwd=/home/okmis/mis/src/reports...
+Load SQL okmis_tsi db pwd=/var/www/okmis/src/reports...
 Active	Type	ProvID	Name	LName	FName	Email	NoMail
 0	4	128	NULL	Barron	Sherie 	sherie@therapeuticservicesok.com	0
 0	4	132	NULL	Barron	Sherie	sherie@therapeuticservicesok.com	0

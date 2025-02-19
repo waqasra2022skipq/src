@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ############################################################################
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use Cwd;
 use DBI;
 use myForm;
@@ -12,39 +12,55 @@ use utils;
 
 ############################################################################
 my $form = myForm->new();
-$form->{'method'} = 'BilledvsIncome';           # default graph
+$form->{'method'} = 'BilledvsIncome';    # default graph
 $form->{'daterange'} = 'lastmonth' if ( $form->{'daterange'} eq '' );
 $form = DBUtil->setDates($form);
+
 #foreach my $f ( sort keys %{$form} ) { warn "graphs.cgi: 1: form-$f=$form->{$f}\n"; }
 #warn qq|graphs.cgi: s=$form->{'s'}\n|;
-$form = utils->writesid($form,$form->{'s'});
+$form = utils->writesid( $form, $form->{'s'} );
+
 #foreach my $f ( sort keys %{$form} ) { warn "graphs.cgi: 2: form-$f=$form->{$f}\n"; }
-my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $dbh    = myDBI->dbconnect( $form->{'DBNAME'} );
 my $javaor = "||";
 
 ############################################################################
-if ( $form->{LOGINPROVID} == 91 )
-{
-  open OUT, ">/home/okmis/mis/src/debug/graphs.out" or die "Couldn't open file: $!";
-  foreach my $f ( sort keys %{$form} ) { print OUT "graphs.cgi: form-$f=$form->{$f}\n"; }
-  close(OUT);
+if ( $form->{LOGINPROVID} == 91 ) {
+    open OUT, ">/var/www/okmis/src/debug/graphs.out"
+      or die "Couldn't open file: $!";
+    foreach my $f ( sort keys %{$form} ) {
+        print OUT "graphs.cgi: form-$f=$form->{$f}\n";
+    }
+    close(OUT);
 }
-# Static date variables...
-my $fdow = DBUtil->Date($form->{FromDate},'dow');
-my $fdayname = (Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday)[$fdow];
-my $tdow = DBUtil->Date($form->{ToDate},'dow');
-my $tdayname = (Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday)[$tdow];
 
-my $addSelection = DBA->withClinicProvider($form,'and','Client.clinicClinicID','Treatment.ProvID');
+# Static date variables...
+my $fdow = DBUtil->Date( $form->{FromDate}, 'dow' );
+my $fdayname =
+  ( Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday )[$fdow];
+my $tdow = DBUtil->Date( $form->{ToDate}, 'dow' );
+my $tdayname =
+  ( Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday )[$tdow];
+
+my $addSelection =
+  DBA->withClinicProvider( $form, 'and', 'Client.clinicClinicID',
+    'Treatment.ProvID' );
 my $ReportHeader = DBA->withSelectionHeader($form);
-my $chartname = 'bar_chart';
-my $ChartStyle = qq||;
-my ($xLabel,$xFormat) = ('Clinics',',.d0');
-my ($yLabel,$yFormat) = ('Population',',.d0');
+my $chartname    = 'bar_chart';
+my $ChartStyle   = qq||;
+my ( $xLabel, $xFormat ) = ( 'Clinics', ',.d0' );
+my ( $yLabel, $yFormat ) = ( 'Population', ',.d0' );
 ############################################################################
-my $CloseButton = qq|<INPUT TYPE="button" NAME="close" VALUE="close" ONCLICK="javascript: window.close()" >|;
-my $MENU = myHTML->getHTML($form,'graph.menu',1);
-my $html = myHTML->new($form,'Millennium Graphs','CheckPopupWindow SetD3lib','STYLE="background-color: white"') . qq|
+my $CloseButton =
+qq|<INPUT TYPE="button" NAME="close" VALUE="close" ONCLICK="javascript: window.close()" >|;
+my $MENU = myHTML->getHTML( $form, 'graph.menu', 1 );
+my $html = myHTML->new(
+    $form,
+    'Millennium Graphs',
+    'CheckPopupWindow SetD3lib',
+    'STYLE="background-color: white"'
+  )
+  . qq|
 <SCRIPT TYPE="text/javascript" SRC="/cgi/js/ajaxrequest.js"></SCRIPT>
   <LINK REL="stylesheet" TYPE="text/css" HREF="/cgi/jcal/calendar-forest.css" >
   <LINK REL="stylesheet" TYPE="text/css" HREF="/cgi/css/StyleYearMonth.css"> 
@@ -152,22 +168,25 @@ function gather_Form(id,reset)
 <TABLE CLASS="fullsize" > <TR><TD>${MENU}</TD></TR> </TABLE>
 </FORM>
 |;
+
 # create/finish the graph from data...
-my $data = main->default_graph($form,$addSelection);
+my $data  = main->default_graph( $form, $addSelection );
 my $parms = ();
 $parms->{'function'} = $chartname;
-$parms->{'style'} = $ChartStyle;
-$parms->{'title'} = qq|${ReportHeader} Billed vs Income by Month|;
-$parms->{'subtitle'} = qq|Notes for ServiceDate from ${fdayname} $form->{FromDateD} - ${tdayname} $form->{ToDateD}|;
+$parms->{'style'}    = $ChartStyle;
+$parms->{'title'}    = qq|${ReportHeader} Billed vs Income by Month|;
+$parms->{'subtitle'} =
+qq|Notes for ServiceDate from ${fdayname} $form->{FromDateD} - ${tdayname} $form->{ToDateD}|;
 $parms->{'xformat'} = $xFormat;
-$parms->{'xlabel'} = $xLabel;
+$parms->{'xlabel'}  = $xLabel;
 $parms->{'yformat'} = $yFormat;
-$parms->{'ylabel'} = $yLabel;
-$parms->{'height'} = 500;
-$parms->{'width'} = 1000;
+$parms->{'ylabel'}  = $yLabel;
+$parms->{'height'}  = 500;
+$parms->{'width'}   = 1000;
+
 #print qq|parms: are...\n|;
 #foreach my $f ( keys %{$parms} ) { print ": parms-$f=$parms->{$f}\n"; }
-my $grapharea = graphs->d3_chart($parms,$data);
+my $grapharea = graphs->d3_chart( $parms, $data );
 $html .= qq|
 <DIV ><INPUT TYPE="button" ONCLICK="printDiv('chart1');" VALUE="Print" /> </DIV>
 <SPAN ID="grapharea" >
@@ -189,14 +208,15 @@ exit;
 #############################################################################
 
 #############################################################################
-sub default_graph
-{
-  my ($self,$form,$addsel) = @_;
-  my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
-  $chartname = 'bar_chart';
-  $xLabel = 'Billed vs Income';
-  $yLabel = 'Dollars'; $yFormat = ',.2f';
-  my $s = qq|
+sub default_graph {
+    my ( $self, $form, $addsel ) = @_;
+    my $ForProvID =
+      $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+    $chartname = 'bar_chart';
+    $xLabel    = 'Billed vs Income';
+    $yLabel    = 'Dollars';
+    $yFormat   = ',.2f';
+    my $s = qq|
 select 'Amt' as MyKey, DATE_FORMAT(Treatment.ContLogDate,'%Y-%m') as MyX, SUM(Treatment.BilledAmt) as MyY1
 , SUM(Treatment.IncAmt) as MyY2
  from Client
@@ -206,16 +226,21 @@ select 'Amt' as MyKey, DATE_FORMAT(Treatment.ContLogDate,'%Y-%m') as MyX, SUM(Tr
   left join xSC on xSC.SCID=Treatment.SCID
   left join xInsurance on xInsurance.ID=xSC.InsID
  where Treatment.ContLogDate>="$form->{FromDate}" and Treatment.ContLogDate<="$form->{ToDate}"
-   and | . DBA->withNoteAccess($form,$ForProvID,'Treatment') . $unRec . $addsel . qq|
+   and |
+      . DBA->withNoteAccess( $form, $ForProvID, 'Treatment' )
+      . $unRec
+      . $addsel . qq|
  group by MyKey, MyX |;
-if ( $form->{LOGINPROVID} == 91 )
-{
-  open OUT, ">>/home/okmis/mis/src/debug/graphs.out" or die "Couldn't open file: $!";
-  print OUT qq|graphs.cgi: s=\n$s\n|;
-  close(OUT);
-}
-  my $dataset = ();
-  $dataset = graphs->selData($form,$s,$dataset,'MyY1|BillAmt:MyY2|IncAmt',$chartname);
-  my $data = graphs->setData($dataset);
-  return($data);
+
+    if ( $form->{LOGINPROVID} == 91 ) {
+        open OUT, ">>/var/www/okmis/src/debug/graphs.out"
+          or die "Couldn't open file: $!";
+        print OUT qq|graphs.cgi: s=\n$s\n|;
+        close(OUT);
+    }
+    my $dataset = ();
+    $dataset = graphs->selData( $form, $s, $dataset, 'MyY1|BillAmt:MyY2|IncAmt',
+        $chartname );
+    my $data = graphs->setData($dataset);
+    return ($data);
 }

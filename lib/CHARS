@@ -1,14 +1,16 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 ############################################################################
-#–
+#ï¿½
 #
 ############################################################################
-$str = qq|tel me what–. has this to do  with the other?|;
+$str = qq|tel me whatï¿½. has this to do 
+ with the other?|;
 print qq|==\n$str\n==\n|;
-$str =~ s/–/1/g;
-$newline=qq|\n|;
-$str =~ s//${newline}/g;
+$str =~ s/ï¿½/1/g;
+$newline = qq|\n|;
+$str =~ s/
+/${newline}/g;
 print qq|==\n$str\n==\n|;
 exit;
 ############################################################################

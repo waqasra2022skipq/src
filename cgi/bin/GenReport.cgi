@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use myConfig;
 use Cwd;
 use DBI;
@@ -14,148 +14,197 @@ use Excel::Writer::XLSX;
 my $form = myForm->new();
 
 my $debug = $form->{'LOGINPROVID'} == 91 ? 0 : 0;
+
 #$debug = 1;
-if ( $debug )
-{
-warn qq|\n\n|.localtime().qq|\n\nGenReport: enter: $form->{Name}\n|;
-foreach my $f ( sort keys %{$form} ) { warn "GenReport: form-$f=$form->{$f}\n"; }
+if ($debug) {
+    warn qq|\n\n| . localtime() . qq|\n\nGenReport: enter: $form->{Name}\n|;
+    foreach my $f ( sort keys %{$form} ) {
+        warn "GenReport: form-$f=$form->{$f}\n";
+    }
 }
-my %Args = 
-(
-  'Active'      => qq|<INPUT TYPE="hidden" NAME="Active" VALUE="$form->{Active}" >| ,
-  'Days'        => qq|<INPUT TYPE="hidden" NAME="Days" VALUE="$form->{Days}" >| ,
-  'Folder'      => qq|<INPUT TYPE="hidden" NAME="Folder" VALUE="$form->{Folder}" >| ,
-  'InsCode'     => qq|<INPUT TYPE="hidden" NAME="InsCode" VALUE="$form->{InsCode}" >| ,
-  'CustAgency'  => qq|<INPUT TYPE="hidden" NAME="CustAgency" VALUE="$form->{CustAgency}" >| ,
-  'ClinicIDs'   => qq|<INPUT TYPE="hidden" NAME="ClinicIDs" VALUE="$form->{ClinicIDs}" >| ,
-  'daterange'   => qq|<INPUT TYPE="hidden" NAME="daterange" VALUE="$form->{daterange}" >| ,
-  'FromDate'    => qq|<INPUT TYPE="hidden" NAME="FromDate" VALUE="$form->{FromDate}" >| ,
-  'ToDate'      => qq|<INPUT TYPE="hidden" NAME="ToDate" VALUE="$form->{ToDate}" >| ,
-  'Format'      => qq|<INPUT TYPE="hidden" NAME="Format" VALUE="$form->{Format}" >| ,
-  'InsID'       => qq|<INPUT TYPE="hidden" NAME="InsID" VALUE="$form->{InsID}" >| ,
-  'ProvIDs'     => qq|<INPUT TYPE="hidden" NAME="ProvIDs" VALUE="$form->{ProvIDs}" >| ,
-  'ClientIDs'   => qq|<INPUT TYPE="hidden" NAME="ClientIDs" VALUE="$form->{ClientIDs}" >| ,
-  'CQM'         => qq|<INPUT TYPE="hidden" NAME="CQM" VALUE="$form->{CQM}" >| ,
-  'AMSType'     => qq|<INPUT TYPE="hidden" NAME="AMSType" VALUE="$form->{AMSType}" >| ,
-  'ActivityName'=> qq|<INPUT TYPE="hidden" NAME="ActivityName" VALUE="$form->{ActivityName}" >| ,
-  'sYearMonth'  => qq|<INPUT TYPE="hidden" NAME="sYearMonth" VALUE="$form->{sYearMonth}" >| ,
-  'CronTime'    => qq|<INPUT TYPE="hidden" NAME="CronTime" VALUE="$form->{CronTime}" >| ,
-  'CronDay'     => qq|<INPUT TYPE="hidden" NAME="CronDay" VALUE="$form->{CronDay}" >| ,
-  'CronMonth'   => qq|<INPUT TYPE="hidden" NAME="CronMonth" VALUE="$form->{CronMonth}" >| ,
-  'CronWeek'    => qq|<INPUT TYPE="hidden" NAME="CronWeek" VALUE="$form->{CronWeek}" >| ,
+my %Args = (
+    'Active' =>
+      qq|<INPUT TYPE="hidden" NAME="Active" VALUE="$form->{Active}" >|,
+    'Days'   => qq|<INPUT TYPE="hidden" NAME="Days" VALUE="$form->{Days}" >|,
+    'Folder' =>
+      qq|<INPUT TYPE="hidden" NAME="Folder" VALUE="$form->{Folder}" >|,
+    'InsCode' =>
+      qq|<INPUT TYPE="hidden" NAME="InsCode" VALUE="$form->{InsCode}" >|,
+    'CustAgency' =>
+      qq|<INPUT TYPE="hidden" NAME="CustAgency" VALUE="$form->{CustAgency}" >|,
+    'ClinicIDs' =>
+      qq|<INPUT TYPE="hidden" NAME="ClinicIDs" VALUE="$form->{ClinicIDs}" >|,
+    'daterange' =>
+      qq|<INPUT TYPE="hidden" NAME="daterange" VALUE="$form->{daterange}" >|,
+    'FromDate' =>
+      qq|<INPUT TYPE="hidden" NAME="FromDate" VALUE="$form->{FromDate}" >|,
+    'ToDate' =>
+      qq|<INPUT TYPE="hidden" NAME="ToDate" VALUE="$form->{ToDate}" >|,
+    'Format' =>
+      qq|<INPUT TYPE="hidden" NAME="Format" VALUE="$form->{Format}" >|,
+    'InsID'   => qq|<INPUT TYPE="hidden" NAME="InsID" VALUE="$form->{InsID}" >|,
+    'ProvIDs' =>
+      qq|<INPUT TYPE="hidden" NAME="ProvIDs" VALUE="$form->{ProvIDs}" >|,
+    'ClientIDs' =>
+      qq|<INPUT TYPE="hidden" NAME="ClientIDs" VALUE="$form->{ClientIDs}" >|,
+    'CQM'     => qq|<INPUT TYPE="hidden" NAME="CQM" VALUE="$form->{CQM}" >|,
+    'AMSType' =>
+      qq|<INPUT TYPE="hidden" NAME="AMSType" VALUE="$form->{AMSType}" >|,
+    'ActivityName' =>
+qq|<INPUT TYPE="hidden" NAME="ActivityName" VALUE="$form->{ActivityName}" >|,
+    'sYearMonth' =>
+      qq|<INPUT TYPE="hidden" NAME="sYearMonth" VALUE="$form->{sYearMonth}" >|,
+    'CronTime' =>
+      qq|<INPUT TYPE="hidden" NAME="CronTime" VALUE="$form->{CronTime}" >|,
+    'CronDay' =>
+      qq|<INPUT TYPE="hidden" NAME="CronDay" VALUE="$form->{CronDay}" >|,
+    'CronMonth' =>
+      qq|<INPUT TYPE="hidden" NAME="CronMonth" VALUE="$form->{CronMonth}" >|,
+    'CronWeek' =>
+      qq|<INPUT TYPE="hidden" NAME="CronWeek" VALUE="$form->{CronWeek}" >|,
 );
-my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $dbh  = myDBI->dbconnect( $form->{'DBNAME'} );
 my $cdbh = myDBI->dbconnect('okmis_config');
 chdir("$form->{DOCROOT}/tmp");
-my $result = '';
-my $xtable = $form->{'xtable'} eq '' ? 'xReports' : $form->{'xtable'};
+my $result  = '';
+my $xtable  = $form->{'xtable'} eq '' ? 'xReports' : $form->{'xtable'};
 my $sxTable = $cdbh->prepare("select * from ${xtable} where Name=?");
-$sxTable->execute($form->{Name}) || myDBI->dberror("execute error: $form->{Name}/check");
+$sxTable->execute( $form->{Name} )
+  || myDBI->dberror("execute error: $form->{Name}/check");
 my $rxTable = $sxTable->fetchrow_hashref;
 ##foreach my $f ( sort keys %{$rxTable} ) { warn "GenReport: rxTable-$f=$rxTable->{$f}\n"; }
-if ( $rxTable->{Inputs} eq 'none' )
-{
-  my $cmd = qq|/home/okmis/mis/src/reports/$rxTable->{Script} DBNAME=$form->{DBNAME}\\&mlt=$form->{mlt}\\&hdrline=$form->{hdrline}\\&output=$form->{output}|;
-  $result = main->runReport("${cmd}");
+if ( $rxTable->{Inputs} eq 'none' ) {
+    my $cmd =
+qq|/var/www/okmis/src/reports/$rxTable->{Script} DBNAME=$form->{DBNAME}\\&mlt=$form->{mlt}\\&hdrline=$form->{hdrline}\\&output=$form->{output}|;
+    $result = main->runReport("${cmd}");
 }
-elsif ( $rxTable->{Inputs} eq 'shell' )
-{
-  my $cmd = qq|/home/okmis/mis/src/reports/$rxTable->{Script} $form->{$rxTable->{Args}} $form->{mlt}|;
-  $result = main->runReport("${cmd}");
+elsif ( $rxTable->{Inputs} eq 'shell' ) {
+    my $cmd =
+qq|/var/www/okmis/src/reports/$rxTable->{Script} $form->{$rxTable->{Args}} $form->{mlt}|;
+    $result = main->runReport("${cmd}");
 }
 elsif ( $form->{report} || $form->{save} ) { $result = main->submit(); }
-else { $result = main->check(); }
+else                                       { $result = main->check(); }
 $sxTable->finish();
 myDBI->cleanup();
 print $result;
 exit;
 
 ############################################################################
-sub check
-{
-warn qq|GenReport: check: $form->{Name}\n| if ( $debug );
-  my ($askSection,$addHIDDEN) = ('','');
-  my $savebutton = $rxTable->{'Outputs'}  =~ /save/i    ## don't give them this as output, but save button option
-                 ? qq|<INPUT TYPE="submit" NAME="save" VALUE="save" ONCLICK="return validate(this.form);" >|
-                 : '';
-#foreach my $f ( sort keys %{Args} ) { warn "GenReport: Args-$f=$Args{$f}\n"; }
-  my $askIns;
-  foreach my $inp ( split(':',$rxTable->{Inputs}) )
-  {
-warn qq|GenReport: process: ${inp}\n| if ( $debug );
-    if ( $inp eq 'Active' ) { delete $Args{Active}; $askSection .= main->setActive(); }
-    elsif ( $inp eq 'Days' ) { delete $Args{Days}; $askSection .= main->setDays(); }
-    elsif ( $inp eq 'Folder' ) { delete $Args{Folder}; $askSection .= main->setFolder(); }
-    elsif ( $inp eq 'CustAgency' ) { delete $Args{CustAgency}; $askSection .= main->setCustAgency(); }
-    elsif ( $inp eq 'ClinicIDs' )
-    {
-      delete $Args{ClinicIDs}; 
-      if ( SysAccess->getClinics($form) > 1 )
-      { $askSection .= main->setClinicIDs(); }
-    }
-    elsif ( $inp eq 'daterange' )
-    { 
-      delete $Args{daterange}; 
-      delete $Args{FromDate}; 
-      delete $Args{ToDate}; 
-      $askSection .= main->setDates();
-    }
-    elsif ( $inp eq 'Format' ) { delete $Args{Format}; $askSection .= main->setFormat(); }
-    elsif ( $inp eq 'InsID' ) { delete $Args{InsID}; $askSection .= main->setInsID(); $askIns = 1; }
-    elsif ( $inp eq 'ProvIDs' )
-    {
-      delete $Args{ProvIDs}; 
-      if ( SysAccess->getProviders($form) > 1 )
-      { $askSection .= main->setProvIDs(); }
-    }
-    elsif ( $inp eq 'ClientIDs' ) { delete $Args{ClientIDs}; $askSection .= main->setClientIDs(); }
-    elsif ( $inp eq 'sYearMonth' ) { delete $Args{sYearMonth}; $askSection .= main->setYM(); }
-    elsif ( $inp eq 'ProvClients' )
-    {
-      delete $Args{ProvIDs}; 
-      delete $Args{ClientIDs}; 
-      delete $Args{CQM}; 
-      $askSection .= main->setProvClients();
-    }
-    elsif ( $inp eq 'QRDAIII' )
-    {
-      delete $Args{ProvIDs}; 
-      delete $Args{ClientIDs}; 
-      delete $Args{CQM}; 
-      $askSection .= main->setQRDAIII();
-    }
-    elsif ( $inp eq 'AMSType' ) { delete $Args{AMSType}; $askSection .= main->setAMSType(); }
-    elsif ( $inp eq 'CronTime' )
-    {
-      delete $Args{CronTime};
-      delete $Args{CronDay};
-      delete $Args{CronMonth};
-      delete $Args{CronWeek};
-      $askSection .= main->setCronTime(); 
-    }
-  }
-warn qq|\n\n| if ( $debug );
+sub check {
+    warn qq|GenReport: check: $form->{Name}\n| if ($debug);
+    my ( $askSection, $addHIDDEN ) = ( '', '' );
+    my $savebutton = $rxTable->{'Outputs'} =~
+      /save/i    ## don't give them this as output, but save button option
+      ? qq|<INPUT TYPE="submit" NAME="save" VALUE="save" ONCLICK="return validate(this.form);" >|
+      : '';
 
-# set the hidden VARS from what was NOT input from screen...
-#foreach my $f ( sort keys %{Args} ) { warn "GenReport: Args-$f=$Args{$f}\n"; }
-  foreach my $f ( sort keys %{Args} ) { $addHIDDEN .= "$Args{$f}\n"; };
-# ALWAYS set the type of output...
-  $askSection .= main->setOutput();
+ #foreach my $f ( sort keys %{Args} ) { warn "GenReport: Args-$f=$Args{$f}\n"; }
+    my $askIns;
+    foreach my $inp ( split( ':', $rxTable->{Inputs} ) ) {
+        warn qq|GenReport: process: ${inp}\n| if ($debug);
+        if ( $inp eq 'Active' ) {
+            delete $Args{Active};
+            $askSection .= main->setActive();
+        }
+        elsif ( $inp eq 'Days' ) {
+            delete $Args{Days};
+            $askSection .= main->setDays();
+        }
+        elsif ( $inp eq 'Folder' ) {
+            delete $Args{Folder};
+            $askSection .= main->setFolder();
+        }
+        elsif ( $inp eq 'CustAgency' ) {
+            delete $Args{CustAgency};
+            $askSection .= main->setCustAgency();
+        }
+        elsif ( $inp eq 'ClinicIDs' ) {
+            delete $Args{ClinicIDs};
+            if ( SysAccess->getClinics($form) > 1 ) {
+                $askSection .= main->setClinicIDs();
+            }
+        }
+        elsif ( $inp eq 'daterange' ) {
+            delete $Args{daterange};
+            delete $Args{FromDate};
+            delete $Args{ToDate};
+            $askSection .= main->setDates();
+        }
+        elsif ( $inp eq 'Format' ) {
+            delete $Args{Format};
+            $askSection .= main->setFormat();
+        }
+        elsif ( $inp eq 'InsID' ) {
+            delete $Args{InsID};
+            $askSection .= main->setInsID();
+            $askIns = 1;
+        }
+        elsif ( $inp eq 'ProvIDs' ) {
+            delete $Args{ProvIDs};
+            if ( SysAccess->getProviders($form) > 1 ) {
+                $askSection .= main->setProvIDs();
+            }
+        }
+        elsif ( $inp eq 'ClientIDs' ) {
+            delete $Args{ClientIDs};
+            $askSection .= main->setClientIDs();
+        }
+        elsif ( $inp eq 'sYearMonth' ) {
+            delete $Args{sYearMonth};
+            $askSection .= main->setYM();
+        }
+        elsif ( $inp eq 'ProvClients' ) {
+            delete $Args{ProvIDs};
+            delete $Args{ClientIDs};
+            delete $Args{CQM};
+            $askSection .= main->setProvClients();
+        }
+        elsif ( $inp eq 'QRDAIII' ) {
+            delete $Args{ProvIDs};
+            delete $Args{ClientIDs};
+            delete $Args{CQM};
+            $askSection .= main->setQRDAIII();
+        }
+        elsif ( $inp eq 'AMSType' ) {
+            delete $Args{AMSType};
+            $askSection .= main->setAMSType();
+        }
+        elsif ( $inp eq 'CronTime' ) {
+            delete $Args{CronTime};
+            delete $Args{CronDay};
+            delete $Args{CronMonth};
+            delete $Args{CronWeek};
+            $askSection .= main->setCronTime();
+        }
+    }
+    warn qq|\n\n| if ($debug);
+
+ # set the hidden VARS from what was NOT input from screen...
+ #foreach my $f ( sort keys %{Args} ) { warn "GenReport: Args-$f=$Args{$f}\n"; }
+    foreach my $f ( sort keys %{Args} ) { $addHIDDEN .= "$Args{$f}\n"; }
+
+    # ALWAYS set the type of output...
+    $askSection .= main->setOutput();
 
 # to limit reports hanging the system we tried this...ALWAYS narrow to selecting an Insurance
 # but users did not like...
-  my $validation = $askIns && $form->{'DBNAME'} eq 'okmis_dev' ? qq|
+    my $validation = $askIns && $form->{'DBNAME'} eq 'okmis_dev'
+      ? qq|
   if ( isEmpty(form.InsID) )
   { return vEntry("notnull",form.InsID); }
   else if (typeof form.daterange != "undefined")
   { return vDates(form); }
 |
-                           : qq|
+      : qq|
   if (typeof form.daterange != "undefined")
   { return vDates(form); }
 |;
 
-  my $html = myHTML->newHTML($form,$form->{'Name'},"checkinputwindow noclock countdown_10") . qq|
+    my $html =
+      myHTML->newHTML( $form, $form->{'Name'},
+        "checkinputwindow noclock countdown_10" )
+      . qq|
   <link rel="stylesheet" type="text/css" href="/cgi/jcal/calendar-forest.css" >
   <link rel="stylesheet" type="text/css" href="/cgi/css/StyleYearMonth.css"> 
   <SCRIPT type="text/javascript" src="/cgi/js/ajaxrequest.js"></SCRIPT>
@@ -206,96 +255,103 @@ document.$form->{Name}.elements[0].focus();
 </BODY>
 </HTML>
 |;
-  return($html);
+    return ($html);
 }
-sub submit
-{
-warn "START DEBUGGUNG!!!!!";
-warn qq|GenReport: submit: $form->{Name}, Inputs=$rxTable->{Inputs}\n| if ( $debug );
-  my $hdrline = $form->{hdrline} ? $form->{hdrline} : 3;
-  my $cmd = qq|/home/okmis/mis/src/reports/$rxTable->{Script} 'DBNAME=$form->{DBNAME}&mlt=$form->{mlt}&Type=$form->{Type}&hdrline=$form->{hdrline}&output=$form->{output}&Descr=$rxTable->{Descr}|;
+
+sub submit {
+    warn "START DEBUGGUNG!!!!!";
+    warn qq|GenReport: submit: $form->{Name}, Inputs=$rxTable->{Inputs}\n|
+      if ($debug);
+    my $hdrline = $form->{hdrline} ? $form->{hdrline} : 3;
+    my $cmd =
+qq|/var/www/okmis/src/reports/$rxTable->{Script} 'DBNAME=$form->{DBNAME}&mlt=$form->{mlt}&Type=$form->{Type}&hdrline=$form->{hdrline}&output=$form->{output}&Descr=$rxTable->{Descr}|;
 ##  foreach my $inp ( split(':',$rxTable->{Inputs}) )
-  foreach my $inp ( sort keys %{Args} )
-  {
-    $cmd .= qq|&${inp}=$form->{$inp}|;
-  }
-  $cmd .= qq|&ForProvID=$form->{'ForProvID'}| if ( $form->{'ForProvID'} );
-  $cmd .= qq|&Client_ClientID=$form->{'Client_ClientID'}| if ( $form->{'Client_ClientID'} );
-  $cmd .= qq|&ClientCARSReview_ID=$form->{'ClientCARSReview_ID'}| if ( $form->{'ClientCARSReview_ID'} );
-  (my $ReportDescr = $rxTable->{Descr}) =~ s/\'//g;
-  # ($ReportDescr = $ReportDescr) =~ s/\"//g;
-  # ($ReportDescr = $ReportDescr) =~ s/\(/&#40;/g;      # don't think this alwarys works
-  # ($ReportDescr = $ReportDescr) =~ s/\)/&#41;/g;      # don't think this alwarys works
-  $cmd .= qq|&ReportDescr=${ReportDescr}&xtable=$form->{'xtable'}|;
-  $cmd .= qq|&submit=1'|;  
-
-  my $out = main->runReport("${cmd}");
-  my $html = '';
-  my ($header,$body) = ('','');
-  my $sfx = '.txt';
-  if ( $form->{output} eq 'ss' )
-  {
-    (my $Descr = $rxTable->{Descr}) =~ s;\/;\:;g;
-    my $newfile = 'RPT_'.$form->{PROVLOGINID}.'_'.${Descr}.'_'.$form->{TODAY}.'.xlsx';
-
-    
-    # Your data generation logic here
-    my @data = [];
-    my @cmd_resp = split('\n',$out); #Split the Responce from CMD file into lines
-
-    foreach my $line (@cmd_resp) {
-      my @tabs = split('\t', $line); #Split the Line by Tabs
-      @line_here = [];
-      foreach my $fld (@tabs) {
-        push(@line_here, [$fld]);
-      }
-      shift @line_here;
-      push(@data, [@line_here]);
+    foreach my $inp ( sort keys %{Args} ) {
+        $cmd .= qq|&${inp}=$form->{$inp}|;
     }
+    $cmd .= qq|&ForProvID=$form->{'ForProvID'}| if ( $form->{'ForProvID'} );
+    $cmd .= qq|&Client_ClientID=$form->{'Client_ClientID'}|
+      if ( $form->{'Client_ClientID'} );
+    $cmd .= qq|&ClientCARSReview_ID=$form->{'ClientCARSReview_ID'}|
+      if ( $form->{'ClientCARSReview_ID'} );
+    ( my $ReportDescr = $rxTable->{Descr} ) =~ s/\'//g;
 
-    my $workbook = Excel::Writer::XLSX->new($newfile);
-    my $worksheet = $workbook->add_worksheet();
+# ($ReportDescr = $ReportDescr) =~ s/\"//g;
+# ($ReportDescr = $ReportDescr) =~ s/\(/&#40;/g;      # don't think this alwarys works
+# ($ReportDescr = $ReportDescr) =~ s/\)/&#41;/g;      # don't think this alwarys works
+    $cmd .= qq|&ReportDescr=${ReportDescr}&xtable=$form->{'xtable'}|;
+    $cmd .= qq|&submit=1'|;
 
-    # Write data to the worksheet
-    my $row = 0;
-    foreach my $row_data (@data) {
-        my $col = 0;
-        foreach my $cell_data (@$row_data) {
-            $worksheet->write($row, $col, $cell_data);
-            $col++;
+    my $out  = main->runReport("${cmd}");
+    my $html = '';
+    my ( $header, $body ) = ( '', '' );
+    my $sfx = '.txt';
+    if ( $form->{output} eq 'ss' ) {
+        ( my $Descr = $rxTable->{Descr} ) =~ s;\/;\:;g;
+        my $newfile = 'RPT_'
+          . $form->{PROVLOGINID} . '_'
+          . ${Descr} . '_'
+          . $form->{TODAY} . '.xlsx';
+
+        # Your data generation logic here
+        my @data = [];
+        my @cmd_resp =
+          split( '\n', $out );    #Split the Responce from CMD file into lines
+
+        foreach my $line (@cmd_resp) {
+            my @tabs = split( '\t', $line );    #Split the Line by Tabs
+            @line_here = [];
+            foreach my $fld (@tabs) {
+                push( @line_here, [$fld] );
+            }
+            shift @line_here;
+            push( @data, [@line_here] );
         }
-        $row++;
-    }
 
-    # Close the workbook
-    $workbook->close();
-    
-    my $q = new CGI;
-    print $q->header(
-        -type => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        -attachment => $newfile
-    );
+        my $workbook  = Excel::Writer::XLSX->new($newfile);
+        my $worksheet = $workbook->add_worksheet();
 
-    # Read and print the XLSX file
-    open my $xlsx_file, '<', $newfile or die "Unable to open XLSX file: $!";
-    binmode $xlsx_file;
-    while (my $chunk = <$xlsx_file>) {
-        print $chunk;
+        # Write data to the worksheet
+        my $row = 0;
+        foreach my $row_data (@data) {
+            my $col = 0;
+            foreach my $cell_data (@$row_data) {
+                $worksheet->write( $row, $col, $cell_data );
+                $col++;
+            }
+            $row++;
+        }
+
+        # Close the workbook
+        $workbook->close();
+
+        my $q = new CGI;
+        print $q->header(
+            -type =>
+'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            -attachment => $newfile
+        );
+
+        # Read and print the XLSX file
+        open my $xlsx_file, '<', $newfile or die "Unable to open XLSX file: $!";
+        binmode $xlsx_file;
+        while ( my $chunk = <$xlsx_file> ) {
+            print $chunk;
+        }
+        close $xlsx_file;
     }
-    close $xlsx_file;
-  }
-  elsif ( $form->{output} eq 'html' )
-  {
-    $header = qq|Content-type: text/html\n\n|; 
-    $body = qq|<HTML lang="en" >\n<HEAD><TITLE>$form->{Name}</TITLE></HEAD>\n<BODY >|
-          . gHTML->htmlReport($out,$hdrline) . qq|\n</BODY>\n</HTML>\n|;
-    $sfx = '.html';
-  }
-  elsif ( $form->{output} eq 'plain' ) { $body = $out; }
-  elsif ( $form->{output} eq 'graph' )
-  {
-    $header = qq|Content-type: text/html\n\n|; 
-    $body = qq|<HTML lang="en" >
+    elsif ( $form->{output} eq 'html' ) {
+        $header = qq|Content-type: text/html\n\n|;
+        $body =
+qq|<HTML lang="en" >\n<HEAD><TITLE>$form->{Name}</TITLE></HEAD>\n<BODY >|
+          . gHTML->htmlReport( $out, $hdrline )
+          . qq|\n</BODY>\n</HTML>\n|;
+        $sfx = '.html';
+    }
+    elsif ( $form->{output} eq 'plain' ) { $body = $out; }
+    elsif ( $form->{output} eq 'graph' ) {
+        $header = qq|Content-type: text/html\n\n|;
+        $body   = qq|<HTML lang="en" >
 <HEAD>
   <meta charset="utf-8">
   <TITLE>$form->{Name}</TITLE>
@@ -309,30 +365,28 @@ ${out}
 </BODY>
 </HTML>
 |;
-    $sfx = '.html';
-  }
-  elsif ( $form->{output} eq 'pdf' )
-  {
-    $header = qq|Content-Type: application/pdf\n\n|;
-    $body = $out; 
-    $sfx = '.pdf';
-  }
-  elsif ( $form->{output} eq 'fdf' )
-  {
-    $header = qq|Content-Type: application/vnd.fdf\n\n|;
-    $body = $out; 
-    $sfx = '.fdf';
-  }
-  elsif ( $form->{output} eq 'text' )
-  {
-    $header = qq|Content-type: text/html\n\n|;
-    $body = qq|<HTML lang="en" >\n<HEAD><TITLE>$form->{Name}</TITLE></HEAD>\n<BODY>\n<PRE>\n|
-          . $out . qq|\n</PRE>\n</BODY>\n</HTML>\n|;
-  }
-  else
-  { 
-    $header = qq|Content-type: text/html\n\n|;
-    $body = qq|<HTML lang="en" >
+        $sfx = '.html';
+    }
+    elsif ( $form->{output} eq 'pdf' ) {
+        $header = qq|Content-Type: application/pdf\n\n|;
+        $body   = $out;
+        $sfx    = '.pdf';
+    }
+    elsif ( $form->{output} eq 'fdf' ) {
+        $header = qq|Content-Type: application/vnd.fdf\n\n|;
+        $body   = $out;
+        $sfx    = '.fdf';
+    }
+    elsif ( $form->{output} eq 'text' ) {
+        $header = qq|Content-type: text/html\n\n|;
+        $body =
+qq|<HTML lang="en" >\n<HEAD><TITLE>$form->{Name}</TITLE></HEAD>\n<BODY>\n<PRE>\n|
+          . $out
+          . qq|\n</PRE>\n</BODY>\n</HTML>\n|;
+    }
+    else {
+        $header = qq|Content-type: text/html\n\n|;
+        $body   = qq|<HTML lang="en" >
 <HEAD>
   <TITLE>$form->{Name}</TITLE>
 </HEAD>
@@ -341,48 +395,57 @@ ${out}
 </BODY>
 </HTML>
 |;
-    $sfx = '.html';
-  }
-## KLS
-  if ( $form->{save} )
-  {
-    my $linecnt = 0;
-    if ( $sfx eq '.pdf' ) { $linecnt = 'x'; }
-    else
-    {
-      $linecnt = DBUtil->CountFile($diskfile)-4;
-      $linecnt = 0 if ( $linecnt < 0 );
+        $sfx = '.html';
     }
-    (my $Descr = $rxTable->{Descr}) =~ s;\/;\:;g;
-    my $rptDir = $rxReports->{Dir} eq '' ? 'reports2' : $rxReports->{Dir};
-    chdir("$form->{DOCROOT}/${rptDir}");
-    my $pwd=cwd();
-    my $newfile = 'RPT_scheduled_'.$form->{PROVLOGINID}.'_'.${Descr}.'_'.$form->{TODAY}.'_'.$linecnt.'_'.DBUtil->Date('','stamp').'_'.DBUtil->genToken().'.'.$sfx;
-    open FILE, ">${newfile}" or die "Couldn't open file: $!";
-    print FILE $body;
-    close(FILE);
-    $html = myHTML->newHTML($form,$form->{Name},'CheckPopupWindow noclock countdown_1') . qq|
+## KLS
+    if ( $form->{save} ) {
+        my $linecnt = 0;
+        if ( $sfx eq '.pdf' ) { $linecnt = 'x'; }
+        else {
+            $linecnt = DBUtil->CountFile($diskfile) - 4;
+            $linecnt = 0 if ( $linecnt < 0 );
+        }
+        ( my $Descr = $rxTable->{Descr} ) =~ s;\/;\:;g;
+        my $rptDir = $rxReports->{Dir} eq '' ? 'reports2' : $rxReports->{Dir};
+        chdir("$form->{DOCROOT}/${rptDir}");
+        my $pwd = cwd();
+        my $newfile =
+            'RPT_scheduled_'
+          . $form->{PROVLOGINID} . '_'
+          . ${Descr} . '_'
+          . $form->{TODAY} . '_'
+          . $linecnt . '_'
+          . DBUtil->Date( '', 'stamp' ) . '_'
+          . DBUtil->genToken() . '.'
+          . $sfx;
+        open FILE, ">${newfile}" or die "Couldn't open file: $!";
+        print FILE $body;
+        close(FILE);
+        $html =
+          myHTML->newHTML( $form, $form->{Name},
+            'CheckPopupWindow noclock countdown_1' )
+          . qq|
   <P CLASS="heading" >Your report has been saved to your Report List.</P>
   <P CLASS="title" >Report List can be accessed from the main menu Report->My Reports List.</P>
 </BODY>
 <INPUT TYPE="hidden" NAME="CLOSEWINDOW" VALUE="CLOSE">
 </HTML>
 |;
-    ##DBA->setAlert($form,"You report has been saved.\n");
-warn qq|GenReport: save: COMPLETE\n${html}| if ( $debug );
-  }
-  else
-  { $html = $header.$body; }
-warn qq|GenReport: submit: COMPLETE\n| if ( $debug );
-  return($html);
+        ##DBA->setAlert($form,"You report has been saved.\n");
+        warn qq|GenReport: save: COMPLETE\n${html}| if ($debug);
+    }
+    else { $html = $header . $body; }
+    warn qq|GenReport: submit: COMPLETE\n| if ($debug);
+    return ($html);
 }
-sub setProvClients
-{
-  my ($self) = @_;
-  my $html;
-  my $ListProviders = gHTML->selProviders($form,$form->{LOGINPROVID},$form->{ProvIDs});
-  my $ListCQMs = DBA->selxTable($form,xCQM,'','MeasureTitle ID');
-  my $html = qq|
+
+sub setProvClients {
+    my ($self) = @_;
+    my $html;
+    my $ListProviders =
+      gHTML->selProviders( $form, $form->{LOGINPROVID}, $form->{ProvIDs} );
+    my $ListCQMs = DBA->selxTable( $form, xCQM, '', 'MeasureTitle ID' );
+    my $html     = qq|
 <TABLE CLASS="home fullsize" >
   <TR >
     <TD >
@@ -397,23 +460,28 @@ sub setProvClients
     <TD WIDTH="66%" >
 <SPAN ID="ListProviderClients" >
 |
-. myHTML->set1CheckBoxColumn($form,"",'ClientIDs','ClientID','LName~Last Name~strcol:FName~First Name~strcol:DOB~~hdrcol','Select Clients') . qq|
+      . myHTML->set1CheckBoxColumn(
+        $form, "", 'ClientIDs', 'ClientID',
+        'LName~Last Name~strcol:FName~First Name~strcol:DOB~~hdrcol',
+        'Select Clients'
+      )
+      . qq|
 </SPAN>
     </TD >
   </TR>
 </TABLE >
 |;
-warn qq|GenReport: setProvClients: ${html}\n| if ( $debug == 2 );
-  return($html);
+    warn qq|GenReport: setProvClients: ${html}\n| if ( $debug == 2 );
+    return ($html);
 }
 
-sub setQRDAIII
-{
-  my ($self) = @_;
-  my $html;
-  my $ListProviders = gHTML->selProviders($form,$form->{LOGINPROVID},$form->{ProvIDs});
-  my $ListCQMs = DBA->selxTable($form,xCQM,'','MeasureTitle ID');
-  my $html = qq|
+sub setQRDAIII {
+    my ($self) = @_;
+    my $html;
+    my $ListProviders =
+      gHTML->selProviders( $form, $form->{LOGINPROVID}, $form->{ProvIDs} );
+    my $ListCQMs = DBA->selxTable( $form, xCQM, '', 'MeasureTitle ID' );
+    my $html     = qq|
   <TABLE CLASS="home fullsize" >
     <TR >
       <TD >
@@ -431,86 +499,91 @@ sub setQRDAIII
     </TR>
   </TABLE >
   |;
-  return($html);
+    return ($html);
 }
 
-sub setActive
-{
-  my ($self) = @_;
-  my $checked = $form->{Active} ? 'CHECKED' : '';
-  my $html = qq|
+sub setActive {
+    my ($self)  = @_;
+    my $checked = $form->{Active} ? 'CHECKED' : '';
+    my $html    = qq|
 <TABLE CLASS="home strcol" >
   <TR>
     <TD >Active only: <INPUT TYPE="checkbox" NAME="Active" VALUE="1" ${checked}></TD >
   </TR>
 </TABLE >
 |;
-  return($html);
+    return ($html);
 }
-sub setDays
-{
-  my ($self) = @_;
-  my $html = qq|
+
+sub setDays {
+    my ($self) = @_;
+    my $html = qq|
 <TABLE CLASS="home strcol" >
   <TR>
     <TD >Days: <INPUT TYPE="text" NAME="Days" VALUE="$form->{Days}" ONFOCUS="select()" ONCHANGE="return vNum(this,1,1000)" SIZE="12" ></TD >
   </TR>
 </TABLE >
 |;
-  return($html);
+    return ($html);
 }
-sub setClinicIDs
-{
-  my ($self) = @_;
-  my $ListClinics = gHTML->selClinics($form,$form->{LOGINPROVID},$form->{ClinicIDs});
-  my $html = qq|
+
+sub setClinicIDs {
+    my ($self) = @_;
+    my $ListClinics =
+      gHTML->selClinics( $form, $form->{LOGINPROVID}, $form->{ClinicIDs} );
+    my $html = qq|
 <TABLE CLASS="home hdrcol" >
   <TR>
     <TD CLASS="numcol" >Clinics:</TD><TD><SELECT NAME="ClinicIDs" MULTIPLE SIZE="5" >${ListClinics}</SELECT></TD >
   </TR>
 </TABLE >
 |;
-  return($html);
+    return ($html);
 }
-sub setProvIDs
-{
-  my ($self) = @_;
-  my $ListProviders = gHTML->selProviders($form,$form->{LOGINPROVID},$form->{ProvIDs});
-  my $html = qq|
+
+sub setProvIDs {
+    my ($self) = @_;
+    my $ListProviders =
+      gHTML->selProviders( $form, $form->{LOGINPROVID}, $form->{ProvIDs} );
+    my $html = qq|
 <TABLE CLASS="home hdrcol" >
   <TR>
     <TD CLASS="numcol" >Providers:</TD><TD><SELECT NAME="ProvIDs" MULTIPLE SIZE="5" >${ListProviders}</SELECT></TD >
   </TR>
 </TABLE >
 |;
-  return($html);
+    return ($html);
 }
-sub setClientIDs
-{
-  my ($self) = @_;
-  my $ListClients = DBA->selClients($form,$form->{ClientIDs});
-  my $html = qq|
+
+sub setClientIDs {
+    my ($self)      = @_;
+    my $ListClients = DBA->selClients( $form, $form->{ClientIDs} );
+    my $html        = qq|
 <TABLE CLASS="home hdrcol" >
   <TR>
     <TD CLASS="numcol" >Clients:</TD><TD><SELECT NAME="ClientIDs" MULTIPLE SIZE="5" >${ListClients}</SELECT></TD >
   </TR>
 </TABLE >
 |;
-  return($html);
+    return ($html);
 }
-sub setFormat
-{
-  my ($self) = @_;
-  if ( $form->{Format} =~ /quick/i ) { $quick='CHECKED'; }
-  elsif ( $form->{Format} =~ /extended/i ) { $extended='CHECKED'; }
-  elsif ( $form->{Format} =~ /jolts/i ) { $jolts='CHECKED'; }
-  elsif ( $form->{Format} =~ /byprovidersc/i ) { $byprovidersc='CHECKED'; }
-  elsif ( $form->{Format} =~ /byproviderdate/i ) { $byproviderdate='CHECKED'; }
-  elsif ( $form->{Format} =~ /byprovideronly/i ) { $byprovideronly='CHECKED'; }
-  elsif ( $form->{Format} =~ /byclientsc/i ) { $byclientsc='CHECKED'; }
-  elsif ( $form->{Format} =~ /byclientdate/i ) { $byclientdate='CHECKED'; }
-  else { $quick='CHECKED'; }
-  my $html = qq|
+
+sub setFormat {
+    my ($self) = @_;
+    if    ( $form->{Format} =~ /quick/i )        { $quick        = 'CHECKED'; }
+    elsif ( $form->{Format} =~ /extended/i )     { $extended     = 'CHECKED'; }
+    elsif ( $form->{Format} =~ /jolts/i )        { $jolts        = 'CHECKED'; }
+    elsif ( $form->{Format} =~ /byprovidersc/i ) { $byprovidersc = 'CHECKED'; }
+    elsif ( $form->{Format} =~ /byproviderdate/i ) {
+        $byproviderdate = 'CHECKED';
+    }
+    elsif ( $form->{Format} =~ /byprovideronly/i ) {
+        $byprovideronly = 'CHECKED';
+    }
+    elsif ( $form->{Format} =~ /byclientsc/i )   { $byclientsc   = 'CHECKED'; }
+    elsif ( $form->{Format} =~ /byclientdate/i ) { $byclientdate = 'CHECKED'; }
+    else                                         { $quick        = 'CHECKED'; }
+    my $html = qq|
 <TABLE CLASS="home hdrcol" >
   <TR>
     <TD CLASS="numcol" >Format:</TD>
@@ -529,59 +602,59 @@ sub setFormat
   </TR>
 </TABLE >
 |;
-  return($html);
+    return ($html);
 }
-sub setInsID
-{
-  my ($self) = @_;
-  my $html = qq|
+
+sub setInsID {
+    my ($self) = @_;
+    my $html = qq|
 <TABLE CLASS="home hdrcol" >
   <TR>
     <TD >Insurance:</TD>
     <TD>
       <SELECT NAME="InsID" >
-| . DBA->selInsurance($form,$form->{InsID}). qq|
+| . DBA->selInsurance( $form, $form->{InsID} ) . qq|
       </SELECT>
     </TD>
   </TR>
 </TABLE >
 |;
-  return($html);
+    return ($html);
 }
 
-sub setCustAgency
-{
-  my ($self) = @_;
-  my $CustList = DBA->selxTable($form,'xCustAgency',$form->{'CustAgency'});
-  my $html = qq|
+sub setCustAgency {
+    my ($self) = @_;
+    my $CustList =
+      DBA->selxTable( $form, 'xCustAgency', $form->{'CustAgency'} );
+    my $html = qq|
 <TABLE CLASS="home hdrcol" >
   <TR>
     <TD >Custody Agency: <SELECT NAME="CustAgency" >${CustList}</SELECT></TD >
   </TR>
 </TABLE >
 |;
-  return($html);
+    return ($html);
 }
-sub setDates
-{
-  my ($self) = @_;
-  if ( $form->{daterange} eq "thisweek" ) { $thisweek='CHECKED'; }
-  elsif ( $form->{daterange} eq "lastweek" ) { $lastweek='CHECKED'; }
-  elsif ( $form->{daterange} eq "thismonth" ) { $thismonth='CHECKED'; }
-  elsif ( $form->{daterange} eq "lastmonth" ) { $lastmonth='CHECKED'; }
-  elsif ( $form->{daterange} eq "last3m" ) { $last3m='CHECKED'; }
-  elsif ( $form->{daterange} eq "last6m" ) { $last6m='CHECKED'; }
-  elsif ( $form->{daterange} eq "back1m" ) { $back1m='CHECKED'; }
-  elsif ( $form->{daterange} eq "back6m" ) { $back6m='CHECKED'; }
-  elsif ( $form->{daterange} eq "back12m" ) { $back12m='CHECKED'; }
-  elsif ( $form->{daterange} eq "thisquarter" ) { $thisquarter='CHECKED'; }
-  elsif ( $form->{daterange} eq "lastquarter" ) { $lastquarter='CHECKED'; }
-  elsif ( $form->{daterange} eq "thisyear" ) { $thisyear='CHECKED'; }
-  elsif ( $form->{daterange} eq "lastyear" ) { $lastyear='CHECKED'; }
-  elsif ( $form->{daterange} eq "2yago" ) { $twoyago='CHECKED'; }
-  elsif ( $form->{daterange} eq "all" ) { $all='CHECKED'; }
-  elsif ( $form->{daterange} eq "today" ) { $today='CHECKED'; }
-  my $html = qq|
+
+sub setDates {
+    my ($self) = @_;
+    if    ( $form->{daterange} eq "thisweek" )    { $thisweek    = 'CHECKED'; }
+    elsif ( $form->{daterange} eq "lastweek" )    { $lastweek    = 'CHECKED'; }
+    elsif ( $form->{daterange} eq "thismonth" )   { $thismonth   = 'CHECKED'; }
+    elsif ( $form->{daterange} eq "lastmonth" )   { $lastmonth   = 'CHECKED'; }
+    elsif ( $form->{daterange} eq "last3m" )      { $last3m      = 'CHECKED'; }
+    elsif ( $form->{daterange} eq "last6m" )      { $last6m      = 'CHECKED'; }
+    elsif ( $form->{daterange} eq "back1m" )      { $back1m      = 'CHECKED'; }
+    elsif ( $form->{daterange} eq "back6m" )      { $back6m      = 'CHECKED'; }
+    elsif ( $form->{daterange} eq "back12m" )     { $back12m     = 'CHECKED'; }
+    elsif ( $form->{daterange} eq "thisquarter" ) { $thisquarter = 'CHECKED'; }
+    elsif ( $form->{daterange} eq "lastquarter" ) { $lastquarter = 'CHECKED'; }
+    elsif ( $form->{daterange} eq "thisyear" )    { $thisyear    = 'CHECKED'; }
+    elsif ( $form->{daterange} eq "lastyear" )    { $lastyear    = 'CHECKED'; }
+    elsif ( $form->{daterange} eq "2yago" )       { $twoyago     = 'CHECKED'; }
+    elsif ( $form->{daterange} eq "all" )         { $all         = 'CHECKED'; }
+    elsif ( $form->{daterange} eq "today" )       { $today       = 'CHECKED'; }
+    my $html = qq|
 <SCRIPT TYPE="text/javascript" >
 function vDates(form)
 {
@@ -661,13 +734,16 @@ function clrObj(Date,form,name)
   </TR>
 </TABLE >
 |;
-  return($html);
+    return ($html);
 }
-sub setYM
-{
-  my ($self) = @_;
-  my $YM = $form->{sYearMonth} ? $form->{sYearMonth} : substr($form->{TODAY},0,7);
-  my $html = qq|
+
+sub setYM {
+    my ($self) = @_;
+    my $YM =
+        $form->{sYearMonth}
+      ? $form->{sYearMonth}
+      : substr( $form->{TODAY}, 0, 7 );
+    my $html = qq|
 <TABLE CLASS="home hdrcol" >
   <TR CLASS="subtitle tophdr" ><TD >select YearMonth from calendar</TD</TR>
   <TR>
@@ -676,37 +752,37 @@ sub setYM
   </TR>
 </TABLE >
 |;
-  return($html);
+    return ($html);
 }
-sub setFolder
-{
-  my ($self) = @_;
-  my $html = qq|
+
+sub setFolder {
+    my ($self) = @_;
+    my $html = qq|
 <TABLE CLASS="home strcol" >
   <TR>
     <TD >Folder: <INPUT TYPE="text" NAME="Folder" VALUE="$form->{Folder}" ONFOCUS="select()" SIZE="60" ></TD >
   </TR>
 </TABLE >
 |;
-  return($html);
+    return ($html);
 }
-sub setAMSType
-{
-  my ($self) = @_;
-  my $AMSType = DBA->selxTable($form,'xAMSType',$form->{'AMSType'});
-  my $html = qq|
+
+sub setAMSType {
+    my ($self)  = @_;
+    my $AMSType = DBA->selxTable( $form, 'xAMSType', $form->{'AMSType'} );
+    my $html    = qq|
 <TABLE CLASS="home hdrcol" >
   <TR>
     <TD >AMS Report Type: <SELECT NAME="AMSType" >${AMSType}</SELECT></TD >
   </TR>
 </TABLE >
 |;
-  return($html);
+    return ($html);
 }
-sub setCronTime
-{
-  my ($self) = @_;
-  my $html = qq|
+
+sub setCronTime {
+    my ($self) = @_;
+    my $html = qq|
 <TABLE CLASS="home hdrcol" >
   <TR><TD CLASS="port" COLSPAN="4" >Select Times to run job:</TD></TR>
   <TR>
@@ -718,46 +794,69 @@ sub setCronTime
     </TD>
     <TD >Month:
       <SELECT NAME="CronMonth" >
-|.DBA->selxTable($form,'xMonths',$form->{'CronMonth'},'ID Descr',1).qq|
+|
+      . DBA->selxTable( $form, 'xMonths', $form->{'CronMonth'}, 'ID Descr', 1 )
+      . qq|
       </SELECT>
     </TD>
     <TD >DayOfWeek:
       <SELECT NAME="CronWeek" >
-|.DBA->selxTable($form,'xDaysOfWeek',$form->{'CronWeek'},'ID Descr',1).qq|
+|
+      . DBA->selxTable( $form, 'xDaysOfWeek', $form->{'CronWeek'}, 'ID Descr',
+        1 )
+      . qq|
       </SELECT>
     </TD>
   </TR>
 </TABLE >
 |;
-  return($html);
+    return ($html);
 }
-sub setOutput
-{
-  my ($self) = @_;
-  my $html, $OutputTypes, $cnt=0;
-  my $outhtml,$outss,$outpdf,$outfdf,$outgraph,$outtext;
-  if ( $form->{output} =~ /html/i ) { $outhtml='CHECKED'; }
-  elsif ( $form->{output} =~ /ss/i ) { $outss='CHECKED'; }
-  elsif ( $form->{output} =~ /pdf/i ) { $outpdf='CHECKED'; }
-  elsif ( $form->{output} =~ /fdf/i ) { $outfdf='CHECKED'; }
-  elsif ( $form->{output} =~ /graph/i ) { $outgraph='CHECKED'; }
-  elsif ( $form->{output} =~ /text/i ) { $outtext='CHECKED'; }
-  else { $outhtml='CHECKED'; }
-  if ( $rxTable->{Outputs} =~ /text/ )
-  { $cnt++; $OutputTypes .= qq|        <LI><INPUT TYPE="radio" NAME="output" VALUE="text" ${outtext} > text</LI>|; }
-  if ( $rxTable->{Outputs} =~ /html/ )
-  { $cnt++; $OutputTypes .= qq|        <LI><INPUT TYPE="radio" NAME="output" VALUE="html" ${outhtml} > html</LI>|; }
-  if ( $rxTable->{Outputs} =~ /ss/ )
-  { $cnt++; $OutputTypes .= qq|        <LI><INPUT TYPE="radio" NAME="output" VALUE="ss" ${outss} > SpreadSheet</LI>|; }
-  if ( $rxTable->{Outputs} =~ /pdf/ )
-  { $cnt++; $OutputTypes .= qq|        <LI><INPUT TYPE="radio" NAME="output" VALUE="pdf" ${outpdf} > pdf</LI>|; }
-  if ( $rxTable->{Outputs} =~ /fdf/ )
-  { $cnt++; $OutputTypes .= qq|        <LI><INPUT TYPE="radio" NAME="output" VALUE="fdf" ${outfdf} > fdf</LI>|; }
-  if ( $rxTable->{Outputs} =~ /graph/ )
-  { $cnt++; $OutputTypes .= qq|        <LI><INPUT TYPE="radio" NAME="output" VALUE="graph" ${outgraph} > graph</LI>|; }
-  if ( $cnt > 1 )
-  {
-    $html = qq|
+
+sub setOutput {
+    my ($self) = @_;
+    my $html, $OutputTypes, $cnt = 0;
+    my $outhtml, $outss, $outpdf, $outfdf, $outgraph, $outtext;
+    if    ( $form->{output} =~ /html/i )  { $outhtml  = 'CHECKED'; }
+    elsif ( $form->{output} =~ /ss/i )    { $outss    = 'CHECKED'; }
+    elsif ( $form->{output} =~ /pdf/i )   { $outpdf   = 'CHECKED'; }
+    elsif ( $form->{output} =~ /fdf/i )   { $outfdf   = 'CHECKED'; }
+    elsif ( $form->{output} =~ /graph/i ) { $outgraph = 'CHECKED'; }
+    elsif ( $form->{output} =~ /text/i )  { $outtext  = 'CHECKED'; }
+    else                                  { $outhtml  = 'CHECKED'; }
+
+    if ( $rxTable->{Outputs} =~ /text/ ) {
+        $cnt++;
+        $OutputTypes .=
+qq|        <LI><INPUT TYPE="radio" NAME="output" VALUE="text" ${outtext} > text</LI>|;
+    }
+    if ( $rxTable->{Outputs} =~ /html/ ) {
+        $cnt++;
+        $OutputTypes .=
+qq|        <LI><INPUT TYPE="radio" NAME="output" VALUE="html" ${outhtml} > html</LI>|;
+    }
+    if ( $rxTable->{Outputs} =~ /ss/ ) {
+        $cnt++;
+        $OutputTypes .=
+qq|        <LI><INPUT TYPE="radio" NAME="output" VALUE="ss" ${outss} > SpreadSheet</LI>|;
+    }
+    if ( $rxTable->{Outputs} =~ /pdf/ ) {
+        $cnt++;
+        $OutputTypes .=
+qq|        <LI><INPUT TYPE="radio" NAME="output" VALUE="pdf" ${outpdf} > pdf</LI>|;
+    }
+    if ( $rxTable->{Outputs} =~ /fdf/ ) {
+        $cnt++;
+        $OutputTypes .=
+qq|        <LI><INPUT TYPE="radio" NAME="output" VALUE="fdf" ${outfdf} > fdf</LI>|;
+    }
+    if ( $rxTable->{Outputs} =~ /graph/ ) {
+        $cnt++;
+        $OutputTypes .=
+qq|        <LI><INPUT TYPE="radio" NAME="output" VALUE="graph" ${outgraph} > graph</LI>|;
+    }
+    if ( $cnt > 1 ) {
+        $html = qq|
 <TABLE CLASS="home hdrcol" >
   <TR CLASS="subtitle tophdr" ><TD >Type of output</TD</TR>
   <TR CLASS="subtitle" >
@@ -769,46 +868,62 @@ ${OutputTypes}
   </TR>
 </TABLE >
 |;
-  }
-  else
-  { $html = qq|<INPUT TYPE="hidden" NAME="output" VALUE="$rxTable->{Outputs}" >|; }
-  return($html);
+    }
+    else {
+        $html =
+          qq|<INPUT TYPE="hidden" NAME="output" VALUE="$rxTable->{Outputs}" >|;
+    }
+    return ($html);
 }
-sub runReport
-{
-  my ($self,$cmd) = @_;
-  my $ProvID = $form->{'LOGINPROVID'};
-  my $RptID = $rxTable->{'ID'};
-  my $RptName = $rxTable->{'Name'};
-warn qq|GenReport: runReport: $form->{Name}: output=$form->{output}, cmd:${cmd}\n| if ( true );
-warn qq|GenReport: runReport: ProvID=$ProvID, RptID=$RptID, xtable=$xtable, RptName=$RptName\n| if ( $debug );
-# first log the Report...
-  my $DT = main->getDATETIME();
-  my $s=$dbh->prepare("insert into wReports (ProvID,RptID,xtable,RptName,BeginTime) values ($ProvID,$RptID,'$xtable','$RptName','$DT')");
-  $s->execute() || myDBI->dberror("insert error wReports: ${ProvID}/${RptID}");
-  my $NEWID = $s->{'mysql_insertid'};
-# run the Report...
-  my $diskfile = DBUtil->ExecCmd($cmd,'.warn');
-  my $out = DBUtil->ReadFile($diskfile);
-# end time the Report...
-  $DT = main->getDATETIME();
-  $s=$dbh->prepare("update wReports set EndTime='${DT}' where ID='${NEWID}'");
-  $s->execute() || myDBI->dberror("update error wReports: ${NEWID}/${DT}");
-  $s->finish();
-warn qq|GenReport: runReport: $form->{Name}: diskfile=$diskfile\nout=\n${out}\n| if ( $debug == 2 );
-  return($out);
+
+sub runReport {
+    my ( $self, $cmd ) = @_;
+    my $ProvID  = $form->{'LOGINPROVID'};
+    my $RptID   = $rxTable->{'ID'};
+    my $RptName = $rxTable->{'Name'};
+    warn
+qq|GenReport: runReport: $form->{Name}: output=$form->{output}, cmd:${cmd}\n|
+      if (true);
+    warn
+qq|GenReport: runReport: ProvID=$ProvID, RptID=$RptID, xtable=$xtable, RptName=$RptName\n|
+      if ($debug);
+
+    # first log the Report...
+    my $DT = main->getDATETIME();
+    my $s  = $dbh->prepare(
+"insert into wReports (ProvID,RptID,xtable,RptName,BeginTime) values ($ProvID,$RptID,'$xtable','$RptName','$DT')"
+    );
+    $s->execute()
+      || myDBI->dberror("insert error wReports: ${ProvID}/${RptID}");
+    my $NEWID = $s->{'mysql_insertid'};
+
+    # run the Report...
+    my $diskfile = DBUtil->ExecCmd( $cmd, '.warn' );
+    my $out      = DBUtil->ReadFile($diskfile);
+
+    # end time the Report...
+    $DT = main->getDATETIME();
+    $s =
+      $dbh->prepare("update wReports set EndTime='${DT}' where ID='${NEWID}'");
+    $s->execute() || myDBI->dberror("update error wReports: ${NEWID}/${DT}");
+    $s->finish();
+    warn
+qq|GenReport: runReport: $form->{Name}: diskfile=$diskfile\nout=\n${out}\n|
+      if ( $debug == 2 );
+    return ($out);
 }
-sub getDATETIME
-{
-  my ($self) = @_;
-  my ($sec, $min, $hrs, $day, $month, $year, $wday, $julian) = localtime();
-  $month++; $year +=1900;
-  $month = length($month) == 2 ? $month : '0'.$month;
-  $day = length($day) == 2 ? $day : '0'.$day;
-  $hrs = length($hrs) == 2 ? $hrs : '0'.$hrs;
-  $min = length($min) == 2 ? $min : '0'.$min;
-  $sec = length($sec) == 2 ? $sec : '0'.$sec;
-  my $CURTIME = qq|${year}-${month}-${day} ${hrs}:${min}:${sec}|;
-  return($CURTIME);
+
+sub getDATETIME {
+    my ($self) = @_;
+    my ( $sec, $min, $hrs, $day, $month, $year, $wday, $julian ) = localtime();
+    $month++;
+    $year += 1900;
+    $month = length($month) == 2 ? $month : '0' . $month;
+    $day   = length($day) == 2   ? $day   : '0' . $day;
+    $hrs   = length($hrs) == 2   ? $hrs   : '0' . $hrs;
+    $min   = length($min) == 2   ? $min   : '0' . $min;
+    $sec   = length($sec) == 2   ? $sec   : '0' . $sec;
+    my $CURTIME = qq|${year}-${month}-${day} ${hrs}:${min}:${sec}|;
+    return ($CURTIME);
 }
 ############################################################################

@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 use DBA;
@@ -9,21 +9,22 @@ use Time::Local;
 # usage: prtAmtDue DBNAME=xxxx\&ClientID=id
 ############################################################################
 $form = DBForm->new;
-my $dbh = $form->dbconnect;
-  my $AmtDue = 0;
-  my $dbh = $form->dbconnect;
-  my $q = qq|select * from Treatment where AmtDue > 0 |;
-  $q .= qq| and TrID=$form->{TrID} | if ( $form->{TrID} );
-  $q .= qq| and ClientID=$form->{ClientID} | if ( $form->{ClientID} );
-  $q .= qq| order by ContLogDate|;
-  my $s = $dbh->prepare($q);
-  $s->execute();
-  while ( my $r = $s->fetchrow_hashref )
-  { 
+my $dbh    = $form->dbconnect;
+my $AmtDue = 0;
+my $dbh    = $form->dbconnect;
+my $q      = qq|select * from Treatment where AmtDue > 0 |;
+$q .= qq| and TrID=$form->{TrID} |         if ( $form->{TrID} );
+$q .= qq| and ClientID=$form->{ClientID} | if ( $form->{ClientID} );
+$q .= qq| order by ContLogDate|;
+my $s = $dbh->prepare($q);
+$s->execute();
+
+while ( my $r = $s->fetchrow_hashref ) {
     $AmtDue += $r->{AmtDue};
-    print qq|$r->{TrID}, $r->{BillDate}, $r->{RecDate}, $r->{AmtDue}, $AmtDue\n|;
-  }
-  $s->finish();
-  $AmtDue = sprintf("%.2f",$AmtDue);
+    print
+      qq|$r->{TrID}, $r->{BillDate}, $r->{RecDate}, $r->{AmtDue}, $AmtDue\n|;
+}
+$s->finish();
+$AmtDue = sprintf( "%.2f", $AmtDue );
 print qq|AmtDue=$AmtDue\n|;
 exit;

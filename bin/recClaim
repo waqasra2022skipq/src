@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use File::Copy;
 use DBI;
 use DBForm;
@@ -9,61 +9,68 @@ use uBill;
 
 ############################################################################
 # add a Note Transaction
-#   uses an input file 
+#   uses an input file
 #   originally written to void claims
 #   ex: ./recClaim DBNAME=okmis_gpr\&file=xxx
 ############################################################################
-my $form = DBForm->new();
-my $dbh = $form->dbconnect();
-my $sNote = $dbh->prepare("select * from Treatment left join xSC on xSC.SCID=Treatment.SCID where Treatment.TrID=?");
+my $form  = DBForm->new();
+my $dbh   = $form->dbconnect();
+my $sNote = $dbh->prepare(
+"select * from Treatment left join xSC on xSC.SCID=Treatment.SCID where Treatment.TrID=?"
+);
 my $file = $form->{'file'};
-if ( open(INFILE,$file) ) 
-{
-  while ( $in = <INFILE> )
-  {
-    next if ( substr($in,0,1) eq '#' );     # skip comment lines
-    chomp($in);
-    my ($TrID,$InsCode,$SRC,$Code,$PaidAmt,$RefID,$ICN,$DenCode,$RecDate) = split('\|',$in);
-    $RecDate = $form->{'TODAY'} if ( $RecDate eq '' );
-    $sNote->execute($TrID) || $form->dberror("select Treatment: $TrID");
-    if ( my $rNote = $sNote->fetchrow_hashref )
-    { 
-      # create a NoteTrans record...
-      my $r = ();
-      $r->{'TrID'} = $TrID;
-      $r->{'ClientID'} = $rNote->{'ClientID'};
-      $r->{'ContDate'} = $rNote->{'ContLogDate'};
-      $r->{'BillDate'} = $rNote->{'BillDate'};
-      $r->{'SCID'} = $rNote->{'SCID'};
-      $r->{'SCNum'} = $rNote->{'SCNum'};
-      $r->{'InsCode'} = $InsCode;
-      $r->{'BillAmt'} = $rNote->{'BilledAmt'};
-      $r->{'Units'}   = $rNote->{'Units'};
-      $r->{'Code'} = 'BI';
-      $r->{'SRC'} = $SRC;
-#foreach my $f ( sort keys %{$r} ) { warn "r: $f=$r->{$f}\n"; }
-      my $TransID = DBA->doUpdate($form,'NoteTrans',$r);        # insert the record (no where)
+if ( open( INFILE, $file ) ) {
+    while ( $in = <INFILE> ) {
+        next if ( substr( $in, 0, 1 ) eq '#' );    # skip comment lines
+        chomp($in);
+        my (
+            $TrID,  $InsCode, $SRC,     $Code, $PaidAmt,
+            $RefID, $ICN,     $DenCode, $RecDate
+        ) = split( '\|', $in );
+        $RecDate = $form->{'TODAY'} if ( $RecDate eq '' );
+        $sNote->execute($TrID) || $form->dberror("select Treatment: $TrID");
+        if ( my $rNote = $sNote->fetchrow_hashref ) {
 
-      my $r835 = ();
-      $r835->{'TransID'}    = $TransID;
-      $r835->{'ClientID'}   = $rNote->{'ClientID'};
-      $r835->{'ContDate'}   = $rNote->{'ContLogDate'};
-      $r835->{'ServCode'}   = $rNote->{'SCNum'};
-      $r835->{'RecDate'}    = $RecDate;
-      $r835->{'InsCode'}    = $InsCode;
-      $r835->{'BillAmt'}    = $rNote->{'BilledAmt'};
-      $r835->{'PaidAmt'}    = $PaidAmt;
-      $r835->{'Units'}      = $rNote->{'Units'};
-      $r835->{'RefID'}      = $RefID;
-      $r835->{'ICN'}        = $ICN;
-      $r835->{'DenCode'}    = $DenCode;
-      $r835->{'ReasonCode'} = $DenCode;
-#foreach my $f ( sort keys %{$r835} ) { warn "r835: $f=$r835->{$f}\n"; }
-      my ($trid,$scid,$code,$type) = uBill->postClaim($form,$r835,$SRC,$Code);
-      print qq|TrID=${trid}, SCID=${scid}, code=${code}, type=${type}\n|;
+            # create a NoteTrans record...
+            my $r = ();
+            $r->{'TrID'}     = $TrID;
+            $r->{'ClientID'} = $rNote->{'ClientID'};
+            $r->{'ContDate'} = $rNote->{'ContLogDate'};
+            $r->{'BillDate'} = $rNote->{'BillDate'};
+            $r->{'SCID'}     = $rNote->{'SCID'};
+            $r->{'SCNum'}    = $rNote->{'SCNum'};
+            $r->{'InsCode'}  = $InsCode;
+            $r->{'BillAmt'}  = $rNote->{'BilledAmt'};
+            $r->{'Units'}    = $rNote->{'Units'};
+            $r->{'Code'}     = 'BI';
+            $r->{'SRC'}      = $SRC;
+
+            #foreach my $f ( sort keys %{$r} ) { warn "r: $f=$r->{$f}\n"; }
+            my $TransID = DBA->doUpdate( $form, 'NoteTrans', $r )
+              ;    # insert the record (no where)
+
+            my $r835 = ();
+            $r835->{'TransID'}    = $TransID;
+            $r835->{'ClientID'}   = $rNote->{'ClientID'};
+            $r835->{'ContDate'}   = $rNote->{'ContLogDate'};
+            $r835->{'ServCode'}   = $rNote->{'SCNum'};
+            $r835->{'RecDate'}    = $RecDate;
+            $r835->{'InsCode'}    = $InsCode;
+            $r835->{'BillAmt'}    = $rNote->{'BilledAmt'};
+            $r835->{'PaidAmt'}    = $PaidAmt;
+            $r835->{'Units'}      = $rNote->{'Units'};
+            $r835->{'RefID'}      = $RefID;
+            $r835->{'ICN'}        = $ICN;
+            $r835->{'DenCode'}    = $DenCode;
+            $r835->{'ReasonCode'} = $DenCode;
+
+        #foreach my $f ( sort keys %{$r835} ) { warn "r835: $f=$r835->{$f}\n"; }
+            my ( $trid, $scid, $code, $type ) =
+              uBill->postClaim( $form, $r835, $SRC, $Code );
+            print qq|TrID=${trid}, SCID=${scid}, code=${code}, type=${type}\n|;
+        }
+        else { print qq|NOT FOUND! TrID: ${TrID}\n|; }
     }
-    else { print qq|NOT FOUND! TrID: ${TrID}\n|; }
-  }
 }
 else { print qq|Couldn't open '${file}' file: $!|; }
 $sNote->finish();

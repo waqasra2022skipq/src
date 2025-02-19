@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 use DBUtil;
@@ -11,12 +11,13 @@ $form = DBForm->new();
 $form = DBUtil->setDates($form);
 my $DateRange = qq|from $form->{FromDateD} thru $form->{ToDateD}|;
 
-my $dbh = $form->dbconnect();
+my $dbh       = $form->dbconnect();
 my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
-my $ProviderSelection = DBA->getProviderSelection($form,$ForProvID,'Provider.ProvID','where');
+my $ProviderSelection =
+  DBA->getProviderSelection( $form, $ForProvID, 'Provider.ProvID', 'where' );
 $ProviderSelection .= qq| and Provider.Active=1| if ( $form->{Active} );
-(my $InTime = $form->{FromDate}) =~ s/-//g;
-(my $OutTime = $form->{ToDate}) =~ s/-//g;
+( my $InTime  = $form->{FromDate} ) =~ s/-//g;
+( my $OutTime = $form->{ToDate} )   =~ s/-//g;
 my $qTimesheet = qq|
 select * 
   from Timesheet 
@@ -25,6 +26,7 @@ select *
   and LoginTime >= '${InTime}0000' and LogoutTime <= '${OutTime}9999'
   order by Provider.LName, Provider.FName, Timesheet.LoginTime
 |;
+
 #warn qq|qTimesheet=\n$qTimesheet\n|;
 my $sTimesheet = $dbh->prepare($qTimesheet);
 
@@ -34,43 +36,49 @@ my $ProvIDDate;
 my $PrevProvIDDate;
 my $TotHours = 'Hours';
 print qq|${DT}\nTimesheet Report ${DateRange}\n|;
-print qq|Multiple In/Out times for each day are on 1 line and the Date is the InDate. If the Hours is greater that 24 then the OutDate is not the same as the InDate.\n|;
+print
+qq|Multiple In/Out times for each day are on 1 line and the Date is the InDate. If the Hours is greater that 24 then the OutDate is not the same as the InDate.\n|;
 print qq|LName\tFName\tProvID\tDate\tInTime\tOutTime|;
 $sTimesheet->execute();
-while ( my $rTimesheet = $sTimesheet->fetchrow_hashref )
-{
-  $cnt++;
-  my $indate='', $intime='';
-  if ( $rTimesheet->{LoginTime} ne '' )
-  {
-    $indate = substr($rTimesheet->{LoginTime},4,2) . '/' . substr($rTimesheet->{LoginTime},6,2) . '/' . substr($rTimesheet->{LoginTime},0,4);
-    $intime = substr($rTimesheet->{LoginTime},8,2) . ':' . substr($rTimesheet->{LoginTime},10,2);
-  }
-  my $outdate='', $outtime='';
-  if ( $rTimesheet->{LogoutTime} ne '' )
-  {
-    $outdate = substr($rTimesheet->{LogoutTime},4,2) . '/' . substr($rTimesheet->{LogoutTime},6,2) . '/' . substr($rTimesheet->{LogoutTime},0,4);
-    $outtime = substr($rTimesheet->{LogoutTime},8,2) . ':' . substr($rTimesheet->{LogoutTime},10,2);
-  }
-  my $Hours=0;
-  if ( $rTimesheet->{LoginTime} ne '' && $rTimesheet->{LogoutTime} ne '' )
-  {
-    my $Duration = DBUtil->getDurationTS($rTimesheet->{LoginTime}, $rTimesheet->{LogoutTime});
-    $Hours = sprintf("%.2f",$Duration / 3600);
-  }
-  $ProvIDDate = $rTimesheet->{'ProvID'} . '_' . $indate;
-  if ( $PrevProvIDDate eq $ProvIDDate )
-  {
-    print qq|\t${intime}\t${outtime}|;
-  }
-  else
-  {
-    print qq|\t${TotHours}\n|;
-    $TotHours = 0;
-    print qq|$rTimesheet->{'LName'}\t$rTimesheet->{'FName'}\t$rTimesheet->{'ProvID'}\t${indate}\t${intime}\t${outtime}|;
-  }
-  $TotHours += $Hours;
-  $PrevProvIDDate = $ProvIDDate;
+
+while ( my $rTimesheet = $sTimesheet->fetchrow_hashref ) {
+    $cnt++;
+    my $indate = '', $intime = '';
+    if ( $rTimesheet->{LoginTime} ne '' ) {
+        $indate =
+            substr( $rTimesheet->{LoginTime}, 4, 2 ) . '/'
+          . substr( $rTimesheet->{LoginTime}, 6, 2 ) . '/'
+          . substr( $rTimesheet->{LoginTime}, 0, 4 );
+        $intime = substr( $rTimesheet->{LoginTime}, 8, 2 ) . ':'
+          . substr( $rTimesheet->{LoginTime}, 10, 2 );
+    }
+    my $outdate = '', $outtime = '';
+    if ( $rTimesheet->{LogoutTime} ne '' ) {
+        $outdate =
+            substr( $rTimesheet->{LogoutTime}, 4, 2 ) . '/'
+          . substr( $rTimesheet->{LogoutTime}, 6, 2 ) . '/'
+          . substr( $rTimesheet->{LogoutTime}, 0, 4 );
+        $outtime = substr( $rTimesheet->{LogoutTime}, 8, 2 ) . ':'
+          . substr( $rTimesheet->{LogoutTime}, 10, 2 );
+    }
+    my $Hours = 0;
+    if ( $rTimesheet->{LoginTime} ne '' && $rTimesheet->{LogoutTime} ne '' ) {
+        my $Duration = DBUtil->getDurationTS( $rTimesheet->{LoginTime},
+            $rTimesheet->{LogoutTime} );
+        $Hours = sprintf( "%.2f", $Duration / 3600 );
+    }
+    $ProvIDDate = $rTimesheet->{'ProvID'} . '_' . $indate;
+    if ( $PrevProvIDDate eq $ProvIDDate ) {
+        print qq|\t${intime}\t${outtime}|;
+    }
+    else {
+        print qq|\t${TotHours}\n|;
+        $TotHours = 0;
+        print
+qq|$rTimesheet->{'LName'}\t$rTimesheet->{'FName'}\t$rTimesheet->{'ProvID'}\t${indate}\t${intime}\t${outtime}|;
+    }
+    $TotHours += $Hours;
+    $PrevProvIDDate = $ProvIDDate;
 }
 print qq|\t${TotHours}\n|;
 #####################################################################

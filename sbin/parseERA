@@ -1,280 +1,327 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use Accounts;
 use DBForm;
 use DBUtil;
 use myConfig;
-my $debug = 0;
-my $clinics=Accounts->NPIs(Accounts->dbs('active'));
-my $WWW = myConfig->cfg('WWW');
-my $Adjhdr = 'Adjustment Date  Provider ID  Reference ID                                       Adjustment Amt  Reason                                                 ';
-my $Payhdr = 'Check#                         Amount          # Claims       NPI or Tax ID           Payee                         Date       ';
-my $Clmhdr = 'Check#                         Patient ID         Last,First          Charge Amt  Payment Amt  Accnt#        Status                         Payer                             ';
-my $Itmhdr = '          Line Item:  Svc Date   CPT    Charge Amt   Payment Amt  Total Adj Amt  Remarks                                                                                      ';
-my $Section_dlm = '========================================================================================================================================================';
-my $Claim_dlm = '--------------------------------------------------------------------------------------------------------------------------------------------------------';
+my $debug   = 0;
+my $clinics = Accounts->NPIs( Accounts->dbs('active') );
+my $WWW     = myConfig->cfg('WWW');
+my $Adjhdr =
+'Adjustment Date  Provider ID  Reference ID                                       Adjustment Amt  Reason                                                 ';
+my $Payhdr =
+'Check#                         Amount          # Claims       NPI or Tax ID           Payee                         Date       ';
+my $Clmhdr =
+'Check#                         Patient ID         Last,First          Charge Amt  Payment Amt  Accnt#        Status                         Payer                             ';
+my $Itmhdr =
+'          Line Item:  Svc Date   CPT    Charge Amt   Payment Amt  Total Adj Amt  Remarks                                                                                      ';
+my $Section_dlm =
+'========================================================================================================================================================';
+my $Claim_dlm =
+'--------------------------------------------------------------------------------------------------------------------------------------------------------';
 ############################################################################
-foreach my $file ( @ARGV )
-{
-  print qq|\nparse file: $file\n|;
-  if ( open(FILE,$file) ) 
-  {
-    my $section = 0;
-    my $Header = main->getHeader($file);
-print qq|Header=$Header\n| if ( $debug );
-    my $Adjustments = main->getAdjustments($file);
-    my $NoAdj = 0;
-    if ( $Adjustment eq 'none' ) { $NoAdj = 1; print qq|YES NONE~\n|; }
-    my $Payments = main->getPayments($file,$NoAdj);
+foreach my $file (@ARGV) {
+    print qq|\nparse file: $file\n|;
+    if ( open( FILE, $file ) ) {
+        my $section = 0;
+        my $Header  = main->getHeader($file);
+        print qq|Header=$Header\n| if ($debug);
+        my $Adjustments = main->getAdjustments($file);
+        my $NoAdj       = 0;
+        if ( $Adjustment eq 'none' ) { $NoAdj = 1; print qq|YES NONE~\n|; }
+        my $Payments = main->getPayments( $file, $NoAdj );
+
 #foreach my $n ( sort keys %{ $Payments } ) { print qq|n=$n\n|; foreach my $c ( keys %{ $Payments->{$n} } ) { print qq|  $c=$Payments->{$n}->{$c}\n|; } }
-    my ($Claims,$Clients,$Notes) = main->getClaims($file);
-#foreach my $c ( sort keys %{ $Claims } ) { print qq|  $c=$Claims->{$c}\n|; }
-#foreach my $c ( sort keys %{ $Clients } ) { print qq|  $c=$Clients->{$c}\n|; }
-    main->wFile($file,$Header,$Adjustments,$Payments,$Claims,$Clients,$Notes);
-    close(FILE);
-  } else { print qq|>>>ERROR: open ${file} $!\n|; }
+        my ( $Claims, $Clients, $Notes ) = main->getClaims($file);
+
+ #foreach my $c ( sort keys %{ $Claims } ) { print qq|  $c=$Claims->{$c}\n|; }
+ #foreach my $c ( sort keys %{ $Clients } ) { print qq|  $c=$Clients->{$c}\n|; }
+        main->wFile( $file, $Header, $Adjustments, $Payments, $Claims,
+            $Clients, $Notes );
+        close(FILE);
+    }
+    else { print qq|>>>ERROR: open ${file} $!\n|; }
 }
 exit;
 ################################################################
-sub getHeader
-{
-  my ($self,$filename) = @_;
-  my ($hdr,$err,$cnt) = ('','',0);
-  while ( $line = <FILE> )
-  {
-    $line =~ s/\r?\n$//;
-print qq|getHeader: line=$line\n| if ( $debug );
-    $cnt++;
-    return($hdr) if ( $line eq $Section_dlm );
-    $hdr .= $line."\n" unless ( $cnt == 1 );
-  }
-  main->prtError($filename,'Header: NO =delimeter= FOUND!');
+sub getHeader {
+    my ( $self, $filename ) = @_;
+    my ( $hdr, $err, $cnt ) = ( '', '', 0 );
+    while ( $line = <FILE> ) {
+        $line =~ s/\r?\n$//;
+        print qq|getHeader: line=$line\n| if ($debug);
+        $cnt++;
+        return ($hdr) if ( $line eq $Section_dlm );
+        $hdr .= $line . "\n" unless ( $cnt == 1 );
+    }
+    main->prtError( $filename, 'Header: NO =delimeter= FOUND!' );
 }
+
 #          1         2         3         4         5         6         7
 #012345678901234567890123456789012345678901234567890123456789012345678901
-#12/31/2014       1245286285   4814153661000      42805                           -37.26          Forwarding Balance                                     
-sub getAdjustments
-{
-  my ($self,$filename) = @_;
-  my $out = ();
-  my ($err,$cnt,$dcnt,$skip) = ('',0,0,0);
-  while ( $line = <FILE> )
-  {
-    $line =~ s/\r?\n$//;
-    $cnt++;
-print qq|Adjustments: line=:${line}:\n| if ( $debug );
-    if ( $line eq $Adjhdr ) { $skip++; }
-    elsif ( $line eq $Payhdr ) { return('none'); }
-    elsif ( $line eq $Section_dlm )
-    {
-      if ( $dcnt == 0 ) { $dcnt++; }
-      elsif ( $dcnt == 1 ) { $dcnt++; }
-      else { return($out); }
+#12/31/2014       1245286285   4814153661000      42805                           -37.26          Forwarding Balance
+sub getAdjustments {
+    my ( $self, $filename ) = @_;
+    my $out = ();
+    my ( $err, $cnt, $dcnt, $skip ) = ( '', 0, 0, 0 );
+    while ( $line = <FILE> ) {
+        $line =~ s/\r?\n$//;
+        $cnt++;
+        print qq|Adjustments: line=:${line}:\n| if ($debug);
+        if    ( $line eq $Adjhdr ) { $skip++; }
+        elsif ( $line eq $Payhdr ) { return ('none'); }
+        elsif ( $line eq $Section_dlm ) {
+            if    ( $dcnt == 0 ) { $dcnt++; }
+            elsif ( $dcnt == 1 ) { $dcnt++; }
+            else                 { return ($out); }
+        }
+        else {
+            my $npi = substr( $line, 17, 10 );
+            print qq|Adjustments: npi=$npi\n| if ($debug);
+            $out->{$npi} .= $line . "\n";
+        }
     }
-    else
-    {
-      my $npi = substr($line,17,10);
-print qq|Adjustments: npi=$npi\n| if ( $debug );
-      $out->{$npi} .= $line."\n";
-    }
-  }
-#  main->prtError($filename,'Adjustments: MISSING =delimeter=!');
-  return($out);
+
+    #  main->prtError($filename,'Adjustments: MISSING =delimeter=!');
+    return ($out);
 }
+
 #          1         2         3         4         5         6         7         8         9         10        11        12
 #0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
-#312051790                      0.00            2              1245286285              MILLENNIUM MEDICAL SERVICES   06/11/2014 
-sub getPayments
-{
-  my ($self,$filename,$NoAdj) = @_;
-  my $out = ();
-  my ($err,$cnt,$dcnt,$skip) = ('',0,0,0);
-  while ( $line = <FILE> )
-  {
-    $line =~ s/\r?\n$//;
-    $cnt++;
-print qq|Payments: line=:${line}:\n| if ( $debug );
-    if ( $line eq $Section_dlm ) { $dcnt++; }
-    elsif ( $line eq $Payhdr || $NoAdj ) { $skip++; }
-    elsif ( $line eq $Claim_dlm ) { return($out); }
-    else
-    {
-      unless ( $line eq '' )
-      {
-        my $checkno = substr($line,0,30);
-        $checkno =~ s/^\s*(.*?)\s*$/$1/g;             # trim leading/trailing spaces
-        my $npi = substr($line,62,10);
-print qq|Payments: npt=$npi, checkno=${checkno}\n| if ( $debug );
-        $out->{$npi}->{$checkno} = $line;
-      }
+#312051790                      0.00            2              1245286285              MILLENNIUM MEDICAL SERVICES   06/11/2014
+sub getPayments {
+    my ( $self, $filename, $NoAdj ) = @_;
+    my $out = ();
+    my ( $err, $cnt, $dcnt, $skip ) = ( '', 0, 0, 0 );
+    while ( $line = <FILE> ) {
+        $line =~ s/\r?\n$//;
+        $cnt++;
+        print qq|Payments: line=:${line}:\n| if ($debug);
+        if    ( $line eq $Section_dlm )      { $dcnt++; }
+        elsif ( $line eq $Payhdr || $NoAdj ) { $skip++; }
+        elsif ( $line eq $Claim_dlm )        { return ($out); }
+        else {
+            unless ( $line eq '' ) {
+                my $checkno = substr( $line, 0, 30 );
+                $checkno =~ s/^\s*(.*?)\s*$/$1/g; # trim leading/trailing spaces
+                my $npi = substr( $line, 62, 10 );
+                print qq|Payments: npt=$npi, checkno=${checkno}\n| if ($debug);
+                $out->{$npi}->{$checkno} = $line;
+            }
+        }
     }
-  }
-  main->prtError($filename,'Payments: MISSING =check delimeter=!');
+    main->prtError( $filename, 'Payments: MISSING =check delimeter=!' );
 }
+
 #          1         2         3         4         5         6         7         8         9         10        11
 #012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
-#312051790                      443766839A         BURGESS,ALMA        97.46       0.00         45141         PROCESSED AS PRIMARY, FWDED    NOVITAS SOLUTIONS, INC.           
-#                      05/26/2014 90834  83.50        0.00         83.50          MEDICARE PART B DOES NOT PAY FOR ITEMS OR SERVICES PROVIDED BY THIS TYPE OF PRACTITIONER FOR 
-sub getClaims
-{
-  my ($self,$filename) = @_;
-  my $out1 = ();
-  my $out2 = ();
-  my $out3 = ();
-  my $cnt = 0;
-  my ($checkno,$clientid,$claimcnt,$clm) = ('none','',0,$Claim_dlm."\n");
-  my ($junk,$taxid,$contdate,$scode,$trid,$itemcnt) = ('','','','','',0);
-  while ( $line = <FILE> )
-  {
-    $line =~ s/\r?\n$//;
-    $cnt++;
-print qq|Claims: line=:${line}:\n| if ( $debug );
-    if ( $line eq $Clmhdr )
-    {
-      $claimcnt=1;
-      $clm .= $line."\n";
+#312051790                      443766839A         BURGESS,ALMA        97.46       0.00         45141         PROCESSED AS PRIMARY, FWDED    NOVITAS SOLUTIONS, INC.
+#                      05/26/2014 90834  83.50        0.00         83.50          MEDICARE PART B DOES NOT PAY FOR ITEMS OR SERVICES PROVIDED BY THIS TYPE OF PRACTITIONER FOR
+sub getClaims {
+    my ( $self, $filename ) = @_;
+    my $out1 = ();
+    my $out2 = ();
+    my $out3 = ();
+    my $cnt  = 0;
+    my ( $checkno, $clientid, $claimcnt, $clm ) =
+      ( 'none', '', 0, $Claim_dlm . "\n" );
+    my ( $junk, $taxid, $contdate, $scode, $trid, $itemcnt ) =
+      ( '', '', '', '', '', 0 );
+    while ( $line = <FILE> ) {
+        $line =~ s/\r?\n$//;
+        $cnt++;
+        print qq|Claims: line=:${line}:\n| if ($debug);
+        if ( $line eq $Clmhdr ) {
+            $claimcnt = 1;
+            $clm .= $line . "\n";
+        }
+        elsif ( $claimcnt == 1 ) {
+            $claimcnt = 0;                        # reset
+            $checkno  = substr( $line, 0, 30 );
+            $checkno =~ s/^\s*(.*?)\s*$/$1/g;     # trim leading/trailing spaces
+            $clientid = substr( $line, 93, 12 );
+            $clientid =~ s/^\s*(.*?)\s*$/$1/g;    # trim leading/trailing spaces
+            $clm .= $line . "\n";
+        }
+        elsif ( $line =~ / Tax ID: / )    # only get last Tax ID: in claims
+        {
+            ( $junk, $taxid ) = split( ':', $line );
+            $taxid =~ s/^\s*(.*?)\s*$/$1/g;    # trim leading/trailing spaces
+            print qq|Claims: taxid=${taxid}=\n| if ($debug);
+            $clm .= $line . "\n";
+        }
+        elsif ( $line eq $Itmhdr ) {
+            $itemcnt = 1;
+            $clm .= $line . "\n";
+        }
+        elsif ( $itemcnt == 1 ) {
+            $itemcnt = 0;                      # reset
+            my $cdate = substr( $line, 22, 10 );
+            $cdate =~ s/^\s*(.*?)\s*$/$1/g;    # trim leading/trailing spaces
+            $contdate =
+                substr( $cdate, 6, 4 ) . '-'
+              . substr( $cdate, 0, 2 ) . '-'
+              . substr( $cdate, 3, 2 );
+            $scode = substr( $line, 33, 7 );
+            $scode =~ s/^\s*(.*?)\s*$/$1/g;    # trim leading/trailing spaces
+            $trid = $contdate . "_" . $scode;
+            print
+qq|Claims: checkno=$checkno, clientid=$clientid, contdate=$contdate, scode=$scode,$trid\n|
+              if ($debug);
+            $clm .= $line . "\n";
+        }
+        elsif ( $line eq $Claim_dlm ) {
+            $out1->{$checkno} .= $clm;
+            $out1->{$checkno}->{'taxid'} = $taxid;
+            $out2->{$checkno}->{$clientid} .= $clm;
+            $out3->{$checkno}->{$clientid}->{$trid} .= $clm if ($trid);
+
+            # reset
+            ( $checkno, $clientid, $claimcnt, $clm ) =
+              ( 'none', '', 0, $Claim_dlm . "\n" );
+            ( $junk, $taxid, $contdate, $scode, $trid, $itemcnt ) =
+              ( '', '', '', '', '', 0 );
+        }
+        else { $clm .= $line . "\n"; }
     }
-    elsif ( $claimcnt == 1 )
-    {
-      $claimcnt = 0;                             # reset
-      $checkno = substr($line,0,30);
-      $checkno =~ s/^\s*(.*?)\s*$/$1/g;          # trim leading/trailing spaces
-      $clientid = substr($line,93,12);
-      $clientid =~ s/^\s*(.*?)\s*$/$1/g;         # trim leading/trailing spaces
-      $clm .= $line."\n";
-    }
-    elsif ( $line =~ / Tax ID: / )               # only get last Tax ID: in claims
-    {
-      ($junk,$taxid) = split(':',$line);
-      $taxid =~ s/^\s*(.*?)\s*$/$1/g;            # trim leading/trailing spaces
-print qq|Claims: taxid=${taxid}=\n| if ( $debug );
-      $clm .= $line."\n";
-    }
-    elsif ( $line eq $Itmhdr )
-    {
-      $itemcnt=1;
-      $clm .= $line."\n";
-    }
-    elsif ( $itemcnt == 1 )
-    {
-      $itemcnt = 0;                              # reset
-      my $cdate = substr($line,22,10);
-      $cdate =~ s/^\s*(.*?)\s*$/$1/g;            # trim leading/trailing spaces
-      $contdate = substr($cdate,6,4).'-'.substr($cdate,0,2).'-'.substr($cdate,3,2);
-      $scode = substr($line,33,7);
-      $scode =~ s/^\s*(.*?)\s*$/$1/g;            # trim leading/trailing spaces
-      $trid = $contdate."_".$scode;
-print qq|Claims: checkno=$checkno, clientid=$clientid, contdate=$contdate, scode=$scode,$trid\n| if ( $debug );
-      $clm .= $line."\n";
-    }
-    elsif ( $line eq $Claim_dlm )
-    {
-      $out1->{$checkno} .= $clm;
-      $out1->{$checkno}->{'taxid'} = $taxid;
-      $out2->{$checkno}->{$clientid} .= $clm;
-      $out3->{$checkno}->{$clientid}->{$trid} .= $clm if ( $trid );
-      # reset
-      ($checkno,$clientid,$claimcnt,$clm) = ('none','',0,$Claim_dlm."\n");
-      ($junk,$taxid,$contdate,$scode,$trid,$itemcnt) = ('','','','','',0);
-    }
-    else
-    { $clm .= $line."\n"; }
-  }
-  $out1->{$checkno} .= $clm;
-  $out1->{$checkno}->{'taxid'} = $taxid;
-  $out2->{$checkno}->{$clientid} .= $clm;
-  $out3->{$checkno}->{$clientid}->{$trid} .= $clm if ( $trid );
-  return($out1,$out2,$out3);
+    $out1->{$checkno} .= $clm;
+    $out1->{$checkno}->{'taxid'} = $taxid;
+    $out2->{$checkno}->{$clientid} .= $clm;
+    $out3->{$checkno}->{$clientid}->{$trid} .= $clm if ($trid);
+    return ( $out1, $out2, $out3 );
 }
 ##    if ( $in =~ /^Check#                         Amount/ )
-sub wFile
-{
-  my ($self,$filename,$header,$adjustments,$payments,$claims,$clients,$notes) = @_;
-  my ($fn,$sfx) = split('\.',$filename,2);
-  my ($fileno,$era,$status,$ver,$dt) = split('_',$fn,5);
-  my $tdate = substr($dt,0,4).'-'.substr($dt,4,2).'-'.substr($dt,6,2);
-print qq|wFile: filename=${filename}, fn=${fn}, sfx=${sfx}\n| if ( $debug );
-print qq|wFile: fileno=${fileno}, era=${era}, dt=${dt}\n| if ( $debug );
-  foreach my $npi ( sort keys %{ $payments } )
-  {
-    my ($payout,$adjout,$chkout,$cidout,$taxid,$totalclaimcount) = ('','','','','',0);
-    $adjout .= $adjustments->{$npi}."\n";
-    my $dbname = $clinics->{$npi}->{DB};
-    my ($domain,$subdomain) = split('_',$dbname);
-print qq|wFile: npi=${npi}, dbname=${dbname}\n|;
-print qq|wFile: domain=${domain}, subdomain=${subdomain}\n|;
-    my $form = DBForm->new("DBNAME=$dbname");
-    my $dbh = $form->dbconnect();
-    my $sTreatment = $dbh->prepare("select * from Treatment left join xSC on xSC.SCID=Treatment.SCID where Treatment.ClientID=? and Treatment.ContLogDate=? and xSC.SCNum=?");
-    my $sProvider = $dbh->prepare("select Provider.ProvID from Provider left join ProviderControl on ProviderControl.ProvID=Provider.ProvID where Provider.Type=3 and ProviderControl.NPI=?");
-    $sProvider->execute($npi) || $form->dberror("parseERA: select Clinic $npi");
-    my $rProvider = $sProvider->fetchrow_hashref;
-    foreach my $chk ( keys %{ $payments->{$npi} } )
-    {
-      my $payline = $payments->{$npi}->{$chk};
-      $payout .= $payline."\n";
-      my $claimcount = substr($payline,47,5);
-      $claimcount =~ s/^\s*(.*?)\s*$/$1/g;             # trim leading/trailing spaces
-      $totalclaimcount += $claimcount;
-      my $chkdate = substr($payline,116,10);
-      my $cdate = substr($chkdate,6,4).'-'.substr($chkdate,0,2).'-'.substr($chkdate,3,2);
-      $chkout .= $claims->{$chk};
-      $taxid = $claims->{$chk}->{'taxid'};
-print qq|doUpdate: ${chkdate} and ${cdate} (taxid=$taxid)\n| if ( $debug );
-      foreach my $cid ( keys %{ $clients->{$chk} } )
-      {
-        my $rClientInsRemarks = ();
-        $rClientInsRemarks->{'ClientID'} = $cid;
-        $rClientInsRemarks->{'CreateProvID'} = $form->{'LOGINPROVID'};
-        $rClientInsRemarks->{'CreateDate'} = $form->{'TODAY'};
-        $rClientInsRemarks->{'ChangeProvID'} = $form->{'LOGINPROVID'};
-        $rClientInsRemarks->{'CheckNo'} = $chk;
-        $rClientInsRemarks->{'CheckDate'} = $cdate;
-        $rClientInsRemarks->{'HTMLText'} = $clients->{$chk}->{$cid};
-foreach my $f ( sort keys %{ $rClientInsRemarks } ) { print qq|  $f=$rClientInsRemarks->{$f}\n|; }
-print qq|doUpdate: ClientID=${cid} and CheckNo=${chk}\n| if ( $debug );
-        my $ID = DBA->doUpdate($form,'ClientInsRemarks',$rClientInsRemarks,"ClientID='${cid}' and CheckNo='$chk'");
-#print qq|doUpdate: foreach key: $clients->{$chk}->{$cid}\n| if ( $debug );
-        foreach my $key ( keys %{ $notes->{$chk}->{$cid} } )
-        {
-          my ($contdate,$scode) = split('_',$key);
-print qq|doUpdate: find TrID: ${contdate} and ${scode}\n| if ( $debug );
-          $sTreatment->execute($cid,$contdate,$scode) || $form->dberror("parseERA: select Treatment $cid");
-          if ( my $rTreatment = $sTreatment->fetchrow_hashref )
-          {
-            my $trid = $rTreatment->{'TrID'};
-            my $rClientInsRemarksDetail = ();
-            $rClientInsRemarksDetail->{'ClientID'} = $cid;
-            $rClientInsRemarksDetail->{'CreateProvID'} = $form->{'LOGINPROVID'};
-            $rClientInsRemarksDetail->{'CreateDate'} = $form->{'TODAY'};
-            $rClientInsRemarksDetail->{'ChangeProvID'} = $form->{'LOGINPROVID'};
-            $rClientInsRemarksDetail->{'CheckNo'} = $chk;
-            $rClientInsRemarksDetail->{'CheckDate'} = $cdate;
-            $rClientInsRemarksDetail->{'TrID'} = $trid;
-            $rClientInsRemarksDetail->{'ServiceCode'} = $scode;
-            $rClientInsRemarksDetail->{'ContactDate'} = $contdate;
-            $rClientInsRemarksDetail->{'HTMLText'} = $notes->{$chk}->{$cid}->{$key};
-foreach my $f ( sort keys %{ $rClientInsRemarksDetail } ) { print qq|  $f=$rClientInsRemarksDetail->{$f}\n|; }
-print qq|doUpdate: TrID=${trid}/ClientID=${cid} and CheckNo=${chk}\n|;
-            my $ID = DBA->doUpdate($form,'ClientInsRemarksDetail',$rClientInsRemarksDetail,"ClientID='${cid}' and CheckNo='$chk' and TrID='$trid'");
-          }
+sub wFile {
+    my ( $self, $filename, $header, $adjustments, $payments, $claims, $clients,
+        $notes )
+      = @_;
+    my ( $fn, $sfx ) = split( '\.', $filename, 2 );
+    my ( $fileno, $era, $status, $ver, $dt ) = split( '_', $fn, 5 );
+    my $tdate =
+        substr( $dt, 0, 4 ) . '-'
+      . substr( $dt, 4, 2 ) . '-'
+      . substr( $dt, 6, 2 );
+    print qq|wFile: filename=${filename}, fn=${fn}, sfx=${sfx}\n| if ($debug);
+    print qq|wFile: fileno=${fileno}, era=${era}, dt=${dt}\n|     if ($debug);
+    foreach my $npi ( sort keys %{$payments} ) {
+        my ( $payout, $adjout, $chkout, $cidout, $taxid, $totalclaimcount ) =
+          ( '', '', '', '', '', 0 );
+        $adjout .= $adjustments->{$npi} . "\n";
+        my $dbname = $clinics->{$npi}->{DB};
+        my ( $domain, $subdomain ) = split( '_', $dbname );
+        print qq|wFile: npi=${npi}, dbname=${dbname}\n|;
+        print qq|wFile: domain=${domain}, subdomain=${subdomain}\n|;
+        my $form       = DBForm->new("DBNAME=$dbname");
+        my $dbh        = $form->dbconnect();
+        my $sTreatment = $dbh->prepare(
+"select * from Treatment left join xSC on xSC.SCID=Treatment.SCID where Treatment.ClientID=? and Treatment.ContLogDate=? and xSC.SCNum=?"
+        );
+        my $sProvider = $dbh->prepare(
+"select Provider.ProvID from Provider left join ProviderControl on ProviderControl.ProvID=Provider.ProvID where Provider.Type=3 and ProviderControl.NPI=?"
+        );
+        $sProvider->execute($npi)
+          || $form->dberror("parseERA: select Clinic $npi");
+        my $rProvider = $sProvider->fetchrow_hashref;
+
+        foreach my $chk ( keys %{ $payments->{$npi} } ) {
+            my $payline = $payments->{$npi}->{$chk};
+            $payout .= $payline . "\n";
+            my $claimcount = substr( $payline, 47, 5 );
+            $claimcount =~ s/^\s*(.*?)\s*$/$1/g;  # trim leading/trailing spaces
+            $totalclaimcount += $claimcount;
+            my $chkdate = substr( $payline, 116, 10 );
+            my $cdate =
+                substr( $chkdate, 6, 4 ) . '-'
+              . substr( $chkdate, 0, 2 ) . '-'
+              . substr( $chkdate, 3, 2 );
+            $chkout .= $claims->{$chk};
+            $taxid = $claims->{$chk}->{'taxid'};
+            print qq|doUpdate: ${chkdate} and ${cdate} (taxid=$taxid)\n|
+              if ($debug);
+
+            foreach my $cid ( keys %{ $clients->{$chk} } ) {
+                my $rClientInsRemarks = ();
+                $rClientInsRemarks->{'ClientID'}     = $cid;
+                $rClientInsRemarks->{'CreateProvID'} = $form->{'LOGINPROVID'};
+                $rClientInsRemarks->{'CreateDate'}   = $form->{'TODAY'};
+                $rClientInsRemarks->{'ChangeProvID'} = $form->{'LOGINPROVID'};
+                $rClientInsRemarks->{'CheckNo'}      = $chk;
+                $rClientInsRemarks->{'CheckDate'}    = $cdate;
+                $rClientInsRemarks->{'HTMLText'}     = $clients->{$chk}->{$cid};
+
+                foreach my $f ( sort keys %{$rClientInsRemarks} ) {
+                    print qq|  $f=$rClientInsRemarks->{$f}\n|;
+                }
+                print qq|doUpdate: ClientID=${cid} and CheckNo=${chk}\n|
+                  if ($debug);
+                my $ID =
+                  DBA->doUpdate( $form, 'ClientInsRemarks', $rClientInsRemarks,
+                    "ClientID='${cid}' and CheckNo='$chk'" );
+
+     #print qq|doUpdate: foreach key: $clients->{$chk}->{$cid}\n| if ( $debug );
+                foreach my $key ( keys %{ $notes->{$chk}->{$cid} } ) {
+                    my ( $contdate, $scode ) = split( '_', $key );
+                    print qq|doUpdate: find TrID: ${contdate} and ${scode}\n|
+                      if ($debug);
+                    $sTreatment->execute( $cid, $contdate, $scode )
+                      || $form->dberror("parseERA: select Treatment $cid");
+                    if ( my $rTreatment = $sTreatment->fetchrow_hashref ) {
+                        my $trid                    = $rTreatment->{'TrID'};
+                        my $rClientInsRemarksDetail = ();
+                        $rClientInsRemarksDetail->{'ClientID'} = $cid;
+                        $rClientInsRemarksDetail->{'CreateProvID'} =
+                          $form->{'LOGINPROVID'};
+                        $rClientInsRemarksDetail->{'CreateDate'} =
+                          $form->{'TODAY'};
+                        $rClientInsRemarksDetail->{'ChangeProvID'} =
+                          $form->{'LOGINPROVID'};
+                        $rClientInsRemarksDetail->{'CheckNo'}     = $chk;
+                        $rClientInsRemarksDetail->{'CheckDate'}   = $cdate;
+                        $rClientInsRemarksDetail->{'TrID'}        = $trid;
+                        $rClientInsRemarksDetail->{'ServiceCode'} = $scode;
+                        $rClientInsRemarksDetail->{'ContactDate'} = $contdate;
+                        $rClientInsRemarksDetail->{'HTMLText'} =
+                          $notes->{$chk}->{$cid}->{$key};
+
+                        foreach my $f ( sort keys %{$rClientInsRemarksDetail} )
+                        {
+                            print qq|  $f=$rClientInsRemarksDetail->{$f}\n|;
+                        }
+                        print
+qq|doUpdate: TrID=${trid}/ClientID=${cid} and CheckNo=${chk}\n|;
+                        my $ID = DBA->doUpdate(
+                            $form,
+                            'ClientInsRemarksDetail',
+                            $rClientInsRemarksDetail,
+"ClientID='${cid}' and CheckNo='$chk' and TrID='$trid'"
+                        );
+                    }
+                }
+            }
         }
-      }
-    }
-    my $ins = $taxid eq '20-5296137' ? 'medicare'
-            : $taxid eq '41-1289245' ? 'optum'
-            : $taxid eq '94-2649097' ? 'optum'
-            : $taxid eq '06-6033492' ? 'aetna'
-            : $taxid eq '36-1236610' ? 'bcbsok'
-            : 'unknown';
-    print qq|\n\n>>>Tax ID is unknown: ${filename} !!!\n\n| if ( $taxid eq 'unknown' );
-    my $rptDir = $WWW.'/'.$subdomain.'/reports4';
-    my $fileName = 'EBT_resp_'.$rProvider->{ProvID}.'_'.$ins.'_'.$tdate.'_'.$totalclaimcount.'_'.DBUtil->Date('','stamp').'_'.DBUtil->genToken().'.htm';
-print qq|wFile: rptDir=$rptDir, fileName=$fileName\n| if ( $debug );
-    $sProvider->finish();
-    $sTreatment->finish();
-    $form->complete();
-    my $text = qq|<PRE>
+        my $ins =
+            $taxid eq '20-5296137' ? 'medicare'
+          : $taxid eq '41-1289245' ? 'optum'
+          : $taxid eq '94-2649097' ? 'optum'
+          : $taxid eq '06-6033492' ? 'aetna'
+          : $taxid eq '36-1236610' ? 'bcbsok'
+          :                          'unknown';
+        print qq|\n\n>>>Tax ID is unknown: ${filename} !!!\n\n|
+          if ( $taxid eq 'unknown' );
+        my $rptDir = $WWW . '/' . $subdomain . '/reports4';
+        my $fileName =
+            'EBT_resp_'
+          . $rProvider->{ProvID} . '_'
+          . $ins . '_'
+          . $tdate . '_'
+          . $totalclaimcount . '_'
+          . DBUtil->Date( '', 'stamp' ) . '_'
+          . DBUtil->genToken() . '.htm';
+        print qq|wFile: rptDir=$rptDir, fileName=$fileName\n| if ($debug);
+        $sProvider->finish();
+        $sTreatment->finish();
+        $form->complete();
+        my $text = qq|<PRE>
 Electronic Batch Report
 ${filename}
 ${header}
@@ -287,22 +334,23 @@ ${payout}
 ${chkout}
 </PRE>
 |;
-#my $rptDir='.';
-    if ( open(OUT,">${rptDir}/${fileName}") ) 
-    {
-      print OUT $text;
-      close(OUT);
-    } else { print qq|>>>ERROR: open ${fileName} $!\n|; }
-  }
-  return();
+
+        #my $rptDir='.';
+        if ( open( OUT, ">${rptDir}/${fileName}" ) ) {
+            print OUT $text;
+            close(OUT);
+        }
+        else { print qq|>>>ERROR: open ${fileName} $!\n|; }
+    }
+    return ();
 }
-sub prtError
-{
-  my ($self,$filename,$text) = @_;
-  print qq|
+
+sub prtError {
+    my ( $self, $filename, $text ) = @_;
+    print qq|
 >>> Error in processing file: ${filename}!
 ${text}
 |;
-  exit;
+    exit;
 }
 ################################################################

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ############################################################################
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use myForm;
 use myDBI;
@@ -13,10 +13,13 @@ my $DT = localtime();
 #   ProvEmpl ForProvID=id
 ############################################################################
 my $form = myForm->new();
-my $dbh = myDBI->dbconnect($form->{'DBNAME'});
-my $sProviderLicenses = $dbh->prepare("select * from ProviderLicenses where ProvID=? and State='OK'");
-my $ForProvID = $form->{'ForProvID'} ? $form->{'ForProvID'} : $form->{'LOGINPROVID'};
-my $ProviderSelection = DBA->getProviderSelection($form,$ForProvID,'Provider.ProvID','where');
+my $dbh  = myDBI->dbconnect( $form->{'DBNAME'} );
+my $sProviderLicenses =
+  $dbh->prepare("select * from ProviderLicenses where ProvID=? and State='OK'");
+my $ForProvID =
+  $form->{'ForProvID'} ? $form->{'ForProvID'} : $form->{'LOGINPROVID'};
+my $ProviderSelection =
+  DBA->getProviderSelection( $form, $ForProvID, 'Provider.ProvID', 'where' );
 $ProviderSelection .= qq| and Provider.Active=1| if ( $form->{Active} );
 my $q = qq|
 select Provider.LName, Provider.FName, Provider.ProvID, Provider.Active
@@ -36,32 +39,58 @@ select Provider.LName, Provider.FName, Provider.ProvID, Provider.Active
   ${ProviderSelection} 
   order by LName, FName
 |;
+
 #warn qq|q=$q\n|;
 my $s = $dbh->prepare($q);
 ############################################################################
 print qq|${DT}\nProvider Employee\n|;
-my @fields = ('LName','FName','ProvID','Active','SSN','NPI','CAQH','JobTitle','HireDate','TermDate','EvalDate','DOB','Supervision','DocOnFile','Diploma','Transcript','Credential','CodeOfEthics','JobDescr','CPRAdultExpDate','CPRChildExpDate','FirstAidExpDate','CPIExpDate','MandtExpDate','HireForm','InfoForm','AgreeDate','W4','I9','DLExpDate','AutoExpDate','SSNonFile','Equip','COBRA','InsApp','401K','Comments','Addr1','Addr2','City','ST','Zip','HmPh','License','Creds');
-foreach my $field ( @fields ) { print $field."\t"; } print "\n";
+my @fields = (
+    'LName',           'FName',
+    'ProvID',          'Active',
+    'SSN',             'NPI',
+    'CAQH',            'JobTitle',
+    'HireDate',        'TermDate',
+    'EvalDate',        'DOB',
+    'Supervision',     'DocOnFile',
+    'Diploma',         'Transcript',
+    'Credential',      'CodeOfEthics',
+    'JobDescr',        'CPRAdultExpDate',
+    'CPRChildExpDate', 'FirstAidExpDate',
+    'CPIExpDate',      'MandtExpDate',
+    'HireForm',        'InfoForm',
+    'AgreeDate',       'W4',
+    'I9',              'DLExpDate',
+    'AutoExpDate',     'SSNonFile',
+    'Equip',           'COBRA',
+    'InsApp',          '401K',
+    'Comments',        'Addr1',
+    'Addr2',           'City',
+    'ST',              'Zip',
+    'HmPh',            'License',
+    'Creds'
+);
+foreach my $field (@fields) { print $field. "\t"; }
+print "\n";
 $s->execute() || $form->dberror($q);
-while ( my $r = $s->fetchrow_hashref )
-{
-  my $License = '';
-  $sProviderLicenses->execute($r->{'ProvID'})
-        || $form->dberror("ProvEmpl: select ProviderLicenses $r->{'ProvID'}");
-  if ( my $rProviderLicenses = $sProviderLicenses->fetchrow_hashref )
-  { $License = qq|$rProviderLicenses->{'LicType'} $rProviderLicenses->{'LicNumber'}|; }
-  $r->{'License'} = $License;
-  my $Creds = main->setCreds($form,$r->{'ProvID'});
-  $r->{'Creds'} = $Creds;
-  my $reportline = '';
+while ( my $r = $s->fetchrow_hashref ) {
+    my $License = '';
+    $sProviderLicenses->execute( $r->{'ProvID'} )
+      || $form->dberror("ProvEmpl: select ProviderLicenses $r->{'ProvID'}");
+    if ( my $rProviderLicenses = $sProviderLicenses->fetchrow_hashref ) {
+        $License =
+          qq|$rProviderLicenses->{'LicType'} $rProviderLicenses->{'LicNumber'}|;
+    }
+    $r->{'License'} = $License;
+    my $Creds = main->setCreds( $form, $r->{'ProvID'} );
+    $r->{'Creds'} = $Creds;
+    my $reportline = '';
 
-  foreach my $field ( @fields )
-  { 
-    my $fld = DBA->subchr($r->{$field});
-    $fld =~ s/;/\t/g if ( $field eq 'Creds' );
-    $reportline .= qq|${fld}\t|;
-  }
-  print $reportline."\n";
+    foreach my $field (@fields) {
+        my $fld = DBA->subchr( $r->{$field} );
+        $fld =~ s/;/\t/g if ( $field eq 'Creds' );
+        $reportline .= qq|${fld}\t|;
+    }
+    print $reportline. "\n";
 }
 $s->finish();
 $sProviderLicenses->finish();
@@ -69,18 +98,19 @@ $sProviderLicenses->finish();
 myDBI->cleanup();
 exit;
 ############################################################################
-sub setCreds
-{
-  my ($self,$form,$ProvID) = @_;
-  my ($Creds,$dlm) = ('','');
-  my $sCreds = $dbh->prepare("select * from Credentials where ProvID=?");
-  $sCreds->execute($ProvID) || $form->dberror("setCreds: select Credentials ${ProvID}");
-  while ( my $r = $sCreds->fetchrow_hashref )
-  {
-    my $InsName = DBA->getxref($form,'xInsurance',$r->{'InsID'},'Name');
-    my $Abbr = DBA->getxref($form,'xCredentials',$r->{'CredID'},'Abbr');
-    $Creds .= qq|${dlm}${InsName}-${Abbr}|;
-    $dlm = '; ';
-  }
-  return($Creds);
+sub setCreds {
+    my ( $self, $form, $ProvID ) = @_;
+    my ( $Creds, $dlm ) = ( '', '' );
+    my $sCreds = $dbh->prepare("select * from Credentials where ProvID=?");
+    $sCreds->execute($ProvID)
+      || $form->dberror("setCreds: select Credentials ${ProvID}");
+    while ( my $r = $sCreds->fetchrow_hashref ) {
+        my $InsName =
+          DBA->getxref( $form, 'xInsurance', $r->{'InsID'}, 'Name' );
+        my $Abbr =
+          DBA->getxref( $form, 'xCredentials', $r->{'CredID'}, 'Abbr' );
+        $Creds .= qq|${dlm}${InsName}-${Abbr}|;
+        $dlm = '; ';
+    }
+    return ($Creds);
 }

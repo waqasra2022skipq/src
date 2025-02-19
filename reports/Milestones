@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 use SysAccess;
@@ -12,12 +12,17 @@ $DT = localtime();
 $form = DBForm->new();
 $form = DBUtil->setDates($form);
 my $DateRange = qq|from $form->{FromDateD} thru $form->{ToDateD}|;
-my $noteSelection .= qq|and '$form->{FromDate}'<=Treatment.ContLogDate and Treatment.ContLogDate<='$form->{ToDate}' |;
+my $noteSelection .=
+qq|and '$form->{FromDate}'<=Treatment.ContLogDate and Treatment.ContLogDate<='$form->{ToDate}' |;
 $dbh = $form->dbconnect();
-my $sDischarge = $dbh->prepare("select * from ClientDischarge left join ClientDischargeCDC on ClientDischargeCDC.ClientDischargeID=ClientDischarge.ID where ClientDischarge.ClientID=? order by ClientDischargeCDC.TransDate desc");
+my $sDischarge = $dbh->prepare(
+"select * from ClientDischarge left join ClientDischargeCDC on ClientDischargeCDC.ClientDischargeID=ClientDischarge.ID where ClientDischarge.ClientID=? order by ClientDischargeCDC.TransDate desc"
+);
 #######################################################
 my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
-my $addSelection = DBA->getForProvID($form,$ForProvID,'and','Treatment.ClinicID','Treatment.ProvID');
+my $addSelection =
+  DBA->getForProvID( $form, $ForProvID, 'and', 'Treatment.ClinicID',
+    'Treatment.ProvID' );
 my $qNotes = qq|
 select Treatment.ClientID,Treatment.TrID,Treatment.ContLogDate
       ,Treatment.BillStatus,Treatment.RevStatus,Treatment.StatusDate,Treatment.StatusMsg
@@ -37,64 +42,79 @@ select Treatment.ClientID,Treatment.TrID,Treatment.ContLogDate
     ${noteSelection}
   order by Clinic.Name, xInsurance.Name, Counselor.LName, Counselor.FName, Client.LName, Client.FName, Treatment.ContLogDate
 |;
+
 #warn "qNotes=$qNotes\n" if ( $form->{LOGINPROVID} == 91 );
 $sNotes = $dbh->prepare($qNotes);
 
 #####################################################################
 my $NoteCnt = 0;
-my ($PrevClinicID,$PrevCounselorID) = ('','');
-my ($PrevClientID,$PrevContDate,$DaysDiff,$DischargeDate,$PrintDischargeDate,$Total) = ('','','','','',0);
+my ( $PrevClinicID, $PrevCounselorID ) = ( '', '' );
+my ( $PrevClientID, $PrevContDate, $DaysDiff, $DischargeDate,
+    $PrintDischargeDate, $Total )
+  = ( '', '', '', '', '', 0 );
 my $Counts = ();
 print qq|${DT}\nMilestones ${DateRange}\n|;
-print qq|Clinic/Counselor\tClient\tClientID\tInsurance\tTrID\tContactDate\tCode\tDays\tDischarge\tTotal\n|;
+print
+qq|Clinic/Counselor\tClient\tClientID\tInsurance\tTrID\tContactDate\tCode\tDays\tDischarge\tTotal\n|;
 $sNotes->execute() || $form->dberror($qNotes);
-while ( $rNotes = $sNotes->fetchrow_hashref )
-{
-  $NoteCnt++;
-  my $InsID = $rNotes->{InsID} ? $rNotes->{InsID} : '0';           # 0 = No Insurance, none.
-  my $InsDescr = $rNotes->{InsID} ? $rNotes->{InsDescr} : 'none';  # 0 = No Insurance, none.
-  my $InsName = $rNotes->{InsID} ? $rNotes->{InsName} : 'none';    # 0 = No Insurance, none.
-  unless ( $rNotes->{ClinicID} == $PrevClinicID )
-  { print qq|CLINIC: $rNotes->{ClinicName}\n|; }
-  unless ( $rNotes->{CounselorID} == $PrevCounselorID )
-  { print qq|\nCOUNSELOR: $rNotes->{CounselorFName} $rNotes->{CounselorLName}\n|; }
-  if ( $rNotes->{ClientID} == $PrevClientID )
-  {
-    $DaysDiff = DBUtil->Date($rNotes->{ContLogDate},'diff',$PrevContDate);
-    $PrintDischargeDate = '';
-    print qq|\t\t|;
-  }
-  else
-  {
-    $DaysDiff = '';
-    $sDischarge->execute($rNotes->{ClientID}) || $form->dberror("select ClientDischarge: $rNotes->{ClientID}");
-    $rDischarge = $sDischarge->fetchrow_hashref;
-    $DischargeDate = $rDischarge->{TransDate};
-    $PrintDischargeDate = $DischargeDate;
-    $Total = 0;
-    print qq|\t$rNotes->{ClientFName} $rNotes->{ClientLName}\t$rNotes->{ClientID}|;
-  }
-  $Total += $DaysDiff;
-  print qq|\t$InsName\t$rNotes->{TrID}\t$rNotes->{ContLogDate}\t$rNotes->{SCNum}\t${DaysDiff}\t${PrintDischargeDate}\t${Total}\n|;
-  $PrevClinicID=$rNotes->{ClinicID};
-  $PrevCounselorID=$rNotes->{CounselorID};
-  $PrevClientID=$rNotes->{ClientID};
-  $PrevContDate=$rNotes->{ContLogDate};
-  $Counts->{$rNotes->{SCNum}}->{Count} += 1;
-  $Counts->{$rNotes->{SCNum}}->{Discharged} += 1 unless ( $DischargeDate eq '' );
+
+while ( $rNotes = $sNotes->fetchrow_hashref ) {
+    $NoteCnt++;
+    my $InsID =
+      $rNotes->{InsID} ? $rNotes->{InsID} : '0';    # 0 = No Insurance, none.
+    my $InsDescr =
+      $rNotes->{InsID} ? $rNotes->{InsDescr} : 'none'; # 0 = No Insurance, none.
+    my $InsName =
+      $rNotes->{InsID} ? $rNotes->{InsName} : 'none';  # 0 = No Insurance, none.
+    unless ( $rNotes->{ClinicID} == $PrevClinicID ) {
+        print qq|CLINIC: $rNotes->{ClinicName}\n|;
+    }
+    unless ( $rNotes->{CounselorID} == $PrevCounselorID ) {
+        print
+qq|\nCOUNSELOR: $rNotes->{CounselorFName} $rNotes->{CounselorLName}\n|;
+    }
+    if ( $rNotes->{ClientID} == $PrevClientID ) {
+        $DaysDiff =
+          DBUtil->Date( $rNotes->{ContLogDate}, 'diff', $PrevContDate );
+        $PrintDischargeDate = '';
+        print qq|\t\t|;
+    }
+    else {
+        $DaysDiff = '';
+        $sDischarge->execute( $rNotes->{ClientID} )
+          || $form->dberror("select ClientDischarge: $rNotes->{ClientID}");
+        $rDischarge         = $sDischarge->fetchrow_hashref;
+        $DischargeDate      = $rDischarge->{TransDate};
+        $PrintDischargeDate = $DischargeDate;
+        $Total              = 0;
+        print
+qq|\t$rNotes->{ClientFName} $rNotes->{ClientLName}\t$rNotes->{ClientID}|;
+    }
+    $Total += $DaysDiff;
+    print
+qq|\t$InsName\t$rNotes->{TrID}\t$rNotes->{ContLogDate}\t$rNotes->{SCNum}\t${DaysDiff}\t${PrintDischargeDate}\t${Total}\n|;
+    $PrevClinicID    = $rNotes->{ClinicID};
+    $PrevCounselorID = $rNotes->{CounselorID};
+    $PrevClientID    = $rNotes->{ClientID};
+    $PrevContDate    = $rNotes->{ContLogDate};
+    $Counts->{ $rNotes->{SCNum} }->{Count}      += 1;
+    $Counts->{ $rNotes->{SCNum} }->{Discharged} += 1
+      unless ( $DischargeDate eq '' );
 }
 $sNotes->finish();
 $sDischarge->finish();
 ##
 # Part 2
 ##
-@Codes = ('XMS1','XMS2','XMS3','XMS4','XMS5','XMS6','XMS7','XMS8','XMS9','XMSA');
+@Codes = (
+    'XMS1', 'XMS2', 'XMS3', 'XMS4', 'XMS5', 'XMS6',
+    'XMS7', 'XMS8', 'XMS9', 'XMSA'
+);
 print qq|\n\nPart 2\nCode\tCount\tDischarged\n|;
-foreach my $Code ( @Codes )
-{
-  my $CodCount = $Counts->{$Code}->{Count} + 0;
-  my $DisCount = $Counts->{$Code}->{Discharged} + 0;
-  print qq|${Code}\t${CodCount}\t${DisCount}\n|;
+foreach my $Code (@Codes) {
+    my $CodCount = $Counts->{$Code}->{Count} + 0;
+    my $DisCount = $Counts->{$Code}->{Discharged} + 0;
+    print qq|${Code}\t${CodCount}\t${DisCount}\n|;
 }
 $form->complete();
 exit;

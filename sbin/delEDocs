@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use Cwd;
 use File::Copy;
 use Accounts;
@@ -9,69 +9,72 @@ use DBA;
 ############################################################################
 # This routine deletes EDoc records with DELETE in Title and Descr
 ############################################################################
-my @DBS = $ARGV[0] eq 'test' ? Accounts->dbs('test') : scalar(@ARGV) ? @ARGV : Accounts->dbs('active'); 
+my @DBS =
+    $ARGV[0] eq 'test' ? Accounts->dbs('test')
+  : scalar(@ARGV)      ? @ARGV
+  :                      Accounts->dbs('active');
 my $WWW = myConfig->cfg('WWW');
 
-foreach my $dbname ( @DBS )
-{
-  my ($domain,$subdomain) = split('_',$dbname);
-  my $ACCTPATH = $WWW.'/'.$subdomain;
-  if ( chdir($ACCTPATH) )
-  {
-    my $pwd=cwd();
-    print qq|\n--------------------------------------\n|;
-    print qq|database: ${dbname} pwd=${pwd}\n|;
+foreach my $dbname (@DBS) {
+    my ( $domain, $subdomain ) = split( '_', $dbname );
+    my $ACCTPATH = $WWW . '/' . $subdomain;
+    if ( chdir($ACCTPATH) ) {
+        my $pwd = cwd();
+        print qq|\n--------------------------------------\n|;
+        print qq|database: ${dbname} pwd=${pwd}\n|;
 
-    my $form = DBForm->new("DBNAME=$dbname");
-    main->edelete($form,'Provider');
-    main->edelete($form,'Client');
-    $form->complete();
-  }
-  else { print qq|chdir ${ACCTPATH} failed: $!\n|; }
+        my $form = DBForm->new("DBNAME=$dbname");
+        main->edelete( $form, 'Provider' );
+        main->edelete( $form, 'Client' );
+        $form->complete();
+    }
+    else { print qq|chdir ${ACCTPATH} failed: $!\n|; }
 }
 exit;
 ############################################################################
-sub edelete
-{
-  my ($self,$form,$type) = @_;
-  my $dbh = $form->dbconnect();
-  my $table = $type.'EDocs';
-  my $qEDocs = qq|select * from ${table} where BINARY Title='DELETE' and BINARY Descr='DELETE'|;
-  my $sEDocs = $dbh->prepare($qEDocs);
-  my $qEDocsDEL = qq|delete from ${table} where ID=?|;
-  my $sEDocsDEL = $dbh->prepare($qEDocsDEL);
-  $sEDocs->execute() || $form->dberror($qEDocs);
-  ##my $cnt = $sEDocs->rows;
-  my $cnt = 0;
-  while ( my $r = $sEDocs->fetchrow_hashref ) 
-  { 
-    my $path = $r->{'Path'};
-    my ($dir,$fn) = $path =~ /(.*\/)?(.+)/s;
-    mkdir('backup'.$dir,777) unless ( -d 'backup'.$dir );
-#print "D=$dir, F=$fn\n";
-    my $fromPath = '.'.$r->{'Path'};
-    my $toPath = 'backup'.$r->{'Path'};
-    print qq|  move from: ${fromPath} to: ${toPath}\n|;
-    move($fromPath,$toPath) or print "  error=$!\n";
-    if ( $! eq 'No such file or directory' )
-    {
-      print qq|  missing file: ${fromPath}\n|;
-      print qq|  delete ${table}:ID:$r->{'ID'} Path: $r->{Path}\n|;
-      unless ( $sEDocsDEL->execute($r->{'ID'}) ) { print qq|<<<ERROR>>>: delete ID=$r->{'ID'} failed: $!\n|; }
-      $cnt++;
+sub edelete {
+    my ( $self, $form, $type ) = @_;
+    my $dbh   = $form->dbconnect();
+    my $table = $type . 'EDocs';
+    my $qEDocs =
+qq|select * from ${table} where BINARY Title='DELETE' and BINARY Descr='DELETE'|;
+    my $sEDocs    = $dbh->prepare($qEDocs);
+    my $qEDocsDEL = qq|delete from ${table} where ID=?|;
+    my $sEDocsDEL = $dbh->prepare($qEDocsDEL);
+    $sEDocs->execute() || $form->dberror($qEDocs);
+    ##my $cnt = $sEDocs->rows;
+    my $cnt = 0;
+    while ( my $r = $sEDocs->fetchrow_hashref ) {
+        my $path = $r->{'Path'};
+        my ( $dir, $fn ) = $path =~ /(.*\/)?(.+)/s;
+        mkdir( 'backup' . $dir, 777 ) unless ( -d 'backup' . $dir );
+
+        #print "D=$dir, F=$fn\n";
+        my $fromPath = '.' . $r->{'Path'};
+        my $toPath   = 'backup' . $r->{'Path'};
+        print qq|  move from: ${fromPath} to: ${toPath}\n|;
+        move( $fromPath, $toPath ) or print "  error=$!\n";
+        if ( $! eq 'No such file or directory' ) {
+            print qq|  missing file: ${fromPath}\n|;
+            print qq|  delete ${table}:ID:$r->{'ID'} Path: $r->{Path}\n|;
+            unless ( $sEDocsDEL->execute( $r->{'ID'} ) ) {
+                print qq|<<<ERROR>>>: delete ID=$r->{'ID'} failed: $!\n|;
+            }
+            $cnt++;
+        }
+        elsif ( $! eq '' ) {
+            DBA->insLog( $form, $table, 'ID', $r->{'ID'}, $table . 'Log' );
+            print qq|  delete ${table}:ID:$r->{'ID'} Path: $r->{Path}\n|;
+            unless ( $sEDocsDEL->execute( $r->{'ID'} ) ) {
+                print qq|<<<ERROR>>>: delete ID=$r->{'ID'} failed: $!\n|;
+            }
+            $cnt++;
+        }
+        else { print qq|<<<ERROR>>>: Move ${fromPath} failed: $!\n|; }
     }
-    elsif ( $! eq '' )
-    {
-      DBA->insLog($form,$table,'ID',$r->{'ID'},$table.'Log');
-      print qq|  delete ${table}:ID:$r->{'ID'} Path: $r->{Path}\n|;
-      unless ( $sEDocsDEL->execute($r->{'ID'}) ) { print qq|<<<ERROR>>>: delete ID=$r->{'ID'} failed: $!\n|; }
-      $cnt++;
-    }
-    else { print qq|<<<ERROR>>>: Move ${fromPath} failed: $!\n|; }
-  }
-  $sEDocsDEL->finish();
-  $sEDocs->finish();
-  print qq|  ${cnt} rows updated.\n|;
-  return(1);
+    $sEDocsDEL->finish();
+    $sEDocs->finish();
+    print qq|  ${cnt} rows updated.\n|;
+    return (1);
 }
 ############################################################################

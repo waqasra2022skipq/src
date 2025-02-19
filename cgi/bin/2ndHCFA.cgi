@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ############################################################################
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use myConfig;
 use Cwd;
 use DBI;
@@ -13,35 +13,43 @@ use myHTML;
 
 ############################################################################
 my $form = myForm->new();
-my $dbh = myDBI->dbconnect($form->{'DBNAME'});
-if ( ! SysAccess->verify($form,'Privilege=BillingRemit') )
-{ myDBI->error("BillingRemit Access / Not Found!"); }
+my $dbh  = myDBI->dbconnect( $form->{'DBNAME'} );
+if ( !SysAccess->verify( $form, 'Privilege=BillingRemit' ) ) {
+    myDBI->error("BillingRemit Access / Not Found!");
+}
 
 $form = DBUtil->setDates($form);
-my $fdow = DBUtil->Date($form->{FromDate},'dow');
-my $fdayname = (Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday)[$fdow];
-my $tdow = DBUtil->Date($form->{ToDate},'dow');
-my $tdayname = (Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday)[$tdow];
-my $DateRange = qq|from ${fdayname} $form->{FromDateD} - ${tdayname} $form->{ToDateD}|;
+my $fdow = DBUtil->Date( $form->{FromDate}, 'dow' );
+my $fdayname =
+  ( Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday )[$fdow];
+my $tdow = DBUtil->Date( $form->{ToDate}, 'dow' );
+my $tdayname =
+  ( Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday )[$tdow];
+my $DateRange =
+  qq|from ${fdayname} $form->{FromDateD} - ${tdayname} $form->{ToDateD}|;
 
 ############################################################################
 # 2ndHCFA.cgi does 1 Insurance type at a time.
 ##
-my $sClientInsurance=$dbh->prepare("select * from Insurance where ClientID=? and InsID=? and Priority=?");
-my $sInsurance=$dbh->prepare("select * from xInsurance where ID=?");
-$sInsurance->execute($form->{'InsID'}) || myDBI->dberror("2ndHCFA: select xInsurance $form->{'InsID'}");
+my $sClientInsurance = $dbh->prepare(
+    "select * from Insurance where ClientID=? and InsID=? and Priority=?");
+my $sInsurance = $dbh->prepare("select * from xInsurance where ID=?");
+$sInsurance->execute( $form->{'InsID'} )
+  || myDBI->dberror("2ndHCFA: select xInsurance $form->{'InsID'}");
 my $rInsurance = $sInsurance->fetchrow_hashref;
-$s=$dbh->prepare("select * from xInsurance");
-  $s->execute();
-  while (my $r = $s->fetchrow_hashref) { $xInsurance{$r->{ID}} = $r; }
-  $xInsurance{0}{ID} = 0;
-  $xInsurance{0}{Name} = 'No Insurance';
-  $xInsurance{0}{Descr} = 'none';
+$s = $dbh->prepare("select * from xInsurance");
+$s->execute();
+while ( my $r = $s->fetchrow_hashref ) { $xInsurance{ $r->{ID} } = $r; }
+$xInsurance{0}{ID}    = 0;
+$xInsurance{0}{Name}  = 'No Insurance';
+$xInsurance{0}{Descr} = 'none';
 $s->finish();
-my $SecondaryInsuranceID = '100';      # medicaid
+my $SecondaryInsuranceID = '100';    # medicaid
 
-my $html = $form->{'submit'} ? main->submit()
-                             : main->list();
+my $html =
+  $form->{'submit'}
+  ? main->submit()
+  : main->list();
 $sClientInsurance->finish();
 $sInsurance->finish();
 myDBI->cleanup();
@@ -49,12 +57,16 @@ print $html;
 exit;
 
 ############################################################################
-sub list()
-{
-#warn qq|2ndHCFA: doHTML\n|;
-  my $Title = qq|$rInsurance->{Name} Billed and AmtDue Notes|;
-  my $Hdr = qq|This screen selects notes for the client's secondary insurance payments for the primary insurance claims and generates the HCFA 1500 pdf. Check the box in the 'Due' column to select the note. When all notes are selected, hit the appropriate submit button for blank paper or pre-printed forms.<BR><U>For these notes the Primary insurance should have been used. And make sure that the Secondary Insurance for the Client has an EffDate before the PA of the Primary insurance.</U>|;
-  my $html = myHTML->newHTML($form,'2nd HCFA','CheckPopupWindow noclock countdown_60') . qq|
+sub list() {
+
+    #warn qq|2ndHCFA: doHTML\n|;
+    my $Title = qq|$rInsurance->{Name} Billed and AmtDue Notes|;
+    my $Hdr =
+qq|This screen selects notes for the client's secondary insurance payments for the primary insurance claims and generates the HCFA 1500 pdf. Check the box in the 'Due' column to select the note. When all notes are selected, hit the appropriate submit button for blank paper or pre-printed forms.<BR><U>For these notes the Primary insurance should have been used. And make sure that the Secondary Insurance for the Client has an EffDate before the PA of the Primary insurance.</U>|;
+    my $html =
+      myHTML->newHTML( $form, '2nd HCFA',
+        'CheckPopupWindow noclock countdown_60' )
+      . qq|
 <SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/NoEnter.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/serverREQ.js"> </SCRIPT>
@@ -84,16 +96,20 @@ function validate(form) { return(1); }
     <TH ALIGN="right" >Paid</TH>
     <TH ALIGN="right" >Due</TH>
   </TR >
-|; 
+|;
 
-#============================================================================
+   #============================================================================
 
-  my $ForProvID = $form->{Provider} ? $form->{Provider} : $form->{LOGINPROVID};
-  my $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Treatment.ClinicID');
-  my $DateSelection = '';
-  $DateSelection .= qq|and ContLogDate >= '$form->{FromDate}' | if ( $form->{FromDate} );
-  $DateSelection .= qq|and ContLogDate <= '$form->{ToDate}' | if ( $form->{ToDate} );
-  my $qNotes = qq|
+    my $ForProvID =
+      $form->{Provider} ? $form->{Provider} : $form->{LOGINPROVID};
+    my $ClinicSelection =
+      DBA->getClinicSelection( $form, $ForProvID, 'Treatment.ClinicID' );
+    my $DateSelection = '';
+    $DateSelection .= qq|and ContLogDate >= '$form->{FromDate}' |
+      if ( $form->{FromDate} );
+    $DateSelection .= qq|and ContLogDate <= '$form->{ToDate}' |
+      if ( $form->{ToDate} );
+    my $qNotes = qq|
 select Treatment.*
       ,Provider.LName as PLName, Provider.FName as PFName
       ,Client.LName as CLName, Client.FName as CFName
@@ -108,38 +124,40 @@ select Treatment.*
     ${DateSelection}
   order by Client.LName, Client.FName, Treatment.ContLogDate
 |;
-warn qq|2ndHCFA: qNotes=\n$qNotes\n|;
-  my $cnt = 0;
-  my $ClinicID = '';
-  $sNotes=$dbh->prepare($qNotes);
-  $sNotes->execute();
-  while (my $rNotes = $sNotes->fetchrow_hashref)
-  {
-    $ClientID = $rNotes->{ClientID};
-    next unless ( main->check2nd($ClientID) );
-    $cnt+=1;
-    $ClinicID=$rNotes->{ClinicID};        # FOR NOW WE GET THE LAST CLINIC-NEEDS TO BE GIVEN
-    $even = int($cnt/2) == $cnt/2 ? '1' : '0';
-    my $class = qq|rptodd|;
-    if ( $even ) { $class = qq|rpteven|; }
-    $html .= qq|  <TR CLASS="${class}" >\n|;
-    $html .= qq|    <TD ALIGN="left" >$rNotes->{CLName} &nbsp;</TD>\n|;
-    $html .= qq|    <TD ALIGN="left" >$rNotes->{CFName} &nbsp;</TD>\n|;
-    $html .= qq|    <TD ALIGN="left" >$rNotes->{TrID} &nbsp;</TD>\n|;
-    $html .= qq|    <TD ALIGN="left" >$rNotes->{ContLogDate} &nbsp;</TD>\n|;
-    $html .= qq|    <TD ALIGN="left" >$rNotes->{CIPDate} &nbsp;</TD>\n|;
-    $html .= qq|    <TD ALIGN="left" >$rNotes->{RecDate} &nbsp;</TD>\n|;
-    $html .= qq|    <TD ALIGN="right" >$rNotes->{BilledAmt} &nbsp;</TD>\n|;
-    my $PaidAmt = $rNotes->{'BilledAmt'} - $rNotes->{'AmtDue'};
-    $html .= qq|    <TD ALIGN="right" >${PaidAmt} &nbsp;</TD>\n|;
-    $html .= qq|    <TD ALIGN="right" >\n|;
-    $html .= qq|      <INPUT TYPE=checkbox NAME="2ND_$rNotes->{TrID}" VALUE=1 ONCLICK="form.AMT_$rNotes->{TrID}.value=''" >\n|;
-    $html .= qq|      $rNotes->{AmtDue}\n|;
-    $html .= qq|    </TD>\n|;
-    $html .= qq|  </TR>\n|; 
-  }
-  $html .= qq|</TABLE>\n|;
-  $html .= qq|
+    warn qq|2ndHCFA: qNotes=\n$qNotes\n|;
+    my $cnt      = 0;
+    my $ClinicID = '';
+    $sNotes = $dbh->prepare($qNotes);
+    $sNotes->execute();
+
+    while ( my $rNotes = $sNotes->fetchrow_hashref ) {
+        $ClientID = $rNotes->{ClientID};
+        next unless ( main->check2nd($ClientID) );
+        $cnt += 1;
+        $ClinicID = $rNotes->{ClinicID}
+          ;    # FOR NOW WE GET THE LAST CLINIC-NEEDS TO BE GIVEN
+        $even = int( $cnt / 2 ) == $cnt / 2 ? '1' : '0';
+        my $class = qq|rptodd|;
+        if ($even) { $class = qq|rpteven|; }
+        $html .= qq|  <TR CLASS="${class}" >\n|;
+        $html .= qq|    <TD ALIGN="left" >$rNotes->{CLName} &nbsp;</TD>\n|;
+        $html .= qq|    <TD ALIGN="left" >$rNotes->{CFName} &nbsp;</TD>\n|;
+        $html .= qq|    <TD ALIGN="left" >$rNotes->{TrID} &nbsp;</TD>\n|;
+        $html .= qq|    <TD ALIGN="left" >$rNotes->{ContLogDate} &nbsp;</TD>\n|;
+        $html .= qq|    <TD ALIGN="left" >$rNotes->{CIPDate} &nbsp;</TD>\n|;
+        $html .= qq|    <TD ALIGN="left" >$rNotes->{RecDate} &nbsp;</TD>\n|;
+        $html .= qq|    <TD ALIGN="right" >$rNotes->{BilledAmt} &nbsp;</TD>\n|;
+        my $PaidAmt = $rNotes->{'BilledAmt'} - $rNotes->{'AmtDue'};
+        $html .= qq|    <TD ALIGN="right" >${PaidAmt} &nbsp;</TD>\n|;
+        $html .= qq|    <TD ALIGN="right" >\n|;
+        $html .=
+qq|      <INPUT TYPE=checkbox NAME="2ND_$rNotes->{TrID}" VALUE=1 ONCLICK="form.AMT_$rNotes->{TrID}.value=''" >\n|;
+        $html .= qq|      $rNotes->{AmtDue}\n|;
+        $html .= qq|    </TD>\n|;
+        $html .= qq|  </TR>\n|;
+    }
+    $html .= qq|</TABLE>\n|;
+    $html .= qq|
 <HR WIDTH="90%" >
 <TABLE WIDTH="90%" BORDER="0" CELLSPACING="0" CELLPADDING="2" >
   <TR CLASS="site" >
@@ -163,37 +181,39 @@ document.HCFA.elements[0].focus();
 </BODY>
 </HTML>
 |;
-  $sNotes->finish();
-  return($html);
+    $sNotes->finish();
+    return ($html);
 }
 
 ############################################################################
-sub submit()
-{
-warn qq|2ndHCFA: submit\n|;
-  chdir("$form->{DOCROOT}/reports3");
-  my $Location = myForm->popLINK();
-warn qq|2ndHCFA: Location: $Location\n|;
-  my ($TrIDs,$cnt) = ('',0);
-  foreach my $f ( sort keys %{$form} )
-  { 
-    if ( $f =~ /^2ND_/ )
-    {
-      my ($tag,$TrID) = split('_',$f);
-      $TrIDs .= $TrID . ' ';
-      $cnt++;
+sub submit() {
+    warn qq|2ndHCFA: submit\n|;
+    chdir("$form->{DOCROOT}/reports3");
+    my $Location = myForm->popLINK();
+    warn qq|2ndHCFA: Location: $Location\n|;
+    my ( $TrIDs, $cnt ) = ( '', 0 );
+    foreach my $f ( sort keys %{$form} ) {
+        if ( $f =~ /^2ND_/ ) {
+            my ( $tag, $TrID ) = split( '_', $f );
+            $TrIDs .= $TrID . ' ';
+            $cnt++;
+        }
     }
-  }
-  my $stamp = DBUtil->Date('','stamp');
-  my $token = DBUtil->genToken();
-  my $file = qq|HCFA_2nd_$form->{ClinicID}_$form->{InsID}_$form->{TODAY}_${cnt}_${stamp}_${token}.pdf|;
-warn qq|2ndHCFA: file: $file\n|;
-warn qq|2ndHCFA: TrIDs: ${TrIDs}\n|;
+    my $stamp = DBUtil->Date( '', 'stamp' );
+    my $token = DBUtil->genToken();
+    my $file =
+qq|HCFA_2nd_$form->{ClinicID}_$form->{InsID}_$form->{TODAY}_${cnt}_${stamp}_${token}.pdf|;
+    warn qq|2ndHCFA: file: $file\n|;
+    warn qq|2ndHCFA: TrIDs: ${TrIDs}\n|;
 ### InsID DOES NOT MATTER...TEST WITHOUT IT...
-  my $cmd = qq|/home/okmis/mis/src/cgi/bin/printHCFA.pl DBNAME=$form->{DBNAME}\\&Secondary=1\\&InsID=$form->{InsID}\\&HCFAtype=$form->{HCFAtype}\\&TrIDs=${TrIDs}\\&file=${file}\\&mlt=$form->{mlt}|;
-warn qq|2ndHCFA: cmd: $cmd\n|;
-  system($cmd);
-  my $html = myHTML->newHTML($form,'2nd HCFA','CheckPopupWindow noclock countdown_2') . qq|
+    my $cmd =
+qq|/var/www/okmis/src/cgi/bin/printHCFA.pl DBNAME=$form->{DBNAME}\\&Secondary=1\\&InsID=$form->{InsID}\\&HCFAtype=$form->{HCFAtype}\\&TrIDs=${TrIDs}\\&file=${file}\\&mlt=$form->{mlt}|;
+    warn qq|2ndHCFA: cmd: $cmd\n|;
+    system($cmd);
+    my $html =
+      myHTML->newHTML( $form, '2nd HCFA',
+        'CheckPopupWindow noclock countdown_2' )
+      . qq|
 <HR WIDTH="90%" >
 <DIV CLASS="title" >Reports Window</DIV>
 <DIV CLASS="subtitle" >for $form->{LOGINNAME}</DIV>
@@ -206,18 +226,22 @@ warn qq|2ndHCFA: cmd: $cmd\n|;
 </BODY>
 </HTML>
 |;
-warn qq|2ndHCFA:\n$html\n|;
-  return($html);
+    warn qq|2ndHCFA:\n$html\n|;
+    return ($html);
 }
-sub check2nd
-{
-  my ($self,$ClientID) = @_;
-  $sClientInsurance->execute($ClientID,$SecondaryInsuranceID,2) || myDBI->dberror("2ndHCFA: select Insurance ${ClientID}");
-  if ( my $rClientInsurance = $sClientInsurance->fetchrow_hashref )
-  { return(1); }
-  $sClientInsurance->execute($ClientID,$SecondaryInsuranceID,3) || myDBI->dberror("2ndHCFA: select Insurance ${ClientID}");
-  if ( my $rClientInsurance = $sClientInsurance->fetchrow_hashref )
-  { return(1); }
-  return(0);
+
+sub check2nd {
+    my ( $self, $ClientID ) = @_;
+    $sClientInsurance->execute( $ClientID, $SecondaryInsuranceID, 2 )
+      || myDBI->dberror("2ndHCFA: select Insurance ${ClientID}");
+    if ( my $rClientInsurance = $sClientInsurance->fetchrow_hashref ) {
+        return (1);
+    }
+    $sClientInsurance->execute( $ClientID, $SecondaryInsuranceID, 3 )
+      || myDBI->dberror("2ndHCFA: select Insurance ${ClientID}");
+    if ( my $rClientInsurance = $sClientInsurance->fetchrow_hashref ) {
+        return (1);
+    }
+    return (0);
 }
 ############################################################################

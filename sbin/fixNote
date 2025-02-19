@@ -1,13 +1,13 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 use DBA;
 use uBill;
 ############################################################################
-my $form = DBForm->new();
-my $dbh = $form->dbconnect();
-my $sTreatment = $dbh->prepare("
+my $form       = DBForm->new();
+my $dbh        = $form->dbconnect();
+my $sTreatment = $dbh->prepare( "
 select Treatment.ProvID, Treatment.ClientID, Treatment.TrID, Treatment.SCID, Treatment.Mod4
      , Treatment.ContLogDate, Treatment.Units, Treatment.BilledAmt
      , xSC.InsID, xSC.SCNum
@@ -18,47 +18,58 @@ select Treatment.ProvID, Treatment.ClientID, Treatment.TrID, Treatment.SCID, Tre
     left join xInsurance on xInsurance.ID=xSC.InsID
   where TrID=?
     and xSCRates.EffDate <= Treatment.ContLogDate and (Treatment.ContLogDate <= xSCRates.ExpDate or xSCRates.ExpDate is null)
-");
-foreach my $TrID ( split(' ',$form->{TrIDs}) )
-{
-  print qq|fixNote: TrID=$TrID: |;
-  if ( $form->{'writeoff'} )
-  {
-    my $RecDate = $form->{'RecDate'} eq '' ? $form->{'TODAY'} : $form->{'RecDate'};
-    my $RefID = $form->{'RefID'} eq '' ? 'R'.$RecDate : $form->{'RefID'};
-    my $Reason = $form->{'Reason'} eq '' ? 'Amount written off' : $form->{'Reason'};
-# are we adjusting this note before it was even billed?
-    uBill->fixBillDate($form,$TrID,$form->{TODAY});
-    my ($BilledAmt,$IncAmt,$SchAmt,$AmtDue) = uBill->setBilledAmt($form,$TrID);
-    print qq|BilledAmt=$BilledAmt, IncAmt=$IncAmt, SchAmt=$SchAmt, AmtDue=$AmtDue\n|;
-    $sTreatment->execute($TrID) || $form->dberror("Remit: select Treatment ${TrID}");
-    my $rTreatment = $sTreatment->fetchrow_hashref;
-    my $r835 = ();
-    $r835->{'TrID'}       = $TrID;                           # ok to set
-    $r835->{'ClientID'}   = $rTreatment->{'ClientID'};
-    $r835->{'ContDate'}   = $rTreatment->{'ContLogDate'};
-    $r835->{'ServCode'}   = $rTreatment->{'Mod4'} eq '' ? $rTreatment->{'SCNum'}
-                          : $rTreatment->{'SCNum'}.' '.$rTreatment->{'Mod4'};
-    $r835->{'RecDate'}    = $RecDate;             
-    $r835->{'PaidDate'}   = $RecDate;                        # no writeoff in Payroll 
-    $r835->{'RefID'}      = $RefID;
-    $r835->{'InsCode'}    = $rTreatment->{'InsCode'};
-    $r835->{'PaidAmt'}    = $AmtDue;
-    my ($trid,$scid,$code,$type) = uBill->postClaim($form,$r835,'MR','SR');
-    print qq|trid=$trid, scid=$scid, code=$code,type=$type\n|;
-    # was set to '5' for 'Reconcile' in postClaim
-    #   won't update if already 5:Reconcile
-    uBill->setBillStatus($form,$TrID,4,$RecDate,$Reason);
-#   did we reconcile this note before it was even billed?
-    uBill->fixBillDate($form,$TrID,$RecDate);
-    # don't leave it unreviewed.
-    uBill->fixRevDates($form,$TrID,3);
-  }
-  else
-  {
-    my ($BilledAmt,$IncAmt,$SchAmt,$AmtDue) = uBill->setBilledAmt($form,$TrID);
-    print qq|BilledAmt=$BilledAmt, IncAmt=$IncAmt, SchAmt=$SchAmt, AmtDue=$AmtDue\n|;
-  }
+" );
+foreach my $TrID ( split( ' ', $form->{TrIDs} ) ) {
+    print qq|fixNote: TrID=$TrID: |;
+    if ( $form->{'writeoff'} ) {
+        my $RecDate =
+          $form->{'RecDate'} eq '' ? $form->{'TODAY'} : $form->{'RecDate'};
+        my $RefID = $form->{'RefID'} eq '' ? 'R' . $RecDate : $form->{'RefID'};
+        my $Reason =
+          $form->{'Reason'} eq '' ? 'Amount written off' : $form->{'Reason'};
+
+        # are we adjusting this note before it was even billed?
+        uBill->fixBillDate( $form, $TrID, $form->{TODAY} );
+        my ( $BilledAmt, $IncAmt, $SchAmt, $AmtDue ) =
+          uBill->setBilledAmt( $form, $TrID );
+        print
+qq|BilledAmt=$BilledAmt, IncAmt=$IncAmt, SchAmt=$SchAmt, AmtDue=$AmtDue\n|;
+        $sTreatment->execute($TrID)
+          || $form->dberror("Remit: select Treatment ${TrID}");
+        my $rTreatment = $sTreatment->fetchrow_hashref;
+        my $r835       = ();
+        $r835->{'TrID'}     = $TrID;                          # ok to set
+        $r835->{'ClientID'} = $rTreatment->{'ClientID'};
+        $r835->{'ContDate'} = $rTreatment->{'ContLogDate'};
+        $r835->{'ServCode'} =
+            $rTreatment->{'Mod4'} eq ''
+          ? $rTreatment->{'SCNum'}
+          : $rTreatment->{'SCNum'} . ' ' . $rTreatment->{'Mod4'};
+        $r835->{'RecDate'}  = $RecDate;
+        $r835->{'PaidDate'} = $RecDate;                 # no writeoff in Payroll
+        $r835->{'RefID'}    = $RefID;
+        $r835->{'InsCode'}  = $rTreatment->{'InsCode'};
+        $r835->{'PaidAmt'}  = $AmtDue;
+        my ( $trid, $scid, $code, $type ) =
+          uBill->postClaim( $form, $r835, 'MR', 'SR' );
+        print qq|trid=$trid, scid=$scid, code=$code,type=$type\n|;
+
+        # was set to '5' for 'Reconcile' in postClaim
+        #   won't update if already 5:Reconcile
+        uBill->setBillStatus( $form, $TrID, 4, $RecDate, $Reason );
+
+        #   did we reconcile this note before it was even billed?
+        uBill->fixBillDate( $form, $TrID, $RecDate );
+
+        # don't leave it unreviewed.
+        uBill->fixRevDates( $form, $TrID, 3 );
+    }
+    else {
+        my ( $BilledAmt, $IncAmt, $SchAmt, $AmtDue ) =
+          uBill->setBilledAmt( $form, $TrID );
+        print
+qq|BilledAmt=$BilledAmt, IncAmt=$IncAmt, SchAmt=$SchAmt, AmtDue=$AmtDue\n|;
+    }
 }
 ############################################################################
 $sTreatment->finish();

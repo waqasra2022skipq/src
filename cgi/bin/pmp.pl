@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBA;
 use myForm;
@@ -10,27 +10,36 @@ my $debug = 0;
 
 ###################################################################################
 my $form = myForm->new();
-my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $dbh  = myDBI->dbconnect( $form->{'DBNAME'} );
+
 #foreach my $f ( sort keys %{$form} ) { warn "PMPws: form-$f=$form->{$f}\n"; }
 my $ClientID = $form->{'Client_ClientID'};
 
 my $sProvider = $dbh->prepare("select * from Provider where ProvID=?");
-my $sProviderLicenses = $dbh->prepare("select * from ProviderLicenses where ProvID=?");
+my $sProviderLicenses =
+  $dbh->prepare("select * from ProviderLicenses where ProvID=?");
 my $sClient = $dbh->prepare("select * from Client where ClientID=?");
-$sClient->execute($ClientID) || myDBI->dberror("DMHws: select Client: ${ClientID}");
-if ( $rClient = $sClient->fetchrow_hashref )
-{
-foreach my $f ( sort keys %{$rClient} ) { warn "PMPws: rClient-$f=$rClient->{$f}\n"; }
-  # reformat these...
-  my $DOB = DBUtil->Date($rClient->{DOB},'fmt','MM/DD/YYYY');
+$sClient->execute($ClientID)
+  || myDBI->dberror("DMHws: select Client: ${ClientID}");
+if ( $rClient = $sClient->fetchrow_hashref ) {
+    foreach my $f ( sort keys %{$rClient} ) {
+        warn "PMPws: rClient-$f=$rClient->{$f}\n";
+    }
 
-  my $ClinicID = $rClient->{'clinicClinicID'};
-  $sProvider->execute($ClinicID) || myDBI->dberror("PMPws: select Provider: ${ClinicID}");
-  $rClinic = $sProvider->fetchrow_hashref;
-  $sProviderLicenses->execute($ClinicID) || myDBI->dberror("PMPws: select ProviderLicenses: ${ClinicID}");
-  $rProviderLicenses = $sProvider->fetchrow_hashref;
-foreach my $f ( sort keys %{$rClinic} ) { warn "PMPws: rClinic-$f=$rClinic->{$f}\n"; }
-  my $xml = qq|
+    # reformat these...
+    my $DOB = DBUtil->Date( $rClient->{DOB}, 'fmt', 'MM/DD/YYYY' );
+
+    my $ClinicID = $rClient->{'clinicClinicID'};
+    $sProvider->execute($ClinicID)
+      || myDBI->dberror("PMPws: select Provider: ${ClinicID}");
+    $rClinic = $sProvider->fetchrow_hashref;
+    $sProviderLicenses->execute($ClinicID)
+      || myDBI->dberror("PMPws: select ProviderLicenses: ${ClinicID}");
+    $rProviderLicenses = $sProvider->fetchrow_hashref;
+    foreach my $f ( sort keys %{$rClinic} ) {
+        warn "PMPws: rClinic-$f=$rClinic->{$f}\n";
+    }
+    my $xml = qq|
 <PatientRequest xmlns="http://xml.appriss.com/gateway/v5_1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <Requester>
     <Provider>
@@ -59,11 +68,10 @@ foreach my $f ( sort keys %{$rClinic} ) { warn "PMPws: rClinic-$f=$rClinic->{$f}
   </PrescriptionRequest>
 </PatientRequest>
 |;
-  print $xml;
+    print $xml;
 }
-else
-{
-  print qq|\n>>>ERROR: Not a valid ClientID!\n\n|;
+else {
+    print qq|\n>>>ERROR: Not a valid ClientID!\n\n|;
 }
 $sClient->finish();
 $sProvider->finish();

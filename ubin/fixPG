@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use myForm;
 use myDBI;
@@ -8,65 +8,77 @@ use DBA;
 # xInsurance comes from okmis_mms $dbh
 # xPAgroups is in DB okmis_config $cdbh
 ############################################################################
-my $form = myForm->new();
-my $dbh = myDBI->dbconnect($form->{'DBNAME'});
-my $cdbh = myDBI->dbconnect('okmis_config');
-my $PAgroup=$form->{PAgroup};
+my $form    = myForm->new();
+my $dbh     = myDBI->dbconnect( $form->{'DBNAME'} );
+my $cdbh    = myDBI->dbconnect('okmis_config');
+my $PAgroup = $form->{PAgroup};
 
-my $n=$cdbh->prepare("update xPAgroups set SCIDs=NULL where ID='${PAgroup}'");
+my $n = $cdbh->prepare("update xPAgroups set SCIDs=NULL where ID='${PAgroup}'");
 $n->execute() || myDBI->dberror("null SCIDs ${PAgroup}");
 $n->finish();
 
 my $InsID = 100;
-$qMain=qq|select * from xSC left join xSCRates on xSCRates.SCID=xSC.SCID where xSC.InsID=? and xSC.Active=1 and xSC.PAReq=1 and xSCRates.EffDate >= '2009-04-01' and xSCRates.ExpDate is null and xSCRates.UnitLbl != 'NonBill'|;
-my $q=$qMain;
+$qMain =
+qq|select * from xSC left join xSCRates on xSCRates.SCID=xSC.SCID where xSC.InsID=? and xSC.Active=1 and xSC.PAReq=1 and xSCRates.EffDate >= '2009-04-01' and xSCRates.ExpDate is null and xSCRates.UnitLbl != 'NonBill'|;
+my $q = $qMain;
 
 # PG001/PG042-045  eliminate Moderate H0031/32 (non TF)
-if ( $PAgroup eq 'PG001'
-  || $PAgroup eq 'PG042'
-  || $PAgroup eq 'PG043'
-  || $PAgroup eq 'PG044'
-  || $PAgroup eq 'PG045' )
+if (   $PAgroup eq 'PG001'
+    || $PAgroup eq 'PG042'
+    || $PAgroup eq 'PG043'
+    || $PAgroup eq 'PG044'
+    || $PAgroup eq 'PG045' )
 {
-  # PG001-008  eliminate Moderate H0031/32 (non TF)
-  $q .= qq| and ((xSC.SCNum NOT LIKE 'H0031%' or xSC.SCNum NOT LIKE 'H0032%') and xSC.SCName NOT LIKE '%moderate%') |;
+    # PG001-008  eliminate Moderate H0031/32 (non TF)
+    $q .=
+qq| and ((xSC.SCNum NOT LIKE 'H0031%' or xSC.SCNum NOT LIKE 'H0032%') and xSC.SCName NOT LIKE '%moderate%') |;
 }
 
 # PG001/PG046-049  NON Rehab, eliminate Moderate H0031/32 (non TF) and w/Rehab
-if ( $PAgroup eq 'PG046'
-  || $PAgroup eq 'PG047'
-  || $PAgroup eq 'PG048'
-  || $PAgroup eq 'PG049' )
+if (   $PAgroup eq 'PG046'
+    || $PAgroup eq 'PG047'
+    || $PAgroup eq 'PG048'
+    || $PAgroup eq 'PG049' )
 {
-  # PG046-049  eliminate Moderate H0031/32 (non TF)
-  $q .= qq| and ((xSC.SCNum NOT LIKE 'H0031%' or xSC.SCNum NOT LIKE 'H0032%') and xSC.SCName NOT LIKE '%moderate%') and xSC.SCName NOT LIKE '%Rehab%' |;
+    # PG046-049  eliminate Moderate H0031/32 (non TF)
+    $q .=
+qq| and ((xSC.SCNum NOT LIKE 'H0031%' or xSC.SCNum NOT LIKE 'H0032%') and xSC.SCName NOT LIKE '%moderate%') and xSC.SCName NOT LIKE '%Rehab%' |;
 }
 
 # PG029 Testing codes
-if ( $PAgroup eq 'PG028'
-  || $PAgroup eq 'PG029' )
-{ $q .= qq| and xSC.SCName LIKE '%testing%'|; }
-else
-{ $q .= qq| and xSC.SCName NOT LIKE '%testing%'|; }
+if (   $PAgroup eq 'PG028'
+    || $PAgroup eq 'PG029' )
+{
+    $q .= qq| and xSC.SCName LIKE '%testing%'|;
+}
+else { $q .= qq| and xSC.SCName NOT LIKE '%testing%'|; }
 
 # IndLBHP or IndPsych
-if ( $PAgroup eq 'PG028'
-  || $PAgroup eq 'PG029'
-  || $PAgroup eq 'PG030'
-  || $PAgroup eq 'PG040' )
-                        #   INDLBHP (+uSup)             INDPSYCH (+uSup)
-{ $q .= qq| and (xSC.CredID='43' or xSC.CredID='44' or xSC.CredID='45' or xSC.CredID='46')|; }
-else                              # default
-{ $q .= qq| and ((xSC.CredID!='43' or xSC.CredID!='44' and xSC.CredID!='45' and xSC.CredID!='46') or xSC.CredID is null)|; }
+if (   $PAgroup eq 'PG028'
+    || $PAgroup eq 'PG029'
+    || $PAgroup eq 'PG030'
+    || $PAgroup eq 'PG040' )
+
+  #   INDLBHP (+uSup)             INDPSYCH (+uSup)
+{
+    $q .=
+qq| and (xSC.CredID='43' or xSC.CredID='44' or xSC.CredID='45' or xSC.CredID='46')|;
+}
+else    # default
+{
+    $q .=
+qq| and ((xSC.CredID!='43' or xSC.CredID!='44' and xSC.CredID!='45' and xSC.CredID!='46') or xSC.CredID is null)|;
+}
 
 # PG029 Testing codes
-if ( $PAgroup eq 'DH502'
-  || $PAgroup eq 'DH502' )
-{ $q .= qq| and xSC.SCName LIKE '%prison%'|; }
+if (   $PAgroup eq 'DH502'
+    || $PAgroup eq 'DH502' )
+{
+    $q .= qq| and xSC.SCName LIKE '%prison%'|;
+}
 
 # Health Home Codes
-if ( $PAgroup =~ /G90/ )
-{ $InsID = 356; }
+if ( $PAgroup =~ /G90/ ) { $InsID = 356; }
 
 # additional units (now uses almost all codes 7/16/2013)
 # elsif ( $PAgroup eq 'PG033' )
@@ -75,19 +87,17 @@ if ( $PAgroup =~ /G90/ )
 $q .= qq| order by xSC.SCNum|;
 print qq|q=$q\n|;
 
-my ($cnt,$SCIDs) = (0,'');
+my ( $cnt, $SCIDs ) = ( 0, '' );
 my $s = $dbh->prepare($q);
 $s->execute($InsID) || myDBI->dberror($q);
-while ( my $r = $s->fetchrow_hashref )
-{
-  $cnt++;
-  print qq|add ${PAgroup}: $r->{'SCNum'} $r->{'SCName'} ($r->{SCID})\n|;
-  if ( $cnt == 1 )
-  { $SCIDs = $r->{'SCID'}; }
-  else
-  { $SCIDs .= chr(253).$r->{'SCID'}; }
+while ( my $r = $s->fetchrow_hashref ) {
+    $cnt++;
+    print qq|add ${PAgroup}: $r->{'SCNum'} $r->{'SCName'} ($r->{SCID})\n|;
+    if ( $cnt == 1 ) { $SCIDs = $r->{'SCID'}; }
+    else             { $SCIDs .= chr(253) . $r->{'SCID'}; }
 }
-my $u=$cdbh->prepare("update xPAgroups set SCIDs='${SCIDs}' where ID='${PAgroup}'");
+my $u =
+  $cdbh->prepare("update xPAgroups set SCIDs='${SCIDs}' where ID='${PAgroup}'");
 $u->execute() || myDBI->dberror("update ${PAgroup} (${SCIDs})");
 $u->finish();
 $s->finish();

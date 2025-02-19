@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use myConfig;
 use DBI;
 use DBForm;
@@ -7,58 +7,67 @@ use DBForm;
 # prints delete's for multiple sub-records.
 # usage: delDUPS oays mms ...
 ############################################################################
-my $form = DBForm->new();
-my $dbh = $form->dbconnect();
+my $form    = DBForm->new();
+my $dbh     = $form->dbconnect();
 my $SRCSBIN = myConfig->cfg('SRCSBIN');
-my $catout = `echo > ddc`;
+my $catout  = `echo > ddc`;
 print qq|## database=$form->{DBNAME}\n|;
-main->delbydID($dbh,'ProgNotes','NoteID','ID','Methods');
+main->delbydID( $dbh, 'ProgNotes', 'NoteID', 'ID', 'Methods' );
 #####main->delbydID($dbh,'TrPlan','PrAuthID','TrPlanID','TrPlanType');
 #####main->delbydID($dbh,'PDDiag','PrAuthID','PDDiagID','Axis1ACode');
-main->delbydID($dbh,'PDDom','PrAuthID','PDDomID','Dom1Score');
-main->delbydID($dbh,'ClientReferrals','ClientID','ID','ReferredBy1NPI');
-main->delbydID($dbh,'MedHx','ClientID','ID','DevlDesc');
-main->delbydID($dbh,'MentalStat','ClientID','ID','Dress');
-main->delbydID($dbh,'PDPsyStat','ClientID','PsyStatID','AdmPS');
-main->delbydID($dbh,'ClientEducation','ClientID','ID','SchoolGrade');
-main->delbydID($dbh,'ClientHealth','ClientID','ID','HearingPass');
-main->delbydID($dbh,'ClientSocial','ClientID','ID','Axis5Curr');
-main->delbydID($dbh,'ClientRelations','ClientID','ID','RelHistory');
-main->delbydID($dbh,'ClientTrauma','ClientID','ID','Psych');
+main->delbydID( $dbh, 'PDDom',           'PrAuthID', 'PDDomID', 'Dom1Score' );
+main->delbydID( $dbh, 'ClientReferrals', 'ClientID', 'ID', 'ReferredBy1NPI' );
+main->delbydID( $dbh, 'MedHx',           'ClientID', 'ID', 'DevlDesc' );
+main->delbydID( $dbh, 'MentalStat',      'ClientID', 'ID', 'Dress' );
+main->delbydID( $dbh, 'PDPsyStat',       'ClientID', 'PsyStatID', 'AdmPS' );
+main->delbydID( $dbh, 'ClientEducation', 'ClientID', 'ID', 'SchoolGrade' );
+main->delbydID( $dbh, 'ClientHealth',    'ClientID', 'ID', 'HearingPass' );
+main->delbydID( $dbh, 'ClientSocial',    'ClientID', 'ID', 'Axis5Curr' );
+main->delbydID( $dbh, 'ClientRelations', 'ClientID', 'ID', 'RelHistory' );
+main->delbydID( $dbh, 'ClientTrauma',    'ClientID', 'ID', 'Psych' );
 $form->complete();
 exit;
 ############################################################################
 # dID = the ID that can't be duplicated
 # kID = the ID that is key on the duplicated record
-sub delbydID
-{
-  my ($self,$dbh,$table,$dID,$kID,$dfld) = @_;
-#warn qq|$table,$dID,$kID,$dfld\n|;
-  my ($PrevID,$PrevkID,$Prevr) = ('','',''); 
-  my $s = $dbh->prepare("select * from ${table} order by ${dID}, ${kID}");
-#warn "select * from ${table} order by ${dID}, ${kID}\n";
-  $s->execute() || die "select * from ${table} order by ${dID}, ${kID}";
-  while ( my $r = $s->fetchrow_hashref )
-  {
-#warn "ClientID=$r->{ClientID}, $kID=$r->{$kID}, r-$dID=$r->{$dID}\n";
-#warn "PrevID=$PrevID, r-dID=$r->{$dID}, PrevkID=$PrevkID\n";
-    if ( $PrevID ne '' && $PrevID == $r->{$dID} )
-    {
-      print qq|\n|;
-        my $prevDate = $Prevr->{'RecDOLC'} eq '' ? $Prevr->{'ChangeDate'} : $Prevr->{'RecDOLC'};
-        my $cDate = $r->{'RecDOLC'} eq '' ? $r->{'ChangeDate'} : $r->{'RecDOLC'};
-        print qq|# $r->{$kID}: DUPLICATE ${dID}=$r->{$dID}/ClientID=$r->{ClientID}, ${PrevkID} vs $r->{$kID}\n|;
-        print qq|delete from ${table} where $kID=$r->{$kID};     # c=$Prevr->{$kID}=${prevDate}/$r->{$kID}=${cDate}\n|;
+sub delbydID {
+    my ( $self, $dbh, $table, $dID, $kID, $dfld ) = @_;
+
+    #warn qq|$table,$dID,$kID,$dfld\n|;
+    my ( $PrevID, $PrevkID, $Prevr ) = ( '', '', '' );
+    my $s = $dbh->prepare("select * from ${table} order by ${dID}, ${kID}");
+
+    #warn "select * from ${table} order by ${dID}, ${kID}\n";
+    $s->execute() || die "select * from ${table} order by ${dID}, ${kID}";
+    while ( my $r = $s->fetchrow_hashref ) {
+
+        #warn "ClientID=$r->{ClientID}, $kID=$r->{$kID}, r-$dID=$r->{$dID}\n";
+        #warn "PrevID=$PrevID, r-dID=$r->{$dID}, PrevkID=$PrevkID\n";
+        if ( $PrevID ne '' && $PrevID == $r->{$dID} ) {
+            print qq|\n|;
+            my $prevDate =
+                $Prevr->{'RecDOLC'} eq ''
+              ? $Prevr->{'ChangeDate'}
+              : $Prevr->{'RecDOLC'};
+            my $cDate =
+              $r->{'RecDOLC'} eq '' ? $r->{'ChangeDate'} : $r->{'RecDOLC'};
+            print
+qq|# $r->{$kID}: DUPLICATE ${dID}=$r->{$dID}/ClientID=$r->{ClientID}, ${PrevkID} vs $r->{$kID}\n|;
+            print
+qq|delete from ${table} where $kID=$r->{$kID};     # c=$Prevr->{$kID}=${prevDate}/$r->{$kID}=${cDate}\n|;
 ##        print qq|#sqlcmp $form->{'DBNAME'} ${table} ${PrevkID} $r->{$kID} ${kID}\n|;
-        my $results = `sh ${SRCSBIN}/sqlcmp $form->{'DBNAME'} ${table} ${PrevkID} $r->{$kID} ${kID} >> ddc`;
-        #print qq|# results\n${results}\n|;
+            my $results =
+`sh ${SRCSBIN}/sqlcmp $form->{'DBNAME'} ${table} ${PrevkID} $r->{$kID} ${kID} >> ddc`;
+
+            #print qq|# results\n${results}\n|;
+        }
+        $PrevID  = $r->{$dID};
+        $PrevkID = $r->{$kID};
+        $Prevr   = $r;
+
+        #warn "set:PrevID=$PrevID, PrevkID=$PrevkID\n";
     }
-    $PrevID = $r->{$dID};
-    $PrevkID = $r->{$kID};
-    $Prevr = $r;
-#warn "set:PrevID=$PrevID, PrevkID=$PrevkID\n";
-  }
-  $s->finish();
-  return(1);
+    $s->finish();
+    return (1);
 }
 ############################################################################

@@ -1,7 +1,7 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBUtil;
-my ($sec, $min, $hrs, $day, $month, $year, $wday, $julian) = localtime();
+my ( $sec, $min, $hrs, $day, $month, $year, $wday, $julian ) = localtime();
 ############################################################################
 # usage: command                           for all accounts
 #    or: command INSURANCE TYPE FLATTEN    for INSURANCE of 'medicaid' and TYPE of run,
@@ -9,99 +9,114 @@ my ($sec, $min, $hrs, $day, $month, $year, $wday, $julian) = localtime();
 #    or: command medicaid 270 yes acct1 acct2... to run for 'acct1' 'acct2' ...
 ############################################################################
 # get the command name...
-my ($pw,$cmd) = $0 =~ m/(.*\/)(.*)$/;
+my ( $pw, $cmd ) = $0 =~ m/(.*\/)(.*)$/;
 my $INSURANCE = shift;
-my $TYPE = shift;
-my $FLATTEN = shift;
-my $DATESTAMP = DBUtil->Date('today','fmt','YYYYMMDD') . pad0s($hrs,2) . pad0s($min,2);
-my ($Version,$mainhdr,$mainsts,$mainftr) = ('005010X222A1','','','');
+my $TYPE      = shift;
+my $FLATTEN   = shift;
+my $DATESTAMP =
+    DBUtil->Date( 'today', 'fmt', 'YYYYMMDD' )
+  . pad0s( $hrs, 2 )
+  . pad0s( $min, 2 );
+my ( $Version, $mainhdr, $mainsts, $mainftr ) = ( '005010X222A1', '', '', '' );
 
 ############################################################################
 $Names = "*.${INSURANCE}*.${TYPE}";
 my @Files = glob($Names);
-foreach $file ( @Files )
-{
-  print qq|\n  Process file: $file\n|;
-  my ($hdr,$sts,$ftr) = main->findST($file);
-  if ( $mainhdr eq '' ) { $mainhdr = $hdr; $mainftr = $ftr; }
-  $mainsts .= $sts;
+foreach $file (@Files) {
+    print qq|\n  Process file: $file\n|;
+    my ( $hdr, $sts, $ftr ) = main->findST($file);
+    if ( $mainhdr eq '' ) { $mainhdr = $hdr; $mainftr = $ftr; }
+    $mainsts .= $sts;
 }
+
 #warn qq|\nmainhdr=\n${mainhdr}\n|;
 #warn qq|\nmainsts=\n${mainsts}\n|;
 #warn qq|\nmainftr=\n${mainftr}\n|;
-my ($TEXT,$COUNT) = main->markST($mainhdr . $mainsts . $mainftr);
+my ( $TEXT, $COUNT ) = main->markST( $mainhdr . $mainsts . $mainftr );
+
 # flatten file?
-if ( $FLATTEN ) { $TEXT =~ s/\~/\~\n/g; } else { $TEXT .= "\n"; }
+if ($FLATTEN) { $TEXT =~ s/\~/\~\n/g; }
+else          { $TEXT .= "\n"; }
 my $outfile = qq|${INSURANCE}.${COUNT}.${DATESTAMP}.${TYPE}|;
-if ( open(OUTFILE,">${outfile}") )
-{ print OUTFILE $TEXT; close(OUTFILE); }
-else { print "Couldn't open ${outfile}! $!"; }
+if ( open( OUTFILE, ">${outfile}" ) ) { print OUTFILE $TEXT; close(OUTFILE); }
+else                                  { print "Couldn't open ${outfile}! $!"; }
 exit;
 ############################################################################
-sub findST
-{
-  my ($self,$infile) = @_;
-  my $dlm = '~';
-  my ($hdr,$out,$ftr) = ('','','');
-  if ( open(INFILE,$infile) ) 
-  {
-      my @in = <INFILE>;
-      foreach my $line ( @in )
-      {
-        chomp($line);
-        $line =~ s/\r//g;
-        $line =~ s/^\s*(.*?)\s*$/$1/g;             # trim leading/trailing spaces
-        foreach my $subline ( split($dlm,$line) )  # w/o trim we'd get an empty subline on end.
-        {
-          my ($RecType,$f1,$f2,$f3,$f4,$f5,$f6,$f7,$f8,$f9,$rest) = split('\*',$subline,11);
-          if ( $RecType eq 'ISA' ) { $hdr = qq|${subline}${dlm}|; }
-          elsif ( $RecType eq 'GS' ) { $hdr .= qq|${subline}${dlm}|; $Version = $f8; }
-          elsif ( $RecType eq 'ST' ) { $out .= qq|${subline}${dlm}|; }
-          elsif ( $RecType eq 'SE' ) { $out .= qq|${subline}${dlm}|; }
-          elsif ( $RecType eq 'GE' ) { $ftr = qq|${subline}${dlm}|; }
-          elsif ( $RecType eq 'IEA' ) { $ftr .= qq|${subline}${dlm}|; }
-          else { $out .= qq|${subline}${dlm}|; }
+sub findST {
+    my ( $self, $infile ) = @_;
+    my $dlm = '~';
+    my ( $hdr, $out, $ftr ) = ( '', '', '' );
+    if ( open( INFILE, $infile ) ) {
+        my @in = <INFILE>;
+        foreach my $line (@in) {
+            chomp($line);
+            $line =~ s/\r//g;
+            $line =~ s/^\s*(.*?)\s*$/$1/g;    # trim leading/trailing spaces
+            foreach my $subline (
+                split( $dlm, $line )
+              )    # w/o trim we'd get an empty subline on end.
+            {
+                my (
+                    $RecType, $f1, $f2, $f3, $f4, $f5,
+                    $f6,      $f7, $f8, $f9, $rest
+                ) = split( '\*', $subline, 11 );
+                if    ( $RecType eq 'ISA' ) { $hdr = qq|${subline}${dlm}|; }
+                elsif ( $RecType eq 'GS' ) {
+                    $hdr .= qq|${subline}${dlm}|;
+                    $Version = $f8;
+                }
+                elsif ( $RecType eq 'ST' )  { $out .= qq|${subline}${dlm}|; }
+                elsif ( $RecType eq 'SE' )  { $out .= qq|${subline}${dlm}|; }
+                elsif ( $RecType eq 'GE' )  { $ftr = qq|${subline}${dlm}|; }
+                elsif ( $RecType eq 'IEA' ) { $ftr .= qq|${subline}${dlm}|; }
+                else                        { $out .= qq|${subline}${dlm}|; }
+            }
         }
-      }
-    close(INFILE);
-  }
-  else { print qq|Couldn't open '${infile}' file: $!|; }
-#warn qq|\nhdr=\n${hdr}\n|;
-#warn qq|\nout=\n${out}\n|;
-#warn qq|\nftr=\n${ftr}\n|;
-  return($hdr,$out,$ftr);
+        close(INFILE);
+    }
+    else { print qq|Couldn't open '${infile}' file: $!|; }
+
+    #warn qq|\nhdr=\n${hdr}\n|;
+    #warn qq|\nout=\n${out}\n|;
+    #warn qq|\nftr=\n${ftr}\n|;
+    return ( $hdr, $out, $ftr );
 }
-sub markST
-{
-  my ($self,$text) = @_;
-  my ($out,$str,$dlm,$ClaimCnt,$SCN,$GCN) = ('','','~',0,'000000000','0');
-  foreach my $line ( split($dlm,$text) )
-  {
-    $line =~ s/\r//g;
-#warn qq|line=${line}\n|;
-    my ($RecType,$f1,$f2,$f3,$f4,$f5,$f6,$f7,$f8,$f9,$rest) = split('\*',$line,11);
-#warn qq|RecType=${RecType}=\n|;
-    if ( $RecType eq 'CLM' )                      # 837 files
-    { $ClaimCnt++; $str = $line . $dlm; }
-    elsif ( $RecType eq 'EQ' )                    # 270 files
-    { $ClaimCnt++; $str = $line . $dlm; }
-    elsif ( $RecType eq 'ST' )
-    { $SCN++; $str = qq|ST*${f1}*${SCN}*${Version}${dlm}|; $GCN++; }
-    ##{ $SCN++; $str = qq|ST*${f1}*${SCN}${dlm}|; $GCN++; }
-    elsif ( $RecType eq 'SE' )
-    { $str = qq|SE*${f1}*${SCN}${dlm}|; }
-    elsif ( $RecType eq 'GE' )
-    { $str = qq|GE*${GCN}*${f2}${dlm}|; }
-    else { $str = $line . $dlm; }
-#warn qq|SCN=${SCN}\n|;
-#warn qq|str=${str}\n|;
-    $out .= $str;
-  } 
-  return($out,$ClaimCnt);
+
+sub markST {
+    my ( $self, $text ) = @_;
+    my ( $out, $str, $dlm, $ClaimCnt, $SCN, $GCN ) =
+      ( '', '', '~', 0, '000000000', '0' );
+    foreach my $line ( split( $dlm, $text ) ) {
+        $line =~ s/\r//g;
+
+        #warn qq|line=${line}\n|;
+        my ( $RecType, $f1, $f2, $f3, $f4, $f5, $f6, $f7, $f8, $f9, $rest ) =
+          split( '\*', $line, 11 );
+
+        #warn qq|RecType=${RecType}=\n|;
+        if ( $RecType eq 'CLM' )      # 837 files
+        { $ClaimCnt++; $str = $line . $dlm; }
+        elsif ( $RecType eq 'EQ' )    # 270 files
+        { $ClaimCnt++; $str = $line . $dlm; }
+        elsif ( $RecType eq 'ST' ) {
+            $SCN++;
+            $str = qq|ST*${f1}*${SCN}*${Version}${dlm}|;
+            $GCN++;
+        }
+        ##{ $SCN++; $str = qq|ST*${f1}*${SCN}${dlm}|; $GCN++; }
+        elsif ( $RecType eq 'SE' ) { $str = qq|SE*${f1}*${SCN}${dlm}|; }
+        elsif ( $RecType eq 'GE' ) { $str = qq|GE*${GCN}*${f2}${dlm}|; }
+        else                       { $str = $line . $dlm; }
+
+        #warn qq|SCN=${SCN}\n|;
+        #warn qq|str=${str}\n|;
+        $out .= $str;
+    }
+    return ( $out, $ClaimCnt );
 }
-sub pad0s
-{
-  my ($Num,$Width) = @_;
-  $Num = length $Num < $Width ? '0' x ($Width - length $Num) . $Num : $Num;
-  return($Num);
+
+sub pad0s {
+    my ( $Num, $Width ) = @_;
+    $Num = length $Num < $Width ? '0' x ( $Width - length $Num ) . $Num : $Num;
+    return ($Num);
 }

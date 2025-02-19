@@ -14,6 +14,6 @@ pwd
 grep -l -d skip "\/usr\/local\/mis" * |
 while read fn; do
   echo "convert '/usr/local/mis' file: ${fn}"
-  sed "s;/usr/local/mis;/home/okmis/mis/src;" ${fn} > new
+  sed "s;/usr/local/mis;/var/www/okmis/src;" ${fn} > new
   mv -v new ${fn}
 done

@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 use DBA;
@@ -10,98 +10,113 @@ use myDBI;
 #        duplicate fromTrID to newTrID
 ############################################################################
 ############################################################################
-my $debug=1;
-my $form = DBForm->new();
-my $dbh = $form->dbconnect();
-my $fromTrID=$form->{fromTrID};
+my $debug    = 1;
+my $form     = DBForm->new();
+my $dbh      = $form->dbconnect();
+my $fromTrID = $form->{fromTrID};
 my $newTrID;
 $form->{'LOGINPROVID'} = 90;    # HelpDesk
 
-if ( $fromTrID )
-{
-  my $sTreatment = $dbh->prepare("select * from Treatment where TrID=?");
-  $sTreatment->execute($fromTrID);
-  if ( $rTreatment = $sTreatment->fetchrow_hashref )
-  {
-    delete $rTreatment->{'TrID'};
-    delete $rTreatment->{'DenCode'};
-    delete $rTreatment->{'DenDate'};
-    delete $rTreatment->{'RecDate'};
-    delete $rTreatment->{'CIPDate'};
-    delete $rTreatment->{'COPLDate'};
-    delete $rTreatment->{'PaidDate'};
-    $rTreatment->{'BillStatus'} = 0;
-    $rTreatment->{'StatusDate'}=$form->{'TODAY'};
-    $rTreatment->{'AmtDue'}=$rTreatment->{'BilledAmt'};
-    # these are needed in setDefaults.
-    $form->{'Client_ClientID_1'} = $rTreatment->{'ClientID'};  # set sub-Client tables in setDefaults
-    $form->{'Treatment_TrID_1'} = $newTrID;                    # set sub-Treatment tables in setDefaults
-    $newTrID = main->insRecord($form,'Treatment',$rTreatment); 
-    foreach my $subtable ( myDBI->getDetTables('Treatment') )
-    { next if ( $subtable eq 'NoteTrans' ); main->gen($form,$subtable,$fromTrID,$newTrID); }
-    print qq|Treatment ${fromTrID} copied to ${newTrID}\n|;
-  }
-  else { print qq|ERROR: Treatment ${fromTrID} NOT FOUND!\n|; }
-  $sTreatment->finish();
+if ($fromTrID) {
+    my $sTreatment = $dbh->prepare("select * from Treatment where TrID=?");
+    $sTreatment->execute($fromTrID);
+    if ( $rTreatment = $sTreatment->fetchrow_hashref ) {
+        delete $rTreatment->{'TrID'};
+        delete $rTreatment->{'DenCode'};
+        delete $rTreatment->{'DenDate'};
+        delete $rTreatment->{'RecDate'};
+        delete $rTreatment->{'CIPDate'};
+        delete $rTreatment->{'COPLDate'};
+        delete $rTreatment->{'PaidDate'};
+        $rTreatment->{'BillStatus'} = 0;
+        $rTreatment->{'StatusDate'} = $form->{'TODAY'};
+        $rTreatment->{'AmtDue'}     = $rTreatment->{'BilledAmt'};
+
+        # these are needed in setDefaults.
+        $form->{'Client_ClientID_1'} =
+          $rTreatment->{'ClientID'};    # set sub-Client tables in setDefaults
+        $form->{'Treatment_TrID_1'} =
+          $newTrID;    # set sub-Treatment tables in setDefaults
+        $newTrID = main->insRecord( $form, 'Treatment', $rTreatment );
+        foreach my $subtable ( myDBI->getDetTables('Treatment') ) {
+            next if ( $subtable eq 'NoteTrans' );
+            main->gen( $form, $subtable, $fromTrID, $newTrID );
+        }
+        print qq|Treatment ${fromTrID} copied to ${newTrID}\n|;
+    }
+    else { print qq|ERROR: Treatment ${fromTrID} NOT FOUND!\n|; }
+    $sTreatment->finish();
 }
-else
-{ print qq|\nERROR: NO TrID GIVEN!\n\n|; }
+else { print qq|\nERROR: NO TrID GIVEN!\n\n|; }
 
 $form->complete();
 exit;
 ############################################################################
-sub gen
-{
-  my ($self,$form,$table,$fromid,$newid) = @_;
-  my $dbh = $form->dbconnect();
-  my $HDRTABLE = myConfig->tbl($table,'HEADERTABLE');
-  my $HDRTABLEID = myConfig->tbl($HDRTABLE,'RECID');
-  my $RECID = myConfig->tbl($table,'RECID');
-  my $DETAILID = myConfig->tbl($table,'DETAILID');
-print qq|## ENTER gen: ${HDRTABLE}-${table}: RECID=${RECID}, DETAILID=${DETAILID}, fromid=${fromid}, newid=${newid}\n| if ( $debug ); 
-  my $s = $dbh->prepare("select * from ${table} where ${DETAILID}=?");
-  $s->execute($fromid);
-  my $rows = $s->rows;
-print qq|## gen: selected ${rows} for ${table}=${DETAILID}=${fromid}\n| if ( $debug );
-  while ( $r = $s->fetchrow_hashref )
-  {
-print qq|## gen1: ${table}: RECID=${RECID}=$r->{$RECID}, DETAILID=${DETAILID}=$r->{$DETAILID} (TrID=$r->{'TrID'})\n| if ( $debug ); 
-    my $ORGID = $r->{$RECID};                                 # save this because it is the new search id.
-    delete $r->{$RECID};
-    $r->{$DETAILID} = $newid;
-    $form->{"${HDRTABLE}_${HDRTABLEID}_1"} = $newid;       # used in setDefaults
-print qq|## gen2: ${table}: RECID=${RECID}=$r->{$RECID}, DETAILID=${DETAILID}=$r->{$DETAILID}, ORGID=${ORGID})\n| if ( $debug ); 
-if ( $debug ) { foreach my $f ( sort keys %{ $r } ) { print "${table} r-$f=$r->{$f}\n"; } }
-    my $NEWID = main->insRecord($form,$table,$r);             # this is the  new record backward link.
-print qq|## gen2: ${table}: RECID=${RECID}=$r->{$RECID}, DETAILID=${DETAILID}=$r->{$DETAILID}, NEWID=${NEWID})\n| if ( $debug ); 
-    foreach my $subtable ( myDBI->getDetTables($table) )
-    {
-      main->gen($form,$subtable,$ORGID,$NEWID);
+sub gen {
+    my ( $self, $form, $table, $fromid, $newid ) = @_;
+    my $dbh        = $form->dbconnect();
+    my $HDRTABLE   = myConfig->tbl( $table,    'HEADERTABLE' );
+    my $HDRTABLEID = myConfig->tbl( $HDRTABLE, 'RECID' );
+    my $RECID      = myConfig->tbl( $table,    'RECID' );
+    my $DETAILID   = myConfig->tbl( $table,    'DETAILID' );
+    print
+qq|## ENTER gen: ${HDRTABLE}-${table}: RECID=${RECID}, DETAILID=${DETAILID}, fromid=${fromid}, newid=${newid}\n|
+      if ($debug);
+    my $s = $dbh->prepare("select * from ${table} where ${DETAILID}=?");
+    $s->execute($fromid);
+    my $rows = $s->rows;
+    print qq|## gen: selected ${rows} for ${table}=${DETAILID}=${fromid}\n|
+      if ($debug);
+
+    while ( $r = $s->fetchrow_hashref ) {
+        print
+qq|## gen1: ${table}: RECID=${RECID}=$r->{$RECID}, DETAILID=${DETAILID}=$r->{$DETAILID} (TrID=$r->{'TrID'})\n|
+          if ($debug);
+        my $ORGID = $r->{$RECID};   # save this because it is the new search id.
+        delete $r->{$RECID};
+        $r->{$DETAILID} = $newid;
+        $form->{"${HDRTABLE}_${HDRTABLEID}_1"} = $newid;   # used in setDefaults
+        print
+qq|## gen2: ${table}: RECID=${RECID}=$r->{$RECID}, DETAILID=${DETAILID}=$r->{$DETAILID}, ORGID=${ORGID})\n|
+          if ($debug);
+        if ($debug) {
+            foreach my $f ( sort keys %{$r} ) {
+                print "${table} r-$f=$r->{$f}\n";
+            }
+        }
+        my $NEWID = main->insRecord( $form, $table, $r )
+          ;    # this is the  new record backward link.
+        print
+qq|## gen2: ${table}: RECID=${RECID}=$r->{$RECID}, DETAILID=${DETAILID}=$r->{$DETAILID}, NEWID=${NEWID})\n|
+          if ($debug);
+        foreach my $subtable ( myDBI->getDetTables($table) ) {
+            main->gen( $form, $subtable, $ORGID, $NEWID );
+        }
     }
-  }
-  $s->finish();
-  return();
+    $s->finish();
+    return ();
 }
 ############################################################################
-sub insRecord
-{
-  my ($self,$form,$table,$record) = @_;
-  my $dbh = $form->dbconnect();
-  my $uData = ();                                           # not used except for call to setDefaults
-  delete $record->{'RecDOLC'};
-  delete $record->{'ChangeDate'};
-  $record->{'CreateDate'}=$form->{'TODAY'};
-  $record->{'CreateProvID'}=$form->{'LOGINPROVID'};
+sub insRecord {
+    my ( $self, $form, $table, $record ) = @_;
+    my $dbh   = $form->dbconnect();
+    my $uData = ();                   # not used except for call to setDefaults
+    delete $record->{'RecDOLC'};
+    delete $record->{'ChangeDate'};
+    $record->{'CreateDate'}   = $form->{'TODAY'};
+    $record->{'CreateProvID'} = $form->{'LOGINPROVID'};
+
 #if ( $debug ) { foreach my $f ( sort keys %{ $record } ) { print "i1: ${table} record-$f=$record->{$f}\n"; } }
-  DBA->setDefaults($form,$table,$record,$uData);
+    DBA->setDefaults( $form, $table, $record, $uData );
+
 #if ( $debug ) { foreach my $f ( sort keys %{ $record } ) { print "i2: ${table} record-$f=$record->{$f}\n"; } }
-  my $qInsert = DBA->genInsert($form,$table,$record);
-print qq|insRecord: qInsert=${qInsert}\n| if ( $debug );
-  my $sInsert = $dbh->prepare($qInsert);
-  $sInsert->execute() || $form->dberror("INSERT ERROR: ${table}: ${qInsert}");
-  my $RTNID = $sInsert->{'mysql_insertid'};
-  $sInsert->finish();
-print qq|insRecord: ${table}: RTNID=${RTNID}\n| if ( $debug );
-  return($RTNID);
+    my $qInsert = DBA->genInsert( $form, $table, $record );
+    print qq|insRecord: qInsert=${qInsert}\n| if ($debug);
+    my $sInsert = $dbh->prepare($qInsert);
+    $sInsert->execute() || $form->dberror("INSERT ERROR: ${table}: ${qInsert}");
+    my $RTNID = $sInsert->{'mysql_insertid'};
+    $sInsert->finish();
+    print qq|insRecord: ${table}: RTNID=${RTNID}\n| if ($debug);
+    return ($RTNID);
 }
 ############################################################################

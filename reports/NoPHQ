@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use myForm;
 use myDBI;
@@ -12,15 +12,20 @@ my $DT = localtime();
 #   NoPHQ ForProvID=id
 ############################################################################
 my $form = myForm->new();
-my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $dbh  = myDBI->dbconnect( $form->{'DBNAME'} );
+
 #foreach my $f ( sort keys %{$form} ) { warn "form-$f=$form->{$f}\n"; }
 
 my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+
 # join xInsurance needed for withSelection
-my $ClinicSelection = DBA->withSelection($form,'and','Client.clinicClinicID','Client.ProvID','','');
+my $ClinicSelection =
+  DBA->withSelection( $form, 'and', 'Client.clinicClinicID', 'Client.ProvID',
+    '', '' );
 my $Header = DBA->withSelectionHeader($form);
 $ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
-my $sProvider = $dbh->prepare("select LName, FName from Provider where ProvID=?");
+my $sProvider =
+  $dbh->prepare("select LName, FName from Provider where ProvID=?");
 my $qClient = qq"
 select Client.LName, Client.FName, Client.ClientID, Client.DOB, Client.ProvID, Client.RecDOLC as LastContDate, Client.Active
       ,ClientPrAuth.PAnumber, ClientPrAuth.EffDate, ClientPrAuth.ExpDate, ClientPrAuthCDC.TransType
@@ -63,27 +68,31 @@ select Client.LName, Client.FName, Client.ClientID, Client.DOB, Client.ProvID, C
     and (ClientPrAuthCDC.TransType=23 || ClientPrAuthCDC.TransType=42)
   ${ClinicSelection}
   group by Client.LName, Client.FName, Client.ClientID";
+
 #warn qq|qClient=\n${qClient}\n|;
 my $sClient = $dbh->prepare($qClient);
-print qq|${DT}\n${Header}Missing PHQ Report.\nClients with missing any PHQ Test report\n|;
-print qq|Client Name\tClientID\tActive\tDOB\tAge\tPA Number\tTransType\tProvider Name\tMessage\tLast Contact Date\n|;
+print
+qq|${DT}\n${Header}Missing PHQ Report.\nClients with missing any PHQ Test report\n|;
+print
+qq|Client Name\tClientID\tActive\tDOB\tAge\tPA Number\tTransType\tProvider Name\tMessage\tLast Contact Date\n|;
 $sClient->execute();
-while (my $rClient = $sClient->fetchrow_hashref)
-{ 
-  my $ClientID = $rClient->{'ClientID'};
-  my $ActiveFlag = $rClient->{'Active'} ? 'Yes' : 'No';
-  my $LastContDate = $rClient->{'LastContDate'};
-  my $ClientName = qq|$rClient->{'LName'}, $rClient->{'FName'}|;
-  my $Age = DBUtil->Date($rClient->{DOB}, 'age');
+while ( my $rClient = $sClient->fetchrow_hashref ) {
+    my $ClientID     = $rClient->{'ClientID'};
+    my $ActiveFlag   = $rClient->{'Active'} ? 'Yes' : 'No';
+    my $LastContDate = $rClient->{'LastContDate'};
+    my $ClientName   = qq|$rClient->{'LName'}, $rClient->{'FName'}|;
+    my $Age          = DBUtil->Date( $rClient->{DOB}, 'age' );
 ## in select  next unless ( $rClient->{'TestPHQ'} eq '' && $rClient->{'TestPHQ4'} eq '' && $rClient->{'TestPHQ9'} eq '' && $rClient->{'TestTPHQ9'} eq '' && $rClient->{'TestPHQ15'} eq '' && $rClient->{'TestPHQBrief'} eq '' && $rClient->{'TestPHQSADS'} eq '' );
 ## in select  next if ( $rClient->{'PAnumber'} eq '' );
 ## in select  next unless ( $rClient->{'TransType'} =~ /23|42/ );
-  next if ( $Age < 13 );
-  my $msg = 'NO CLIENT PHQ TESTS';
-  $sProvider->execute($rClient->{ProvID});
-  my ($ProvLName, $ProvFName) = $sProvider->fetchrow_array;
-  my $ProvName = qq|$ProvLName, $ProvFName ($rClient->{ProvID})|; 
-  print qq|${ClientName}\t${ClientID}\t${ActiveFlag}\t$rClient->{'DOB'}\t${Age}\t$rClient->{'PAnumber'}\t$rClient->{'TransType'}\t${ProvName}\t${msg}\t${LastContDate}\n|;
+    next if ( $Age < 13 );
+    my $msg = 'NO CLIENT PHQ TESTS';
+    $sProvider->execute( $rClient->{ProvID} );
+    my ( $ProvLName, $ProvFName ) = $sProvider->fetchrow_array;
+    my $ProvName = qq|$ProvLName, $ProvFName ($rClient->{ProvID})|;
+    print
+qq|${ClientName}\t${ClientID}\t${ActiveFlag}\t$rClient->{'DOB'}\t${Age}\t$rClient->{'PAnumber'}\t$rClient->{'TransType'}\t${ProvName}\t${msg}\t${LastContDate}\n|;
+
 #  print qq|Dates:\t$rClient->{'TestPHQ'}\t$rClient->{'TestPHQ4'}\t$rClient->{'TestPHQ9'}\t$rClient->{'TestTPHQ9'}\t$rClient->{'TestPHQ15'}\t$rClient->{'TestPHQBrief'}\t$rClient->{'TestPHQSADS'}\n|;
 }
 

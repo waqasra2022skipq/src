@@ -1,99 +1,98 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBForm;
 use DBUtil;
 use myConfig;
-my $linecount=0;
-my $WWW = myConfig->cfg('WWW');
+my $linecount = 0;
+my $WWW       = myConfig->cfg('WWW');
 ############################################################################
-foreach my $file ( @ARGV )
-{
-  print qq|\nparse file: $file\n|;
-  if ( open(FILE,$file) ) 
-  {
-    my $section = 0;
-    my ($Claims,$Header,$FileName) = main->getHeader();
-    while ( $Claims )
-    {
-print qq|Claims=$Claims\n|;
-      $section++;
-      my ($NPI,$pat,$ecnt,$acnt) = ('','',0,0);
-      for ( my $c=1; $c<=$Claims; $c++ )
-      {
-        ($Patient,$NEWNPI,$ACount,$ECount) = main->getPatient();
-        if ( $NPI ne '' && $NPI != $NEWNPI )
-        {
-          my $out = main->gText($file,$section,$Header,$acnt,$ecnt,$pat);
-          main->wFile($FileName,$NPI,$out,$acnt,$ecnt);
-          $pat = '';
-          $acnt = 0;
-          $ecnt = 0;
+foreach my $file (@ARGV) {
+    print qq|\nparse file: $file\n|;
+    if ( open( FILE, $file ) ) {
+        my $section = 0;
+        my ( $Claims, $Header, $FileName ) = main->getHeader();
+        while ($Claims) {
+            print qq|Claims=$Claims\n|;
+            $section++;
+            my ( $NPI, $pat, $ecnt, $acnt ) = ( '', '', 0, 0 );
+            for ( my $c = 1 ; $c <= $Claims ; $c++ ) {
+                ( $Patient, $NEWNPI, $ACount, $ECount ) = main->getPatient();
+                if ( $NPI ne '' && $NPI != $NEWNPI ) {
+                    my $out =
+                      main->gText( $file, $section, $Header, $acnt, $ecnt,
+                        $pat );
+                    main->wFile( $FileName, $NPI, $out, $acnt, $ecnt );
+                    $pat  = '';
+                    $acnt = 0;
+                    $ecnt = 0;
+                }
+                $pat .= $Patient;
+                $NPI = $NEWNPI;
+                $acnt += $ACount;
+                $ecnt += $ECount;
+            }
+            my $out =
+              main->gText( $file, $section, $Header, $acnt, $ecnt, $pat );
+            main->wFile( $FileName, $NPI, $out, $acnt, $ecnt );
+            ( $Claims, $Header, $FileName ) = main->getHeader();
+
+            #last if ( $section == 6 );
         }
-        $pat .= $Patient;
-        $NPI = $NEWNPI;
-        $acnt += $ACount;
-        $ecnt += $ECount;
-      }
-      my $out = main->gText($file,$section,$Header,$acnt,$ecnt,$pat);
-      main->wFile($FileName,$NPI,$out,$acnt,$ecnt);
-      ($Claims,$Header,$FileName) = main->getHeader();
-#last if ( $section == 6 );
+        close(FILE);
     }
-    close(FILE);
-  } else { print qq|>>>ERROR: open ${file} $!\n|; }
+    else { print qq|>>>ERROR: open ${file} $!\n|; }
 }
 exit;
 ################################################################
-sub getHeader
-{
-  my ($c,$h,$f) = (0,'','');
-#print qq|getHeader:\n|;
-  while ( $in = <FILE> )
-  {
-    $linecount++;
-    next if ( $linecount < 4 );    # skip first 3 lines in file.
-#print qq|getHeader: in=$in\n|;
-    if ( $in =~ /^File Name:/ )
-    { $f = substr($in,23); chomp($f); $h .= $in; }
-    elsif ( $in =~ /^Claim Responses Returned:/ )
-    { $c = substr($in,25,5); }
-    elsif ( $in =~ /^Accepted Claims:/ )
-    { $skip = 1; }
-    elsif ( $in =~ /^Rejected Claims:/ )
-    { $skip = 1; }
-    else
-    { $h .= $in; }
-    return($c,$h,$f) if ( $in =~ /^Rejected Claims:/ );
-    return(0) if ( $in =~ /END OF REPORT/ );
-  }
-  print qq|>>>ERROR in getHeader\n|;
-  return(0);
+sub getHeader {
+    my ( $c, $h, $f ) = ( 0, '', '' );
+
+    #print qq|getHeader:\n|;
+    while ( $in = <FILE> ) {
+        $linecount++;
+        next if ( $linecount < 4 );    # skip first 3 lines in file.
+
+        #print qq|getHeader: in=$in\n|;
+        if ( $in =~ /^File Name:/ ) {
+            $f = substr( $in, 23 );
+            chomp($f);
+            $h .= $in;
+        }
+        elsif ( $in =~ /^Claim Responses Returned:/ ) {
+            $c = substr( $in, 25, 5 );
+        }
+        elsif ( $in =~ /^Accepted Claims:/ ) { $skip = 1; }
+        elsif ( $in =~ /^Rejected Claims:/ ) { $skip = 1; }
+        else                                 { $h .= $in; }
+        return ( $c, $h, $f ) if ( $in =~ /^Rejected Claims:/ );
+        return (0)            if ( $in =~ /END OF REPORT/ );
+    }
+    print qq|>>>ERROR in getHeader\n|;
+    return (0);
 }
-sub getPatient
-{
-#print qq|getPatient:\n|;
-  my ($p,$n,$a,$e) = ('','',0,0);
-  while ( $in = <FILE> )
-  {
-#print qq|getPatient: in=$in\n|;
-    $p .= $in;
-    if ( $in =~ /^Provider Billing ID:/ )
-    { $n = substr($in,23,10); }
-    elsif ( $in =~ /^Message:/ )
-    { $a++; }
-    elsif ( $in =~ /^Error Message:/ )
-    { $e++; }
-    return($p,$n,$a,$e) if ( $in =~ /^Segment ID:/ );
-  }
-  print qq|>>>ERROR in getPatient\n|;
-  return();
+
+sub getPatient {
+
+    #print qq|getPatient:\n|;
+    my ( $p, $n, $a, $e ) = ( '', '', 0, 0 );
+    while ( $in = <FILE> ) {
+
+        #print qq|getPatient: in=$in\n|;
+        $p .= $in;
+        if    ( $in =~ /^Provider Billing ID:/ ) { $n = substr( $in, 23, 10 ); }
+        elsif ( $in =~ /^Message:/ )             { $a++; }
+        elsif ( $in =~ /^Error Message:/ )       { $e++; }
+        return ( $p, $n, $a, $e ) if ( $in =~ /^Segment ID:/ );
+    }
+    print qq|>>>ERROR in getPatient\n|;
+    return ();
 }
-sub gText
-{
-  my ($self,$f,$s,$hdr,$a,$e,$out) = @_;
-  my $acount = length($a) < 3 ? '0' x int(3-length($a)) . $a : $a;
-  my $ecount = length($e) < 3 ? '0' x int(3-length($e)) . $e : $e;
-  my $text = qq|<PRE>
+
+sub gText {
+    my ( $self, $f, $s, $hdr, $a, $e, $out ) = @_;
+    my $acount = length($a) < 3 ? '0' x int( 3 - length($a) ) . $a : $a;
+    my $ecount = length($e) < 3 ? '0' x int( 3 - length($e) ) . $e : $e;
+    my $text   = qq|<PRE>
 Electronic Batch Report
 ${f} Section: ${s}
 ----------------------------------------------------------------------------------------
@@ -103,33 +102,48 @@ Rejected Claims:       ${ecount}
 ${out}----------------------------------------------------------------------------------------
 </PRE>
 |;
-  return($text);
+    return ($text);
 }
-sub wFile
-{
-  my ($self,$sentfile,$NPI,$text,$acnt,$ecnt) = @_;
-#print qq|wFile: sentfile=$sentfile\n|;
-#print qq|wFile: NPI=$NPI\n|;
-#print qq|wFile: out=${out}\n|;
-  my ($dbname,$ins,$cnt,$dt,$type) = split('\.',$sentfile,5);
-  my ($domain,$subdomain) = split('_',$dbname);
-  my $tcnt = $acnt+$ecnt;
-  my $tdate = substr($dt,0,4).'-'.substr($dt,4,2).'-'.substr($dt,6,2);
-  my $form = DBForm->new("DBNAME=$dbname");
-  my $dbh = $form->dbconnect();
-  my $sProvider = $dbh->prepare("select Provider.ProvID from Provider left join ProviderControl on ProviderControl.ProvID=Provider.ProvID where Provider.Type=3 and ProviderControl.NPI=?");
-  $sProvider->execute($NPI) || $form->dberror("parseEBT: select Clinic $NPI");
-  my $rProvider = $sProvider->fetchrow_hashref;
-  my $rptDir = $WWW.'/'.$subdomain.'/reports4';
-  my $fileName = 'EBT_resp_'.$rProvider->{ProvID}.'_'.$ins.'_'.$tdate.'_'.$tcnt.'_'.DBUtil->Date('','stamp').'_'.DBUtil->genToken().'.htm';
-  if ( open(OUT,">${rptDir}/${fileName}") ) 
-  {
-    print OUT $text;
-    close(OUT);
-  } else { print qq|>>>ERROR: open ${fileName} $!\n|; }
-#print qq|wFile: fileName=$fileName\n|;
-  $sProvider->finish();
-  $form->complete();
-  return();
+
+sub wFile {
+    my ( $self, $sentfile, $NPI, $text, $acnt, $ecnt ) = @_;
+
+    #print qq|wFile: sentfile=$sentfile\n|;
+    #print qq|wFile: NPI=$NPI\n|;
+    #print qq|wFile: out=${out}\n|;
+    my ( $dbname, $ins, $cnt, $dt, $type ) = split( '\.', $sentfile, 5 );
+    my ( $domain, $subdomain ) = split( '_', $dbname );
+    my $tcnt = $acnt + $ecnt;
+    my $tdate =
+        substr( $dt, 0, 4 ) . '-'
+      . substr( $dt, 4, 2 ) . '-'
+      . substr( $dt, 6, 2 );
+    my $form      = DBForm->new("DBNAME=$dbname");
+    my $dbh       = $form->dbconnect();
+    my $sProvider = $dbh->prepare(
+"select Provider.ProvID from Provider left join ProviderControl on ProviderControl.ProvID=Provider.ProvID where Provider.Type=3 and ProviderControl.NPI=?"
+    );
+    $sProvider->execute($NPI) || $form->dberror("parseEBT: select Clinic $NPI");
+    my $rProvider = $sProvider->fetchrow_hashref;
+    my $rptDir    = $WWW . '/' . $subdomain . '/reports4';
+    my $fileName =
+        'EBT_resp_'
+      . $rProvider->{ProvID} . '_'
+      . $ins . '_'
+      . $tdate . '_'
+      . $tcnt . '_'
+      . DBUtil->Date( '', 'stamp' ) . '_'
+      . DBUtil->genToken() . '.htm';
+
+    if ( open( OUT, ">${rptDir}/${fileName}" ) ) {
+        print OUT $text;
+        close(OUT);
+    }
+    else { print qq|>>>ERROR: open ${fileName} $!\n|; }
+
+    #print qq|wFile: fileName=$fileName\n|;
+    $sProvider->finish();
+    $form->complete();
+    return ();
 }
 ################################################################

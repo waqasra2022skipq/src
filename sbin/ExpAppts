@@ -1,27 +1,27 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 use Time::Local;
-my $DT=localtime();
+my $DT = localtime();
 require("config.pl");
 ############################################################################
 my $form;
 my @DBS = scalar(@ARGV) ? @ARGV : @ACTIVE_DBS;
 print qq|ExpAppts: @DBS\n|;
-foreach my $dbname ( @DBS )
-{
-  print qq|Database: $dbname\n|;
-  $form = DBForm->new("DBNAME=$dbname");
-  my $dbh = $form->dbconnect();
-  my $DelDate = DBUtil->Date('',0,-7);
-  $sDelete = $dbh->prepare("delete from Appointments where ContactDate<?"); 
-  $sDelete->execute($DelDate);
-  my $cnt = $sDelete->rows();
-  print qq|  delete: $cnt\n|;
-  $sDelete->finish();
-  $form->complete();
-  print qq|\n|;
+
+foreach my $dbname (@DBS) {
+    print qq|Database: $dbname\n|;
+    $form = DBForm->new("DBNAME=$dbname");
+    my $dbh     = $form->dbconnect();
+    my $DelDate = DBUtil->Date( '', 0, -7 );
+    $sDelete = $dbh->prepare("delete from Appointments where ContactDate<?");
+    $sDelete->execute($DelDate);
+    my $cnt = $sDelete->rows();
+    print qq|  delete: $cnt\n|;
+    $sDelete->finish();
+    $form->complete();
+    print qq|\n|;
 }
 ############################################################################
 exit;

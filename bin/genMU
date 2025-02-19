@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 
@@ -7,22 +7,21 @@ use DBForm;
 # setup Meaningful Use Accounting
 #   ./genMU DBNAME=db&BillDate=billdate&ClientID=clientid
 ############################################################################
-my $form = DBForm->new();
+my $form     = DBForm->new();
 my $ClientID = $form->{'ClientID'};
 my $BillDate = $form->{'BillDate'};
-if ( $BillDate eq '' )
-{
-  print qq|\nMISSING BillDate!\n|;
-  $form->complete();
-  exit;
+if ( $BillDate eq '' ) {
+    print qq|\nMISSING BillDate!\n|;
+    $form->complete();
+    exit;
 }
-my $dbh = $form->dbconnect();
+my $dbh    = $form->dbconnect();
 my $dbname = $form->{'DBNAME'};
-print qq|genMU Started: |.localtime().qq|\n|;
+print qq|genMU Started: | . localtime() . qq|\n|;
 print qq|======================================\n\n|;
 my $with = $ClientID ? qq| and Treatment.ClientID=${ClientID}| : '';
 print qq|BillDate: ${BillDate}, with=${with}\n|;
-my $sNote = $dbh->prepare("
+my $sNote = $dbh->prepare( "
 select Treatment.*
      , Client.LName, Client.FName, Client.Suffix, Client.SSN
      , Counselor.FName as ProviderFName, Counselor.LName as ProviderLName, Counselor.ScreenName as ProviderScreenName
@@ -32,49 +31,52 @@ select Treatment.*
   left join Provider as Counselor on Counselor.ProvID=Treatment.ProvID
   left join Provider as Clinic on Clinic.ProvID=Treatment.ClinicID
  where BillDate='${BillDate}' ${with}
- order by ContLogDate");
+ order by ContLogDate" );
 $sNote->execute() || $form->dberror("select Treatment ${BillDate} ${ClientID}");
-while ( my $rNote = $sNote->fetchrow_hashref )
-{ 
-  print qq|Process: ClientID=$rNote->{ClientID}, TrID=$rNote->{TrID}, BilledAmt=$rNote->{BilledAmt}, AmtDue=$rNote->{AmtDue}\n|;
-  print qq|         $rNote->{'FName'} $rNote->{'LName'}\n|;
-  print qq|         $rNote->{'ProviderFName'} $rNote->{'ProviderLName'}\n|;
-  print qq|         $rNote->{'ClinicName'} \n|;
-  ##my $r = ();
-  ##$r->{'TrID'} = $rNote->{'TrID'};
-  ##$r->{'ClientID'} = $rNote->{'ClientID'};
-  ##$r->{'ContDate'} = $rNote->{'ContLogDate'};
-  ##$r->{'BillDate'} = $rNote->{'BillDate'};
-  ##$r->{'SCID'} = $rNote->{'SCID'};
-  ##$r->{'SCNum'} = $rNote->{'SCNum'};
-  ##$r->{'InsCode'} = $InsCode;
-  ##$r->{'BillAmt'} = $rNote->{'BilledAmt'};
-  ##$r->{'Units'}   = $rNote->{'Units'};
-  ##$r->{'Code'} = 'BI';
-  ##$r->{'SRC'} = $SRC;
-#foreach my $f ( sort keys %{$r} ) { warn "r: $f=$r->{$f}\n"; }
-  my $TrID = $rNote->{'TrID'};
-  my $ClientID = $rNote->{'ClientID'};
-  my $ProvID = $rNote->{'ProvID'};
-  my $ClinicID = $rNote->{'ClinicID'};
-  my $ContDate = DBUtil->Date($rNote->{'ContLogDate'},'fmt','MM-DD-YYYY');
-  $e = qq|call `emradv_sp_AMS_AddMeasureInformation` ('${ClientID}','${ProvID}','${ClinicID}','${TrID}',STR_TO_DATE('${ContDate}','%m-%d-%Y'),'visitcreated');|;
-warn qq|$e\n|;
-  my $p= $dbh->prepare($e);
-  $p->execute();
-  $e = qq|call `emradv_sp_AMS_AddMeasureInformation` ('${ClientID}','${ProvID}','${ClinicID}','${TrID}',STR_TO_DATE('${ContDate}','%m-%d-%Y'),'PatientEducationinOffice');|;
-warn qq|$e\n|;
-  my $p= $dbh->prepare($e);
-  $p->execute();
-  $e = qq|call `emradv_sp_AMS_AddMeasureInformation` ('${ClientID}','${ProvID}','${ClinicID}','${TrID}',STR_TO_DATE('${ContDate}','%m-%d-%Y'),'PatientEducationOnPortal');|;
-warn qq|$e\n|;
-  my $p= $dbh->prepare($e);
-  $p->execute();
-  $p->finish();
+while ( my $rNote = $sNote->fetchrow_hashref ) {
+    print
+qq|Process: ClientID=$rNote->{ClientID}, TrID=$rNote->{TrID}, BilledAmt=$rNote->{BilledAmt}, AmtDue=$rNote->{AmtDue}\n|;
+    print qq|         $rNote->{'FName'} $rNote->{'LName'}\n|;
+    print qq|         $rNote->{'ProviderFName'} $rNote->{'ProviderLName'}\n|;
+    print qq|         $rNote->{'ClinicName'} \n|;
+    ##my $r = ();
+    ##$r->{'TrID'} = $rNote->{'TrID'};
+    ##$r->{'ClientID'} = $rNote->{'ClientID'};
+    ##$r->{'ContDate'} = $rNote->{'ContLogDate'};
+    ##$r->{'BillDate'} = $rNote->{'BillDate'};
+    ##$r->{'SCID'} = $rNote->{'SCID'};
+    ##$r->{'SCNum'} = $rNote->{'SCNum'};
+    ##$r->{'InsCode'} = $InsCode;
+    ##$r->{'BillAmt'} = $rNote->{'BilledAmt'};
+    ##$r->{'Units'}   = $rNote->{'Units'};
+    ##$r->{'Code'} = 'BI';
+    ##$r->{'SRC'} = $SRC;
+    #foreach my $f ( sort keys %{$r} ) { warn "r: $f=$r->{$f}\n"; }
+    my $TrID     = $rNote->{'TrID'};
+    my $ClientID = $rNote->{'ClientID'};
+    my $ProvID   = $rNote->{'ProvID'};
+    my $ClinicID = $rNote->{'ClinicID'};
+    my $ContDate = DBUtil->Date( $rNote->{'ContLogDate'}, 'fmt', 'MM-DD-YYYY' );
+    $e =
+qq|call `emradv_sp_AMS_AddMeasureInformation` ('${ClientID}','${ProvID}','${ClinicID}','${TrID}',STR_TO_DATE('${ContDate}','%m-%d-%Y'),'visitcreated');|;
+    warn qq|$e\n|;
+    my $p = $dbh->prepare($e);
+    $p->execute();
+    $e =
+qq|call `emradv_sp_AMS_AddMeasureInformation` ('${ClientID}','${ProvID}','${ClinicID}','${TrID}',STR_TO_DATE('${ContDate}','%m-%d-%Y'),'PatientEducationinOffice');|;
+    warn qq|$e\n|;
+    my $p = $dbh->prepare($e);
+    $p->execute();
+    $e =
+qq|call `emradv_sp_AMS_AddMeasureInformation` ('${ClientID}','${ProvID}','${ClinicID}','${TrID}',STR_TO_DATE('${ContDate}','%m-%d-%Y'),'PatientEducationOnPortal');|;
+    warn qq|$e\n|;
+    my $p = $dbh->prepare($e);
+    $p->execute();
+    $p->finish();
 }
 $sNote->finish();
 print qq|======================================\n|;
-print qq|genMU Completed: |.localtime().qq|\n\n|;
+print qq|genMU Completed: | . localtime() . qq|\n\n|;
 $form->complete();
 exit;
 ############################################################################

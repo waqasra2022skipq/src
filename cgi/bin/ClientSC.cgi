@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use myForm;
 use myDBI;
@@ -8,20 +8,23 @@ use Time::Local;
 my $DT = localtime();
 ############################################################################
 my $form = myForm->new();
-my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $dbh  = myDBI->dbconnect( $form->{'DBNAME'} );
 
 my $ClientID = $form->{ClientID} ? $form->{ClientID} : $form->{Client_ClientID};
-my ($delm,$InsSel) = ('','');
+my ( $delm, $InsSel ) = ( '', '' );
 my $s = $dbh->prepare("select InsID from Insurance where ClientID=?");
-$s->execute($ClientID) || myDBI->dberror("ClientSC: select Insurance ClientID=${ClientID}");
-while (my ($InsID) = $s->fetchrow_array)
-{ $InsSel .= qq|${delm} xInsurance.ID=${InsID} |; $delm='or'; }
+$s->execute($ClientID)
+  || myDBI->dberror("ClientSC: select Insurance ClientID=${ClientID}");
+while ( my ($InsID) = $s->fetchrow_array ) {
+    $InsSel .= qq|${delm} xInsurance.ID=${InsID} |;
+    $delm = 'or';
+}
 $s->finish();
 my $report = qq|No Insurances for Client (or no ClientID).|;
-if ( $InsSel )   # generate report?
-{ 
-  my $ForIns = $InsSel ? qq| and (${InsSel})| : '';
-  my $select = qq|
+if ($InsSel)    # generate report?
+{
+    my $ForIns = $InsSel ? qq| and (${InsSel})| : '';
+    my $select = qq|
 select xInsurance.Name, xCredentials.Abbr as Credential
       ,xSC.SCNum, xSC.SCName
       ,xSCRestrictions.Descr as Restriction
@@ -37,7 +40,8 @@ select xInsurance.Name, xCredentials.Abbr as Credential
   ${ForIns}
  order by xInsurance.Name, xCredentials.Abbr, xSC.SCNum, xSC.SCID, xSCRates.EffDate, xSCRestrictions.Descr
 |;
-  $report = gHTML->rptSQL($form,$select,'',':::::::numeric:date:date','::::::::MM/DD/YY:MM/DD/YY');
+    $report = gHTML->rptSQL( $form, $select, '', ':::::::numeric:date:date',
+        '::::::::MM/DD/YY:MM/DD/YY' );
 }
 my $html = qq|Content-type: text/html
 

@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use myForm;
 use myDBI;
@@ -10,19 +10,22 @@ use Rollup;
 ############################################################################
 
 # Get the command name...
-my ($pw, $cmd) = $0 =~ m/(.*\/)(.*)$/;
+my ( $pw, $cmd ) = $0 =~ m/(.*\/)(.*)$/;
 print qq|#${cmd}: Started | . localtime() . qq|\n|;
 
 my $form = myForm->new();
-my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $dbh  = myDBI->dbconnect( $form->{'DBNAME'} );
 
 print qq|  Database Selected = $form->{'DBNAME'}...\n|;
 
 my $EB = $dbh->prepare("ALTER TABLE `EligibleDMH` DROP `PUB`, DROP `HH`;");
 $EB->execute();
 $EB->finish();
+
 # Select unique ClientId with Priority = 2
-my $EB2 = $dbh->prepare("ALTER TABLE `EligibleDMH` ADD `OCH` INT NOT NULL DEFAULT '0' AFTER `BADADDRESS`, ADD `HUM` INT NOT NULL DEFAULT '0' AFTER `OCH`, ADD `AET` INT NOT NULL DEFAULT '0' AFTER `HUM`;");
+my $EB2 = $dbh->prepare(
+"ALTER TABLE `EligibleDMH` ADD `OCH` INT NOT NULL DEFAULT '0' AFTER `BADADDRESS`, ADD `HUM` INT NOT NULL DEFAULT '0' AFTER `OCH`, ADD `AET` INT NOT NULL DEFAULT '0' AFTER `HUM`;"
+);
 $EB2->execute();
 $EB2->finish();
 

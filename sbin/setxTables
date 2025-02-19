@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use Accounts;
 use myConfig;
 use Cwd;
@@ -9,66 +9,71 @@ use DBForm;
 # usage: setxTables
 #        copy x... tables from main account to all 'live' accounts
 ############################################################################
-my $FROMDB="okmis_mms";
+my $FROMDB = "okmis_mms";
+
 # get the command name...
-my ($pw,$cmd) = $0 =~ m/(.*\/)(.*)$/;
+my ( $pw, $cmd ) = $0 =~ m/(.*\/)(.*)$/;
 my $group = qq|like 'x%'|;
-if ( $ARGV[0] eq 'ins' )
-{ shift; $group = qq|where Tables_in_${FROMDB}='xInsurance' or Tables_in_${FROMDB}='xSC' or
- Tables_in_${FROMDB}='xSCRates'|; }
+if ( $ARGV[0] eq 'ins' ) {
+    shift;
+    $group =
+      qq|where Tables_in_${FROMDB}='xInsurance' or Tables_in_${FROMDB}='xSC' or
+ Tables_in_${FROMDB}='xSCRates'|;
+}
+
 # the accounts to work with
-my @DBS = scalar(@ARGV) ? @ARGV : Accounts->dbs('live'); 
+my @DBS  = scalar(@ARGV) ? @ARGV : Accounts->dbs('live');
 my $form = DBForm->new("DBNAME=$FROMDB");
-my $dbh = $form->dbconnect();
-chdir(myConfig->cfg('WORKDIR'));
-my $pwd=cwd();
-print qq|${cmd}: Started: |.localtime().qq|\n|;
+my $dbh  = $form->dbconnect();
+chdir( myConfig->cfg('WORKDIR') );
+my $pwd = cwd();
+print qq|${cmd}: Started: | . localtime() . qq|\n|;
 print qq|${cmd}: pwd=$pwd\n|;
 print qq|======================================\n\n|;
 
 my $sqlfile = "${cmd}.sql";
-open(FILE,">${sqlfile}") or die "Couldn't open file: ${sqlfile} ($!)\n";
+open( FILE, ">${sqlfile}" ) or die "Couldn't open file: ${sqlfile} ($!)\n";
 close(FILE);
 print qq|Creating: ${sqlfile}...|;
-my $tcnt=0;
-my $qShow= qq|show tables ${group}|;
+my $tcnt  = 0;
+my $qShow = qq|show tables ${group}|;
 print qq|qShow=$qShow\n|;
-my $sShow= $dbh->prepare($qShow);
+my $sShow = $dbh->prepare($qShow);
 $sShow->execute() || $form->dberror("show tables error ($!)");
-while ( my ($table) = $sShow->fetchrow_array )
-{
-print qq|table=$table\n|;
-  system("mysqldump ${FROMDB} ${table} >> ${sqlfile}");
-  $tcnt++;
+
+while ( my ($table) = $sShow->fetchrow_array ) {
+    print qq|table=$table\n|;
+    system("mysqldump ${FROMDB} ${table} >> ${sqlfile}");
+    $tcnt++;
 }
 print qq|table count=${tcnt}\n|;
 $sShow->finish();
 $form->complete();
 
 print qq|ReCreate xtables...\n|;
-my @SPECIALDBS=();
-foreach my $dbname ( @DBS )
-{
-  next if ( $dbname eq $FROMDB );
-  print qq|  set: ${dbname}: |.localtime().qq|\n|;
-  system("mysql ${dbname} < ${sqlfile}");
-# these updated old tables not used anymore...
-#  push(@SPECIALDBS,'okmis_mms') if ( $dbname eq 'okmis_mms' );
+my @SPECIALDBS = ();
+foreach my $dbname (@DBS) {
+    next if ( $dbname eq $FROMDB );
+    print qq|  set: ${dbname}: | . localtime() . qq|\n|;
+    system("mysql ${dbname} < ${sqlfile}");
+
+    # these updated old tables not used anymore...
+    #  push(@SPECIALDBS,'okmis_mms') if ( $dbname eq 'okmis_mms' );
 }
 print qq|Set special updates...\n|;
-foreach my $dbname ( @SPECIALDBS )
-{
-  print qq|  update: ${dbname}: |.localtime().qq|\n|;
-  my $form = DBForm->new("DBNAME=$dbname");
-  my $dbh = $form->dbconnect();
-  # could update something....
-  my $q=qq|update table set 'something'...|;
-  my $s=$dbh->prepare($q);
-  $s->execute() || $form->dberror($q);
-  $s->finish();
-  $form->complete();
+foreach my $dbname (@SPECIALDBS) {
+    print qq|  update: ${dbname}: | . localtime() . qq|\n|;
+    my $form = DBForm->new("DBNAME=$dbname");
+    my $dbh  = $form->dbconnect();
+
+    # could update something....
+    my $q = qq|update table set 'something'...|;
+    my $s = $dbh->prepare($q);
+    $s->execute() || $form->dberror($q);
+    $s->finish();
+    $form->complete();
 }
 print qq|======================================\n\n|;
-print qq|${cmd}: Completed: |.localtime().qq|\n|;
+print qq|${cmd}: Completed: | . localtime() . qq|\n|;
 exit;
 ############################################################################

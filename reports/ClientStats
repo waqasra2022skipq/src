@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use Cwd;
 use DBI;
 use DBA;
@@ -15,72 +15,82 @@ my $DT = localtime();
 ############################################################################
 my $form = myForm->new();
 $form = DBUtil->setDates($form);
+
 #foreach my $f ( sort keys %{$form} ) { warn "ClientStats: form-$f=$form->{$f}\n"; }
 
-if ( ! SysAccess->verify($form,'Privilege=BillingReports') )
-{ $form->error("Access Denied! / BillingReports Privilege"); }
+if ( !SysAccess->verify( $form, 'Privilege=BillingReports' ) ) {
+    $form->error("Access Denied! / BillingReports Privilege");
+}
 
 my $multidel = 'ý';
+
 #  # Quarters are Jul-Sep, Oct-Dec, Jan-Mar, Apr-Jun
 #  @BegQTRs = ( '07-01', '10-01', '01-01', '04-01' );
 #  @EndQTRs = ( '09-30', '12-31', '03-31', '06-30' );
 #  @Titles = ( '1st', '2nd', '3rd', '4th' );
 #  $Title = 'Client Statistics Report for ' . $Titles[$form->{QTR}-1] . ' Quarter ' . $QtrYear . ' (YTD from ' . $YTDBeg . ')';
 
-my $fdow = DBUtil->Date($form->{FromDate},'dow');
-my $fdayname = (Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday)[$fdow];
-my $tdow = DBUtil->Date($form->{ToDate},'dow');
-my $tdayname = (Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday)[$tdow];
-my $DateRange = qq|from ${fdayname} $form->{FromDateD} - ${tdayname} $form->{ToDateD}|;
+my $fdow = DBUtil->Date( $form->{FromDate}, 'dow' );
+my $fdayname =
+  ( Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday )[$fdow];
+my $tdow = DBUtil->Date( $form->{ToDate}, 'dow' );
+my $tdayname =
+  ( Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday )[$tdow];
+my $DateRange =
+  qq|from ${fdayname} $form->{FromDateD} - ${tdayname} $form->{ToDateD}|;
 
-my $Year = DBUtil->Date($form->{FromDate},'fmt','YYYY');
-my $MMDD = DBUtil->Date($form->{FromDate},'fmt','MMDD');
+my $Year = DBUtil->Date( $form->{FromDate}, 'fmt', 'YYYY' );
+my $MMDD = DBUtil->Date( $form->{FromDate}, 'fmt', 'MMDD' );
 $Year -= 1 if ( $MMDD lt '0701' );
-my $YTDBeg = $Year.'-07-01';
+my $YTDBeg  = $Year . '-07-01';
 my $BegDate = $form->{FromDate};
 my $EndDate = $form->{ToDate};
 my $Title = 'Client Statistics Report for DateRange (YTD from ' . $YTDBeg . ')';
-my $BegDateFmt = DBUtil->Date($BegDate,'fmt','MM/DD/YY');
-my $EndDateFmt = DBUtil->Date($EndDate,'fmt','MM/DD/YY');
+my $BegDateFmt = DBUtil->Date( $BegDate, 'fmt', 'MM/DD/YY' );
+my $EndDateFmt = DBUtil->Date( $EndDate, 'fmt', 'MM/DD/YY' );
 my $RangeLabel = qq|${BegDateFmt}-${EndDateFmt}|;
+
 #warn "ClientStats: YTDBeg=${YTDBeg}, RangeLabel=${RangeLabel}\n";
 ############################################################################
-my $dbh = myDBI->dbconnect($form->{'DBNAME'});
-my $cdbh = myDBI->dbconnect('okmis_config');      # connect to the config database.
+my $dbh  = myDBI->dbconnect( $form->{'DBNAME'} );
+my $cdbh = myDBI->dbconnect('okmis_config');   # connect to the config database.
 ##
 my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
-my $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Treatment.ClinicID');
+my $ClinicSelection =
+  DBA->getClinicSelection( $form, $ForProvID, 'Treatment.ClinicID' );
 ##
-$s=$dbh->prepare("select * from Provider where Type=3");
-  $s->execute();
-  while (my $r = $s->fetchrow_hashref) { $xClinics->{$r->{ProvID}} = $r; }
-$s=$dbh->prepare("select * from xInsurance");
-  $s->execute();
-  while (my $r = $s->fetchrow_hashref) { $xInsurance->{$r->{ID}} = $r; }
-$s=$dbh->prepare("select * from xSC");
-  $s->execute();
-  while (my $r = $s->fetchrow_hashref) { $xSC->{$r->{SCID}} = $r; }
-$s=$dbh->prepare("select * from okmis_config.xRaces");
-  $s->execute();
-  while (my $r = $s->fetchrow_hashref) { $xRace->{$r->{ID}} = $r; }
-  $xRace->{'N'}{Descr} = 'No Response';
-$s=$cdbh->prepare("select * from xMarStat");
-  $s->execute();
-  while (my $r = $s->fetchrow_hashref) { $xMarStat->{$r->{ID}} = $r; }
-  $xMarStat->{'N'}{Descr} = 'No Response';
-$s=$dbh->prepare("select * from xEmplStat");
-  $s->execute();
-  while (my $r = $s->fetchrow_hashref) { $xEmplStat->{$r->{ID}} = $r; }
-  $xEmplStat->{'N'}{Descr} = 'No Response';
-$s=$dbh->prepare("select * from xEmplType");
-  $s->execute();
-  while (my $r = $s->fetchrow_hashref) { $xEmplType->{$r->{ID}} = $r; }
-  $xEmplType->{'N'}{Descr} = 'No Response';
+$s = $dbh->prepare("select * from Provider where Type=3");
+$s->execute();
+while ( my $r = $s->fetchrow_hashref ) { $xClinics->{ $r->{ProvID} } = $r; }
+$s = $dbh->prepare("select * from xInsurance");
+$s->execute();
+while ( my $r = $s->fetchrow_hashref ) { $xInsurance->{ $r->{ID} } = $r; }
+$s = $dbh->prepare("select * from xSC");
+$s->execute();
+while ( my $r = $s->fetchrow_hashref ) { $xSC->{ $r->{SCID} } = $r; }
+$s = $dbh->prepare("select * from okmis_config.xRaces");
+$s->execute();
+while ( my $r = $s->fetchrow_hashref ) { $xRace->{ $r->{ID} } = $r; }
+$xRace->{'N'}{Descr} = 'No Response';
+$s = $cdbh->prepare("select * from xMarStat");
+$s->execute();
+while ( my $r = $s->fetchrow_hashref ) { $xMarStat->{ $r->{ID} } = $r; }
+$xMarStat->{'N'}{Descr} = 'No Response';
+$s = $dbh->prepare("select * from xEmplStat");
+$s->execute();
+while ( my $r = $s->fetchrow_hashref ) { $xEmplStat->{ $r->{ID} } = $r; }
+$xEmplStat->{'N'}{Descr} = 'No Response';
+$s = $dbh->prepare("select * from xEmplType");
+$s->execute();
+while ( my $r = $s->fetchrow_hashref ) { $xEmplType->{ $r->{ID} } = $r; }
+$xEmplType->{'N'}{Descr} = 'No Response';
 $s->finish();
 
-$sAgency=$dbh->prepare("select * from Provider where ProvID=?");
-$sClientInsurance=$dbh->prepare("select InsID from Insurance where ClientID=? order by Priority");
-$sInsurance=$dbh->prepare("select * from Insurance where InsID=? and ClientID=?");
+$sAgency          = $dbh->prepare("select * from Provider where ProvID=?");
+$sClientInsurance = $dbh->prepare(
+    "select InsID from Insurance where ClientID=? order by Priority");
+$sInsurance =
+  $dbh->prepare("select * from Insurance where InsID=? and ClientID=?");
 ##
 $qPDDiag = qq|
   select *
@@ -90,12 +100,13 @@ $qPDDiag = qq|
    order by ClientPrAuth.EffDate desc
 |;
 $sPDDiag = $dbh->prepare($qPDDiag);
+
 #warn "qPDDiag=\n$qPDDiag\n";
 # was checking same quarter period.
 # now check 60 days apart.
-my $testdays = DBUtil->Date($EndDate,'diff',$BegDate);
+my $testdays = DBUtil->Date( $EndDate, 'diff', $BegDate );
 $SetProgress = $testdays > 60 ? 1 : 0;
-$qProgNotes = qq|
+$qProgNotes  = qq|
     select * from ProgNotes
       left join Treatment on Treatment.TrID=ProgNotes.NoteID
     where ProgNotes.ClientID=?
@@ -103,6 +114,7 @@ $qProgNotes = qq|
       and Treatment.ContLogDate between '${BegDate}' and '${EndDate}'
     order by Treatment.ContLogDate
 |;
+
 #warn "qProgNotes=\n$qProgNotes\n";
 $sProgNotes = $dbh->prepare($qProgNotes);
 ##
@@ -117,110 +129,116 @@ $qNotes = qq|
     ${ClinicSelection}
     order by Treatment.ContLogDate
 |;
+
 #warn "qNotes=\n$qNotes\n";
 $sNotes = $dbh->prepare($qNotes);
-$qSurveys = qq|select * from Surveys where Surveys.Date>='${YTDBeg}' and Surveys.Date<='${EndDate}' order by Surveys.Date|;
+$qSurveys =
+qq|select * from Surveys where Surveys.Date>='${YTDBeg}' and Surveys.Date<='${EndDate}' order by Surveys.Date|;
 $sSurveys = $dbh->prepare($qSurveys);
+
 #warn "qSurveys=\n$qSurveys\n";
 #warn qq|$YTDBeg, $BegDate, $EndDate, $form->{InsID}\n|;
 #warn qq|$Title\n|;
 ############################################################################
 
-my $ReportRange = qq|Fiscal Year | . DBUtil->Date($YTDBeg,'fmt','MM/DD/YYYY') . '-' . DBUtil->Date($EndDate,'fmt','MM/DD/YYYY');
+my $ReportRange =
+    qq|Fiscal Year |
+  . DBUtil->Date( $YTDBeg,  'fmt', 'MM/DD/YYYY' ) . '-'
+  . DBUtil->Date( $EndDate, 'fmt', 'MM/DD/YYYY' );
 my $Stats = ();
-$Stats->{COUNT} = 0;
-$Stats->{NOTECOUNT} = 0;
-$Stats->{NOTECOUNTQTR} = 0;
-$Stats->{NOSHOWS} = 0;
-$Stats->{NOSHOWSQTR} = 0;
-$Stats->{GAFLESS} = 0;
-$Stats->{GAFMORE} = 0;
-$Stats->{GAFCOUNT} = 0;
-$Stats->{PROG}->{PROGM3} = 0;
-$Stats->{PROG}->{PROGM2} = 0;
-$Stats->{PROG}->{PROGM1} = 0;
-$Stats->{PROG}->{PROG0} = 0;
-$Stats->{PROG}->{PROG1} = 0;
-$Stats->{PROG}->{PROG2} = 0;
-$Stats->{PROG}->{PROG3} = 0;
-$Stats->{PROGCOUNT} = 0;
-$Stats->{PROGRESSCOUNT} = 0;
-$Stats->{AVGPROGRESSQTR} = 0;
-$Stats->{AGE}->{CAT0} = 0;
-$Stats->{AGE}->{CAT1} = 0;
-$Stats->{AGE}->{CAT2} = 0;
-$Stats->{AGE}->{CAT3} = 0;
-$Stats->{AGE}->{CAT4} = 0;
-$Stats->{AGE}->{CAT5} = 0;
-$Stats->{AGE}->{CAT6} = 0;
-$Stats->{CARFAGE}->{CAT0} = 0;
-$Stats->{CARFAGE}->{CAT1} = 0;
-$Stats->{CARFAGE}->{CAT2} = 0;
-$Stats->{CARFAGE}->{CAT3} = 0;
-$Stats->{CARFAGE}->{CAT4} = 0;
-$Stats->{CARFAGE}->{CAT5} = 0;
-$Stats->{CARFAGE}->{CAT6} = 0;
-$Stats->{MALE} = 0;
-$Stats->{FEMALE} = 0;
-$Stats->{REFSQTR} = 0;
-$Stats->{REFSYTD} = 0;
-$Stats->{REFMORE} = 0;
-$Stats->{REFLESS} = 0;
-$Stats->{HRSQTR} = 0;
-$Stats->{HRSYTD} = 0;
-$Stats->{NEWREQQTR} = 0;
-$Stats->{GAFMOREJSUC} = 0;
-$Stats->{GAFMOREJBDC} = 0;
-$Stats->{GAFMOREDHS} = 0;
-$Stats->{GAFMOREOTH} = 0;
-$Stats->{GAFLESSJSUC} = 0;
-$Stats->{GAFLESSJBDC} = 0;
-$Stats->{GAFLESSDHS} = 0;
-$Stats->{GAFLESSOTH} = 0;
-$Stats->{Only1GAFJSUC} = 0;
-$Stats->{Only1GAFJBDC} = 0;
-$Stats->{Only1GAFDHS} = 0;
-$Stats->{Only1GAFOTH} = 0;
-$Stats->{REFMOREJSUC} = 0;
-$Stats->{REFMOREJBDC} = 0;
-$Stats->{REFMOREDHS} = 0;
-$Stats->{REFMOREOTH} = 0;
-$Stats->{REFLESSJSUC} = 0;
-$Stats->{REFLESSJBDC} = 0;
-$Stats->{REFLESSDHS} = 0;
-$Stats->{REFLESSOTH} = 0;
-$Stats->{NEWREQSQTRJSUC} = 0;
-$Stats->{NEWREQSQTRJBDC} = 0;
-$Stats->{NEWREQSQTRDHS} = 0;
-$Stats->{NEWREQSQTROTH} = 0;
-$Stats->{REFSQTRJSUC} = 0;
-$Stats->{REFSQTRJBDC} = 0;
-$Stats->{REFSQTRDHS} = 0;
-$Stats->{REFSQTROTH} = 0;
-$Stats->{REFSYTDJSUC} = 0;
-$Stats->{REFSYTDJBDC} = 0;
-$Stats->{REFSYTDDHS} = 0;
-$Stats->{REFSYTDOTH} = 0;
-$Stats->{HRSQTRJSUC} = 0;
-$Stats->{HRSQTRJBDC} = 0;
-$Stats->{HRSQTRDHS} = 0;
-$Stats->{HRSQTROTH} = 0;
-$Stats->{HRSYTDJSUC} = 0;
-$Stats->{HRSYTDJBDC} = 0;
-$Stats->{HRSYTDDHS} = 0;
-$Stats->{HRSYTDOTH} = 0;
-$Stats->{SURVEYCOUNTQTR} = 0;
+$Stats->{COUNT}               = 0;
+$Stats->{NOTECOUNT}           = 0;
+$Stats->{NOTECOUNTQTR}        = 0;
+$Stats->{NOSHOWS}             = 0;
+$Stats->{NOSHOWSQTR}          = 0;
+$Stats->{GAFLESS}             = 0;
+$Stats->{GAFMORE}             = 0;
+$Stats->{GAFCOUNT}            = 0;
+$Stats->{PROG}->{PROGM3}      = 0;
+$Stats->{PROG}->{PROGM2}      = 0;
+$Stats->{PROG}->{PROGM1}      = 0;
+$Stats->{PROG}->{PROG0}       = 0;
+$Stats->{PROG}->{PROG1}       = 0;
+$Stats->{PROG}->{PROG2}       = 0;
+$Stats->{PROG}->{PROG3}       = 0;
+$Stats->{PROGCOUNT}           = 0;
+$Stats->{PROGRESSCOUNT}       = 0;
+$Stats->{AVGPROGRESSQTR}      = 0;
+$Stats->{AGE}->{CAT0}         = 0;
+$Stats->{AGE}->{CAT1}         = 0;
+$Stats->{AGE}->{CAT2}         = 0;
+$Stats->{AGE}->{CAT3}         = 0;
+$Stats->{AGE}->{CAT4}         = 0;
+$Stats->{AGE}->{CAT5}         = 0;
+$Stats->{AGE}->{CAT6}         = 0;
+$Stats->{CARFAGE}->{CAT0}     = 0;
+$Stats->{CARFAGE}->{CAT1}     = 0;
+$Stats->{CARFAGE}->{CAT2}     = 0;
+$Stats->{CARFAGE}->{CAT3}     = 0;
+$Stats->{CARFAGE}->{CAT4}     = 0;
+$Stats->{CARFAGE}->{CAT5}     = 0;
+$Stats->{CARFAGE}->{CAT6}     = 0;
+$Stats->{MALE}                = 0;
+$Stats->{FEMALE}              = 0;
+$Stats->{REFSQTR}             = 0;
+$Stats->{REFSYTD}             = 0;
+$Stats->{REFMORE}             = 0;
+$Stats->{REFLESS}             = 0;
+$Stats->{HRSQTR}              = 0;
+$Stats->{HRSYTD}              = 0;
+$Stats->{NEWREQQTR}           = 0;
+$Stats->{GAFMOREJSUC}         = 0;
+$Stats->{GAFMOREJBDC}         = 0;
+$Stats->{GAFMOREDHS}          = 0;
+$Stats->{GAFMOREOTH}          = 0;
+$Stats->{GAFLESSJSUC}         = 0;
+$Stats->{GAFLESSJBDC}         = 0;
+$Stats->{GAFLESSDHS}          = 0;
+$Stats->{GAFLESSOTH}          = 0;
+$Stats->{Only1GAFJSUC}        = 0;
+$Stats->{Only1GAFJBDC}        = 0;
+$Stats->{Only1GAFDHS}         = 0;
+$Stats->{Only1GAFOTH}         = 0;
+$Stats->{REFMOREJSUC}         = 0;
+$Stats->{REFMOREJBDC}         = 0;
+$Stats->{REFMOREDHS}          = 0;
+$Stats->{REFMOREOTH}          = 0;
+$Stats->{REFLESSJSUC}         = 0;
+$Stats->{REFLESSJBDC}         = 0;
+$Stats->{REFLESSDHS}          = 0;
+$Stats->{REFLESSOTH}          = 0;
+$Stats->{NEWREQSQTRJSUC}      = 0;
+$Stats->{NEWREQSQTRJBDC}      = 0;
+$Stats->{NEWREQSQTRDHS}       = 0;
+$Stats->{NEWREQSQTROTH}       = 0;
+$Stats->{REFSQTRJSUC}         = 0;
+$Stats->{REFSQTRJBDC}         = 0;
+$Stats->{REFSQTRDHS}          = 0;
+$Stats->{REFSQTROTH}          = 0;
+$Stats->{REFSYTDJSUC}         = 0;
+$Stats->{REFSYTDJBDC}         = 0;
+$Stats->{REFSYTDDHS}          = 0;
+$Stats->{REFSYTDOTH}          = 0;
+$Stats->{HRSQTRJSUC}          = 0;
+$Stats->{HRSQTRJBDC}          = 0;
+$Stats->{HRSQTRDHS}           = 0;
+$Stats->{HRSQTROTH}           = 0;
+$Stats->{HRSYTDJSUC}          = 0;
+$Stats->{HRSYTDJBDC}          = 0;
+$Stats->{HRSYTDDHS}           = 0;
+$Stats->{HRSYTDOTH}           = 0;
+$Stats->{SURVEYCOUNTQTR}      = 0;
 $Stats->{SurveySessionsOKQTR} = 0;
-$Stats->{SurveyTrPlanQTR} = 0;
-$Stats->{SurveyRespectedQTR} = 0;
-$Stats->{SurveyHelpedQTR} = 0;
-$Stats->{SurveyRecommendQTR} = 0;
-$Stats->{SURVEYCOUNTYTD} = 0;
+$Stats->{SurveyTrPlanQTR}     = 0;
+$Stats->{SurveyRespectedQTR}  = 0;
+$Stats->{SurveyHelpedQTR}     = 0;
+$Stats->{SurveyRecommendQTR}  = 0;
+$Stats->{SURVEYCOUNTYTD}      = 0;
 $Stats->{SurveySessionsOKYTD} = 0;
-$Stats->{SurveyTrPlanYTD} = 0;
-$Stats->{SurveyRespectedYTD} = 0;
-$Stats->{SurveyHelpedYTD} = 0;
-$Stats->{SurveyRecommendYTD} = 0;
+$Stats->{SurveyTrPlanYTD}     = 0;
+$Stats->{SurveyRespectedYTD}  = 0;
+$Stats->{SurveyHelpedYTD}     = 0;
+$Stats->{SurveyRecommendYTD}  = 0;
 ##
 # This is our report range.
 ##
@@ -251,257 +269,315 @@ select distinct Treatment.ClientID, Client.clinicClinicID as ClinicID
     ${ClinicSelection}
   order by Client.LName, Client.FName
 |;
+
 #warn qq|qActive=$qActive|;
-$sActive= $dbh->prepare($qActive);
+$sActive = $dbh->prepare($qActive);
+
 #and Client.ClientID=5295
 $sActive->execute();
-my $headr = qq|${DT}\n${Title}\nReports Clients with notes in the system. Must have at least one note to be on this report.\n|;
-if ( $form->{InsID} )
-{
-  $headr .= qq|For Insurance $xInsurance->{$form->{InsID}}{Name}\n|;
+my $headr =
+qq|${DT}\n${Title}\nReports Clients with notes in the system. Must have at least one note to be on this report.\n|;
+if ( $form->{InsID} ) {
+    $headr .= qq|For Insurance $xInsurance->{$form->{InsID}}{Name}\n|;
 }
-if ( $form->{'ReferredBy1'} )
-{
-  my $rxNPI = DBA->selxref($form,'xNPI','NPI',$form->{'ReferredBy1'});
-  $headr .= qq|For Facility $rxNPI->{'ProvOrgName'}\n|;
-  $Stats->{'ReferredBy1'} = $rxNPI->{'ProvOrgName'};
+if ( $form->{'ReferredBy1'} ) {
+    my $rxNPI = DBA->selxref( $form, 'xNPI', 'NPI', $form->{'ReferredBy1'} );
+    $headr .= qq|For Facility $rxNPI->{'ProvOrgName'}\n|;
+    $Stats->{'ReferredBy1'} = $rxNPI->{'ProvOrgName'};
 }
-if ( $form->{Race} )
-{
-  $headr .= qq|For Race=$xRace->{$form->{Race}}{Descr}\n|;
+if ( $form->{Race} ) {
+    $headr .= qq|For Race=$xRace->{$form->{Race}}{Descr}\n|;
 }
-if ( $form->{Gend} )
-{
-  $headr .= qq|For Gender=$form->{Gend}\n|;
+if ( $form->{Gend} ) {
+    $headr .= qq|For Gender=$form->{Gend}\n|;
 }
-if ( $form->{MISAge} )
-{
-  if ( $form->{PDF} ) { null; }
-  elsif ( $form->{MISAge} eq 'CAT0' ) { $headr .= qq|For MISAge 'Unreported'\n|; }
-  elsif ( $form->{MISAge} eq 'CAT1' ) { $headr .= qq|For MISAge '0 to 3'\n|; }
-  elsif ( $form->{MISAge} eq 'CAT2' ) { $headr .= qq|For MISAge '4 to 7'\n|; }
-  elsif ( $form->{MISAge} eq 'CAT3' ) { $headr .= qq|For MISAge '8 to 11'\n|; }
-  elsif ( $form->{MISAge} eq 'CAT4' ) { $headr .= qq|For MISAge '12 to 15'\n|; }
-  elsif ( $form->{MISAge} eq 'CAT5' ) { $headr .= qq|For MISAge '16 to 19'\n|; }
-  elsif ( $form->{MISAge} eq 'CAT6' ) { $headr .= qq|For MISAge '20+'\n|; }
+if ( $form->{MISAge} ) {
+    if    ( $form->{PDF} ) { null; }
+    elsif ( $form->{MISAge} eq 'CAT0' ) {
+        $headr .= qq|For MISAge 'Unreported'\n|;
+    }
+    elsif ( $form->{MISAge} eq 'CAT1' ) { $headr .= qq|For MISAge '0 to 3'\n|; }
+    elsif ( $form->{MISAge} eq 'CAT2' ) { $headr .= qq|For MISAge '4 to 7'\n|; }
+    elsif ( $form->{MISAge} eq 'CAT3' ) {
+        $headr .= qq|For MISAge '8 to 11'\n|;
+    }
+    elsif ( $form->{MISAge} eq 'CAT4' ) {
+        $headr .= qq|For MISAge '12 to 15'\n|;
+    }
+    elsif ( $form->{MISAge} eq 'CAT5' ) {
+        $headr .= qq|For MISAge '16 to 19'\n|;
+    }
+    elsif ( $form->{MISAge} eq 'CAT6' ) { $headr .= qq|For MISAge '20+'\n|; }
 }
-if ( $form->{CARFAge} )
-{
-  if ( $form->{PDF} ) { null; }
-  elsif ( $form->{CARFAge} eq 'CAT0' ) { $headr .= qq|For CARFAge 'Unreported'\n|; }
-  elsif ( $form->{CARFAge} eq 'CAT1' ) { $headr .= qq|For CARFAge '0 to 5'\n|; }
-  elsif ( $form->{CARFAge} eq 'CAT2' ) { $headr .= qq|For CARFAge '6 to 17'\n|; }
-  elsif ( $form->{CARFAge} eq 'CAT3' ) { $headr .= qq|For CARFAge '18 to 40'\n|; }
-  elsif ( $form->{CARFAge} eq 'CAT4' ) { $headr .= qq|For CARFAge '41 to 65'\n|; }
-  elsif ( $form->{CARFAge} eq 'CAT5' ) { $headr .= qq|For CARFAge '65 to 85'\n|; }
-  elsif ( $form->{CARFAge} eq 'CAT6' ) { $headr .= qq|For CARFAge '85+'\n|; }
+if ( $form->{CARFAge} ) {
+    if    ( $form->{PDF} ) { null; }
+    elsif ( $form->{CARFAge} eq 'CAT0' ) {
+        $headr .= qq|For CARFAge 'Unreported'\n|;
+    }
+    elsif ( $form->{CARFAge} eq 'CAT1' ) {
+        $headr .= qq|For CARFAge '0 to 5'\n|;
+    }
+    elsif ( $form->{CARFAge} eq 'CAT2' ) {
+        $headr .= qq|For CARFAge '6 to 17'\n|;
+    }
+    elsif ( $form->{CARFAge} eq 'CAT3' ) {
+        $headr .= qq|For CARFAge '18 to 40'\n|;
+    }
+    elsif ( $form->{CARFAge} eq 'CAT4' ) {
+        $headr .= qq|For CARFAge '41 to 65'\n|;
+    }
+    elsif ( $form->{CARFAge} eq 'CAT5' ) {
+        $headr .= qq|For CARFAge '65 to 85'\n|;
+    }
+    elsif ( $form->{CARFAge} eq 'CAT6' ) { $headr .= qq|For CARFAge '85+'\n|; }
 }
 $headr .= qq|Reported from ${BegDate} through ${EndDate}\n|;
-while ($rActive = $sActive->fetchrow_hashref)
-{
+while ( $rActive = $sActive->fetchrow_hashref ) {
+
 #warn qq|Selected ClientID=$rActive->{ClientID}, Religion=$rActive->{'Religion'}\n|;
 #foreach my $f ( sort keys %{$rActive} ) { warn "rActive-$f=$rActive->{$f}\n"; }
-  $Age = '';
-  if ( $rActive->{DOB} ne '' ) { $Age = DBUtil->Date($rActive->{DOB}, 'age'); }
-  next unless main->addIN($form,$rActive);
+    $Age = '';
+    if ( $rActive->{DOB} ne '' ) {
+        $Age = DBUtil->Date( $rActive->{DOB}, 'age' );
+    }
+    next unless main->addIN( $form, $rActive );
 ##
-# These are YTD (because report runs YTDBeg)
-# Qtr are figured in getNotes.
+    # These are YTD (because report runs YTDBeg)
+    # Qtr are figured in getNotes.
 ##
-  $Stats->{COUNT}++;                                      # Number of Clients
-  $Stats->{MALE}++ if ( $rActive->{Gend} eq 'M' );        # Number of Males
-  $Stats->{FEMALE}++ if ( $rActive->{Gend} eq 'F' );      # Number of Females
+    $Stats->{COUNT}++;                                    # Number of Clients
+    $Stats->{MALE}++   if ( $rActive->{Gend} eq 'M' );    # Number of Males
+    $Stats->{FEMALE}++ if ( $rActive->{Gend} eq 'F' );    # Number of Females
 ##
-# CLINICNAME, Age used below in getNotes
+    # CLINICNAME, Age used below in getNotes
 ##
-  $CLINICNAME = $xClinics->{$rActive->{ClinicID}}{Name};
-  $Stats->{COUNTCLINIC}->{$CLINICNAME}++;  # Number by Clients by Clinics
-  $rActive->{Race} = 'N' if ( $rActive->{Race} eq '' );
-  $Stats->{RACE}->{$xRace->{$rActive->{Race}}{Descr}}++;                # Number by Races
-  my $ETHNICITY = 'None';
-  if ( $rActive->{Ethnicity} eq '' ) { $ETHNICITY = 'No Response'; }
-  else { $ETHNICITY = DBA->getxref($form,'xEthnicity',$rActive->{'Ethnicity'},'Descr'); }
-  $Stats->{ETHNICITY}->{$ETHNICITY}++;
-  my $LANGUAGE = 'None';
-  if ( $rActive->{PreLang} eq '' ) { $LANGUAGE = 'No Response'; }
-  else { $LANGUAGE = DBA->getxref($form,'xLanguages',$rActive->{'PreLang'},'English'); }
-  $Stats->{LANGUAGE}->{$LANGUAGE}++;
-  my $RELIGION = 'None';
-  if ( $rActive->{'Religion'} eq '' ) { $RELIGION = 'No Response'; }
-  elsif ( $rActive->{'Religion'} eq '0000' ) { $RELIGION = 'DECLINED TO SPECIFY'; }
-  else { $RELIGION = DBA->getxref($form,'xReligiousAffiliation',$rActive->{'Religion'},'Descr'); }
-#warn qq|RELIGION: ${RELIGION}\n|;
-  $Stats->{RELIGION}->{$RELIGION}++;
+    $CLINICNAME = $xClinics->{ $rActive->{ClinicID} }{Name};
+    $Stats->{COUNTCLINIC}->{$CLINICNAME}++;    # Number by Clients by Clinics
+    $rActive->{Race} = 'N' if ( $rActive->{Race} eq '' );
+    $Stats->{RACE}->{ $xRace->{ $rActive->{Race} }{Descr} }++; # Number by Races
+    my $ETHNICITY = 'None';
+    if ( $rActive->{Ethnicity} eq '' ) { $ETHNICITY = 'No Response'; }
+    else {
+        $ETHNICITY =
+          DBA->getxref( $form, 'xEthnicity', $rActive->{'Ethnicity'}, 'Descr' );
+    }
+    $Stats->{ETHNICITY}->{$ETHNICITY}++;
+    my $LANGUAGE = 'None';
+    if ( $rActive->{PreLang} eq '' ) { $LANGUAGE = 'No Response'; }
+    else {
+        $LANGUAGE =
+          DBA->getxref( $form, 'xLanguages', $rActive->{'PreLang'}, 'English' );
+    }
+    $Stats->{LANGUAGE}->{$LANGUAGE}++;
+    my $RELIGION = 'None';
+    if    ( $rActive->{'Religion'} eq '' ) { $RELIGION = 'No Response'; }
+    elsif ( $rActive->{'Religion'} eq '0000' ) {
+        $RELIGION = 'DECLINED TO SPECIFY';
+    }
+    else {
+        $RELIGION =
+          DBA->getxref( $form, 'xReligiousAffiliation', $rActive->{'Religion'},
+            'Descr' );
+    }
+
+    #warn qq|RELIGION: ${RELIGION}\n|;
+    $Stats->{RELIGION}->{$RELIGION}++;
+
 #foreach my $Religion ( sort keys %{$Stats->{RELIGION}} ) { warn qq|RELIGION LOOP: $Religion\n|; }
-  $rActive->{MarStat} = 'N' if ( $rActive->{MarStat} eq '' );
-  $Stats->{MARSTAT}->{$xMarStat->{$rActive->{MarStat}}{Descr}}++;       # Number by MarStat
-  $rActive->{EmplStat} = 'N' if ( $rActive->{EmplStat} eq '' );
-  $Stats->{EMPLSTAT}->{$xEmplStat->{$rActive->{EmplStat}}{Descr}}++;    # Number by EmplStat
-  $rActive->{EmplType} = 'N' if ( $rActive->{EmplType} eq '' );
-  $Stats->{EMPLTYPE}->{$xEmplType->{$rActive->{EmplType}}{Descr}}++;    # Number by EmplType
-  my $SS = 'None';
-  if ( $rActive->{SchoolStat} eq '' ) { $SS = 'No Response'; }
-  else { $SS = DBA->getxref($form,'xSchoolStat',$rActive->{'SchoolStat'},'Descr'); }
-  $Stats->{SCHOOLSTAT}->{$SS}++;                                        # Number by SchoolStat
-  if ( $rActive->{SchoolGrade} eq '' ) { $SG = 'No Response'; }
-  else { $SG = DBA->getxref($form,'xSchoolGrades',$rActive->{'SchoolGrade'},'Concept'); }
-  $Stats->{SCHOOLGRADE}->{$SG}++;                                       # Number by SchoolGrade
-  
-  if ( $Age eq '' ) { $Stats->{AGE}->{CAT0}++; }
-  elsif ( 0 <= $Age && $Age <= 3 ) { $Stats->{AGE}->{CAT1}++; }
-  elsif ( 4 <= $Age && $Age <= 7 ) { $Stats->{AGE}->{CAT2}++; }
-  elsif ( 8 <= $Age && $Age <= 11 ) { $Stats->{AGE}->{CAT3}++; }
-  elsif ( 12 <= $Age && $Age <= 15 ) { $Stats->{AGE}->{CAT4}++; }
-  elsif ( 16 <= $Age && $Age <= 19 ) { $Stats->{AGE}->{CAT5}++; }
-  else { $Stats->{AGE}->{CAT6}++; }
-
-  if ( $Age eq '' ) { $Stats->{CARFAGE}->{CAT0}++; }
-  elsif ( 0 <= $Age && $Age <= 5 ) { $Stats->{CARFAGE}->{CAT1}++; }
-  elsif ( 6 <= $Age && $Age <= 17 ) { $Stats->{CARFAGE}->{CAT2}++; }
-  elsif ( 18 <= $Age && $Age <= 40 ) { $Stats->{CARFAGE}->{CAT3}++; }
-  elsif ( 41 <= $Age && $Age <= 65 ) { $Stats->{CARFAGE}->{CAT4}++; }
-  elsif ( 65 <= $Age && $Age <= 85 ) { $Stats->{CARFAGE}->{CAT5}++; }
-  else { $Stats->{CARFAGE}->{CAT6}++; }
-
-  ##
-  # 1. GAF based on PDDiag Axis5Curr
-  ##
-  my ($PREVGAF, $CURRGAF) = main->getGAF($rActive->{ClientID});
-  if ( $PREVGAF eq '' || $CURRGAF eq '' )
-  { 
-    if ( $rActive->{'CustAgency'} eq 'JSUC' ) { $Stats->{Only1GAFJSUC}++; }
-    elsif ( $rActive->{'CustAgency'} eq 'JBDC' ) { $Stats->{Only1GAFJBDC}++; }
-    elsif ( $rActive->{'CustAgency'} eq 'DHS' ) { $Stats->{Only1GAFDHS}++; }
-    else { $Stats->{Only1GAFOTH}++; }
-  }
-  else
-  {
-    $Stats->{GAFCOUNT}++;
-    my $GAFDiff = $CURRGAF - $PREVGAF;
-    if ( $GAFDiff >= 2.0 )
-    {
-      $Stats->{GAFMORE}++;
-      $Stats->{$ClientID}->{GAFMORE}++;
-      if ( $rActive->{'CustAgency'} eq 'JSUC' ) { $Stats->{GAFMOREJSUC}++; }
-      elsif ( $rActive->{'CustAgency'} eq 'JBDC' ) { $Stats->{GAFMOREJBDC}++; }
-      elsif ( $rActive->{'CustAgency'} eq 'DHS' ) { $Stats->{GAFMOREDHS}++; }
-      else { $Stats->{GAFMOREOTH}++; }
+    $rActive->{MarStat} = 'N' if ( $rActive->{MarStat} eq '' );
+    $Stats->{MARSTAT}
+      ->{ $xMarStat->{ $rActive->{MarStat} }{Descr} }++;    # Number by MarStat
+    $rActive->{EmplStat} = 'N' if ( $rActive->{EmplStat} eq '' );
+    $Stats->{EMPLSTAT}
+      ->{ $xEmplStat->{ $rActive->{EmplStat} }{Descr} }++;  # Number by EmplStat
+    $rActive->{EmplType} = 'N' if ( $rActive->{EmplType} eq '' );
+    $Stats->{EMPLTYPE}
+      ->{ $xEmplType->{ $rActive->{EmplType} }{Descr} }++;  # Number by EmplType
+    my $SS = 'None';
+    if ( $rActive->{SchoolStat} eq '' ) { $SS = 'No Response'; }
+    else {
+        $SS = DBA->getxref( $form, 'xSchoolStat', $rActive->{'SchoolStat'},
+            'Descr' );
     }
-    else
-    {
-      $Stats->{GAFLESS}++;
-      $Stats->{$ClientID}->{GAFLESS}++;
-      if ( $rActive->{'CustAgency'} eq 'JSUC' ) { $Stats->{GAFLESSJSUC}++; }
-      elsif ( $rActive->{'CustAgency'} eq 'JBDC' ) { $Stats->{GAFLESSJBDC}++; }
-      elsif ( $rActive->{'CustAgency'} eq 'DHS' ) { $Stats->{GAFLESSDHS}++; }
-      else { $Stats->{GAFLESSOTH}++; }
+    $Stats->{SCHOOLSTAT}->{$SS}++;    # Number by SchoolStat
+    if ( $rActive->{SchoolGrade} eq '' ) { $SG = 'No Response'; }
+    else {
+        $SG = DBA->getxref( $form, 'xSchoolGrades', $rActive->{'SchoolGrade'},
+            'Concept' );
     }
-  }
+    $Stats->{SCHOOLGRADE}->{$SG}++;    # Number by SchoolGrade
 
-  if ( $SetProgress )
-  {
+    if    ( $Age eq '' )               { $Stats->{AGE}->{CAT0}++; }
+    elsif ( 0 <= $Age && $Age <= 3 )   { $Stats->{AGE}->{CAT1}++; }
+    elsif ( 4 <= $Age && $Age <= 7 )   { $Stats->{AGE}->{CAT2}++; }
+    elsif ( 8 <= $Age && $Age <= 11 )  { $Stats->{AGE}->{CAT3}++; }
+    elsif ( 12 <= $Age && $Age <= 15 ) { $Stats->{AGE}->{CAT4}++; }
+    elsif ( 16 <= $Age && $Age <= 19 ) { $Stats->{AGE}->{CAT5}++; }
+    else                               { $Stats->{AGE}->{CAT6}++; }
+
+    if    ( $Age eq '' )               { $Stats->{CARFAGE}->{CAT0}++; }
+    elsif ( 0 <= $Age && $Age <= 5 )   { $Stats->{CARFAGE}->{CAT1}++; }
+    elsif ( 6 <= $Age && $Age <= 17 )  { $Stats->{CARFAGE}->{CAT2}++; }
+    elsif ( 18 <= $Age && $Age <= 40 ) { $Stats->{CARFAGE}->{CAT3}++; }
+    elsif ( 41 <= $Age && $Age <= 65 ) { $Stats->{CARFAGE}->{CAT4}++; }
+    elsif ( 65 <= $Age && $Age <= 85 ) { $Stats->{CARFAGE}->{CAT5}++; }
+    else                               { $Stats->{CARFAGE}->{CAT6}++; }
+
     ##
-    # Progress based on first note to last note if 60 days +.
+    # 1. GAF based on PDDiag Axis5Curr
     ##
-    my ($PROG1, $PROG2) = main->getPROG($rActive->{ClientID});
-    if ( $PROG2 ne '' )
+    my ( $PREVGAF, $CURRGAF ) = main->getGAF( $rActive->{ClientID} );
+    if ( $PREVGAF eq '' || $CURRGAF eq '' ) {
+        if ( $rActive->{'CustAgency'} eq 'JSUC' ) { $Stats->{Only1GAFJSUC}++; }
+        elsif ( $rActive->{'CustAgency'} eq 'JBDC' ) {
+            $Stats->{Only1GAFJBDC}++;
+        }
+        elsif ( $rActive->{'CustAgency'} eq 'DHS' ) { $Stats->{Only1GAFDHS}++; }
+        else                                        { $Stats->{Only1GAFOTH}++; }
+    }
+    else {
+        $Stats->{GAFCOUNT}++;
+        my $GAFDiff = $CURRGAF - $PREVGAF;
+        if ( $GAFDiff >= 2.0 ) {
+            $Stats->{GAFMORE}++;
+            $Stats->{$ClientID}->{GAFMORE}++;
+            if ( $rActive->{'CustAgency'} eq 'JSUC' ) {
+                $Stats->{GAFMOREJSUC}++;
+            }
+            elsif ( $rActive->{'CustAgency'} eq 'JBDC' ) {
+                $Stats->{GAFMOREJBDC}++;
+            }
+            elsif ( $rActive->{'CustAgency'} eq 'DHS' ) {
+                $Stats->{GAFMOREDHS}++;
+            }
+            else { $Stats->{GAFMOREOTH}++; }
+        }
+        else {
+            $Stats->{GAFLESS}++;
+            $Stats->{$ClientID}->{GAFLESS}++;
+            if ( $rActive->{'CustAgency'} eq 'JSUC' ) {
+                $Stats->{GAFLESSJSUC}++;
+            }
+            elsif ( $rActive->{'CustAgency'} eq 'JBDC' ) {
+                $Stats->{GAFLESSJBDC}++;
+            }
+            elsif ( $rActive->{'CustAgency'} eq 'DHS' ) {
+                $Stats->{GAFLESSDHS}++;
+            }
+            else { $Stats->{GAFLESSOTH}++; }
+        }
+    }
+
+    if ($SetProgress) {
+        ##
+        # Progress based on first note to last note if 60 days +.
+        ##
+        my ( $PROG1, $PROG2 ) = main->getPROG( $rActive->{ClientID} );
+        if ( $PROG2 ne '' ) {
+            if    ( $PROG2 == -3 ) { $Stats->{PROG}->{PROGM3}++; }
+            elsif ( $PROG2 == -2 ) { $Stats->{PROG}->{PROGM2}++; }
+            elsif ( $PROG2 == -1 ) { $Stats->{PROG}->{PROGM1}++; }
+            elsif ( $PROG2 == 0 )  { $Stats->{PROG}->{PROG0}++; }
+            elsif ( $PROG2 == 1 )  { $Stats->{PROG}->{PROG1}++; }
+            elsif ( $PROG2 == 2 )  { $Stats->{PROG}->{PROG2}++; }
+            elsif ( $PROG2 == 3 )  { $Stats->{PROG}->{PROG3}++; }
+            $Stats->{PROGCOUNT}++;
+        }
+    }
+##
+    # Intake Date for New Referrals.
+    # 2. Service Request based on RefDate within QTR and within 5 days.
+    # 3. New Referrals based on RefDate within QTR or YEAR.
+    # 4. Direct Hours per QTR or YEAR based on note contact time totals.
+##
+    my @ClientInsIDs = ();
+    $sClientInsurance->execute( $rActive->{ClientID} );
+    while ( my ($Ins) = $sClientInsurance->fetchrow_array ) {
+        push( @ClientInsIDs, $Ins );
+    }
+    my $PrimaryInsID = @ClientInsIDs[0];
+    my ( $FXDOS, $FDOS, $LDOS ) =
+      main->getNotes( $rActive->{ClientID}, $PrimaryInsID );
+    $Stats->{INS}
+      ->{ $xInsurance->{ ${PrimaryInsID} }{Name} }++;    # Number by Insurances
+    my ( $REFQTR, $REFYTD ) = ( 0, 0 );
+    my ( $NEWREQQTR, $REFMORE, $REFLESS, $REFXLESS, $REFXLESS ) =
+      ( 0, 0, 0, 0, 0 );
+    if (   $BegDate le $rActive->{'RefDate'}
+        && $rActive->{'RefDate'} le $EndDate )
     {
-      if ( $PROG2 == -3 ) { $Stats->{PROG}->{PROGM3}++; }
-      elsif ( $PROG2 == -2 ) { $Stats->{PROG}->{PROGM2}++; }
-      elsif ( $PROG2 == -1 ) { $Stats->{PROG}->{PROGM1}++; }
-      elsif ( $PROG2 == 0 ) { $Stats->{PROG}->{PROG0}++; }
-      elsif ( $PROG2 == 1 ) { $Stats->{PROG}->{PROG1}++; }
-      elsif ( $PROG2 == 2 ) { $Stats->{PROG}->{PROG2}++; }
-      elsif ( $PROG2 == 3 ) { $Stats->{PROG}->{PROG3}++; }
-      $Stats->{PROGCOUNT}++;
+        $REFQTR = 1;
+        if ($FDOS) {
+            my $REFDIFF = DBUtil->Date( $FDOS, 'diff', $rActive->{'RefDate'} );
+            if   ( $REFDIFF > 15 ) { $REFMORE = 1; }
+            else                   { $REFLESS = 1; }
+        }
+        else { $NEWREQQTR = 1; }
+        if ($FXDOS) {
+            my $REFDIFF = DBUtil->Date( $FXDOS, 'diff', $rActive->{'RefDate'} );
+            if   ( $REFDIFF > 5 ) { $REFXMORE = 1; }
+            else                  { $REFXLESS = 1; }
+        }
     }
-  }
-##
-# Intake Date for New Referrals.
-# 2. Service Request based on RefDate within QTR and within 5 days.
-# 3. New Referrals based on RefDate within QTR or YEAR.
-# 4. Direct Hours per QTR or YEAR based on note contact time totals.
-##
-  my @ClientInsIDs = ();
-  $sClientInsurance->execute($rActive->{ClientID});
-  while ( my ($Ins) = $sClientInsurance->fetchrow_array ) { push(@ClientInsIDs,$Ins); }
-  my $PrimaryInsID = @ClientInsIDs[0];
-  my ($FXDOS, $FDOS, $LDOS) = main->getNotes($rActive->{ClientID},$PrimaryInsID);
-  $Stats->{INS}->{$xInsurance->{${PrimaryInsID}}{Name}}++;              # Number by Insurances
-  my ($REFQTR, $REFYTD) = (0,0);
-  my ($NEWREQQTR, $REFMORE, $REFLESS, $REFXLESS, $REFXLESS) = (0,0,0,0,0);
-  if ( $BegDate le $rActive->{'RefDate'} && $rActive->{'RefDate'} le $EndDate )
-  {
-    $REFQTR = 1;
-    if ( $FDOS )
-    { 
-      my $REFDIFF = DBUtil->Date($FDOS,'diff',$rActive->{'RefDate'});
-      if ( $REFDIFF > 15 ) { $REFMORE = 1; } else { $REFLESS = 1; }
+    if ( $YTDBeg le $rActive->{'RefDate'} && $rActive->{'RefDate'} le $EndDate )
+    {
+        $REFYTD = 1;
     }
-    else { $NEWREQQTR = 1; }
-    if ( $FXDOS )
-    { 
-      my $REFDIFF = DBUtil->Date($FXDOS,'diff',$rActive->{'RefDate'});
-      if ( $REFDIFF > 5 ) { $REFXMORE = 1; } else { $REFXLESS = 1; }
-    }
-  }
-  if ( $YTDBeg le $rActive->{'RefDate'} && $rActive->{'RefDate'} le $EndDate )
-  { $REFYTD = 1; }
-  $Stats->{REFSQTR} += $REFQTR;
-  $Stats->{REFSYTD} += $REFYTD;
+    $Stats->{REFSQTR} += $REFQTR;
+    $Stats->{REFSYTD} += $REFYTD;
+
 #print qq|$rActive->{ClinicID}, $rActive->{ClientID}, $rActive->{LName}, $rActive->{FName}, $rActive->{'RefDate'}, $REFQTR, $REFYTD, ${CLINICNAME}\n|;
-  $Stats->{REFSQTRCLINIC}->{$CLINICNAME} += $REFQTR;
-  $Stats->{REFSYTDCLINIC}->{$CLINICNAME} += $REFYTD;
-#  $sClientInsurance->execute($rActive->{ClientID});
-#  while ( $rClientInsurance = $sClientInsurance->fetchrow_hashref )
-  foreach my $InsID ( @ClientInsIDs )
-  {
-#print qq|$rActive->{ClientID}, $rClientInsurance->{InsID}\n|;
-    $Stats->{REFSQTRINS}->{$xInsurance->{${InsID}}{Name}} += $REFQTR;
-    $Stats->{REFSYTDINS}->{$xInsurance->{${InsID}}{Name}} += $REFYTD;
-  }
-  my $rxNPI = DBA->selxref($form,'xNPI','NPI',$rActive->{'ReferredBy1NPI'});
-  if ( $rxNPI->{'ProvOrgName'} eq '' ) { $RA = 'None'; }
-  else                                 { $RA = $rxNPI->{ProvOrgName}; }
-  $Stats->{REFSQTRREF}->{$RA} += $REFQTR;
-  $Stats->{REFSYTDREF}->{$RA} += $REFYTD;
+    $Stats->{REFSQTRCLINIC}->{$CLINICNAME} += $REFQTR;
+    $Stats->{REFSYTDCLINIC}->{$CLINICNAME} += $REFYTD;
 
-  $Stats->{REFMORE} += $REFMORE;
-  $Stats->{REFLESS} += $REFLESS;
-  $Stats->{NEWREQQTR} += $NEWREQQTR;
-  if ( $rActive->{'CustAgency'} eq 'JSUC' ) 
-  {
-    $Stats->{REFSQTRJSUC} += $REFQTR;
-    $Stats->{REFSYTDJSUC} += $REFYTD;
-    $Stats->{REFMOREJSUC} += $REFXMORE;
-    $Stats->{REFLESSJSUC} += $REFXLESS;
-    $Stats->{NEWREQSQTRJSUC} += $NEWREQQTR;
-  }
-  elsif ( $rActive->{'CustAgency'} eq 'JBDC' ) 
-  {
-    $Stats->{REFSQTRJBDC} += $REFQTR;
-    $Stats->{REFSYTDJBDC} += $REFYTD;
-    $Stats->{REFMOREJBDC} += $REFXMORE;
-    $Stats->{REFLESSJBDC} += $REFXLESS;
-    $Stats->{NEWREQSQTRJBDC} += $NEWREQQTR;
-  }
-  elsif ( $rActive->{'CustAgency'} eq 'DHS' ) 
-  {
-    $Stats->{REFSQTRDHS} += $REFQTR;
-    $Stats->{REFSYTDDHS} += $REFYTD;
-    $Stats->{REFMOREDHS} += $REFXMORE;
-    $Stats->{REFLESSDHS} += $REFXLESS;
-    $Stats->{NEWREQSQTRDHS} += $NEWREQQTR;
-  }
-  else
-  {
-    $Stats->{REFSQTROTH} += $REFQTR;
-    $Stats->{REFSYTDOTH} += $REFYTD;
-    $Stats->{REFMOREOTH} += $REFXMORE;
-    $Stats->{REFLESSOTH} += $REFXLESS;
-    $Stats->{NEWREQSQTROTH} += $NEWREQQTR;
-  }
-#warn "$BegDate\t$rActive->{'RefDate'}\t$EndDate\t$REFQTR\t$REFYTD\n";
+    #  $sClientInsurance->execute($rActive->{ClientID});
+    #  while ( $rClientInsurance = $sClientInsurance->fetchrow_hashref )
+    foreach my $InsID (@ClientInsIDs) {
+
+        #print qq|$rActive->{ClientID}, $rClientInsurance->{InsID}\n|;
+        $Stats->{REFSQTRINS}->{ $xInsurance->{ ${InsID} }{Name} } += $REFQTR;
+        $Stats->{REFSYTDINS}->{ $xInsurance->{ ${InsID} }{Name} } += $REFYTD;
+    }
+    my $rxNPI =
+      DBA->selxref( $form, 'xNPI', 'NPI', $rActive->{'ReferredBy1NPI'} );
+    if   ( $rxNPI->{'ProvOrgName'} eq '' ) { $RA = 'None'; }
+    else                                   { $RA = $rxNPI->{ProvOrgName}; }
+    $Stats->{REFSQTRREF}->{$RA} += $REFQTR;
+    $Stats->{REFSYTDREF}->{$RA} += $REFYTD;
+
+    $Stats->{REFMORE}   += $REFMORE;
+    $Stats->{REFLESS}   += $REFLESS;
+    $Stats->{NEWREQQTR} += $NEWREQQTR;
+    if ( $rActive->{'CustAgency'} eq 'JSUC' ) {
+        $Stats->{REFSQTRJSUC}    += $REFQTR;
+        $Stats->{REFSYTDJSUC}    += $REFYTD;
+        $Stats->{REFMOREJSUC}    += $REFXMORE;
+        $Stats->{REFLESSJSUC}    += $REFXLESS;
+        $Stats->{NEWREQSQTRJSUC} += $NEWREQQTR;
+    }
+    elsif ( $rActive->{'CustAgency'} eq 'JBDC' ) {
+        $Stats->{REFSQTRJBDC}    += $REFQTR;
+        $Stats->{REFSYTDJBDC}    += $REFYTD;
+        $Stats->{REFMOREJBDC}    += $REFXMORE;
+        $Stats->{REFLESSJBDC}    += $REFXLESS;
+        $Stats->{NEWREQSQTRJBDC} += $NEWREQQTR;
+    }
+    elsif ( $rActive->{'CustAgency'} eq 'DHS' ) {
+        $Stats->{REFSQTRDHS}    += $REFQTR;
+        $Stats->{REFSYTDDHS}    += $REFYTD;
+        $Stats->{REFMOREDHS}    += $REFXMORE;
+        $Stats->{REFLESSDHS}    += $REFXLESS;
+        $Stats->{NEWREQSQTRDHS} += $NEWREQQTR;
+    }
+    else {
+        $Stats->{REFSQTROTH}    += $REFQTR;
+        $Stats->{REFSYTDOTH}    += $REFYTD;
+        $Stats->{REFMOREOTH}    += $REFXMORE;
+        $Stats->{REFLESSOTH}    += $REFXLESS;
+        $Stats->{NEWREQSQTROTH} += $NEWREQQTR;
+    }
+
+    #warn "$BegDate\t$rActive->{'RefDate'}\t$EndDate\t$REFQTR\t$REFYTD\n";
 }
 main->getSurveys();
 
@@ -513,886 +589,1051 @@ $sProgNotes->finish();
 $sPDDiag->finish();
 $sSurveys->finish();
 
-if ( $form->{output} eq 'fdf' ) { main->prtpdf($headr); }
-elsif ( $form->{BHO} ) { main->prtbho($headr); }
-else { main->prtstats($headr); }
+if    ( $form->{output} eq 'fdf' ) { main->prtpdf($headr); }
+elsif ( $form->{BHO} )             { main->prtbho($headr); }
+else                               { main->prtstats($headr); }
 
 $sAgency->finish();
 myDBI->cleanup();
 exit;
 #######################################################
-sub addIN
-{
-  my ($self,$form,$r) = @_;
-  
-  my $rtncode = 1;
-  if ( $form->{InsID} )
-  {
-    $sInsurance->execute($form->{InsID},$r->{ClientID});
-    unless ($rInsurance = $sInsurance->fetchrow_hashref) { return(0); }
-  }
-  if ( $form->{'ReferredBy1'} )
-  {
-    unless ( $form->{'ReferredBy1'} eq $r->{'ReferredBy1NPI'} ) { return(0); }
-  }
-  if ( $form->{Race} )
-  {
-    unless ( $form->{Race} eq $r->{Race} ) { return(0); }
-  }
-  if ( $form->{Gend} )
-  {
-    unless ( $form->{Gend} eq $r->{Gend} ) { return(0); }
-  }
-  if ( $form->{MISAge} )
-  {
-    if ( $Age eq '' && $form->{MISAge} eq 'CAT0' ) { return(1); }
-    elsif ( 0 <= $Age && $Age <= 3 && $form->{MISAge} eq 'CAT1' ) { return(1); }
-    elsif ( 4 <= $Age && $Age <= 7 && $form->{MISAge} eq 'CAT2' ) { return(1); }
-    elsif ( 8 <= $Age && $Age <= 11 && $form->{MISAge} eq 'CAT3' ) { return(1); }
-    elsif ( 12 <= $Age && $Age <= 15 && $form->{MISAge} eq 'CAT4' ) { return(1); }
-    elsif ( 16 <= $Age && $Age <= 19 && $form->{MISAge} eq 'CAT5' ) { return(1); }
-    elsif ( $form->{MISAge} eq 'CAT6' ) { return(1); }
-    return(0);
-  }
-  if ( $form->{CARFAge} )
-  {
-    if ( $Age eq '' && $form->{CARFAge} eq 'CAT0' ) { return(1); }
-    elsif ( 0 <= $Age && $Age <= 5 && $form->{CARFAge} eq 'CAT1' ) { return(1); }
-    elsif ( 6 <= $Age && $Age <= 17 && $form->{CARFAge} eq 'CAT2' ) { return(1); }
-    elsif ( 18 <= $Age && $Age <= 40 && $form->{CARFAge} eq 'CAT3' ) { return(1); }
-    elsif ( 41 <= $Age && $Age <= 65 && $form->{CARFAge} eq 'CAT4' ) { return(1); }
-    elsif ( 65 <= $Age && $Age <= 85 && $form->{CARFAge} eq 'CAT5' ) { return(1); }
-    elsif ( $form->{CARFAge} eq 'CAT6' ) { return(1); }
-    return(0);
-  }
-  return($rtncode);
+sub addIN {
+    my ( $self, $form, $r ) = @_;
+
+    my $rtncode = 1;
+    if ( $form->{InsID} ) {
+        $sInsurance->execute( $form->{InsID}, $r->{ClientID} );
+        unless ( $rInsurance = $sInsurance->fetchrow_hashref ) { return (0); }
+    }
+    if ( $form->{'ReferredBy1'} ) {
+        unless ( $form->{'ReferredBy1'} eq $r->{'ReferredBy1NPI'} ) {
+            return (0);
+        }
+    }
+    if ( $form->{Race} ) {
+        unless ( $form->{Race} eq $r->{Race} ) { return (0); }
+    }
+    if ( $form->{Gend} ) {
+        unless ( $form->{Gend} eq $r->{Gend} ) { return (0); }
+    }
+    if ( $form->{MISAge} ) {
+        if    ( $Age eq '' && $form->{MISAge} eq 'CAT0' ) { return (1); }
+        elsif ( 0 <= $Age && $Age <= 3 && $form->{MISAge} eq 'CAT1' ) {
+            return (1);
+        }
+        elsif ( 4 <= $Age && $Age <= 7 && $form->{MISAge} eq 'CAT2' ) {
+            return (1);
+        }
+        elsif ( 8 <= $Age && $Age <= 11 && $form->{MISAge} eq 'CAT3' ) {
+            return (1);
+        }
+        elsif ( 12 <= $Age && $Age <= 15 && $form->{MISAge} eq 'CAT4' ) {
+            return (1);
+        }
+        elsif ( 16 <= $Age && $Age <= 19 && $form->{MISAge} eq 'CAT5' ) {
+            return (1);
+        }
+        elsif ( $form->{MISAge} eq 'CAT6' ) { return (1); }
+        return (0);
+    }
+    if ( $form->{CARFAge} ) {
+        if    ( $Age eq '' && $form->{CARFAge} eq 'CAT0' ) { return (1); }
+        elsif ( 0 <= $Age && $Age <= 5 && $form->{CARFAge} eq 'CAT1' ) {
+            return (1);
+        }
+        elsif ( 6 <= $Age && $Age <= 17 && $form->{CARFAge} eq 'CAT2' ) {
+            return (1);
+        }
+        elsif ( 18 <= $Age && $Age <= 40 && $form->{CARFAge} eq 'CAT3' ) {
+            return (1);
+        }
+        elsif ( 41 <= $Age && $Age <= 65 && $form->{CARFAge} eq 'CAT4' ) {
+            return (1);
+        }
+        elsif ( 65 <= $Age && $Age <= 85 && $form->{CARFAge} eq 'CAT5' ) {
+            return (1);
+        }
+        elsif ( $form->{CARFAge} eq 'CAT6' ) { return (1); }
+        return (0);
+    }
+    return ($rtncode);
 }
 ##
 # Axis5 for prev period and this period
 ##
-sub getGAF
-{
-  my ($self,$ClientID) = @_;
-  my ($pGAF,$cGAF) = ('','');
-# ordered most current to oldest, 
-#  quit when before BegDate, we want last one before period
-  $sPDDiag->execute($ClientID);
-  while ( my $rPDDiag = $sPDDiag->fetchrow_hashref )
-  {
-    if ( $rPDDiag->{'EffDate'} lt ${BegDate} )
-    { $pGAF = $rPDDiag->{'Axis5Curr'}; last; }
-    else
-    {
-      unless ( $rPDDiag->{'Axis3ACode'} eq '' )
-      { $Stats->{'AXIS3'}->{$rPDDiag->{'Axis3ACode'}}++; }
-      unless ( $rPDDiag->{'Axis3BCode'} eq '' )
-      { $Stats->{'AXIS3'}->{$rPDDiag->{'Axis3BCode'}}++; }
-      unless ( $rPDDiag->{'Axis3CCode'} eq '' )
-      { $Stats->{'AXIS3'}->{$rPDDiag->{'Axis3CCode'}}++; }
-      unless ( $rPDDiag->{'Axis3DCode'} eq '' )
-      { $Stats->{'AXIS3'}->{$rPDDiag->{'Axis3DCode'}}++; }
-      $cGAF = $rPDDiag->{'Axis5Curr'};
-    }
-    my $Pri1 = $rPDDiag->{'Axis1ACode'};
-    my $Pri2 = $rPDDiag->{'Axis1BCode'};
-    my $Sec1 = $rPDDiag->{'Axis2ACode'};
+sub getGAF {
+    my ( $self, $ClientID ) = @_;
+    my ( $pGAF, $cGAF )     = ( '', '' );
+
+    # ordered most current to oldest,
+    #  quit when before BegDate, we want last one before period
+    $sPDDiag->execute($ClientID);
+    while ( my $rPDDiag = $sPDDiag->fetchrow_hashref ) {
+        if ( $rPDDiag->{'EffDate'} lt ${BegDate} ) {
+            $pGAF = $rPDDiag->{'Axis5Curr'};
+            last;
+        }
+        else {
+            unless ( $rPDDiag->{'Axis3ACode'} eq '' ) {
+                $Stats->{'AXIS3'}->{ $rPDDiag->{'Axis3ACode'} }++;
+            }
+            unless ( $rPDDiag->{'Axis3BCode'} eq '' ) {
+                $Stats->{'AXIS3'}->{ $rPDDiag->{'Axis3BCode'} }++;
+            }
+            unless ( $rPDDiag->{'Axis3CCode'} eq '' ) {
+                $Stats->{'AXIS3'}->{ $rPDDiag->{'Axis3CCode'} }++;
+            }
+            unless ( $rPDDiag->{'Axis3DCode'} eq '' ) {
+                $Stats->{'AXIS3'}->{ $rPDDiag->{'Axis3DCode'} }++;
+            }
+            $cGAF = $rPDDiag->{'Axis5Curr'};
+        }
+        my $Pri1 = $rPDDiag->{'Axis1ACode'};
+        my $Pri2 = $rPDDiag->{'Axis1BCode'};
+        my $Sec1 = $rPDDiag->{'Axis2ACode'};
+
 #warn qq|$Pri1,$rPDDiag->{Axis1ACode}, $Pri2,$rPDDiag->{Axis1BCode}, $Sec1,$rPDDiag->{Axis2ACode}\n|;
-    $Stats->{'AXIS1A'}->{$Pri1}++;
-    $Stats->{'AXIS1B'}->{$Pri2}++;
-    $Stats->{'AXIS2A'}->{$Sec1}++;
+        $Stats->{'AXIS1A'}->{$Pri1}++;
+        $Stats->{'AXIS1B'}->{$Pri2}++;
+        $Stats->{'AXIS2A'}->{$Sec1}++;
+
 #warn qq|$Stats->{'AXIS1A'}->{'293'}, $Stats->{'AXIS1A'}->{$Pri1}, $Stats->{'AXIS1B'}->{$Pri2}, $Stats->{'AXIS2A'}->{$Sec1}\n|;
-  }
-#print qq|getGAF: ClientID=$ClientID, pGAF=$pGAF, cGAF=$cGAF\n|;
-  return($pGAF,$cGAF);
+    }
+
+    #print qq|getGAF: ClientID=$ClientID, pGAF=$pGAF, cGAF=$cGAF\n|;
+    return ( $pGAF, $cGAF );
 }
 ##
 # Progress for period, First and last one.
 # must be at least 60 days apart to count.
 # only count the last one.
 ##
-sub getPROG
-{
-  my ($self,$ClientID) = @_;
-  my ($oPROG,$oDate) = ('','');
-  my ($cPROG,$cDate) = ('','');
-  my ($perClient,$progCount) = (0,0);
-  $sProgNotes->execute($ClientID);
-  while ( my $rProgNotes = $sProgNotes->fetchrow_hashref )
-  {
-    $progCount++;
-    $perClient += $rProgNotes->{Progress};
+sub getPROG {
+    my ( $self, $ClientID ) = @_;
+    my ( $oPROG,     $oDate )     = ( '', '' );
+    my ( $cPROG,     $cDate )     = ( '', '' );
+    my ( $perClient, $progCount ) = ( 0,  0 );
+    $sProgNotes->execute($ClientID);
+    while ( my $rProgNotes = $sProgNotes->fetchrow_hashref ) {
+        $progCount++;
+        $perClient += $rProgNotes->{Progress};
+
 #warn qq|getPROG: ClientID=$ClientID, perClient=$perClient, progCount=$progCount\n|;
-    if ( $oPROG eq '' ) 
-    { 
-      $oPROG = $rProgNotes->{Progress};
-      $oDate = $rProgNotes->{ContLogDate};
-    }
-    else
-    {
-      my $days = DBUtil->Date($rProgNotes->{ContLogDate},'diff',$oDate);
-      if ( $days >= 60 ) { $cPROG = $rProgNotes->{Progress}; }
+        if ( $oPROG eq '' ) {
+            $oPROG = $rProgNotes->{Progress};
+            $oDate = $rProgNotes->{ContLogDate};
+        }
+        else {
+            my $days =
+              DBUtil->Date( $rProgNotes->{ContLogDate}, 'diff', $oDate );
+            if ( $days >= 60 ) { $cPROG = $rProgNotes->{Progress}; }
+
 #warn qq|ClientID=$ClientID, $oDate, $rProgNotes->{ContLogDate}, days=$days, cPROG=$cPROG\n|;
+        }
     }
-  }
-  if ( $progCount > 0 ) 
-  { 
-    $Stats->{AVGPROGRESS}->{$ClientID} = ($perClient / $progCount);
-    $Stats->{PROGRESSCOUNT}++;
-    $Stats->{AVGPROGRESSQTR} += ($perClient / $progCount);
-  }
-  return($oPROG,$cPROG);
+    if ( $progCount > 0 ) {
+        $Stats->{AVGPROGRESS}->{$ClientID} = ( $perClient / $progCount );
+        $Stats->{PROGRESSCOUNT}++;
+        $Stats->{AVGPROGRESSQTR} += ( $perClient / $progCount );
+    }
+    return ( $oPROG, $cPROG );
 }
 ##
 # Notes for YTD and period
 ##
-sub getNotes
-{
-  my ($self,$ClientID,$PrimaryInsID) = @_;
-#print qq|$ClientID\n|;
-  my ($flagQtr,$flagYtd) = (0,0);
-  my ($FXDOS,$FDOS,$LDOS) = ('','','');
-  $sNotes->execute($ClientID);
-  while ( $rNotes = $sNotes->fetchrow_hashref )
-  {
-#    my ($code,$msg,$rxSC) = cBill->ChkSC($form,$rNotes);
-    $rxSC = cBill->getServiceCode($form,$rNotes->{SCID},$rNotes->{ContLogDate},$rNotes->{ContLogBegTime},$rNotes->{ContLogEndTime},$rNotes->{TrID},$rNotes->{BillDate});
-    $Stats->{NOTECOUNT}++;
-    $Stats->{GRPSIZE}++ if ( $rNotes->{GrpSize} > 0 );
-#    if ( $code ) 
+sub getNotes {
+    my ( $self, $ClientID, $PrimaryInsID ) = @_;
+
+    #print qq|$ClientID\n|;
+    my ( $flagQtr, $flagYtd ) = ( 0, 0 );
+    my ( $FXDOS, $FDOS, $LDOS ) = ( '', '', '' );
+    $sNotes->execute($ClientID);
+    while ( $rNotes = $sNotes->fetchrow_hashref ) {
+
+        #    my ($code,$msg,$rxSC) = cBill->ChkSC($form,$rNotes);
+        $rxSC = cBill->getServiceCode(
+            $form,                     $rNotes->{SCID},
+            $rNotes->{ContLogDate},    $rNotes->{ContLogBegTime},
+            $rNotes->{ContLogEndTime}, $rNotes->{TrID},
+            $rNotes->{BillDate}
+        );
+        $Stats->{NOTECOUNT}++;
+        $Stats->{GRPSIZE}++ if ( $rNotes->{GrpSize} > 0 );
+
+#    if ( $code )
 #    { warn "WARNING: Note '$rNotes->{TrID}' has NO SC RATES! $rxSC->{SCNum}, $rNotes->{ContLogDate} ($rNotes->{SCID})\n"; }
-    if ( $BegDate le $rNotes->{ContLogDate} && $rNotes->{ContLogDate} le $EndDate )
-    { 
-      $flagQtr = 1;
-      $Stats->{NOTECOUNTQTR}++;
-      if ( $rxSC->{SCNum} eq 'XNOSHOW' ) { $Stats->{NOSHOWSQTR}++; }
-      if ( $FDOS eq '' ) { $FDOS = $rNotes->{ContLogDate}; }
-      $LDOS = $rNotes->{ContLogDate};
-      if ( $FXDOS eq '' )
-      { if ( $rxSC->{SCNum} eq 'XPHONE' ) { $FXDOS = $rNotes->{ContLogDate}; } }
-      my $hrsqtr = $rxSC->{Duration} / 3600;
-      if ( $rxSC->{InsDescr} eq 'grids' ) { $Stats->{INDQTR} += $hrsqtr; }
-    }
-    if ( $YTDBeg le $rNotes->{ContLogDate} && $rNotes->{ContLogDate} le $EndDate )
-    {
-      $flagYtd = 1;
-      my $hrsytd = $rxSC->{Duration} / 3600;
-      if ( $rxSC->{InsDescr} eq 'grids' ) { $Stats->{INDYTD} += $hrsytd; }
-    }
+        if (   $BegDate le $rNotes->{ContLogDate}
+            && $rNotes->{ContLogDate} le $EndDate )
+        {
+            $flagQtr = 1;
+            $Stats->{NOTECOUNTQTR}++;
+            if ( $rxSC->{SCNum} eq 'XNOSHOW' ) { $Stats->{NOSHOWSQTR}++; }
+            if ( $FDOS eq '' ) { $FDOS = $rNotes->{ContLogDate}; }
+            $LDOS = $rNotes->{ContLogDate};
+            if ( $FXDOS eq '' ) {
+                if ( $rxSC->{SCNum} eq 'XPHONE' ) {
+                    $FXDOS = $rNotes->{ContLogDate};
+                }
+            }
+            my $hrsqtr = $rxSC->{Duration} / 3600;
+            if ( $rxSC->{InsDescr} eq 'grids' ) { $Stats->{INDQTR} += $hrsqtr; }
+        }
+        if (   $YTDBeg le $rNotes->{ContLogDate}
+            && $rNotes->{ContLogDate} le $EndDate )
+        {
+            $flagYtd = 1;
+            my $hrsytd = $rxSC->{Duration} / 3600;
+            if ( $rxSC->{InsDescr} eq 'grids' ) { $Stats->{INDYTD} += $hrsytd; }
+        }
 
-#print qq|$rxSC->{UnitLbl}\n|;
-    if ( $rxSC->{SCNum} eq 'XNOSHOW' ) { $Stats->{NOSHOWS}++; }
-    next if ( $rxSC->{UnitLbl} eq 'NonBill' );     # Check for non-billable.
+        #print qq|$rxSC->{UnitLbl}\n|;
+        if ( $rxSC->{SCNum} eq 'XNOSHOW' ) { $Stats->{NOSHOWS}++; }
+        next if ( $rxSC->{UnitLbl} eq 'NonBill' );    # Check for non-billable.
 
-    # only if NOT NonBill
+        # only if NOT NonBill
 
-    if ( $BegDate le $rNotes->{ContLogDate} && $rNotes->{ContLogDate} le $EndDate )
-    {
-      my $hrsqtr = $rxSC->{Duration} / 3600;
-      $Stats->{HRSQTR} += $hrsqtr;
-      $Stats->{HRSQTRINS}->{$xInsurance->{$rxSC->{InsID}}{Name}} += $hrsqtr;
-      $Stats->{HRSQTRSC}->{$xSC->{$rxSC->{SCID}}{SCName}} += $hrsqtr;
-      if ( $rActive->{'CustAgency'} eq 'JSUC' ) { $Stats->{HRSQTRJSUC} += $hrsqtr; }
-      elsif ( $rActive->{'CustAgency'} eq 'JBDC' ) { $Stats->{HRSQTRJBDC} += $hrsqtr; }
-      elsif ( $rActive->{'CustAgency'} eq 'DHS' ) { $Stats->{HRSQTRDHS} += $hrsqtr; }
-      else { $Stats->{HRSQTROTH} += $hrsqtr; }
-      $Stats->{NOTECOUNTQTRINS}->{$xInsurance->{$rxSC->{InsID}}{Name}}++;
-      $Stats->{NOTECOUNTQTRSC}->{$xSC->{$rxSC->{SCID}}{SCName}}++;
-      $Stats->{GRPSIZEQTRINS}->{$xInsurance->{$rxSC->{InsID}}{Name}}++ if ( $rNotes->{GrpSize} > 0 );
-      $Stats->{GRPSIZEQTRSC}->{$xSC->{$rxSC->{SCID}}{SCName}}++ if ( $rNotes->{GrpSize} > 0 );
-#print "$hrsqtr, $Stats->{HRSQTRDHS}\n";
+        if (   $BegDate le $rNotes->{ContLogDate}
+            && $rNotes->{ContLogDate} le $EndDate )
+        {
+            my $hrsqtr = $rxSC->{Duration} / 3600;
+            $Stats->{HRSQTR} += $hrsqtr;
+            $Stats->{HRSQTRINS}->{ $xInsurance->{ $rxSC->{InsID} }{Name} } +=
+              $hrsqtr;
+            $Stats->{HRSQTRSC}->{ $xSC->{ $rxSC->{SCID} }{SCName} } += $hrsqtr;
+            if ( $rActive->{'CustAgency'} eq 'JSUC' ) {
+                $Stats->{HRSQTRJSUC} += $hrsqtr;
+            }
+            elsif ( $rActive->{'CustAgency'} eq 'JBDC' ) {
+                $Stats->{HRSQTRJBDC} += $hrsqtr;
+            }
+            elsif ( $rActive->{'CustAgency'} eq 'DHS' ) {
+                $Stats->{HRSQTRDHS} += $hrsqtr;
+            }
+            else { $Stats->{HRSQTROTH} += $hrsqtr; }
+            $Stats->{NOTECOUNTQTRINS}
+              ->{ $xInsurance->{ $rxSC->{InsID} }{Name} }++;
+            $Stats->{NOTECOUNTQTRSC}->{ $xSC->{ $rxSC->{SCID} }{SCName} }++;
+            $Stats->{GRPSIZEQTRINS}->{ $xInsurance->{ $rxSC->{InsID} }{Name} }++
+              if ( $rNotes->{GrpSize} > 0 );
+            $Stats->{GRPSIZEQTRSC}->{ $xSC->{ $rxSC->{SCID} }{SCName} }++
+              if ( $rNotes->{GrpSize} > 0 );
+
+            #print "$hrsqtr, $Stats->{HRSQTRDHS}\n";
+        }
+        if (   $YTDBeg le $rNotes->{ContLogDate}
+            && $rNotes->{ContLogDate} le $EndDate )
+        {
+            my $hrsytd = $rxSC->{Duration} / 3600;
+            $Stats->{HRSYTD} += $hrsytd;
+            $Stats->{HRSYTDINS}->{ $xInsurance->{ $rxSC->{InsID} }{Name} } +=
+              $hrsytd;
+            $Stats->{HRSYTDSC}->{ $xSC->{ $rxSC->{SCID} }{SCName} } += $hrsytd;
+            if ( $rActive->{'CustAgency'} eq 'JSUC' ) {
+                $Stats->{HRSYTDJSUC} += $hrsytd;
+            }
+            elsif ( $rActive->{'CustAgency'} eq 'JBDC' ) {
+                $Stats->{HRSYTDJBDC} += $hrsytd;
+            }
+            elsif ( $rActive->{'CustAgency'} eq 'DHS' ) {
+                $Stats->{HRSYTDDHS} += $hrsytd;
+            }
+            else { $Stats->{HRSYTDOTH} += $hrsytd; }
+            $Stats->{NOTECOUNTYTDINS}
+              ->{ $xInsurance->{ $rxSC->{InsID} }{Name} }++;
+            $Stats->{NOTECOUNTYTDSC}->{ $xSC->{ $rxSC->{SCID} }{SCName} }++;
+            $Stats->{GRPSIZEYTDINS}->{ $xInsurance->{ $rxSC->{InsID} }{Name} }++
+              if ( $rNotes->{GrpSize} > 0 );
+            $Stats->{GRPSIZEYTDSC}->{ $xSC->{ $rxSC->{SCID} }{SCName} }++
+              if ( $rNotes->{GrpSize} > 0 );
+        }
+
+        #print "\t$rNotes->{ContLogDate}\t$FDOS\t$LDOS\n";
+
     }
-    if ( $YTDBeg le $rNotes->{ContLogDate} && $rNotes->{ContLogDate} le $EndDate )
-    {
-      my $hrsytd = $rxSC->{Duration} / 3600;
-      $Stats->{HRSYTD} += $hrsytd;
-      $Stats->{HRSYTDINS}->{$xInsurance->{$rxSC->{InsID}}{Name}} += $hrsytd;
-      $Stats->{HRSYTDSC}->{$xSC->{$rxSC->{SCID}}{SCName}} += $hrsytd;
-      if ( $rActive->{'CustAgency'} eq 'JSUC' ) { $Stats->{HRSYTDJSUC} += $hrsytd; }
-      elsif ( $rActive->{'CustAgency'} eq 'JBDC' ) { $Stats->{HRSYTDJBDC} += $hrsytd; }
-      elsif ( $rActive->{'CustAgency'} eq 'DHS' ) { $Stats->{HRSYTDDHS} += $hrsytd; }
-      else { $Stats->{HRSYTDOTH} += $hrsytd; }
-      $Stats->{NOTECOUNTYTDINS}->{$xInsurance->{$rxSC->{InsID}}{Name}}++;
-      $Stats->{NOTECOUNTYTDSC}->{$xSC->{$rxSC->{SCID}}{SCName}}++;
-      $Stats->{GRPSIZEYTDINS}->{$xInsurance->{$rxSC->{InsID}}{Name}}++ if ( $rNotes->{GrpSize} > 0 );
-      $Stats->{GRPSIZEYTDSC}->{$xSC->{$rxSC->{SCID}}{SCName}}++ if ( $rNotes->{GrpSize} > 0 );
-    }
-#print "\t$rNotes->{ContLogDate}\t$FDOS\t$LDOS\n";
-    
-  }
-  if ( $flagQtr )
-  {
+    if ($flagQtr) {
 ##
-# CLINICNAME, Age set above.
+        # CLINICNAME, Age set above.
 ##
-    $Stats->{COUNTQTR}++;                                                 # Number of Clients
-    $Stats->{MALEQTR}++ if ( $rActive->{Gend} eq 'M' );                   # Number of Males
-    $Stats->{FEMALEQTR}++ if ( $rActive->{Gend} eq 'F' );                 # Number of Females
-    $rActive->{Race} = 'N' if ( $rActive->{Race} eq '' );
-    $Stats->{RACEQTR}->{$xRace->{$rActive->{Race}}{Descr}}++;             # Number by Races
-    my $ETHNICITY = 'None';
-    if ( $rActive->{Ethnicity} eq '' ) { $ETHNICITY = 'No Response'; }
-    else { $ETHNICITY = DBA->getxref($form,'xEthnicity',$rActive->{'Ethnicity'},'Descr'); }
-    $Stats->{ETHNICITYQTR}->{$ETHNICITY}++;                               # Number by Ethnicity
-    my $LANGUAGE = 'None';
-    if ( $rActive->{PreLang} eq '' ) { $LANGUAGE = 'No Response'; }
-    else { $LANGUAGE = DBA->getxref($form,'xLanguages',$rActive->{'PreLang'},'English'); }
-    $Stats->{LANGUAGEQTR}->{$LANGUAGE}++;
-    my $RELIGION = 'None';
-    if ( $rActive->{'Religion'} eq '' ) { $RELIGION = 'No Response'; }
-    elsif ( $rActive->{'Religion'} eq '0000' ) { $RELIGION = 'DECLINED TO SPECIFY'; }
-    else { $RELIGION = DBA->getxref($form,'xReligiousAffiliation',$rActive->{'Religion'},'Descr'); }
-#warn qq|RELIGIONQTR: ${RELIGION}\n|;
-    $Stats->{RELIGIONQTR}->{$RELIGION}++;
-    $rActive->{MarStat} = 'N' if ( $rActive->{MarStat} eq '' );
-    $Stats->{MARSTATQTR}->{$xMarStat->{$rActive->{MarStat}}{Descr}}++;    # Number by MarStat
-    $rActive->{EmplStat} = 'N' if ( $rActive->{EmplStat} eq '' );
-    $Stats->{EMPLSTATQTR}->{$xEmplStat->{$rActive->{EmplStat}}{Descr}}++; # Number by EmplStat
-    $rActive->{EmplType} = 'N' if ( $rActive->{EmplType} eq '' );
-    $Stats->{EMPLTYPEQTR}->{$xEmplType->{$rActive->{EmplType}}{Descr}}++; # Number by EmplType
-    my $SS = 'None';
-    if ( $rActive->{SchoolStat} eq '' ) { $SS = 'No Response'; }
-    else { $SS = DBA->getxref($form,'xSchoolStat',$rActive->{'SchoolStat'},'Descr'); }
-    $Stats->{SCHOOLSTATQTR}->{$SS}++;                                     # Number by SchoolStat
-    if ( $rActive->{SchoolGrade} eq '' ) { $SG = 'No Response'; }
-    else { $SG = DBA->getxref($form,'xSchoolGrades',$rActive->{'SchoolGrade'},'Concept'); }
-    $Stats->{SCHOOLGRADEQTR}->{$SG}++;                                    # Number by SchoolGrade
-    $Stats->{INSQTR}->{$xInsurance->{${PrimaryInsID}}{Name}}++;           # Number by Insurances
-  
-    if ( $Age eq '' ) { $Stats->{AGEQTR}->{CAT0}++; }
-    elsif ( 0 <= $Age && $Age <= 3 ) { $Stats->{AGEQTR}->{CAT1}++; }
-    elsif ( 4 <= $Age && $Age <= 7 ) { $Stats->{AGEQTR}->{CAT2}++; }
-    elsif ( 8 <= $Age && $Age <= 11 ) { $Stats->{AGEQTR}->{CAT3}++; }
-    elsif ( 12 <= $Age && $Age <= 15 ) { $Stats->{AGEQTR}->{CAT4}++; }
-    elsif ( 16 <= $Age && $Age <= 19 ) { $Stats->{AGEQTR}->{CAT5}++; }
-    else { $Stats->{AGEQTR}->{CAT6}++; }
-  
-    if ( $Age eq '' ) { $Stats->{CARFAGEQTR}->{CAT0}++; }
-    elsif ( 0 <= $Age && $Age <= 5 ) { $Stats->{CARFAGEQTR}->{CAT1}++; }
-    elsif ( 6 <= $Age && $Age <= 17 ) { $Stats->{CARFAGEQTR}->{CAT2}++; }
-    elsif ( 18 <= $Age && $Age <= 40 ) { $Stats->{CARFAGEQTR}->{CAT3}++; }
-    elsif ( 41 <= $Age && $Age <= 65 ) { $Stats->{CARFAGEQTR}->{CAT4}++; }
-    elsif ( 65 <= $Age && $Age <= 85 ) { $Stats->{CARFAGEQTR}->{CAT5}++; }
-    else { $Stats->{CARFAGEQTR}->{CAT6}++; }
-  }
+        $Stats->{COUNTQTR}++;                                # Number of Clients
+        $Stats->{MALEQTR}++ if ( $rActive->{Gend} eq 'M' );  # Number of Males
+        $Stats->{FEMALEQTR}++
+          if ( $rActive->{Gend} eq 'F' );                    # Number of Females
+        $rActive->{Race} = 'N' if ( $rActive->{Race} eq '' );
+        $Stats->{RACEQTR}
+          ->{ $xRace->{ $rActive->{Race} }{Descr} }++;       # Number by Races
+        my $ETHNICITY = 'None';
+        if ( $rActive->{Ethnicity} eq '' ) { $ETHNICITY = 'No Response'; }
+        else {
+            $ETHNICITY =
+              DBA->getxref( $form, 'xEthnicity', $rActive->{'Ethnicity'},
+                'Descr' );
+        }
+        $Stats->{ETHNICITYQTR}->{$ETHNICITY}++;    # Number by Ethnicity
+        my $LANGUAGE = 'None';
+        if ( $rActive->{PreLang} eq '' ) { $LANGUAGE = 'No Response'; }
+        else {
+            $LANGUAGE =
+              DBA->getxref( $form, 'xLanguages', $rActive->{'PreLang'},
+                'English' );
+        }
+        $Stats->{LANGUAGEQTR}->{$LANGUAGE}++;
+        my $RELIGION = 'None';
+        if    ( $rActive->{'Religion'} eq '' ) { $RELIGION = 'No Response'; }
+        elsif ( $rActive->{'Religion'} eq '0000' ) {
+            $RELIGION = 'DECLINED TO SPECIFY';
+        }
+        else {
+            $RELIGION = DBA->getxref( $form, 'xReligiousAffiliation',
+                $rActive->{'Religion'}, 'Descr' );
+        }
+
+        #warn qq|RELIGIONQTR: ${RELIGION}\n|;
+        $Stats->{RELIGIONQTR}->{$RELIGION}++;
+        $rActive->{MarStat} = 'N' if ( $rActive->{MarStat} eq '' );
+        $Stats->{MARSTATQTR}
+          ->{ $xMarStat->{ $rActive->{MarStat} }{Descr} }++; # Number by MarStat
+        $rActive->{EmplStat} = 'N' if ( $rActive->{EmplStat} eq '' );
+        $Stats->{EMPLSTATQTR}->{ $xEmplStat->{ $rActive->{EmplStat} }{Descr} }++
+          ;    # Number by EmplStat
+        $rActive->{EmplType} = 'N' if ( $rActive->{EmplType} eq '' );
+        $Stats->{EMPLTYPEQTR}->{ $xEmplType->{ $rActive->{EmplType} }{Descr} }++
+          ;    # Number by EmplType
+        my $SS = 'None';
+        if ( $rActive->{SchoolStat} eq '' ) { $SS = 'No Response'; }
+        else {
+            $SS = DBA->getxref( $form, 'xSchoolStat', $rActive->{'SchoolStat'},
+                'Descr' );
+        }
+        $Stats->{SCHOOLSTATQTR}->{$SS}++;    # Number by SchoolStat
+        if ( $rActive->{SchoolGrade} eq '' ) { $SG = 'No Response'; }
+        else {
+            $SG =
+              DBA->getxref( $form, 'xSchoolGrades', $rActive->{'SchoolGrade'},
+                'Concept' );
+        }
+        $Stats->{SCHOOLGRADEQTR}->{$SG}++;    # Number by SchoolGrade
+        $Stats->{INSQTR}
+          ->{ $xInsurance->{ ${PrimaryInsID} }{Name} }++; # Number by Insurances
+
+        if    ( $Age eq '' )               { $Stats->{AGEQTR}->{CAT0}++; }
+        elsif ( 0 <= $Age && $Age <= 3 )   { $Stats->{AGEQTR}->{CAT1}++; }
+        elsif ( 4 <= $Age && $Age <= 7 )   { $Stats->{AGEQTR}->{CAT2}++; }
+        elsif ( 8 <= $Age && $Age <= 11 )  { $Stats->{AGEQTR}->{CAT3}++; }
+        elsif ( 12 <= $Age && $Age <= 15 ) { $Stats->{AGEQTR}->{CAT4}++; }
+        elsif ( 16 <= $Age && $Age <= 19 ) { $Stats->{AGEQTR}->{CAT5}++; }
+        else                               { $Stats->{AGEQTR}->{CAT6}++; }
+
+        if    ( $Age eq '' )               { $Stats->{CARFAGEQTR}->{CAT0}++; }
+        elsif ( 0 <= $Age && $Age <= 5 )   { $Stats->{CARFAGEQTR}->{CAT1}++; }
+        elsif ( 6 <= $Age && $Age <= 17 )  { $Stats->{CARFAGEQTR}->{CAT2}++; }
+        elsif ( 18 <= $Age && $Age <= 40 ) { $Stats->{CARFAGEQTR}->{CAT3}++; }
+        elsif ( 41 <= $Age && $Age <= 65 ) { $Stats->{CARFAGEQTR}->{CAT4}++; }
+        elsif ( 65 <= $Age && $Age <= 85 ) { $Stats->{CARFAGEQTR}->{CAT5}++; }
+        else                               { $Stats->{CARFAGEQTR}->{CAT6}++; }
+    }
 ## not needed here, calculated in main loop.
-#  if ( $flagYtd )
-#  {
-#  }
-  return($FXDOS,$FDOS,$LDOS);
+    #  if ( $flagYtd )
+    #  {
+    #  }
+    return ( $FXDOS, $FDOS, $LDOS );
 }
 ##
 # Surveys for YTD and period
 ##
-sub getSurveys
-{
-  my ($self) = @_;
-  $sSurveys->execute();
-  while ( $rSurveys = $sSurveys->fetchrow_hashref )
-  {
-    if ( $BegDate le $rSurveys->{Date} && $rSurveys->{Date} le $EndDate )
-    {
-      $Stats->{SURVEYCOUNTQTR}++;
-      $Stats->{SurveySessionsOKQTR} += $rSurveys->{SessionsOK};
-      $Stats->{SurveyTrPlanQTR} += $rSurveys->{TrPlan};
-      $Stats->{SurveyRespectedQTR} += $rSurveys->{Respected};
-      $Stats->{SurveyHelpedQTR} += $rSurveys->{Helped};
-      $Stats->{SurveyRecommendQTR} += $rSurveys->{Recommend};
-    }
-    if ( $YTDBeg le $rSurveys->{Date} && $rSurveys->{Date} le $EndDate )
-    {
-      $Stats->{SURVEYCOUNTYTD}++;
-      $Stats->{SurveySessionsOKYTD} += $rSurveys->{SessionsOK};
-      $Stats->{SurveyTrPlanYTD} += $rSurveys->{TrPlan};
-      $Stats->{SurveyRespectedYTD} += $rSurveys->{Respected};
-      $Stats->{SurveyHelpedYTD} += $rSurveys->{Helped};
-      $Stats->{SurveyRecommendYTD} += $rSurveys->{Recommend};
-    }
+sub getSurveys {
+    my ($self) = @_;
+    $sSurveys->execute();
+    while ( $rSurveys = $sSurveys->fetchrow_hashref ) {
+        if ( $BegDate le $rSurveys->{Date} && $rSurveys->{Date} le $EndDate ) {
+            $Stats->{SURVEYCOUNTQTR}++;
+            $Stats->{SurveySessionsOKQTR} += $rSurveys->{SessionsOK};
+            $Stats->{SurveyTrPlanQTR}     += $rSurveys->{TrPlan};
+            $Stats->{SurveyRespectedQTR}  += $rSurveys->{Respected};
+            $Stats->{SurveyHelpedQTR}     += $rSurveys->{Helped};
+            $Stats->{SurveyRecommendQTR}  += $rSurveys->{Recommend};
+        }
+        if ( $YTDBeg le $rSurveys->{Date} && $rSurveys->{Date} le $EndDate ) {
+            $Stats->{SURVEYCOUNTYTD}++;
+            $Stats->{SurveySessionsOKYTD} += $rSurveys->{SessionsOK};
+            $Stats->{SurveyTrPlanYTD}     += $rSurveys->{TrPlan};
+            $Stats->{SurveyRespectedYTD}  += $rSurveys->{Respected};
+            $Stats->{SurveyHelpedYTD}     += $rSurveys->{Helped};
+            $Stats->{SurveyRecommendYTD}  += $rSurveys->{Recommend};
+        }
+
 #warn qq|Date=$rSurveys->{Date}, $Stats->{SURVEYCOUNTQTR}, $YTDBeg, $BegDate, $EndDate\n|;
-  }
-  return(0);
-}
-#######################################################
-sub prtpdf
-{
-  my ($self,$headr) = @_;
-  my ($site,$name) = split('_',$form->{DBNAME});
-  my $PDFPath = qq|https://${name}.okmis.com/pdf/QA_20080801.pdf|;
-  if ( $form->{PDF} eq 'BHO' ) { $PDFPath = qq|https://${name}.okmis.com/pdf/BHOP_20041015.pdf|; }
-  my $AgencyID = MgrTree->getAgency($form,$form->{LOGINPROVID});
-  $sAgency->execute($AgencyID);
-  my $rAgency = $sAgency->fetchrow_hashref;
-  $form->{AGENCY_NAME} = $rAgency->{Name};
-  $form->{AGENCY_CITY} = $rAgency->{City};
-  $form->{DOCRANGE} = $ReportRange;
-  $form->{DATERANGE} = $RangeLabel;
-  $form->{STARTYTD} = DBUtil->Date($YTDBeg,'fmt','MM/DD/YY');
-  $form->{INSURANCE} = $form->{InsID} ? $xInsurance->{$form->{InsID}}{Name} : 'all';;
-  $form->{REFBY} = $form->{'ReferredBy1'} ? $Stats->{'ReferredBy1'} : 'all';;
-  $form->{NOTECOUNT} = $Stats->{NOTECOUNT};
-  $form->{NOTECOUNTQTR} = $Stats->{NOTECOUNTQTR};
-  $form->{NOSHOWS} = $Stats->{NOSHOWS};
-  $form->{NOSHOWSQTR} = $Stats->{NOSHOWSQTR};
-  $form->{NOSHOWSPCT}=0;
-  if ( $Stats->{NOTECOUNT} > 0 )
-  { $form->{NOSHOWSPCT} = sprintf("%.2f",($Stats->{NOSHOWS} / $Stats->{NOTECOUNT}) * 100); }
-  $form->{NOSHOWSPCTQTR}=0;
-  if ( $Stats->{NOTECOUNTQTR} > 0 )
-  { $form->{NOSHOWSPCTQTR} = sprintf("%.2f",($Stats->{NOSHOWSQTR} / $Stats->{NOTECOUNTQTR}) * 100); }
-  $form->{GAFLESS} = $Stats->{GAFLESS};
-  $form->{GAFMORE} = $Stats->{GAFMORE};
-  $form->{GAFCOUNT} = $Stats->{GAFCOUNT};
-  $form->{GAFLESSPCT}=0; $form->{GAFMOREPCT}=0;
-  if ( $Stats->{GAFCOUNT} > 0 )           # don't divide by 0.
-  {
-    $form->{GAFLESSPCT} = sprintf("%.2f",($Stats->{GAFLESS} / $Stats->{GAFCOUNT}) * 100);
-    $form->{GAFMOREPCT} = sprintf("%.2f",($Stats->{GAFMORE} / $Stats->{GAFCOUNT}) * 100);
-  }
-  $form->{REFMORE} = $Stats->{REFMORE};
-  $form->{REFLESS} = $Stats->{REFLESS};
-  $form->{REFSQTR} = $Stats->{REFSQTR};
-  $form->{REFSYTD} = $Stats->{REFSYTD};
-  $form->{REFLESSPCT}=0; $form->{REFMOREPCT}=0;
-  if ( $Stats->{REFSQTR} > 0 )           # don't divide by 0.
-  {
-    $form->{REFLESSPCT} = sprintf("%.2f",($Stats->{REFLESS} / $Stats->{REFSQTR}) * 100);
-    $form->{REFMOREPCT} = sprintf("%.2f",($Stats->{REFMORE} / $Stats->{REFSQTR}) * 100);
-  }
-  my $AVGPROGRESS = 0;
-  if ( $Stats->{PROGRESSCOUNT} > 0 )
-  { $AVGPROGRESS = sprintf("%.2f",$Stats->{AVGPROGRESSQTR} / $Stats->{PROGRESSCOUNT}); }
-  $form->{AVGPROGRESS} = $AVGPROGRESS;
-  $form->{PROGRESSCOUNT} = $Stats->{PROGRESSCOUNT};
-  $form->{PROGM3} = $Stats->{PROG}->{PROGM3};
-  $form->{PROGM2} = $Stats->{PROG}->{PROGM2};
-  $form->{PROGM1} = $Stats->{PROG}->{PROGM1};
-  $form->{PROG0} = $Stats->{PROG}->{PROG0};
-  $form->{PROG1} = $Stats->{PROG}->{PROG1};
-  $form->{PROG2} = $Stats->{PROG}->{PROG2};
-  $form->{PROG3} = $Stats->{PROG}->{PROG3};
-  $form->{PROGCOUNT} = $Stats->{PROGCOUNT};
-  $form->{PROGM3PCT}=0;
-  $form->{PROGM2PCT}=0;
-  $form->{PROGM1PCT}=0;
-  $form->{PROG0PCT}=0;
-  $form->{PROG1PCT}=0;
-  $form->{PROG2PCT}=0;
-  $form->{PROG3PCT}=0;
-  if ( $Stats->{PROGCOUNT} > 0 )          # don't divide by 0.
-  {
-    $form->{PROGM3PCT} = sprintf("%.2f",($Stats->{PROG}->{PROGM3} / $Stats->{PROGCOUNT}) * 100);
-    $form->{PROGM2PCT} = sprintf("%.2f",($Stats->{PROG}->{PROGM2} / $Stats->{PROGCOUNT}) * 100);
-    $form->{PROGM1PCT} = sprintf("%.2f",($Stats->{PROG}->{PROGM1} / $Stats->{PROGCOUNT}) * 100);
-    $form->{PROG0PCT} = sprintf("%.2f",($Stats->{PROG}->{PROG0} / $Stats->{PROGCOUNT}) * 100);
-    $form->{PROG1PCT} = sprintf("%.2f",($Stats->{PROG}->{PROG1} / $Stats->{PROGCOUNT}) * 100);
-    $form->{PROG2PCT} = sprintf("%.2f",($Stats->{PROG}->{PROG2} / $Stats->{PROGCOUNT}) * 100);
-    $form->{PROG3PCT} = sprintf("%.2f",($Stats->{PROG}->{PROG3} / $Stats->{PROGCOUNT}) * 100);
-  }
-  if ( $Stats->{SURVEYCOUNTQTR} > 0 )
-  {
-    $form->{SurveySessionsOK} = sprintf("%.1f",$Stats->{SurveySessionsOKQTR} / $Stats->{SURVEYCOUNTQTR});
-    $form->{SurveyTrPlan} = sprintf("%.1f",$Stats->{SurveyTrPlanQTR} / $Stats->{SURVEYCOUNTQTR});
-    $form->{SurveyRespected} = sprintf("%.1f",$Stats->{SurveyRespectedQTR} / $Stats->{SURVEYCOUNTQTR});
-    $form->{SurveyHelped} = sprintf("%.1f",$Stats->{SurveyHelpedQTR} / $Stats->{SURVEYCOUNTQTR});
-    $form->{SurveyRecommend} = sprintf("%.1f",$Stats->{SurveyRecommendQTR} / $Stats->{SURVEYCOUNTQTR});
-  }
-  else
-  {
-    $form->{SurveySessionsOK} = 0;
-    $form->{SurveyTrPlan} = 0;
-    $form->{SurveyRespected} = 0;
-    $form->{SurveyHelped} = 0;
-    $form->{SurveyRecommend} = 0;
-  }
-  $form->{HRSQTR} = sprintf("%.2f",$Stats->{HRSQTR});
-  $form->{HRSYTD} = sprintf("%.2f",$Stats->{HRSYTD});
-  $form->{INDQTR} = sprintf("%.2f",$Stats->{INDQTR});
-  $form->{INDYTD} = sprintf("%.2f",$Stats->{INDYTD});
-  $form->{PROVIDER_NAME} = $form->{LOGINUSERNAME};
-  $form->{DOCDATE} = DBUtil->Date($form->{TODAY},'fmt','MM/DD/YYYY');
-#warn "PDFPath=$PDFPath\n";
-  my $Text = &PDF::genFDF($PDFPath,$form);
-if ( $form->{LOGINPROVID} == 91 )
-{
-  open OUT, ">/home/okmis/mis/src/debug/Stats.out" or die "Couldn't open file: $!";
-  print OUT qq|${Text}|;
-  close(OUT);
-}
-#warn "FDF=${Text}\n";
-  print qq|${Text}|;
-  return(0);
-}
-sub prtbho
-{
-  my ($self,$headr) = @_;
-
-  print $headr;
-  print qq|Based on Custody Agency                                          \tJSUC\tJBDC\tDHS\tOther\n|;
-  print qq|# of GAF Scores that increased 2 or more points                  |
-         . qq|\t| . $Stats->{GAFMOREJSUC}
-         . qq|\t| . $Stats->{GAFMOREJBDC}
-         . qq|\t| . $Stats->{GAFMOREDHS}
-         . qq|\t| . $Stats->{GAFMOREOTH}
-         . qq|\n|;
-  print qq|# of GAF Scores that did not increase 2 points                   |
-         . qq|\t| . $Stats->{GAFLESSJSUC}
-         . qq|\t| . $Stats->{GAFLESSJBDC}
-         . qq|\t| . $Stats->{GAFLESSDHS}
-         . qq|\t| . $Stats->{GAFLESSOTH}
-         . qq|\n|;
-  print qq|# of GAF Scores that had only 1 GAF                              |
-         . qq|\t| . $Stats->{Only1GAFJSUC}
-         . qq|\t| . $Stats->{Only1GAFJBDC}
-         . qq|\t| . $Stats->{Only1GAFDHS}
-         . qq|\t| . $Stats->{Only1GAFOTH}
-         . qq|\n|;
-  print qq|\n|;
-
-  print qq|# of persons making a service request contacted within 5 days   |
-         . qq|\t| . $Stats->{REFMOREJSUC}
-         . qq|\t| . $Stats->{REFMOREJBDC}
-         . qq|\t| . $Stats->{REFMOREDHS}
-         . qq|\t| . $Stats->{REFMOREOTH}
-         . qq|\n|;
-  print qq|# of persons making a service request taking more than 5 days   |
-         . qq|\t| . $Stats->{REFLESSJSUC}
-         . qq|\t| . $Stats->{REFLESSJBDC}
-         . qq|\t| . $Stats->{REFLESSDHS}
-         . qq|\t| . $Stats->{REFLESSOTH}
-         . qq|\n|;
-  print qq|# of new service requests (no contacts in ${RangeLabel})               |
-         . qq|\t| . $Stats->{NEWREQSQTRJSUC}
-         . qq|\t| . $Stats->{NEWREQSQTRJBDC}
-         . qq|\t| . $Stats->{NEWREQSQTRDHS}
-         . qq|\t| . $Stats->{NEWREQSQTROTH}
-         . qq|\n|;
-  print qq|\n|;
-  print qq|# of new referrals within ${RangeLabel}                                |
-         . qq|\t| . $Stats->{REFSQTRJSUC}
-         . qq|\t| . $Stats->{REFSQTRJBDC}
-         . qq|\t| . $Stats->{REFSQTRDHS}
-         . qq|\t| . $Stats->{REFSQTROTH}
-         . qq|\n|;
-  print qq|# of new referrals within year to date                           |
-         . qq|\t| . $Stats->{REFSYTDJSUC}
-         . qq|\t| . $Stats->{REFSYTDJBDC}
-         . qq|\t| . $Stats->{REFSYTDDHS}
-         . qq|\t| . $Stats->{REFSYTDOTH}
-         . qq|\n|;
-  print qq|\n|;
-  print qq|# of direct client service hours within ${RangeLabel}                  |
-         . qq|\t| . sprintf("%.2f",$Stats->{HRSQTRJSUC}) 
-         . qq|\t| . sprintf("%.2f",$Stats->{HRSQTRJBDC}) 
-         . qq|\t| . sprintf("%.2f",$Stats->{HRSQTRDHS}) 
-         . qq|\t| . sprintf("%.2f",$Stats->{HRSQTROTH}) 
-         . qq|\n|;
-  print qq|# of direct client service hours within year to date             |
-         . qq|\t| . sprintf("%.2f",$Stats->{HRSYTDJSUC}) 
-         . qq|\t| . sprintf("%.2f",$Stats->{HRSYTDJBDC}) 
-         . qq|\t| . sprintf("%.2f",$Stats->{HRSYTDDHS}) 
-         . qq|\t| . sprintf("%.2f",$Stats->{HRSYTDOTH}) 
-         . qq|\n|;
-  print qq|\n|;
-  return(0);
-}
-#######################################################
-sub prtstats
-{
-  my ($self,$headr) = @_;
-
-  print $headr;
-  ##
-  # Section 1: No Shows
-  ##
-  print qq|\n|;
-  print qq|===================================\n|;
-  my $Pct;
-  if ( $Stats->{NOTECOUNT} == 0 ) { $Pct = 0; }
-  else { $Pct = sprintf("%.2f",($Stats->{NOSHOWS} / $Stats->{NOTECOUNT}) * 100); }
-  my $PctQtr;
-  if ( $Stats->{NOTECOUNTQTR} == 0 ) { $Pct = 0; }
-  else { $PctQtr = sprintf("%.2f",($Stats->{NOSHOWSQTR} / $Stats->{NOTECOUNTQTR}) * 100); }
-  print qq|\tTotal Appointments\tNumber of No Shows\tPercent\n|;
-  print qq|YTD\t$Stats->{NOTECOUNT}\t$Stats->{NOSHOWS}\t${Pct}%\n|;
-  print qq|QTR\t$Stats->{NOTECOUNTQTR}\t$Stats->{NOSHOWSQTR}\t${PctQtr}%\n|;
-  print qq|===================================\n|;
-  print qq|\n|;
-
-  ##
-  # Section 2: Direct Hours
-  ##
-  print qq|\n|;
-  print qq|===================================\n|;
-  print qq|Direct Hours\n|;
-  print qq|Within ${RangeLabel}\tYear To Date\n|;
-  print sprintf("%.2f",$Stats->{HRSQTR}) . qq|\t| . sprintf("%.2f",$Stats->{HRSYTD}) . qq|\n|;
-  print qq|===================================\n|;
-  print qq|\n|;
-  print qq|===================================\n|;
-  print qq|Direct Hours by Insurance\n|;
-  print qq|Insurance\t${RangeLabel}\tYear To Date\n|;
-  foreach my $Ins ( sort keys %{$Stats->{HRSQTRINS}} )
-  {
-    my $hrsqtr = sprintf("%.2f",$Stats->{HRSQTRINS}->{$Ins});
-    my $hrsytd = sprintf("%.2f",$Stats->{HRSYTDINS}->{$Ins});
-    print qq|$Ins\t$hrsqtr\t$hrsytd\n|;
-  }
-  print qq|===================================\n|;
-  print qq|\n|;
-  print qq|===================================\n|;
-  print qq|Direct Hours by Service Code\n|;
-  print qq|Service Code\t${RangeLabel}\tYear To Date\n|;
-  foreach my $SC ( sort keys %{$Stats->{HRSQTRSC}} )
-  {
-    my $hrsqtr = sprintf("%.2f",$Stats->{HRSQTRSC}->{$SC});
-    my $hrsytd = sprintf("%.2f",$Stats->{HRSYTDSC}->{$SC});
-    print qq|$SC\t$hrsqtr\t$hrsytd\n|;
-  }
-  print qq|===================================\n|;
-  print qq|\n|;
-  print qq|===================================\n|;
-  print qq|People Served by Insurance (Group Size)\n|;
-  print qq|Insurance\t${RangeLabel}\tYear To Date\n|;
-  foreach my $Ins ( sort keys %{$Stats->{GRPSIZEQTRINS}} )
-  {
-    print qq|$Ins\t$Stats->{GRPSIZEQTRINS}->{$Ins}\t$Stats->{GRPSIZEYTDINS}->{$Ins}\n|;
-  }
-  print qq|===================================\n|;
-  print qq|\n|;
-  print qq|===================================\n|;
-  print qq|People Served by Service Code (Group Size)\n|;
-  print qq|Service Code\t${RangeLabel}\tYear To Date\n|;
-  foreach my $SC ( sort keys %{$Stats->{GRPSIZEQTRSC}} )
-  {
-    print qq|$SC\t$Stats->{GRPSIZEQTRSC}->{$SC}\t$Stats->{GRPSIZEYTDSC}->{$SC}\n|;
-  }
-  print qq|===================================\n|;
-  print qq|\n|;
-  print qq|\n|;
-  print qq|===================================\n|;
-  print qq|Activities by Insurance (Notes)\n|;
-  print qq|Insurance\t${RangeLabel}\tYear To Date\n|;
-  foreach my $Ins ( sort keys %{$Stats->{NOTECOUNTQTRINS}} )
-  {
-    print qq|$Ins\t$Stats->{NOTECOUNTQTRINS}->{$Ins}\t$Stats->{NOTECOUNTYTDINS}->{$Ins}\n|;
-  }
-  print qq|===================================\n|;
-  print qq|\n|;
-  print qq|===================================\n|;
-  print qq|Activities by Service Code (Notes)\n|;
-  print qq|Service Code\t${RangeLabel}\tYear To Date\n|;
-  foreach my $SC ( sort keys %{$Stats->{NOTECOUNTQTRSC}} )
-  {
-    print qq|$SC\t$Stats->{NOTECOUNTQTRSC}->{$SC}\t$Stats->{NOTECOUNTYTDSC}->{$SC}\n|;
-  }
-  print qq|===================================\n|;
-  print qq|\n|;
-
-  ##
-  # Section 3: Axis1 Primary/Secondary Axis2 Primary and GAFs
-  ##
-  print qq|\n|;
-  print qq|===================================\n|;
-  print qq|Primary Axis1\tCode\tCount\n|;
-#foreach my $f ( sort keys %{$Stats->{AXIS1A}} ) { warn "Stats-AXIS1A-$f=$Stats->{AXIS1A}->{$f}\n"; }
-  my @list = sort { $Stats->{AXIS1A}->{$b} <=> $Stats->{AXIS1A}->{$a} } keys %{$Stats->{AXIS1A}};
-  for ( my $i=1; $i<=10; $i++ )
-  {
-    my $ID = $list[$i];
-#warn qq|ID=$ID\n|;
-    my $ICD9 = DBA->getxref($form,'xAxis1',$ID,'ICD9'); 
-    my $Descr = DBA->getxref($form,'xAxis1',$ID,'Descr'); 
-    print qq|${Descr}\t${ICD9}\t$Stats->{AXIS1A}->{$ID}\n|;
-  }
-#warn qq|AXIS1B=$Stats->{AXIS1B}\n|;
-  print qq|Secondary Axis1\tCode\tCount\n|;
-  my @list = sort { $Stats->{AXIS1B}->{$b} <=> $Stats->{AXIS1B}->{$a} } keys %{$Stats->{AXIS1B}};
-  for ( my $i=1; $i<=10; $i++ )
-  {
-    my $ID = $list[$i];
-#warn qq|ID=$ID\n|;
-    my $ICD9 = DBA->getxref($form,'xAxis1',$ID,'ICD9'); 
-    my $Descr = DBA->getxref($form,'xAxis1',$ID,'Descr'); 
-    print qq|${Descr}\t${ICD9}\t$Stats->{AXIS1B}->{$ID}\n|;
-  }
-  print qq|Primary Axis2\tCode\tCount\n|;
-#warn qq|AXIS2A=$Stats->{AXIS2A}\n|;
-  my @list = sort { $Stats->{AXIS2A}->{$b} <=> $Stats->{AXIS2A}->{$a} } keys %{$Stats->{AXIS2A}};
-  for ( my $i=1; $i<=10; $i++ )
-  {
-    my $ID = $list[$i];
-#warn qq|ID=$ID\n|;
-    my $ICD9 = DBA->getxref($form,'xAxis2',$ID,'ICD9'); 
-    my $Descr = DBA->getxref($form,'xAxis2',$ID,'Descr'); 
-    print qq|${Descr}\t${ICD9}\t$Stats->{AXIS2A}->{$ID}\n|;
-  }
-  
-  print qq|\n|;
-  print qq|===================================\n|;
-  print qq|GAFs (Current between '${BegDate}' and '${EndDate}'; Previous before ${BegDate}).\n|;
-  print qq|Increase >= 2\tNumber of Clients\n|;
-  print qq|No\t$Stats->{GAFLESS}\n|;
-  print qq|Yes\t$Stats->{GAFMORE}\n|;
-  print qq|Total Reporting Clients\t$Stats->{GAFCOUNT}\n|;
-  print qq|\n|;
-  my $Pct1=0; my $Pct2=0;
-  if ( $Stats->{GAFCOUNT} > 0 )           # don't divide by 0.
-  {
-    $Pct1 = sprintf("%.2f",($Stats->{GAFLESS} / $Stats->{GAFCOUNT}) * 100);
-    $Pct2 = sprintf("%.2f",($Stats->{GAFMORE} / $Stats->{GAFCOUNT}) * 100);
-  }
-  print qq|Percent Showing Increase < 2\t${Pct1}%\n|;
-  print qq|Percent Showing Increase >= 2\t${Pct2}%\n|;
-  print qq|===================================\n|;
-  print qq|\n|;
-
-  print qq|\n|;
-  print qq|===================================\n|;
-  print qq|Axis3 Handicap\tCount\n|;
-  foreach my $HID ( sort keys %{$Stats->{AXIS3}} )
-  { print DBA->getxref($form,'xHandicap',$HID,'Descr') . qq|\t$Stats->{AXIS3}->{$HID}\t$Stats->{AXIS3}->{$HID}\n|; }
-  print qq|Note: Totals are for all 4 Handicaps in Axis3 so if same chosen for more than 1; totals are increased.\n|;
-  print qq|      (i.e. NONE for all 4)\n|;
-
-  ##
-  # Section 4: Progress
-  ##
-  if ( $SetProgress )
-  {
-    print qq|\n|;
-    print qq|===================================\n|;
-    my $Avg = 0;
-    if ( $Stats->{PROGRESSCOUNT} > 0 )
-    { $Avg = sprintf("%.2f",$Stats->{AVGPROGRESSQTR} / $Stats->{PROGRESSCOUNT}); }
-    print qq|Average Progress All Clients\t$Avg\n|;
-    print qq|Total Reporting Clients\t$Stats->{PROGRESSCOUNT}\n|;
-    print qq|\n|;
-
-    print qq|Progress in Quarter separated by 60 days or more.\n|;
-    print qq|Progress Scale\tNumber of Clients\n|;
-    print qq|-3. Significant Deterioration\t$Stats->{PROG}->{PROGM3}\n|;
-    print qq|-2. Moderate Deterioration\t$Stats->{PROG}->{PROGM2}\n|;
-    print qq|-1. Minimal Deterioration\t$Stats->{PROG}->{PROGM1}\n|;
-    print qq| 0. No Progress\t$Stats->{PROG}->{PROG0}\n|;
-    print qq| 1. Minimal Progress\t$Stats->{PROG}->{PROG1}\n|;
-    print qq| 2. Average Progress\t$Stats->{PROG}->{PROG2}\n|;
-    print qq| 3. Significant Progress\t$Stats->{PROG}->{PROG3}\n|;
-    print qq|Total Reporting Clients\t$Stats->{PROGCOUNT}\n|;
-    print qq|\n|;
-
-    my ($Pctm3,$Pctm2,$Pctm1,$Pct0,$Pct1,$Pct2,$Pct3) = (0,0,0,0,0,0,0);
-    if ( $Stats->{PROGCOUNT} > 0 )          # don't divide by 0.
-    {
-      $Pctm3 = sprintf("%.2f",($Stats->{PROG}->{PROGM3} / $Stats->{PROGCOUNT}) * 100);
-      $Pctm2 = sprintf("%.2f",($Stats->{PROG}->{PROGM2} / $Stats->{PROGCOUNT}) * 100);
-      $Pctm1 = sprintf("%.2f",($Stats->{PROG}->{PROGM1} / $Stats->{PROGCOUNT}) * 100);
-      $Pct0 = sprintf("%.2f",($Stats->{PROG}->{PROG0} / $Stats->{PROGCOUNT}) * 100);
-      $Pct1 = sprintf("%.2f",($Stats->{PROG}->{PROG1} / $Stats->{PROGCOUNT}) * 100);
-      $Pct2 = sprintf("%.2f",($Stats->{PROG}->{PROG2} / $Stats->{PROGCOUNT}) * 100);
-      $Pct3 = sprintf("%.2f",($Stats->{PROG}->{PROG3} / $Stats->{PROGCOUNT}) * 100);
     }
-    print qq|Percentage Showing Significant Deterioration\t${Pctm3}%\n|;
-    print qq|Percentage Showing Moderate Deterioration\t${Pctm2}%\n|;
-    print qq|Percentage Showing Minimal Deterioration\t${Pctm1}%\n|;
-    print qq|Percentage Showing No Progress\t${Pct0}%\n|;
-    print qq|Percentage Showing Minimal Progress\t${Pct1}%\n|;
-    print qq|Percentage Showing Average Progress\t${Pct2}%\n|;
-    print qq|Percentage Showing Significant Progress\t${Pct3}%\n|;
+    return (0);
+}
+#######################################################
+sub prtpdf {
+    my ( $self, $headr ) = @_;
+    my ( $site, $name )  = split( '_', $form->{DBNAME} );
+    my $PDFPath = qq|https://${name}.okmis.com/pdf/QA_20080801.pdf|;
+    if ( $form->{PDF} eq 'BHO' ) {
+        $PDFPath = qq|https://${name}.okmis.com/pdf/BHOP_20041015.pdf|;
+    }
+    my $AgencyID = MgrTree->getAgency( $form, $form->{LOGINPROVID} );
+    $sAgency->execute($AgencyID);
+    my $rAgency = $sAgency->fetchrow_hashref;
+    $form->{AGENCY_NAME} = $rAgency->{Name};
+    $form->{AGENCY_CITY} = $rAgency->{City};
+    $form->{DOCRANGE}    = $ReportRange;
+    $form->{DATERANGE}   = $RangeLabel;
+    $form->{STARTYTD}    = DBUtil->Date( $YTDBeg, 'fmt', 'MM/DD/YY' );
+    $form->{INSURANCE} =
+      $form->{InsID} ? $xInsurance->{ $form->{InsID} }{Name} : 'all';
+    $form->{REFBY} = $form->{'ReferredBy1'} ? $Stats->{'ReferredBy1'} : 'all';
+    $form->{NOTECOUNT}    = $Stats->{NOTECOUNT};
+    $form->{NOTECOUNTQTR} = $Stats->{NOTECOUNTQTR};
+    $form->{NOSHOWS}      = $Stats->{NOSHOWS};
+    $form->{NOSHOWSQTR}   = $Stats->{NOSHOWSQTR};
+    $form->{NOSHOWSPCT}   = 0;
+
+    if ( $Stats->{NOTECOUNT} > 0 ) {
+        $form->{NOSHOWSPCT} =
+          sprintf( "%.2f", ( $Stats->{NOSHOWS} / $Stats->{NOTECOUNT} ) * 100 );
+    }
+    $form->{NOSHOWSPCTQTR} = 0;
+    if ( $Stats->{NOTECOUNTQTR} > 0 ) {
+        $form->{NOSHOWSPCTQTR} = sprintf( "%.2f",
+            ( $Stats->{NOSHOWSQTR} / $Stats->{NOTECOUNTQTR} ) * 100 );
+    }
+    $form->{GAFLESS}    = $Stats->{GAFLESS};
+    $form->{GAFMORE}    = $Stats->{GAFMORE};
+    $form->{GAFCOUNT}   = $Stats->{GAFCOUNT};
+    $form->{GAFLESSPCT} = 0;
+    $form->{GAFMOREPCT} = 0;
+    if ( $Stats->{GAFCOUNT} > 0 )    # don't divide by 0.
+    {
+        $form->{GAFLESSPCT} =
+          sprintf( "%.2f", ( $Stats->{GAFLESS} / $Stats->{GAFCOUNT} ) * 100 );
+        $form->{GAFMOREPCT} =
+          sprintf( "%.2f", ( $Stats->{GAFMORE} / $Stats->{GAFCOUNT} ) * 100 );
+    }
+    $form->{REFMORE}    = $Stats->{REFMORE};
+    $form->{REFLESS}    = $Stats->{REFLESS};
+    $form->{REFSQTR}    = $Stats->{REFSQTR};
+    $form->{REFSYTD}    = $Stats->{REFSYTD};
+    $form->{REFLESSPCT} = 0;
+    $form->{REFMOREPCT} = 0;
+    if ( $Stats->{REFSQTR} > 0 )    # don't divide by 0.
+    {
+        $form->{REFLESSPCT} =
+          sprintf( "%.2f", ( $Stats->{REFLESS} / $Stats->{REFSQTR} ) * 100 );
+        $form->{REFMOREPCT} =
+          sprintf( "%.2f", ( $Stats->{REFMORE} / $Stats->{REFSQTR} ) * 100 );
+    }
+    my $AVGPROGRESS = 0;
+    if ( $Stats->{PROGRESSCOUNT} > 0 ) {
+        $AVGPROGRESS =
+          sprintf( "%.2f", $Stats->{AVGPROGRESSQTR} / $Stats->{PROGRESSCOUNT} );
+    }
+    $form->{AVGPROGRESS}   = $AVGPROGRESS;
+    $form->{PROGRESSCOUNT} = $Stats->{PROGRESSCOUNT};
+    $form->{PROGM3}        = $Stats->{PROG}->{PROGM3};
+    $form->{PROGM2}        = $Stats->{PROG}->{PROGM2};
+    $form->{PROGM1}        = $Stats->{PROG}->{PROGM1};
+    $form->{PROG0}         = $Stats->{PROG}->{PROG0};
+    $form->{PROG1}         = $Stats->{PROG}->{PROG1};
+    $form->{PROG2}         = $Stats->{PROG}->{PROG2};
+    $form->{PROG3}         = $Stats->{PROG}->{PROG3};
+    $form->{PROGCOUNT}     = $Stats->{PROGCOUNT};
+    $form->{PROGM3PCT}     = 0;
+    $form->{PROGM2PCT}     = 0;
+    $form->{PROGM1PCT}     = 0;
+    $form->{PROG0PCT}      = 0;
+    $form->{PROG1PCT}      = 0;
+    $form->{PROG2PCT}      = 0;
+    $form->{PROG3PCT}      = 0;
+
+    if ( $Stats->{PROGCOUNT} > 0 )    # don't divide by 0.
+    {
+        $form->{PROGM3PCT} = sprintf( "%.2f",
+            ( $Stats->{PROG}->{PROGM3} / $Stats->{PROGCOUNT} ) * 100 );
+        $form->{PROGM2PCT} = sprintf( "%.2f",
+            ( $Stats->{PROG}->{PROGM2} / $Stats->{PROGCOUNT} ) * 100 );
+        $form->{PROGM1PCT} = sprintf( "%.2f",
+            ( $Stats->{PROG}->{PROGM1} / $Stats->{PROGCOUNT} ) * 100 );
+        $form->{PROG0PCT} = sprintf( "%.2f",
+            ( $Stats->{PROG}->{PROG0} / $Stats->{PROGCOUNT} ) * 100 );
+        $form->{PROG1PCT} = sprintf( "%.2f",
+            ( $Stats->{PROG}->{PROG1} / $Stats->{PROGCOUNT} ) * 100 );
+        $form->{PROG2PCT} = sprintf( "%.2f",
+            ( $Stats->{PROG}->{PROG2} / $Stats->{PROGCOUNT} ) * 100 );
+        $form->{PROG3PCT} = sprintf( "%.2f",
+            ( $Stats->{PROG}->{PROG3} / $Stats->{PROGCOUNT} ) * 100 );
+    }
+    if ( $Stats->{SURVEYCOUNTQTR} > 0 ) {
+        $form->{SurveySessionsOK} = sprintf( "%.1f",
+            $Stats->{SurveySessionsOKQTR} / $Stats->{SURVEYCOUNTQTR} );
+        $form->{SurveyTrPlan} = sprintf( "%.1f",
+            $Stats->{SurveyTrPlanQTR} / $Stats->{SURVEYCOUNTQTR} );
+        $form->{SurveyRespected} = sprintf( "%.1f",
+            $Stats->{SurveyRespectedQTR} / $Stats->{SURVEYCOUNTQTR} );
+        $form->{SurveyHelped} = sprintf( "%.1f",
+            $Stats->{SurveyHelpedQTR} / $Stats->{SURVEYCOUNTQTR} );
+        $form->{SurveyRecommend} = sprintf( "%.1f",
+            $Stats->{SurveyRecommendQTR} / $Stats->{SURVEYCOUNTQTR} );
+    }
+    else {
+        $form->{SurveySessionsOK} = 0;
+        $form->{SurveyTrPlan}     = 0;
+        $form->{SurveyRespected}  = 0;
+        $form->{SurveyHelped}     = 0;
+        $form->{SurveyRecommend}  = 0;
+    }
+    $form->{HRSQTR}        = sprintf( "%.2f", $Stats->{HRSQTR} );
+    $form->{HRSYTD}        = sprintf( "%.2f", $Stats->{HRSYTD} );
+    $form->{INDQTR}        = sprintf( "%.2f", $Stats->{INDQTR} );
+    $form->{INDYTD}        = sprintf( "%.2f", $Stats->{INDYTD} );
+    $form->{PROVIDER_NAME} = $form->{LOGINUSERNAME};
+    $form->{DOCDATE} = DBUtil->Date( $form->{TODAY}, 'fmt', 'MM/DD/YYYY' );
+
+    #warn "PDFPath=$PDFPath\n";
+    my $Text = &PDF::genFDF( $PDFPath, $form );
+    if ( $form->{LOGINPROVID} == 91 ) {
+        open OUT, ">/var/www/okmis/src/debug/Stats.out"
+          or die "Couldn't open file: $!";
+        print OUT qq|${Text}|;
+        close(OUT);
+    }
+
+    #warn "FDF=${Text}\n";
+    print qq|${Text}|;
+    return (0);
+}
+
+sub prtbho {
+    my ( $self, $headr ) = @_;
+
+    print $headr;
+    print
+qq|Based on Custody Agency                                          \tJSUC\tJBDC\tDHS\tOther\n|;
+    print qq|# of GAF Scores that increased 2 or more points                  |
+      . qq|\t|
+      . $Stats->{GAFMOREJSUC} . qq|\t|
+      . $Stats->{GAFMOREJBDC} . qq|\t|
+      . $Stats->{GAFMOREDHS} . qq|\t|
+      . $Stats->{GAFMOREOTH} . qq|\n|;
+    print qq|# of GAF Scores that did not increase 2 points                   |
+      . qq|\t|
+      . $Stats->{GAFLESSJSUC} . qq|\t|
+      . $Stats->{GAFLESSJBDC} . qq|\t|
+      . $Stats->{GAFLESSDHS} . qq|\t|
+      . $Stats->{GAFLESSOTH} . qq|\n|;
+    print qq|# of GAF Scores that had only 1 GAF                              |
+      . qq|\t|
+      . $Stats->{Only1GAFJSUC} . qq|\t|
+      . $Stats->{Only1GAFJBDC} . qq|\t|
+      . $Stats->{Only1GAFDHS} . qq|\t|
+      . $Stats->{Only1GAFOTH} . qq|\n|;
+    print qq|\n|;
+
+    print qq|# of persons making a service request contacted within 5 days   |
+      . qq|\t|
+      . $Stats->{REFMOREJSUC} . qq|\t|
+      . $Stats->{REFMOREJBDC} . qq|\t|
+      . $Stats->{REFMOREDHS} . qq|\t|
+      . $Stats->{REFMOREOTH} . qq|\n|;
+    print qq|# of persons making a service request taking more than 5 days   |
+      . qq|\t|
+      . $Stats->{REFLESSJSUC} . qq|\t|
+      . $Stats->{REFLESSJBDC} . qq|\t|
+      . $Stats->{REFLESSDHS} . qq|\t|
+      . $Stats->{REFLESSOTH} . qq|\n|;
+    print
+qq|# of new service requests (no contacts in ${RangeLabel})               |
+      . qq|\t|
+      . $Stats->{NEWREQSQTRJSUC} . qq|\t|
+      . $Stats->{NEWREQSQTRJBDC} . qq|\t|
+      . $Stats->{NEWREQSQTRDHS} . qq|\t|
+      . $Stats->{NEWREQSQTROTH} . qq|\n|;
+    print qq|\n|;
+    print
+qq|# of new referrals within ${RangeLabel}                                |
+      . qq|\t|
+      . $Stats->{REFSQTRJSUC} . qq|\t|
+      . $Stats->{REFSQTRJBDC} . qq|\t|
+      . $Stats->{REFSQTRDHS} . qq|\t|
+      . $Stats->{REFSQTROTH} . qq|\n|;
+    print qq|# of new referrals within year to date                           |
+      . qq|\t|
+      . $Stats->{REFSYTDJSUC} . qq|\t|
+      . $Stats->{REFSYTDJBDC} . qq|\t|
+      . $Stats->{REFSYTDDHS} . qq|\t|
+      . $Stats->{REFSYTDOTH} . qq|\n|;
+    print qq|\n|;
+    print
+qq|# of direct client service hours within ${RangeLabel}                  |
+      . qq|\t|
+      . sprintf( "%.2f", $Stats->{HRSQTRJSUC} ) . qq|\t|
+      . sprintf( "%.2f", $Stats->{HRSQTRJBDC} ) . qq|\t|
+      . sprintf( "%.2f", $Stats->{HRSQTRDHS} ) . qq|\t|
+      . sprintf( "%.2f", $Stats->{HRSQTROTH} ) . qq|\n|;
+    print qq|# of direct client service hours within year to date             |
+      . qq|\t|
+      . sprintf( "%.2f", $Stats->{HRSYTDJSUC} ) . qq|\t|
+      . sprintf( "%.2f", $Stats->{HRSYTDJBDC} ) . qq|\t|
+      . sprintf( "%.2f", $Stats->{HRSYTDDHS} ) . qq|\t|
+      . sprintf( "%.2f", $Stats->{HRSYTDOTH} ) . qq|\n|;
+    print qq|\n|;
+    return (0);
+}
+#######################################################
+sub prtstats {
+    my ( $self, $headr ) = @_;
+
+    print $headr;
+    ##
+    # Section 1: No Shows
+    ##
+    print qq|\n|;
+    print qq|===================================\n|;
+    my $Pct;
+    if ( $Stats->{NOTECOUNT} == 0 ) { $Pct = 0; }
+    else {
+        $Pct =
+          sprintf( "%.2f", ( $Stats->{NOSHOWS} / $Stats->{NOTECOUNT} ) * 100 );
+    }
+    my $PctQtr;
+    if ( $Stats->{NOTECOUNTQTR} == 0 ) { $Pct = 0; }
+    else {
+        $PctQtr = sprintf( "%.2f",
+            ( $Stats->{NOSHOWSQTR} / $Stats->{NOTECOUNTQTR} ) * 100 );
+    }
+    print qq|\tTotal Appointments\tNumber of No Shows\tPercent\n|;
+    print qq|YTD\t$Stats->{NOTECOUNT}\t$Stats->{NOSHOWS}\t${Pct}%\n|;
+    print qq|QTR\t$Stats->{NOTECOUNTQTR}\t$Stats->{NOSHOWSQTR}\t${PctQtr}%\n|;
     print qq|===================================\n|;
     print qq|\n|;
-  }
-  else
-  {
+
+    ##
+    # Section 2: Direct Hours
+    ##
     print qq|\n|;
     print qq|===================================\n|;
-    print qq|Progress: Date range to narrow. \n|;
+    print qq|Direct Hours\n|;
+    print qq|Within ${RangeLabel}\tYear To Date\n|;
+    print sprintf( "%.2f", $Stats->{HRSQTR} ) . qq|\t|
+      . sprintf( "%.2f", $Stats->{HRSYTD} ) . qq|\n|;
     print qq|===================================\n|;
     print qq|\n|;
-  }
+    print qq|===================================\n|;
+    print qq|Direct Hours by Insurance\n|;
+    print qq|Insurance\t${RangeLabel}\tYear To Date\n|;
 
-  ##
-  # Section 5: Referrals
-  ##
-  print qq|\n|;
-  print qq|===================================\n|;
-  print qq|Referrals by Assigned Clinic\tNumber of Clients\t${RangeLabel}\tYTD\n|;
-  foreach my $Clinic ( sort keys %{$Stats->{COUNTCLINIC}} )
-  {
-    print qq|$Clinic\t$Stats->{COUNTCLINIC}->{$Clinic}\t$Stats->{REFSQTRCLINIC}->{$Clinic}\t$Stats->{REFSYTDCLINIC}->{$Clinic}\n|;
-  }
-  print qq|Total Referrals\t$Stats->{COUNT}\t$Stats->{REFSQTR}\t$Stats->{REFSYTD}\n|;
-  print qq|===================================\n|;
-  print qq|\n|;
-  print qq|===================================\n|;
-  print qq|Referrals by Insurance\t${RangeLabel}\tYTD\n|;
-  foreach my $Ins ( sort keys %{$Stats->{REFSQTRINS}} )
-  {
-    print qq|$Ins\t$Stats->{REFSQTRINS}->{$Ins}\t$Stats->{REFSYTDINS}->{$Ins}\n|;
-  }
-  print qq|Note: These total-up by Client Insurance. If a client has more than 1 insurance (record) then they will have more than one referral.\n|;
-  print qq|===================================\n|;
-  print qq|\n|;
-  print qq|===================================\n|;
-  print qq|Referrals by Referral Agency\t${RangeLabel}\tYTD\n|;
-  foreach my $RA ( sort keys %{$Stats->{REFSQTRREF}} )
-  {
-    print qq|$RA\t$Stats->{REFSQTRREF}->{$RA}\t$Stats->{REFSYTDREF}->{$RA}\n|;
-  }
-  print qq|===================================\n|;
-  print qq|\n|;
-  ##
-  # Number of persons making a service request contacted +-15 days.
-  ##
-  print qq|\n|;
-  print qq|===================================\n|;
-  print qq|Service request contacted within 15 days.\n|;
-  print qq|Within 15\tMore than 15\tTotal\n|;
-  print qq|$Stats->{REFLESS}\t$Stats->{REFMORE}\t$Stats->{REFSQTR}\n|;
-  print qq|\n|;
-  my $Pct1=0; my $Pct2=0;
-  if ( $Stats->{REFSQTR} > 0 )           # don't divide by 0.
-  {
-    $Pct1 = sprintf("%.2f",($Stats->{REFLESS} / $Stats->{REFSQTR}) * 100);
-    $Pct2 = sprintf("%.2f",($Stats->{REFMORE} / $Stats->{REFSQTR}) * 100);
-  }
-  print qq|Percentage within 15 days\t${Pct1}%\n|;
-  print qq|Percentage more than 15 days\t${Pct2}%\n|;
-  print qq|===================================\n|;
-  print qq|\n|;
+    foreach my $Ins ( sort keys %{ $Stats->{HRSQTRINS} } ) {
+        my $hrsqtr = sprintf( "%.2f", $Stats->{HRSQTRINS}->{$Ins} );
+        my $hrsytd = sprintf( "%.2f", $Stats->{HRSYTDINS}->{$Ins} );
+        print qq|$Ins\t$hrsqtr\t$hrsytd\n|;
+    }
+    print qq|===================================\n|;
+    print qq|\n|;
+    print qq|===================================\n|;
+    print qq|Direct Hours by Service Code\n|;
+    print qq|Service Code\t${RangeLabel}\tYear To Date\n|;
+    foreach my $SC ( sort keys %{ $Stats->{HRSQTRSC} } ) {
+        my $hrsqtr = sprintf( "%.2f", $Stats->{HRSQTRSC}->{$SC} );
+        my $hrsytd = sprintf( "%.2f", $Stats->{HRSYTDSC}->{$SC} );
+        print qq|$SC\t$hrsqtr\t$hrsytd\n|;
+    }
+    print qq|===================================\n|;
+    print qq|\n|;
+    print qq|===================================\n|;
+    print qq|People Served by Insurance (Group Size)\n|;
+    print qq|Insurance\t${RangeLabel}\tYear To Date\n|;
+    foreach my $Ins ( sort keys %{ $Stats->{GRPSIZEQTRINS} } ) {
+        print
+qq|$Ins\t$Stats->{GRPSIZEQTRINS}->{$Ins}\t$Stats->{GRPSIZEYTDINS}->{$Ins}\n|;
+    }
+    print qq|===================================\n|;
+    print qq|\n|;
+    print qq|===================================\n|;
+    print qq|People Served by Service Code (Group Size)\n|;
+    print qq|Service Code\t${RangeLabel}\tYear To Date\n|;
+    foreach my $SC ( sort keys %{ $Stats->{GRPSIZEQTRSC} } ) {
+        print
+qq|$SC\t$Stats->{GRPSIZEQTRSC}->{$SC}\t$Stats->{GRPSIZEYTDSC}->{$SC}\n|;
+    }
+    print qq|===================================\n|;
+    print qq|\n|;
+    print qq|\n|;
+    print qq|===================================\n|;
+    print qq|Activities by Insurance (Notes)\n|;
+    print qq|Insurance\t${RangeLabel}\tYear To Date\n|;
+    foreach my $Ins ( sort keys %{ $Stats->{NOTECOUNTQTRINS} } ) {
+        print
+qq|$Ins\t$Stats->{NOTECOUNTQTRINS}->{$Ins}\t$Stats->{NOTECOUNTYTDINS}->{$Ins}\n|;
+    }
+    print qq|===================================\n|;
+    print qq|\n|;
+    print qq|===================================\n|;
+    print qq|Activities by Service Code (Notes)\n|;
+    print qq|Service Code\t${RangeLabel}\tYear To Date\n|;
+    foreach my $SC ( sort keys %{ $Stats->{NOTECOUNTQTRSC} } ) {
+        print
+qq|$SC\t$Stats->{NOTECOUNTQTRSC}->{$SC}\t$Stats->{NOTECOUNTYTDSC}->{$SC}\n|;
+    }
+    print qq|===================================\n|;
+    print qq|\n|;
 
-  ##
-  # Section 6: by Insurance
-  ##
-  print qq|\n|;
-  print qq|===================================\n|;
-  print qq|Clients by Primary Insurance\t${RangeLabel}\tYTD\n|;
-  foreach my $Ins ( sort keys %{$Stats->{INS}} )
-  {
-    print qq|$Ins\t$Stats->{INSQTR}->{$Ins}\t$Stats->{INS}->{$Ins}\n|;
-  }
-  print qq|Total Clients\t$Stats->{COUNTQTR}\t$Stats->{COUNT}\n|;
-  print qq|===================================\n|;
-  print qq|\n|;
+    ##
+    # Section 3: Axis1 Primary/Secondary Axis2 Primary and GAFs
+    ##
+    print qq|\n|;
+    print qq|===================================\n|;
+    print qq|Primary Axis1\tCode\tCount\n|;
 
-  ##
-  # Section 7: by MarStat/EmplStat/EmplType/SchoolStat
-  ##
-  print qq|\n|;
-  print qq|===================================\n|;
-  print qq|Clients by Marriage Status\t${RangeLabel}\tYTD\n|;
-  foreach my $MarStat ( sort keys %{$Stats->{MARSTAT}} )
-  { print qq|$MarStat\t$Stats->{MARSTATQTR}->{$MarStat}\t$Stats->{MARSTAT}->{$MarStat}\n|; }
-  print qq|Total Clients\t$Stats->{COUNTQTR}\t$Stats->{COUNT}\n|;
-  print qq|===================================\n|;
-  print qq|\n|;
-  print qq|\n|;
-  print qq|===================================\n|;
-  print qq|Clients by Employment Status\t${RangeLabel}\tYTD\n|;
-  foreach my $EmplStat ( sort keys %{$Stats->{EMPLSTAT}} )
-  { print qq|$EmplStat\t$Stats->{EMPLSTATQTR}->{$EmplStat}\t$Stats->{EMPLSTAT}->{$EmplStat}\n|; }
-  print qq|Total Clients\t$Stats->{COUNTQTR}\t$Stats->{COUNT}\n|;
-  print qq|===================================\n|;
-  print qq|\n|;
-  print qq|\n|;
-  print qq|===================================\n|;
-  print qq|Clients by Employment Type\t${RangeLabel}\tYTD\n|;
-  foreach my $EmplType ( sort keys %{$Stats->{EMPLTYPE}} )
-  { print qq|$EmplType\t$Stats->{EMPLTYPEQTR}->{$EmplType}\t$Stats->{EMPLTYPE}->{$EmplType}\n|; }
-  print qq|Total Clients\t$Stats->{COUNTQTR}\t$Stats->{COUNT}\n|;
-  print qq|===================================\n|;
-  print qq|\n|;
-  print qq|\n|;
-  print qq|===================================\n|;
-  print qq|Clients by School Status\t${RangeLabel}\tYTD\n|;
-  foreach my $SchoolStat ( sort keys %{$Stats->{SCHOOLSTAT}} )
-  { print qq|$SchoolStat\t$Stats->{SCHOOLSTATQTR}->{$SchoolStat}\t$Stats->{SCHOOLSTAT}->{$SchoolStat}\n|; }
-  print qq|Total Clients\t$Stats->{COUNTQTR}\t$Stats->{COUNT}\n|;
-  print qq|===================================\n|;
-  print qq|\n|;
-  print qq|\n|;
-  print qq|===================================\n|;
-  print qq|Clients by Highest Grade Completed\t${RangeLabel}\tYTD\n|;
-  foreach my $SG ( sort keys %{$Stats->{SCHOOLGRADE}} )
-  { print qq|$SG\t$Stats->{SCHOOLGRADEQTR}->{$SG}\t$Stats->{SCHOOLGRADE}->{$SG}\n|; }
-  print qq|Total Clients\t$Stats->{COUNTQTR}\t$Stats->{COUNT}\n|;
-  print qq|===================================\n|;
-  print qq|\n|;
-  ##
-  # Section 8: by Age
-  ##
-  print qq|\n|;
-  print qq|===================================\n|;
-  print qq|Clients by MIS Age\t${RangeLabel}\tYTD\n|;
-  print qq|Not Reported\t$Stats->{AGEQTR}->{CAT0}\t$Stats->{AGE}->{CAT0}\n|;
-  print qq|0 to 3\t$Stats->{AGEQTR}->{CAT1}\t$Stats->{AGE}->{CAT1}\n|;
-  print qq|4 to 7\t$Stats->{AGEQTR}->{CAT2}\t$Stats->{AGE}->{CAT2}\n|;
-  print qq|8 to 11\t$Stats->{AGEQTR}->{CAT3}\t$Stats->{AGE}->{CAT3}\n|;
-  print qq|12 to 15\t$Stats->{AGEQTR}->{CAT4}\t$Stats->{AGE}->{CAT4}\n|;
-  print qq|16 to 19\t$Stats->{AGEQTR}->{CAT5}\t$Stats->{AGE}->{CAT5}\n|;
-  print qq|20+\t$Stats->{AGEQTR}->{CAT6}\t$Stats->{AGE}->{CAT6}\n|;
-  print qq|\n|;
-  print qq|Total Clients\t$Stats->{COUNTQTR}\t$Stats->{COUNT}\n|;
-  print qq|===================================\n|;
-  print qq|\n|;
-  ##
-  print qq|\n|;
-  print qq|===================================\n|;
-  print qq|Clients by CARF Age\t${RangeLabel}\tYTD\n|;
-  print qq|Not Reported\t$Stats->{CARFAGEQTR}->{CAT0}\t$Stats->{CARFAGE}->{CAT0}\n|;
-  print qq|0 to 5\t$Stats->{CARFAGEQTR}->{CAT1}\t$Stats->{CARFAGE}->{CAT1}\n|;
-  print qq|6 to 17\t$Stats->{CARFAGEQTR}->{CAT2}\t$Stats->{CARFAGE}->{CAT2}\n|;
-  print qq|18 to 40\t$Stats->{CARFAGEQTR}->{CAT3}\t$Stats->{CARFAGE}->{CAT3}\n|;
-  print qq|41 to 65\t$Stats->{CARFAGEQTR}->{CAT4}\t$Stats->{CARFAGE}->{CAT4}\n|;
-  print qq|65 to 85\t$Stats->{CARFAGEQTR}->{CAT5}\t$Stats->{CARFAGE}->{CAT5}\n|;
-  print qq|85+\t$Stats->{CARFAGEQTR}->{CAT6}\t$Stats->{CARFAGE}->{CAT6}\n|;
-  print qq|\n|;
-  print qq|Total Clients\t$Stats->{COUNTQTR}\t$Stats->{COUNT}\n|;
-  print qq|===================================\n|;
-  print qq|\n|;
-  ##
-  # Section 9: by Race/Ethnicity/Gender/Language/Religion
-  ##
-  print qq|\n|;
-  print qq|===================================\n|;
-  print qq|Clients by Race\t${RangeLabel}\tYTD\n|;
-  foreach my $Race ( sort keys %{$Stats->{RACE}} )
-  { print qq|$Race\t$Stats->{RACEQTR}->{$Race}\t$Stats->{RACE}->{$Race}\n|; }
-  print qq|Total Clients\t$Stats->{COUNTQTR}\t$Stats->{COUNT}\n|;
-  print qq|===================================\n|;
-  print qq|\n|;
-  print qq|\n|;
-  print qq|===================================\n|;
-  print qq|Clients by Ethnicity\t${RangeLabel}\tYTD\n|;
-  foreach my $Ethnicity ( sort keys %{$Stats->{ETHNICITY}} )
-  { print qq|$Ethnicity\t$Stats->{ETHNICITYQTR}->{$Ethnicity}\t$Stats->{ETHNICITY}->{$Ethnicity}\n|; }
-  print qq|Total Clients\t$Stats->{COUNTQTR}\t$Stats->{COUNT}\n|;
-  print qq|===================================\n|;
-  print qq|\n|;
-  print qq|\n|;
-  print qq|===================================\n|;
-  print qq|Clients by Language\t${RangeLabel}\tYTD\n|;
-  foreach my $Language ( sort keys %{$Stats->{LANGUAGE}} )
-  { print qq|$Language\t$Stats->{LANGUAGEQTR}->{$Language}\t$Stats->{LANGUAGE}->{$Language}\n|; }
-  print qq|Total Clients\t$Stats->{COUNTQTR}\t$Stats->{COUNT}\n|;
-  print qq|===================================\n|;
-  print qq|\n|;
-  print qq|\n|;
-  print qq|===================================\n|;
-  print qq|Clients by Religion\t${RangeLabel}\tYTD\n|;
-  foreach my $Religion ( sort keys %{$Stats->{RELIGION}} )
-  { print qq|$Religion\t$Stats->{RELIGIONQTR}->{$Religion}\t$Stats->{RELIGION}->{$Religion}\n|; }
-  print qq|Total Clients\t$Stats->{COUNTQTR}\t$Stats->{COUNT}\n|;
-  print qq|===================================\n|;
-  print qq|\n|;
-  print qq|\n|;
-  print qq|===================================\n|;
-  print qq|Clients by Gender\t${RangeLabel}\tYTD\n|;
-  print qq|Male\t$Stats->{MALEQTR}\t$Stats->{MALE}\n|;
-  print qq|Female\t$Stats->{FEMALEQTR}\t$Stats->{FEMALE}\n|;
-  print qq|\n|;
-  print qq|Total Clients\t$Stats->{COUNTQTR}\t$Stats->{COUNT}\n|;
-  print qq|===================================\n|;
-  print qq|\n|;
+#foreach my $f ( sort keys %{$Stats->{AXIS1A}} ) { warn "Stats-AXIS1A-$f=$Stats->{AXIS1A}->{$f}\n"; }
+    my @list = sort { $Stats->{AXIS1A}->{$b} <=> $Stats->{AXIS1A}->{$a} }
+      keys %{ $Stats->{AXIS1A} };
+    for ( my $i = 1 ; $i <= 10 ; $i++ ) {
+        my $ID = $list[$i];
 
-  return(0);
+        #warn qq|ID=$ID\n|;
+        my $ICD9  = DBA->getxref( $form, 'xAxis1', $ID, 'ICD9' );
+        my $Descr = DBA->getxref( $form, 'xAxis1', $ID, 'Descr' );
+        print qq|${Descr}\t${ICD9}\t$Stats->{AXIS1A}->{$ID}\n|;
+    }
+
+    #warn qq|AXIS1B=$Stats->{AXIS1B}\n|;
+    print qq|Secondary Axis1\tCode\tCount\n|;
+    my @list = sort { $Stats->{AXIS1B}->{$b} <=> $Stats->{AXIS1B}->{$a} }
+      keys %{ $Stats->{AXIS1B} };
+    for ( my $i = 1 ; $i <= 10 ; $i++ ) {
+        my $ID = $list[$i];
+
+        #warn qq|ID=$ID\n|;
+        my $ICD9  = DBA->getxref( $form, 'xAxis1', $ID, 'ICD9' );
+        my $Descr = DBA->getxref( $form, 'xAxis1', $ID, 'Descr' );
+        print qq|${Descr}\t${ICD9}\t$Stats->{AXIS1B}->{$ID}\n|;
+    }
+    print qq|Primary Axis2\tCode\tCount\n|;
+
+    #warn qq|AXIS2A=$Stats->{AXIS2A}\n|;
+    my @list = sort { $Stats->{AXIS2A}->{$b} <=> $Stats->{AXIS2A}->{$a} }
+      keys %{ $Stats->{AXIS2A} };
+    for ( my $i = 1 ; $i <= 10 ; $i++ ) {
+        my $ID = $list[$i];
+
+        #warn qq|ID=$ID\n|;
+        my $ICD9  = DBA->getxref( $form, 'xAxis2', $ID, 'ICD9' );
+        my $Descr = DBA->getxref( $form, 'xAxis2', $ID, 'Descr' );
+        print qq|${Descr}\t${ICD9}\t$Stats->{AXIS2A}->{$ID}\n|;
+    }
+
+    print qq|\n|;
+    print qq|===================================\n|;
+    print
+qq|GAFs (Current between '${BegDate}' and '${EndDate}'; Previous before ${BegDate}).\n|;
+    print qq|Increase >= 2\tNumber of Clients\n|;
+    print qq|No\t$Stats->{GAFLESS}\n|;
+    print qq|Yes\t$Stats->{GAFMORE}\n|;
+    print qq|Total Reporting Clients\t$Stats->{GAFCOUNT}\n|;
+    print qq|\n|;
+    my $Pct1 = 0;
+    my $Pct2 = 0;
+
+    if ( $Stats->{GAFCOUNT} > 0 )    # don't divide by 0.
+    {
+        $Pct1 =
+          sprintf( "%.2f", ( $Stats->{GAFLESS} / $Stats->{GAFCOUNT} ) * 100 );
+        $Pct2 =
+          sprintf( "%.2f", ( $Stats->{GAFMORE} / $Stats->{GAFCOUNT} ) * 100 );
+    }
+    print qq|Percent Showing Increase < 2\t${Pct1}%\n|;
+    print qq|Percent Showing Increase >= 2\t${Pct2}%\n|;
+    print qq|===================================\n|;
+    print qq|\n|;
+
+    print qq|\n|;
+    print qq|===================================\n|;
+    print qq|Axis3 Handicap\tCount\n|;
+    foreach my $HID ( sort keys %{ $Stats->{AXIS3} } ) {
+        print DBA->getxref( $form, 'xHandicap', $HID, 'Descr' )
+          . qq|\t$Stats->{AXIS3}->{$HID}\t$Stats->{AXIS3}->{$HID}\n|;
+    }
+    print
+qq|Note: Totals are for all 4 Handicaps in Axis3 so if same chosen for more than 1; totals are increased.\n|;
+    print qq|      (i.e. NONE for all 4)\n|;
+
+    ##
+    # Section 4: Progress
+    ##
+    if ($SetProgress) {
+        print qq|\n|;
+        print qq|===================================\n|;
+        my $Avg = 0;
+        if ( $Stats->{PROGRESSCOUNT} > 0 ) {
+            $Avg = sprintf( "%.2f",
+                $Stats->{AVGPROGRESSQTR} / $Stats->{PROGRESSCOUNT} );
+        }
+        print qq|Average Progress All Clients\t$Avg\n|;
+        print qq|Total Reporting Clients\t$Stats->{PROGRESSCOUNT}\n|;
+        print qq|\n|;
+
+        print qq|Progress in Quarter separated by 60 days or more.\n|;
+        print qq|Progress Scale\tNumber of Clients\n|;
+        print qq|-3. Significant Deterioration\t$Stats->{PROG}->{PROGM3}\n|;
+        print qq|-2. Moderate Deterioration\t$Stats->{PROG}->{PROGM2}\n|;
+        print qq|-1. Minimal Deterioration\t$Stats->{PROG}->{PROGM1}\n|;
+        print qq| 0. No Progress\t$Stats->{PROG}->{PROG0}\n|;
+        print qq| 1. Minimal Progress\t$Stats->{PROG}->{PROG1}\n|;
+        print qq| 2. Average Progress\t$Stats->{PROG}->{PROG2}\n|;
+        print qq| 3. Significant Progress\t$Stats->{PROG}->{PROG3}\n|;
+        print qq|Total Reporting Clients\t$Stats->{PROGCOUNT}\n|;
+        print qq|\n|;
+
+        my ( $Pctm3, $Pctm2, $Pctm1, $Pct0, $Pct1, $Pct2, $Pct3 ) =
+          ( 0, 0, 0, 0, 0, 0, 0 );
+        if ( $Stats->{PROGCOUNT} > 0 )    # don't divide by 0.
+        {
+            $Pctm3 = sprintf( "%.2f",
+                ( $Stats->{PROG}->{PROGM3} / $Stats->{PROGCOUNT} ) * 100 );
+            $Pctm2 = sprintf( "%.2f",
+                ( $Stats->{PROG}->{PROGM2} / $Stats->{PROGCOUNT} ) * 100 );
+            $Pctm1 = sprintf( "%.2f",
+                ( $Stats->{PROG}->{PROGM1} / $Stats->{PROGCOUNT} ) * 100 );
+            $Pct0 = sprintf( "%.2f",
+                ( $Stats->{PROG}->{PROG0} / $Stats->{PROGCOUNT} ) * 100 );
+            $Pct1 = sprintf( "%.2f",
+                ( $Stats->{PROG}->{PROG1} / $Stats->{PROGCOUNT} ) * 100 );
+            $Pct2 = sprintf( "%.2f",
+                ( $Stats->{PROG}->{PROG2} / $Stats->{PROGCOUNT} ) * 100 );
+            $Pct3 = sprintf( "%.2f",
+                ( $Stats->{PROG}->{PROG3} / $Stats->{PROGCOUNT} ) * 100 );
+        }
+        print qq|Percentage Showing Significant Deterioration\t${Pctm3}%\n|;
+        print qq|Percentage Showing Moderate Deterioration\t${Pctm2}%\n|;
+        print qq|Percentage Showing Minimal Deterioration\t${Pctm1}%\n|;
+        print qq|Percentage Showing No Progress\t${Pct0}%\n|;
+        print qq|Percentage Showing Minimal Progress\t${Pct1}%\n|;
+        print qq|Percentage Showing Average Progress\t${Pct2}%\n|;
+        print qq|Percentage Showing Significant Progress\t${Pct3}%\n|;
+        print qq|===================================\n|;
+        print qq|\n|;
+    }
+    else {
+        print qq|\n|;
+        print qq|===================================\n|;
+        print qq|Progress: Date range to narrow. \n|;
+        print qq|===================================\n|;
+        print qq|\n|;
+    }
+
+    ##
+    # Section 5: Referrals
+    ##
+    print qq|\n|;
+    print qq|===================================\n|;
+    print
+      qq|Referrals by Assigned Clinic\tNumber of Clients\t${RangeLabel}\tYTD\n|;
+    foreach my $Clinic ( sort keys %{ $Stats->{COUNTCLINIC} } ) {
+        print
+qq|$Clinic\t$Stats->{COUNTCLINIC}->{$Clinic}\t$Stats->{REFSQTRCLINIC}->{$Clinic}\t$Stats->{REFSYTDCLINIC}->{$Clinic}\n|;
+    }
+    print
+qq|Total Referrals\t$Stats->{COUNT}\t$Stats->{REFSQTR}\t$Stats->{REFSYTD}\n|;
+    print qq|===================================\n|;
+    print qq|\n|;
+    print qq|===================================\n|;
+    print qq|Referrals by Insurance\t${RangeLabel}\tYTD\n|;
+    foreach my $Ins ( sort keys %{ $Stats->{REFSQTRINS} } ) {
+        print
+qq|$Ins\t$Stats->{REFSQTRINS}->{$Ins}\t$Stats->{REFSYTDINS}->{$Ins}\n|;
+    }
+    print
+qq|Note: These total-up by Client Insurance. If a client has more than 1 insurance (record) then they will have more than one referral.\n|;
+    print qq|===================================\n|;
+    print qq|\n|;
+    print qq|===================================\n|;
+    print qq|Referrals by Referral Agency\t${RangeLabel}\tYTD\n|;
+    foreach my $RA ( sort keys %{ $Stats->{REFSQTRREF} } ) {
+        print
+          qq|$RA\t$Stats->{REFSQTRREF}->{$RA}\t$Stats->{REFSYTDREF}->{$RA}\n|;
+    }
+    print qq|===================================\n|;
+    print qq|\n|;
+    ##
+    # Number of persons making a service request contacted +-15 days.
+    ##
+    print qq|\n|;
+    print qq|===================================\n|;
+    print qq|Service request contacted within 15 days.\n|;
+    print qq|Within 15\tMore than 15\tTotal\n|;
+    print qq|$Stats->{REFLESS}\t$Stats->{REFMORE}\t$Stats->{REFSQTR}\n|;
+    print qq|\n|;
+    my $Pct1 = 0;
+    my $Pct2 = 0;
+
+    if ( $Stats->{REFSQTR} > 0 )    # don't divide by 0.
+    {
+        $Pct1 =
+          sprintf( "%.2f", ( $Stats->{REFLESS} / $Stats->{REFSQTR} ) * 100 );
+        $Pct2 =
+          sprintf( "%.2f", ( $Stats->{REFMORE} / $Stats->{REFSQTR} ) * 100 );
+    }
+    print qq|Percentage within 15 days\t${Pct1}%\n|;
+    print qq|Percentage more than 15 days\t${Pct2}%\n|;
+    print qq|===================================\n|;
+    print qq|\n|;
+
+    ##
+    # Section 6: by Insurance
+    ##
+    print qq|\n|;
+    print qq|===================================\n|;
+    print qq|Clients by Primary Insurance\t${RangeLabel}\tYTD\n|;
+    foreach my $Ins ( sort keys %{ $Stats->{INS} } ) {
+        print qq|$Ins\t$Stats->{INSQTR}->{$Ins}\t$Stats->{INS}->{$Ins}\n|;
+    }
+    print qq|Total Clients\t$Stats->{COUNTQTR}\t$Stats->{COUNT}\n|;
+    print qq|===================================\n|;
+    print qq|\n|;
+
+    ##
+    # Section 7: by MarStat/EmplStat/EmplType/SchoolStat
+    ##
+    print qq|\n|;
+    print qq|===================================\n|;
+    print qq|Clients by Marriage Status\t${RangeLabel}\tYTD\n|;
+    foreach my $MarStat ( sort keys %{ $Stats->{MARSTAT} } ) {
+        print
+qq|$MarStat\t$Stats->{MARSTATQTR}->{$MarStat}\t$Stats->{MARSTAT}->{$MarStat}\n|;
+    }
+    print qq|Total Clients\t$Stats->{COUNTQTR}\t$Stats->{COUNT}\n|;
+    print qq|===================================\n|;
+    print qq|\n|;
+    print qq|\n|;
+    print qq|===================================\n|;
+    print qq|Clients by Employment Status\t${RangeLabel}\tYTD\n|;
+    foreach my $EmplStat ( sort keys %{ $Stats->{EMPLSTAT} } ) {
+        print
+qq|$EmplStat\t$Stats->{EMPLSTATQTR}->{$EmplStat}\t$Stats->{EMPLSTAT}->{$EmplStat}\n|;
+    }
+    print qq|Total Clients\t$Stats->{COUNTQTR}\t$Stats->{COUNT}\n|;
+    print qq|===================================\n|;
+    print qq|\n|;
+    print qq|\n|;
+    print qq|===================================\n|;
+    print qq|Clients by Employment Type\t${RangeLabel}\tYTD\n|;
+    foreach my $EmplType ( sort keys %{ $Stats->{EMPLTYPE} } ) {
+        print
+qq|$EmplType\t$Stats->{EMPLTYPEQTR}->{$EmplType}\t$Stats->{EMPLTYPE}->{$EmplType}\n|;
+    }
+    print qq|Total Clients\t$Stats->{COUNTQTR}\t$Stats->{COUNT}\n|;
+    print qq|===================================\n|;
+    print qq|\n|;
+    print qq|\n|;
+    print qq|===================================\n|;
+    print qq|Clients by School Status\t${RangeLabel}\tYTD\n|;
+    foreach my $SchoolStat ( sort keys %{ $Stats->{SCHOOLSTAT} } ) {
+        print
+qq|$SchoolStat\t$Stats->{SCHOOLSTATQTR}->{$SchoolStat}\t$Stats->{SCHOOLSTAT}->{$SchoolStat}\n|;
+    }
+    print qq|Total Clients\t$Stats->{COUNTQTR}\t$Stats->{COUNT}\n|;
+    print qq|===================================\n|;
+    print qq|\n|;
+    print qq|\n|;
+    print qq|===================================\n|;
+    print qq|Clients by Highest Grade Completed\t${RangeLabel}\tYTD\n|;
+    foreach my $SG ( sort keys %{ $Stats->{SCHOOLGRADE} } ) {
+        print
+qq|$SG\t$Stats->{SCHOOLGRADEQTR}->{$SG}\t$Stats->{SCHOOLGRADE}->{$SG}\n|;
+    }
+    print qq|Total Clients\t$Stats->{COUNTQTR}\t$Stats->{COUNT}\n|;
+    print qq|===================================\n|;
+    print qq|\n|;
+    ##
+    # Section 8: by Age
+    ##
+    print qq|\n|;
+    print qq|===================================\n|;
+    print qq|Clients by MIS Age\t${RangeLabel}\tYTD\n|;
+    print qq|Not Reported\t$Stats->{AGEQTR}->{CAT0}\t$Stats->{AGE}->{CAT0}\n|;
+    print qq|0 to 3\t$Stats->{AGEQTR}->{CAT1}\t$Stats->{AGE}->{CAT1}\n|;
+    print qq|4 to 7\t$Stats->{AGEQTR}->{CAT2}\t$Stats->{AGE}->{CAT2}\n|;
+    print qq|8 to 11\t$Stats->{AGEQTR}->{CAT3}\t$Stats->{AGE}->{CAT3}\n|;
+    print qq|12 to 15\t$Stats->{AGEQTR}->{CAT4}\t$Stats->{AGE}->{CAT4}\n|;
+    print qq|16 to 19\t$Stats->{AGEQTR}->{CAT5}\t$Stats->{AGE}->{CAT5}\n|;
+    print qq|20+\t$Stats->{AGEQTR}->{CAT6}\t$Stats->{AGE}->{CAT6}\n|;
+    print qq|\n|;
+    print qq|Total Clients\t$Stats->{COUNTQTR}\t$Stats->{COUNT}\n|;
+    print qq|===================================\n|;
+    print qq|\n|;
+    ##
+    print qq|\n|;
+    print qq|===================================\n|;
+    print qq|Clients by CARF Age\t${RangeLabel}\tYTD\n|;
+    print
+qq|Not Reported\t$Stats->{CARFAGEQTR}->{CAT0}\t$Stats->{CARFAGE}->{CAT0}\n|;
+    print qq|0 to 5\t$Stats->{CARFAGEQTR}->{CAT1}\t$Stats->{CARFAGE}->{CAT1}\n|;
+    print
+      qq|6 to 17\t$Stats->{CARFAGEQTR}->{CAT2}\t$Stats->{CARFAGE}->{CAT2}\n|;
+    print
+      qq|18 to 40\t$Stats->{CARFAGEQTR}->{CAT3}\t$Stats->{CARFAGE}->{CAT3}\n|;
+    print
+      qq|41 to 65\t$Stats->{CARFAGEQTR}->{CAT4}\t$Stats->{CARFAGE}->{CAT4}\n|;
+    print
+      qq|65 to 85\t$Stats->{CARFAGEQTR}->{CAT5}\t$Stats->{CARFAGE}->{CAT5}\n|;
+    print qq|85+\t$Stats->{CARFAGEQTR}->{CAT6}\t$Stats->{CARFAGE}->{CAT6}\n|;
+    print qq|\n|;
+    print qq|Total Clients\t$Stats->{COUNTQTR}\t$Stats->{COUNT}\n|;
+    print qq|===================================\n|;
+    print qq|\n|;
+    ##
+    # Section 9: by Race/Ethnicity/Gender/Language/Religion
+    ##
+    print qq|\n|;
+    print qq|===================================\n|;
+    print qq|Clients by Race\t${RangeLabel}\tYTD\n|;
+    foreach my $Race ( sort keys %{ $Stats->{RACE} } ) {
+        print qq|$Race\t$Stats->{RACEQTR}->{$Race}\t$Stats->{RACE}->{$Race}\n|;
+    }
+    print qq|Total Clients\t$Stats->{COUNTQTR}\t$Stats->{COUNT}\n|;
+    print qq|===================================\n|;
+    print qq|\n|;
+    print qq|\n|;
+    print qq|===================================\n|;
+    print qq|Clients by Ethnicity\t${RangeLabel}\tYTD\n|;
+    foreach my $Ethnicity ( sort keys %{ $Stats->{ETHNICITY} } ) {
+        print
+qq|$Ethnicity\t$Stats->{ETHNICITYQTR}->{$Ethnicity}\t$Stats->{ETHNICITY}->{$Ethnicity}\n|;
+    }
+    print qq|Total Clients\t$Stats->{COUNTQTR}\t$Stats->{COUNT}\n|;
+    print qq|===================================\n|;
+    print qq|\n|;
+    print qq|\n|;
+    print qq|===================================\n|;
+    print qq|Clients by Language\t${RangeLabel}\tYTD\n|;
+    foreach my $Language ( sort keys %{ $Stats->{LANGUAGE} } ) {
+        print
+qq|$Language\t$Stats->{LANGUAGEQTR}->{$Language}\t$Stats->{LANGUAGE}->{$Language}\n|;
+    }
+    print qq|Total Clients\t$Stats->{COUNTQTR}\t$Stats->{COUNT}\n|;
+    print qq|===================================\n|;
+    print qq|\n|;
+    print qq|\n|;
+    print qq|===================================\n|;
+    print qq|Clients by Religion\t${RangeLabel}\tYTD\n|;
+    foreach my $Religion ( sort keys %{ $Stats->{RELIGION} } ) {
+        print
+qq|$Religion\t$Stats->{RELIGIONQTR}->{$Religion}\t$Stats->{RELIGION}->{$Religion}\n|;
+    }
+    print qq|Total Clients\t$Stats->{COUNTQTR}\t$Stats->{COUNT}\n|;
+    print qq|===================================\n|;
+    print qq|\n|;
+    print qq|\n|;
+    print qq|===================================\n|;
+    print qq|Clients by Gender\t${RangeLabel}\tYTD\n|;
+    print qq|Male\t$Stats->{MALEQTR}\t$Stats->{MALE}\n|;
+    print qq|Female\t$Stats->{FEMALEQTR}\t$Stats->{FEMALE}\n|;
+    print qq|\n|;
+    print qq|Total Clients\t$Stats->{COUNTQTR}\t$Stats->{COUNT}\n|;
+    print qq|===================================\n|;
+    print qq|\n|;
+
+    return (0);
 }
 #######################################################

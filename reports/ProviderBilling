@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 use SysAccess;
@@ -13,8 +13,9 @@ $DT = localtime();
 # usage:
 ############################################################################
 $form = DBForm->new();
-if ( ! SysAccess->verify($form,'Privilege=BillingReports') )
-{ $form->error("Access Denied! / Billing Reports"); }
+if ( !SysAccess->verify( $form, 'Privilege=BillingReports' ) ) {
+    $form->error("Access Denied! / Billing Reports");
+}
 $form = DBUtil->setDates($form);
 my $DateRange = qq|from $form->{FromDateD} thru $form->{ToDateD}|;
 
@@ -23,14 +24,14 @@ my $DateRange = qq|from $form->{FromDateD} thru $form->{ToDateD}|;
 ##
 $dbh = $form->dbconnect();
 
-$xref='ClinicList';
-  $s= $dbh->prepare("select * from Provider where Type=3");
-  $s->execute();
-  while (my $r = $s->fetchrow_hashref) { $$xref{$r->{ProvID}} = $r; }
-$xref='xInsurance';
-  $s= $dbh->prepare("select * from $xref");
-  $s->execute();
-  while (my $r = $s->fetchrow_hashref) { $$xref{$r->{ID}} = $r; }
+$xref = 'ClinicList';
+$s    = $dbh->prepare("select * from Provider where Type=3");
+$s->execute();
+while ( my $r = $s->fetchrow_hashref ) { $$xref{ $r->{ProvID} } = $r; }
+$xref = 'xInsurance';
+$s    = $dbh->prepare("select * from $xref");
+$s->execute();
+while ( my $r = $s->fetchrow_hashref ) { $$xref{ $r->{ID} } = $r; }
 $s->finish();
 
 $qInsurance = qq|
@@ -43,11 +44,13 @@ $sInsurance = $dbh->prepare($qInsurance);
 
 %TotalTrIDs = ();
 %TotalUnits = ();
-%Detail = ();
-%ProvNames = ();
+%Detail     = ();
+%ProvNames  = ();
 
 my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
-$ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Treatment.ClinicID');
+$ClinicSelection =
+  DBA->getClinicSelection( $form, $ForProvID, 'Treatment.ClinicID' );
+
 # Marie Detty Clinics
 
 #######################################################
@@ -64,9 +67,8 @@ $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Treatment.ClinicID'
 $form->complete();
 exit;
 #######################################################
-sub SelectNotes()
-{
-  $qNotes = qq|
+sub SelectNotes() {
+    $qNotes = qq|
   select Treatment.*, Client.LName, Client.FName, Client.Suffix
         ,Provider.SSN, Provider.LName as PLName, Provider.FName as PFName, Provider.JobTitle
     from Treatment
@@ -76,96 +78,114 @@ sub SelectNotes()
     ${ClinicSelection}
     order by Provider.SSN, Treatment.ContLogDate, Treatment.ContLogBegTime
 |;
-#warn "qNotes=\n$qNotes\n";
-  $sNotes = $dbh->prepare($qNotes);
-  $sNotes->execute() || $form->dberror($qNotes);
-  while ( $rNotes = $sNotes->fetchrow_hashref )
-  {
+
+    #warn "qNotes=\n$qNotes\n";
+    $sNotes = $dbh->prepare($qNotes);
+    $sNotes->execute() || $form->dberror($qNotes);
+    while ( $rNotes = $sNotes->fetchrow_hashref ) {
+
 #    ($code,$msg,$rxSC) = cBill->ChkSC($form,$rNotes);
 #    if ( $code ) { print qq|WARNING: $rNotes->{TrID}, $rNotes->{ContLogDate}, $rNotes->{SCID}, $rxSC->{SCName}: ${msg}\n|; }
-    $rxSC = cBill->getServiceCode($form,$rNotes->{SCID},$rNotes->{ContLogDate},$rNotes->{ContLogBegTime},$rNotes->{ContLogEndTime},$rNotes->{TrID},$rNotes->{BillDate});
+        $rxSC = cBill->getServiceCode(
+            $form,                     $rNotes->{SCID},
+            $rNotes->{ContLogDate},    $rNotes->{ContLogBegTime},
+            $rNotes->{ContLogEndTime}, $rNotes->{TrID},
+            $rNotes->{BillDate}
+        );
 
-    my $SSN= $rNotes->{SSN};
-    my $Client_Name = $rNotes->{LName};
-    $Client_Name .= ", $rNotes->{FName}" if ( $rNotes->{FName} );
-    $Client_Name .= " $rNotes->{Suffix}" if ( $rNotes->{Suffix} );
-    my $Clinic_Name = $ClinicList{$rNotes->{ClinicID}}{Name};
-    my $ContactDate = DBUtil->Date($rNotes->{ContLogDate},'fmt','MM/DD/YYYY');
-    $sInsurance->execute($rNotes->{ClientID},$rNotes->{ContLogDate},$rNotes->{ContLogDate}) 
-                      || $form->dberror($qInsurance);
-    my $rInsurance = $sInsurance->fetchrow_hashref;
-    my $InsName = $xInsurance{$rInsurance->{InsID}}{Name};
-    my $SrcBilled = $xInsurance{$rxSC->{InsID}}{Name};
-    my $BegTime = substr($rNotes->{ContLogBegTime},0,5);
-    my $EndTime = substr($rNotes->{ContLogEndTime},0,5);
-    my ($BilledHrs, $NonBilledHrs) = (0,0);
-    if ( $rxSC->{UnitLbl} eq 'NonBill' )
-    { $NonBilledHrs = sprintf("%.2f",$rxSC->{Duration} / 3600); }
-    else { $BilledHrs = sprintf("%.2f",$rxSC->{Duration} / 3600); }
-# don't want the scholarshipped amounts, only the actual paided(IncAmt).
-    my $IncAmt = $rNotes->{'IncAmt'};
-    my $BillStatus=DBA->getxref($form,'xBillStatus',$rNotes->{'BillStatus'});
-    my $Reason = qq|${BillStatus} on $rNotes->{StatusDate}|;
-    $Detail{$SSN} .= qq|${ContactDate}\t|;
-    $Detail{$SSN} .= qq|$Client_Name\t|;
-    $Detail{$SSN} .= qq|${InsName}\t|;
-    $Detail{$SSN} .= qq|${SrcBilled}\t|;
-    $Detail{$SSN} .= qq|$rxSC->{SCNum}\t|;
-    $Detail{$SSN} .= qq|${BegTime}\t|;
-    $Detail{$SSN} .= qq|${EndTime}\t|;
-    $Detail{$SSN} .= qq|${BilledHrs}\t|;
-    $Detail{$SSN} .= qq|${NonBilledHrs}\t|;
-    $Detail{$SSN} .= qq|\$$rxSC->{BillAmt}\t|;
-    $Detail{$SSN} .= qq|\$${IncAmt}\t|;
-    $Detail{$SSN} .= qq|${Reason}\t|;
-    $Detail{$SSN} .= qq|$Clinic_Name\n|;
-    $TotBilled{$SSN} += $BilledHrs;
-    $TotNonBilled{$SSN} += $NonBilledHrs;
-    $TotReImbursed{$SSN} += $rxSC->{BillAmt};
-    $TotIncome{$SSN} += $IncAmt;
-    if ( $rxSC->{Name} =~ /no show/i ) { $TotNONs{$SSN}++; }
-    elsif ( $rxSC->{Name} =~ /cancel/i ) { $TotNONs{$SSN}++; }
-    elsif ( $rxSC->{Name} =~ /resched/i ) { $TotNONs{$SSN}++; }
-    $TotTrIDs{$SSN}++;
-    $TotUnits{$SSN} += $rxSC->{Units};
-    $sInsurance->finish();
-    $ProvNames->{"$rNotes->{PLName}, $rNotes->{PFName} (${SSN})"} = $SSN;
-    $ProvNames->{"$rNotes->{PLName}, $rNotes->{PFName} (${SSN})"}->{JobTitle} = $rNotes->{JobTitle};
-  }
-  $sNotes->finish();
-  return(1);
+        my $SSN         = $rNotes->{SSN};
+        my $Client_Name = $rNotes->{LName};
+        $Client_Name .= ", $rNotes->{FName}" if ( $rNotes->{FName} );
+        $Client_Name .= " $rNotes->{Suffix}" if ( $rNotes->{Suffix} );
+        my $Clinic_Name = $ClinicList{ $rNotes->{ClinicID} }{Name};
+        my $ContactDate =
+          DBUtil->Date( $rNotes->{ContLogDate}, 'fmt', 'MM/DD/YYYY' );
+        $sInsurance->execute(
+            $rNotes->{ClientID},
+            $rNotes->{ContLogDate},
+            $rNotes->{ContLogDate}
+        ) || $form->dberror($qInsurance);
+        my $rInsurance = $sInsurance->fetchrow_hashref;
+        my $InsName    = $xInsurance{ $rInsurance->{InsID} }{Name};
+        my $SrcBilled  = $xInsurance{ $rxSC->{InsID} }{Name};
+        my $BegTime    = substr( $rNotes->{ContLogBegTime}, 0, 5 );
+        my $EndTime    = substr( $rNotes->{ContLogEndTime}, 0, 5 );
+        my ( $BilledHrs, $NonBilledHrs ) = ( 0, 0 );
+
+        if ( $rxSC->{UnitLbl} eq 'NonBill' ) {
+            $NonBilledHrs = sprintf( "%.2f", $rxSC->{Duration} / 3600 );
+        }
+        else { $BilledHrs = sprintf( "%.2f", $rxSC->{Duration} / 3600 ); }
+
+        # don't want the scholarshipped amounts, only the actual paided(IncAmt).
+        my $IncAmt = $rNotes->{'IncAmt'};
+        my $BillStatus =
+          DBA->getxref( $form, 'xBillStatus', $rNotes->{'BillStatus'} );
+        my $Reason = qq|${BillStatus} on $rNotes->{StatusDate}|;
+        $Detail{$SSN} .= qq|${ContactDate}\t|;
+        $Detail{$SSN} .= qq|$Client_Name\t|;
+        $Detail{$SSN} .= qq|${InsName}\t|;
+        $Detail{$SSN} .= qq|${SrcBilled}\t|;
+        $Detail{$SSN} .= qq|$rxSC->{SCNum}\t|;
+        $Detail{$SSN} .= qq|${BegTime}\t|;
+        $Detail{$SSN} .= qq|${EndTime}\t|;
+        $Detail{$SSN} .= qq|${BilledHrs}\t|;
+        $Detail{$SSN} .= qq|${NonBilledHrs}\t|;
+        $Detail{$SSN} .= qq|\$$rxSC->{BillAmt}\t|;
+        $Detail{$SSN} .= qq|\$${IncAmt}\t|;
+        $Detail{$SSN} .= qq|${Reason}\t|;
+        $Detail{$SSN} .= qq|$Clinic_Name\n|;
+        $TotBilled{$SSN}     += $BilledHrs;
+        $TotNonBilled{$SSN}  += $NonBilledHrs;
+        $TotReImbursed{$SSN} += $rxSC->{BillAmt};
+        $TotIncome{$SSN}     += $IncAmt;
+        if    ( $rxSC->{Name} =~ /no show/i ) { $TotNONs{$SSN}++; }
+        elsif ( $rxSC->{Name} =~ /cancel/i )  { $TotNONs{$SSN}++; }
+        elsif ( $rxSC->{Name} =~ /resched/i ) { $TotNONs{$SSN}++; }
+        $TotTrIDs{$SSN}++;
+        $TotUnits{$SSN} += $rxSC->{Units};
+        $sInsurance->finish();
+        $ProvNames->{"$rNotes->{PLName}, $rNotes->{PFName} (${SSN})"} = $SSN;
+        $ProvNames->{"$rNotes->{PLName}, $rNotes->{PFName} (${SSN})"}
+          ->{JobTitle} = $rNotes->{JobTitle};
+    }
+    $sNotes->finish();
+    return (1);
 }
 #######################################################
-sub PrintRpt()
-{
-  my ($TotTB,$TotTN,$TotTR,$TotTI,$TotTC) = (0,0,0,0,0);
-  foreach my $ProviderName ( sort keys %{$ProvNames} )
-  {
-    my $SSN = $ProvNames->{$ProviderName};
-    next if ( $SSN eq '' );
-    next if ( $Detail{$SSN} eq '' );
+sub PrintRpt() {
+    my ( $TotTB, $TotTN, $TotTR, $TotTI, $TotTC ) = ( 0, 0, 0, 0, 0 );
+    foreach my $ProviderName ( sort keys %{$ProvNames} ) {
+        my $SSN = $ProvNames->{$ProviderName};
+        next if ( $SSN eq '' );
+        next if ( $Detail{$SSN} eq '' );
 
-    print qq|${DT}\nProvider Billing Report ${DateRange}\n\n$ProviderName\n$ProvNames->{$ProviderName}->{JobTitle}\n\n|;
-    print qq|Date\tClientName\tPrimary Billing Source\tSource Billed\tService\tStart\tEnd\tDirect Billable Hours\tDirect Non Billable Hours\tReimbursable Amount Expected\tActual Reimbursement\tNOTES:\tClinic\n|;
-    print qq|$Detail{$SSN}\n|;
-    my $TB = sprintf("%.2f", $TotBilled{$SSN});
-    my $TN = sprintf("%.2f", $TotNonBilled{$SSN});
-    my $TR = sprintf("%.2f", $TotReImbursed{$SSN});
-    my $TI = sprintf("%.2f", $TotIncome{$SSN});
-    my $TC = sprintf("%.2f", $TotNONs{$SSN});
-    print qq|\t\t\t\t\t\tTotal Direct Hours Served:\t${TB}\t${TN}\t\$${TR}\t\$${TI}\n|;
-    print qq|\t\t\t\t\t\tTotal No Shows, Cancelled, Rescheduled:\t${TC}\n|;
-    print qq|\t\t\t\t\t\tHoliday Hours\n|;
-    print qq|\t\t\t\t\t\tAnnual Leave\n|;
-    print qq|\t\t\t\t\t\tSick Leave\n|;
-    $TotTB+=$TB;
-    $TotTN+=$TN;
-    $TotTR+=$TR;
-    $TotTI+=$TI;
-    $TotTC+=$TC;
-  }
-  print qq|\t\t\t\t\t\tOverall Total Direct Hours Served:\t${TotTB}\t${TotTN}\t\$${TotTR}\t\$${TotTI}\n|;
-  print qq|\t\t\t\t\t\tOverall Total No Shows, Cancelled, Rescheduled:\t${TotTC}\n|;
-  return(1);
+        print
+qq|${DT}\nProvider Billing Report ${DateRange}\n\n$ProviderName\n$ProvNames->{$ProviderName}->{JobTitle}\n\n|;
+        print
+qq|Date\tClientName\tPrimary Billing Source\tSource Billed\tService\tStart\tEnd\tDirect Billable Hours\tDirect Non Billable Hours\tReimbursable Amount Expected\tActual Reimbursement\tNOTES:\tClinic\n|;
+        print qq|$Detail{$SSN}\n|;
+        my $TB = sprintf( "%.2f", $TotBilled{$SSN} );
+        my $TN = sprintf( "%.2f", $TotNonBilled{$SSN} );
+        my $TR = sprintf( "%.2f", $TotReImbursed{$SSN} );
+        my $TI = sprintf( "%.2f", $TotIncome{$SSN} );
+        my $TC = sprintf( "%.2f", $TotNONs{$SSN} );
+        print
+qq|\t\t\t\t\t\tTotal Direct Hours Served:\t${TB}\t${TN}\t\$${TR}\t\$${TI}\n|;
+        print qq|\t\t\t\t\t\tTotal No Shows, Cancelled, Rescheduled:\t${TC}\n|;
+        print qq|\t\t\t\t\t\tHoliday Hours\n|;
+        print qq|\t\t\t\t\t\tAnnual Leave\n|;
+        print qq|\t\t\t\t\t\tSick Leave\n|;
+        $TotTB += $TB;
+        $TotTN += $TN;
+        $TotTR += $TR;
+        $TotTI += $TI;
+        $TotTC += $TC;
+    }
+    print
+qq|\t\t\t\t\t\tOverall Total Direct Hours Served:\t${TotTB}\t${TotTN}\t\$${TotTR}\t\$${TotTI}\n|;
+    print
+qq|\t\t\t\t\t\tOverall Total No Shows, Cancelled, Rescheduled:\t${TotTC}\n|;
+    return (1);
 }
 #######################################################

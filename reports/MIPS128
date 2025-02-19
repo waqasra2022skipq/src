@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use myForm;
 use myDBI;
@@ -9,29 +9,37 @@ use Time::Local;
 my $DT = localtime();
 ############################################################################
 # usage:
-#   MIPS 
+#   MIPS
 ############################################################################
-my $form = myForm->new();
-my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $form  = myForm->new();
+my $dbh   = myDBI->dbconnect( $form->{'DBNAME'} );
 my $debug = $form->{'LOGINPROVID'} == 91 ? 0 : 0;
-if ( $debug ) { foreach my $f ( sort keys %{$form} ) { print "form-$f=$form->{$f}\n"; } }
+if ($debug) {
+    foreach my $f ( sort keys %{$form} ) { print "form-$f=$form->{$f}\n"; }
+}
 my $Type = $form->{'Type'};
 $form = DBUtil->setDates($form);
 my $DateRange = qq|from $form->{FromDateD} thru $form->{ToDateD}|;
 
-my $multidel = 'ý';
+my $multidel  = 'ý';
 my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+
 # join xInsurance needed for withSelection
-my $withSelection = DBA->withSelection($form,'and','Client.clinicClinicID','Treatment.ProvID','Treatment.ClientID','Treatment.TrID');
+my $withSelection = DBA->withSelection( $form, 'and', 'Client.clinicClinicID',
+    'Treatment.ProvID', 'Treatment.ClientID', 'Treatment.TrID' );
 my $Header = DBA->withSelectionHeader($form);
+
 #warn qq|Header: ${Header}\n|;
 $withSelection .= qq| and Client.Active=1| if ( $form->{Active} );
-  $QID = qq|QID128|;
-  $TITLE = qq|Preventive Care and Screening: Body Mass Index (BMI) Screening and Follow-Up Plan - National Quality Strategy Domain: Community/Population Health - Meaningful Measure Area: Preventive Care|;
-  $CTYPE = qq|MIPS CLINICAL QUALITY MEASURES (CQMS)|;
-  $MTYPE = qq|Process|;
-  $DESC = qq|Percentage of patients aged 18 years and older with a BMI documented during the current encounter or within the previous twelve months AND who had a follow-up plan documented if most recent BMI was outside of normal parameters|;
-  $INST = qq|There is no diagnosis associated with this measure. This measure is to be submitted a minimum of once per
+$QID = qq|QID128|;
+$TITLE =
+qq|Preventive Care and Screening: Body Mass Index (BMI) Screening and Follow-Up Plan - National Quality Strategy Domain: Community/Population Health - Meaningful Measure Area: Preventive Care|;
+$CTYPE = qq|MIPS CLINICAL QUALITY MEASURES (CQMS)|;
+$MTYPE = qq|Process|;
+$DESC =
+qq|Percentage of patients aged 18 years and older with a BMI documented during the current encounter or within the previous twelve months AND who had a follow-up plan documented if most recent BMI was outside of normal parameters|;
+$INST =
+qq|There is no diagnosis associated with this measure. This measure is to be submitted a minimum of once per
 performance period for patients seen during the performance period. This measure may be submitted by Meritbased Incentive Payment System (MIPS) eligible clinicians who perform the quality actions described in the measure 
 based on the services provided at the time of the qualifying visit and the measure-specific denominator coding. The 
 BMI may be documented in the medical record of the provider or in outside medical records obtained by the provider. 
@@ -42,10 +50,16 @@ counseling for BMI above or below normal parameters” (See Definitions for exam
 more than one BMI is submitted during the measurement period, the most recent BMI will be used to determine if the 
 performance has been met. Review the exclusions and exceptions criteria to determine those patients that BMI 
 measurement may not be appropriate or necessary.|;
-  my @FLDS = ('ClinicName:ClinicName','LName:LastName','FName:FirstName','ClientID:ClientID','DOB:DateOfBirth','Age:Age','Race:Race','pcount:ProbAddr','PrimaryProvider:PrimaryProvider');
-  my $numFLDS = scalar(@FLDS)-2;
-print qq|numFLDS=${numFLDS}\n| if ( $debug );
-  my $qrecord = qq|
+my @FLDS = (
+    'ClinicName:ClinicName', 'LName:LastName',
+    'FName:FirstName',       'ClientID:ClientID',
+    'DOB:DateOfBirth',       'Age:Age',
+    'Race:Race',             'pcount:ProbAddr',
+    'PrimaryProvider:PrimaryProvider'
+);
+my $numFLDS = scalar(@FLDS) - 2;
+print qq|numFLDS=${numFLDS}\n| if ($debug);
+my $qrecord = qq|
 select Treatment.TrID,Treatment.ContLogDate,Treatment.ClinicID, Treatment.POS, xSC.SCNum
       ,Client.LName,Client.FName,Client.ClientID
       ,Clinic.Name as ClinicName
@@ -149,7 +163,8 @@ select Treatment.TrID,Treatment.ContLogDate,Treatment.ClinicID, Treatment.POS, x
  group by Client.LName,Client.FName,Client.ClientID
 |;
 
-my $sGCode = $dbh->prepare("select TrID 
+my $sGCode = $dbh->prepare(
+    "select TrID 
  from Treatment left join xSC on xSC.SCID=Treatment.SCID 
  where Treatment.ClientID=? 
    and (Treatment.ContLogDate >= '$form->{FromDate}' and Treatment.ContLogDate<='$form->{ToDate}')
@@ -159,46 +174,50 @@ my $sGCode = $dbh->prepare("select TrID
         or xSC.SCNum='G2181'
         or xSC.SCNum='G8421'
         or xSC.SCNum='G8420'
-        or xSC.SCNum='G8419')");
+        or xSC.SCNum='G8419')"
+);
 
-my ($Denominator, $total, $PFMET, $DNEXCEPTION, $PFNOTMET) = (0,0,0,0,0);
+my ( $Denominator, $total, $PFMET, $DNEXCEPTION, $PFNOTMET ) =
+  ( 0, 0, 0, 0, 0 );
 
 my $table_header = '';
-foreach my $f ( @FLDS ) { 
-  my ($fld,$hdr) = split(':',$f); 
-  $table_header .= qq|${hdr}\t|; 
+foreach my $f (@FLDS) {
+    my ( $fld, $hdr ) = split( ':', $f );
+    $table_header .= qq|${hdr}\t|;
 }
 $table_header .= qq|\n|;
 $table_entries = '';
 
-
 my $srecord = $dbh->prepare($qrecord);
 $srecord->execute();
-while (my $rrecord = $srecord->fetchrow_hashref)
-{ 
-  $sGCode->execute($rrecord->{'ClientID'});
-  while (my $rGCode = $sGCode->fetchrow_hashref) {
-     if($rGCode->{'SCNum'} == 'G8420' || $rGCode->{'SCNum'} == 'G8417' || $rGCode->{'SCNum'} == 'G8418') {
-      $PFMET++;
-     }
+while ( my $rrecord = $srecord->fetchrow_hashref ) {
+    $sGCode->execute( $rrecord->{'ClientID'} );
+    while ( my $rGCode = $sGCode->fetchrow_hashref ) {
+        if (   $rGCode->{'SCNum'} == 'G8420'
+            || $rGCode->{'SCNum'} == 'G8417'
+            || $rGCode->{'SCNum'} == 'G8418' )
+        {
+            $PFMET++;
+        }
 
-     if($rGCode->{'SCNum'} == 'G2181' || $rGCode->{'SCNum'} == 'G9716') {
-      $DNEXCEPTION++;
-     }
+        if ( $rGCode->{'SCNum'} == 'G2181' || $rGCode->{'SCNum'} == 'G9716' ) {
+            $DNEXCEPTION++;
+        }
 
-     if($rGCode->{'SCNum'} == 'G8421' || $rGCode->{'SCNum'} == 'G8419') {
-      $PFNOTMET++;
-     }
-  }
-  $Denominator++;
-  foreach my $f ( @FLDS ) { 
-    my ($fld,$hdr) = split(':',$f); 
-    $table_entries .= qq|$rrecord->{$fld}\t|; 
-  }
-  # print qq|$rClientAUDIT->{'q2'}\t$rClientSBIRT->{'q2'}\t|;
-  $table_entries .= qq|\n|; 
+        if ( $rGCode->{'SCNum'} == 'G8421' || $rGCode->{'SCNum'} == 'G8419' ) {
+            $PFNOTMET++;
+        }
+    }
+    $Denominator++;
+    foreach my $f (@FLDS) {
+        my ( $fld, $hdr ) = split( ':', $f );
+        $table_entries .= qq|$rrecord->{$fld}\t|;
+    }
 
-  $total += $rrecord->{'pcount'};
+    # print qq|$rClientAUDIT->{'q2'}\t$rClientSBIRT->{'q2'}\t|;
+    $table_entries .= qq|\n|;
+
+    $total += $rrecord->{'pcount'};
 }
 
 my $Data_Completeness_Rate;
@@ -206,27 +225,31 @@ my $Performance_Rate;
 
 my $Data_Completeness_Numerator = $PFMET + $DNEXCEPTION + $PFNOTMET;
 
-if($Denominator eq 0) {
+if ( $Denominator eq 0 ) {
 
-  $Data_Completeness_Rate = 0;
-  $Performance_Rate = 0;
+    $Data_Completeness_Rate = 0;
+    $Performance_Rate       = 0;
 
-} else {
+}
+else {
 
-  $Data_Completeness_Rate = ($Data_Completeness_Numerator/ $Denominator) * 100;
-  if($Data_Completeness_Numerator > $DNEXCEPTION) {
-    $Performance_Rate = ($PFMET / ($Data_Completeness_Numerator - $DNEXCEPTION)) * 100;
-  }
+    $Data_Completeness_Rate =
+      ( $Data_Completeness_Numerator / $Denominator ) * 100;
+    if ( $Data_Completeness_Numerator > $DNEXCEPTION ) {
+        $Performance_Rate =
+          ( $PFMET / ( $Data_Completeness_Numerator - $DNEXCEPTION ) ) * 100;
+    }
 }
 
-$Data_Completeness_Rate = sprintf("%.2f", $Data_Completeness_Rate);
-$Performance_Rate = sprintf("%.2f", $Performance_Rate);
+$Data_Completeness_Rate = sprintf( "%.2f", $Data_Completeness_Rate );
+$Performance_Rate       = sprintf( "%.2f", $Performance_Rate );
 
-
-
-my $nom_denom = qq|Numerator = Performance Met (${PFMET}) +  Denominator Exception (${DNEXCEPTION}) +  Performance Not Met (${PFNOTMET}) = ${Data_Completeness_Numerator} \n Denominator(Eligible Population) = ${Denominator}\n|;
-my $Data_Completeness_Rate_Text = qq|Data Completeness Rate = Numerator(${Data_Completeness_Numerator}) / Denominator(${Denominator}) = ${Data_Completeness_Rate}% \n|;
-my $Performance_Rate_Text = qq|Performance Rate = Performance Met (${PFMET}) / Numerator(${Data_Completeness_Numerator}) - Denominator Exception (${DNEXCEPTION}) = ${Performance_Rate}% \n|;
+my $nom_denom =
+qq|Numerator = Performance Met (${PFMET}) +  Denominator Exception (${DNEXCEPTION}) +  Performance Not Met (${PFNOTMET}) = ${Data_Completeness_Numerator} \n Denominator(Eligible Population) = ${Denominator}\n|;
+my $Data_Completeness_Rate_Text =
+qq|Data Completeness Rate = Numerator(${Data_Completeness_Numerator}) / Denominator(${Denominator}) = ${Data_Completeness_Rate}% \n|;
+my $Performance_Rate_Text =
+qq|Performance Rate = Performance Met (${PFMET}) / Numerator(${Data_Completeness_Numerator}) - Denominator Exception (${DNEXCEPTION}) = ${Performance_Rate}% \n|;
 
 $Header = qq|${DT}\n${QID} ${TITLE} ${DateRange} ${Header} \n ${nom_denom}|;
 
@@ -236,7 +259,7 @@ print $Performance_Rate_Text;
 print $table_header;
 print $table_entries;
 
-print qq|${Denominator}|."\t" x $numFLDS.qq|${total}\n|;
+print qq|${Denominator}| . "\t" x $numFLDS . qq|${total}\n|;
 $srecord->finish();
 $sGCode->finish();
 

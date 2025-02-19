@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ############################################################################
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBUtil;
 use myForm;
@@ -10,56 +10,60 @@ use SysAccess;
 
 ############################################################################
 my $form = myForm->new();
-my $dbh = myDBI->dbconnect($form->{'DBNAME'});
-print qq|Location: https://time.paycheckrecords.com/login.jsf\n\n| if ( $form->{'DBNAME'} eq 'okmis_mms' );
-my $query = qq|select * from Timesheet where ProvID=? order by LoginTime desc|;
+my $dbh  = myDBI->dbconnect( $form->{'DBNAME'} );
+print qq|Location: https://time.paycheckrecords.com/login.jsf\n\n|
+  if ( $form->{'DBNAME'} eq 'okmis_mms' );
+my $query  = qq|select * from Timesheet where ProvID=? order by LoginTime desc|;
 my $select = $dbh->prepare($query);
 
-my $ForProvID = $form->{Provider_ProvID} ? $form->{Provider_ProvID} : $form->{LOGINPROVID};
+my $ForProvID =
+  $form->{Provider_ProvID} ? $form->{Provider_ProvID} : $form->{LOGINPROVID};
 $form->{Provider_ProvID} = $ForProvID;
 my $qProvider = qq|select * from Provider where ProvID=?|;
 my $sProvider = $dbh->prepare($qProvider);
 $sProvider->execute($ForProvID);
 my $rProvider = $sProvider->fetchrow_hashref;
 ############################################################################
-if ( $form->{UpdateTables} )
-{
-  unless ( DBA->updSQLdone($form) )
-  {
-    my $stamp = DBUtil->Date('','stamp');
-    if ( $form->{Type} =~ /login/i )
-    {
-      my $query = qq|insert into Timesheet (ProvID,LoginTime,InIP,CreateDate,CreateProvID) values (${ForProvID},'${stamp}','$ENV{REMOTE_ADDR}','$form->{TODAY}',$form->{LOGINPROVID})|;
-      my $insert = $dbh->prepare($query);
-      $insert->execute();
-      $insert->finish();
+if ( $form->{UpdateTables} ) {
+    unless ( DBA->updSQLdone($form) ) {
+        my $stamp = DBUtil->Date( '', 'stamp' );
+        if ( $form->{Type} =~ /login/i ) {
+            my $query =
+qq|insert into Timesheet (ProvID,LoginTime,InIP,CreateDate,CreateProvID) values (${ForProvID},'${stamp}','$ENV{REMOTE_ADDR}','$form->{TODAY}',$form->{LOGINPROVID})|;
+            my $insert = $dbh->prepare($query);
+            $insert->execute();
+            $insert->finish();
+        }
+        else {
+            my $f = ();    # find on ProvID/LogoutTime is null.
+            $f->{ProvID} = ${ForProvID};
+            my $u = ();
+            $u->{ProvID}       = ${ForProvID};
+            $u->{LogoutTime}   = ${stamp};
+            $u->{OutIP}        = $ENV{REMOTE_ADDR};
+            $u->{CreateDate}   = $form->{TODAY};
+            $u->{CreateProvID} = $form->{LOGINPROVID};
+            $u->{ChangeProvID} = $form->{LOGINPROVID};
+            DBA->update( $form, 'Timesheet', 'ProvID:LogoutTime', $f, $u );
+        }
     }
-    else
-    {
-      my $f = ();     # find on ProvID/LogoutTime is null.
-      $f->{ProvID} = ${ForProvID};
-      my $u = ();
-      $u->{ProvID} = ${ForProvID};
-      $u->{LogoutTime} = ${stamp};
-      $u->{OutIP} = $ENV{REMOTE_ADDR};
-      $u->{CreateDate} = $form->{TODAY};
-      $u->{CreateProvID} = $form->{LOGINPROVID};
-      $u->{ChangeProvID} = $form->{LOGINPROVID};
-      DBA->update($form, 'Timesheet', 'ProvID:LogoutTime', $f, $u);
-    }
-  }
 }
 ############################################################################
 # The display.
-my $url = myForm->genLink('Provider') . "&mlt=$form->{mlt}&misLINKS=$form->{misLINKS}";
-my $cnt=0;
+my $url =
+  myForm->genLink('Provider') . "&mlt=$form->{mlt}&misLINKS=$form->{misLINKS}";
+my $cnt = 0;
 $form->{'FORMID'} = myDBI->getFORMID($form);
 my $Edit;
-if ( SysAccess->verify($form,'Privilege=Agent') )
-{ $Edit = qq|      <INPUT TYPE="submit" ONCLICK="return validate(this.form);" NAME="view=ListProviderTimesheet.cgi&${url}&fwdTABLE=Provider&pushID=$form->{LINKID}&NONAVIGATION=1" VALUE="Edit Entries">|; }
+if ( SysAccess->verify( $form, 'Privilege=Agent' ) ) {
+    $Edit =
+qq|      <INPUT TYPE="submit" ONCLICK="return validate(this.form);" NAME="view=ListProviderTimesheet.cgi&${url}&fwdTABLE=Provider&pushID=$form->{LINKID}&NONAVIGATION=1" VALUE="Edit Entries">|;
+}
 
 # Start out the display.
-my $html = myHTML->newHTML($form,'TimeClock','CheckPopupWindow noclock countdown_10') . qq|
+my $html =
+  myHTML->newHTML( $form, 'TimeClock', 'CheckPopupWindow noclock countdown_10' )
+  . qq|
 <SCRIPT LANGUAGE="JavaScript1.2" > function validate() { return(1); } </SCRIPT>
 <TABLE CLASS="main fullsize" >
   <TR ALIGN="left" >
@@ -75,7 +79,7 @@ my $html = myHTML->newHTML($form,'TimeClock','CheckPopupWindow noclock countdown
   </TR>
 </TABLE>
 <FORM NAME="TimeClock" ACTION="/cgi/bin/TimeClock.cgi" METHOD="POST" >
-|.main->genList(${ForProvID}). qq|
+| . main->genList( ${ForProvID} ) . qq|
 <TABLE CLASS="port fullsize" >
   <TR >
     <TD CLASS="hdrcol" >
@@ -110,14 +114,14 @@ $html .= qq|
 $select->finish();
 $sProvider->finish();
 myDBI->cleanup();
+
 #warn qq|TimeClock:\n${html}\n|;
 print $html;
 exit;
 ############################################################################
-sub genList
-{
-  my ($self,$ProvID) = @_;
-  my $out = qq|
+sub genList {
+    my ( $self, $ProvID ) = @_;
+    my $out = qq|
 <HR WIDTH="90%" >
 <TABLE CLASS="port fullsize" >
   <TR >
@@ -141,29 +145,39 @@ sub genList
   </TR>
 <TR ><TD COLSPAN=2 >&nbsp;</TD></TR>
 |;
-  $select->execute($ProvID);
-  while ( my $record = $select->fetchrow_hashref )
-  {
-    $cnt++;
-    last if ( $cnt > 20 );
-    my $even = int($cnt/2) == $cnt/2 ? '1' : '0';
-    if ( $even ) { $cls = qq|rpteven|; }
-    else { $cls = qq|rptodd|; }
-    my $indate, $intime;
-    if ( $record->{LoginTime} ne '' )
-    {
-      $indate = substr($record->{LoginTime},4,2) . '/' . substr($record->{LoginTime},6,2) . '/' . substr($record->{LoginTime},0,4);
-      $intime = substr($record->{LoginTime},8,2) . ':' . substr($record->{LoginTime},10,2) . ':' . substr($record->{LoginTime},12,2);
-    }
-    my $outdate, $outtime, $Hours;
-    if ( $record->{LogoutTime} ne '' )
-    {
-      $outdate = substr($record->{LogoutTime},4,2) . '/' . substr($record->{LogoutTime},6,2) . '/' . substr($record->{LogoutTime},0,4);
-      $outtime = substr($record->{LogoutTime},8,2) . ':' . substr($record->{LogoutTime},10,2) . ':' . substr($record->{LogoutTime},12,2);
-      my $Duration = DBUtil->getDurationTS($record->{LoginTime}, $record->{LogoutTime});
-      $Hours = sprintf("%.2f",$Duration / 3600);
-    }
-    $out .= qq|
+    $select->execute($ProvID);
+    while ( my $record = $select->fetchrow_hashref ) {
+        $cnt++;
+        last if ( $cnt > 20 );
+        my $even = int( $cnt / 2 ) == $cnt / 2 ? '1' : '0';
+        if   ($even) { $cls = qq|rpteven|; }
+        else         { $cls = qq|rptodd|; }
+        my $indate, $intime;
+        if ( $record->{LoginTime} ne '' ) {
+            $indate =
+                substr( $record->{LoginTime}, 4, 2 ) . '/'
+              . substr( $record->{LoginTime}, 6, 2 ) . '/'
+              . substr( $record->{LoginTime}, 0, 4 );
+            $intime =
+                substr( $record->{LoginTime}, 8, 2 ) . ':'
+              . substr( $record->{LoginTime}, 10, 2 ) . ':'
+              . substr( $record->{LoginTime}, 12, 2 );
+        }
+        my $outdate, $outtime, $Hours;
+        if ( $record->{LogoutTime} ne '' ) {
+            $outdate =
+                substr( $record->{LogoutTime}, 4, 2 ) . '/'
+              . substr( $record->{LogoutTime}, 6, 2 ) . '/'
+              . substr( $record->{LogoutTime}, 0, 4 );
+            $outtime =
+                substr( $record->{LogoutTime}, 8, 2 ) . ':'
+              . substr( $record->{LogoutTime}, 10, 2 ) . ':'
+              . substr( $record->{LogoutTime}, 12, 2 );
+            my $Duration = DBUtil->getDurationTS( $record->{LoginTime},
+                $record->{LogoutTime} );
+            $Hours = sprintf( "%.2f", $Duration / 3600 );
+        }
+        $out .= qq|
   <TR CLASS=${cls} >
     <TD ALIGN="left" >${indate}</TD>
     <TD ALIGN="left" >${intime}</TD>
@@ -174,11 +188,11 @@ sub genList
     <TD ALIGN="left" >${Hours}</TD>
   </TR>
 |;
-  }
-  $out .= qq|
+    }
+    $out .= qq|
 </TABLE>\n
 <HR WIDTH="90%" >
 |;
-  return($out);
+    return ($out);
 }
 #####################################################################

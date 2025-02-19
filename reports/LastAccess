@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use MgrTree;
 use DBForm;
@@ -9,58 +9,66 @@ $DT = localtime();
 
 ############################################################################
 $form = DBForm->new();
-$dbh = $form->dbconnect();
+$dbh  = $form->dbconnect();
 ############################################################################
 $MinutesToWatch = 60;
 print qq|${DT}\nAccess for User in last ${MinutesToWatch} minutes.\n|;
 print qq|UserName\tAgency\tTime\tIP\n|;
 
 $Prev = '';
+
 # Note - the SQL statement below requires MySQL 3.22 or greater (date_sub)
-$sAccess = $dbh->prepare("
+$sAccess = $dbh->prepare( "
 select Provider.FName, Provider.LName, Provider.ProvID, Links.Access, Links.IP
   from Links
     left join Provider on Provider.ProvID=Links.ProvID
   where Access>=date_format(date_sub(now(),INTERVAL $MinutesToWatch MINUTE) ,'%Y%m%d%H%i%S')
   order by Provider.LName, Provider.FName, Provider.ProvID, Links.Access desc
-"); 
+" );
 $sProvider = $dbh->prepare("select * from Provider where ProvID=?");
 my $ForProvID = $form->{Provider} ? $form->{Provider} : $form->{LOGINPROVID};
-my $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID');
+my $ClinicSelection =
+  DBA->getClinicSelection( $form, $ForProvID, 'Client.clinicClinicID' );
+
 #warn qq|ListAccess: ${ClinicSelection}\n|;
 $sAccess->execute();
-while ( my ($FName, $LName, $ProvID, $Date, $IP) = $sAccess->fetchrow_array )
+while ( my ( $FName, $LName, $ProvID, $Date, $IP ) = $sAccess->fetchrow_array )
 {
-#warn qq|test:   $Prev, $ProvID\n|;
-  next if ( $Prev == $ProvID );
-  $Prev = $ProvID;
-# test for what Agency they belong to. 
-# (no longer on Clinic because of those Providers not assigned to a clinic).
-  my $AgencyID = MgrTree->getAgency($form,$ProvID);
-#warn qq|passed: $Prev, $ProvID, $AgencyID\n|;
-  if ( SysAccess->tstACL($form,$AgencyID) )
-  {
-    $sProvider->execute($AgencyID);
-    my $rAgency = $sProvider->fetchrow_hashref;   # get initials
-    (my $Name = $rAgency->{Name}) =~ s/ and | for | of / /gi;
-    my $i=''; $i.=uc($1) while $Name=~/(\w)\w+\s?/g;
-#warn qq|print: $Prev, $ProvID, $AgencyID, $Name, $i\n|;
-    $Date =~ s/\d{8}(\d{2})(\d{2})\d{2}/$1:$2/;
-    ($HRS,$MIN) = split(':',$Date);
-    print qq|${FName} ${LName}\t${i}\t${HRS}:${MIN}\t${IP}\n|;
-  }
+    #warn qq|test:   $Prev, $ProvID\n|;
+    next if ( $Prev == $ProvID );
+    $Prev = $ProvID;
+
+    # test for what Agency they belong to.
+    # (no longer on Clinic because of those Providers not assigned to a clinic).
+    my $AgencyID = MgrTree->getAgency( $form, $ProvID );
+
+    #warn qq|passed: $Prev, $ProvID, $AgencyID\n|;
+    if ( SysAccess->tstACL( $form, $AgencyID ) ) {
+        $sProvider->execute($AgencyID);
+        my $rAgency = $sProvider->fetchrow_hashref;    # get initials
+        ( my $Name = $rAgency->{Name} ) =~ s/ and | for | of / /gi;
+        my $i = '';
+        $i .= uc($1) while $Name =~ /(\w)\w+\s?/g;
+
+        #warn qq|print: $Prev, $ProvID, $AgencyID, $Name, $i\n|;
+        $Date =~ s/\d{8}(\d{2})(\d{2})\d{2}/$1:$2/;
+        ( $HRS, $MIN ) = split( ':', $Date );
+        print qq|${FName} ${LName}\t${i}\t${HRS}:${MIN}\t${IP}\n|;
+    }
 }
 $sAccess->finish();
 $sProvider->finish();
 ############################################################################
 # output unbilled notes...
-$LastFri=`date --date 'last Mon' +%Y-%m-%d`;
+$LastFri = `date --date 'last Mon' +%Y-%m-%d`;
 chomp $LastFri;
-my $qUnbilled = qq|select count(*) from Treatment left join Client on Client.ClientID=Treatment.ClientID where Treatment.BillDate is null and Treatment.ContLogDate<'${LastFri}' ${ClinicSelection}|;
+my $qUnbilled =
+qq|select count(*) from Treatment left join Client on Client.ClientID=Treatment.ClientID where Treatment.BillDate is null and Treatment.ContLogDate<'${LastFri}' ${ClinicSelection}|;
 my $sUnbilled = $dbh->prepare($qUnbilled);
 $sUnbilled->execute();
 my ($Unbilled) = $sUnbilled->fetchrow_array;
-$qTotalUnbilled = qq|select count(*) from Treatment left join Client on Client.ClientID=Treatment.ClientID where Treatment.BillDate is null ${ClinicSelection}|;
+$qTotalUnbilled =
+qq|select count(*) from Treatment left join Client on Client.ClientID=Treatment.ClientID where Treatment.BillDate is null ${ClinicSelection}|;
 $sTotalUnbilled = $dbh->prepare($qTotalUnbilled);
 $sTotalUnbilled->execute();
 my ($TotUnbilled) = $sTotalUnbilled->fetchrow_array;

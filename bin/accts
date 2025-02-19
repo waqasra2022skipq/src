@@ -1,7 +1,7 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use Accounts;
 my $which = shift;
-my @a=Accounts->accts($which);
+my @a     = Accounts->accts($which);
 print "@a\n";
 exit;

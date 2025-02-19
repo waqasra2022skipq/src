@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 ############################################################################
@@ -7,15 +7,16 @@ use DBForm;
 $form = DBForm->new();
 my $self;
 my $dbh = $form->dbconnect;
-$s=$dbh->prepare("select * from xInsurance");
-  $s->execute();
-  while (my $r = $s->fetchrow_hashref) { $xInsurance{$r->{ID}} = $r; }
-  $xInsurance{0}{ID} = 0;
-  $xInsurance{0}{Name} = 'No Insurance';
-  $xInsurance{0}{Descr} = 'none';
+$s = $dbh->prepare("select * from xInsurance");
+$s->execute();
+while ( my $r = $s->fetchrow_hashref ) { $xInsurance{ $r->{ID} } = $r; }
+$xInsurance{0}{ID}    = 0;
+$xInsurance{0}{Name}  = 'No Insurance';
+$xInsurance{0}{Descr} = 'none';
 $s->finish();
-$qRebill=qq|insert into NoteTrans (ProvID,ClientID,TrID,ContDate,SCID,SCNum,Units,BillAmt,InsCode,Code,CreateProvID,CreateDate) values (?,?,?,?,?,?,?,?,?,?,'91','$form->{TODAY}')|;
-$sRebill=$dbh->prepare($qRebill);
+$qRebill =
+qq|insert into NoteTrans (ProvID,ClientID,TrID,ContDate,SCID,SCNum,Units,BillAmt,InsCode,Code,CreateProvID,CreateDate) values (?,?,?,?,?,?,?,?,?,?,'91','$form->{TODAY}')|;
+$sRebill = $dbh->prepare($qRebill);
 my $qNote = qq|
   select * from Treatment
     left join xSC on xSC.SCID=Treatment.SCID
@@ -23,100 +24,114 @@ my $qNote = qq|
       and Treatment.AmtDue > 0
 |;
 $qNote .= qq| and Treatment.TrID=$form->{TrID} | if ( $form->{TrID} );
+
 #    order by Treatment.ContLogDate, Treatment.ContLogBegTime
 warn "qNote=\n$qNote\n";
 my $sNote = $dbh->prepare($qNote);
 $sNote->execute() || $form->dberror($qNotes);
-while ( my $rNote = $sNote->fetchrow_hashref )
-{ 
-print qq|Process: ClientID=$rNote->{ClientID}, TrID=$rNote->{TrID}, BilledAmt=$rNote->{BilledAmt}, AmtDue=$rNote->{AmtDue}\n|;
-    my $InsID = main->findIns($form,$rNote->{ClientID},$rNote->{TrID});
-    if ( $InsID )      # rebill to this insurance
+while ( my $rNote = $sNote->fetchrow_hashref ) {
+    print
+qq|Process: ClientID=$rNote->{ClientID}, TrID=$rNote->{TrID}, BilledAmt=$rNote->{BilledAmt}, AmtDue=$rNote->{AmtDue}\n|;
+    my $InsID = main->findIns( $form, $rNote->{ClientID}, $rNote->{TrID} );
+    if ($InsID)    # rebill to this insurance
     {
-print qq|  SCID: SCID=$rNote->{SCID}, InsID=$InsID, ContLogDate=$rNote->{ContLogDate}, CredID=$rNote->{CredID}, Res=$rNote->{Restriction}\n|;
-      my $SCID=main->matchSC($form,$InsID,$rNote->{SCNum},$rNote->{ContLogDate},$rNote->{CredID},$rNote->{Restriction});
-      if ( $SCID )
-      {
-print qq|  rebill InsID=$InsID: SCID=$SCID\n|;
-        my $InsCode = $xInsurance{$InsID}{InsCode};
-print qq|Rebill->execute($rNote->{ProvID},$rNote->{ClientID},$rNote->{TrID},$rNote->{ContLogDate},$SCID,$rNote->{SCNum},$rNote->{Units},$rNote->{AmtDue},$InsCode,'RB')\n|;
-#        $Rebill->execute($rNote->{ProvID},$rNote->{ClientID},$rNote->{TrID},$rNote->{ContLogDate},$SCID,$rNote->{SCNum},$rNote->{Units},$rNote->{AmtDue},$InsCode,'RB') 
+        print
+qq|  SCID: SCID=$rNote->{SCID}, InsID=$InsID, ContLogDate=$rNote->{ContLogDate}, CredID=$rNote->{CredID}, Res=$rNote->{Restriction}\n|;
+        my $SCID =
+          main->matchSC( $form, $InsID, $rNote->{SCNum}, $rNote->{ContLogDate},
+            $rNote->{CredID}, $rNote->{Restriction} );
+        if ($SCID) {
+            print qq|  rebill InsID=$InsID: SCID=$SCID\n|;
+            my $InsCode = $xInsurance{$InsID}{InsCode};
+            print
+qq|Rebill->execute($rNote->{ProvID},$rNote->{ClientID},$rNote->{TrID},$rNote->{ContLogDate},$SCID,$rNote->{SCNum},$rNote->{Units},$rNote->{AmtDue},$InsCode,'RB')\n|;
+
+#        $Rebill->execute($rNote->{ProvID},$rNote->{ClientID},$rNote->{TrID},$rNote->{ContLogDate},$SCID,$rNote->{SCNum},$rNote->{Units},$rNote->{AmtDue},$InsCode,'RB')
 #           || $form->dberror($qRebill);
-      }
-      else
-      {
-print qq|  no match for InsID=$InsID: SCNum=$rNote->{SCNum}, SCID=$rNote->{SCID}, CredID=$rNote->{CredID}, Restriction=$rNote->{Restriction}\n|;
-      }
+        }
+        else {
+            print
+qq|  no match for InsID=$InsID: SCNum=$rNote->{SCNum}, SCID=$rNote->{SCID}, CredID=$rNote->{CredID}, Restriction=$rNote->{Restriction}\n|;
+        }
     }
-    else               # bill AmtDue to client '09'.
+    else    # bill AmtDue to client '09'.
     {
-print qq|  bill '09' amtdue=$rNote->{AmtDue}\n|;
-print qq|Rebill->execute($rNote->{ProvID},$rNote->{ClientID},$rNote->{TrID},$rNote->{ContLogDate},$rNote->{SCID},$rNote->{SCNum},$rNote->{Units},$rNote->{AmtDue},'09','PR')\n|;
-#      $Rebill->execute($rNote->{ProvID},$rNote->{ClientID},$rNote->{TrID},$rNote->{ContLogDate},$rNote->{SCID},$rNote->{SCNum},$rNote->{Units},$rNote->{AmtDue},'09','PR') 
+        print qq|  bill '09' amtdue=$rNote->{AmtDue}\n|;
+        print
+qq|Rebill->execute($rNote->{ProvID},$rNote->{ClientID},$rNote->{TrID},$rNote->{ContLogDate},$rNote->{SCID},$rNote->{SCNum},$rNote->{Units},$rNote->{AmtDue},'09','PR')\n|;
+
+#      $Rebill->execute($rNote->{ProvID},$rNote->{ClientID},$rNote->{TrID},$rNote->{ContLogDate},$rNote->{SCID},$rNote->{SCNum},$rNote->{Units},$rNote->{AmtDue},'09','PR')
 #         || $form->dberror($qRebill);
     }
-print qq|End: $rNote->{ClientID}, $rNote->{TrID}: $InsID=$InsID\n|;
+    print qq|End: $rNote->{ClientID}, $rNote->{TrID}: $InsID=$InsID\n|;
 }
 exit;
 ############################################################################
-sub findIns
-{
-  my ($self,$form,$ClientID,$TrID) = @_;
-  my $NBInsID = '';
-  my $sInsurance = $dbh->prepare("select * from Insurance where ClientID=? group by InsID, Priority");
-  my $sInsruance = $dbh->prepare($qInsruance);
-  my $qNoteTrans = qq|select NoteTrans.*, xSC.InsID from NoteTrans left join xSC on xSC.SCID=NoteTrans.SCID where NoteTrans.TrID=? and xSC.InsID=?|;
-  my $sNoteTrans = $dbh->prepare($qNoteTrans);
-  $sInsurance->execute($ClientID) || $form->dberror("select Insurance");
-  while ( my $rInsurance = $sInsurance->fetchrow_hashref )
-  { 
-    # continue if we found TrID billed to an Insurance
-    $sNoteTrans->execute($TrID,$rInsurance->{InsID});
-    unless ( $rNoteTrans = $sNoteTrans->fetchrow_hashref )
-    { $NBInsID = $rInsurance->{InsID}; last; }
-  }
-  $sInsurance->finish();
-  $sNoteTrans->finish();
-  return($NBInsID);
+sub findIns {
+    my ( $self, $form, $ClientID, $TrID ) = @_;
+    my $NBInsID    = '';
+    my $sInsurance = $dbh->prepare(
+        "select * from Insurance where ClientID=? group by InsID, Priority");
+    my $sInsruance = $dbh->prepare($qInsruance);
+    my $qNoteTrans =
+qq|select NoteTrans.*, xSC.InsID from NoteTrans left join xSC on xSC.SCID=NoteTrans.SCID where NoteTrans.TrID=? and xSC.InsID=?|;
+    my $sNoteTrans = $dbh->prepare($qNoteTrans);
+    $sInsurance->execute($ClientID) || $form->dberror("select Insurance");
+    while ( my $rInsurance = $sInsurance->fetchrow_hashref ) {
+
+        # continue if we found TrID billed to an Insurance
+        $sNoteTrans->execute( $TrID, $rInsurance->{InsID} );
+        unless ( $rNoteTrans = $sNoteTrans->fetchrow_hashref ) {
+            $NBInsID = $rInsurance->{InsID};
+            last;
+        }
+    }
+    $sInsurance->finish();
+    $sNoteTrans->finish();
+    return ($NBInsID);
 }
 ############################################################################
-sub matchSC
-{
-  my ($self,$form,$InsID,$SCNum,$ContDate,$CredID,$Res) = @_;
+sub matchSC {
+    my ( $self, $form, $InsID, $SCNum, $ContDate, $CredID, $Res ) = @_;
 
-print qq|  matchSC: InsID=$InsID, SCNum=$SCNum\n|;
-  my $SCID = 0;
-  my $dbh = $form->dbconnect;
-# we are looking for the SCID for requested InsID/SCNum.
+    print qq|  matchSC: InsID=$InsID, SCNum=$SCNum\n|;
+    my $SCID = 0;
+    my $dbh  = $form->dbconnect;
+
+    # we are looking for the SCID for requested InsID/SCNum.
     my $q = qq|
 select xSC.SCID from xSC left join xSCRates on xSCRates.SCID=xSC.SCID
   where xSC.InsID=$InsID and xSC.SCNum='$SCNum'
     and xSCRates.EffDate <= '$ContDate' and ( '$ContDate' <= xSCRates.ExpDate or xSCRates.ExpDate is null)
 |;
     my $qxSC = $q;
-    if ( $CredID ) { $qxSC .= qq| and xSC.CredID=$CredID |; } else { $qxSC .= qq| and xSC.CredID is null |; }
-    if ( $Res ) { $qxSC .= qq| and xSC.Restriction='$Res' |; } else { $qxSC .= qq| and xSC.Restriction is null |; }
-#print qq|q=\n$qxSC\n|;
+    if   ($CredID) { $qxSC .= qq| and xSC.CredID=$CredID |; }
+    else           { $qxSC .= qq| and xSC.CredID is null |; }
+    if   ($Res) { $qxSC .= qq| and xSC.Restriction='$Res' |; }
+    else        { $qxSC .= qq| and xSC.Restriction is null |; }
+
+    #print qq|q=\n$qxSC\n|;
     my $s = $dbh->prepare($qxSC);
     $s->execute() || $form->dberror($qxSC);
     if ( my ($ID) = $s->fetchrow_array ) { $SCID = $ID; }
-    else
-    {
-      $qxSC = $q;
-      if ( $CredID ) { $qxSC .= qq| and xSC.CredID=$CredID |; } else { $qxSC .= qq| and xSC.CredID is null |; }
-#print qq|q=\n$qxSC\n|;
-      $s = $dbh->prepare($qxSC);
-      $s->execute() || $form->dberror($qxSC);
-      if ( my ($ID) = $s->fetchrow_array ) { $SCID = $ID; }
-      else
-      {
-        $s = $dbh->prepare($q);
-        $s->execute() || $form->dberror($q);
-#print qq|q=\n$q\n|;
+    else {
+        $qxSC = $q;
+        if   ($CredID) { $qxSC .= qq| and xSC.CredID=$CredID |; }
+        else           { $qxSC .= qq| and xSC.CredID is null |; }
+
+        #print qq|q=\n$qxSC\n|;
+        $s = $dbh->prepare($qxSC);
+        $s->execute() || $form->dberror($qxSC);
         if ( my ($ID) = $s->fetchrow_array ) { $SCID = $ID; }
-      }
+        else {
+            $s = $dbh->prepare($q);
+            $s->execute() || $form->dberror($q);
+
+            #print qq|q=\n$q\n|;
+            if ( my ($ID) = $s->fetchrow_array ) { $SCID = $ID; }
+        }
     }
     $s->finish();
-  return($SCID) 
+    return ($SCID);
 }
 ############################################################################

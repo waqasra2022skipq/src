@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use Cwd;
 use DBI;
 use DBA;
@@ -12,23 +12,23 @@ use XML::LibXML;
 binmode STDOUT, ":utf8";
 
 ############################################################################
-# usage: 
+# usage:
 ############################################################################
 my $form = myForm->new();
-my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $dbh  = myDBI->dbconnect( $form->{'DBNAME'} );
 foreach my $f ( sort keys %{$form} ) { warn ": form-$f=$form->{$f}\n"; }
-my $ProvID = $form->{'ProvID'};
+my $ProvID   = $form->{'ProvID'};
 my $ClientID = $form->{'ClientID'};
-my $TrID = $form->{'TrIDs'};
-my $Agent = SysAccess->verify($form,'Privilege=Agent');
-unless ( $Agent ) { myDBI->error("Page DENIED!"); }
+my $TrID     = $form->{'TrIDs'};
+my $Agent    = SysAccess->verify( $form, 'Privilege=Agent' );
+unless ($Agent) { myDBI->error("Page DENIED!"); }
 ##
 chdir("$form->{DOCROOT}");
 my $out = '';
-  $Names = "tmp/FILEs/CQM*/*";
-  my @Files = glob($Names);
-  foreach $file ( @Files )
-  {
+$Names = "tmp/FILEs/CQM*/*";
+my @Files = glob($Names);
+
+foreach $file (@Files) {
     my $type = $file =~ /XML_/ ? 'XML' : 'QRDA';
     $out .= qq|
   <TR>
@@ -37,9 +37,12 @@ my $out = '';
     </TD>
   </TR>
 |;
-  }
+}
+
 # now output the html screen to select the created documents...
-my $html = myHTML->newHTML($form,'Send CCDA','CheckPopupWindow noclock countdown_1') . qq|
+my $html =
+  myHTML->newHTML( $form, 'Send CCDA', 'CheckPopupWindow noclock countdown_1' )
+  . qq|
 <SCRIPT LANGUAGE="JavaScript" >
 function validate(form)
 {

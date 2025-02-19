@@ -1,5 +1,5 @@
 #!/usr/bin/perl 
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 use Time::Local;
@@ -7,42 +7,43 @@ $DT = localtime();
 
 #############################################################################
 $form = DBForm->new();
-$dbh = $form->dbconnect();
+$dbh  = $form->dbconnect();
 
-if ( ! SysAccess->verify($form,'Privilege=Agent') )
-{ $form->error("User Dump / denied"); }
+if ( !SysAccess->verify( $form, 'Privilege=Agent' ) ) {
+    $form->error("User Dump / denied");
+}
 
 $sUserLogin = $dbh->prepare("select * from UserLogin order by loginid");
-$sProvider = $dbh->prepare("select * from Provider where ProvID=?");
-$sManager = $dbh->prepare("select * from Manager where ProviderID=?");
+$sProvider  = $dbh->prepare("select * from Provider where ProvID=?");
+$sManager   = $dbh->prepare("select * from Manager where ProviderID=?");
 
 print qq|${DT}\nUser Dump\n|;
 print qq|ProvID\tLogin\tName\tPassword\tManager\n|;
 $sUserLogin->execute();
-while ($rUserLogin = $sUserLogin->fetchrow_hashref) 
-{
-  $loginid = $rUserLogin->{loginid};
-  $ProvID = $rUserLogin->{UserID};
-  $Password = $ProvID == 89 ? '' : $rUserLogin->{Password};
+while ( $rUserLogin = $sUserLogin->fetchrow_hashref ) {
+    $loginid  = $rUserLogin->{loginid};
+    $ProvID   = $rUserLogin->{UserID};
+    $Password = $ProvID == 89 ? '' : $rUserLogin->{Password};
 
-  next if ( $ProvID == 91 );      # not root
+    next if ( $ProvID == 91 );    # not root
 
-  # name of this provider
-  $sProvider->execute($ProvID);
-  $rProvider = $sProvider->fetchrow_hashref; 
-  $Provider_Name = "$rProvider->{FName} $rProvider->{LName}";
+    # name of this provider
+    $sProvider->execute($ProvID);
+    $rProvider     = $sProvider->fetchrow_hashref;
+    $Provider_Name = "$rProvider->{FName} $rProvider->{LName}";
 
-  # Manager of this provider
-  $sManager->execute($ProvID);
-  $rManager = $sManager->fetchrow_hashref; 
-  $ManagerID = $rManager->{ManagerID};
+    # Manager of this provider
+    $sManager->execute($ProvID);
+    $rManager  = $sManager->fetchrow_hashref;
+    $ManagerID = $rManager->{ManagerID};
 
-  # name of the Manager of this provider
-  $sProvider->execute($ManagerID);
-  $rProvider = $sProvider->fetchrow_hashref; 
-  $Manager_Name = "$rProvider->{FName} $rProvider->{LName}";
+    # name of the Manager of this provider
+    $sProvider->execute($ManagerID);
+    $rProvider    = $sProvider->fetchrow_hashref;
+    $Manager_Name = "$rProvider->{FName} $rProvider->{LName}";
 
-  print qq|${ProvID}\t${loginid}\t${Provider_Name}\t${Password}\t${Manager_Name}\n|;
+    print
+qq|${ProvID}\t${loginid}\t${Provider_Name}\t${Password}\t${Manager_Name}\n|;
 }
 $sUserLogin->finish();
 $sProvider->finish();
@@ -50,11 +51,13 @@ $sManager->finish();
 ##
 # part 2 ProviderControl Passwords
 print qq|ProviderControl Passwords\n|;
-$qProviderControl = qq|select * from ProviderControl left join Provider on Provider.ProvID=ProviderControl.ProvID where Passwords is not null|;
+$qProviderControl =
+qq|select * from ProviderControl left join Provider on Provider.ProvID=ProviderControl.ProvID where Passwords is not null|;
 $sProviderControl = $dbh->prepare($qProviderControl);
 $sProviderControl->execute();
-while ($rProviderControl = $sProviderControl->fetchrow_hashref) 
-{ print qq|$rProviderControl->{Name}\t$rProviderControl->{Passwords}\n|; }
+while ( $rProviderControl = $sProviderControl->fetchrow_hashref ) {
+    print qq|$rProviderControl->{Name}\t$rProviderControl->{Passwords}\n|;
+}
 $sProviderControl->finish();
 $form->complete();
 exit;

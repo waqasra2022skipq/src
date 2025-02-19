@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use Cwd;
 use DBUtil;
 use myConfig;
@@ -8,36 +8,38 @@ use Time::Local;
 ############################################################################
 # usage: sysfile
 ############################################################################
-my $rm = shift;
-my $cmdpath = qq|/home/okmis/mis/src/sbin|;   # location of CMD
+my $rm      = shift;
+my $cmdpath = qq|/var/www/okmis/src/sbin|;    # location of CMD
 
-my $DT=localtime();
+my $DT = localtime();
 print "sysfile started @ $DT\n";
 chdir("/tmp");
 my @files = glob("sysfile:*");
-foreach $f ( @files )
-{
-  print qq|f=$f\n|;
-  my ($name,$cmd,$rest) = split(':',$f,3);
-  (my $parms = $rest) =~ s/:/ /g;
-  my $text = DBUtil->ReadFile($f);
-  unlink($f);     # get rid of it before we execute
+foreach $f (@files) {
+    print qq|f=$f\n|;
+    my ( $name, $cmd, $rest ) = split( ':', $f, 3 );
+    ( my $parms = $rest ) =~ s/:/ /g;
+    my $text = DBUtil->ReadFile($f);
+    unlink($f);    # get rid of it before we execute
 
-  my $outfile = myConfig->cfg('WORKDIR').'/tmp/'.DBUtil->genToken().'_'.DBUtil->Date('','stamp') . '.sec';
-print qq|sysfile: ${cmdpath}/${cmd} ${parms} > ${outfile}\n|;
-  $FUNCCODE = system("${cmdpath}/${cmd} ${parms} > ${outfile} 2>&1");
-  $FUNCERROR = $! . DBUtil->ReadFile($outfile);
+    my $outfile =
+        myConfig->cfg('WORKDIR') . '/tmp/'
+      . DBUtil->genToken() . '_'
+      . DBUtil->Date( '', 'stamp' ) . '.sec';
+    print qq|sysfile: ${cmdpath}/${cmd} ${parms} > ${outfile}\n|;
+    $FUNCCODE  = system("${cmdpath}/${cmd} ${parms} > ${outfile} 2>&1");
+    $FUNCERROR = $! . DBUtil->ReadFile($outfile);
 
-  my $subj = "${name}: execute ${f}";
-  my $msg = "${cmd} ${parms}\n${text}\nresult: ${FUNCCODE}\n${FUNCERROR}\noutfile: ${outfile}";
-  DBUtil->email($form,'support@okmis.com',$subj,$msg);
+    my $subj = "${name}: execute ${f}";
+    my $msg =
+"${cmd} ${parms}\n${text}\nresult: ${FUNCCODE}\n${FUNCERROR}\noutfile: ${outfile}";
+    DBUtil->email( $form, 'support@okmis.com', $subj, $msg );
 }
-if ( $rm )
-{
-  my @files = glob("*.sec");
-  unlink(@files);
+if ($rm) {
+    my @files = glob("*.sec");
+    unlink(@files);
 }
-my $DT=localtime();
+my $DT = localtime();
 print "sysfile ended @ $DT\n";
 exit;
 ############################################################################

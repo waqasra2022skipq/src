@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use Cwd;
 use DBI;
 use DBForm;
@@ -11,48 +11,52 @@ use XML::LibXML;
 binmode STDOUT, ":utf8";
 
 ############################################################################
-# usage: 
+# usage:
 #        to create files: Visit_[trid].xml, CCDA_Visit_[trid].xml
 #        to create files: Referral_[trid].xml, CCDA_Referral_[trid].xml
 #        for sending (sendCCDA.cgi) to phimail
 ############################################################################
 my $form = DBForm->new();
-my $dbh = $form->dbconnect();
+my $dbh  = $form->dbconnect();
 foreach my $f ( sort keys %{$form} ) { warn ": form-$f=$form->{$f}\n"; }
-my $ProvID = $form->{'ProvID'};
+my $ProvID   = $form->{'ProvID'};
 my $ClientID = $form->{'ClientID'};
-my $TrID = $form->{'TrIDs'};
-my $Agent = SysAccess->verify($form,'Privilege=Agent');
-unless ( $Agent ) { $form->error("Page DENIED!"); }
+my $TrID     = $form->{'TrIDs'};
+my $Agent    = SysAccess->verify( $form, 'Privilege=Agent' );
+unless ($Agent) { $form->error("Page DENIED!"); }
 ##
 # first generate the XML file...
-  my $xml = qq|<?xml version="1.0" encoding="utf-8"?>\n|.gXML->setXML($form,$ProvID,$ClientID,$TrID,'','','CCDA nonulls');
+my $xml = qq|<?xml version="1.0" encoding="utf-8"?>\n|
+  . gXML->setXML( $form, $ProvID, $ClientID, $TrID, '', '', 'CCDA nonulls' );
+
 #$form->{'MEASUREID'} = 2; my $xml = qq|<?xml version="1.0" encoding="utf-8"?>\n|.gXML->setXML($form,$ProvID,$ClientID,'','2017-07-01','2017-09-31','QRDA nonulls');
-  my $xmlfile = qq|/tmp/XML_${TrID}.xml|;
-  my $xmlpath = qq|$form->{DOCROOT}${xmlfile}|;
-  open(XML, ">", $xmlpath) || die "Couldn't open '${xmlpath}' file: $!"; 
-  print XML $xml;
-  close(XML);
+my $xmlfile = qq|/tmp/XML_${TrID}.xml|;
+my $xmlpath = qq|$form->{DOCROOT}${xmlfile}|;
+open( XML, ">", $xmlpath ) || die "Couldn't open '${xmlpath}' file: $!";
+print XML $xml;
+close(XML);
 
 # next the generate Visit CCDA file...
-  my $visitout = gXML->styleCCDA($form,$xmlfile,'Visit');
-  my $visitfile = qq|/tmp/CCDA_${TrID}_Visit.xml|;
+my $visitout  = gXML->styleCCDA( $form, $xmlfile, 'Visit' );
+my $visitfile = qq|/tmp/CCDA_${TrID}_Visit.xml|;
 warn qq|genCCDA: visitfile=${visitfile}\n|;
-  my $visitpath = qq|$form->{DOCROOT}${visitfile}|;
+my $visitpath = qq|$form->{DOCROOT}${visitfile}|;
 warn qq|genCCDA: visitpath=${visitpath}\n|;
-  open(OUT, ">:encoding(UTF-8)", $visitpath) || die "Couldn't open '${visitpath}' file: $!"; 
-  print OUT $visitout;
-  close(OUT);
+open( OUT, ">:encoding(UTF-8)", $visitpath )
+  || die "Couldn't open '${visitpath}' file: $!";
+print OUT $visitout;
+close(OUT);
 
 # next the generate Referral CCDA file...
-  my $referralout = gXML->styleCCDA($form,$xmlfile,'Referral');
-  my $referralfile = qq|/tmp/CCDA_${TrID}_Referral.xml|;
+my $referralout  = gXML->styleCCDA( $form, $xmlfile, 'Referral' );
+my $referralfile = qq|/tmp/CCDA_${TrID}_Referral.xml|;
 warn qq|genCCDA: referralfile=${referralfile}\n|;
-  my $referralpath = qq|$form->{DOCROOT}${referralfile}|;
+my $referralpath = qq|$form->{DOCROOT}${referralfile}|;
 warn qq|genCCDA: referralpath=${referralpath}\n|;
-  open(OUT, ">:encoding(UTF-8)", $referralpath) || die "Couldn't open '${referralpath}' file: $!"; 
-  print OUT $referralout;
-  close(OUT);
+open( OUT, ">:encoding(UTF-8)", $referralpath )
+  || die "Couldn't open '${referralpath}' file: $!";
+print OUT $referralout;
+close(OUT);
 
 ### next the generate QRDA file...
 ##  my $qrdavisitout = gXML->styleQRDA($form,$xmlfile);
@@ -60,7 +64,7 @@ warn qq|genCCDA: referralpath=${referralpath}\n|;
 ##warn qq|genCCDA: qrdavisitfile=${qrdavisitfile}\n|;
 ##  my $qrdavisitpath = qq|$form->{DOCROOT}${qrdavisitfile}|;
 ##warn qq|genCCDA: qrdavisitpath=${qrdavisitpath}\n|;
-##  open(OUT, ">:encoding(UTF-8)", $qrdavisitpath) || die "Couldn't open '${qrdavisitpath}' file: $!"; 
+##  open(OUT, ">:encoding(UTF-8)", $qrdavisitpath) || die "Couldn't open '${qrdavisitpath}' file: $!";
 ##  print OUT $qrdavisitout;
 ##  close(OUT);
 ##  my $qrdahtml = qq|
@@ -73,26 +77,31 @@ warn qq|genCCDA: referralpath=${referralpath}\n|;
 ##</TABLE>|;
 
 # next the generate Visit CDA file...
-  my $cdavisit = gXML->styleCDA($form,$visitfile);
-  my $cdavisitfile = qq|/tmp/CDA_${TrID}_Visit.htm|;
+my $cdavisit     = gXML->styleCDA( $form, $visitfile );
+my $cdavisitfile = qq|/tmp/CDA_${TrID}_Visit.htm|;
 warn qq|genCCDA: cdavisitfile=${cdavisitfile}\n|;
-  my $cdavisitpath = qq|$form->{DOCROOT}$cdavisitfile|;
+my $cdavisitpath = qq|$form->{DOCROOT}$cdavisitfile|;
 warn qq|genCCDA: cdavisitpath=${cdavisitpath}\n|;
-  open(OUT, ">:encoding(UTF-8)", $cdavisitpath) || die "Couldn't open '${cdavisitpath}' file: $!"; 
-  print OUT $cdavisit;
-  close(OUT);
+open( OUT, ">:encoding(UTF-8)", $cdavisitpath )
+  || die "Couldn't open '${cdavisitpath}' file: $!";
+print OUT $cdavisit;
+close(OUT);
+
 # next the generate Referral CDA file...
-  my $cdareferral = gXML->styleCDA($form,$referralfile);
-  my $cdareferralfile = qq|/tmp/CDA_${TrID}_Referral.htm|;
+my $cdareferral     = gXML->styleCDA( $form, $referralfile );
+my $cdareferralfile = qq|/tmp/CDA_${TrID}_Referral.htm|;
 warn qq|genCCDA: cdareferralfile=${cdareferralfile}\n|;
-  my $cdareferralpath = qq|$form->{DOCROOT}$cdareferralfile|;
+my $cdareferralpath = qq|$form->{DOCROOT}$cdareferralfile|;
 warn qq|genCCDA: cdareferralpath=${cdareferralpath}\n|;
-  open(OUT, ">:encoding(UTF-8)", $cdareferralpath) || die "Couldn't open '${cdareferralpath}' file: $!"; 
-  print OUT $cdareferral;
-  close(OUT);
+open( OUT, ">:encoding(UTF-8)", $cdareferralpath )
+  || die "Couldn't open '${cdareferralpath}' file: $!";
+print OUT $cdareferral;
+close(OUT);
 ##
 # now output the html screen to select the created documents...
-my $html = myHTML->newHTML($form,'Send CCDA','CheckPopupWindow noclock countdown_1') . qq|
+my $html =
+  myHTML->newHTML( $form, 'Send CCDA', 'CheckPopupWindow noclock countdown_1' )
+  . qq|
 <SCRIPT LANGUAGE="JavaScript" >
 function validate(form)
 {
@@ -108,7 +117,14 @@ function validate(form)
   <TR>
     <TD CLASS="strcol" >
       To:
-      <SELECT NAME="To" >|.DBA->selxTable($form,'xPhiEmails','wellformed1@ttpedge.sitenv.org','Email Purpose','','Email').qq|      </SELECT>
+      <SELECT NAME="To" >|
+  . DBA->selxTable(
+    $form, 'xPhiEmails',
+    'wellformed1@ttpedge.sitenv.org',
+    'Email Purpose',
+    '', 'Email'
+  )
+  . qq|      </SELECT>
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE="submit" ONCLICK="return validate(this.form);" VALUE="Send Visit CCDA">
@@ -132,7 +148,14 @@ function validate(form)
   <TR>
     <TD CLASS="strcol" >
       To:
-      <SELECT NAME="To" >|.DBA->selxTable($form,'xPhiEmails','wellformed1@ttpedge.sitenv.org','Email Purpose','','Email').qq|      </SELECT>
+      <SELECT NAME="To" >|
+  . DBA->selxTable(
+    $form, 'xPhiEmails',
+    'wellformed1@ttpedge.sitenv.org',
+    'Email Purpose',
+    '', 'Email'
+  )
+  . qq|      </SELECT>
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE="submit" ONCLICK="return validate(this.form);" VALUE="Send Referral CCDA">

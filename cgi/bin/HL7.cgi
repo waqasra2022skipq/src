@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use myForm;
 use myDBI;
@@ -10,20 +10,25 @@ use PopUp;
 
 ############################################################################
 my $form = myForm->new();
-if ( ! SysAccess->chkPriv($form,'QAReports') )
-{ myDBI->error("HL7 Report / Access Denied!"); }
+if ( !SysAccess->chkPriv( $form, 'QAReports' ) ) {
+    myDBI->error("HL7 Report / Access Denied!");
+}
 my $cdbh = myDBI->dbconnect('okmis_config');
 
 ############################################################################
-if ( $form->{submit} ) { main->submit(); }
-else { main->check(); }
+if   ( $form->{submit} ) { main->submit(); }
+else                     { main->check(); }
 myDBI->cleanup();
 exit;
 
 ############################################################################
-sub check
-{
-  my $html = myHTML->newHTML($form,'Report HL7 Tags','CheckPopupWindow noclock countdown_10') . qq|
+sub check {
+    my $html = myHTML->newHTML(
+        $form,
+        'Report HL7 Tags',
+        'CheckPopupWindow noclock countdown_10'
+      )
+      . qq|
 <SCRIPT type="text/javascript" src="/cgi/js/ajaxrequest.js"></SCRIPT>
 <H3>Report HL7 Tags</H3>
 <P>
@@ -39,14 +44,14 @@ sub check
 </BODY>
 </HTML>
 |;
-  print $html;
-  return();
+    print $html;
+    return ();
 }
-sub submit
-{
-  my $q, $text;
-  my $text = qq|SUBMIT: $form->{Name} report.|;
-  print qq|Content-type: text/html\n\n
+
+sub submit {
+    my $q, $text;
+    my $text = qq|SUBMIT: $form->{Name} report.|;
+    print qq|Content-type: text/html\n\n
 <HTML>
 <HEAD> <TITLE>$rxHL7->{Tag}</TITLE> 
 <script language="JavaScript">
@@ -62,24 +67,24 @@ window.opener.location.href = window.opener.location.href;
 </BODY>
 </HTML>
 |;
-  return();
+    return ();
 }
-sub selHL7Tags
-{
-  my ($self,$form) = @_;
-  my $items = ();
-  my $s = $cdbh->prepare("select Tag from xHL7 group by Tag");
-  $s->execute() || myDBI->dberror("selHL7Tag: group by Tag");
-  while ( my $r = $s->fetchrow_hashref )
-  {
-    my $name = $r->{'Tag'};
-    my $val = $r->{'Tag'};
-    $items->{$name}->{name} = ${name};
-    $items->{$name}->{val} = ${val};
-  }
-  my $unSel = PopUp->unMatched();
-# just uses items->{name} to sort
-  my $SelStmt = PopUp->makeSelect($items,$bynum);
-  $s->finish();
-  return($unSel.$SelStmt);
+
+sub selHL7Tags {
+    my ( $self, $form ) = @_;
+    my $items = ();
+    my $s     = $cdbh->prepare("select Tag from xHL7 group by Tag");
+    $s->execute() || myDBI->dberror("selHL7Tag: group by Tag");
+    while ( my $r = $s->fetchrow_hashref ) {
+        my $name = $r->{'Tag'};
+        my $val  = $r->{'Tag'};
+        $items->{$name}->{name} = ${name};
+        $items->{$name}->{val}  = ${val};
+    }
+    my $unSel = PopUp->unMatched();
+
+    # just uses items->{name} to sort
+    my $SelStmt = PopUp->makeSelect( $items, $bynum );
+    $s->finish();
+    return ( $unSel . $SelStmt );
 }

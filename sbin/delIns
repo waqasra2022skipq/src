@@ -1,54 +1,56 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
-use  DBI;
-use  DBForm;
-use  DBA;
+use lib '/var/www/okmis/src/lib';
+use DBI;
+use DBForm;
+use DBA;
 
 ############################################################################
 # usage: delIns DBNAME=db&ID=InsuranceID
 ############################################################################
 $form = DBForm->new;
-my $ID=$form->{ID};
-if ( !$ID )
-{ print qq|\nNo Insurance ID given!\n\n|;
-  exit;
+my $ID = $form->{ID};
+if ( !$ID ) {
+    print qq|\nNo Insurance ID given!\n\n|;
+    exit;
 }
 ############################################################################
 my $dbh = $form->dbconnect();
 #
-my $sClient = $dbh->prepare("select * from Insurance left join Client on Client.ClientID=Insurance.ClientID where InsNumID=?");
+my $sClient = $dbh->prepare(
+"select * from Insurance left join Client on Client.ClientID=Insurance.ClientID where InsNumID=?"
+);
 $sClient->execute($ID) || $form->dberror("select Client");
 my $rClient = $sClient->fetchrow_hashref;
-print qq|# Client: $rClient->{FName} $rClient->{LName}, InsID: $rClient->{InsID}, Priority: $rClient->{Priority}\n|;
+print
+qq|# Client: $rClient->{FName} $rClient->{LName}, InsID: $rClient->{InsID}, Priority: $rClient->{Priority}\n|;
 #
 print qq|# SELECT ClientPrAuth: InsuranceID=${ID}\n|;
 my $sTrPlan = $dbh->prepare("select * from TrPlan where PrAuthID=?");
 my $sPrAuth = $dbh->prepare("select * from ClientPrAuth where InsuranceID=?");
 $sPrAuth->execute($ID) || $form->dberror("select ClientPrAuth");
-while ( my $rPrAuth = $sPrAuth->fetchrow_hashref )
-{ 
-  my $PrAuthID = $rPrAuth->{ID};
-  print qq|#  SELECT TrPlanID: PrAuthID=${PrAuthID}\n|;
-  $sTrPlan->execute($PrAuthID) || $form->dberror("select TrPlanID");
-  while ( my $rTrPlan = $sTrPlan->fetchrow_hashref )
-  { 
-    my $TrPlanID = $rTrPlan->{TrPlanID};
-    print qq|#     delete TrPlanIP: $TrPlanID\n|;
-    print qq|      delete from TrPlanIP where TrPlanID='${TrPlanID}';\n|;
-  }
-  print qq|#   delete TrPlan: $PrAuthID\n|;
-  print qq|    delete from TrPlan where PrAuthID='${PrAuthID}';\n|;
-  print qq|#   delete PDDiag: $PrAuthID\n|;
-  print qq|    delete from PDDiag where PrAuthID='${PrAuthID}';\n|;
-  print qq|#   delete PDDom: $PrAuthID\n|;
-  print qq|    delete from PDDom where PrAuthID='${PrAuthID}';\n|;
+while ( my $rPrAuth = $sPrAuth->fetchrow_hashref ) {
+    my $PrAuthID = $rPrAuth->{ID};
+    print qq|#  SELECT TrPlanID: PrAuthID=${PrAuthID}\n|;
+    $sTrPlan->execute($PrAuthID) || $form->dberror("select TrPlanID");
+    while ( my $rTrPlan = $sTrPlan->fetchrow_hashref ) {
+        my $TrPlanID = $rTrPlan->{TrPlanID};
+        print qq|#     delete TrPlanIP: $TrPlanID\n|;
+        print qq|      delete from TrPlanIP where TrPlanID='${TrPlanID}';\n|;
+    }
+    print qq|#   delete TrPlan: $PrAuthID\n|;
+    print qq|    delete from TrPlan where PrAuthID='${PrAuthID}';\n|;
+    print qq|#   delete PDDiag: $PrAuthID\n|;
+    print qq|    delete from PDDiag where PrAuthID='${PrAuthID}';\n|;
+    print qq|#   delete PDDom: $PrAuthID\n|;
+    print qq|    delete from PDDom where PrAuthID='${PrAuthID}';\n|;
 
-  print qq|#   delete PrAuthRVU: $PrAuthID\n|;
-  print qq|    delete from PrAuthRVU where PrAuthID='${PrAuthID}';\n|;
+    print qq|#   delete PrAuthRVU: $PrAuthID\n|;
+    print qq|    delete from PrAuthRVU where PrAuthID='${PrAuthID}';\n|;
 
-  print qq|#   delete CDC,ClientPrAuth\n|;
-  print qq|    delete from ClientPrAuthCDC where ClientPrAuthID='${PrAuthID}';\n|;
-  print qq|    delete from ClientPrAuth where ID='${PrAuthID}';\n|;
+    print qq|#   delete CDC,ClientPrAuth\n|;
+    print
+      qq|    delete from ClientPrAuthCDC where ClientPrAuthID='${PrAuthID}';\n|;
+    print qq|    delete from ClientPrAuth where ID='${PrAuthID}';\n|;
 }
 #
 print qq|# delete ClientPrAuth: ${ID}\n|;

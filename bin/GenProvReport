@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use myForm;
 use myDBI;
@@ -17,23 +17,30 @@ use Cwd;
 ############################################################################
 my $form;
 my $ReportName = shift;
+
 # get the command name...
-my ($pw,$cmd) = $0 =~ m/(.*\/)(.*)$/;
+my ( $pw, $cmd ) = $0 =~ m/(.*\/)(.*)$/;
+
 # the databases to work with
-my @DBS = $ARGV[0] eq 'test' ? Accounts->dbs('test') : scalar(@ARGV) ? @ARGV : Accounts->dbs('active'); 
-foreach my $dbname ( @DBS )
-{
-  print qq|Database: ${dbname}: $ReportName: Started   |.localtime().qq|\n|;
-  $form = myForm->new("DBNAME=$dbname");
-  my $dbh = myDBI->dbconnect($form->{'DBNAME'});
-#foreach my $f ( sort keys %{$form} ) { warn "form-$f=$form->{$f}\n"; }
+my @DBS =
+    $ARGV[0] eq 'test' ? Accounts->dbs('test')
+  : scalar(@ARGV)      ? @ARGV
+  :                      Accounts->dbs('active');
+foreach my $dbname (@DBS) {
+    print qq|Database: ${dbname}: $ReportName: Started   |
+      . localtime() . qq|\n|;
+    $form = myForm->new("DBNAME=$dbname");
+    my $dbh = myDBI->dbconnect( $form->{'DBNAME'} );
 
-  chdir("$form->{DOCROOT}/reports2");
-  $pwd=cwd();
-#warn "begin: GenProvReport: pwd=$pwd\n";
+    #foreach my $f ( sort keys %{$form} ) { warn "form-$f=$form->{$f}\n"; }
 
-  my ($cnt,$provs) = (0,'');
-  $qProviderRpts = qq|
+    chdir("$form->{DOCROOT}/reports2");
+    $pwd = cwd();
+
+    #warn "begin: GenProvReport: pwd=$pwd\n";
+
+    my ( $cnt, $provs ) = ( 0, '' );
+    $qProviderRpts = qq|
 select ProviderRpts.Name
      , xReports.ID as RptID, xReports.Descr, xReports.Script, xReports.Args, xReports.Dir
      , Provider.Email, Provider.FName, Provider.LName, Provider.ProvID
@@ -46,99 +53,126 @@ select ProviderRpts.Name
     and Provider.NoMail=0
   order by Provider.LName, Provider.FName
 |;
-  $sProviderRpts = $dbh->prepare($qProviderRpts);
-  $sProviderRpts->execute($ReportName) || myDBI->dberror($qProviderRpts);
-  my $rows = $sProviderRpts->rows;
-  print qq|GenProvReport: ${ReportName}: rows=${rows}\n|;
-#next;
-  while ( $rProviderRpts = $sProviderRpts->fetchrow_hashref )
-  {
-    $cnt++;
-    chdir("$form->{DOCROOT}/$rProviderRpts->{Dir}") if ( $rProviderRpts->{Dir} );
-    $pwd=cwd();
-#warn "report: GenProvReport: pwd=$pwd\n";
-    $provs .= qq| $rProviderRpts->{FName} $rProviderRpts->{LName} $rProviderRpts->{ProvID} ($rProviderRpts->{Email})|;
-    main->genReport($form,$rProviderRpts);
-  }
-  unless ( $cnt == 0 )
-  { DBUtil->email($form,'support@okmis.com',"ProvReport: ${ReportName}","$form->{'DBNAME'} ${cnt} sent.\n${provs}",'',1); }
+    $sProviderRpts = $dbh->prepare($qProviderRpts);
+    $sProviderRpts->execute($ReportName) || myDBI->dberror($qProviderRpts);
+    my $rows = $sProviderRpts->rows;
+    print qq|GenProvReport: ${ReportName}: rows=${rows}\n|;
 
-  $sProviderRpts->finish();
-  myDBI->cleanup();
-  print qq|Database: ${dbname}: $ReportName: Completed |.localtime().qq|\n|;
+    #next;
+    while ( $rProviderRpts = $sProviderRpts->fetchrow_hashref ) {
+        $cnt++;
+        chdir("$form->{DOCROOT}/$rProviderRpts->{Dir}")
+          if ( $rProviderRpts->{Dir} );
+        $pwd = cwd();
+
+        #warn "report: GenProvReport: pwd=$pwd\n";
+        $provs .=
+qq| $rProviderRpts->{FName} $rProviderRpts->{LName} $rProviderRpts->{ProvID} ($rProviderRpts->{Email})|;
+        main->genReport( $form, $rProviderRpts );
+    }
+    unless ( $cnt == 0 ) {
+        DBUtil->email(
+            $form, 'support@okmis.com',
+            "ProvReport: ${ReportName}",
+            "$form->{'DBNAME'} ${cnt} sent.\n${provs}",
+            '', 1
+        );
+    }
+
+    $sProviderRpts->finish();
+    myDBI->cleanup();
+    print qq|Database: ${dbname}: $ReportName: Completed |
+      . localtime() . qq|\n|;
 }
 exit;
 ############################################################################
-sub genReport
-{
-  my ($self, $form, $r) = @_;
+sub genReport {
+    my ( $self, $form, $r ) = @_;
 
-  my $dbh = myDBI->dbconnect($form->{'DBNAME'});
-  print qq|generate Provider Report: $r->{Descr} for $r->{FName} $r->{LName}\n|;
-# first log the Report...
-  my $DT = main->getDATETIME();
-  my $s=$dbh->prepare("insert into wReports (ProvID,RptID,RptName,xtable,BeginTime) values ('$r->{ProvID}','$r->{RptID}','$r->{Name}','GenProvReport','$DT')");
-  $s->execute() || myDBI->dberror("insert error wReports: $r->{ProvID}/$r->{RptID}");
-  my $NEWID = $s->{'mysql_insertid'};
-# run the Report...
-  my $Cmd = qq|/home/okmis/mis/src/reports/$r->{Script} DBNAME=$form->{DBNAME}\\&GenProvReport=1\\&ForProvID=$r->{ProvID}|;
-  $Cmd .= qq|\\&$r->{Args}| if ( $r->{Args} );
-  my $sfx = $r->{Args} =~ /output=pdf/ ? 'pdf' : 'xls';
-  my $tmpFile = "provreport.".$sfx;
-  system("${Cmd} > ${tmpFile} 2>${tmpFile}.err");
-#warn qq|Cmd=${Cmd}\n|;
-# end time the Report...
-  $DT = main->getDATETIME();
-  $s=$dbh->prepare("update wReports set EndTime='${DT}' where ID='${NEWID}'");
-  $s->execute() || myDBI->dberror("update error wReports: ${NEWID}/${DT}");
-  $s->finish();
+    my $dbh = myDBI->dbconnect( $form->{'DBNAME'} );
+    print
+      qq|generate Provider Report: $r->{Descr} for $r->{FName} $r->{LName}\n|;
 
-  my $linecnt = 0;
-  if ( $sfx eq 'pdf' ) { $linecnt = 'x'; }
-  else
-  {
-    $linecnt = DBUtil->CountFile("${tmpFile}")-4;
-    $linecnt = 0 if ( $linecnt < 0 );
-  }
-  (my $Descr = $r->{Descr}) =~ s;\/;\:;g;
-  my $newFile = 'RPT_scheduled_'.$r->{ProvID}.'_'.${Descr}.'_'.$form->{TODAY}.'_'.$linecnt.'_'.DBUtil->Date('','stamp').'_'.DBUtil->genToken().'.'.$sfx;
-  move("${tmpFile}","${newFile}")
-    or print "<<<ERROR>>>: move failed: ${tmpFile} $!";
-  move("${tmpFile}.err","${newFile}.err")
-    or print "<<<ERROR>>>: move failed: ${tmpFile}.err $!";
-  my $Email = $r->{Email};
-  my $Subject = qq|$r->{Descr} run.|;
-  my $Text = '';
-  if ( $Email eq '' ) 
-  { 
-    $Email = 'support@okmis.com';
-    $Subject = qq|REPORT for $r->{FName} $r->{LName} Email NULL: ${Subject}|;
-    $Text = qq|$form->{DBNAME}\nNULL Email: $r->{FName} $r->{LName} for ${Subject}|;
-  }
-  else
-  {
-    my $err = DBUtil->ReadFile("${newFile}.err");
-    my $Message .= localtime().qq|: $r->{Descr} completed.\n
+    # first log the Report...
+    my $DT = main->getDATETIME();
+    my $s  = $dbh->prepare(
+"insert into wReports (ProvID,RptID,RptName,xtable,BeginTime) values ('$r->{ProvID}','$r->{RptID}','$r->{Name}','GenProvReport','$DT')"
+    );
+    $s->execute()
+      || myDBI->dberror("insert error wReports: $r->{ProvID}/$r->{RptID}");
+    my $NEWID = $s->{'mysql_insertid'};
+
+    # run the Report...
+    my $Cmd =
+qq|/var/www/okmis/src/reports/$r->{Script} DBNAME=$form->{DBNAME}\\&GenProvReport=1\\&ForProvID=$r->{ProvID}|;
+    $Cmd .= qq|\\&$r->{Args}| if ( $r->{Args} );
+    my $sfx     = $r->{Args} =~ /output=pdf/ ? 'pdf' : 'xls';
+    my $tmpFile = "provreport." . $sfx;
+    system("${Cmd} > ${tmpFile} 2>${tmpFile}.err");
+
+    #warn qq|Cmd=${Cmd}\n|;
+    # end time the Report...
+    $DT = main->getDATETIME();
+    $s =
+      $dbh->prepare("update wReports set EndTime='${DT}' where ID='${NEWID}'");
+    $s->execute() || myDBI->dberror("update error wReports: ${NEWID}/${DT}");
+    $s->finish();
+
+    my $linecnt = 0;
+    if ( $sfx eq 'pdf' ) { $linecnt = 'x'; }
+    else {
+        $linecnt = DBUtil->CountFile("${tmpFile}") - 4;
+        $linecnt = 0 if ( $linecnt < 0 );
+    }
+    ( my $Descr = $r->{Descr} ) =~ s;\/;\:;g;
+    my $newFile =
+        'RPT_scheduled_'
+      . $r->{ProvID} . '_'
+      . ${Descr} . '_'
+      . $form->{TODAY} . '_'
+      . $linecnt . '_'
+      . DBUtil->Date( '', 'stamp' ) . '_'
+      . DBUtil->genToken() . '.'
+      . $sfx;
+    move( "${tmpFile}", "${newFile}" )
+      or print "<<<ERROR>>>: move failed: ${tmpFile} $!";
+    move( "${tmpFile}.err", "${newFile}.err" )
+      or print "<<<ERROR>>>: move failed: ${tmpFile}.err $!";
+    my $Email   = $r->{Email};
+    my $Subject = qq|$r->{Descr} run.|;
+    my $Text    = '';
+
+    if ( $Email eq '' ) {
+        $Email = 'support@okmis.com';
+        $Subject =
+          qq|REPORT for $r->{FName} $r->{LName} Email NULL: ${Subject}|;
+        $Text =
+qq|$form->{DBNAME}\nNULL Email: $r->{FName} $r->{LName} for ${Subject}|;
+    }
+    else {
+        my $err = DBUtil->ReadFile("${newFile}.err");
+        my $Message .= localtime() . qq|: $r->{Descr} completed.\n
 ${err}
 To view the report select on the menus Reports->Your Reports List
 Reports on this list expire within 20 days after being created.
 |;
-    $Text = qq|\n${Subject}\n${Message}\n|;
-  }
-  DBUtil->email($form,$Email,$Subject,$Text,'',1);
-  return(1);
+        $Text = qq|\n${Subject}\n${Message}\n|;
+    }
+    DBUtil->email( $form, $Email, $Subject, $Text, '', 1 );
+    return (1);
 }
-sub getDATETIME
-{
-  my ($self) = @_;
-  my ($sec, $min, $hrs, $day, $month, $year, $wday, $julian) = localtime();
-  $month++; $year +=1900;
-  $month = length($month) == 2 ? $month : '0'.$month;
-  $day = length($day) == 2 ? $day : '0'.$day;
-  $hrs = length($hrs) == 2 ? $hrs : '0'.$hrs;
-  $min = length($min) == 2 ? $min : '0'.$min;
-  $sec = length($sec) == 2 ? $sec : '0'.$sec;
-  my $CURTIME = qq|${year}-${month}-${day} ${hrs}:${min}:${sec}|;
-  return($CURTIME);
+
+sub getDATETIME {
+    my ($self) = @_;
+    my ( $sec, $min, $hrs, $day, $month, $year, $wday, $julian ) = localtime();
+    $month++;
+    $year += 1900;
+    $month = length($month) == 2 ? $month : '0' . $month;
+    $day   = length($day) == 2   ? $day   : '0' . $day;
+    $hrs   = length($hrs) == 2   ? $hrs   : '0' . $hrs;
+    $min   = length($min) == 2   ? $min   : '0' . $min;
+    $sec   = length($sec) == 2   ? $sec   : '0' . $sec;
+    my $CURTIME = qq|${year}-${month}-${day} ${hrs}:${min}:${sec}|;
+    return ($CURTIME);
 }
 ############################################################################

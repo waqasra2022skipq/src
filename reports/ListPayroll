@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use myConfig;
 use Cwd;
 use DBI;
@@ -8,12 +8,14 @@ use DBUtil;
 use SysAccess;
 
 ############################################################################
-$pwd=cwd();
+$pwd  = cwd();
 $form = DBForm->new();
-if ( ! SysAccess->verify($form,'Privilege=Payroll') )
-{ $form->error("MarkPaid / Access Denied"); }
+if ( !SysAccess->verify( $form, 'Privilege=Payroll' ) ) {
+    $form->error("MarkPaid / Access Denied");
+}
 
 my $dbh = $form->dbconnect();
+
 #chdir("$form->{DOCROOT}/reports2");
 ############################################################################
 # Start out the display.
@@ -21,7 +23,8 @@ print qq|Content-type: text/html\n\n
 <!DOCTYPE html>
 <HTML>
 <HEAD> <TITLE>List Payroll</TITLE>
-  <LINK rel="stylesheet" TYPE="text/css" HREF="|.myConfig->cfgfile('main.css',1).qq|" >
+  <LINK rel="stylesheet" TYPE="text/css" HREF="|
+  . myConfig->cfgfile( 'main.css', 1 ) . qq|" >
   <LINK rel="stylesheet" TYPE="text/css" HREF="/cgi/jcal/calendar-forest.css" >
   <SCRIPT TYPE="text/javascript" SRC="/cgi/js/utils.js"></SCRIPT>
   <SCRIPT TYPE="text/javascript" SRC="/cgi/jcal/calendar.js"></SCRIPT>
@@ -45,7 +48,8 @@ print qq|
       <DIV CLASS="hdrcol" >When satisfied with the Summary/Detail then select the MarkPaid.</DIV>
       <DIV CLASS="hdrcol" >
 |;
-print main->disFiles("$form->{DOCROOT}/reports2/$form->{LOGINPROVID}_Payroll*",5);
+print main->disFiles( "$form->{DOCROOT}/reports2/$form->{LOGINPROVID}_Payroll*",
+    5 );
 print qq|
       </DIV>
       <DIV CLASS="hdrtxt" >After selecting the MarkPaid files are displayed below.</DIV>
@@ -53,6 +57,7 @@ print qq|
   <TR>
 </TABLE>
 |;
+
 # THEN THE MARKED FILES.
 print qq|
 <BR><BR>
@@ -65,7 +70,8 @@ print qq|
       <DIV CLASS="hdrcol" >These files are moved here after they are selected MarkPaid.</DIV>
       <DIV>
 |;
-print main->disFiles("$form->{DOCROOT}/payroll/$form->{LOGINPROVID}_Payroll*",6);
+print main->disFiles( "$form->{DOCROOT}/payroll/$form->{LOGINPROVID}_Payroll*",
+    6 );
 print qq|
       </DIV>
     <TD>
@@ -78,123 +84,143 @@ print qq|
 $form->complete();
 exit;
 ############################################################################
-sub disFiles()
-{
-  my ($self,$Dir,$Cnt) = @_;
-  my ($html,$linecnt) = ('',0);
-  $html .= qq|
+sub disFiles() {
+    my ( $self, $Dir, $Cnt ) = @_;
+    my ( $html, $linecnt ) = ( '', 0 );
+    $html .= qq|
 <DIV ALIGN="center" >
 <TABLE CLASS="home hdrcol" >
 |;
-  my $Files = main->getFiles($Dir,$Cnt);
-#warn qq|\ndisFiles:\n|;
-  # ascending: { $a <=> $b }; descending: { $b <=> $a } 
-  foreach my $key ( sort { $b cmp $a } keys %{$Files} )
-  { 
-#warn qq|key=$key\nfile=$Files->{$key}\n|;
-    $linecnt++;
-    my ($EDT,$ORDER,$SDT,$NAME,$TYPE) = split('_',$key);
-    my $even = int($linecnt/2) == $linecnt/2 ? '1' : '0';
-    if ( $even ) { $cls = qq|rpteven|; }
-    else { $cls = qq|rptodd|; }
-    my $Y = substr($SDT,0,4); my $M = substr($SDT,4,2); my $D = substr($SDT,6,2);
-    my $SDATE = DBUtil->Date("$Y-$M-$D",'fmt','MM/DD/YYYY');
-    my $h = substr($SDT,8,2); my $m = substr($SDT,10,2); my $s = substr($SDT,12,2);
-    my $STIME = $h . ':' . $m . ':' . $s;
-    my $link; my $exat;
-    if ( $EDT eq '' || $Cnt == 5 )
-    {
-      $link = $TYPE =~ /MARK/i
-            ? qq|javascript:InputWindow('/cgi/bin/markPaid.cgi?MarkFile=$Files->{$key}&mlt=$form->{mlt}','Mark',400,400)|
-            : qq|javascript:ReportWindow('/reports2/$Files->{$key}','Payroll')|;
-    }
-    else
-    {
-      $link = $TYPE =~ /MARK/i
-            ? qq|javascript:alert('Already Marked')|
-            : qq|javascript:ReportWindow('/payroll/$Files->{$key}','Payroll')|;
-      my $Y = substr($EDT,0,4); my $M = substr($EDT,4,2); my $D = substr($EDT,6,2);
-      my $EDATE = DBUtil->Date("$Y-$M-$D",'fmt','MM/DD/YYYY');
-      my $h = substr($EDT,8,2); my $m = substr($EDT,10,2); my $s = substr($EDT,12,2);
-      my $ETIME = $h . ':' . $m . ':' . $s;
-      $exat = qq|(Executed: ${EDATE} @ ${ETIME})|;
-    }
-    $html .= qq|
+    my $Files = main->getFiles( $Dir, $Cnt );
+
+    #warn qq|\ndisFiles:\n|;
+    # ascending: { $a <=> $b }; descending: { $b <=> $a }
+    foreach my $key ( sort { $b cmp $a } keys %{$Files} ) {
+
+        #warn qq|key=$key\nfile=$Files->{$key}\n|;
+        $linecnt++;
+        my ( $EDT, $ORDER, $SDT, $NAME, $TYPE ) = split( '_', $key );
+        my $even = int( $linecnt / 2 ) == $linecnt / 2 ? '1' : '0';
+        if   ($even) { $cls = qq|rpteven|; }
+        else         { $cls = qq|rptodd|; }
+        my $Y     = substr( $SDT, 0, 4 );
+        my $M     = substr( $SDT, 4, 2 );
+        my $D     = substr( $SDT, 6, 2 );
+        my $SDATE = DBUtil->Date( "$Y-$M-$D", 'fmt', 'MM/DD/YYYY' );
+        my $h     = substr( $SDT, 8,  2 );
+        my $m     = substr( $SDT, 10, 2 );
+        my $s     = substr( $SDT, 12, 2 );
+        my $STIME = $h . ':' . $m . ':' . $s;
+        my $link;
+        my $exat;
+
+        if ( $EDT eq '' || $Cnt == 5 ) {
+            $link =
+              $TYPE =~ /MARK/i
+              ? qq|javascript:InputWindow('/cgi/bin/markPaid.cgi?MarkFile=$Files->{$key}&mlt=$form->{mlt}','Mark',400,400)|
+              : qq|javascript:ReportWindow('/reports2/$Files->{$key}','Payroll')|;
+        }
+        else {
+            $link =
+              $TYPE =~ /MARK/i
+              ? qq|javascript:alert('Already Marked')|
+              : qq|javascript:ReportWindow('/payroll/$Files->{$key}','Payroll')|;
+            my $Y     = substr( $EDT, 0, 4 );
+            my $M     = substr( $EDT, 4, 2 );
+            my $D     = substr( $EDT, 6, 2 );
+            my $EDATE = DBUtil->Date( "$Y-$M-$D", 'fmt', 'MM/DD/YYYY' );
+            my $h     = substr( $EDT, 8,  2 );
+            my $m     = substr( $EDT, 10, 2 );
+            my $s     = substr( $EDT, 12, 2 );
+            my $ETIME = $h . ':' . $m . ':' . $s;
+            $exat = qq|(Executed: ${EDATE} @ ${ETIME})|;
+        }
+        $html .= qq|
   <TR CLASS="${cls} hdrcol" >
     <TD >
       <A HREF="${link}" >${NAME} ${TYPE} ${SDATE} @ ${STIME} ${exat}</A>
     </TD>
   </TR>
 |;
-  }
-  $html .= qq|
+    }
+    $html .= qq|
 </TABLE>
 </DIV>
 |;
-  return($html);
+    return ($html);
 }
 ############################################################################
 # LAST THE MARKED PAID LIST.
-sub disPayDates
-{
-  my ($self) = @_;
-  my $AFTERDATE = DBUtil->Date('',-3);
-  my $ADATE = DBUtil->Date($AFTERDATE,'fmt','MM/DD/YYYY');
-  my $html = qq|
+sub disPayDates {
+    my ($self)    = @_;
+    my $AFTERDATE = DBUtil->Date( '', -3 );
+    my $ADATE     = DBUtil->Date( $AFTERDATE, 'fmt', 'MM/DD/YYYY' );
+    my $html      = qq|
 <BR><BR>
 <DIV CLASS="heading tophdr" >Listing of Paid Dates and count</DIV>
 <TABLE CLASS="home hdrcol" >
   <TR CLASS="title" ><TD>Count of Notes Paid since ${ADATE}.</TD></TR>
 |;
-  my $cnt=0;
-  my $s = $dbh->prepare("select PaidDate,count(*) as count from Treatment where PaidDate >= '${AFTERDATE}' group by PaidDate");
-  $s->execute() || $form->dberror($s);
-  while (my $r = $s->fetchrow_hashref)
-  {
-    $cnt++;
-    my $even = int($cnt/2) == $cnt/2 ? '1' : '0';
-    if ( $even ) { $cls = qq|rpteven|; }
-    else { $cls = qq|rptodd|; }
-    my $PaidDate = $r->{PaidDate} eq 'NULL' ? 'Unpaid' : DBUtil->Date($r->{PaidDate},'fmt','MM/DD/YYYY');
-    $html .= qq|
+    my $cnt = 0;
+    my $s   = $dbh->prepare(
+"select PaidDate,count(*) as count from Treatment where PaidDate >= '${AFTERDATE}' group by PaidDate"
+    );
+    $s->execute() || $form->dberror($s);
+
+    while ( my $r = $s->fetchrow_hashref ) {
+        $cnt++;
+        my $even = int( $cnt / 2 ) == $cnt / 2 ? '1' : '0';
+        if   ($even) { $cls = qq|rpteven|; }
+        else         { $cls = qq|rptodd|; }
+        my $PaidDate =
+          $r->{PaidDate} eq 'NULL'
+          ? 'Unpaid'
+          : DBUtil->Date( $r->{PaidDate}, 'fmt', 'MM/DD/YYYY' );
+        $html .= qq|
   <TR CLASS="${cls}" >
     <TD CLASS="subtitle" >${PaidDate}</TD>
     <TD CLASS="sublink" >$r->{count}</TD>
   </TR>
 |;
-  }
-  $s->finish();
-  $html .= qq|</TABLE>\n|;
-  return($html);
+    }
+    $s->finish();
+    $html .= qq|</TABLE>\n|;
+    return ($html);
 }
 ############################################################################
-sub getFiles()
-{
-  my ($self,$Dir,$Cnt) = @_;
+sub getFiles() {
+    my ( $self, $Dir, $Cnt ) = @_;
 
-#warn qq|\ngetFiles: Dir=$Dir, Cnt=$Cnt\n|;
-  my @TmpFiles = glob($Dir);
-  my $Files = ();
-  foreach $file ( @TmpFiles )
-  {
-    my ($dir,$fn) = $file =~ m/(.*\/)(.*)$/;
-    my ($p1,$p2) = $fn =~ m/(.*)\.(.*)$/;
-    my ($key,$prov,$name,$type,$stamp,$token,$done) = ($p1,'','','','','','');
-    if ( $Cnt == 5 )
-    { ($prov,$name,$type,$stamp,$token) = $p1 =~ m/(.*)\_(.*)\_(.*)\_(.*)\_(.*)$/; $done=$stamp; }
-    else
-    { ($prov,$name,$type,$stamp,$token,$done) = $p1 =~ m/(.*)\_(.*)\_(.*)\_(.*)\_(.*)\_(.*)$/; }
-    if ( $type =~ /summary/i )
-    { $key = "${done}_1_${stamp}_${name}_${type}"; }
-    elsif ( $type =~ /detail/i )
-    { $key = "${done}_2_${stamp}_${name}_${type}"; }
-    else
-    { $key = "${done}_3_${stamp}_${name}_${type}"; }
+    #warn qq|\ngetFiles: Dir=$Dir, Cnt=$Cnt\n|;
+    my @TmpFiles = glob($Dir);
+    my $Files    = ();
+    foreach $file (@TmpFiles) {
+        my ( $dir, $fn ) = $file =~ m/(.*\/)(.*)$/;
+        my ( $p1,  $p2 ) = $fn   =~ m/(.*)\.(.*)$/;
+        my ( $key, $prov, $name, $type, $stamp, $token, $done ) =
+          ( $p1, '', '', '', '', '', '' );
+        if ( $Cnt == 5 ) {
+            ( $prov, $name, $type, $stamp, $token ) =
+              $p1 =~ m/(.*)\_(.*)\_(.*)\_(.*)\_(.*)$/;
+            $done = $stamp;
+        }
+        else {
+            ( $prov, $name, $type, $stamp, $token, $done ) =
+              $p1 =~ m/(.*)\_(.*)\_(.*)\_(.*)\_(.*)\_(.*)$/;
+        }
+        if ( $type =~ /summary/i ) {
+            $key = "${done}_1_${stamp}_${name}_${type}";
+        }
+        elsif ( $type =~ /detail/i ) {
+            $key = "${done}_2_${stamp}_${name}_${type}";
+        }
+        else { $key = "${done}_3_${stamp}_${name}_${type}"; }
+
 #warn qq|\nfile=$file; d=$dir, f=$fn\n|;
 #warn qq|\np1=$p1, p2=$p2;\nn=$n, prov=$prov, name=$name, type=$type, stamp=$stamp, token=$token, done=$done\n|;
 #warn qq|\nkey=$key\n|;
-    $Files->{$key} = $fn if ( $prov == $form->{LOGINPROVID} );
-  }
-  return($Files);
+        $Files->{$key} = $fn if ( $prov == $form->{LOGINPROVID} );
+    }
+    return ($Files);
 }
 #####################################################################

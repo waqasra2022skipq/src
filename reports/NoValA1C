@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 use DBA;
@@ -12,18 +12,22 @@ my $DT = localtime();
 #                               dd=15,30,45...
 ############################################################################
 my $form = DBForm->new();
+
 #foreach my $f ( sort keys %{$form} ) { warn "form-$f=$form->{$f}\n"; }
 my $dbh = $form->dbconnect();
 
-my $YEARAGO = DBUtil->Date('',-12);
-my $YEARAGOFMT = DBUtil->Date($YEARAGO,'fmt','MM/DD/YYYY');
-my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+my $YEARAGO    = DBUtil->Date( '', -12 );
+my $YEARAGOFMT = DBUtil->Date( $YEARAGO, 'fmt', 'MM/DD/YYYY' );
+my $ForProvID  = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+
 # join xInsurance needed for withSelection
 my $Header = DBA->withSelectionHeader($form);
-my $ClinicSelection = DBA->withSelection($form,'and','Client.clinicClinicID','','','');
+my $ClinicSelection =
+  DBA->withSelection( $form, 'and', 'Client.clinicClinicID', '', '', '' );
 $ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
-my $sProvider = $dbh->prepare("select LName, FName from Provider where ProvID=?");
-my $sTest1 = $dbh->prepare("
+my $sProvider =
+  $dbh->prepare("select LName, FName from Provider where ProvID=?");
+my $sTest1 = $dbh->prepare( "
 select ClientVitalSigns.ClientID
       ,ClientVitalSigns.ID
       ,ClientVitalSigns.VDate as TestDate, ClientVitalSigns.HeightFeet, ClientVitalSigns.HeightInches, ClientVitalSigns.Weight
@@ -33,8 +37,8 @@ select ClientVitalSigns.ClientID
    and ClientVitalSigns.BMI>30
    and ClientVitalSigns.VDate>='${YEARAGO}'
  order by ClientVitalSigns.VDate desc
-");
-my $sTest2 = $dbh->prepare("
+" );
+my $sTest2 = $dbh->prepare( "
 select ClientVitalSigns.ClientID
       ,ClientVitalSigns.ID
       ,ClientVitalSigns.VDate as TestDate, ClientVitalSigns.HeightFeet, ClientVitalSigns.HeightInches, ClientVitalSigns.Weight
@@ -44,7 +48,7 @@ select ClientVitalSigns.ClientID
    and ClientVitalSigns.HbA1c is not null
    and ClientVitalSigns.VDate>='${YEARAGO}'
  order by ClientVitalSigns.VDate desc
-");
+" );
 my $qClient = qq"
 select Client.LName, Client.FName, Client.ClientID, Client.DOB, Client.ProvID, Client.Active, Client.RecDOLC as LastContDate, count(*) as Count
       ,ClientVitalSigns.ID
@@ -57,43 +61,47 @@ select Client.LName, Client.FName, Client.ClientID, Client.DOB, Client.ProvID, C
 #and Client.ClientID=57015
  ${ClinicSelection}
  group by Client.LName, Client.FName, Client.ClientID";
+
 #warn qq|qClient=\n${qClient}\n|;
 my $sClient = $dbh->prepare($qClient);
-print qq|${DT}\n${Header}Patients that have a BMI>30 but do not have an HbA1c (since ${YEARAGOFMT}) report.\n|;
-print qq|Client Name\tActive\tDOB\tAge\tProvider Name\tTestDate\tHeight\tWeight\tBMI\tMessage\tLast Contact Date\n|;
+print
+qq|${DT}\n${Header}Patients that have a BMI>30 but do not have an HbA1c (since ${YEARAGOFMT}) report.\n|;
+print
+qq|Client Name\tActive\tDOB\tAge\tProvider Name\tTestDate\tHeight\tWeight\tBMI\tMessage\tLast Contact Date\n|;
 $sClient->execute();
-while (my $rClient = $sClient->fetchrow_hashref)
-{ 
-  my $ClientID = $rClient->{'ClientID'};
-  my $ActiveFlag = $rClient->{'Active'} ? 'Yes' : 'No';
-  my $LastContDate = $rClient->{'LastContDate'};
-  my $ClientName = qq|$rClient->{'LName'}, $rClient->{'FName'} ($rClient->{'ClientID'})|;
-  my $Age = DBUtil->Date($rClient->{DOB}, 'age');
-  $sProvider->execute($rClient->{ProvID});
-  my ($ProvLName, $ProvFName) = $sProvider->fetchrow_array;
-  my $ProvName = qq|$ProvLName, $ProvFName ($rClient->{ProvID})|; 
-  if ( $rClient->{ID} eq '' )       # should not go here because BMI>30 selection
-  {
-    my $msg = 'NO CLIENT VITAL SIGNS ENTERED';
-    print qq|${ClientName}\t${ActiveFlag}\t$rClient->{'DOB'}\t${Age}\t${ProvName}\t\t\t\t\t${msg}\t${LastContDate}\n|;
-  }
-  else
-  {
-    $sTest1->execute($ClientID);
-    if (my $rTest1 = $sTest1->fetchrow_hashref)
+while ( my $rClient = $sClient->fetchrow_hashref ) {
+    my $ClientID     = $rClient->{'ClientID'};
+    my $ActiveFlag   = $rClient->{'Active'} ? 'Yes' : 'No';
+    my $LastContDate = $rClient->{'LastContDate'};
+    my $ClientName =
+      qq|$rClient->{'LName'}, $rClient->{'FName'} ($rClient->{'ClientID'})|;
+    my $Age = DBUtil->Date( $rClient->{DOB}, 'age' );
+    $sProvider->execute( $rClient->{ProvID} );
+    my ( $ProvLName, $ProvFName ) = $sProvider->fetchrow_array;
+    my $ProvName = qq|$ProvLName, $ProvFName ($rClient->{ProvID})|;
+
+    if ( $rClient->{ID} eq '' )    # should not go here because BMI>30 selection
     {
-#print qq|1: ID=$rTest1->{'ID'}\n|;
-      my $Height = qq|$rTest1->{'HeightFeet'} $rTest1->{'HeightInches'}|;
-      $sTest2->execute($ClientID);
-      if (my $rTest2 = $sTest2->fetchrow_hashref) { null; }
-      else
-      {
-#print qq|2: ID=$rTest2->{'ID'}\n|;
-        my $msg = qq|BMI>30 and NO HbA1c|;
-        print qq|${ClientName}\t${ActiveFlag}\t$rClient->{'DOB'}\t${Age}\t${ProvName}\t$rTest1->{'TestDate'}\t${Height}\t$rTest1->{'Weight'}\t$rTest1->{'BMI'}\t${msg}\t${LastContDate}\n|;
-      }
+        my $msg = 'NO CLIENT VITAL SIGNS ENTERED';
+        print
+qq|${ClientName}\t${ActiveFlag}\t$rClient->{'DOB'}\t${Age}\t${ProvName}\t\t\t\t\t${msg}\t${LastContDate}\n|;
     }
-  }
+    else {
+        $sTest1->execute($ClientID);
+        if ( my $rTest1 = $sTest1->fetchrow_hashref ) {
+
+            #print qq|1: ID=$rTest1->{'ID'}\n|;
+            my $Height = qq|$rTest1->{'HeightFeet'} $rTest1->{'HeightInches'}|;
+            $sTest2->execute($ClientID);
+            if ( my $rTest2 = $sTest2->fetchrow_hashref ) { null; }
+            else {
+                #print qq|2: ID=$rTest2->{'ID'}\n|;
+                my $msg = qq|BMI>30 and NO HbA1c|;
+                print
+qq|${ClientName}\t${ActiveFlag}\t$rClient->{'DOB'}\t${Age}\t${ProvName}\t$rTest1->{'TestDate'}\t${Height}\t$rTest1->{'Weight'}\t$rTest1->{'BMI'}\t${msg}\t${LastContDate}\n|;
+            }
+        }
+    }
 }
 
 $sProvider->finish();

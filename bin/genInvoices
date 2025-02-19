@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 use cBill;
@@ -7,7 +7,7 @@ use cBill;
 # select the outstanding (with AmtDue and Reconciled) notes to invoice
 # from GenInvoices - select all Clients
 # from the html ListInvoices.cgi
-#   select the Generate New Invoice button 
+#   select the Generate New Invoice button
 #   and it runs the /cgi/bin/genInvoices.cgi
 #   which runs this routine
 ############################################################################
@@ -21,17 +21,19 @@ use cBill;
 # Should be documented in our help desk at some point.
 ############################################################################
 $form = DBForm->new();
-$dbh = $form->dbconnect();
+$dbh  = $form->dbconnect();
 my $InvDate = $form->{TODAY};
 $InvDate = $form->{InvDate} if ( $form->{InvDate} );
-my $ClientID=$form->{ClientID};
+my $ClientID = $form->{ClientID};
 ############################################################################
 # selects Notes outstanding where...
 #  AmtDue and Reconciled or (InProcess and Private Pay)
 ############################################################################
-my $add = $form->{'DBNAME'} eq 'okmis_gpr' ? qq| and Treatment.BillDate < '${InvDate}'|
-                                           : '';
-my $with = $ClientID eq 'all' ? '' : qq|and Treatment.ClientID='${ClientID}'|;
+my $add =
+  $form->{'DBNAME'} eq 'okmis_gpr'
+  ? qq| and Treatment.BillDate < '${InvDate}'|
+  : '';
+my $with  = $ClientID eq 'all' ? '' : qq|and Treatment.ClientID='${ClientID}'|;
 my $where = qq|
  from Treatment
   left join xSC on xSC.SCID=Treatment.SCID
@@ -44,32 +46,41 @@ ${add}
 |;
 
 my $qClients = qq|select ClientID,ProvID ${where} ${with} group by ClientID|;
+
 #warn qq|qClients=\n$qClients\n|;
 my $sClients = $dbh->prepare($qClients);
-my $qNote = qq|select Treatment.* ${where} and Treatment.ClientID=? order by Treatment.ContLogDate, Treatment.ContLogBegTime|;
+my $qNote =
+qq|select Treatment.* ${where} and Treatment.ClientID=? order by Treatment.ContLogDate, Treatment.ContLogBegTime|;
+
 #warn qq|qNote=\n$qNote\n|;
 my $sNote = $dbh->prepare($qNote);
-my $qAddInv = qq|insert into Invoices (ClientID,InvDate,CreateProvID,CreateDate,ChangeProvID) values (?,?,?,?,?)|;
+my $qAddInv =
+qq|insert into Invoices (ClientID,InvDate,CreateProvID,CreateDate,ChangeProvID) values (?,?,?,?,?)|;
 my $sAddInv = $dbh->prepare($qAddInv);
-my $qAddInvItems = qq|insert into InvItems (InvID,ClientID,TrID,ContDate,SCNum,Descr,Units,BillAmt,InsCode,PaidAmt,PaidDate,AmtDue,CreateProvID,CreateDate,ChangeProvID) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)|;
+my $qAddInvItems =
+qq|insert into InvItems (InvID,ClientID,TrID,ContDate,SCNum,Descr,Units,BillAmt,InsCode,PaidAmt,PaidDate,AmtDue,CreateProvID,CreateDate,ChangeProvID) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)|;
 my $sAddInvItems = $dbh->prepare($qAddInvItems);
 my $qUpdInvoices = qq|update Invoices set TotalAmt=? where ID=?|;
 my $sUpdInvoices = $dbh->prepare($qUpdInvoices);
 
 ############################################################################
 # add Invoice for Clients.
-my $cnt=0;
+my $cnt = 0;
 $sClients->execute();
-while ( my $rClient = $sClients->fetchrow_hashref )
-{
-#  if ( SysAccess->getRule($form,'GenerateInvoices',$rClient->{ProvID}) )
-#  {
+while ( my $rClient = $sClients->fetchrow_hashref ) {
+
+    #  if ( SysAccess->getRule($form,'GenerateInvoices',$rClient->{ProvID}) )
+    #  {
     $cnt++;
-    $sAddInv->execute($rClient->{ClientID},$InvDate,$form->{LOGINPROVID},$form->{TODAY},$form->{LOGINPROVID});
-    my $NEWID = $sAddInv->{'mysql_insertid'};
-    my $InvAmt = main->genItems($rClient->{'ClientID'},$NEWID);
-    $sUpdInvoices->execute($InvAmt,$NEWID);
+    $sAddInv->execute(
+        $rClient->{ClientID}, $InvDate, $form->{LOGINPROVID},
+        $form->{TODAY},       $form->{LOGINPROVID}
+    );
+    my $NEWID  = $sAddInv->{'mysql_insertid'};
+    my $InvAmt = main->genItems( $rClient->{'ClientID'}, $NEWID );
+    $sUpdInvoices->execute( $InvAmt, $NEWID );
     print qq|Invoice # ${NEWID} added: total: ${InvAmt} <BR>|;
+
 #  }
 #  else
 #  { print qq|Generate Invoice TURNED OFF for Agency: ProvID/ClientID: $rClient->{'ProvID'}/$rClient->{'ClientID'}\n|; }
@@ -84,22 +95,32 @@ $sUpdInvoices->finish();
 $form->complete();
 exit;
 ############################################################################
-sub genItems
-{
-  my ($self,$ClientID,$InvID) = @_;
-  my $TotalCharge = 0;
-  $sNote->execute($ClientID) || $form->dberror($qNote);
-  while ( my $rNote = $sNote->fetchrow_hashref )
-  { 
-    my $rxSC = cBill->getServiceCode($form,$rNote->{SCID},$rNote->{ContLogDate},$rNote->{ContLogBegTime},$rNote->{ContLogEndTime},$rNote->{TrID},$rNote->{BillDate});
-    my $PaidDate = $rNote->{RecDate} ? $rNote->{RecDate} : $rNote->{COPLDate};
-    $sAddInvItems->execute($InvID,$ClientID,$rNote->{TrID},$rNote->{ContLogDate},
-       $rxSC->{SCNum},$rxSC->{SCName},$rxSC->{Units},$rNote->{BilledAmt},$rxSC->{InsCode}
-      ,$rxSC->{RecAmt},$PaidDate,$rNote->{AmtDue}
-      ,$form->{LOGINPROVID},$form->{TODAY},$form->{LOGINPROVID});
-    $TotalCharge += $rNote->{AmtDue};
-    print qq|TrID: $rNote->{TrID} for $rNote->{AmtDue} <BR>|;
-  }
-  return($TotalCharge);
+sub genItems {
+    my ( $self, $ClientID, $InvID ) = @_;
+    my $TotalCharge = 0;
+    $sNote->execute($ClientID) || $form->dberror($qNote);
+    while ( my $rNote = $sNote->fetchrow_hashref ) {
+        my $rxSC = cBill->getServiceCode(
+            $form,                    $rNote->{SCID},
+            $rNote->{ContLogDate},    $rNote->{ContLogBegTime},
+            $rNote->{ContLogEndTime}, $rNote->{TrID},
+            $rNote->{BillDate}
+        );
+        my $PaidDate =
+          $rNote->{RecDate} ? $rNote->{RecDate} : $rNote->{COPLDate};
+        $sAddInvItems->execute(
+            $InvID,               $ClientID,
+            $rNote->{TrID},       $rNote->{ContLogDate},
+            $rxSC->{SCNum},       $rxSC->{SCName},
+            $rxSC->{Units},       $rNote->{BilledAmt},
+            $rxSC->{InsCode},     $rxSC->{RecAmt},
+            $PaidDate,            $rNote->{AmtDue},
+            $form->{LOGINPROVID}, $form->{TODAY},
+            $form->{LOGINPROVID}
+        );
+        $TotalCharge += $rNote->{AmtDue};
+        print qq|TrID: $rNote->{TrID} for $rNote->{AmtDue} <BR>|;
+    }
+    return ($TotalCharge);
 }
 ############################################################################

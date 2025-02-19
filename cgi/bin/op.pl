@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #############################################################################
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use myForm;
 use DBA;
@@ -9,29 +9,32 @@ use DBUtil;
 use utils;
 use graphs;
 use Time::Local;
-my $DT=localtime();
+my $DT = localtime();
 
 #############################################################################
-my $form = myForm->parse();
+my $form   = myForm->parse();
 my $method = $form->{'method'};
-my $value = $form->{'value'};
+my $value  = $form->{'value'};
 my $target = $form->{'target'};
 ##$form->{'sesid'} = $form->{'s'};
 $form = utils->readsid($form);
-my $graphtype = $form->{'method'};      # graphtype comes from sesid file.
+my $graphtype = $form->{'method'};    # graphtype comes from sesid file.
+
 #foreach my $f ( sort keys %{$form} ) { warn "options: form-$f=$form->{$f}\n"; }
 #warn qq|op.pl: graphtype=${graphtype}\n|;
-if ( $method eq 'test' )
-{
-#warn qq|op.pl: test: target=${target}, value=${value}\n|;
-  my $html = qq|
+if ( $method eq 'test' ) {
+
+    #warn qq|op.pl: test: target=${target}, value=${value}\n|;
+    my $html = qq|
 <SCRIPT TYPE="text/javascript" >
 alert("this is the NEW test");
 </SCRIPT>
 |;
-  my $ex = qq|javascript:execute_script('grapharea');|;
-#warn qq|op.pl: html=\n${html}\n|;
-  $out = $err eq '' ? qq|
+    my $ex = qq|javascript:execute_script('grapharea');|;
+
+    #warn qq|op.pl: html=\n${html}\n|;
+    $out = $err eq ''
+      ? qq|
   <command method="setcontent">
     <target>${target}</target>
     <content><![CDATA[${html}]]></content>
@@ -40,43 +43,50 @@ alert("this is the NEW test");
     <target>execute_script</target>
     <content><![CDATA[${ex}]]></content>
   </command>
-| : main->ierr($target,$err,,$msg,$id);
-  $out .= main->iwarn($warn,$msg,$id);
+|
+      : main->ierr( $target, $err, $msg, $id );
+    $out .= main->iwarn( $warn, $msg, $id );
 }
-elsif ( $method eq 'ClinicProvider' )
-{
-#warn qq|op.pl: ClinicProvider: target=${target}, value=${value}\n|;
-  my $html = main->selections('ClinicIDs:ProvIDs');
-#warn qq|op.pl: html=\n${html}\n|;
-  #my $ex = qq|javascript:execute_script('optionsarea');|;
-  #<command method="setscript">
-  #  <target>execute_script</target>
-  #  <content><![CDATA[${ex}]]></content>
-  #</command>
-  $out = $err eq '' ? qq|
+elsif ( $method eq 'ClinicProvider' ) {
+
+    #warn qq|op.pl: ClinicProvider: target=${target}, value=${value}\n|;
+    my $html = main->selections('ClinicIDs:ProvIDs');
+
+    #warn qq|op.pl: html=\n${html}\n|;
+    #my $ex = qq|javascript:execute_script('optionsarea');|;
+    #<command method="setscript">
+    #  <target>execute_script</target>
+    #  <content><![CDATA[${ex}]]></content>
+    #</command>
+    $out = $err eq ''
+      ? qq|
   <command method="setcontent">
     <target>${target}</target>
     <content><![CDATA[${html}]]></content>
   </command>
-| : main->ierr($target,$err,,$msg,$id);
-  $out .= main->iwarn($warn,$msg,$id);
+|
+      : main->ierr( $target, $err, $msg, $id );
+    $out .= main->iwarn( $warn, $msg, $id );
 }
-else
-{
-#warn qq|op.pl: else: target=${target}, value=${value}\n|;
-#warn qq|op.pl: else: method=${method}\n|;
-  my $html = main->selections($method);
-#warn qq|op.pl: html=\n${html}\n|;
-  $out = $err eq '' ? qq|
+else {
+    #warn qq|op.pl: else: target=${target}, value=${value}\n|;
+    #warn qq|op.pl: else: method=${method}\n|;
+    my $html = main->selections($method);
+
+    #warn qq|op.pl: html=\n${html}\n|;
+    $out = $err eq ''
+      ? qq|
   <command method="setcontent">
     <target>${target}</target>
     <content><![CDATA[${html}]]></content>
   </command>
-| : main->ierr($target,$err,,$msg,$id);
-  $out .= main->iwarn($warn,$msg,$id);
+|
+      : main->ierr( $target, $err, $msg, $id );
+    $out .= main->iwarn( $warn, $msg, $id );
 }
 $xml = qq|<response>\n${out}</response>|;
 myDBI->cleanup();
+
 #warn qq|graphs: xml=${xml}\n|;
 print qq|Content-type: text/xml
 
@@ -85,25 +95,24 @@ ${xml}
 |;
 exit;
 ############################################################################
-sub selections
-{
-  my ($self,$requested_options) = @_;
-#warn qq|options: check: $form->{Name}\n|;
-  my ($html,$my_options,$section) = ('','','');
-  my $args = qq|'&mlt=$form->{mlt}&sesid=$form->{sesid}'|;
-  foreach my $option ( split(':',$requested_options) )
-  {
-    $args .= qq|+'|;
-    if ( $option eq 'Active' ) { $section = main->setActive(); }
-    elsif ( $option eq 'Days' ) { $section = main->setDays(); }
-    elsif ( $option eq 'CustAgency' ) { $section = main->setCustAgency(); }
-    elsif ( $option eq 'ClinicIDs' ) { $section = main->setClinicIDs(); }
-    elsif ( $option eq 'daterange' ) { $section = main->setDates(); }
-    elsif ( $option eq 'Format' ) { $section = main->setFormat(); }
-    elsif ( $option eq 'InsIDs' ) { $section = main->setInsIDs(); }
-    elsif ( $option eq 'ProvIDs' ) { $section = main->setProvIDs(); }
-    elsif ( $option eq 'sYearMonth' ) { $section = main->setsYearMonth(); }
-    $my_options .= qq|
+sub selections {
+    my ( $self, $requested_options ) = @_;
+
+    #warn qq|options: check: $form->{Name}\n|;
+    my ( $html, $my_options, $section ) = ( '', '', '' );
+    my $args = qq|'&mlt=$form->{mlt}&sesid=$form->{sesid}'|;
+    foreach my $option ( split( ':', $requested_options ) ) {
+        $args .= qq|+'|;
+        if    ( $option eq 'Active' )     { $section = main->setActive(); }
+        elsif ( $option eq 'Days' )       { $section = main->setDays(); }
+        elsif ( $option eq 'CustAgency' ) { $section = main->setCustAgency(); }
+        elsif ( $option eq 'ClinicIDs' )  { $section = main->setClinicIDs(); }
+        elsif ( $option eq 'daterange' )  { $section = main->setDates(); }
+        elsif ( $option eq 'Format' )     { $section = main->setFormat(); }
+        elsif ( $option eq 'InsIDs' )     { $section = main->setInsIDs(); }
+        elsif ( $option eq 'ProvIDs' )    { $section = main->setProvIDs(); }
+        elsif ( $option eq 'sYearMonth' ) { $section = main->setsYearMonth(); }
+        $my_options .= qq|
 <TABLE CLASS="home hdrcol" >
   <TR CLASS="subtitle tophdr" ><TD >${opt}</TD</TR>
   <TR>
@@ -111,65 +120,71 @@ ${section}
   </TR>
 </TABLE >
 |;
-    $args .= qq|&${option}='+document.theoptions.${option}.value|;
-  }
-  $html = qq|
+        $args .= qq|&${option}='+document.theoptions.${option}.value|;
+    }
+    $html = qq|
 <FORM ID="theoptions" NAME="theoptions" METHOD="POST" >
 ${my_options}
 <DIV ><INPUT TYPE="button" ONCLICK="return validate(this.form);" VALUE="reset" /> </DIV>
 <INPUT TYPE="hidden" NAME="sesid" VALUE="$form->{'sesid'}" >
 </FORM>
 |;
-  return($html);
+    return ($html);
 }
-sub setActive
-{
-  my ($self) = @_;
-  my $checked = $form->{Active} ? 'CHECKED' : '';
-  my $html = qq|
+
+sub setActive {
+    my ($self)  = @_;
+    my $checked = $form->{Active} ? 'CHECKED' : '';
+    my $html    = qq|
     <TD >Active only: <INPUT TYPE="checkbox" NAME="Active" VALUE="1" ${checked}></TD >
 |;
-  return($html);
+    return ($html);
 }
-sub setDays
-{
-  my ($self) = @_;
-  my $html = qq|
+
+sub setDays {
+    my ($self) = @_;
+    my $html = qq|
     <TD >Days: <INPUT TYPE="text" NAME="Days" VALUE="$form->{Days}" ONFOCUS="select()" ONCHANGE="return vNum(this,1,1000)" SIZE=12 ></TD >
 |;
-  return($html);
+    return ($html);
 }
-sub setClinicIDs
-{
-  my ($self) = @_;
-  my $ListClinics = gHTML->selClinics($form,$form->{LOGINPROVID},$form->{ClinicIDs});
-  my $html = qq|
+
+sub setClinicIDs {
+    my ($self) = @_;
+    my $ListClinics =
+      gHTML->selClinics( $form, $form->{LOGINPROVID}, $form->{ClinicIDs} );
+    my $html = qq|
     <TD CLASS="numcol" >Clinics:</TD><TD><SELECT NAME="ClinicIDs" MULTIPLE SIZE="5" >${ListClinics}</SELECT></TD >
 |;
-  return($html);
+    return ($html);
 }
-sub setProvIDs
-{
-  my ($self) = @_;
-  my $ListProviders = gHTML->selProviders($form,$form->{LOGINPROVID},$form->{ProvIDs});
-  my $html = qq|
+
+sub setProvIDs {
+    my ($self) = @_;
+    my $ListProviders =
+      gHTML->selProviders( $form, $form->{LOGINPROVID}, $form->{ProvIDs} );
+    my $html = qq|
     <TD CLASS="numcol" >Providers:</TD><TD><SELECT NAME="ProvIDs" MULTIPLE SIZE="5" >${ListProviders}</SELECT></TD >
 |;
-  return($html);
+    return ($html);
 }
-sub setFormat
-{
-  my ($self) = @_;
-  if ( $form->{Format} =~ /quick/i ) { $quick='CHECKED'; }
-  elsif ( $form->{Format} =~ /extended/i ) { $extended='CHECKED'; }
-  elsif ( $form->{Format} =~ /jolts/i ) { $jolts='CHECKED'; }
-  elsif ( $form->{Format} =~ /byprovidersc/i ) { $byprovidersc='CHECKED'; }
-  elsif ( $form->{Format} =~ /byproviderdate/i ) { $byproviderdate='CHECKED'; }
-  elsif ( $form->{Format} =~ /byprovideronly/i ) { $byprovideronly='CHECKED'; }
-  elsif ( $form->{Format} =~ /byclientsc/i ) { $byclientsc='CHECKED'; }
-  elsif ( $form->{Format} =~ /byclientdate/i ) { $byclientdate='CHECKED'; }
-  else { $quick='CHECKED'; }
-  my $html = qq|
+
+sub setFormat {
+    my ($self) = @_;
+    if    ( $form->{Format} =~ /quick/i )        { $quick        = 'CHECKED'; }
+    elsif ( $form->{Format} =~ /extended/i )     { $extended     = 'CHECKED'; }
+    elsif ( $form->{Format} =~ /jolts/i )        { $jolts        = 'CHECKED'; }
+    elsif ( $form->{Format} =~ /byprovidersc/i ) { $byprovidersc = 'CHECKED'; }
+    elsif ( $form->{Format} =~ /byproviderdate/i ) {
+        $byproviderdate = 'CHECKED';
+    }
+    elsif ( $form->{Format} =~ /byprovideronly/i ) {
+        $byprovideronly = 'CHECKED';
+    }
+    elsif ( $form->{Format} =~ /byclientsc/i )   { $byclientsc   = 'CHECKED'; }
+    elsif ( $form->{Format} =~ /byclientdate/i ) { $byclientdate = 'CHECKED'; }
+    else                                         { $quick        = 'CHECKED'; }
+    my $html = qq|
   <TR>
     <TD CLASS="numcol" >Format:</TD>
     <TD CLASS="numcol" >
@@ -186,52 +201,52 @@ sub setFormat
     </TD >
   </TR>
 |;
-  return($html);
+    return ($html);
 }
-sub setInsIDs
-{
-  my ($self) = @_;
-  my $html = qq|
+
+sub setInsIDs {
+    my ($self) = @_;
+    my $html = qq|
   <TR>
     <TD >Insurance:</TD>
     <TD>
       <SELECT NAME="InsIDs" >
-| . DBA->selInsurance($form,$form->{InsIDs}). qq|
+| . DBA->selInsurance( $form, $form->{InsIDs} ) . qq|
       </SELECT>
     </TD>
   </TR>
 |;
-  return($html);
+    return ($html);
 }
-sub setCustAgency
-{
-  my ($self) = @_;
-  my $CustList = DBA->selxTable($form,'xCustAgency',$form->{CustAgency});
-  my $html = qq|
+
+sub setCustAgency {
+    my ($self)   = @_;
+    my $CustList = DBA->selxTable( $form, 'xCustAgency', $form->{CustAgency} );
+    my $html     = qq|
     <TD >Custody Agency: <SELECT NAME="CustAgency" >${CustList}</SELECT></TD >
 |;
-  return($html);
+    return ($html);
 }
-sub setDates
-{
-  my ($self) = @_;
-  if ( $form->{daterange} eq "thisweek" ) { $thisweek='CHECKED'; }
-  elsif ( $form->{daterange} eq "lastweek" ) { $lastweek='CHECKED'; }
-  elsif ( $form->{daterange} eq "thismonth" ) { $thismonth='CHECKED'; }
-  elsif ( $form->{daterange} eq "lastmonth" ) { $lastmonth='CHECKED'; }
-  elsif ( $form->{daterange} eq "last3m" ) { $last3m='CHECKED'; }
-  elsif ( $form->{daterange} eq "last6m" ) { $last6m='CHECKED'; }
-  elsif ( $form->{daterange} eq "back1m" ) { $back1m='CHECKED'; }
-  elsif ( $form->{daterange} eq "back6m" ) { $back6m='CHECKED'; }
-  elsif ( $form->{daterange} eq "back12m" ) { $back12m='CHECKED'; }
-  elsif ( $form->{daterange} eq "thisquarter" ) { $thisquarter='CHECKED'; }
-  elsif ( $form->{daterange} eq "lastquarter" ) { $lastquarter='CHECKED'; }
-  elsif ( $form->{daterange} eq "thisyear" ) { $thisyear='CHECKED'; }
-  elsif ( $form->{daterange} eq "lastyear" ) { $lastyear='CHECKED'; }
-  elsif ( $form->{daterange} eq "2yago" ) { $twoyago='CHECKED'; }
-  elsif ( $form->{daterange} eq "all" ) { $all='CHECKED'; }
-  elsif ( $form->{daterange} eq "today" ) { $today='CHECKED'; }
-  my $html = qq|
+
+sub setDates {
+    my ($self) = @_;
+    if    ( $form->{daterange} eq "thisweek" )    { $thisweek    = 'CHECKED'; }
+    elsif ( $form->{daterange} eq "lastweek" )    { $lastweek    = 'CHECKED'; }
+    elsif ( $form->{daterange} eq "thismonth" )   { $thismonth   = 'CHECKED'; }
+    elsif ( $form->{daterange} eq "lastmonth" )   { $lastmonth   = 'CHECKED'; }
+    elsif ( $form->{daterange} eq "last3m" )      { $last3m      = 'CHECKED'; }
+    elsif ( $form->{daterange} eq "last6m" )      { $last6m      = 'CHECKED'; }
+    elsif ( $form->{daterange} eq "back1m" )      { $back1m      = 'CHECKED'; }
+    elsif ( $form->{daterange} eq "back6m" )      { $back6m      = 'CHECKED'; }
+    elsif ( $form->{daterange} eq "back12m" )     { $back12m     = 'CHECKED'; }
+    elsif ( $form->{daterange} eq "thisquarter" ) { $thisquarter = 'CHECKED'; }
+    elsif ( $form->{daterange} eq "lastquarter" ) { $lastquarter = 'CHECKED'; }
+    elsif ( $form->{daterange} eq "thisyear" )    { $thisyear    = 'CHECKED'; }
+    elsif ( $form->{daterange} eq "lastyear" )    { $lastyear    = 'CHECKED'; }
+    elsif ( $form->{daterange} eq "2yago" )       { $twoyago     = 'CHECKED'; }
+    elsif ( $form->{daterange} eq "all" )         { $all         = 'CHECKED'; }
+    elsif ( $form->{daterange} eq "today" )       { $today       = 'CHECKED'; }
+    my $html = qq|
 <TABLE CLASS="home hdrcol" >
   <TR CLASS="subtitle tophdr" ><TD COLSPAN="3" >week = Mon-Sun (Billing Week)</TD></TR>
   <TR>
@@ -283,13 +298,16 @@ sub setDates
   </TR>
 </TABLE >
 |;
-  return($html);
+    return ($html);
 }
-sub setYM
-{
-  my ($self) = @_;
-  my $YM = $form->{sYearMonth} ? $form->{sYearMonth} : substr($form->{TODAY},0,7);
-  my $html = qq|
+
+sub setYM {
+    my ($self) = @_;
+    my $YM =
+        $form->{sYearMonth}
+      ? $form->{sYearMonth}
+      : substr( $form->{TODAY}, 0, 7 );
+    my $html = qq|
 <TABLE CLASS="home hdrcol" >
   <TR CLASS="subtitle tophdr" ><TD >select YearMonth from calendar</TD</TR>
   <TR>
@@ -298,28 +316,39 @@ sub setYM
   </TR>
 </TABLE >
 |;
-  return($html);
+    return ($html);
 }
-sub setOutput
-{
-  my ($self) = @_;
-  my $html, $OutputTypes, $cnt=0;
-  if ( $form->{output} =~ /html/i ) { $out1='CHECKED'; }
-  elsif ( $form->{output} =~ /ss/i ) { $out2='CHECKED'; }
-  elsif ( $form->{output} =~ /pdf/i ) { $out3='CHECKED'; }
-  elsif ( $form->{output} =~ /graph/i ) { $out4='CHECKED'; }
-  else { $out1='CHECKED'; }
-  if ( $rxTable->{Outputs} =~ /html/ )
-  { $cnt++; $OutputTypes .= qq|        <LI><INPUT TYPE="radio" NAME="output" VALUE="html" ${out1} > html</LI>|; }
-  if ( $rxTable->{Outputs} =~ /ss/ )
-  { $cnt++; $OutputTypes .= qq|        <LI><INPUT TYPE="radio" NAME="output" VALUE="ss" ${out2} > SpreadSheet</LI>|; }
-  if ( $rxTable->{Outputs} =~ /pdf/ )
-  { $cnt++; $OutputTypes .= qq|        <LI><INPUT TYPE="radio" NAME="output" VALUE="pdf" ${out3} > pdf</LI>|; }
-  if ( $rxTable->{Outputs} =~ /graph/ )
-  { $cnt++; $OutputTypes .= qq|        <LI><INPUT TYPE="radio" NAME="output" VALUE="graph" ${out4} > graph</LI>|; }
-  if ( $cnt > 1 )
-  {
-    $html = qq|
+
+sub setOutput {
+    my ($self) = @_;
+    my $html, $OutputTypes, $cnt = 0;
+    if    ( $form->{output} =~ /html/i )  { $out1 = 'CHECKED'; }
+    elsif ( $form->{output} =~ /ss/i )    { $out2 = 'CHECKED'; }
+    elsif ( $form->{output} =~ /pdf/i )   { $out3 = 'CHECKED'; }
+    elsif ( $form->{output} =~ /graph/i ) { $out4 = 'CHECKED'; }
+    else                                  { $out1 = 'CHECKED'; }
+    if ( $rxTable->{Outputs} =~ /html/ ) {
+        $cnt++;
+        $OutputTypes .=
+qq|        <LI><INPUT TYPE="radio" NAME="output" VALUE="html" ${out1} > html</LI>|;
+    }
+    if ( $rxTable->{Outputs} =~ /ss/ ) {
+        $cnt++;
+        $OutputTypes .=
+qq|        <LI><INPUT TYPE="radio" NAME="output" VALUE="ss" ${out2} > SpreadSheet</LI>|;
+    }
+    if ( $rxTable->{Outputs} =~ /pdf/ ) {
+        $cnt++;
+        $OutputTypes .=
+qq|        <LI><INPUT TYPE="radio" NAME="output" VALUE="pdf" ${out3} > pdf</LI>|;
+    }
+    if ( $rxTable->{Outputs} =~ /graph/ ) {
+        $cnt++;
+        $OutputTypes .=
+qq|        <LI><INPUT TYPE="radio" NAME="output" VALUE="graph" ${out4} > graph</LI>|;
+    }
+    if ( $cnt > 1 ) {
+        $html = qq|
 <TABLE CLASS="home hdrcol" >
   <TR CLASS="subtitle tophdr" ><TD >Type of output</TD</TR>
   <TR CLASS="subtitle" >
@@ -331,40 +360,41 @@ ${OutputTypes}
   </TR>
 </TABLE >
 |;
-  }
-  else
-  { $html = qq|<INPUT TYPE="hidden" NAME="output" VALUE="$rxTable->{Outputs}" >|; }
-  return($html);
+    }
+    else {
+        $html =
+          qq|<INPUT TYPE="hidden" NAME="output" VALUE="$rxTable->{Outputs}" >|;
+    }
+    return ($html);
 }
 ############################################################################
-sub imsg
-{
-  my ($self,$msg,$id) = @_;
-  return('') if ( $msg eq '' );
-  my $out = qq|
+sub imsg {
+    my ( $self, $msg, $id ) = @_;
+    return ('') if ( $msg eq '' );
+    my $out = qq|
   <command method="setcontent">
     <target>${id}</target>
     <content>${msg}</content>
   </command>
 |;
-  return($out);
+    return ($out);
 }
-sub iwarn
-{
-  my ($self,$warn,$msg,$id) = @_;
-  return('') if ( $warn eq '' );
-  my $out = qq|
+
+sub iwarn {
+    my ( $self, $warn, $msg, $id ) = @_;
+    return ('') if ( $warn eq '' );
+    my $out = qq|
   <command method="alert">
     <message>${warn}</message>
   </command>
 |;
-  $out .= main->imsg($msg,$id) if ( $id ne '' );
-  return($out);
+    $out .= main->imsg( $msg, $id ) if ( $id ne '' );
+    return ($out);
 }
-sub ierr
-{
-  my ($self,$target,$err,$msg,$id) = @_;
-  my $out = qq|
+
+sub ierr {
+    my ( $self, $target, $err, $msg, $id ) = @_;
+    my $out = qq|
   <command method="setdefault">
     <target>${target}</target>
   </command>
@@ -375,8 +405,8 @@ sub ierr
     <target>${target}</target>
   </command>
 |;
-  $out .= main->imsg($msg,$id) if ( $id ne '' );
-  return($out);
+    $out .= main->imsg( $msg, $id ) if ( $id ne '' );
+    return ($out);
 }
 ############################################################################
 ############################################################################

@@ -1,56 +1,69 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use Accounts;
 use myConfig;
 ############################################################################
 # usage: Gen db db
-#   creates the 
+#   creates the
 ############################################################################
 # get the command name...
-my ($pw,$cmd) = $0 =~ m/(.*\/)(.*)$/;
+my ( $pw, $cmd ) = $0 =~ m/(.*\/)(.*)$/;
+
 # the databases to work with
-my @DBS = $ARGV[0] eq 'test' ? Accounts->dbs('test') : scalar(@ARGV) ? @ARGV : Accounts->dbs('active'); 
+my @DBS =
+    $ARGV[0] eq 'test' ? Accounts->dbs('test')
+  : scalar(@ARGV)      ? @ARGV
+  :                      Accounts->dbs('active');
 my $BIN = myConfig->cfg('BIN');
 
 ############################################################################
-print qq|${cmd} Started: |.localtime().qq|\n\n|;
+print qq|${cmd} Started: | . localtime() . qq|\n\n|;
 print qq|======================================\n\n|;
-foreach my $dbname ( @DBS )
-{
-  print qq|\n--------------------------------------\n|;
-  print qq|database: ${dbname}\n|;
+foreach my $dbname (@DBS) {
+    print qq|\n--------------------------------------\n|;
+    print qq|database: ${dbname}\n|;
 
-# part 1 get Notifications of Level Of Care (LOC)
-  my $form = DBForm->new("DBNAME=$dbname");
-  my $dbh = $form->dbconnect();
-# for Agencies...
-  my $sAgencySite = $dbh->prepare("select Provider.Name,Contracts.ProvID,xInsurance.Descr,Contracts.InsID,Contracts.PIN from Contracts left join Provider on Provider.ProvID=Contracts.ProvID left join xInsurance on xInsurance.ID=Contracts.InsID where Provider.Active=1 and xInsurance.Descr='medicaid' and Contracts.DMHuserid2 is not null group by Contracts.PIN");
-  $sAgencySite->execute();
-  while ( my $rAgencySite = $sAgencySite->fetchrow_hashref )
-  {
-    print qq|\n    download $rAgencySite->{'PIN'} ...\n|;
-    print qq|\n    $rAgencySite->{'PIN'} is NULL!...skipped\n| if ( $rAgencySite->{'PIN'} eq '' );
-    next if ( $rAgencySite->{'PIN'} eq '' );
-    system("${BIN}/DMHloc.pl DBNAME=${dbname}\\&AgencySite=$rAgencySite->{'PIN'}\\&AgencyNum=1");
-  }
-  $sAgencySite->finish();
-# for Individuals...
-  my $sAgencySite = $dbh->prepare("select Provider.FName,Provider.LName,Credentials.ProvID,xInsurance.Descr,Credentials.InsID,Credentials.PIN from Credentials left join Provider on Provider.ProvID=Credentials.ProvID left join xInsurance on xInsurance.ID=Credentials.InsID where Provider.Active=1 and xInsurance.Descr='medicaid' and Credentials.DMHuserid2 is not null group by Credentials.PIN");
-  $sAgencySite->execute();
-  while ( my $rAgencySite = $sAgencySite->fetchrow_hashref )
-  {
-    print qq|\n    download $rAgencySite->{'PIN'} ...\n|;
-    print qq|\n    download $rAgencySite->{'PIN'} is NULL!...skipped\n| if ( $rAgencySite->{'PIN'} eq '' );
-    next if ( $rAgencySite->{'PIN'} eq '' );
-    system("${BIN}/DMHloc.pl DBNAME=${dbname}\\&AgencySite=$rAgencySite->{'PIN'}\\&AgencyNum=0");
-  }
-  $sAgencySite->finish();
-  $form->complete();
+    # part 1 get Notifications of Level Of Care (LOC)
+    my $form = DBForm->new("DBNAME=$dbname");
+    my $dbh  = $form->dbconnect();
 
-# part 2 process the Health Home PAs
-  system("${BIN}/genHHPA DBNAME=${dbname}");
+    # for Agencies...
+    my $sAgencySite = $dbh->prepare(
+"select Provider.Name,Contracts.ProvID,xInsurance.Descr,Contracts.InsID,Contracts.PIN from Contracts left join Provider on Provider.ProvID=Contracts.ProvID left join xInsurance on xInsurance.ID=Contracts.InsID where Provider.Active=1 and xInsurance.Descr='medicaid' and Contracts.DMHuserid2 is not null group by Contracts.PIN"
+    );
+    $sAgencySite->execute();
+    while ( my $rAgencySite = $sAgencySite->fetchrow_hashref ) {
+        print qq|\n    download $rAgencySite->{'PIN'} ...\n|;
+        print qq|\n    $rAgencySite->{'PIN'} is NULL!...skipped\n|
+          if ( $rAgencySite->{'PIN'} eq '' );
+        next if ( $rAgencySite->{'PIN'} eq '' );
+        system(
+"${BIN}/DMHloc.pl DBNAME=${dbname}\\&AgencySite=$rAgencySite->{'PIN'}\\&AgencyNum=1"
+        );
+    }
+    $sAgencySite->finish();
+
+    # for Individuals...
+    my $sAgencySite = $dbh->prepare(
+"select Provider.FName,Provider.LName,Credentials.ProvID,xInsurance.Descr,Credentials.InsID,Credentials.PIN from Credentials left join Provider on Provider.ProvID=Credentials.ProvID left join xInsurance on xInsurance.ID=Credentials.InsID where Provider.Active=1 and xInsurance.Descr='medicaid' and Credentials.DMHuserid2 is not null group by Credentials.PIN"
+    );
+    $sAgencySite->execute();
+    while ( my $rAgencySite = $sAgencySite->fetchrow_hashref ) {
+        print qq|\n    download $rAgencySite->{'PIN'} ...\n|;
+        print qq|\n    download $rAgencySite->{'PIN'} is NULL!...skipped\n|
+          if ( $rAgencySite->{'PIN'} eq '' );
+        next if ( $rAgencySite->{'PIN'} eq '' );
+        system(
+"${BIN}/DMHloc.pl DBNAME=${dbname}\\&AgencySite=$rAgencySite->{'PIN'}\\&AgencyNum=0"
+        );
+    }
+    $sAgencySite->finish();
+    $form->complete();
+
+    # part 2 process the Health Home PAs
+    system("${BIN}/genHHPA DBNAME=${dbname}");
 }
 print qq|\n\n======================================\n|;
-print qq|${cmd} Completed: |.localtime().qq|\n|;
+print qq|${cmd} Completed: | . localtime() . qq|\n|;
 exit;
 ############################################################################

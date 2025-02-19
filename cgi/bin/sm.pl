@@ -1,12 +1,17 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 use myHTML;
 
 ############################################################################
 my $form = DBForm->new();
-my $html = myHTML->newHTML($form,'Support Message','CheckPopupWindow noclock countdown_1') . qq|
+my $html = myHTML->newHTML(
+    $form,
+    'Support Message',
+    'CheckPopupWindow noclock countdown_1'
+  )
+  . qq|
   <P CLASS="heading" >$form->{'heading'}</P>
   <P CLASS="title" >$form->{'title'}</P>
   <P CLASS="subtitle" >

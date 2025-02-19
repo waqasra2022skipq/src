@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ############################################################################
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use myForm;
 use myDBI;
@@ -11,11 +11,13 @@ use Time::Local;
 
 ############################################################################
 my $form = myForm->new();
-my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $dbh  = myDBI->dbconnect( $form->{'DBNAME'} );
 warn qq|'Database selected'|;
 warn qq|${dbh}|;
-unless ( SysAccess->chkPriv($form,'Agent') )
-{ myDBI->error("Access Denied / Not Found!"); }
+unless ( SysAccess->chkPriv( $form, 'Agent' ) ) {
+    myDBI->error("Access Denied / Not Found!");
+}
+
 #foreach my $f ( sort keys %{$form} ) { warn ": form-$f=$form->{$f}\n"; }
 
 my $type = $form->{'type'};
@@ -25,35 +27,42 @@ if ( $job eq '' ) { myDBI->error("job ERROR / NULL!"); }
 
 my $LOGDIR = myConfig->cfg('LOGDIR');
 chdir($LOGDIR);
-my $pwd=cwd();
+my $pwd = cwd();
 
-my $typename = $type eq '837' ? 'Billing'
-             : $type eq '835' ? 'Remittances'
-             : $type eq '271' ? 'Eligibility'
-             : 'Unknown';
+my $typename =
+    $type eq '837' ? 'Billing'
+  : $type eq '835' ? 'Remittances'
+  : $type eq '271' ? 'Eligibility'
+  :                  'Unknown';
 $type = 'SetACL';
-my $SRCBIN = myConfig->cfg('SRCBIN');
-my $cmd =  qq|${SRCBIN}/setACL|;
-my $stamp = DBUtil->Date('today','fmt', 'YYYYMMDD');
-my $outfile = $job.$type.'_'.$stamp.'.log';
+my $SRCBIN  = myConfig->cfg('SRCBIN');
+my $cmd     = qq|${SRCBIN}/setACL|;
+my $stamp   = DBUtil->Date( 'today', 'fmt', 'YYYYMMDD' );
+my $outfile = $job . $type . '_' . $stamp . '.log';
 
-my $html =  myHTML->close(1,$form->{'mlt'});
-if ( $form->{submit} ) { $html = main->submit(); }
+my $html = myHTML->close( 1, $form->{'mlt'} );
+if    ( $form->{submit} ) { $html = main->submit(); }
 elsif ( $form->{status} ) { $html = main->status(); }
-else { $html = main->verify(); }
+else                      { $html = main->verify(); }
 
 myDBI->cleanup();
 print $html;
 exit;
 ############################################################################
-sub submit
-{
-  my ($self) = @_;
-  system("${cmd} DBNAME=$form->{'DBNAME'}\\&mlt=$form->{'mlt'} > ${outfile} 2>${outfile} &");
-  sleep 4;
-  my $outtext = DBUtil->ReadFile($outfile);
-  my $results = $outtext eq '' ? 'Job still running; check log file' : '';
-  my $html = myHTML->newHTML($form,"${type}: ${job}",'CheckPopupWindow noclock countdown_10') . qq|
+sub submit {
+    my ($self) = @_;
+    system(
+"${cmd} DBNAME=$form->{'DBNAME'}\\&mlt=$form->{'mlt'} > ${outfile} 2>${outfile} &"
+    );
+    sleep 4;
+    my $outtext = DBUtil->ReadFile($outfile);
+    my $results = $outtext eq '' ? 'Job still running; check log file' : '';
+    my $html    = myHTML->newHTML(
+        $form,
+        "${type}: ${job}",
+        'CheckPopupWindow noclock countdown_10'
+      )
+      . qq|
 <P>
 <P>
 <SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/novalidate.js"> </SCRIPT>
@@ -80,14 +89,19 @@ ${outtext}
 </BODY>
 </HTML>
 |;
-  return($html);
+    return ($html);
 }
-sub status
-{
-  my ($self) = @_;
-  my $outtext = DBUtil->ReadFile($outfile);
-  my $results = $outtext eq '' ? 'Job still running; check log file' : '';
-  my $html = myHTML->newHTML($form,"${type}: ${job}",'CheckPopupWindow noclock countdown_10') . qq|
+
+sub status {
+    my ($self)  = @_;
+    my $outtext = DBUtil->ReadFile($outfile);
+    my $results = $outtext eq '' ? 'Job still running; check log file' : '';
+    my $html    = myHTML->newHTML(
+        $form,
+        "${type}: ${job}",
+        'CheckPopupWindow noclock countdown_10'
+      )
+      . qq|
 <P>
 <P>
 <SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/novalidate.js"> </SCRIPT>
@@ -114,12 +128,17 @@ ${outtext}
 </BODY>
 </HTML>
 |;
-  return($html);
+    return ($html);
 }
-sub verify
-{
-  my ($self) = @_;
-  my $html = myHTML->newHTML($form,"${type}: ${job}",'CheckPopupWindow noclock countdown_10') . qq|
+
+sub verify {
+    my ($self) = @_;
+    my $html = myHTML->newHTML(
+        $form,
+        "${type}: ${job}",
+        'CheckPopupWindow noclock countdown_10'
+      )
+      . qq|
 <P>
 <P>
 <SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/novalidate.js"> </SCRIPT>
@@ -141,6 +160,6 @@ sub verify
 </BODY>
 </HTML>
 |;
-  return($html);
+    return ($html);
 }
 ############################################################################

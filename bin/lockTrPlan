@@ -1,19 +1,19 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 use DBA;
 use cBill;
 ############################################################################
 my $form = DBForm->new();
-my $dbh = $form->dbconnect();
-my $cnt = 0;
-my $s = $dbh->prepare("select * from ClientTrPlan");
+my $dbh  = $form->dbconnect();
+my $cnt  = 0;
+my $s    = $dbh->prepare("select * from ClientTrPlan");
 $s->execute() || $form->dberror("fail execute");
-while ( my $rClientTrPlan = $s->fetchrow_hashref )
-{
-  $cnt++;
-  DBA->lockTrPlan($form,$rClientTrPlan->{'ID'});
+
+while ( my $rClientTrPlan = $s->fetchrow_hashref ) {
+    $cnt++;
+    DBA->lockTrPlan( $form, $rClientTrPlan->{'ID'} );
 }
 print qq|${cnt} records processed.\n|;
 $s->finish();

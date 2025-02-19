@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ############################################################################
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use CGI qw(:standard escape);
 use DBI;
 use myForm;
@@ -13,11 +13,13 @@ use Inv;
 
 ############################################################################
 my $form = myForm->new();
-my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $dbh  = myDBI->dbconnect( $form->{'DBNAME'} );
+
 #foreach my $f ( sort keys %{$form} ) { warn "EBDMH: form-$f=$form->{$f}\n"; }
 
-unless ( SysAccess->hasClientAccess($form,$form->{ClientID}) )
-{ myDBI->error("DMH Eligible Access Page / Not Client"); }
+unless ( SysAccess->hasClientAccess( $form, $form->{ClientID} ) ) {
+    myDBI->error("DMH Eligible Access Page / Not Client");
+}
 
 my $out = qq|Legend: 
 TXIX = Recipient is shown to be eligible for Medicaid by ODMHSAS records
@@ -32,32 +34,35 @@ CCBHC = Recipient is active in a CCBHC as of today
 DMH Eligibility for: $form->{FName} $form->{LName} ($form->{ClientID})
 InsIDNum\tTXIX\tDBH\tOCH\tHUM\tAET\tREHAB\tCASEMGMT\tCASEMGMTUNITS\tCCBHC\tBAD ADDRESS\tLastChecked\tStatus
 |;
-my ($cnt,$hdrline) = (0,10);
+my ( $cnt, $hdrline ) = ( 0, 10 );
 
-my $qEligible=qq|select * from EligibleDMH where RECIPIENTID=?|;
+my $qEligible = qq|select * from EligibleDMH where RECIPIENTID=?|;
+
 #warn qq|q=\n${qEligible}\n$form->{InsNumID}\n|;
 my $sEligible = $dbh->prepare($qEligible);
-$sEligible->execute($form->{InsNumID}) || myDBI->dberror($qEligible);
-while ( my $rEligible = $sEligible->fetchrow_hashref )
-{
-  $cnt++;
-  my $TXIX = $rEligible->{'TXIX'} ? 'true' : 'false';
-  my $DMH = $rEligible->{'DMH'} ? 'true' : 'false';
-  my $REHAB = $rEligible->{'REHAB'} ? 'true' : 'false';
-  my $CASEMGMT = $rEligible->{'CASEMGMT'} ? 'true' : 'false';
-  my $CCBHC = $rEligible->{'CCBHC'} ? 'true' : 'false';
-  my $BADADDR = $rEligible->{'BADADDRESS'} ? 'true' : 'false';
-  my $Status = $rEligible->{'Fail'} eq '' ? 'Received' : $rEligible->{'Fail'};
-  my $OCH = $rEligible->{'OCH'} ? 'true' : 'false';
-  my $HUM = $rEligible->{'HUM'} ? 'true' : 'false';
-  my $AET = $rEligible->{'AET'} ? 'true' : 'false';
+$sEligible->execute( $form->{InsNumID} ) || myDBI->dberror($qEligible);
+while ( my $rEligible = $sEligible->fetchrow_hashref ) {
+    $cnt++;
+    my $TXIX     = $rEligible->{'TXIX'}       ? 'true'   : 'false';
+    my $DMH      = $rEligible->{'DMH'}        ? 'true'   : 'false';
+    my $REHAB    = $rEligible->{'REHAB'}      ? 'true'   : 'false';
+    my $CASEMGMT = $rEligible->{'CASEMGMT'}   ? 'true'   : 'false';
+    my $CCBHC    = $rEligible->{'CCBHC'}      ? 'true'   : 'false';
+    my $BADADDR  = $rEligible->{'BADADDRESS'} ? 'true'   : 'false';
+    my $Status = $rEligible->{'Fail'} eq '' ? 'Received' : $rEligible->{'Fail'};
+    my $OCH    = $rEligible->{'OCH'}        ? 'true'     : 'false';
+    my $HUM    = $rEligible->{'HUM'}        ? 'true'     : 'false';
+    my $AET    = $rEligible->{'AET'}        ? 'true'     : 'false';
 
-  $out .= qq|$rEligible->{RECIPIENTID}\t${TXIX}\t${DMH}\t${OCH}\t${HUM}\t${AET}\t${REHAB}\t${CASEMGMT}\t$rEligible->{CASEMGMTUNITS}\t${CCBHC}\t${BADADDR}\t$rEligible->{StatusDate}\t${Status}\n|;
+    $out .=
+qq|$rEligible->{RECIPIENTID}\t${TXIX}\t${DMH}\t${OCH}\t${HUM}\t${AET}\t${REHAB}\t${CASEMGMT}\t$rEligible->{CASEMGMTUNITS}\t${CCBHC}\t${BADADDR}\t$rEligible->{StatusDate}\t${Status}\n|;
 }
 $out .= qq|None found! Click the Check DMH button| if ( $cnt == 0 );
-my $html = gHTML->htmlReport($out,$hdrline);
-print qq|Content-type: text/html\n\n<HTML>\n<HEAD><TITLE>Eligibility Report</TITLE></HEAD>\n<BODY >\n|
-      . $html . qq|\n</BODY>\n</HTML>\n|;
+my $html = gHTML->htmlReport( $out, $hdrline );
+print
+qq|Content-type: text/html\n\n<HTML>\n<HEAD><TITLE>Eligibility Report</TITLE></HEAD>\n<BODY >\n|
+  . $html
+  . qq|\n</BODY>\n</HTML>\n|;
 
 myDBI->cleanup();
 exit;

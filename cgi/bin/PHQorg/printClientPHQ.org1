@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ############################################################################
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use myConfig;
 use DBI;
 use myForm;
@@ -153,7 +153,7 @@ if ($@) {
 # |;
 # if ( $form->{LOGINPROVID} == 91 )
 # {
-#   open XML, ">/home/okmis/mis/src/debug/PrintPHQ.out" or die "Couldn't open file: $!";
+#   open XML, ">/var/www/okmis/src/debug/PrintPHQ.out" or die "Couldn't open file: $!";
 #   print XML ${xdp};
 #   close(XML);
 # }

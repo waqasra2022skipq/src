@@ -2885,7 +2885,7 @@ sub processNewCrop
 {
   my ($self,$form,$ClientID) = @_;
   chdir("$form->{DOCROOT}/tmp");
-  my $cmd = qq|/home/okmis/mis/src/bin/gp6 DBNAME=$form->{DBNAME}\\&mlt=$form->{mlt}\\&ClientID=${ClientID}|;
+  my $cmd = qq|/var/www/okmis/src/bin/gp6 DBNAME=$form->{DBNAME}\\&mlt=$form->{mlt}\\&ClientID=${ClientID}|;
   my $diskfile = DBUtil->ExecCmd($cmd);
   my $out = DBUtil->ReadFile($diskfile);
   return('<PRE>'.$out.'</PRE>');
@@ -3150,20 +3150,21 @@ sub subchr
   $out =~ s/\r//g;               # carriage return
   $out =~ s/\n/ /g;              # new line
   $out =~ s/\t/ /g;              # tab to space
-  $out =~ s// /g;              # new line
-  $out =~ s/…//g;
-  $out =~ s/’//g;
-  $out =~ s/“//g;
-  $out =~ s/”//g;
-  $out =~ s///g;
-  $out =~ s/„//g;
-  $out =~ s/‘//g;
-  $out =~ s/•//g;
-  $out =~ s/–//g;
-  $out =~ s/—//g;
-  $out =~ s/à/a/g;
-  $out =~ s/é/e/g;
-  $out =~ s;½;one-half;g;
+  $out =~ s/
+/ /g;              # new line
+  $out =~ s/ï¿½//g;
+  $out =~ s/ï¿½//g;
+  $out =~ s/ï¿½//g;
+  $out =~ s/ï¿½//g;
+  $out =~ s/ï¿½//g;
+  $out =~ s/ï¿½//g;
+  $out =~ s/ï¿½//g;
+  $out =~ s/ï¿½//g;
+  $out =~ s/ï¿½//g;
+  $out =~ s/ï¿½//g;
+  $out =~ s/ï¿½/a/g;
+  $out =~ s/ï¿½/e/g;
+  $out =~ s;ï¿½;one-half;g;
 #warn qq|subchr: out=${out}\n|;
   return($out);
 }
@@ -3182,26 +3183,27 @@ sub subxml
      $xml =~ s/\r//g;               # carriage return
      $xml =~ s/\n/ /g;              # new line
      $xml =~ s/\t/ /g;              # tab to space
-     $xml =~ s// /g;              # new line
-     $xml =~ s/é/e/g;
-     $xml =~ s;½;one-half;g;
-     $xml =~ s/…//g;
-     $xml =~ s/’//g;
-     $xml =~ s/“//g;
-     $xml =~ s/”//g;
-     $xml =~ s///g;
-     $xml =~ s/„//g;
-     $xml =~ s/‘//g;
-     $xml =~ s/•//g;
-     $xml =~ s/–//g;
-     $xml =~ s/—//g;
-     $xml =~ s/½//g;
+     $xml =~ s/
+/ /g;              # new line
+     $xml =~ s/ï¿½/e/g;
+     $xml =~ s;ï¿½;one-half;g;
+     $xml =~ s/ï¿½//g;
+     $xml =~ s/ï¿½//g;
+     $xml =~ s/ï¿½//g;
+     $xml =~ s/ï¿½//g;
+     $xml =~ s/ï¿½//g;
+     $xml =~ s/ï¿½//g;
+     $xml =~ s/ï¿½//g;
+     $xml =~ s/ï¿½//g;
+     $xml =~ s/ï¿½//g;
+     $xml =~ s/ï¿½//g;
+     $xml =~ s/ï¿½//g;
 #     $xml =~ s/&#8194;//g;         # HTML code for 'en space'
-     $xml =~ s/ //g;
-     $xml =~ s/à/a/g;
+     $xml =~ s/ï¿½//g;
+     $xml =~ s/ï¿½/a/g;
 #     $xml =~ s/ > / greater /g;
 #     $xml =~ s/ < / less /g;
-#     $xml =~ s/fiancé/fiance/g;
+#     $xml =~ s/fiancï¿½/fiance/g;
 #warn qq|subxml: xml=${xml}\n|;
   return($xml);
 }
@@ -3220,22 +3222,23 @@ sub subCHAR
      $out =~ s/\r//g;               # carriage return
      $out =~ s/\n/ /g;              # new line
      $out =~ s/\t/ /g;              # tab to space
-     $out =~ s// /g;              # new line
-     $out =~ s/é/e/g;
-     $out =~ s;½;one-half;g;
-     $out =~ s/…//g;
-     $out =~ s/’//g;
-     $out =~ s/“//g;
-     $out =~ s/”//g;
-     $out =~ s///g;
-     $out =~ s/„//g;
-     $out =~ s/‘//g;
-     $out =~ s/•//g;
-     $out =~ s/–//g;
-     $out =~ s/—//g;
-     $out =~ s/½//g;
-     $out =~ s/ //g;
-     $out =~ s/à/a/g;
+     $out =~ s/
+/ /g;              # new line
+     $out =~ s/ï¿½/e/g;
+     $out =~ s;ï¿½;one-half;g;
+     $out =~ s/ï¿½//g;
+     $out =~ s/ï¿½//g;
+     $out =~ s/ï¿½//g;
+     $out =~ s/ï¿½//g;
+     $out =~ s/ï¿½//g;
+     $out =~ s/ï¿½//g;
+     $out =~ s/ï¿½//g;
+     $out =~ s/ï¿½//g;
+     $out =~ s/ï¿½//g;
+     $out =~ s/ï¿½//g;
+     $out =~ s/ï¿½//g;
+     $out =~ s/ï¿½//g;
+     $out =~ s/ï¿½/a/g;
 #warn qq|subCHAR: out=${out}\n|;
   return($out);
 }

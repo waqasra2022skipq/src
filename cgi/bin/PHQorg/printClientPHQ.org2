@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ############################################################################
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use myConfig;
 use DBI;
 use myForm;
@@ -14,86 +14,120 @@ use PDFlib::PDFlib;
 use strict;
 
 ############################################################################
-my $form = myForm->new();
-my $dbh = myDBI->dbconnect($form->{'DBNAME'});
-my $cdbh = myDBI->dbconnect('okmis_config');
+my $form  = myForm->new();
+my $dbh   = myDBI->dbconnect( $form->{'DBNAME'} );
+my $cdbh  = myDBI->dbconnect('okmis_config');
 my $table = $form->{'action'};
-my $page = $form->{'page'};
+my $page  = $form->{'page'};
+
 #warn "PrintPHQ: IDs=$form->{'IDs'}\n";
 ##
 # prepare selects...
 ##
-my $sPHQ = $dbh->prepare("select * from ${table} where ID=?");
-my $sClient = $dbh->prepare("select * from Client where ClientID=?");
+my $sPHQ      = $dbh->prepare("select * from ${table} where ID=?");
+my $sClient   = $dbh->prepare("select * from Client where ClientID=?");
 my $sProvider = $dbh->prepare("select * from Provider where ProvID=?");
-my $smisTables = $cdbh->prepare("select * from misTables where theTable=? and theField=?");
+my $smisTables =
+  $cdbh->prepare("select * from misTables where theTable=? and theField=?");
 
 ############################################################################
 my $searchpath = "../data";
 
-my $pagewidth = 612;
-my $pageheight = 792;
-my $fontname= "Arial";
-my $boldfontname= "Arial-BoldMT";
-my $fontsizesmall = 8;
-my $fontsize = 9;
-my $fontsizemid = 10;
-my $fontsizelarge = 11;
-my $fontsizemidlarge = 12;
-my $fontsizexlarge = 13;
+my $pagewidth         = 612;
+my $pageheight        = 792;
+my $fontname          = "Arial";
+my $boldfontname      = "Arial-BoldMT";
+my $fontsizesmall     = 8;
+my $fontsize          = 9;
+my $fontsizemid       = 10;
+my $fontsizelarge     = 11;
+my $fontsizemidlarge  = 12;
+my $fontsizexlarge    = 13;
 my $fontsizemidxlarge = 14;
-my $fontsizexxlarge = 15;
-my $basefontoptions = "fontname=" . $fontname . " fontsize=" . $fontsize . " embedding encoding=unicode charref";
+my $fontsizexxlarge   = 15;
+my $basefontoptions =
+    "fontname="
+  . $fontname
+  . " fontsize="
+  . $fontsize
+  . " embedding encoding=unicode charref";
 my $basefontoptions_i = $basefontoptions . " fontstyle=italic";
-my $basefontoptions_u = $basefontoptions . " underline=true underlineposition=-15% underlinewidth=0.3";
-my $baseboldfontoptions = "fontname=" . $boldfontname . " fontsize=" . $fontsize . " embedding encoding=unicode";
-my $baseboldfontoptions_u = $baseboldfontoptions . " underline=true underlineposition=-15% underlinewidth=0.3";
-my $basemidfontoptions = $basefontoptions . " fontsize=" . $fontsizemid;
+my $basefontoptions_u = $basefontoptions
+  . " underline=true underlineposition=-15% underlinewidth=0.3";
+my $baseboldfontoptions =
+    "fontname="
+  . $boldfontname
+  . " fontsize="
+  . $fontsize
+  . " embedding encoding=unicode";
+my $baseboldfontoptions_u = $baseboldfontoptions
+  . " underline=true underlineposition=-15% underlinewidth=0.3";
+my $basemidfontoptions   = $basefontoptions . " fontsize=" . $fontsizemid;
 my $basemidfontoptions_i = $basemidfontoptions . " fontstyle=italic";
-my $basemidfontoptions_u = $basemidfontoptions . " underline=true underlineposition=-15% underlinewidth=0.3";
+my $basemidfontoptions_u = $basemidfontoptions
+  . " underline=true underlineposition=-15% underlinewidth=0.3";
 my $baseboldmidfontoptions = $baseboldfontoptions . " fontsize=" . $fontsizemid;
-my $baseboldmidfontoptions_u = $baseboldmidfontoptions . " underline=true underlineposition=-15% underlinewidth=0.3";
+my $baseboldmidfontoptions_u = $baseboldmidfontoptions
+  . " underline=true underlineposition=-15% underlinewidth=0.3";
 my $baseboldmidfontoptions_i = $baseboldmidfontoptions . " fontstyle=italic";
-my $baselargefontoptions = $basefontoptions . " fontsize=" . $fontsizelarge;
-my $baseboldlargefontoptions = $baseboldfontoptions . " fontsize=" . $fontsizelarge;
-my $baseboldlargefontoptions_u = $baseboldlargefontoptions . " underline=true underlineposition=-15% underlinewidth=0.3";
-my $baseboldlargefontoptions_ui = $baseboldlargefontoptions_u . " fontstyle=italic";
-my $baseboldlargefontoptions_i = $baseboldlargefontoptions . " fontstyle=italic";
-my $basesmallfontoptions = $basefontoptions . " fontsize=" . $fontsizesmall;
+my $baselargefontoptions     = $basefontoptions . " fontsize=" . $fontsizelarge;
+my $baseboldlargefontoptions =
+  $baseboldfontoptions . " fontsize=" . $fontsizelarge;
+my $baseboldlargefontoptions_u = $baseboldlargefontoptions
+  . " underline=true underlineposition=-15% underlinewidth=0.3";
+my $baseboldlargefontoptions_ui =
+  $baseboldlargefontoptions_u . " fontstyle=italic";
+my $baseboldlargefontoptions_i =
+  $baseboldlargefontoptions . " fontstyle=italic";
+my $basesmallfontoptions   = $basefontoptions . " fontsize=" . $fontsizesmall;
 my $basesmallfontoptions_i = $basesmallfontoptions . " fontstyle=italic";
-my $baseboldsmallfontoptions = $baseboldfontoptions . " fontsize=" . $fontsizesmall;
-my $basemidlargefontoptions = $basefontoptions . " fontsize=" . $fontsizemidlarge;
+my $baseboldsmallfontoptions =
+  $baseboldfontoptions . " fontsize=" . $fontsizesmall;
+my $basemidlargefontoptions =
+  $basefontoptions . " fontsize=" . $fontsizemidlarge;
 my $basemidlargefontoptions_i = $basemidlargefontoptions . " fontstyle=italic";
-my $basemidxlargefontoptions = $basefontoptions . " fontsize=" . $fontsizemidxlarge;
-my $baseboldmidxlargefontoptions = $baseboldfontoptions . " fontsize=" . $fontsizemidxlarge;
-my $basemidxlargefontoptions_i = $basemidxlargefontoptions . " fontstyle=italic";
-my $baseboldmidlargefontoptions = $baseboldfontoptions . " fontsize=" . $fontsizemidlarge;
-my $baseboldmidlargefontoptions_u = $baseboldmidlargefontoptions . " underline=true underlineposition=-15% underlinewidth=0.3";
-my $baseboldxlargefontoptions = $baseboldfontoptions . " fontsize=" . $fontsizexlarge;
-my $baseboldxlargefontoptions_i = $baseboldxlargefontoptions . " fontstyle=italic";
-my $basecheckfontoptions = "fontname={DejaVuSans} encoding=unicode fontsize=10 charref";
+my $basemidxlargefontoptions =
+  $basefontoptions . " fontsize=" . $fontsizemidxlarge;
+my $baseboldmidxlargefontoptions =
+  $baseboldfontoptions . " fontsize=" . $fontsizemidxlarge;
+my $basemidxlargefontoptions_i =
+  $basemidxlargefontoptions . " fontstyle=italic";
+my $baseboldmidlargefontoptions =
+  $baseboldfontoptions . " fontsize=" . $fontsizemidlarge;
+my $baseboldmidlargefontoptions_u = $baseboldmidlargefontoptions
+  . " underline=true underlineposition=-15% underlinewidth=0.3";
+my $baseboldxlargefontoptions =
+  $baseboldfontoptions . " fontsize=" . $fontsizexlarge;
+my $baseboldxlargefontoptions_i =
+  $baseboldxlargefontoptions . " fontstyle=italic";
+my $basecheckfontoptions =
+  "fontname={DejaVuSans} encoding=unicode fontsize=10 charref";
 
-my $marginleft = 30;
-my $margintop = 35;
+my $marginleft   = 30;
+my $margintop    = 35;
 my $marginbottom = 30;
 my $contentwidth = $pagewidth - 2 * $marginleft;
 
 my $indoc;
 my $no_of_input_pages;
 my @pagehandles = ();
-my $pagecount = 0;
+my $pagecount   = 0;
 
-my ($sec, $min, $hrs, $day, $month, $year, $wday, $julian) = localtime();
-my $pdfpath = myConfig->cfg('FORMDIR')."/printing/Print${table}${page}.pdf";
-my $formid = $hrs.$min;
-my $filename = '/tmp/'.$form->{'LOGINID'}.'_'.DBUtil->genToken().'_'.DBUtil->Date('','stamp').'.pdf';
-my $outfile = $form->{'file'} eq ''                # create and print pdf else just create.
-        ? $form->{'DOCROOT'}.$filename
-        : $form->{'file'};
+my ( $sec, $min, $hrs, $day, $month, $year, $wday, $julian ) = localtime();
+my $pdfpath  = myConfig->cfg('FORMDIR') . "/printing/Print${table}${page}.pdf";
+my $formid   = $hrs . $min;
+my $filename = '/tmp/'
+  . $form->{'LOGINID'} . '_'
+  . DBUtil->genToken() . '_'
+  . DBUtil->Date( '', 'stamp' ) . '.pdf';
+my $outfile = $form->{'file'} eq ''    # create and print pdf else just create.
+  ? $form->{'DOCROOT'} . $filename
+  : $form->{'file'};
+
 #my $outfile = "kls.pdf";
 
 ############################################################################
-# my $xdp = qq|<?xml version="1.0" encoding="UTF-8" ?> 
+# my $xdp = qq|<?xml version="1.0" encoding="UTF-8" ?>
 # <?xfa generator="XFA2_0" APIVersion="2.2.4333.0" ?>
 # <xdp:xdp xmlns:xdp="http://ns.adobe.com/xdp/" >
 # <xfa:datasets xmlns:xfa="http://www.xfa.org/schema/xfa-data/1.0/" >
@@ -102,43 +136,43 @@ my $outfile = $form->{'file'} eq ''                # create and print pdf else j
 # |;
 eval {
 
-  # create a new PDFlib object 
-  my $p = new PDFlib::PDFlib;
+    # create a new PDFlib object
+    my $p = new PDFlib::PDFlib;
 
-  $p->set_option("SearchPath={{" . $searchpath . "}}");
+    $p->set_option( "SearchPath={{" . $searchpath . "}}" );
 
-  # This mean we don't have to check error return values, but will
-  # get an exception in case of runtime problems.
-  
-  $p->set_option("errorpolicy=exception");
+    # This mean we don't have to check error return values, but will
+    # get an exception in case of runtime problems.
 
-  # all strings are expected as utf8
-  $p->set_option("stringformat=utf8");
+    $p->set_option("errorpolicy=exception");
 
-  $p->begin_document($outfile, "");
+    # all strings are expected as utf8
+    $p->set_option("stringformat=utf8");
 
-  $p->set_info("Creator", "Millennium Information Services");
-  $p->set_info("Author", "Keith Stephenson");
-  $p->set_info("Title", "PHQ");
+    $p->begin_document( $outfile, "" );
 
-  # Open the Block template which contains PDFlib Blocks 
-  $indoc = $p->open_pdi_document($pdfpath, "");
-  if ($indoc == -1) { die("Error: " . $p->get_errmsg()); }
+    $p->set_info( "Creator", "Millennium Information Services" );
+    $p->set_info( "Author",  "Keith Stephenson" );
+    $p->set_info( "Title",   "PHQ" );
 
-  $no_of_input_pages = $p->pcos_get_number($indoc, "length:pages");
+    # Open the Block template which contains PDFlib Blocks
+    $indoc = $p->open_pdi_document( $pdfpath, "" );
+    if ( $indoc == -1 ) { die( "Error: " . $p->get_errmsg() ); }
 
-  main->openPdiPages($p);
+    $no_of_input_pages = $p->pcos_get_number( $indoc, "length:pages" );
 
-  main->printPHQ($p);
+    main->openPdiPages($p);
 
-  main->closePdiPages($p);
+    main->printPHQ($p);
 
-  $p->end_document("");
+    main->closePdiPages($p);
+
+    $p->end_document("");
 
 };
 
 if ($@) {
-  die("$0: PDFlib Exception occurred:\n$@");
+    die("$0: PDFlib Exception occurred:\n$@");
 }
 
 # #warn qq|pdfpath=$pdfpath\n|;
@@ -151,13 +185,13 @@ if ($@) {
 # |;
 # if ( $form->{LOGINPROVID} == 91 )
 # {
-#   open XML, ">/home/okmis/mis/src/debug/PrintPHQ.out" or die "Couldn't open file: $!";
+#   open XML, ">/var/www/okmis/src/debug/PrintPHQ.out" or die "Couldn't open file: $!";
 #   print XML ${xdp};
 #   close(XML);
 # }
 # if ( $form->{file} )
 # {
-#   open OUT, ">$form->{file}" || die "Couldn't open '$form->{file}' file: $!"; 
+#   open OUT, ">$form->{file}" || die "Couldn't open '$form->{file}' file: $!";
 #   print OUT ${xdp};
 #   close(OUT);
 # }
@@ -170,764 +204,1550 @@ $smisTables->finish();
 
 myDBI->cleanup();
 
-if ( $form->{'file'} eq '' )                # create and print pdf.
+if ( $form->{'file'} eq '' )    # create and print pdf.
 { print qq|Location: ${filename}\n\n|; }
 
 exit;
 
 ############################################################################
 sub printPHQ {
-  my ($self, $p) = @_;
-  
-  foreach my $ID ( split(' ',$form->{IDs}) )
-  { 
-  #warn "PrintPHQ: table=${table}, page=${page}, ID=${ID}\n";
-    $sPHQ->execute($ID) || myDBI->dberror("PrintPHQ: select ${table} ${ID}");
-    while ( my $rPHQ = $sPHQ->fetchrow_hashref )
-    { 
-      $sClient->execute($rPHQ->{'ClientID'}) || myDBI->dberror("select Client: $rPHQ->{'ClientID'}");
-      my $rClient = $sClient->fetchrow_hashref;
-      main->createPages($p, $rPHQ, $rClient); 
-    }
-  }
+    my ( $self, $p ) = @_;
 
-  if ($pagecount eq 0) {
-    main->createEmptyPage($p);
-  }
+    foreach my $ID ( split( ' ', $form->{IDs} ) ) {
+
+        #warn "PrintPHQ: table=${table}, page=${page}, ID=${ID}\n";
+        $sPHQ->execute($ID)
+          || myDBI->dberror("PrintPHQ: select ${table} ${ID}");
+        while ( my $rPHQ = $sPHQ->fetchrow_hashref ) {
+            $sClient->execute( $rPHQ->{'ClientID'} )
+              || myDBI->dberror("select Client: $rPHQ->{'ClientID'}");
+            my $rClient = $sClient->fetchrow_hashref;
+            main->createPages( $p, $rPHQ, $rClient );
+        }
+    }
+
+    if ( $pagecount eq 0 ) {
+        main->createEmptyPage($p);
+    }
 }
 
 sub createEmptyPage {
-  my ($self, $p) = @_;
+    my ( $self, $p ) = @_;
 
-  $p->begin_page_ext($pagewidth, $pageheight, "topdown");
-  $p->fit_textline("NOT FOUND", $marginleft, 50, $basefontoptions);
-  $p->end_page_ext("");
+    $p->begin_page_ext( $pagewidth, $pageheight, "topdown" );
+    $p->fit_textline( "NOT FOUND", $marginleft, 50, $basefontoptions );
+    $p->end_page_ext("");
 }
 
-sub createPages
-{
-  my ($self, $p, $rPHQ, $rClient) = @_;
+sub createPages {
+    my ( $self, $p, $rPHQ, $rClient ) = @_;
 ##
-# Header info...GO AHEAD AND SET THESE BUT DON'T PUT THEM ON THE FORM FOR NOW.
-  my $AgencyID = MgrTree->getAgency($form,$rClient->{'clinicClinicID'});
-  $sProvider->execute($AgencyID) || myDBI->dberror("printPHQ: select Provider $AgencyID");
-  my $rAgency = $sProvider->fetchrow_hashref;
-  my $AgencyName = $rAgency->{Name};
-  my $AgencyAddr = $rAgency->{Addr1} . ', ';
-  $AgencyAddr .= $rAgency->{Addr2} . ', ' if ( $rAgency->{Addr2} );
-  $AgencyAddr .= $rAgency->{City} . ', ' . $rAgency->{ST} . '  ' . $rAgency->{Zip};
-  my $AgencyPhFax = 'Office: ' . $rAgency->{WkPh} . '  Fax: ' . $rAgency->{Fax};
-  my $reportInfo = '';                                 # right side of heading
-  my $Title = '';
+  # Header info...GO AHEAD AND SET THESE BUT DON'T PUT THEM ON THE FORM FOR NOW.
+    my $AgencyID = MgrTree->getAgency( $form, $rClient->{'clinicClinicID'} );
+    $sProvider->execute($AgencyID)
+      || myDBI->dberror("printPHQ: select Provider $AgencyID");
+    my $rAgency    = $sProvider->fetchrow_hashref;
+    my $AgencyName = $rAgency->{Name};
+    my $AgencyAddr = $rAgency->{Addr1} . ', ';
+    $AgencyAddr .= $rAgency->{Addr2} . ', ' if ( $rAgency->{Addr2} );
+    $AgencyAddr .=
+      $rAgency->{City} . ', ' . $rAgency->{ST} . '  ' . $rAgency->{Zip};
+    my $AgencyPhFax =
+      'Office: ' . $rAgency->{WkPh} . '  Fax: ' . $rAgency->{Fax};
+    my $reportInfo = '';    # right side of heading
+    my $Title      = '';
 ##
-  $sProvider->execute($rClient->{'ProvID'}) || myDBI->dberror("printPHQ: select PrimaryProvider $rClient->{'ProvID'}");
-  my $rPrimaryProvider = $sProvider->fetchrow_hashref;
-  my $primaryprovider = qq|$rPrimaryProvider->{'FName'} $rPrimaryProvider->{'LName'}|;
+    $sProvider->execute( $rClient->{'ProvID'} )
+      || myDBI->dberror(
+        "printPHQ: select PrimaryProvider $rClient->{'ProvID'}");
+    my $rPrimaryProvider = $sProvider->fetchrow_hashref;
+    my $primaryprovider =
+      qq|$rPrimaryProvider->{'FName'} $rPrimaryProvider->{'LName'}|;
 ##
-  $sProvider->execute($rPHQ->{'ProvID'}) || myDBI->dberror("printPHQ: select Clinician $rPHQ->{'ProvID'}");
-  my $rClinician = $sProvider->fetchrow_hashref;
-  my $clinician = qq|$rClinician->{'FName'} $rClinician->{'LName'}|;
+    $sProvider->execute( $rPHQ->{'ProvID'} )
+      || myDBI->dberror("printPHQ: select Clinician $rPHQ->{'ProvID'}");
+    my $rClinician = $sProvider->fetchrow_hashref;
+    my $clinician  = qq|$rClinician->{'FName'} $rClinician->{'LName'}|;
 ##
-  my $today = DBUtil->Date($form->{TODAY},'fmt','MM/DD/YYYY');
-  my $testdate = DBUtil->Date($rPHQ->{TestDate},'fmt','MM/DD/YYYY');
+    my $today    = DBUtil->Date( $form->{TODAY},    'fmt', 'MM/DD/YYYY' );
+    my $testdate = DBUtil->Date( $rPHQ->{TestDate}, 'fmt', 'MM/DD/YYYY' );
 ##
-  my $clientid = $rClient->{'ClientID'};
-  my $clientname = qq|$rClient->{'FName'} $rClient->{'LName'}|;
-  my $clientnameid = qq|$rClient->{'FName'} $rClient->{'LName'} / ${clientid}|;
-  my $addr1 = $rClient->{'Addr1'};
-  my $addr2 = $rClient->{'Addr2'};
-  my $csz = qq|$rClient->{'City'}, $rClient->{'ST'}  $rClient->{'Zip'}|;
-  if ( $addr2 eq '' ) { $addr2 = $csz; $csz = ''; }
-  my $sex = $rClient->{'Gend'};
-  my $age = DBUtil->Date($rClient->{'DOB'},'age');
+    my $clientid   = $rClient->{'ClientID'};
+    my $clientname = qq|$rClient->{'FName'} $rClient->{'LName'}|;
+    my $clientnameid =
+      qq|$rClient->{'FName'} $rClient->{'LName'} / ${clientid}|;
+    my $addr1 = $rClient->{'Addr1'};
+    my $addr2 = $rClient->{'Addr2'};
+    my $csz   = qq|$rClient->{'City'}, $rClient->{'ST'}  $rClient->{'Zip'}|;
+    if ( $addr2 eq '' ) { $addr2 = $csz; $csz = ''; }
+    my $sex = $rClient->{'Gend'};
+    my $age = DBUtil->Date( $rClient->{'DOB'}, 'age' );
 ##
-  my %DBData = ();
-  my $out = '';
-  my $tALL = 0;
-  my ($total,$t1,$t2,$t3) = (0,0,0,0);         # total = all t1=total all 1's, t2=total all 2's, t3=total all 3's values
-  my ($t15,$t15_1,$t15_2) = (0,0,0);           # ClientPHQSADS [qA]
-  my ($t7,$t7_1,$t7_2,$t7_3) = (0,0,0,0);      # ClientPHQSADS [qB]
-  my ($t9,$t9_1,$t9_2,$t9_3) = (0,0,0,0);      # ClientPHQSADS [qD] & ClientPHQ9 [q10]
-  my ($tINT,$tWM,$tD1,$tD2,$tD3,$tD4,$tD5,$tD6) = (0,0,0,0,0,0,0,0);              # ClientODAS,2017
-  my ($tL1,$tL2,$tL3,$tL4,$tL5,$tL6) = (0,0,0,0,0,0);                             # ClientODAS,2017
-  my ($sLINT,$tLWM,$tLD1,$tLD2,$tLD3,$tLD4,$tLD5,$tLD6) = (0,0,0,0,0,0,0,0);      # ClientODAS,2017
-  my ($sIndicated,$sWMIndicated) = (0,0);                                         # ClientODAS,2017
-  foreach my $f ( sort keys %{$rPHQ} )
-  {
-    $smisTables->execute($table,$f) || myDBI->dberror("printPHQ: select misTables ${table}/${f}");
-    my $rmisTables = $smisTables->fetchrow_hashref;
+    my %DBData = ();
+    my $out    = '';
+    my $tALL   = 0;
+    my ( $total, $t1, $t2, $t3 ) = ( 0, 0, 0, 0 )
+      ; # total = all t1=total all 1's, t2=total all 2's, t3=total all 3's values
+    my ( $t15, $t15_1, $t15_2 ) = ( 0, 0, 0 );             # ClientPHQSADS [qA]
+    my ( $t7,  $t7_1,  $t7_2, $t7_3 ) = ( 0, 0, 0, 0 );    # ClientPHQSADS [qB]
+    my ( $t9,  $t9_1,  $t9_2, $t9_3 ) =
+      ( 0, 0, 0, 0 );    # ClientPHQSADS [qD] & ClientPHQ9 [q10]
+    my ( $tINT, $tWM, $tD1, $tD2, $tD3, $tD4, $tD5, $tD6 ) =
+      ( 0, 0, 0, 0, 0, 0, 0, 0 );    # ClientODAS,2017
+    my ( $tL1, $tL2, $tL3, $tL4, $tL5, $tL6 ) =
+      ( 0, 0, 0, 0, 0, 0 );          # ClientODAS,2017
+    my ( $sLINT, $tLWM, $tLD1, $tLD2, $tLD3, $tLD4, $tLD5, $tLD6 ) =
+      ( 0, 0, 0, 0, 0, 0, 0, 0 );    # ClientODAS,2017
+    my ( $sIndicated, $sWMIndicated ) = ( 0, 0 );    # ClientODAS,2017
+
+    foreach my $f ( sort keys %{$rPHQ} ) {
+        $smisTables->execute( $table, $f )
+          || myDBI->dberror("printPHQ: select misTables ${table}/${f}");
+        my $rmisTables = $smisTables->fetchrow_hashref;
+
 #foreach my $m ( sort keys %{$rmisTables} ) { warn ": rmisTables-$m=$rmisTables->{$m}\n"; }
-    my $val = $rPHQ->{$f};
-    # $out .= qq|    <${f}>${val}</${f}>\n|;
-    $DBData{${f}} = ${val};
-#   for check marks we get a range: 0-n; where the field Name: t(field)_n
-    if ( $rmisTables->{'type'} =~ /radio/ )                # set check mark values
-    {
-      # $out .= qq|    <${f}_${val}>${val}</${f}_${val}>\n|;
-      $DBData{"${f}_${val}"} = ${val};
-      $t1 += 1 if ( $val == 1 );
-      $t2 += 2 if ( $val == 2 );
-      $t3 += 3 if ( $val == 3 );
-      if ( $table eq 'ClientPHQSADS' && substr($f,0,2) eq 'qA' )
-      {
-        $t15_1 += 1 if ( $val == 1 );
-        $t15_2 += 2 if ( $val == 2 );
-      }
-      elsif ( $table eq 'ClientPHQSADS' && substr($f,0,2) eq 'qB' )
-      {
-        $t7_1 += 1 if ( $val == 1 );
-        $t7_2 += 2 if ( $val == 2 );
-        $t7_3 += 3 if ( $val == 3 );
-      }
-      elsif ( $table eq 'ClientPHQSADS' && substr($f,0,2) eq 'qD' )
-      {
-        $t9_1 += 1 if ( $val == 1 );
-        $t9_2 += 2 if ( $val == 2 );
-        $t9_3 += 3 if ( $val == 3 );
-      }
-      elsif ( $table eq 'ClientPHQ9' && substr($f,0,3) ne 'q10' )
-      {
-        $t9_1 += 1 if ( $val == 1 );
-        $t9_2 += 2 if ( $val == 2 );
-        $t9_3 += 3 if ( $val == 3 );
-      }
-      elsif ( $table eq 'ClientPCL5' )
-      {
-        # $out .= qq|    <${f}_N>${val}</${f}_N>\n|;
-        $DBData{"${f}_N"} = ${val};
-      }
-      $tALL += $val;           # total all 'radio' values (could add for 'selectlist' if a digit?)
-#     END radio IF
-    }
-#    else
-#    { $out .= qq|    <${f}>${val}</${f}>\n|; }
-    if ( $table eq 'ClientTCUDS' && $f eq 'q12b' )      # Other specify check mark
-    { 
-      # $out .= $val eq '' ? qq|    <${f}_0>0</${f}_0>\n| : qq|    <${f}_1>1</${f}_1>\n|;
-      if ($val eq '') {
-        $DBData{"${f}_0"} = 0;
-      } else {
-        $DBData{"${f}_1"} = 1;
-      }
-    }
-    elsif ( $table eq 'ClientODAS' )
-    {
-      # Other specify check mark
-      if ( $f eq 'D4Primary' || $f eq 'D4Secondary' || $f eq 'D4Tertiary' )
-      {
-        # $out .= qq|    <${f}_${val}>${val}</${f}_${val}>\n|;
-        $DBData{"${f}_${val}"} = ${val};
-      }
-      # totals...
-      $tINT += $val if ( $f eq 'D1q1' || $f eq 'D1q2' );
-      $tWM += $val if ( $f eq 'D1q3' || $f eq 'D1q4' || $f eq 'D1q5' || $f eq 'D1q6' );
-      $tD1 = $tINT + $tWM;
-#warn qq|f=$f: val=$val:\n tINT=$tINT, tWM=$tWM, tD1=$tD1\n|;
-      $tD2 += $val if ( substr($f,0,3) eq 'D2q' && $f ne 'D2q8' );
-      $tD3 += $val if ( substr($f,0,3) eq 'D3q' && $f ne 'D3q9' );
-      $tD4 += $val if ( substr($f,0,3) eq 'D4q' );
-      $tD5 += $val if ( substr($f,0,3) eq 'D5q' );
-      $tD6 += $val if ( substr($f,0,3) eq 'D6q' );
-#warn qq|f=$f: val=$val:\n tD1=$tD1, tD2=$tD2, tD3=$tD3\n tD4=$tD4, tD5=$tD5, tD6=$tD6\n|;
-    }
-    elsif ( $table eq 'ClientODAS2017' )
-    {
-      # Other specify check mark
-      if ( $f eq 'D4Primary' || $f eq 'D4Secondary' || $f eq 'D4Tertiary' )
-      {
-        # $out .= qq|    <${f}_${val}>${val}</${f}_${val}>\n|;
-        $DBData{"${f}_${val}"} = ${val};
-      }
-      # totals...
-      $tINT += $val if ( $f eq 'D1q1' || $f eq 'D1q2' );
-      $tWM += $val if ( $f eq 'D1q3' || $f eq 'D1q4' || $f eq 'D1q5' || $f eq 'D1q6' || $f eq 'D1q7' );
-      $tD1 = $tINT + $tWM;
-#warn qq|f=$f: val=$val:\n tINT=$tINT, tWM=$tWM, tD1=$tD1\n|;
-      $tD2 += $val if ( substr($f,0,3) eq 'D2q' );
-      $tD3 += $val if ( substr($f,0,3) eq 'D3q' );
-      $tD4 += $val if ( substr($f,0,3) eq 'D4q' );
-      $tD5 += $val if ( substr($f,0,3) eq 'D5q' );
-      $tD6 += $val if ( substr($f,0,3) eq 'D6q' );
-#warn qq|f=$f: val=$val:\n tD1=$tD1, tD2=$tD2, tD3=$tD3\n tD4=$tD4, tD5=$tD5, tD6=$tD6\n|;
-    }
-  }
-# Totals...
-  # $out .= qq|    <tALL>${tALL}</tALL>\n|;
-  $DBData{"tALL"} = ${tALL};
-  $total = $t1 + $t2 + $t3; 
-  # $out .= qq|    <t1>${t1}</t1>\n|;
-  # $out .= qq|    <t2>${t2}</t2>\n|;
-  # $out .= qq|    <t3>${t3}</t3>\n|;
-  # $out .= qq|    <total>${total}</total>\n|;
-  $DBData{"t1"} = ${t1};
-  $DBData{"t2"} = ${t2};
-  $DBData{"t3"} = ${t3};
-  $DBData{"total"} = ${total};
-  if ( $table eq 'ClientPHQSADS' )
-  {
-    my $t15 = $t15_1 + $t15_2;
-    # $out .= qq|    <t15_1>${t15_1}</t15_1>\n|;
-    # $out .= qq|    <t15_2>${t15_2}</t15_2>\n|;
-    # $out .= qq|    <t15>${t15}</t15>\n|;
-    $DBData{"t15_1"} = ${t15_1};
-    $DBData{"t15_2"} = ${t15_2};
-    $DBData{"t15"} = ${t15};
-    my $t7 = $t7_1 + $t7_2 + $t7_3;
-    # $out .= qq|    <t7_1>${t7_1}</t7_1>\n|;
-    # $out .= qq|    <t7_2>${t7_2}</t7_2>\n|;
-    # $out .= qq|    <t7_3>${t7_3}</t7_3>\n|;
-    # $out .= qq|    <t7>${t7}</t7>\n|;
-    $DBData{"t7_1"} = ${t7_1};
-    $DBData{"t7_2"} = ${t7_2};
-    $DBData{"t7_3"} = ${t7_3};
-    $DBData{"t7"} = ${t7};
-    my $t9 = $t9_1 + $t9_2 + $t9_3;
-    # $out .= qq|    <t9_1>${t9_1}</t9_1>\n|;
-    # $out .= qq|    <t9_2>${t9_2}</t9_2>\n|;
-    # $out .= qq|    <t9_3>${t9_3}</t9_3>\n|;
-    # $out .= qq|    <t9>${t9}</t9>\n|;
-    $DBData{"t9_1"} = ${t9_1};
-    $DBData{"t9_2"} = ${t9_2};
-    $DBData{"t9_3"} = ${t9_3};
-    $DBData{"t9"} = ${t9};
-  }
-  if ( $table eq 'ClientPHQ9' )
-  {
-    my $t9 = $t9_1 + $t9_2 + $t9_3;
-    # $out .= qq|    <t9_1>${t9_1}</t9_1>\n|;
-    # $out .= qq|    <t9_2>${t9_2}</t9_2>\n|;
-    # $out .= qq|    <t9_3>${t9_3}</t9_3>\n|;
-    # $out .= qq|    <t9>${t9}</t9>\n|;
-    $DBData{"t9_1"} = ${t9_1};
-    $DBData{"t9_2"} = ${t9_2};
-    $DBData{"t9_3"} = ${t9_3};
-    $DBData{"t9"} = ${t9};
-  }
-  if ( $table eq 'ClientPCL5' )
-  {
-    my $tB = $rPHQ->{'q1'} + $rPHQ->{'q2'} + $rPHQ->{'q3'} + $rPHQ->{'q4'} + $rPHQ->{'q5'};
-    my $tC = $rPHQ->{'q6'} + $rPHQ->{'q7'};
-    my $tD = $rPHQ->{'q8'} + $rPHQ->{'q9'} + $rPHQ->{'q10'} + $rPHQ->{'q11'} + $rPHQ->{'q12'} + $rPHQ->{'q13'} + $rPHQ->{'q14'};
-    my $tE = $rPHQ->{'q15'} + $rPHQ->{'q16'} + $rPHQ->{'q17'} + $rPHQ->{'q18'} + $rPHQ->{'q19'} + $rPHQ->{'q20'};
-    # $out .= qq|    <tB>${tB}</tB>\n|;
-    # $out .= qq|    <tC>${tC}</tC>\n|;
-    # $out .= qq|    <tD>${tD}</tD>\n|;
-    # $out .= qq|    <tE>${tE}</tE>\n|;
-    $DBData{"tB"} = ${tB};
-    $DBData{"tC"} = ${tC};
-    $DBData{"tD"} = ${tD};
-    $DBData{"tE"} = ${tE};
-    my $tBE = $tB + $tC + $tD + $tE;
-    # $out .= qq|    <tBE>${tBE}</tBE>\n|;
-    $DBData{"tBE"} = ${tBE};
-  }
-  if ( $table eq 'ClientODAS' || $table eq 'ClientODAS2017' )
-  {
-    # $out .= qq|    <tINT>${tINT}</tINT>\n|;
-    # $out .= qq|    <tWM>${tWM}</tWM>\n|;
-    # $out .= qq|    <tD1>${tD1}</tD1>\n|;
-    # $out .= qq|    <tD2>${tD2}</tD2>\n|;
-    # $out .= qq|    <tD3>${tD3}</tD3>\n|;
-    # $out .= qq|    <tD4>${tD4}</tD4>\n|;
-    # $out .= qq|    <tD5>${tD5}</tD5>\n|;
-    # $out .= qq|    <tD6>${tD6}</tD6>\n|;
-    $DBData{"tINT"} = ${tINT};
-    $DBData{"tWM"} = ${tWM};
-    $DBData{"tD1"} = ${tD1};
-    $DBData{"tD2"} = ${tD2};
-    $DBData{"tD3"} = ${tD3};
-    $DBData{"tD4"} = ${tD4};
-    $DBData{"tD5"} = ${tD5};
-    $DBData{"tD6"} = ${tD6};
-# calculate the Service Levels ...
-    my $tLINT = $tINT == 0 ? 0 : $tINT <= 2 ? 1 : $tINT <= 4 ? 2 : $tINT <= 6 ? 3 : 4;
-    $tLWM = $tWM == 0 ? 0 : $tWM <= 4 ? 1 : $tWM <= 8 ? 1 : $tWM <= 12 ? 3 : 4;
-    $tL1 = $tLINT;      # same as L1 ACUTE INTOXICATION
-    $tL2 = $tD2 == 0 ? 0 : $tD2 <= 7 ? 1 : $tD2 <= 14 ? 2 : $tD2 <= 21 ? 3 : 4;
-    $tL3 = $tD3 == 0 ? 0 : $tD3 <= 8 ? 1 : $tD3 <= 16 ? 2 : $tD3 <= 24 ? 3 : 4;
-    $tL4 = $tD4 == 0 ? 0 : $tD4 <= 6 ? 1 : $tD4 <= 12 ? 2 : $tD4 <= 18 ? 3 : 4;
-    $tL5 = $tD5 == 0 ? 0 : $tD5 <= 10 ? 1 : $tD5 <= 20 ? 2 : $tD5 <= 30 ? 3 : 4;
-    $tL6 = $tD6 == 0 ? 0 : $tD6 <= 9 ? 1 : $tD6 <= 18 ? 2 : $tD6 <= 27 ? 3 : 4;
-    # $out .= qq|    <tLINT>${tLINT}</tLINT>\n|;
-    # $out .= qq|    <tLWM>${tLWM}</tLWM>\n|;
-    # $out .= qq|    <tL1>${tL1}</tL1>\n|;
-    # $out .= qq|    <tL2>${tL2}</tL2>\n|;
-    # $out .= qq|    <tL3>${tL3}</tL3>\n|;
-    # $out .= qq|    <tL4>${tL4}</tL4>\n|;
-    # $out .= qq|    <tL5>${tL5}</tL5>\n|;
-    # $out .= qq|    <tL6>${tL6}</tL6>\n|;
-    $DBData{"tLINT"} = ${tLINT};
-    $DBData{"tLWM"} = ${tLWM};
-    $DBData{"tL1"} = ${tL1};
-    $DBData{"tL2"} = ${tL2};
-    $DBData{"tL3"} = ${tL3};
-    $DBData{"tL4"} = ${tL4};
-    $DBData{"tL5"} = ${tL5};
-    $DBData{"tL6"} = ${tL6};
-# and calculate the Indicated Service Level ...
-    $sIndicated = $tL1 == 0 
-                  && ($tL2 >= 0 && $tL2 <= 1) || ($tL2 >= 2 && $tL2 <= 3 && $rPHQ->{'D2q8'} == 1)
-                  && ($tL3 >= 0 && $tL3 <= 1)
-                  && ($tL5 >= 2 && $tL5 <= 4)
-                  && ($tL6 >= 2 && $tL6 <= 3)
-                  && ($tL4 >= 3 && $tL4 <= 3) ? '0.5'
-                : ($tL1 >= 0 && $tL1 <= 1) || ($tL1 >= 2 && $tL1 <= 4 && $tWM == 1)
-                  && ($tL2 >= 0 && $tL2 <= 1) || ($tL2 >= 2 && $tL2 <= 3 && $rPHQ->{'D2q8'} == 1)
-                  && ($tL3 >= 0 && $tL3 <= 1) || ($tL3 >= 2 && $tL3 <= 3 && $rPHQ->{'D3q9'} == 1)
-                  && ($tL5 >= 0 && $tL5 <= 2)
-                  && ($tL6 >= 0 && $tL6 <= 2)
-                  && ($tL4 >= 0 && $tL4 <= 2) || 
-                     ($tL4 >= 3 && $tL4 <= 4 && $tL1 >= 0 && $tL1 <= 1 && $tL2 >= 0 && $tL2 <= 1 && $tL3 >= 0 && $tL3 <= 1 && $tL5 >= 0 && $tL5 <= 1 && $tL6 >= 0 && $tL6 <= 1) ? '1'
-                : ($tL1 >= 3 && $tL1 <= 4)
-                  && ($tL2 >= 0 && $tL2 <= 1) || ($tL2 >= 2 && $tL2 <= 3 && $rPHQ->{'D2q8'} == 1)
-                  && ($tL3 >= 0 && $tL3 <= 1) || ($tL3 >= 2 && $tL3 <= 3 && $rPHQ->{'D3q9'} == 1)
-                  && ($tL5 >= 2 && $tL5 <= 4)
-                  && ($tL6 >= 0 && $tL6 <= 2)
-                  && ($tL4 >= 0 && $tL4 <= 2) ? 'OTP1'
-                : ($tL1 >= 0 && $tL1 <= 1) || ($tL1 >= 2 && $tL1 <= 4 && $tWM == 1)
-                  && ($tL2 >= 0 && $tL2 <= 1) || ($tL2 >= 2 && $tL2 <= 3 && $rPHQ->{'D2q8'} == 1)
-                  && ($tL3 >= 0 && $tL3 <= 2)
-                  && ($tL5 >= 2 && $tL5 <= 3)
-                  && ($tL6 >= 2 && $tL6 <= 3)
-                  && ($tL4 >= 2 && $tL4 <= 3) ? '2.1'
-                : ($tL1 >= 0 && $tL1 <= 1) || ($tL1 >= 2 && $tL1 <= 4 && $tWM == 1)
-                  && ($tL2 >= 0 && $tL2 <= 1) || ($tL2 >= 2 && $tL2 <= 3 && $rPHQ->{'D2q8'} == 1)
-                  && ($tL3 >= 0 && $tL3 <= 1) || ($tL3 >= 2 && $tL3 <= 3 && $rPHQ->{'D3q9'} == 1)
-                  && ($tL5 >= 1 && $tL5 <= 3)
-                  && ($tL6 >= 3 && $tL6 <= 4)
-                  && ($tL4 >= 0 && $tL4 <= 3) ? '3.1'
-                : ($tL1 >= 0 && $tL1 <= 1) || ($tL1 >= 2 && $tL1 <= 4 && $tWM == 1)
-                  && ($tL2 >= 0 && $tL2 <= 1) || ($tL2 >= 2 && $tL2 <= 3 && $rPHQ->{'D2q8'} == 1)
-                  && ($tL3 >= 3 && $tL3 <= 4) || (($tL3 >= 1 && $tL3 <= 2) && ($tL4 >= 3 && $tL4 <= 4))
-                  && ($tL5 >= 3 && $tL5 <= 4)
-                  && ($tL6 >= 3 && $tL6 <= 4)
-                  && ($tL4 >= 3 && $tL4 <= 4) || (($tL4 >= 1 && $tL4 <= 2) && ($tL3 >= 3 && $tL3 <= 4)) ? '3.5'
-                : '';
-    $sWMIndicated = $tLWM == 2 ? '1 WM'
-                  : $tLWM == 3 ? '3.2 WM'
-                  : $tLWM == 4 ? '3.7 WM'
-                  : 'none';
-    # $out .= qq|    <sIndicated>${sIndicated}</sIndicated>\n|;
-    # $out .= qq|    <sWMIndicated>${sWMIndicated}</sWMIndicated>\n|;
-    $DBData{"sIndicated"} = ${sIndicated};
-    $DBData{"sWMIndicated"} = ${sWMIndicated};
-  }
-# no logo on these forms...
-#| . DBA->getLogo($form,'Client',$rClient->{ClientID},'base64') . qq|
-# no Agency/companyname on these forms...
-# reportInfo->testdate not on all forms, some only today's date
-  
-#   my $xml = qq|
-#     <recordid>$rPHQ->{'ID'}</recordid>
-#     <companyLogo xfa:contentType="image/gif" xfa:transferEncoding="base64">
-#     </companyLogo>
-#     <companyname>
-#     </companyname> 
-#     <reportInfo>${reportInfo}</reportInfo> 
-#     <footerLeft>${clientnameid}</footerLeft> 
-#     <footerRight>${DT}</footerRight> 
-#     <agencyname>${AgencyName}</agencyname> 
-#     <agencyaddr>${AgencyAddr}</agencyaddr> 
-#     <agencyphonefax>${AgencyPhFax}</agencyphonefax> 
-#     <primaryprovider>${primaryprovider}</primaryprovider> 
-#     <clinician>${clinician}</clinician> 
-#     <testdate>${testdate}</testdate> 
-#     <testdate_pg2>${testdate}</testdate_pg2> 
-#     <testdate_pg3>${testdate}</testdate_pg3> 
-#     <today>${today}</today> 
-#     <clientid>${clientid}</clientid> 
-#     <clientname>${clientname}</clientname> 
-#     <addr1>${addr1}</addr1> 
-#     <addr2>${addr2}</addr2> 
-#     <csz>${csz}</csz> 
-#     <sex>${sex}</sex> 
-#     <sex_F>${sex}</sex_F> 
-#     <sex_M>${sex}</sex_M> 
-#     <age>${age}</age> 
-# ${out}
-# |;
-#   return($xml);
+        my $val = $rPHQ->{$f};
 
-  $DBData{"reportInfo"} = ${reportInfo};
-  $DBData{"footerLeft"} = ${clientnameid};
-  # $DBData{"footerRight"} = ${DT};
-  $DBData{"agencyname"} = ${AgencyName};
-  $DBData{"agencyaddr"} = ${AgencyAddr};
-  $DBData{"agencyphonefax"} = ${AgencyPhFax};
-  $DBData{"primaryprovider"} = ${primaryprovider};
-  $DBData{"clinician"} = ${clinician};
-  $DBData{"testdate"} = ${testdate};
-  $DBData{"testdate_pg2"} = ${testdate};
-  $DBData{"testdate_pg3"} = ${testdate};
-  $DBData{"today"} = ${today};
-  $DBData{"clientid"} = ${clientid};
-  $DBData{"clientname"} = ${clientname};
-  $DBData{"addr1"} = ${addr1};
-  $DBData{"addr2"} = ${addr2};
-  $DBData{"csz"} = ${csz};
-  $DBData{"sex"} = ${sex};
-  $DBData{"sex_F"} = ${sex};
-  $DBData{"sex_M"} = ${sex};
-  $DBData{"age"} = ${age};
+        # $out .= qq|    <${f}>${val}</${f}>\n|;
+        $DBData{ ${f} } = ${val};
 
-#  foreach my $f ( sort keys %DBData ) {
-#    print("$f => " . $DBData{"$f"} . "\n");
-#  }
+       #   for check marks we get a range: 0-n; where the field Name: t(field)_n
+        if ( $rmisTables->{'type'} =~ /radio/ )    # set check mark values
+        {
+            # $out .= qq|    <${f}_${val}>${val}</${f}_${val}>\n|;
+            $DBData{"${f}_${val}"} = ${val};
+            $t1 += 1 if ( $val == 1 );
+            $t2 += 2 if ( $val == 2 );
+            $t3 += 3 if ( $val == 3 );
+            if ( $table eq 'ClientPHQSADS' && substr( $f, 0, 2 ) eq 'qA' ) {
+                $t15_1 += 1 if ( $val == 1 );
+                $t15_2 += 2 if ( $val == 2 );
+            }
+            elsif ( $table eq 'ClientPHQSADS' && substr( $f, 0, 2 ) eq 'qB' ) {
+                $t7_1 += 1 if ( $val == 1 );
+                $t7_2 += 2 if ( $val == 2 );
+                $t7_3 += 3 if ( $val == 3 );
+            }
+            elsif ( $table eq 'ClientPHQSADS' && substr( $f, 0, 2 ) eq 'qD' ) {
+                $t9_1 += 1 if ( $val == 1 );
+                $t9_2 += 2 if ( $val == 2 );
+                $t9_3 += 3 if ( $val == 3 );
+            }
+            elsif ( $table eq 'ClientPHQ9' && substr( $f, 0, 3 ) ne 'q10' ) {
+                $t9_1 += 1 if ( $val == 1 );
+                $t9_2 += 2 if ( $val == 2 );
+                $t9_3 += 3 if ( $val == 3 );
+            }
+            elsif ( $table eq 'ClientPCL5' ) {
+
+                # $out .= qq|    <${f}_N>${val}</${f}_N>\n|;
+                $DBData{"${f}_N"} = ${val};
+            }
+            $tALL += $val
+              ; # total all 'radio' values (could add for 'selectlist' if a digit?)
+
+            #     END radio IF
+        }
+
+        #    else
+        #    { $out .= qq|    <${f}>${val}</${f}>\n|; }
+        if (   $table eq 'ClientTCUDS'
+            && $f eq 'q12b' )    # Other specify check mark
+        {
+# $out .= $val eq '' ? qq|    <${f}_0>0</${f}_0>\n| : qq|    <${f}_1>1</${f}_1>\n|;
+            if ( $val eq '' ) {
+                $DBData{"${f}_0"} = 0;
+            }
+            else {
+                $DBData{"${f}_1"} = 1;
+            }
+        }
+        elsif ( $table eq 'ClientODAS' ) {
+
+            # Other specify check mark
+            if (   $f eq 'D4Primary'
+                || $f eq 'D4Secondary'
+                || $f eq 'D4Tertiary' )
+            {
+                # $out .= qq|    <${f}_${val}>${val}</${f}_${val}>\n|;
+                $DBData{"${f}_${val}"} = ${val};
+            }
+
+            # totals...
+            $tINT += $val if ( $f eq 'D1q1' || $f eq 'D1q2' );
+            $tWM  += $val
+              if ( $f eq 'D1q3'
+                || $f eq 'D1q4'
+                || $f eq 'D1q5'
+                || $f eq 'D1q6' );
+            $tD1 = $tINT + $tWM;
+
+            #warn qq|f=$f: val=$val:\n tINT=$tINT, tWM=$tWM, tD1=$tD1\n|;
+            $tD2 += $val if ( substr( $f, 0, 3 ) eq 'D2q' && $f ne 'D2q8' );
+            $tD3 += $val if ( substr( $f, 0, 3 ) eq 'D3q' && $f ne 'D3q9' );
+            $tD4 += $val if ( substr( $f, 0, 3 ) eq 'D4q' );
+            $tD5 += $val if ( substr( $f, 0, 3 ) eq 'D5q' );
+            $tD6 += $val if ( substr( $f, 0, 3 ) eq 'D6q' );
+
+#warn qq|f=$f: val=$val:\n tD1=$tD1, tD2=$tD2, tD3=$tD3\n tD4=$tD4, tD5=$tD5, tD6=$tD6\n|;
+        }
+        elsif ( $table eq 'ClientODAS2017' ) {
+
+            # Other specify check mark
+            if (   $f eq 'D4Primary'
+                || $f eq 'D4Secondary'
+                || $f eq 'D4Tertiary' )
+            {
+                # $out .= qq|    <${f}_${val}>${val}</${f}_${val}>\n|;
+                $DBData{"${f}_${val}"} = ${val};
+            }
+
+            # totals...
+            $tINT += $val if ( $f eq 'D1q1' || $f eq 'D1q2' );
+            $tWM  += $val
+              if ( $f eq 'D1q3'
+                || $f eq 'D1q4'
+                || $f eq 'D1q5'
+                || $f eq 'D1q6'
+                || $f eq 'D1q7' );
+            $tD1 = $tINT + $tWM;
+
+            #warn qq|f=$f: val=$val:\n tINT=$tINT, tWM=$tWM, tD1=$tD1\n|;
+            $tD2 += $val if ( substr( $f, 0, 3 ) eq 'D2q' );
+            $tD3 += $val if ( substr( $f, 0, 3 ) eq 'D3q' );
+            $tD4 += $val if ( substr( $f, 0, 3 ) eq 'D4q' );
+            $tD5 += $val if ( substr( $f, 0, 3 ) eq 'D5q' );
+            $tD6 += $val if ( substr( $f, 0, 3 ) eq 'D6q' );
+
+#warn qq|f=$f: val=$val:\n tD1=$tD1, tD2=$tD2, tD3=$tD3\n tD4=$tD4, tD5=$tD5, tD6=$tD6\n|;
+        }
+    }
+
+    # Totals...
+    # $out .= qq|    <tALL>${tALL}</tALL>\n|;
+    $DBData{"tALL"} = ${tALL};
+    $total = $t1 + $t2 + $t3;
+
+    # $out .= qq|    <t1>${t1}</t1>\n|;
+    # $out .= qq|    <t2>${t2}</t2>\n|;
+    # $out .= qq|    <t3>${t3}</t3>\n|;
+    # $out .= qq|    <total>${total}</total>\n|;
+    $DBData{"t1"}    = ${t1};
+    $DBData{"t2"}    = ${t2};
+    $DBData{"t3"}    = ${t3};
+    $DBData{"total"} = ${total};
+    if ( $table eq 'ClientPHQSADS' ) {
+        my $t15 = $t15_1 + $t15_2;
+
+        # $out .= qq|    <t15_1>${t15_1}</t15_1>\n|;
+        # $out .= qq|    <t15_2>${t15_2}</t15_2>\n|;
+        # $out .= qq|    <t15>${t15}</t15>\n|;
+        $DBData{"t15_1"} = ${t15_1};
+        $DBData{"t15_2"} = ${t15_2};
+        $DBData{"t15"}   = ${t15};
+        my $t7 = $t7_1 + $t7_2 + $t7_3;
+
+        # $out .= qq|    <t7_1>${t7_1}</t7_1>\n|;
+        # $out .= qq|    <t7_2>${t7_2}</t7_2>\n|;
+        # $out .= qq|    <t7_3>${t7_3}</t7_3>\n|;
+        # $out .= qq|    <t7>${t7}</t7>\n|;
+        $DBData{"t7_1"} = ${t7_1};
+        $DBData{"t7_2"} = ${t7_2};
+        $DBData{"t7_3"} = ${t7_3};
+        $DBData{"t7"}   = ${t7};
+        my $t9 = $t9_1 + $t9_2 + $t9_3;
+
+        # $out .= qq|    <t9_1>${t9_1}</t9_1>\n|;
+        # $out .= qq|    <t9_2>${t9_2}</t9_2>\n|;
+        # $out .= qq|    <t9_3>${t9_3}</t9_3>\n|;
+        # $out .= qq|    <t9>${t9}</t9>\n|;
+        $DBData{"t9_1"} = ${t9_1};
+        $DBData{"t9_2"} = ${t9_2};
+        $DBData{"t9_3"} = ${t9_3};
+        $DBData{"t9"}   = ${t9};
+    }
+    if ( $table eq 'ClientPHQ9' ) {
+        my $t9 = $t9_1 + $t9_2 + $t9_3;
+
+        # $out .= qq|    <t9_1>${t9_1}</t9_1>\n|;
+        # $out .= qq|    <t9_2>${t9_2}</t9_2>\n|;
+        # $out .= qq|    <t9_3>${t9_3}</t9_3>\n|;
+        # $out .= qq|    <t9>${t9}</t9>\n|;
+        $DBData{"t9_1"} = ${t9_1};
+        $DBData{"t9_2"} = ${t9_2};
+        $DBData{"t9_3"} = ${t9_3};
+        $DBData{"t9"}   = ${t9};
+    }
+    if ( $table eq 'ClientPCL5' ) {
+        my $tB =
+          $rPHQ->{'q1'} +
+          $rPHQ->{'q2'} +
+          $rPHQ->{'q3'} +
+          $rPHQ->{'q4'} +
+          $rPHQ->{'q5'};
+        my $tC = $rPHQ->{'q6'} + $rPHQ->{'q7'};
+        my $tD =
+          $rPHQ->{'q8'} +
+          $rPHQ->{'q9'} +
+          $rPHQ->{'q10'} +
+          $rPHQ->{'q11'} +
+          $rPHQ->{'q12'} +
+          $rPHQ->{'q13'} +
+          $rPHQ->{'q14'};
+        my $tE =
+          $rPHQ->{'q15'} +
+          $rPHQ->{'q16'} +
+          $rPHQ->{'q17'} +
+          $rPHQ->{'q18'} +
+          $rPHQ->{'q19'} +
+          $rPHQ->{'q20'};
+
+        # $out .= qq|    <tB>${tB}</tB>\n|;
+        # $out .= qq|    <tC>${tC}</tC>\n|;
+        # $out .= qq|    <tD>${tD}</tD>\n|;
+        # $out .= qq|    <tE>${tE}</tE>\n|;
+        $DBData{"tB"} = ${tB};
+        $DBData{"tC"} = ${tC};
+        $DBData{"tD"} = ${tD};
+        $DBData{"tE"} = ${tE};
+        my $tBE = $tB + $tC + $tD + $tE;
+
+        # $out .= qq|    <tBE>${tBE}</tBE>\n|;
+        $DBData{"tBE"} = ${tBE};
+    }
+    if ( $table eq 'ClientODAS' || $table eq 'ClientODAS2017' ) {
+
+        # $out .= qq|    <tINT>${tINT}</tINT>\n|;
+        # $out .= qq|    <tWM>${tWM}</tWM>\n|;
+        # $out .= qq|    <tD1>${tD1}</tD1>\n|;
+        # $out .= qq|    <tD2>${tD2}</tD2>\n|;
+        # $out .= qq|    <tD3>${tD3}</tD3>\n|;
+        # $out .= qq|    <tD4>${tD4}</tD4>\n|;
+        # $out .= qq|    <tD5>${tD5}</tD5>\n|;
+        # $out .= qq|    <tD6>${tD6}</tD6>\n|;
+        $DBData{"tINT"} = ${tINT};
+        $DBData{"tWM"}  = ${tWM};
+        $DBData{"tD1"}  = ${tD1};
+        $DBData{"tD2"}  = ${tD2};
+        $DBData{"tD3"}  = ${tD3};
+        $DBData{"tD4"}  = ${tD4};
+        $DBData{"tD5"}  = ${tD5};
+        $DBData{"tD6"}  = ${tD6};
+
+        # calculate the Service Levels ...
+        my $tLINT =
+          $tINT == 0 ? 0 : $tINT <= 2 ? 1 : $tINT <= 4 ? 2 : $tINT <= 6 ? 3 : 4;
+        $tLWM =
+          $tWM == 0 ? 0 : $tWM <= 4 ? 1 : $tWM <= 8 ? 1 : $tWM <= 12 ? 3 : 4;
+        $tL1 = $tLINT;    # same as L1 ACUTE INTOXICATION
+        $tL2 =
+          $tD2 == 0 ? 0 : $tD2 <= 7 ? 1 : $tD2 <= 14 ? 2 : $tD2 <= 21 ? 3 : 4;
+        $tL3 =
+          $tD3 == 0 ? 0 : $tD3 <= 8 ? 1 : $tD3 <= 16 ? 2 : $tD3 <= 24 ? 3 : 4;
+        $tL4 =
+          $tD4 == 0 ? 0 : $tD4 <= 6 ? 1 : $tD4 <= 12 ? 2 : $tD4 <= 18 ? 3 : 4;
+        $tL5 =
+          $tD5 == 0 ? 0 : $tD5 <= 10 ? 1 : $tD5 <= 20 ? 2 : $tD5 <= 30 ? 3 : 4;
+        $tL6 =
+          $tD6 == 0 ? 0 : $tD6 <= 9 ? 1 : $tD6 <= 18 ? 2 : $tD6 <= 27 ? 3 : 4;
+
+        # $out .= qq|    <tLINT>${tLINT}</tLINT>\n|;
+        # $out .= qq|    <tLWM>${tLWM}</tLWM>\n|;
+        # $out .= qq|    <tL1>${tL1}</tL1>\n|;
+        # $out .= qq|    <tL2>${tL2}</tL2>\n|;
+        # $out .= qq|    <tL3>${tL3}</tL3>\n|;
+        # $out .= qq|    <tL4>${tL4}</tL4>\n|;
+        # $out .= qq|    <tL5>${tL5}</tL5>\n|;
+        # $out .= qq|    <tL6>${tL6}</tL6>\n|;
+        $DBData{"tLINT"} = ${tLINT};
+        $DBData{"tLWM"}  = ${tLWM};
+        $DBData{"tL1"}   = ${tL1};
+        $DBData{"tL2"}   = ${tL2};
+        $DBData{"tL3"}   = ${tL3};
+        $DBData{"tL4"}   = ${tL4};
+        $DBData{"tL5"}   = ${tL5};
+        $DBData{"tL6"}   = ${tL6};
+
+        # and calculate the Indicated Service Level ...
+        $sIndicated =
+          $tL1 == 0 && ( $tL2 >= 0 && $tL2 <= 1 )
+          || ( $tL2 >= 2 && $tL2 <= 3 && $rPHQ->{'D2q8'} == 1 )
+          && ( $tL3 >= 0 && $tL3 <= 1 )
+          && ( $tL5 >= 2 && $tL5 <= 4 )
+          && ( $tL6 >= 2 && $tL6 <= 3 )
+          && ( $tL4 >= 3 && $tL4 <= 3 ) ? '0.5'
+          : ( $tL1 >= 0 && $tL1 <= 1 )
+          || ( $tL1 >= 2 && $tL1 <= 4 && $tWM == 1 )
+          && ( $tL2 >= 0 && $tL2 <= 1 )
+          || ( $tL2 >= 2 && $tL2 <= 3 && $rPHQ->{'D2q8'} == 1 )
+          && ( $tL3 >= 0 && $tL3 <= 1 )
+          || ( $tL3 >= 2 && $tL3 <= 3 && $rPHQ->{'D3q9'} == 1 )
+          && ( $tL5 >= 0 && $tL5 <= 2 )
+          && ( $tL6 >= 0 && $tL6 <= 2 )
+          && ( $tL4 >= 0 && $tL4 <= 2 )
+          || ( $tL4 >= 3
+            && $tL4 <= 4
+            && $tL1 >= 0
+            && $tL1 <= 1
+            && $tL2 >= 0
+            && $tL2 <= 1
+            && $tL3 >= 0
+            && $tL3 <= 1
+            && $tL5 >= 0
+            && $tL5 <= 1
+            && $tL6 >= 0
+            && $tL6 <= 1 ) ? '1'
+          : ( $tL1 >= 3 && $tL1 <= 4 ) && ( $tL2 >= 0 && $tL2 <= 1 )
+          || ( $tL2 >= 2 && $tL2 <= 3 && $rPHQ->{'D2q8'} == 1 )
+          && ( $tL3 >= 0 && $tL3 <= 1 )
+          || ( $tL3 >= 2 && $tL3 <= 3 && $rPHQ->{'D3q9'} == 1 )
+          && ( $tL5 >= 2 && $tL5 <= 4 )
+          && ( $tL6 >= 0 && $tL6 <= 2 )
+          && ( $tL4 >= 0 && $tL4 <= 2 ) ? 'OTP1'
+          : ( $tL1 >= 0 && $tL1 <= 1 )
+          || ( $tL1 >= 2 && $tL1 <= 4 && $tWM == 1 )
+          && ( $tL2 >= 0 && $tL2 <= 1 )
+          || ( $tL2 >= 2 && $tL2 <= 3 && $rPHQ->{'D2q8'} == 1 )
+          && ( $tL3 >= 0 && $tL3 <= 2 )
+          && ( $tL5 >= 2 && $tL5 <= 3 )
+          && ( $tL6 >= 2 && $tL6 <= 3 )
+          && ( $tL4 >= 2 && $tL4 <= 3 ) ? '2.1'
+          : ( $tL1 >= 0 && $tL1 <= 1 )
+          || ( $tL1 >= 2 && $tL1 <= 4 && $tWM == 1 )
+          && ( $tL2 >= 0 && $tL2 <= 1 )
+          || ( $tL2 >= 2 && $tL2 <= 3 && $rPHQ->{'D2q8'} == 1 )
+          && ( $tL3 >= 0 && $tL3 <= 1 )
+          || ( $tL3 >= 2 && $tL3 <= 3 && $rPHQ->{'D3q9'} == 1 )
+          && ( $tL5 >= 1 && $tL5 <= 3 )
+          && ( $tL6 >= 3 && $tL6 <= 4 )
+          && ( $tL4 >= 0 && $tL4 <= 3 ) ? '3.1'
+          : ( $tL1 >= 0 && $tL1 <= 1 )
+          || ( $tL1 >= 2                  && $tL1 <= 4 && $tWM == 1 )
+          && ( $tL2 >= 0                  && $tL2 <= 1 )
+          || ( $tL2 >= 2                  && $tL2 <= 3 && $rPHQ->{'D2q8'} == 1 )
+          && ( $tL3 >= 3                  && $tL3 <= 4 )
+          || ( ( $tL3 >= 1 && $tL3 <= 2 ) && ( $tL4 >= 3 && $tL4 <= 4 ) )
+          && ( $tL5 >= 3                  && $tL5 <= 4 )
+          && ( $tL6 >= 3                  && $tL6 <= 4 )
+          && ( $tL4 >= 3                  && $tL4 <= 4 )
+          || ( ( $tL4 >= 1 && $tL4 <= 2 ) && ( $tL3 >= 3 && $tL3 <= 4 ) )
+          ? '3.5'
+          : '';
+        $sWMIndicated =
+            $tLWM == 2 ? '1 WM'
+          : $tLWM == 3 ? '3.2 WM'
+          : $tLWM == 4 ? '3.7 WM'
+          :              'none';
+
+        # $out .= qq|    <sIndicated>${sIndicated}</sIndicated>\n|;
+        # $out .= qq|    <sWMIndicated>${sWMIndicated}</sWMIndicated>\n|;
+        $DBData{"sIndicated"}   = ${sIndicated};
+        $DBData{"sWMIndicated"} = ${sWMIndicated};
+    }
+
+    # no logo on these forms...
+    #| . DBA->getLogo($form,'Client',$rClient->{ClientID},'base64') . qq|
+    # no Agency/companyname on these forms...
+    # reportInfo->testdate not on all forms, some only today's date
+
+   #   my $xml = qq|
+   #     <recordid>$rPHQ->{'ID'}</recordid>
+   #     <companyLogo xfa:contentType="image/gif" xfa:transferEncoding="base64">
+   #     </companyLogo>
+   #     <companyname>
+   #     </companyname>
+   #     <reportInfo>${reportInfo}</reportInfo>
+   #     <footerLeft>${clientnameid}</footerLeft>
+   #     <footerRight>${DT}</footerRight>
+   #     <agencyname>${AgencyName}</agencyname>
+   #     <agencyaddr>${AgencyAddr}</agencyaddr>
+   #     <agencyphonefax>${AgencyPhFax}</agencyphonefax>
+   #     <primaryprovider>${primaryprovider}</primaryprovider>
+   #     <clinician>${clinician}</clinician>
+   #     <testdate>${testdate}</testdate>
+   #     <testdate_pg2>${testdate}</testdate_pg2>
+   #     <testdate_pg3>${testdate}</testdate_pg3>
+   #     <today>${today}</today>
+   #     <clientid>${clientid}</clientid>
+   #     <clientname>${clientname}</clientname>
+   #     <addr1>${addr1}</addr1>
+   #     <addr2>${addr2}</addr2>
+   #     <csz>${csz}</csz>
+   #     <sex>${sex}</sex>
+   #     <sex_F>${sex}</sex_F>
+   #     <sex_M>${sex}</sex_M>
+   #     <age>${age}</age>
+   # ${out}
+   # |;
+   #   return($xml);
+
+    $DBData{"reportInfo"} = ${reportInfo};
+    $DBData{"footerLeft"} = ${clientnameid};
+
+    # $DBData{"footerRight"} = ${DT};
+    $DBData{"agencyname"}      = ${AgencyName};
+    $DBData{"agencyaddr"}      = ${AgencyAddr};
+    $DBData{"agencyphonefax"}  = ${AgencyPhFax};
+    $DBData{"primaryprovider"} = ${primaryprovider};
+    $DBData{"clinician"}       = ${clinician};
+    $DBData{"testdate"}        = ${testdate};
+    $DBData{"testdate_pg2"}    = ${testdate};
+    $DBData{"testdate_pg3"}    = ${testdate};
+    $DBData{"today"}           = ${today};
+    $DBData{"clientid"}        = ${clientid};
+    $DBData{"clientname"}      = ${clientname};
+    $DBData{"addr1"}           = ${addr1};
+    $DBData{"addr2"}           = ${addr2};
+    $DBData{"csz"}             = ${csz};
+    $DBData{"sex"}             = ${sex};
+    $DBData{"sex_F"}           = ${sex};
+    $DBData{"sex_M"}           = ${sex};
+    $DBData{"age"}             = ${age};
+
+    #  foreach my $f ( sort keys %DBData ) {
+    #    print("$f => " . $DBData{"$f"} . "\n");
+    #  }
 
 #####################
-  my @PageData = ();
+    my @PageData = ();
 
-  if ("$table$page" eq "ClientPHQSADS") {
-    @PageData = (
-      { "descr" => "page 1", "data" => [
-          { "type" => "check", "ypos" => 627.6, "optlist" => "fontsize=11", "xposarray" => [385, 447, 509],
-                                "val" => $DBData{"qA1"} },             # qA1
-          { "type" => "check", "ypos" => 611.3, "optlist" => "fontsize=11", "xposarray" => [385, 447, 509],
-                                "val" => $DBData{"qA2"} },             # qA2
-          { "type" => "check", "ypos" => 594.7, "optlist" => "fontsize=11", "xposarray" => [385, 447, 509],
-                                "val" => $DBData{"qA3"} },             # qA3
-          { "type" => "check", "ypos" => 578.2, "optlist" => "fontsize=11", "xposarray" => [385, 447, 509],
-                                "val" => $DBData{"qA4"} },             # qA4
-          { "type" => "check", "ypos" => 561.8, "optlist" => "fontsize=11", "xposarray" => [385, 447, 509],
-                                "val" => $DBData{"qA5"} },             # qA5
-          { "type" => "check", "ypos" => 529.7, "optlist" => "fontsize=11", "xposarray" => [385, 447, 509],
-                                "val" => $DBData{"qA6"} },             # qA6
-          { "type" => "check", "ypos" => 501.8, "optlist" => "fontsize=11", "xposarray" => [385, 447, 509],
-                                "val" => $DBData{"qA7"} },             # qA7
-          { "type" => "check", "ypos" => 485, "optlist" => "fontsize=11", "xposarray" => [385, 447, 509],
-                                "val" => $DBData{"qA8"} },             # qA8
-          { "type" => "check", "ypos" => 468.7, "optlist" => "fontsize=11", "xposarray" => [385, 447, 509],
-                                "val" => $DBData{"qA9"} },             # qA9
-          { "type" => "check", "ypos" => 452.4, "optlist" => "fontsize=11", "xposarray" => [385, 447, 509],
-                                "val" => $DBData{"qA10"} },             # qA10
-          { "type" => "check", "ypos" => 435.8, "optlist" => "fontsize=11", "xposarray" => [385, 447, 509],
-                                "val" => $DBData{"qA11"} },             # qA11
-          { "type" => "check", "ypos" => 419.3, "optlist" => "fontsize=11", "xposarray" => [385, 447, 509],
-                                "val" => $DBData{"qA12"} },             # qA12
-          { "type" => "check", "ypos" => 402.7, "optlist" => "fontsize=11", "xposarray" => [385, 447, 509],
-                                "val" => $DBData{"qA13"} },             # qA13
-          { "type" => "check", "ypos" => 386.4, "optlist" => "fontsize=11", "xposarray" => [385, 447, 509],
-                                "val" => $DBData{"qA14"} },             # qA14
-          { "type" => "check", "ypos" => 369.8, "optlist" => "fontsize=11", "xposarray" => [385, 447, 509],
-                                "val" => $DBData{"qA15"} },             # qA15
-          { "type" => "textline", "ypos" => 337.2, "xpos" => 372, "optlist" => $basefontoptions . " position={center bottom}",
-                                "text" => $DBData{"t15"} },                       # t15
-          { "type" => "textline", "ypos" => 337.2, "xpos" => 453.1, "optlist" => $basefontoptions . " position={center bottom}",
-                                "text" => $DBData{"t15_1"} },                       # t15_1
-          { "type" => "textline", "ypos" => 337.2, "xpos" => 514.8, "optlist" => $basefontoptions . " position={center bottom}",
-                                "text" => $DBData{"t15_2"} },                       # t15_2
-          { "type" => "check", "ypos" => 244.8, "optlist" => "fontsize=11", "xposarray" => [385, 428.5, 472, 515.5],
-                                "xpos" => $DBData{"qB1"} },             # qB1
-          { "type" => "check", "ypos" => 227.3, "optlist" => "fontsize=11", "xposarray" => [385, 428.5, 472, 515.5],
-                                "val" => $DBData{"qB2"} },             # qB2
-          { "type" => "check", "ypos" => 210, "optlist" => "fontsize=11", "xposarray" => [385, 428.5, 472, 515.5],
-                                "val" => $DBData{"qB3"} },             # qB3
-          { "type" => "check", "ypos" => 192.5, "optlist" => "fontsize=11", "xposarray" => [385, 428.5, 472, 515.5],
-                                "val" => $DBData{"qB4"} },             # qB4
-          { "type" => "check", "ypos" => 175, "optlist" => "fontsize=11", "xposarray" => [385, 428.5, 472, 515.5],
-                                "val" => $DBData{"qB5"} },             # qB5
-          { "type" => "check", "ypos" => 157.2, "optlist" => "fontsize=11", "xposarray" => [385, 428.5, 472, 515.5],
-                                "val" => $DBData{"qB6"} },             # qB6
-          { "type" => "check", "ypos" => 139.9, "optlist" => "fontsize=11", "xposarray" => [385, 428.5, 472, 515.5],
-                                "val" => $DBData{"qB7"} },             # qB7
-          { "type" => "textline", "ypos" => 105.6, "xpos" => 372, "optlist" => $basefontoptions . " position={center bottom}",
-                                "text" => $DBData{"t7"} },                       # t7
-          { "type" => "textline", "ypos" => 105.6, "xpos" => 434.6, "optlist" => $basefontoptions . " position={center bottom}",
-                                "text" => $DBData{"t7_1"} },                       # t7_1
-          { "type" => "textline", "ypos" => 105.6, "xpos" => 479.3, "optlist" => $basefontoptions . " position={center bottom}",
-                                "text" => $DBData{"t7_2"} },                       # t7_2
-          { "type" => "textline", "ypos" => 105.6, "xpos" => 521.3, "optlist" => $basefontoptions . " position={center bottom}",
-                                "text" => $DBData{"t7_3"} },                       # t7_3
-      ] },
-      { "descr" => "page 2", "data" => [
-          { "type" => "check", "ypos" => 701.5, "optlist" => "fontsize=11", "xposarray" => [435.6, 507.8],
-                                "val" => $DBData{"qC1"} },             # qC1
-          { "type" => "check", "ypos" => 681.6, "optlist" => "fontsize=11", "xposarray" => [435.6, 507.8],
-                                "val" => $DBData{"qC2"} },             # qC2
-          { "type" => "check", "ypos" => 641, "optlist" => "fontsize=11", "xposarray" => [435.6, 507.8],
-                                "val" => $DBData{"qC3"} },             # qC3
-          { "type" => "check", "ypos" => 611.3, "optlist" => "fontsize=11", "xposarray" => [435.6, 507.8],
-                                "val" => $DBData{"qC4"} },             # qC4
-          { "type" => "check", "ypos" => 582.2, "optlist" => "fontsize=11", "xposarray" => [435.6, 507.8],
-                                "val" => $DBData{"qC5"} },             # qC5
-          { "type" => "check", "ypos" => 495.1, "optlist" => "fontsize=11", "xposarray" => [384.7, 428.9, 472, 518.3],
-                                "val" => $DBData{"qD1"} },             # qD1
-          { "type" => "check", "ypos" => 466.3, "optlist" => "fontsize=11", "xposarray" => [384.7, 428.9, 472, 518.3],
-                                "val" => $DBData{"qD2"} },             # qD2
-          { "type" => "check", "ypos" => 425.8, "optlist" => "fontsize=11", "xposarray" => [384.7, 428.9, 472, 518.3],
-                                "val" => $DBData{"qD3"} },             # qD3
-          { "type" => "check", "ypos" => 397, "optlist" => "fontsize=11", "xposarray" => [384.7, 428.9, 472, 518.3],
-                                "val" => $DBData{"qD4"} },             # qD4
-          { "type" => "check", "ypos" => 379.2, "optlist" => "fontsize=11", "xposarray" => [384.7, 428.9, 472, 518.3],
-                                "val" => $DBData{"qD5"} },             # qD5
-          { "type" => "check", "ypos" => 350.2, "optlist" => "fontsize=11", "xposarray" => [384.7, 428.9, 472, 518.3],
-                                "val" => $DBData{"qD6"} },             # qD6
-          { "type" => "check", "ypos" => 309.4, "optlist" => "fontsize=11", "xposarray" => [384.7, 428.9, 472, 518.3],
-                                "val" => $DBData{"qD7"} },             # qD7
-          { "type" => "check", "ypos" => 246.7, "optlist" => "fontsize=11", "xposarray" => [384.7, 428.9, 472, 518.3],
-                                "val" => $DBData{"qD8"} },             # qD8
-          { "type" => "check", "ypos" => 205.7, "optlist" => "fontsize=11", "xposarray" => [384.7, 428.9, 472, 518.3],
-                                "val" => $DBData{"qD9"} },             # qD9
-          { "type" => "textline", "ypos" => 172, "xpos" => 372, "optlist" => $basefontoptions . " position={center bottom}",
-                                "text" => $DBData{"t9"} },                       # t9
-          { "type" => "textline", "ypos" => 172, "xpos" => 433.7, "optlist" => $basefontoptions . " position={center bottom}",
-                                "text" => $DBData{"t9_1"} },                       # t9_1
-          { "type" => "textline", "ypos" => 172, "xpos" => 478.3, "optlist" => $basefontoptions . " position={center bottom}",
-                                "text" => $DBData{"t9_2"} },                       # t9_2
-          { "type" => "textline", "ypos" => 172, "xpos" => 523.4, "optlist" => $basefontoptions . " position={center bottom}",
-                                "text" => $DBData{"t9_3"} },                       # t9_3
-          { "type" => "check", "ypos" => 91.4, "optlist" => "fontsize=11", "xposarray" => [159, 310.8, 425, 518.2],
-                                "val" => $DBData{"qE"} },             # qE
-      ] }
-    );
-  }
+    if ( "$table$page" eq "ClientPHQSADS" ) {
+        @PageData = (
+            {
+                "descr" => "page 1",
+                "data"  => [
+                    {
+                        "type"      => "check",
+                        "ypos"      => 627.6,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 385, 447, 509 ],
+                        "val"       => $DBData{"qA1"}
+                    },    # qA1
+                    {
+                        "type"      => "check",
+                        "ypos"      => 611.3,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 385, 447, 509 ],
+                        "val"       => $DBData{"qA2"}
+                    },    # qA2
+                    {
+                        "type"      => "check",
+                        "ypos"      => 594.7,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 385, 447, 509 ],
+                        "val"       => $DBData{"qA3"}
+                    },    # qA3
+                    {
+                        "type"      => "check",
+                        "ypos"      => 578.2,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 385, 447, 509 ],
+                        "val"       => $DBData{"qA4"}
+                    },    # qA4
+                    {
+                        "type"      => "check",
+                        "ypos"      => 561.8,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 385, 447, 509 ],
+                        "val"       => $DBData{"qA5"}
+                    },    # qA5
+                    {
+                        "type"      => "check",
+                        "ypos"      => 529.7,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 385, 447, 509 ],
+                        "val"       => $DBData{"qA6"}
+                    },    # qA6
+                    {
+                        "type"      => "check",
+                        "ypos"      => 501.8,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 385, 447, 509 ],
+                        "val"       => $DBData{"qA7"}
+                    },    # qA7
+                    {
+                        "type"      => "check",
+                        "ypos"      => 485,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 385, 447, 509 ],
+                        "val"       => $DBData{"qA8"}
+                    },    # qA8
+                    {
+                        "type"      => "check",
+                        "ypos"      => 468.7,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 385, 447, 509 ],
+                        "val"       => $DBData{"qA9"}
+                    },    # qA9
+                    {
+                        "type"      => "check",
+                        "ypos"      => 452.4,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 385, 447, 509 ],
+                        "val"       => $DBData{"qA10"}
+                    },    # qA10
+                    {
+                        "type"      => "check",
+                        "ypos"      => 435.8,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 385, 447, 509 ],
+                        "val"       => $DBData{"qA11"}
+                    },    # qA11
+                    {
+                        "type"      => "check",
+                        "ypos"      => 419.3,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 385, 447, 509 ],
+                        "val"       => $DBData{"qA12"}
+                    },    # qA12
+                    {
+                        "type"      => "check",
+                        "ypos"      => 402.7,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 385, 447, 509 ],
+                        "val"       => $DBData{"qA13"}
+                    },    # qA13
+                    {
+                        "type"      => "check",
+                        "ypos"      => 386.4,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 385, 447, 509 ],
+                        "val"       => $DBData{"qA14"}
+                    },    # qA14
+                    {
+                        "type"      => "check",
+                        "ypos"      => 369.8,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 385, 447, 509 ],
+                        "val"       => $DBData{"qA15"}
+                    },    # qA15
+                    {
+                        "type"    => "textline",
+                        "ypos"    => 337.2,
+                        "xpos"    => 372,
+                        "optlist" => $basefontoptions
+                          . " position={center bottom}",
+                        "text" => $DBData{"t15"}
+                    },    # t15
+                    {
+                        "type"    => "textline",
+                        "ypos"    => 337.2,
+                        "xpos"    => 453.1,
+                        "optlist" => $basefontoptions
+                          . " position={center bottom}",
+                        "text" => $DBData{"t15_1"}
+                    },    # t15_1
+                    {
+                        "type"    => "textline",
+                        "ypos"    => 337.2,
+                        "xpos"    => 514.8,
+                        "optlist" => $basefontoptions
+                          . " position={center bottom}",
+                        "text" => $DBData{"t15_2"}
+                    },    # t15_2
+                    {
+                        "type"      => "check",
+                        "ypos"      => 244.8,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 385, 428.5, 472, 515.5 ],
+                        "xpos"      => $DBData{"qB1"}
+                    },    # qB1
+                    {
+                        "type"      => "check",
+                        "ypos"      => 227.3,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 385, 428.5, 472, 515.5 ],
+                        "val"       => $DBData{"qB2"}
+                    },    # qB2
+                    {
+                        "type"      => "check",
+                        "ypos"      => 210,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 385, 428.5, 472, 515.5 ],
+                        "val"       => $DBData{"qB3"}
+                    },    # qB3
+                    {
+                        "type"      => "check",
+                        "ypos"      => 192.5,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 385, 428.5, 472, 515.5 ],
+                        "val"       => $DBData{"qB4"}
+                    },    # qB4
+                    {
+                        "type"      => "check",
+                        "ypos"      => 175,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 385, 428.5, 472, 515.5 ],
+                        "val"       => $DBData{"qB5"}
+                    },    # qB5
+                    {
+                        "type"      => "check",
+                        "ypos"      => 157.2,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 385, 428.5, 472, 515.5 ],
+                        "val"       => $DBData{"qB6"}
+                    },    # qB6
+                    {
+                        "type"      => "check",
+                        "ypos"      => 139.9,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 385, 428.5, 472, 515.5 ],
+                        "val"       => $DBData{"qB7"}
+                    },    # qB7
+                    {
+                        "type"    => "textline",
+                        "ypos"    => 105.6,
+                        "xpos"    => 372,
+                        "optlist" => $basefontoptions
+                          . " position={center bottom}",
+                        "text" => $DBData{"t7"}
+                    },    # t7
+                    {
+                        "type"    => "textline",
+                        "ypos"    => 105.6,
+                        "xpos"    => 434.6,
+                        "optlist" => $basefontoptions
+                          . " position={center bottom}",
+                        "text" => $DBData{"t7_1"}
+                    },    # t7_1
+                    {
+                        "type"    => "textline",
+                        "ypos"    => 105.6,
+                        "xpos"    => 479.3,
+                        "optlist" => $basefontoptions
+                          . " position={center bottom}",
+                        "text" => $DBData{"t7_2"}
+                    },    # t7_2
+                    {
+                        "type"    => "textline",
+                        "ypos"    => 105.6,
+                        "xpos"    => 521.3,
+                        "optlist" => $basefontoptions
+                          . " position={center bottom}",
+                        "text" => $DBData{"t7_3"}
+                    },    # t7_3
+                ]
+            },
+            {
+                "descr" => "page 2",
+                "data"  => [
+                    {
+                        "type"      => "check",
+                        "ypos"      => 701.5,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 435.6, 507.8 ],
+                        "val"       => $DBData{"qC1"}
+                    },    # qC1
+                    {
+                        "type"      => "check",
+                        "ypos"      => 681.6,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 435.6, 507.8 ],
+                        "val"       => $DBData{"qC2"}
+                    },    # qC2
+                    {
+                        "type"      => "check",
+                        "ypos"      => 641,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 435.6, 507.8 ],
+                        "val"       => $DBData{"qC3"}
+                    },    # qC3
+                    {
+                        "type"      => "check",
+                        "ypos"      => 611.3,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 435.6, 507.8 ],
+                        "val"       => $DBData{"qC4"}
+                    },    # qC4
+                    {
+                        "type"      => "check",
+                        "ypos"      => 582.2,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 435.6, 507.8 ],
+                        "val"       => $DBData{"qC5"}
+                    },    # qC5
+                    {
+                        "type"      => "check",
+                        "ypos"      => 495.1,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 384.7, 428.9, 472, 518.3 ],
+                        "val"       => $DBData{"qD1"}
+                    },    # qD1
+                    {
+                        "type"      => "check",
+                        "ypos"      => 466.3,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 384.7, 428.9, 472, 518.3 ],
+                        "val"       => $DBData{"qD2"}
+                    },    # qD2
+                    {
+                        "type"      => "check",
+                        "ypos"      => 425.8,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 384.7, 428.9, 472, 518.3 ],
+                        "val"       => $DBData{"qD3"}
+                    },    # qD3
+                    {
+                        "type"      => "check",
+                        "ypos"      => 397,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 384.7, 428.9, 472, 518.3 ],
+                        "val"       => $DBData{"qD4"}
+                    },    # qD4
+                    {
+                        "type"      => "check",
+                        "ypos"      => 379.2,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 384.7, 428.9, 472, 518.3 ],
+                        "val"       => $DBData{"qD5"}
+                    },    # qD5
+                    {
+                        "type"      => "check",
+                        "ypos"      => 350.2,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 384.7, 428.9, 472, 518.3 ],
+                        "val"       => $DBData{"qD6"}
+                    },    # qD6
+                    {
+                        "type"      => "check",
+                        "ypos"      => 309.4,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 384.7, 428.9, 472, 518.3 ],
+                        "val"       => $DBData{"qD7"}
+                    },    # qD7
+                    {
+                        "type"      => "check",
+                        "ypos"      => 246.7,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 384.7, 428.9, 472, 518.3 ],
+                        "val"       => $DBData{"qD8"}
+                    },    # qD8
+                    {
+                        "type"      => "check",
+                        "ypos"      => 205.7,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 384.7, 428.9, 472, 518.3 ],
+                        "val"       => $DBData{"qD9"}
+                    },    # qD9
+                    {
+                        "type"    => "textline",
+                        "ypos"    => 172,
+                        "xpos"    => 372,
+                        "optlist" => $basefontoptions
+                          . " position={center bottom}",
+                        "text" => $DBData{"t9"}
+                    },    # t9
+                    {
+                        "type"    => "textline",
+                        "ypos"    => 172,
+                        "xpos"    => 433.7,
+                        "optlist" => $basefontoptions
+                          . " position={center bottom}",
+                        "text" => $DBData{"t9_1"}
+                    },    # t9_1
+                    {
+                        "type"    => "textline",
+                        "ypos"    => 172,
+                        "xpos"    => 478.3,
+                        "optlist" => $basefontoptions
+                          . " position={center bottom}",
+                        "text" => $DBData{"t9_2"}
+                    },    # t9_2
+                    {
+                        "type"    => "textline",
+                        "ypos"    => 172,
+                        "xpos"    => 523.4,
+                        "optlist" => $basefontoptions
+                          . " position={center bottom}",
+                        "text" => $DBData{"t9_3"}
+                    },    # t9_3
+                    {
+                        "type"      => "check",
+                        "ypos"      => 91.4,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 159, 310.8, 425, 518.2 ],
+                        "val"       => $DBData{"qE"}
+                    },    # qE
+                ]
+            }
+        );
+    }
 
-  if ("$table$page" eq "ClientPHQ") {
-    @PageData = (
-      { "descr" => "page 1", "data" => [
-          { "type" => "textline", "ypos" => 640.1, "xpos" => 100,
-                                "text" => $DBData{"clientname"} },                       # clientname
-          { "type" => "textline", "ypos" => 640.1, "xpos" => 241,
-                                "text" => $DBData{"age"} },                       # age
-          { "type" => "textline", "ypos" => 638.8, "xpos" => 305, "optlist" => $basecheckfontoptions . " fontsize=11",
-                                "text" => $DBData{"sex_F"} eq 'F' ? '&#x2713;' : '' },                       # Sex F
-          { "type" => "textline", "ypos" => 638.8, "xpos" => 360, "optlist" => $basecheckfontoptions . " fontsize=11",
-                                "text" => $DBData{"sex_M"} eq 'M' ? '&#x2713;' : '' },                       # Sex M
-          { "type" => "textline", "ypos" => 640.1, "xpos" => 473,
-                                "text" => $DBData{"today"} },                       # today
-          { "type" => "check", "ypos" => 582, "optlist" => "fontsize=11", "xposarray" => [397, 453.4, 509.8],
-                                "val" => $DBData{"q1a"} },             # q1a
-          { "type" => "check", "ypos" => 566.4, "optlist" => "fontsize=11", "xposarray" => [397, 453.4, 509.8],
-                                "val" => $DBData{"q1b"} },             # q1b
-          { "type" => "check", "ypos" => 550.8, "optlist" => "fontsize=11", "xposarray" => [397, 453.4, 509.8],
-                                "val" => $DBData{"q1c"} },             # q1c
-          { "type" => "check", "ypos" => 525.1, "optlist" => "fontsize=11", "xposarray" => [397, 453.4, 509.8],
-                                "val" => $DBData{"q1d"} },             # q1d
-          { "type" => "check", "ypos" => 509.5, "optlist" => "fontsize=11", "xposarray" => [397, 453.4, 509.8],
-                                "val" => $DBData{"q1e"} },             # q1e
-          { "type" => "check", "ypos" => 493.9, "optlist" => "fontsize=11", "xposarray" => [397, 453.4, 509.8],
-                                "val" => $DBData{"q1f"} },             # q1f
-          { "type" => "check", "ypos" => 478.6, "optlist" => "fontsize=11", "xposarray" => [397, 453.4, 509.8],
-                                "val" => $DBData{"q1g"} },             # q1g
-          { "type" => "check", "ypos" => 463, "optlist" => "fontsize=11", "xposarray" => [397, 453.4, 509.8],
-                                "val" => $DBData{"q1h"} },             # q1h
-          { "type" => "check", "ypos" => 447.4, "optlist" => "fontsize=11", "xposarray" => [397, 453.4, 509.8],
-                                "val" => $DBData{"q1i"} },             # q1i
-          { "type" => "check", "ypos" => 431.8, "optlist" => "fontsize=11", "xposarray" => [397, 453.4, 509.8],
-                                "val" => $DBData{"q1j"} },             # q1j
-          { "type" => "check", "ypos" => 416.4, "optlist" => "fontsize=11", "xposarray" => [397, 453.4, 509.8],
-                                "val" => $DBData{"q1k"} },             # q1k
-          { "type" => "check", "ypos" => 401, "optlist" => "fontsize=11", "xposarray" => [397, 453.4, 509.8],
-                                "val" => $DBData{"q1l"} },             # q1l
-          { "type" => "check", "ypos" => 385.4, "optlist" => "fontsize=11", "xposarray" => [397, 453.4, 509.8],
-                                "val" => $DBData{"q1m"} },             # q1m
-          { "type" => "check", "ypos" => 323.3, "optlist" => "fontsize=11", "xposarray" => [389.8, 432.5, 474.5, 517],
-                                "val" => $DBData{"q2a"} },             # q2a
-          { "type" => "check", "ypos" => 307.9, "optlist" => "fontsize=11", "xposarray" => [389.8, 432.5, 474.5, 517],
-                                "val" => $DBData{"q2b"} },             # q2b
-          { "type" => "check", "ypos" => 282, "optlist" => "fontsize=11", "xposarray" => [389.8, 432.5, 474.5, 517],
-                                "val" => $DBData{"q2c"} },             # q2c
-          { "type" => "check", "ypos" => 266.9, "optlist" => "fontsize=11", "xposarray" => [389.8, 432.5, 474.5, 517],
-                                "val" => $DBData{"q2d"} },             # q2d
-          { "type" => "check", "ypos" => 251, "optlist" => "fontsize=11", "xposarray" => [389.8, 432.5, 474.5, 517],
-                                "val" => $DBData{"q2e"} },             # q2e
-          { "type" => "check", "ypos" => 225.1, "optlist" => "fontsize=11", "xposarray" => [389.8, 432.5, 474.5, 517],
-                                "val" => $DBData{"q2f"} },             # q2f
-          { "type" => "check", "ypos" => 199.2, "optlist" => "fontsize=11", "xposarray" => [389.8, 432.5, 474.5, 517],
-                                "val" => $DBData{"q2g"} },             # q2g
-          { "type" => "check", "ypos" => 162.5, "optlist" => "fontsize=11", "xposarray" => [389.8, 432.5, 474.5, 517],
-                                "val" => $DBData{"q2h"} },             # q2h
-          { "type" => "check", "ypos" => 136.8, "optlist" => "fontsize=11", "xposarray" => [389.8, 432.5, 474.5, 517],
-                                "val" => $DBData{"q2i"} },             # q2i                                
-      ] },
-      { "descr" => "page 2", "data" => [
-          { "type" => "check", "ypos" => 677.3, "optlist" => "fontsize=11", "xposarray" => [421.4, 499],
-                                "val" => $DBData{"q3a"} },             # q3a
-          { "type" => "check", "ypos" => 646.6, "optlist" => "fontsize=11", "xposarray" => [421.4, 499],
-                                "val" => $DBData{"q3b"} },             # q3b
-          { "type" => "check", "ypos" => 610.1, "optlist" => "fontsize=11", "xposarray" => [421.4, 499],
-                                "val" => $DBData{"q3c"} },             # q3c
-          { "type" => "check", "ypos" => 583.9, "optlist" => "fontsize=11", "xposarray" => [421.4, 499],
-                                "val" => $DBData{"q3d"} },             # q3d
-          { "type" => "check", "ypos" => 535.2, "optlist" => "fontsize=11", "xposarray" => [421.4, 499],
-                                "val" => $DBData{"q4a"} },             # q4a
-          { "type" => "check", "ypos" => 519.6, "optlist" => "fontsize=11", "xposarray" => [421.4, 499],
-                                "val" => $DBData{"q4b"} },             # q4b
-          { "type" => "check", "ypos" => 504.2, "optlist" => "fontsize=11", "xposarray" => [421.4, 499],
-                                "val" => $DBData{"q4c"} },             # q4c
-          { "type" => "check", "ypos" => 488.6, "optlist" => "fontsize=11", "xposarray" => [421.4, 499],
-                                "val" => $DBData{"q4d"} },             # q4d
-          { "type" => "check", "ypos" => 473, "optlist" => "fontsize=11", "xposarray" => [421.4, 499],
-                                "val" => $DBData{"q4e"} },             # q4e
-          { "type" => "check", "ypos" => 457.7, "optlist" => "fontsize=11", "xposarray" => [421.4, 499],
-                                "val" => $DBData{"q4f"} },             # q4f
-          { "type" => "check", "ypos" => 431.5, "optlist" => "fontsize=11", "xposarray" => [421.4, 499],
-                                "val" => $DBData{"q4g"} },             # q4g
-          { "type" => "check", "ypos" => 416.2, "optlist" => "fontsize=11", "xposarray" => [421.4, 499],
-                                "val" => $DBData{"q4h"} },             # q4h
-          { "type" => "check", "ypos" => 400.8, "optlist" => "fontsize=11", "xposarray" => [421.4, 499],
-                                "val" => $DBData{"q4i"} },             # q4i
-          { "type" => "check", "ypos" => 385.2, "optlist" => "fontsize=11", "xposarray" => [421.4, 499],
-                                "val" => $DBData{"q4j"} },             # q4j
-          { "type" => "check", "ypos" => 369.6, "optlist" => "fontsize=11", "xposarray" => [421.4, 499],
-                                "val" => $DBData{"q4k"} },             # q4k
-          { "type" => "check", "ypos" => 292.6, "optlist" => "fontsize=11", "xposarray" => [397.4, 453.4, 509.8],
-                                "val" => $DBData{"q5a"} },             # q5a
-          { "type" => "check", "ypos" => 260.9, "optlist" => "fontsize=11", "xposarray" => [397.4, 453.4, 509.8],
-                                "val" => $DBData{"q5b"} },             # q5b
-          { "type" => "check", "ypos" => 245.5, "optlist" => "fontsize=11", "xposarray" => [397.4, 453.4, 509.8],
-                                "val" => $DBData{"q5c"} },             # q5c
-          { "type" => "check", "ypos" => 229.7, "optlist" => "fontsize=11", "xposarray" => [397.4, 453.4, 509.8],
-                                "val" => $DBData{"q5d"} },             # q5d
-          { "type" => "check", "ypos" => 214.3, "optlist" => "fontsize=11", "xposarray" => [397.4, 453.4, 509.8],
-                                "val" => $DBData{"q5e"} },             # q5e
-          { "type" => "check", "ypos" => 199, "optlist" => "fontsize=11", "xposarray" => [397.4, 453.4, 509.8],
-                                "val" => $DBData{"q5f"} },             # q5f
-          { "type" => "check", "ypos" => 173, "optlist" => "fontsize=11", "xposarray" => [397.4, 453.4, 509.8],
-                                "val" => $DBData{"q5g"} },             # q5g
-      ] },
-      { "descr" => "page 3", "data" => [
-          { "type" => "check", "ypos" => 721.2, "optlist" => "fontsize=11", "xposarray" => [435.1, 499],
-                                "val" => $DBData{"q6a"} },             # q6a
-          { "type" => "check", "ypos" => 683.3, "optlist" => "fontsize=11", "xposarray" => [435.1, 499],
-                                "val" => $DBData{"q6b"} },             # q6b
-          { "type" => "check", "ypos" => 642.5, "optlist" => "fontsize=11", "xposarray" => [435.1, 499],
-                                "val" => $DBData{"q6c"} },             # q6c
-          { "type" => "check", "ypos" => 583, "optlist" => "fontsize=11", "xposarray" => [435.1, 499],
-                                "val" => $DBData{"q7a"} },             # q7a
-          { "type" => "check", "ypos" => 565.4, "optlist" => "fontsize=11", "xposarray" => [435.1, 499],
-                                "val" => $DBData{"q7b"} },             # q7b
-          { "type" => "check", "ypos" => 541.2, "optlist" => "fontsize=11", "xposarray" => [435.1, 499],
-                                "val" => $DBData{"q7c"} },             # q7c
-          { "type" => "check", "ypos" => 516, "optlist" => "fontsize=11", "xposarray" => [435.1, 499],
-                                "val" => $DBData{"q7d"} },             # q7d
-          { "type" => "check", "ypos" => 473.8, "optlist" => "fontsize=11", "xposarray" => [435.1, 499],
-                                "val" => $DBData{"q8"} },             # q8
-          { "type" => "check", "ypos" => 431.3, "optlist" => "fontsize=11", "xposarray" => [435.1, 499],
-                                "val" => $DBData{"q9"} },             # q9
-          { "type" => "check", "ypos" => 372.7, "optlist" => "fontsize=11", "xposarray" => [435.1, 499],
-                                "val" => $DBData{"q10a"} },             # q10a
-          { "type" => "check", "ypos" => 336, "optlist" => "fontsize=11", "xposarray" => [435.1, 499],
-                                "val" => $DBData{"q10b"} },             # q10b
-          { "type" => "check", "ypos" => 309.6, "optlist" => "fontsize=11", "xposarray" => [435.1, 499],
-                                "val" => $DBData{"q10c"} },             # q10c
-          { "type" => "check", "ypos" => 284.2, "optlist" => "fontsize=11", "xposarray" => [435.1, 499],
-                                "val" => $DBData{"q10d"} },             # q10d
-          { "type" => "check", "ypos" => 258.7, "optlist" => "fontsize=11", "xposarray" => [435.1, 499],
-                                "val" => $DBData{"q10e"} },             # q10e
-          { "type" => "check", "ypos" => 170.9, "optlist" => "fontsize=11", "xposarray" => [124.3, 239, 351.1, 473.8],
-                                "val" => $DBData{"q11"} },             # q11
-      ] }
-    );
-  }
+    if ( "$table$page" eq "ClientPHQ" ) {
+        @PageData = (
+            {
+                "descr" => "page 1",
+                "data"  => [
+                    {
+                        "type" => "textline",
+                        "ypos" => 640.1,
+                        "xpos" => 100,
+                        "text" => $DBData{"clientname"}
+                    },    # clientname
+                    {
+                        "type" => "textline",
+                        "ypos" => 640.1,
+                        "xpos" => 241,
+                        "text" => $DBData{"age"}
+                    },    # age
+                    {
+                        "type"    => "textline",
+                        "ypos"    => 638.8,
+                        "xpos"    => 305,
+                        "optlist" => $basecheckfontoptions . " fontsize=11",
+                        "text"    => $DBData{"sex_F"} eq 'F' ? '&#x2713;' : ''
+                    },    # Sex F
+                    {
+                        "type"    => "textline",
+                        "ypos"    => 638.8,
+                        "xpos"    => 360,
+                        "optlist" => $basecheckfontoptions . " fontsize=11",
+                        "text"    => $DBData{"sex_M"} eq 'M' ? '&#x2713;' : ''
+                    },    # Sex M
+                    {
+                        "type" => "textline",
+                        "ypos" => 640.1,
+                        "xpos" => 473,
+                        "text" => $DBData{"today"}
+                    },    # today
+                    {
+                        "type"      => "check",
+                        "ypos"      => 582,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 397, 453.4, 509.8 ],
+                        "val"       => $DBData{"q1a"}
+                    },    # q1a
+                    {
+                        "type"      => "check",
+                        "ypos"      => 566.4,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 397, 453.4, 509.8 ],
+                        "val"       => $DBData{"q1b"}
+                    },    # q1b
+                    {
+                        "type"      => "check",
+                        "ypos"      => 550.8,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 397, 453.4, 509.8 ],
+                        "val"       => $DBData{"q1c"}
+                    },    # q1c
+                    {
+                        "type"      => "check",
+                        "ypos"      => 525.1,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 397, 453.4, 509.8 ],
+                        "val"       => $DBData{"q1d"}
+                    },    # q1d
+                    {
+                        "type"      => "check",
+                        "ypos"      => 509.5,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 397, 453.4, 509.8 ],
+                        "val"       => $DBData{"q1e"}
+                    },    # q1e
+                    {
+                        "type"      => "check",
+                        "ypos"      => 493.9,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 397, 453.4, 509.8 ],
+                        "val"       => $DBData{"q1f"}
+                    },    # q1f
+                    {
+                        "type"      => "check",
+                        "ypos"      => 478.6,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 397, 453.4, 509.8 ],
+                        "val"       => $DBData{"q1g"}
+                    },    # q1g
+                    {
+                        "type"      => "check",
+                        "ypos"      => 463,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 397, 453.4, 509.8 ],
+                        "val"       => $DBData{"q1h"}
+                    },    # q1h
+                    {
+                        "type"      => "check",
+                        "ypos"      => 447.4,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 397, 453.4, 509.8 ],
+                        "val"       => $DBData{"q1i"}
+                    },    # q1i
+                    {
+                        "type"      => "check",
+                        "ypos"      => 431.8,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 397, 453.4, 509.8 ],
+                        "val"       => $DBData{"q1j"}
+                    },    # q1j
+                    {
+                        "type"      => "check",
+                        "ypos"      => 416.4,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 397, 453.4, 509.8 ],
+                        "val"       => $DBData{"q1k"}
+                    },    # q1k
+                    {
+                        "type"      => "check",
+                        "ypos"      => 401,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 397, 453.4, 509.8 ],
+                        "val"       => $DBData{"q1l"}
+                    },    # q1l
+                    {
+                        "type"      => "check",
+                        "ypos"      => 385.4,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 397, 453.4, 509.8 ],
+                        "val"       => $DBData{"q1m"}
+                    },    # q1m
+                    {
+                        "type"      => "check",
+                        "ypos"      => 323.3,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 389.8, 432.5, 474.5, 517 ],
+                        "val"       => $DBData{"q2a"}
+                    },    # q2a
+                    {
+                        "type"      => "check",
+                        "ypos"      => 307.9,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 389.8, 432.5, 474.5, 517 ],
+                        "val"       => $DBData{"q2b"}
+                    },    # q2b
+                    {
+                        "type"      => "check",
+                        "ypos"      => 282,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 389.8, 432.5, 474.5, 517 ],
+                        "val"       => $DBData{"q2c"}
+                    },    # q2c
+                    {
+                        "type"      => "check",
+                        "ypos"      => 266.9,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 389.8, 432.5, 474.5, 517 ],
+                        "val"       => $DBData{"q2d"}
+                    },    # q2d
+                    {
+                        "type"      => "check",
+                        "ypos"      => 251,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 389.8, 432.5, 474.5, 517 ],
+                        "val"       => $DBData{"q2e"}
+                    },    # q2e
+                    {
+                        "type"      => "check",
+                        "ypos"      => 225.1,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 389.8, 432.5, 474.5, 517 ],
+                        "val"       => $DBData{"q2f"}
+                    },    # q2f
+                    {
+                        "type"      => "check",
+                        "ypos"      => 199.2,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 389.8, 432.5, 474.5, 517 ],
+                        "val"       => $DBData{"q2g"}
+                    },    # q2g
+                    {
+                        "type"      => "check",
+                        "ypos"      => 162.5,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 389.8, 432.5, 474.5, 517 ],
+                        "val"       => $DBData{"q2h"}
+                    },    # q2h
+                    {
+                        "type"      => "check",
+                        "ypos"      => 136.8,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 389.8, 432.5, 474.5, 517 ],
+                        "val"       => $DBData{"q2i"}
+                    },    # q2i
+                ]
+            },
+            {
+                "descr" => "page 2",
+                "data"  => [
+                    {
+                        "type"      => "check",
+                        "ypos"      => 677.3,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 421.4, 499 ],
+                        "val"       => $DBData{"q3a"}
+                    },    # q3a
+                    {
+                        "type"      => "check",
+                        "ypos"      => 646.6,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 421.4, 499 ],
+                        "val"       => $DBData{"q3b"}
+                    },    # q3b
+                    {
+                        "type"      => "check",
+                        "ypos"      => 610.1,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 421.4, 499 ],
+                        "val"       => $DBData{"q3c"}
+                    },    # q3c
+                    {
+                        "type"      => "check",
+                        "ypos"      => 583.9,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 421.4, 499 ],
+                        "val"       => $DBData{"q3d"}
+                    },    # q3d
+                    {
+                        "type"      => "check",
+                        "ypos"      => 535.2,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 421.4, 499 ],
+                        "val"       => $DBData{"q4a"}
+                    },    # q4a
+                    {
+                        "type"      => "check",
+                        "ypos"      => 519.6,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 421.4, 499 ],
+                        "val"       => $DBData{"q4b"}
+                    },    # q4b
+                    {
+                        "type"      => "check",
+                        "ypos"      => 504.2,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 421.4, 499 ],
+                        "val"       => $DBData{"q4c"}
+                    },    # q4c
+                    {
+                        "type"      => "check",
+                        "ypos"      => 488.6,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 421.4, 499 ],
+                        "val"       => $DBData{"q4d"}
+                    },    # q4d
+                    {
+                        "type"      => "check",
+                        "ypos"      => 473,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 421.4, 499 ],
+                        "val"       => $DBData{"q4e"}
+                    },    # q4e
+                    {
+                        "type"      => "check",
+                        "ypos"      => 457.7,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 421.4, 499 ],
+                        "val"       => $DBData{"q4f"}
+                    },    # q4f
+                    {
+                        "type"      => "check",
+                        "ypos"      => 431.5,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 421.4, 499 ],
+                        "val"       => $DBData{"q4g"}
+                    },    # q4g
+                    {
+                        "type"      => "check",
+                        "ypos"      => 416.2,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 421.4, 499 ],
+                        "val"       => $DBData{"q4h"}
+                    },    # q4h
+                    {
+                        "type"      => "check",
+                        "ypos"      => 400.8,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 421.4, 499 ],
+                        "val"       => $DBData{"q4i"}
+                    },    # q4i
+                    {
+                        "type"      => "check",
+                        "ypos"      => 385.2,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 421.4, 499 ],
+                        "val"       => $DBData{"q4j"}
+                    },    # q4j
+                    {
+                        "type"      => "check",
+                        "ypos"      => 369.6,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 421.4, 499 ],
+                        "val"       => $DBData{"q4k"}
+                    },    # q4k
+                    {
+                        "type"      => "check",
+                        "ypos"      => 292.6,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 397.4, 453.4, 509.8 ],
+                        "val"       => $DBData{"q5a"}
+                    },    # q5a
+                    {
+                        "type"      => "check",
+                        "ypos"      => 260.9,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 397.4, 453.4, 509.8 ],
+                        "val"       => $DBData{"q5b"}
+                    },    # q5b
+                    {
+                        "type"      => "check",
+                        "ypos"      => 245.5,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 397.4, 453.4, 509.8 ],
+                        "val"       => $DBData{"q5c"}
+                    },    # q5c
+                    {
+                        "type"      => "check",
+                        "ypos"      => 229.7,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 397.4, 453.4, 509.8 ],
+                        "val"       => $DBData{"q5d"}
+                    },    # q5d
+                    {
+                        "type"      => "check",
+                        "ypos"      => 214.3,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 397.4, 453.4, 509.8 ],
+                        "val"       => $DBData{"q5e"}
+                    },    # q5e
+                    {
+                        "type"      => "check",
+                        "ypos"      => 199,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 397.4, 453.4, 509.8 ],
+                        "val"       => $DBData{"q5f"}
+                    },    # q5f
+                    {
+                        "type"      => "check",
+                        "ypos"      => 173,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 397.4, 453.4, 509.8 ],
+                        "val"       => $DBData{"q5g"}
+                    },    # q5g
+                ]
+            },
+            {
+                "descr" => "page 3",
+                "data"  => [
+                    {
+                        "type"      => "check",
+                        "ypos"      => 721.2,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 435.1, 499 ],
+                        "val"       => $DBData{"q6a"}
+                    },    # q6a
+                    {
+                        "type"      => "check",
+                        "ypos"      => 683.3,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 435.1, 499 ],
+                        "val"       => $DBData{"q6b"}
+                    },    # q6b
+                    {
+                        "type"      => "check",
+                        "ypos"      => 642.5,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 435.1, 499 ],
+                        "val"       => $DBData{"q6c"}
+                    },    # q6c
+                    {
+                        "type"      => "check",
+                        "ypos"      => 583,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 435.1, 499 ],
+                        "val"       => $DBData{"q7a"}
+                    },    # q7a
+                    {
+                        "type"      => "check",
+                        "ypos"      => 565.4,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 435.1, 499 ],
+                        "val"       => $DBData{"q7b"}
+                    },    # q7b
+                    {
+                        "type"      => "check",
+                        "ypos"      => 541.2,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 435.1, 499 ],
+                        "val"       => $DBData{"q7c"}
+                    },    # q7c
+                    {
+                        "type"      => "check",
+                        "ypos"      => 516,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 435.1, 499 ],
+                        "val"       => $DBData{"q7d"}
+                    },    # q7d
+                    {
+                        "type"      => "check",
+                        "ypos"      => 473.8,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 435.1, 499 ],
+                        "val"       => $DBData{"q8"}
+                    },    # q8
+                    {
+                        "type"      => "check",
+                        "ypos"      => 431.3,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 435.1, 499 ],
+                        "val"       => $DBData{"q9"}
+                    },    # q9
+                    {
+                        "type"      => "check",
+                        "ypos"      => 372.7,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 435.1, 499 ],
+                        "val"       => $DBData{"q10a"}
+                    },    # q10a
+                    {
+                        "type"      => "check",
+                        "ypos"      => 336,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 435.1, 499 ],
+                        "val"       => $DBData{"q10b"}
+                    },    # q10b
+                    {
+                        "type"      => "check",
+                        "ypos"      => 309.6,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 435.1, 499 ],
+                        "val"       => $DBData{"q10c"}
+                    },    # q10c
+                    {
+                        "type"      => "check",
+                        "ypos"      => 284.2,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 435.1, 499 ],
+                        "val"       => $DBData{"q10d"}
+                    },    # q10d
+                    {
+                        "type"      => "check",
+                        "ypos"      => 258.7,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 435.1, 499 ],
+                        "val"       => $DBData{"q10e"}
+                    },    # q10e
+                    {
+                        "type"      => "check",
+                        "ypos"      => 170.9,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 124.3, 239, 351.1, 473.8 ],
+                        "val"       => $DBData{"q11"}
+                    },    # q11
+                ]
+            }
+        );
+    }
 
-  if ("$table$page" eq "ClientPHQ15") {
-    @PageData = (
-      { "descr" => "page 1", "data" => [
-          { "type" => "check", "ypos" => 584.6, "optlist" => "fontsize=11", "xposarray" => [396, 454.6, 513.6],
-                                "val" => $DBData{"q1"} },             # q1
-          { "type" => "check", "ypos" => 555.4, "optlist" => "fontsize=11", "xposarray" => [396, 454.6, 513.6],
-                                "val" => $DBData{"q2"} },             # q2
-          { "type" => "check", "ypos" => 526.3, "optlist" => "fontsize=11", "xposarray" => [396, 454.6, 513.6],
-                                "val" => $DBData{"q3"} },             # q3
-          { "type" => "check", "ypos" => 496.6, "optlist" => "fontsize=11", "xposarray" => [396, 454.6, 513.6],
-                                "val" => $DBData{"q4"} },             # q4
-          { "type" => "check", "ypos" => 467.8, "optlist" => "fontsize=11", "xposarray" => [396, 454.6, 513.6],
-                                "val" => $DBData{"q5"} },             # q5
-          { "type" => "check", "ypos" => 438.2, "optlist" => "fontsize=11", "xposarray" => [396, 454.6, 513.6],
-                                "val" => $DBData{"q6"} },             # q6
-          { "type" => "check", "ypos" => 409, "optlist" => "fontsize=11", "xposarray" => [396, 454.6, 513.6],
-                                "val" => $DBData{"q7"} },             # q7
-          { "type" => "check", "ypos" => 379.7, "optlist" => "fontsize=11", "xposarray" => [396, 454.6, 513.6],
-                                "val" => $DBData{"q8"} },             # q8
-          { "type" => "check", "ypos" => 350.4, "optlist" => "fontsize=11", "xposarray" => [396, 454.6, 513.6],
-                                "val" => $DBData{"q9"} },             # q9
-          { "type" => "check", "ypos" => 320.9, "optlist" => "fontsize=11", "xposarray" => [396, 454.6, 513.6],
-                                "val" => $DBData{"q10"} },             # q10
-          { "type" => "check", "ypos" => 291.8, "optlist" => "fontsize=11", "xposarray" => [396, 454.6, 513.6],
-                                "val" => $DBData{"q11"} },             # q11
-          { "type" => "check", "ypos" => 262.3, "optlist" => "fontsize=11", "xposarray" => [396, 454.6, 513.6],
-                                "val" => $DBData{"q12"} },             # q12
-          { "type" => "check", "ypos" => 233, "optlist" => "fontsize=11", "xposarray" => [396, 454.6, 513.6],
-                                "val" => $DBData{"q13"} },             # q13
-          { "type" => "check", "ypos" => 204, "optlist" => "fontsize=11", "xposarray" => [396, 454.6, 513.6],
-                                "val" => $DBData{"q14"} },             # q14
-          { "type" => "check", "ypos" => 174.5, "optlist" => "fontsize=11", "xposarray" => [396, 454.6, 513.6],
-                                "val" => $DBData{"q15"} },             # q15
-          { "type" => "textline", "ypos" => 134.6, "xpos" => 412.6, "optlist" => $basefontoptions . " position={center bottom}",
-                                "text" => $DBData{"tALL"} },                       # tALL
-          { "type" => "textline", "ypos" => 134.6, "xpos" => 462, "optlist" => $basefontoptions . " position={center bottom}",
-                                "text" => $DBData{"t1"} },                       # t1
-          { "type" => "textline", "ypos" => 134.6, "xpos" => 516.7, "optlist" => $basefontoptions . " position={center bottom}",
-                                "text" => $DBData{"t2"} },                       # t2
-      ] }
-    );
-  }
+    if ( "$table$page" eq "ClientPHQ15" ) {
+        @PageData = (
+            {
+                "descr" => "page 1",
+                "data"  => [
+                    {
+                        "type"      => "check",
+                        "ypos"      => 584.6,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 396, 454.6, 513.6 ],
+                        "val"       => $DBData{"q1"}
+                    },    # q1
+                    {
+                        "type"      => "check",
+                        "ypos"      => 555.4,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 396, 454.6, 513.6 ],
+                        "val"       => $DBData{"q2"}
+                    },    # q2
+                    {
+                        "type"      => "check",
+                        "ypos"      => 526.3,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 396, 454.6, 513.6 ],
+                        "val"       => $DBData{"q3"}
+                    },    # q3
+                    {
+                        "type"      => "check",
+                        "ypos"      => 496.6,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 396, 454.6, 513.6 ],
+                        "val"       => $DBData{"q4"}
+                    },    # q4
+                    {
+                        "type"      => "check",
+                        "ypos"      => 467.8,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 396, 454.6, 513.6 ],
+                        "val"       => $DBData{"q5"}
+                    },    # q5
+                    {
+                        "type"      => "check",
+                        "ypos"      => 438.2,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 396, 454.6, 513.6 ],
+                        "val"       => $DBData{"q6"}
+                    },    # q6
+                    {
+                        "type"      => "check",
+                        "ypos"      => 409,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 396, 454.6, 513.6 ],
+                        "val"       => $DBData{"q7"}
+                    },    # q7
+                    {
+                        "type"      => "check",
+                        "ypos"      => 379.7,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 396, 454.6, 513.6 ],
+                        "val"       => $DBData{"q8"}
+                    },    # q8
+                    {
+                        "type"      => "check",
+                        "ypos"      => 350.4,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 396, 454.6, 513.6 ],
+                        "val"       => $DBData{"q9"}
+                    },    # q9
+                    {
+                        "type"      => "check",
+                        "ypos"      => 320.9,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 396, 454.6, 513.6 ],
+                        "val"       => $DBData{"q10"}
+                    },    # q10
+                    {
+                        "type"      => "check",
+                        "ypos"      => 291.8,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 396, 454.6, 513.6 ],
+                        "val"       => $DBData{"q11"}
+                    },    # q11
+                    {
+                        "type"      => "check",
+                        "ypos"      => 262.3,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 396, 454.6, 513.6 ],
+                        "val"       => $DBData{"q12"}
+                    },    # q12
+                    {
+                        "type"      => "check",
+                        "ypos"      => 233,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 396, 454.6, 513.6 ],
+                        "val"       => $DBData{"q13"}
+                    },    # q13
+                    {
+                        "type"      => "check",
+                        "ypos"      => 204,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 396, 454.6, 513.6 ],
+                        "val"       => $DBData{"q14"}
+                    },    # q14
+                    {
+                        "type"      => "check",
+                        "ypos"      => 174.5,
+                        "optlist"   => "fontsize=11",
+                        "xposarray" => [ 396, 454.6, 513.6 ],
+                        "val"       => $DBData{"q15"}
+                    },    # q15
+                    {
+                        "type"    => "textline",
+                        "ypos"    => 134.6,
+                        "xpos"    => 412.6,
+                        "optlist" => $basefontoptions
+                          . " position={center bottom}",
+                        "text" => $DBData{"tALL"}
+                    },    # tALL
+                    {
+                        "type"    => "textline",
+                        "ypos"    => 134.6,
+                        "xpos"    => 462,
+                        "optlist" => $basefontoptions
+                          . " position={center bottom}",
+                        "text" => $DBData{"t1"}
+                    },    # t1
+                    {
+                        "type"    => "textline",
+                        "ypos"    => 134.6,
+                        "xpos"    => 516.7,
+                        "optlist" => $basefontoptions
+                          . " position={center bottom}",
+                        "text" => $DBData{"t2"}
+                    },    # t2
+                ]
+            }
+        );
+    }
 
 #####################
-  for (my $pageno = 1; $pageno <= $no_of_input_pages; $pageno++) {
-    $p->begin_page_ext($pagewidth, $pageheight, "");
-    $p->fit_pdi_page($pagehandles[$pageno], 0, 0, "cloneboxes");
-    foreach (@{$PageData[$pageno-1]->{"data"}}) {
-      main->renderObject($p, $_);
+    for ( my $pageno = 1 ; $pageno <= $no_of_input_pages ; $pageno++ ) {
+        $p->begin_page_ext( $pagewidth, $pageheight, "" );
+        $p->fit_pdi_page( $pagehandles[$pageno], 0, 0, "cloneboxes" );
+        foreach ( @{ $PageData[ $pageno - 1 ]->{"data"} } ) {
+            main->renderObject( $p, $_ );
+        }
+        $p->end_page_ext("");
+        $pagecount++;
     }
-    $p->end_page_ext("");
-    $pagecount++;
-  }
 }
 
 ############################################################################
 sub renderObject {
-  my ($self, $p, $obj) = @_;
+    my ( $self, $p, $obj ) = @_;
 
-  if ($obj->{"type"} eq "textline") {
-    main->renderTextline($p,
-      $obj->{"text"}, $obj->{"xpos"}, $obj->{"ypos"}, $obj->{"optlist"});
-  }
+    if ( $obj->{"type"} eq "textline" ) {
+        main->renderTextline( $p,
+            $obj->{"text"}, $obj->{"xpos"}, $obj->{"ypos"}, $obj->{"optlist"} );
+    }
 
-  if ($obj->{"type"} eq "check") {
-    main->renderCheck($p,
-      $obj->{"val"}, $obj->{"xposarray"}, $obj->{"ypos"}, $obj->{"optlist"});
-  }
+    if ( $obj->{"type"} eq "check" ) {
+        main->renderCheck( $p,
+            $obj->{"val"}, $obj->{"xposarray"}, $obj->{"ypos"},
+            $obj->{"optlist"} );
+    }
 
 }
 
 sub openPdiPages {
-  my ($self, $p) = @_;
+    my ( $self, $p ) = @_;
 
-#warn qq|no_of_input_pages: ${no_of_input_pages}\n|;
-  # Prepare all pages of the input document. We assume a small
-  # number of input pages and a large number of generated output
-  # pages. Therefore it makes sense to keep the input pages
-  # open instead of opening the pages again for each encounter.
-    
-  for (my $pageno = 1; $pageno <= $no_of_input_pages; $pageno++)
-  {
-    # Open the first page and clone the page size 
-    $pagehandles[$pageno] = $p->open_pdi_page($indoc, $pageno, "cloneboxes");
-    if ($pagehandles[$pageno] == -1) { die("Error: " . $p->get_errmsg()); }
-  }
+    #warn qq|no_of_input_pages: ${no_of_input_pages}\n|;
+    # Prepare all pages of the input document. We assume a small
+    # number of input pages and a large number of generated output
+    # pages. Therefore it makes sense to keep the input pages
+    # open instead of opening the pages again for each encounter.
+
+    for ( my $pageno = 1 ; $pageno <= $no_of_input_pages ; $pageno++ ) {
+
+        # Open the first page and clone the page size
+        $pagehandles[$pageno] =
+          $p->open_pdi_page( $indoc, $pageno, "cloneboxes" );
+        if ( $pagehandles[$pageno] == -1 ) {
+            die( "Error: " . $p->get_errmsg() );
+        }
+    }
 }
 
 sub closePdiPages {
-  my ($self, $p) = @_;
+    my ( $self, $p ) = @_;
 
-  # Close all input pages 
-  for (my $pageno = 1; $pageno <= $no_of_input_pages; $pageno++)
-  { $p->close_pdi_page($pagehandles[$pageno]); }
-  $p->close_pdi_document($indoc);
+    # Close all input pages
+    for ( my $pageno = 1 ; $pageno <= $no_of_input_pages ; $pageno++ ) {
+        $p->close_pdi_page( $pagehandles[$pageno] );
+    }
+    $p->close_pdi_document($indoc);
 }
 
 sub renderTextline {
-  my ($self, $p, $text, $xpos, $ypos, $optlist) = @_;
+    my ( $self, $p, $text, $xpos, $ypos, $optlist ) = @_;
 
-  $p->fit_textline($text, $xpos, $ypos, $basesmallfontoptions . " " . ($optlist ? $optlist : ""));
+    $p->fit_textline( $text, $xpos, $ypos,
+        $basesmallfontoptions . " " . ( $optlist ? $optlist : "" ) );
 }
 
 sub renderCheck {
-  my ($self, $p, $val, $xposarray, $ypos, $optlist) = @_;
+    my ( $self, $p, $val, $xposarray, $ypos, $optlist ) = @_;
 
-  if ($val ne '') {
-    $p->fit_textline('&#x2713;', @{$xposarray}[int($val)], $ypos, $basecheckfontoptions . " " . ($optlist ? $optlist : ""));
-  }
+    if ( $val ne '' ) {
+        $p->fit_textline( '&#x2713;', @{$xposarray}[ int($val) ],
+            $ypos, $basecheckfontoptions . " " . ( $optlist ? $optlist : "" ) );
+    }
 }

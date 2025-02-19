@@ -1,84 +1,88 @@
 #!/usr/bin/perl
 
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 use DBA;
 
 $form = DBForm->new;
-$dbh = $form->dbconnect;
+$dbh  = $form->dbconnect;
 ############################################################################
 
-$sClient = $dbh->prepare("
+$sClient = $dbh->prepare( "
   select * from Client 
     order by LName, FName, SSN 
-");
-$sClientIntake = $dbh->prepare("
+" );
+$sClientIntake = $dbh->prepare( "
   select * from ClientIntake
     where ClientID=? 
-");
-$sTreatment = $dbh->prepare("
+" );
+$sTreatment = $dbh->prepare( "
   select * from Treatment
     where ClientID=? 
     order by ContLogDate
-");
+" );
 ############################################################################
-print "LName\tFName\tSSN\tActive\tClientID\tProvID\tIntDate\t# Treatments\tRecDOLC\tCreateProvID\tCreateDate\tChangeProvID\n";
-($PrevClientID, $PrevLName, $PrevFName, $PrevSSN, $PrevRecDOLC) = ('', '','','','');
-$Flag =0;
+print
+"LName\tFName\tSSN\tActive\tClientID\tProvID\tIntDate\t# Treatments\tRecDOLC\tCreateProvID\tCreateDate\tChangeProvID\n";
+( $PrevClientID, $PrevLName, $PrevFName, $PrevSSN, $PrevRecDOLC ) =
+  ( '', '', '', '', '' );
+$Flag = 0;
 $sClient->execute();
-while ( $rClient = $sClient->fetchrow_hashref )
-{
-  $ClientID=$rClient->{ClientID};
-  $LName=$rClient->{LName};
-  $FName=$rClient->{FName};
-  $SSN=$rClient->{SSN};
-  $Active=$rClient->{Active};
-  $ProvID=$rClient->{ProvID};
-  $RecDOLC=$rClient->{RecDOLC};
-  $CreateProvID=$rClient->{CreateProvID};
-  $CreateDate=$rClient->{CreateDate};
-  $ChangeProvID=$rClient->{ChangeProvID};
-  $TrCnt = &getTreatments($ClientID);
+while ( $rClient = $sClient->fetchrow_hashref ) {
+    $ClientID     = $rClient->{ClientID};
+    $LName        = $rClient->{LName};
+    $FName        = $rClient->{FName};
+    $SSN          = $rClient->{SSN};
+    $Active       = $rClient->{Active};
+    $ProvID       = $rClient->{ProvID};
+    $RecDOLC      = $rClient->{RecDOLC};
+    $CreateProvID = $rClient->{CreateProvID};
+    $CreateDate   = $rClient->{CreateDate};
+    $ChangeProvID = $rClient->{ChangeProvID};
+    $TrCnt        = &getTreatments($ClientID);
 
-  $sClientIntake->execute($ClientID);
-  $rClientIntake = $sClientIntake->fetchrow_hashref;
-  $IntDate=$rClientIntake->{IntDate};
+    $sClientIntake->execute($ClientID);
+    $rClientIntake = $sClientIntake->fetchrow_hashref;
+    $IntDate       = $rClientIntake->{IntDate};
 
-#  if ( $SSN eq $PrevSSN )
-  if ( $LName eq $PrevLName && $FName eq $PrevFName )
-  { 
-    print "$PrevLName\t$PrevFName\t$PrevSSN\t$PrevActive\t$PrevClientID\t$PrevProvID\t$PrevIntDate\t$PrevTrCnt\t$PrevRecDOLC\t$PrevCreateProvID\t$PrevCreateDate\t$PrevChangeProvID\n" if ( !$Flag );
-    print "$LName\t$FName\t$SSN\t$Active\t$ClientID\t$ProvID\t$IntDate\t$TrCnt\t$RecDOLC\t$CreateProvID\t$CreateDate\t$ChangeProvID\n";
-#print "client-dump $PrevClientID > $PrevClientID\n";
-#print "client-dump $ClientID > $ClientID\n";
-#print "client-merge $PrevClientID $ClientID $PrevClientID\n";
-    $Flag = 1;
-  }
-  else { if ( $Flag ) { $Flag = 0; print "\n"; } }
-  $PrevSSN=$SSN;
-  $PrevLName=$LName;
-  $PrevFName=$FName;
-  $PrevClientID=$ClientID;
-  $PrevProvID=$ProvID;
-  $PrevRecDOLC=$RecDOLC;
-  $PrevCreateProvID=$CreateProvID;
-  $PrevCreateDate=$CreateDate;
-  $PrevChangeProvID=$ChangeProvID;
-  $PrevActive = $Active;
-  $PrevIntDate = $IntDate;
-  $PrevTrCnt = $TrCnt;
+    #  if ( $SSN eq $PrevSSN )
+    if ( $LName eq $PrevLName && $FName eq $PrevFName ) {
+        print
+"$PrevLName\t$PrevFName\t$PrevSSN\t$PrevActive\t$PrevClientID\t$PrevProvID\t$PrevIntDate\t$PrevTrCnt\t$PrevRecDOLC\t$PrevCreateProvID\t$PrevCreateDate\t$PrevChangeProvID\n"
+          if ( !$Flag );
+        print
+"$LName\t$FName\t$SSN\t$Active\t$ClientID\t$ProvID\t$IntDate\t$TrCnt\t$RecDOLC\t$CreateProvID\t$CreateDate\t$ChangeProvID\n";
+
+        #print "client-dump $PrevClientID > $PrevClientID\n";
+        #print "client-dump $ClientID > $ClientID\n";
+        #print "client-merge $PrevClientID $ClientID $PrevClientID\n";
+        $Flag = 1;
+    }
+    else {
+        if ($Flag) { $Flag = 0; print "\n"; }
+    }
+    $PrevSSN          = $SSN;
+    $PrevLName        = $LName;
+    $PrevFName        = $FName;
+    $PrevClientID     = $ClientID;
+    $PrevProvID       = $ProvID;
+    $PrevRecDOLC      = $RecDOLC;
+    $PrevCreateProvID = $CreateProvID;
+    $PrevCreateDate   = $CreateDate;
+    $PrevChangeProvID = $ChangeProvID;
+    $PrevActive       = $Active;
+    $PrevIntDate      = $IntDate;
+    $PrevTrCnt        = $TrCnt;
 }
 
-sub getTreatments($)
-{
-  my ($ClientID) = @_;
+sub getTreatments($) {
+    my ($ClientID) = @_;
 
-  my $Cnt=0;
-  $sTreatment->execute($ClientID);
-  while ( my $r= $sTreatment->fetchrow_hashref )
-  {
-    $Cnt+=1;
-  }
-  return $Cnt;
+    my $Cnt = 0;
+    $sTreatment->execute($ClientID);
+    while ( my $r = $sTreatment->fetchrow_hashref ) {
+        $Cnt += 1;
+    }
+    return $Cnt;
 }

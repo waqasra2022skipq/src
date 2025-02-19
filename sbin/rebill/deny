@@ -1,25 +1,30 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use Time::Local;
-my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime();
-my $Y = $year+1900;
-my $M = $mon+1;
-$M = length($M) == 1 ? '0'.$M: $M;
-my $D = length($mday) == 1 ? '0'.$mday : $mday;
+my ( $sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst ) =
+  localtime();
+my $Y = $year + 1900;
+my $M = $mon + 1;
+$M = length($M) == 1 ? '0' . $M : $M;
+my $D       = length($mday) == 1 ? '0' . $mday : $mday;
 my $curdate = "$Y-$M-$D";
 my $dencode = 'A1';
+
 #my $refid = 'OHCA error';
 my $refid = 'REBILL';
 
 ############################################################################
 # denyrebill trid trid trid ... > uu
 ############################################################################
-foreach my $TrID ( @ARGV )
-{
-# set note to Deny...
-  print qq|update Treatment set BillStatus=6,StatusDate='${curdate}',DenDate='${curdate}',DenCode='${dencode}',CIPDate=NULL where TrID='${TrID}' and RecDate is null;\n|;
-# set note RefID information...see above...
-  print qq|update NoteTrans set RefID='${refid}',RecDate='${curdate}',PaidAmt=0,DenCode='${dencode}',ReasonCode='${dencode}',Code='MD',SRC='DA',ChangeProvID='91',ChangeDate='${curdate}' where TrID='${TrID}' and RecDate is null;\n|;
+foreach my $TrID (@ARGV) {
+
+    # set note to Deny...
+    print
+qq|update Treatment set BillStatus=6,StatusDate='${curdate}',DenDate='${curdate}',DenCode='${dencode}',CIPDate=NULL where TrID='${TrID}' and RecDate is null;\n|;
+
+    # set note RefID information...see above...
+    print
+qq|update NoteTrans set RefID='${refid}',RecDate='${curdate}',PaidAmt=0,DenCode='${dencode}',ReasonCode='${dencode}',Code='MD',SRC='DA',ChangeProvID='91',ChangeDate='${curdate}' where TrID='${TrID}' and RecDate is null;\n|;
 }
 exit;
 ############################################################################

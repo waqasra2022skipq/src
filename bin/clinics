@@ -1,43 +1,53 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use Accounts;
 my $which = shift;
+
 # Build the list of NPI/Organizations to find dbs.
 my $arr;
-if ( $which eq 'n' )
-{ print qq|NPIs:\n|; $arr=Accounts->NPIs(Accounts->dbs('active')); }
-elsif ( $which eq 'o' )
-{ print qq|OrgIDs:\n|; $arr=Accounts->OrgIDs(Accounts->dbs('active')); }
-elsif ( $which eq 'r' )
-{ print qq|NPIRECs:\n|; $arr=Accounts->NPIRECs(Accounts->dbs('active')); }
-elsif ( $which eq 'p' )
-{ print qq|PINRECs:\n|; $arr=Accounts->PINRECs(Accounts->dbs('active')); }
-elsif ( $which eq 't' )
-{ print qq|TaxIDs:\n|; $arr=Accounts->TaxIDs(Accounts->dbs('active')); }
-else
-{ print qq|PINs:\n|; $arr=Accounts->PINs(Accounts->dbs('active')); }
+if ( $which eq 'n' ) {
+    print qq|NPIs:\n|;
+    $arr = Accounts->NPIs( Accounts->dbs('active') );
+}
+elsif ( $which eq 'o' ) {
+    print qq|OrgIDs:\n|;
+    $arr = Accounts->OrgIDs( Accounts->dbs('active') );
+}
+elsif ( $which eq 'r' ) {
+    print qq|NPIRECs:\n|;
+    $arr = Accounts->NPIRECs( Accounts->dbs('active') );
+}
+elsif ( $which eq 'p' ) {
+    print qq|PINRECs:\n|;
+    $arr = Accounts->PINRECs( Accounts->dbs('active') );
+}
+elsif ( $which eq 't' ) {
+    print qq|TaxIDs:\n|;
+    $arr = Accounts->TaxIDs( Accounts->dbs('active') );
+}
+else { print qq|PINs:\n|; $arr = Accounts->PINs( Accounts->dbs('active') ); }
 ############################################################################
 print qq|\n|;
-foreach my $key ( sort keys %{$arr} )
-{
-  my $Name = DBUtil->FmtStr($arr->{$key}->{Name},30,'L');
-  my $DB = DBUtil->FmtStr($arr->{$key}->{DB},12,'L');
-  my $PIN = DBUtil->FmtStr($arr->{$key}->{PIN},10,'L');
-  my $NPI = DBUtil->FmtStr($arr->{$key}->{NPI},10,'L');
-  my $OrgID = DBUtil->FmtStr($arr->{$key}->{OrgID},10,'L');
-  my $Descr = DBUtil->FmtStr($arr->{$key}->{Descr},10,'L');
-  my $RecID = DBUtil->FmtStr($arr->{$key}->{RecID},15,'L');
-  my $SubID = DBUtil->FmtStr($arr->{$key}->{SubID},15,'L');
-  if ( $which eq 'n' )
-  { print qq|${Name} ${DB} (${key}/${PIN}/${OrgID})\n|; }
-  elsif ( $which eq 'r' )
-  { print qq|${Name} ${DB} ${Descr} ${SubID} ${key}\n|; }
-  elsif ( $which eq 'o' )
-  { print qq|${Name} ${DB} (${key}/${PIN}/${NPI})\n|; }
-  elsif ( $which eq 't' )
-  { print qq|${Name} ${DB} (${key}/${PIN}/${NPI})\n|; }
-  else
-  { print qq|${Name} ${DB} (${key}/${NPI}/${OrgID})\n|; }
+foreach my $key ( sort keys %{$arr} ) {
+    my $Name  = DBUtil->FmtStr( $arr->{$key}->{Name},  30, 'L' );
+    my $DB    = DBUtil->FmtStr( $arr->{$key}->{DB},    12, 'L' );
+    my $PIN   = DBUtil->FmtStr( $arr->{$key}->{PIN},   10, 'L' );
+    my $NPI   = DBUtil->FmtStr( $arr->{$key}->{NPI},   10, 'L' );
+    my $OrgID = DBUtil->FmtStr( $arr->{$key}->{OrgID}, 10, 'L' );
+    my $Descr = DBUtil->FmtStr( $arr->{$key}->{Descr}, 10, 'L' );
+    my $RecID = DBUtil->FmtStr( $arr->{$key}->{RecID}, 15, 'L' );
+    my $SubID = DBUtil->FmtStr( $arr->{$key}->{SubID}, 15, 'L' );
+    if ( $which eq 'n' ) { print qq|${Name} ${DB} (${key}/${PIN}/${OrgID})\n|; }
+    elsif ( $which eq 'r' ) {
+        print qq|${Name} ${DB} ${Descr} ${SubID} ${key}\n|;
+    }
+    elsif ( $which eq 'o' ) {
+        print qq|${Name} ${DB} (${key}/${PIN}/${NPI})\n|;
+    }
+    elsif ( $which eq 't' ) {
+        print qq|${Name} ${DB} (${key}/${PIN}/${NPI})\n|;
+    }
+    else { print qq|${Name} ${DB} (${key}/${NPI}/${OrgID})\n|; }
 }
 print qq|\n|;
 ############################################################################

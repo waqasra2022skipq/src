@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 
 use DBI;
 use afm;
@@ -10,52 +10,59 @@ my $i = inflateInit;
 my $old = '';
 while (<>) { $old .= $_; }
 
-$new = &inflate($old,"stream\n","endstream");
-$new =~ s//\n/g;
+$new = &inflate( $old, "stream\n", "endstream" );
+$new =~ s/
+/\n/g;
 print $new;
 
 exit;
 
 #############################################################
-sub inflate($$$)
-{
-  my ($old, $btag, $etag) = @_;
+sub inflate($$$) {
+    my ( $old, $btag, $etag ) = @_;
 
-  my $my_btag = $btag;
-  chomp($my_btag);
-  my $my_etag = $etag;
-  chomp($my_etag);
-  my ($btlen, $new, $bidx, $eidx, $str, $pos) = 
-     (length($btag),'',0,length($old),'',0);
-  while (( $pos = index($old, $btag, $pos )) > -1)
-  { 
-#print "pos=$pos\n";
-    $str = substr($old,$bidx,$pos-$bidx);
-    $pos += $btlen;
-#print "pos=$pos\n";
-    my $tag_start = $pos;
-    my $tag_end = index($old, $etag, $pos )-1;
-    my $out = substr($old,$tag_start,$tag_end-$tag_start+1);
-  
-#print "bidx=$bidx, eidx=$eidx\n";
-#print "out=$out\n";
-    my $test = $i->inflate($out);
-    $out = $test if ( $test ne '' );
-#print "out=$out\n";
-    $str =~ s/\/Filter//g;
-    $str =~ s/\/FlateDecode//g;
-#    chomp($str);
-#print "str=$str\n";
-    $new .= $str . $btag . $out . $etag;
-#    $new .= "$str\n$my_btag\n" . "$out\n$my_etag\n";
-#print "new=$new\n";
-    $pos = $tag_end + 10;
-#print "pos=$pos\n";
-    $bidx = $pos;
-#last;
-  }
-#print "bidx=$bidx, eidx=$eidx\n";
-  $new .= substr($old,$bidx,$eidx-$bidx+1);
-  return($new);
+    my $my_btag = $btag;
+    chomp($my_btag);
+    my $my_etag = $etag;
+    chomp($my_etag);
+    my ( $btlen, $new, $bidx, $eidx, $str, $pos ) =
+      ( length($btag), '', 0, length($old), '', 0 );
+    while ( ( $pos = index( $old, $btag, $pos ) ) > -1 ) {
+
+        #print "pos=$pos\n";
+        $str = substr( $old, $bidx, $pos - $bidx );
+        $pos += $btlen;
+
+        #print "pos=$pos\n";
+        my $tag_start = $pos;
+        my $tag_end   = index( $old, $etag, $pos ) - 1;
+        my $out       = substr( $old, $tag_start, $tag_end - $tag_start + 1 );
+
+        #print "bidx=$bidx, eidx=$eidx\n";
+        #print "out=$out\n";
+        my $test = $i->inflate($out);
+        $out = $test if ( $test ne '' );
+
+        #print "out=$out\n";
+        $str =~ s/\/Filter//g;
+        $str =~ s/\/FlateDecode//g;
+
+        #    chomp($str);
+        #print "str=$str\n";
+        $new .= $str . $btag . $out . $etag;
+
+        #    $new .= "$str\n$my_btag\n" . "$out\n$my_etag\n";
+        #print "new=$new\n";
+        $pos = $tag_end + 10;
+
+        #print "pos=$pos\n";
+        $bidx = $pos;
+
+        #last;
+    }
+
+    #print "bidx=$bidx, eidx=$eidx\n";
+    $new .= substr( $old, $bidx, $eidx - $bidx + 1 );
+    return ($new);
 }
 #############################################################

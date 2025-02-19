@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ############################################################################
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 use DBA;
@@ -18,8 +18,9 @@ $DT = localtime();
 #   overall = current - first
 ############################################################################
 $form = DBForm->new();
-if ( ! SysAccess->verify($form,'Privilege=QAReports') )
-{ $form->error("Access Denied! / Privilege"); }
+if ( !SysAccess->verify( $form, 'Privilege=QAReports' ) ) {
+    $form->error("Access Denied! / Privilege");
+}
 $form = DBUtil->setDates($form);
 my $DateRange = qq|from $form->{FromDateD} thru $form->{ToDateD}|;
 
@@ -28,125 +29,139 @@ $dbh = $form->dbconnect();
 # defaults to overall
 ##
 my $Type = $form->{Type} ? $form->{Type} : 'overall';
-%Clients=();
+%Clients = ();
 $sClient = $dbh->prepare("select * from Client where ClientID=?");
-$Prev='';
+$Prev    = '';
 
-$form->{Report_Clinics} = $form->{ClinicIDs};   # GenReport uses ClinicIDs.
+$form->{Report_Clinics} = $form->{ClinicIDs};    # GenReport uses ClinicIDs.
 my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
-my $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID','and');
+my $ClinicSelection =
+  DBA->getClinicSelection( $form, $ForProvID, 'Client.clinicClinicID', 'and' );
 ############################################################################
 $stmt = "select * from ClientBasis32
   left join Client on Client.ClientID=ClientBasis32.ClientID
   where Client.Active=1 ${ClinicSelection}";
-$stmt .= " and ClientBasis32.EffDate <= '$form->{ToDate}'" if ( $form->{ToDate} );
+$stmt .= " and ClientBasis32.EffDate <= '$form->{ToDate}'"
+  if ( $form->{ToDate} );
 $stmt .= " order by ClientBasis32.ClientID, ClientBasis32.EffDate desc";
+
 #warn qq|ClientBasis32=$stmt\n|;
 $sClientBasis32 = $dbh->prepare($stmt);
 $sClientBasis32->execute();
-while ( $rClientBasis32 = $sClientBasis32->fetchrow_hashref )
-{
-  $ClientID = $rClientBasis32->{ClientID};
-  if ( $Prev eq $ClientID )
-  { $Cnt++; }
-  else
-  { $Cnt=1; $Prev=$ClientID; }
-  $Score = $rClientBasis32->{Score};
-  if ( $Cnt == 1 )
-  { &setCount('Score1'); }
-  elsif ( $Cnt == 2 || $Type =~ /overall/i )
-  { &setCount('Score2'); }
+while ( $rClientBasis32 = $sClientBasis32->fetchrow_hashref ) {
+    $ClientID = $rClientBasis32->{ClientID};
+    if   ( $Prev eq $ClientID ) { $Cnt++; }
+    else                        { $Cnt = 1; $Prev = $ClientID; }
+    $Score = $rClientBasis32->{Score};
+    if    ( $Cnt == 1 )                        { &setCount('Score1'); }
+    elsif ( $Cnt == 2 || $Type =~ /overall/i ) { &setCount('Score2'); }
 }
 ############################################################################
-$Prev='';
+$Prev = '';
 $stmt = "select * from PDDiag
   left join Client on Client.ClientID=PDDiag.ClientID
   left join ClientPrAuth on ClientPrAuth.ID=PDDiag.PrAuthID
   where Client.Active=1 ${ClinicSelection}";
-$stmt .= " and ClientPrAuth.EffDate <= '$form->{ToDate}'" if ( $form->{ToDate} );
+$stmt .= " and ClientPrAuth.EffDate <= '$form->{ToDate}'"
+  if ( $form->{ToDate} );
 $stmt .= " order by PDDiag.ClientID, ClientPrAuth.EffDate desc";
 $sPDDiag = $dbh->prepare($stmt);
 $sPDDiag->execute();
-while ( $rPDDiag = $sPDDiag->fetchrow_hashref )
-{
-  $ClientID = $rPDDiag->{ClientID};
-  if ( $Prev eq $ClientID )
-  { $Cnt++; }
-  else
-  { $Cnt=1; $Prev=$ClientID; }
-  $Score = $rPDDiag->{Axis5Curr};
-  if ( $Cnt == 1 )
-  { $Clients{$ClientID}{GAF1} = $Score; }
-  elsif ( $Cnt == 2 || $Type =~ /overall/i )
-  { $Clients{$ClientID}{GAF2} = $Score; }
-}
-############################################################################
-sub setCount($)
-{
-  my ($rec) = @_;
 
-  foreach my $id ( sort keys %$rClientBasis32 )
-  { 
-#print "$id=$rClientBasis32->{$id}\n";
-    $Score=$rClientBasis32->{$id}; 
-    if ( $id eq 'B07'
-      || $id eq 'B08'
-      || $id eq 'B10'
-      || $id eq 'B11'
-      || $id eq 'B12'
-      || $id eq 'B14'
-      || $id eq 'B15' )
-    { if ( $Score ne '' )
-      { $Clients{$ClientID}{$rec}{T1}+=$Score; $Clients{$ClientID}{$rec}{I1}+=1; }
+while ( $rPDDiag = $sPDDiag->fetchrow_hashref ) {
+    $ClientID = $rPDDiag->{ClientID};
+    if   ( $Prev eq $ClientID ) { $Cnt++; }
+    else                        { $Cnt = 1; $Prev = $ClientID; }
+    $Score = $rPDDiag->{Axis5Curr};
+    if    ( $Cnt == 1 ) { $Clients{$ClientID}{GAF1} = $Score; }
+    elsif ( $Cnt == 2 || $Type =~ /overall/i ) {
+        $Clients{$ClientID}{GAF2} = $Score;
     }
-    elsif ( $id eq 'B01'
-      || $id eq 'B02'
-      || $id eq 'B05'
-      || $id eq 'B13'
-      || $id eq 'B16'
-      || $id eq 'B21'
-      || $id eq 'B32' )
-    { 
-      if ( $id eq 'B02' )
-      {
-        $Score=$rClientBasis32->{B03} if ( $rClientBasis32->{B03} > $Score );
-        $Score=$rClientBasis32->{B04} if ( $rClientBasis32->{B04} > $Score );
-      }
-      if ( $Score ne '' )
-      { $Clients{$ClientID}{$rec}{T2}+=$Score; $Clients{$ClientID}{$rec}{I2}+=1; }
-    }
-    elsif ( $id eq 'B06'
-      || $id eq 'B09'
-      || $id eq 'B17'
-      || $id eq 'B18'
-      || $id eq 'B19'
-      || $id eq 'B20' )
-    { if ( $Score ne '' )
-      { $Clients{$ClientID}{$rec}{T3}+=$Score; $Clients{$ClientID}{$rec}{I3}+=1; }
-    }
-    elsif ( $id eq 'B25'
-      || $id eq 'B26'
-      || $id eq 'B28'
-      || $id eq 'B29'
-      || $id eq 'B30'
-      || $id eq 'B31' )
-    { if ( $Score ne '' )
-      { $Clients{$ClientID}{$rec}{T4}+=$Score; $Clients{$ClientID}{$rec}{I4}+=1; }
-    }
-    elsif ( $id eq 'B22'
-      || $id eq 'B23'
-      || $id eq 'B24'
-      || $id eq 'B27' )
-    { if ( $Score ne '' )
-      { $Clients{$ClientID}{$rec}{T5}+=$Score; $Clients{$ClientID}{$rec}{I5}+=1; }
-    }
-    if ( $id =~ /B\d{2}/ && $Score ne '' )
-    { $Clients{$ClientID}{$rec}{Total}+=$Score; $Clients{$ClientID}{$rec}{Items}+=1; }
-  }
-  return(1);
 }
 ############################################################################
-print "${DT}\nClient Basis32 Report (Basis32/Diag) (Type: $Type, Date: $form->{ToDate})\n";
+sub setCount($) {
+    my ($rec) = @_;
+
+    foreach my $id ( sort keys %$rClientBasis32 ) {
+
+        #print "$id=$rClientBasis32->{$id}\n";
+        $Score = $rClientBasis32->{$id};
+        if (   $id eq 'B07'
+            || $id eq 'B08'
+            || $id eq 'B10'
+            || $id eq 'B11'
+            || $id eq 'B12'
+            || $id eq 'B14'
+            || $id eq 'B15' )
+        {
+            if ( $Score ne '' ) {
+                $Clients{$ClientID}{$rec}{T1} += $Score;
+                $Clients{$ClientID}{$rec}{I1} += 1;
+            }
+        }
+        elsif ($id eq 'B01'
+            || $id eq 'B02'
+            || $id eq 'B05'
+            || $id eq 'B13'
+            || $id eq 'B16'
+            || $id eq 'B21'
+            || $id eq 'B32' )
+        {
+            if ( $id eq 'B02' ) {
+                $Score = $rClientBasis32->{B03}
+                  if ( $rClientBasis32->{B03} > $Score );
+                $Score = $rClientBasis32->{B04}
+                  if ( $rClientBasis32->{B04} > $Score );
+            }
+            if ( $Score ne '' ) {
+                $Clients{$ClientID}{$rec}{T2} += $Score;
+                $Clients{$ClientID}{$rec}{I2} += 1;
+            }
+        }
+        elsif ($id eq 'B06'
+            || $id eq 'B09'
+            || $id eq 'B17'
+            || $id eq 'B18'
+            || $id eq 'B19'
+            || $id eq 'B20' )
+        {
+            if ( $Score ne '' ) {
+                $Clients{$ClientID}{$rec}{T3} += $Score;
+                $Clients{$ClientID}{$rec}{I3} += 1;
+            }
+        }
+        elsif ($id eq 'B25'
+            || $id eq 'B26'
+            || $id eq 'B28'
+            || $id eq 'B29'
+            || $id eq 'B30'
+            || $id eq 'B31' )
+        {
+            if ( $Score ne '' ) {
+                $Clients{$ClientID}{$rec}{T4} += $Score;
+                $Clients{$ClientID}{$rec}{I4} += 1;
+            }
+        }
+        elsif ($id eq 'B22'
+            || $id eq 'B23'
+            || $id eq 'B24'
+            || $id eq 'B27' )
+        {
+            if ( $Score ne '' ) {
+                $Clients{$ClientID}{$rec}{T5} += $Score;
+                $Clients{$ClientID}{$rec}{I5} += 1;
+            }
+        }
+        if ( $id =~ /B\d{2}/ && $Score ne '' ) {
+            $Clients{$ClientID}{$rec}{Total} += $Score;
+            $Clients{$ClientID}{$rec}{Items} += 1;
+        }
+    }
+    return (1);
+}
+############################################################################
+print
+"${DT}\nClient Basis32 Report (Basis32/Diag) (Type: $Type, Date: $form->{ToDate})\n";
 print "Client\tAge";
 print "\tInitialDOM6\tCurrentDOM6\tDiff";
 print "\tInitialDOM7\tCurrentDOM7\tDiff";
@@ -156,79 +171,74 @@ print "\tInitialDOM1\tCurrentDOM1\tDiff";
 print "\tInitialTOTAL\tCurrentTOTAL\tDiff";
 print "\tCurrentGAF\tInitialGAF\tDiff";
 print "\n";
-foreach $id ( keys %Clients )
-{
-  $sClient->execute($id);
-  $rClient = $sClient->fetchrow_hashref;
-  $DOB = $rClient->{DOB};
-  $Age = DBUtil->Date( $DOB, 'age' );
-  next if ( $Age >= 60 );
 
-  $Client_Name = $rClient->{LName};
-  $Client_Name .= ", $rClient->{FName}" if ( $rClient->{FName} );
-  $Client_Name .= " $rClient->{Suffix}" if ( $rClient->{Suffix} );
-  $Client_Name .= " ($id)";
-  print "$Client_Name\t$Age";
+foreach $id ( keys %Clients ) {
+    $sClient->execute($id);
+    $rClient = $sClient->fetchrow_hashref;
+    $DOB     = $rClient->{DOB};
+    $Age     = DBUtil->Date( $DOB, 'age' );
+    next if ( $Age >= 60 );
 
-  for ($i=1; $i<=5; $i++)
-  {
-    $tname = 'T' . $i;
-    $iname = 'I' . $i;
-    $Total = $Clients{$id}{Score1}{$tname};
-    $Items = $Clients{$id}{Score1}{$iname};
-    if ( $Total )
-    { $Avg1 = $Items ?  $Total / $Items : 0;
-      $Avg1 = sprintf("%.2f", $Avg1);
+    $Client_Name = $rClient->{LName};
+    $Client_Name .= ", $rClient->{FName}" if ( $rClient->{FName} );
+    $Client_Name .= " $rClient->{Suffix}" if ( $rClient->{Suffix} );
+    $Client_Name .= " ($id)";
+    print "$Client_Name\t$Age";
+
+    for ( $i = 1 ; $i <= 5 ; $i++ ) {
+        $tname = 'T' . $i;
+        $iname = 'I' . $i;
+        $Total = $Clients{$id}{Score1}{$tname};
+        $Items = $Clients{$id}{Score1}{$iname};
+        if ($Total) {
+            $Avg1 = $Items ? $Total / $Items : 0;
+            $Avg1 = sprintf( "%.2f", $Avg1 );
+        }
+        else { $Avg1 = ''; }
+        $Total = $Clients{$id}{Score2}{$tname};
+        $Items = $Clients{$id}{Score2}{$iname};
+        if ($Total) {
+            $Avg2 = $Items ? $Total / $Items : 0;
+            $Avg2 = sprintf( "%.2f", $Avg2 );
+        }
+        else                  { $Avg2 = ''; }
+        if ( $Avg1 && $Avg2 ) { $Diff = sprintf( "%.2f", $Avg2 - $Avg1 ); }
+        else                  { $Diff = ''; }
+        print "\t$Avg2\t$Avg1\t$Diff";
     }
-    else
-    { $Avg1 = ''; }
-    $Total = $Clients{$id}{Score2}{$tname};
-    $Items = $Clients{$id}{Score2}{$iname};
-    if ( $Total )
-    { $Avg2 = $Items ?  $Total / $Items : 0;
-      $Avg2 = sprintf("%.2f", $Avg2);
+    $Total = $Clients{$id}{Score1}{Total};
+    $Items = $Clients{$id}{Score1}{Items};
+    if ($Total) {
+        $Avg1 = $Items ? $Total / $Items : 0;
+        $Avg1 = sprintf( "%.2f", $Avg1 );
     }
-    else
-    { $Avg2 = ''; }
-    if ( $Avg1 && $Avg2 )
-    { $Diff = sprintf("%.2f", $Avg2 - $Avg1); }
-    else
-    { $Diff = ''; }
+    else { $Avg1 = ''; }
+    $Total = $Clients{$id}{Score2}{Total};
+    $Items = $Clients{$id}{Score2}{Items};
+    if ($Total) {
+        $Avg2 = $Items ? $Total / $Items : 0;
+        $Avg2 = sprintf( "%.2f", $Avg2 );
+    }
+    else                  { $Avg2 = ''; }
+    if ( $Avg1 && $Avg2 ) { $Diff = sprintf( "%.2f", $Avg2 - $Avg1 ); }
+    else                  { $Diff = ''; }
     print "\t$Avg2\t$Avg1\t$Diff";
-  }
-  $Total = $Clients{$id}{Score1}{Total};
-  $Items = $Clients{$id}{Score1}{Items};
-  if ( $Total )
-  { $Avg1 = $Items ?  $Total / $Items : 0;
-    $Avg1 = sprintf("%.2f", $Avg1);
-  }
-  else
-  { $Avg1 = ''; }
-  $Total = $Clients{$id}{Score2}{Total};
-  $Items = $Clients{$id}{Score2}{Items};
-  if ( $Total )
-  { $Avg2 = $Items ?  $Total / $Items : 0;
-    $Avg2 = sprintf("%.2f", $Avg2);
-  }
-  else
-  { $Avg2 = ''; }
-  if ( $Avg1 && $Avg2 )
-  { $Diff = sprintf("%.2f", $Avg2 - $Avg1); }
-  else
-  { $Diff = ''; }
-  print "\t$Avg2\t$Avg1\t$Diff";
-# GAF (Axis5Curr)
-  $GAF1 = $Clients{$id}{GAF1};
-  $GAF1 = $GAF1 eq '' ? '' : sprintf("%.2f", $GAF1);
-  $GAF2 = $Clients{$id}{GAF2};
-  $GAF2 = $GAF2 eq '' ? '' : sprintf("%.2f", $GAF2);
-  if ( $Clients{$id}{GAF1} eq ''
-    || $Clients{$id}{GAF2} eq '' )
-  { $GAF = 'NULL'; }
-  else
-  { $GAF = sprintf("%.2f", $Clients{$id}{GAF1} - $Clients{$id}{GAF2}); }
-  print "\t$GAF1\t$GAF2\t$GAF";
-  print "\n";
+
+    # GAF (Axis5Curr)
+    $GAF1 = $Clients{$id}{GAF1};
+    $GAF1 = $GAF1 eq '' ? '' : sprintf( "%.2f", $GAF1 );
+    $GAF2 = $Clients{$id}{GAF2};
+    $GAF2 = $GAF2 eq '' ? '' : sprintf( "%.2f", $GAF2 );
+    if (   $Clients{$id}{GAF1} eq ''
+        || $Clients{$id}{GAF2} eq '' )
+    {
+        $GAF = 'NULL';
+    }
+    else {
+        $GAF = sprintf( "%.2f", $Clients{$id}{GAF1} - $Clients{$id}{GAF2} );
+    }
+    print "\t$GAF1\t$GAF2\t$GAF";
+    print "\n";
 }
 $sClientBasis32->finish();
 $sPDDiag->finish();

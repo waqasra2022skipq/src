@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 use DBA;
@@ -12,21 +12,24 @@ $DT = localtime();
 ############################################################################
 my $form = DBForm->new();
 $form = DBUtil->setDates($form);
-my $DateRange = qq|from $form->{FromDateD} thru $form->{ToDateD}|;
-my $fDate = DBUtil->Date($form->{FromDate},'fmt','MM/DD/YYYY');
-my $tDate = DBUtil->Date($form->{ToDate},'fmt','MM/DD/YYYY');
+my $DateRange  = qq|from $form->{FromDateD} thru $form->{ToDateD}|;
+my $fDate      = DBUtil->Date( $form->{FromDate}, 'fmt', 'MM/DD/YYYY' );
+my $tDate      = DBUtil->Date( $form->{ToDate},   'fmt', 'MM/DD/YYYY' );
 my $RangeLabel = qq|$form->{FromDateD}-$form->{ToDateD}|;
-my $Stats = ();
-my $dbh = $form->dbconnect();
-my $multidel = 'ý';
+my $Stats      = ();
+my $dbh        = $form->dbconnect();
+my $multidel   = 'ý';
 
 ############################################################################
 print "${DT}\nReAdmittance Report\tfor Intake Date\t${RangeLabel}\n";
 
 my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
-my $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID');
-$sDischarge=$dbh->prepare("select * from ClientDischarge left join ClientDischargeCDC on ClientDischargeCDC.ClientDischargeID=ClientDischarge.ID where ClientDischarge.ClientID=? and ClientDischargeCDC.TransDate<? order by ClientDischargeCDC.TransDate desc");
-$s=$dbh->prepare("
+my $ClinicSelection =
+  DBA->getClinicSelection( $form, $ForProvID, 'Client.clinicClinicID' );
+$sDischarge = $dbh->prepare(
+"select * from ClientDischarge left join ClientDischargeCDC on ClientDischargeCDC.ClientDischargeID=ClientDischarge.ID where ClientDischarge.ClientID=? and ClientDischargeCDC.TransDate<? order by ClientDischargeCDC.TransDate desc"
+);
+$s = $dbh->prepare( "
 select *
       ,ClientLegal.CustAgency
       ,xRaces.Descr as Race
@@ -37,39 +40,38 @@ select *
    where ClientIntake.IntDate>='$form->{FromDate}' and ClientIntake.IntDate<='$form->{ToDate}'
      ${ClinicSelection}
    order by Client.LName, Client.FName, Client.ClientID, ClientIntake.IntDate desc
-");
+" );
 $s->execute();
-print "Client\tAge\tRace\tGender\tZip\tCustAgency\tActive\tIntDate\tDisDate\tetc...\n";
-while ( my $r = $s->fetchrow_hashref )
-{
-  my $flag=0; my $DDates='';
-  $sDischarge->execute($r->{ClientID},$r->{IntDate});
-  while ( my $rDischarge = $sDischarge->fetchrow_hashref )
-  {
-    $flag=1;
-    $DDates .= qq|$rDischarge->{TransDate}\t|;
-  }
-  if ( $flag )
-  {
-    $Stats->{COUNT}++;
-    $Stats->{AGENCY}->{$r->{CustAgency}}++;
-    my $Age = DBUtil->Date($r->{DOB}, 'age'); 
-    my $Active = $r->{Active} ? 'yes' : 'no';
-    print "$r->{LName}, $r->{FName} ($r->{ClientID})\t$Age\t$r->{Race}\t$r->{Gend}\t$r->{Zip}\t$r->{'CustAgency'}\t${Active}\t$r->{IntDate}\t${DDates}\n";
-  }
+print
+"Client\tAge\tRace\tGender\tZip\tCustAgency\tActive\tIntDate\tDisDate\tetc...\n";
+while ( my $r = $s->fetchrow_hashref ) {
+    my $flag   = 0;
+    my $DDates = '';
+    $sDischarge->execute( $r->{ClientID}, $r->{IntDate} );
+    while ( my $rDischarge = $sDischarge->fetchrow_hashref ) {
+        $flag = 1;
+        $DDates .= qq|$rDischarge->{TransDate}\t|;
+    }
+    if ($flag) {
+        $Stats->{COUNT}++;
+        $Stats->{AGENCY}->{ $r->{CustAgency} }++;
+        my $Age    = DBUtil->Date( $r->{DOB}, 'age' );
+        my $Active = $r->{Active} ? 'yes' : 'no';
+        print
+"$r->{LName}, $r->{FName} ($r->{ClientID})\t$Age\t$r->{Race}\t$r->{Gend}\t$r->{Zip}\t$r->{'CustAgency'}\t${Active}\t$r->{IntDate}\t${DDates}\n";
+    }
 }
-  print qq|\n|;
-  print qq|===================================\n|;
-  print qq|Clients by Agency\t${RangeLabel}\tPercent\n|;
-  foreach my $Agency ( sort keys %{$Stats->{AGENCY}} )
-  {
-    my $pct = 
-    my $pct = sprintf("%.2f",($Stats->{AGENCY}->{$Agency} / $Stats->{COUNT}) * 100);
+print qq|\n|;
+print qq|===================================\n|;
+print qq|Clients by Agency\t${RangeLabel}\tPercent\n|;
+foreach my $Agency ( sort keys %{ $Stats->{AGENCY} } ) {
+    my $pct = my $pct = sprintf( "%.2f",
+        ( $Stats->{AGENCY}->{$Agency} / $Stats->{COUNT} ) * 100 );
     print qq|$Agency\t$Stats->{AGENCY}->{$Agency}\t$pct\n|;
-  }
-  print qq|Total Clients\t$Stats->{COUNT}\n|;
-  print qq|===================================\n|;
-  print qq|\n|;
+}
+print qq|Total Clients\t$Stats->{COUNT}\n|;
+print qq|===================================\n|;
+print qq|\n|;
 
 $form->complete();
 exit;

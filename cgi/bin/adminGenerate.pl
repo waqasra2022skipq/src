@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use myForm;
 use myDBI;
@@ -10,18 +10,20 @@ use File::stat;
 
 ############################################################################
 my $form = myForm->new();
-my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $dbh  = myDBI->dbconnect( $form->{'DBNAME'} );
 my $type = $form->{'type'};
 
-unless ( SysAccess->chkPriv($form,'Agent') )
-{ myDBI->error("Access Denied! (List ${type} Electronic Files)"); }
+unless ( SysAccess->chkPriv( $form, 'Agent' ) ) {
+    myDBI->error("Access Denied! (List ${type} Electronic Files)");
+}
 
-my $typename = $type eq '837' ? 'Billing'
-             : $type eq '835' ? 'Remittances'
-             : $type eq '271' ? 'Eligibility'
-             : 'Unknown';
-my $desc = $type eq '837' ?
-qq|
+my $typename =
+    $type eq '837' ? 'Billing'
+  : $type eq '835' ? 'Remittances'
+  : $type eq '271' ? 'Eligibility'
+  :                  'Unknown';
+my $desc = $type eq '837'
+  ? qq|
 <P CLASS="indent1" >
 Billing Files (837) are generated automatically at 5pm each Monday.
  They complete about 8pm.
@@ -62,8 +64,7 @@ All other Insurance 837 files generated are automatically uploaded to availity o
 
 <P CLASS="indent1" >
 |
-         : $type eq '835' ?
-qq|
+  : $type eq '835' ? qq|
 <P CLASS="indent1" >
 Remittance files are automatically downloaded from Availity and OfficeAlly on Sun 10am, Mon 11pm and Wed 10am. 
 </P>
@@ -81,8 +82,7 @@ Once the 835 files are downloaded from OHCA and via Availity and OfficeAlly you 
 
 <P></P>
 |
-         : $type eq '271' ?
-qq|
+  : $type eq '271' ? qq|
 <P CLASS="indent1" >
 Eligibility Files (270) are generated automatically at 8am each 14th and 28th of the month.
  The 14th run generates for the current month, the 28th run generates for the next month.
@@ -110,12 +110,18 @@ After a few hours OHCA will process the file and return a '271' file.
 <P CLASS="indent1" >
 Call OHCA EDI (405-522-6205,#,1,200129170*21,,2,2) with the transaction ID if the '270' file has errors. It will be the 6 digit listed in the Upload Files->Search OR the 6 digits of the first part of the '999' you looked at for the errors.
 |
-         : 'Unknown';
-             
-############################################################################
-my $CloseButton = qq|<INPUT TYPE="button" NAME="close" VALUE="close" ONCLICK="javascript: window.close()" >|;
+  : 'Unknown';
 
-my $html = myHTML->newHTML($form,'Generate Job/File Panel','CheckPopupWindow noclock countdown_10') . qq|
+############################################################################
+my $CloseButton =
+qq|<INPUT TYPE="button" NAME="close" VALUE="close" ONCLICK="javascript: window.close()" >|;
+
+my $html = myHTML->newHTML(
+    $form,
+    'Generate Job/File Panel',
+    'CheckPopupWindow noclock countdown_10'
+  )
+  . qq|
 <P>
 <P>
 <SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/novalidate.js"> </SCRIPT>
@@ -123,9 +129,7 @@ my $html = myHTML->newHTML($form,'Generate Job/File Panel','CheckPopupWindow noc
 ${desc}
 </DIV>
 <FORM NAME="adminFiles" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
-| 
-. main->listJobs($type)
-. qq|
+| . main->listJobs($type) . qq|
 <INPUT TYPE="hidden" NAME="mlt" VALUE="$form->{mlt}" >
 <INPUT TYPE="hidden" NAME="misLINKS" VALUE="$form->{misLINKS}" >
 <INPUT TYPE="hidden" NAME="LINKID" VALUE="$form->{LINKID}" >
@@ -139,46 +143,43 @@ myDBI->cleanup();
 print $html;
 exit;
 ############################################################################
-sub listJobs
-{
-  my ($self,$type) = @_;
-  my $html = $type eq '837' ? main->gen837()
-             : $type eq '835' ? main->gen835()
-             : $type eq '271' ? main->gen271()
-             : 'Unknown';
-  return($html);
+sub listJobs {
+    my ( $self, $type ) = @_;
+    my $html =
+        $type eq '837' ? main->gen837()
+      : $type eq '835' ? main->gen835()
+      : $type eq '271' ? main->gen271()
+      :                  'Unknown';
+    return ($html);
 }
 #####################################################################
-sub gen837
-{
-  my ($self) = @_;
-  my $html = '';
-  $html .= qq|
+sub gen837 {
+    my ($self) = @_;
+    my $html = '';
+    $html .= qq|
 <P>
 <P>
 |;
-  return($html);
+    return ($html);
 }
 #####################################################################
-sub gen835
-{
-  my ($self) = @_;
-  my $html = '';
-  $html .= qq|
+sub gen835 {
+    my ($self) = @_;
+    my $html = '';
+    $html .= qq|
 <P>
 <P>
 |;
-  return($html);
+    return ($html);
 }
 #####################################################################
-sub gen271
-{
-  my ($self) = @_;
-  my $html = '';
-  $html .= qq|
+sub gen271 {
+    my ($self) = @_;
+    my $html = '';
+    $html .= qq|
 <P>
 <P>
 |;
-  return($html);
+    return ($html);
 }
 #####################################################################

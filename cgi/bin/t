@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #############################################################################
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 use DBA;
@@ -11,15 +11,15 @@ use graphs;
 use Time::Local;
 
 #############################################################################
-my $form = myForm->new();
-my $dbh = myDBI->dbconnect($form->{'DBNAME'});
-my $cdbh = myDBI->dbconnect('okmis_config');      # connect to the config database.
+my $form   = myForm->new();
+my $dbh    = myDBI->dbconnect( $form->{'DBNAME'} );
+my $cdbh   = myDBI->dbconnect('okmis_config'); # connect to the config database.
 my $xtable = 'xPrenatal';
-my $where = "where ID='U'";
-    my $s=$cdbh->prepare("select * from ${xtable} ${where}");
-    $s->execute();
-while (my $r = $s->fetchrow_hashref) 
-{
-  foreach my $f ( sort keys %{$r} ) { warn ": r-$f=$r->{$f}=\n"; }
+my $where  = "where ID='U'";
+my $s      = $cdbh->prepare("select * from ${xtable} ${where}");
+$s->execute();
+
+while ( my $r = $s->fetchrow_hashref ) {
+    foreach my $f ( sort keys %{$r} ) { warn ": r-$f=$r->{$f}=\n"; }
 }
 exit;

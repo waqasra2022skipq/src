@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use myForm;
 use myDBI;
@@ -9,35 +9,50 @@ use Time::Local;
 my $DT = localtime();
 ############################################################################
 # usage:
-#   MIPS 
+#   MIPS
 ############################################################################
-my $form = myForm->new();
-my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $form  = myForm->new();
+my $dbh   = myDBI->dbconnect( $form->{'DBNAME'} );
 my $debug = $form->{'LOGINPROVID'} == 91 ? 0 : 0;
-if ( $debug ) { foreach my $f ( sort keys %{$form} ) { print "form-$f=$form->{$f}\n"; } }
+if ($debug) {
+    foreach my $f ( sort keys %{$form} ) { print "form-$f=$form->{$f}\n"; }
+}
 my $Type = $form->{'Type'};
 $form->{'FromDate'} = '2019-01-01';
-$form->{'ToDate'} = '2019-12-31';
-$form = DBUtil->setDates($form);
+$form->{'ToDate'}   = '2019-12-31';
+$form               = DBUtil->setDates($form);
 my $DateRange = qq|from $form->{FromDateD} thru $form->{ToDateD}|;
 
-my $multidel = 'ý';
+my $multidel  = 'ý';
 my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+
 # join xInsurance needed for withSelection
-my $withSelection = DBA->withSelection($form,'and','Treatment.ClinicID','Treatment.ProvID','Treatment.ClientID','Treatment.TrID');
+my $withSelection =
+  DBA->withSelection( $form, 'and', 'Treatment.ClinicID', 'Treatment.ProvID',
+    'Treatment.ClientID', 'Treatment.TrID' );
 my $Header = DBA->withSelectionHeader($form);
+
 #warn qq|Header: ${Header}\n|;
 $withSelection .= qq| and Client.Active=1| if ( $form->{Active} );
-  $QID = qq|QID402|;
-  $TITLE = qq|Tobacco Use and Help with Quitting Among Adolescents - National Quality Strategy Domain: Community/Population Health - Meaningful Measure Area: Prevention and Treatment of Opioid and Substance Use Disorders|;
-  $CTYPE = qq|MIPS CLINICAL QUALITY MEASURES (CQMS)|;
-  $MTYPE = qq|Process|;
-  $DESC = qq|The percentage of adolescents 12 to 20 years of age with a primary care visit during the measurement year for whom tobacco use status was documented and received help with quitting if identified as a tobacco user|;
-  $INST = qq|This measure is to be submitted once per performance period for patients seen during the performance period. This measure is intended to reflect the quality of services provided for preventive screening for tobacco use. This measure may be submitted by Merit-based Incentive Payment System (MIPS) eligible clinicians who perform the quality actions described in the measure based on the services provided and the measure-specific denominator coding.|;
-  my @FLDS = ('ClinicName:ClinicName','LName:LastName','FName:FirstName','ClientID:ClientID','DOB:DateOfBirth','Age:Age','Race:Race','pcount:ProbAddr','PrimaryProvider:PrimaryProvider');
-  my $numFLDS = scalar(@FLDS)-3;
-print qq|numFLDS=${numFLDS}\n| if ( $debug );
-  my $qrecord = qq|
+$QID = qq|QID402|;
+$TITLE =
+qq|Tobacco Use and Help with Quitting Among Adolescents - National Quality Strategy Domain: Community/Population Health - Meaningful Measure Area: Prevention and Treatment of Opioid and Substance Use Disorders|;
+$CTYPE = qq|MIPS CLINICAL QUALITY MEASURES (CQMS)|;
+$MTYPE = qq|Process|;
+$DESC =
+qq|The percentage of adolescents 12 to 20 years of age with a primary care visit during the measurement year for whom tobacco use status was documented and received help with quitting if identified as a tobacco user|;
+$INST =
+qq|This measure is to be submitted once per performance period for patients seen during the performance period. This measure is intended to reflect the quality of services provided for preventive screening for tobacco use. This measure may be submitted by Merit-based Incentive Payment System (MIPS) eligible clinicians who perform the quality actions described in the measure based on the services provided and the measure-specific denominator coding.|;
+my @FLDS = (
+    'ClinicName:ClinicName', 'LName:LastName',
+    'FName:FirstName',       'ClientID:ClientID',
+    'DOB:DateOfBirth',       'Age:Age',
+    'Race:Race',             'pcount:ProbAddr',
+    'PrimaryProvider:PrimaryProvider'
+);
+my $numFLDS = scalar(@FLDS) - 3;
+print qq|numFLDS=${numFLDS}\n| if ($debug);
+my $qrecord = qq|
 select Treatment.TrID,Treatment.ContLogDate,Treatment.ClinicID,xSC.SCNum
       ,Client.LName,Client.FName,Client.ClientID
       ,Clinic.Name as ClinicName
@@ -96,30 +111,37 @@ select Treatment.TrID,Treatment.ContLogDate,Treatment.ClinicID,xSC.SCNum
   ${withSelection}
  group by Client.LName,Client.FName,Client.ClientID
 |;
+
 # group by Client.LName,Client.FName,Client.ClientID,xSC.SCNum,misICD10.ICD10
 #warn qq|qrecord=\n${qrecord}\n|;
-my ($Numerator,$Denominator,$total) = (0,0,0);
+my ( $Numerator, $Denominator, $total ) = ( 0, 0, 0 );
 print qq|${DT}\n${QID} ${TITLE} ${DateRange} ${Header}\n|;
-foreach my $f ( @FLDS ) { my ($fld,$hdr) = split(':',$f); print qq|${hdr}\t|; }
+foreach my $f (@FLDS) {
+    my ( $fld, $hdr ) = split( ':', $f );
+    print qq|${hdr}\t|;
+}
 print qq|\n|;
-my $sGCode = $dbh->prepare("select TrID 
+my $sGCode = $dbh->prepare(
+    "select TrID 
  from Treatment left join xSC on xSC.SCID=Treatment.SCID 
  where Treatment.ClientID=? 
    and (Treatment.ContLogDate >= '$form->{FromDate}' and Treatment.ContLogDate<='$form->{ToDate}')
-   and xSC.SCNum IN ('G9458','G9459','G9460')");
+   and xSC.SCNum IN ('G9458','G9459','G9460')"
+);
 my $srecord = $dbh->prepare($qrecord);
 $srecord->execute();
-while (my $rrecord = $srecord->fetchrow_hashref)
-{ 
-  $Denominator++;
-  $sGCode->execute($rrecord->{'ClientID'});
-  if (my $rGCode = $sGCode->fetchrow_hashref)
-  { $Numerator++; }
-  foreach my $f ( @FLDS ) { my ($fld,$hdr) = split(':',$f); print qq|$rrecord->{$fld}\t|; }
-  print qq|\n|;
-  $total += $rrecord->{'pcount'};
+while ( my $rrecord = $srecord->fetchrow_hashref ) {
+    $Denominator++;
+    $sGCode->execute( $rrecord->{'ClientID'} );
+    if ( my $rGCode = $sGCode->fetchrow_hashref ) { $Numerator++; }
+    foreach my $f (@FLDS) {
+        my ( $fld, $hdr ) = split( ':', $f );
+        print qq|$rrecord->{$fld}\t|;
+    }
+    print qq|\n|;
+    $total += $rrecord->{'pcount'};
 }
-print qq|Numerator\t${Numerator}|."\t" x $numFLDS.qq|${total}\n|;
+print qq|Numerator\t${Numerator}| . "\t" x $numFLDS . qq|${total}\n|;
 print qq|Denominator\t${Denominator}\n|;
 $srecord->finish();
 $sGCode->finish();

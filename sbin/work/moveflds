@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 use DBUtil;
@@ -7,74 +7,87 @@ use DBUtil;
 # ./moveflds DBNAME=db
 ############################################################################
 # get the command name...
-my ($pw,$cmd) = $0 =~ m/(.*\/)(.*)$/;
-print qq|#${cmd}: Started |.localtime().qq|\n|;
-my $form = DBForm->new();
-my $dbh = $form->dbconnect();
+my ( $pw, $cmd ) = $0 =~ m/(.*\/)(.*)$/;
+print qq|#${cmd}: Started | . localtime() . qq|\n|;
+my $form  = DBForm->new();
+my $dbh   = $form->dbconnect();
 my $debug = 1;
 ## example...probably not needed anymore...since we can feed fromfld and tofld
 ## my $cnt = main->alterflds('ClientLegal',['L2:OnPP']);
 
-my $cnt = main->moveflds('ClientASI:G1','ClientResources:ClientID',['E4:ValidDL','E5:AutoForUse','E8:RegSupport','E9:MajSupport']);
-my $cnt = main->moveflds('ClientIntake:ClientID','ClientResources:ClientID',['IncomeDeps','AbleToPay','AbleToCare','AbleToMeetNeeds','AbleToMeetLegal','RecoveryNeeds','BasicNeeds','FinDesc','ActiveSupport','FamilySupport','EmplSupport','SelfHelp','ChurchSupport','SelfHelp30','SupportDesc']);
+my $cnt = main->moveflds( 'ClientASI:G1', 'ClientResources:ClientID',
+    [ 'E4:ValidDL', 'E5:AutoForUse', 'E8:RegSupport', 'E9:MajSupport' ] );
+my $cnt = main->moveflds(
+    'ClientIntake:ClientID',
+    'ClientResources:ClientID',
+    [
+        'IncomeDeps',      'AbleToPay',
+        'AbleToCare',      'AbleToMeetNeeds',
+        'AbleToMeetLegal', 'RecoveryNeeds',
+        'BasicNeeds',      'FinDesc',
+        'ActiveSupport',   'FamilySupport',
+        'EmplSupport',     'SelfHelp',
+        'ChurchSupport',   'SelfHelp30',
+        'SupportDesc'
+    ]
+);
 
-print qq|#${cmd}: Completed |.localtime().qq|\n|;
+print qq|#${cmd}: Completed | . localtime() . qq|\n|;
 $form->complete();
 exit;
 ############################################################################
-sub moveflds
-{
-  my ($self,$from,$to,$FLDS) = @_;
-  print qq|\nENTER: moveflds ${from}, ${to}\n|;
-  print qq|ENTER: FLDS=@$FLDS\n|;
-  my ($fromTable,$fromID) = split(':',$from);
-  my ($toTable,$toID) = split(':',$to);
-  print qq|ENTER: moveflds ${fromTable}/${fromID}, ${toTable}/${toID}\n|;
-  my $cnt = 0;
-  my $select = $dbh->prepare("select * from ${fromTable} order by ${fromID}");
-  $select->execute() || $form->dberror("moveflds: select ${fromTable}");
-  while ( my $record = $select->fetchrow_hashref )
-  {
-print "\n";
-    my $r = ();
-    # ALWAYS SET THESE...
-    $r->{$toID} = $record->{$fromID};
-    $r->{'CreateProvID'} = $record->{'CreateProvID'};
-    $r->{'CreateDate'} = $record->{'CreateDate'};
-    $r->{'ChangeProvID'} = $record->{'ChangeProvID'};
-    $r->{'ChangeDate'} = $record->{'RecDOLC'};          # CHANGE THIS??
-    foreach my $flds ( @$FLDS )
-    {
-      my ($fromfld,$tofld) = split(':',$flds);
-      $tofld = $fromfld if ( $tofld eq '' );
-      $r->{$tofld} = $record->{$fromfld}; 
+sub moveflds {
+    my ( $self, $from, $to, $FLDS ) = @_;
+    print qq|\nENTER: moveflds ${from}, ${to}\n|;
+    print qq|ENTER: FLDS=@$FLDS\n|;
+    my ( $fromTable, $fromID ) = split( ':', $from );
+    my ( $toTable,   $toID )   = split( ':', $to );
+    print qq|ENTER: moveflds ${fromTable}/${fromID}, ${toTable}/${toID}\n|;
+    my $cnt    = 0;
+    my $select = $dbh->prepare("select * from ${fromTable} order by ${fromID}");
+    $select->execute() || $form->dberror("moveflds: select ${fromTable}");
+
+    while ( my $record = $select->fetchrow_hashref ) {
+        print "\n";
+        my $r = ();
+
+        # ALWAYS SET THESE...
+        $r->{$toID}          = $record->{$fromID};
+        $r->{'CreateProvID'} = $record->{'CreateProvID'};
+        $r->{'CreateDate'}   = $record->{'CreateDate'};
+        $r->{'ChangeProvID'} = $record->{'ChangeProvID'};
+        $r->{'ChangeDate'}   = $record->{'RecDOLC'};        # CHANGE THIS??
+        foreach my $flds (@$FLDS) {
+            my ( $fromfld, $tofld ) = split( ':', $flds );
+            $tofld = $fromfld if ( $tofld eq '' );
+            $r->{$tofld} = $record->{$fromfld};
+        }
+        foreach my $f ( sort keys %{$r} ) { print "r-$f=$r->{$f}"; }
+        DBA->doUpdate( $form, $toTable, $r, "${toID}=$r->{$toID}" );
+        $cnt++;
     }
-foreach my $f ( sort keys %{$r} ) { print "r-$f=$r->{$f}"; }
-    DBA->doUpdate($form,$toTable,$r,"${toID}=$r->{$toID}");
-    $cnt++;
-  }
-  $select->finish();
-  print qq|\n${fromTable}-${toTable}: ${cnt} processed.\n|;
-  return($cnt);
+    $select->finish();
+    print qq|\n${fromTable}-${toTable}: ${cnt} processed.\n|;
+    return ($cnt);
 }
-sub alterflds
-{
-  my ($self,$table,$FLDS) = @_;
-  print qq|\nENTER: alterflds ${table}, @$FLDS\n|;
-  my $show = $dbh->prepare("show fields from ${table} where Field=?");
-  foreach my $fld ( @$FLDS )
-  {
-    my ($n1,$n2) = split(':',$fld);
-    $show->execute($n1) || $form->dberror("alterflds: ${table} ${n1}");
-    my $r = $show->fetchrow_hashref;
-    my $type = $r->{'Type'};
-    
-print "alter table ${table} change ${n1} ${n2} ${type}\n";
-    my $change = $dbh->prepare("alter table ${table} change ${n1} ${n2} ${type}");
-    $change->execute() || $form->dberror("alterflds: ${alter}");
-    $change->finish();
-  }
-  $show->finish();
-  return();
+
+sub alterflds {
+    my ( $self, $table, $FLDS ) = @_;
+    print qq|\nENTER: alterflds ${table}, @$FLDS\n|;
+    my $show = $dbh->prepare("show fields from ${table} where Field=?");
+    foreach my $fld (@$FLDS) {
+        my ( $n1, $n2 ) = split( ':', $fld );
+        $show->execute($n1) || $form->dberror("alterflds: ${table} ${n1}");
+        my $r    = $show->fetchrow_hashref;
+        my $type = $r->{'Type'};
+
+        print "alter table ${table} change ${n1} ${n2} ${type}\n";
+        my $change =
+          $dbh->prepare("alter table ${table} change ${n1} ${n2} ${type}");
+        $change->execute() || $form->dberror("alterflds: ${alter}");
+        $change->finish();
+    }
+    $show->finish();
+    return ();
 }
 ############################################################################

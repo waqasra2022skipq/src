@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 
 use CGI::Carp qw(fatalsToBrowser);
 use DBI;
@@ -12,15 +12,17 @@ use Time::Local;
 
 ############################################################################
 my $form = myForm->new();
-my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $dbh  = myDBI->dbconnect( $form->{'DBNAME'} );
 
 ############################################################################
-my $CloseButton = qq|<INPUT TYPE="button" NAME="close" VALUE="close" ONCLICK="javascript: window.close()" >|;
-my $html =  myHTML->close(1,$form->{'mlt'});
+my $CloseButton =
+qq|<INPUT TYPE="button" NAME="close" VALUE="close" ONCLICK="javascript: window.close()" >|;
+my $html = myHTML->close( 1, $form->{'mlt'} );
 
-if($form->{submit}) {
+if ( $form->{submit} ) {
     $html = main->submit($form);
-} else {
+}
+else {
     $html = main->printNotesType();
 }
 myDBI->cleanup();
@@ -28,7 +30,12 @@ print $html;
 exit;
 
 sub printNotesType {
-    my $html = myHTML->newHTML($form,'Unreconcile Form','CheckPopupWindow noclock countdown_10') . qq|
+    my $html = myHTML->newHTML(
+        $form,
+        'Unreconcile Form',
+        'CheckPopupWindow noclock countdown_10'
+      )
+      . qq|
                     <P>
                     <P>
                     <SCRIPT LANGUAGE="JavaScript" src="/cgi/js/novalidate.js"> </SCRIPT>
@@ -69,7 +76,7 @@ sub printNotesType {
                 </BODY>
             </HTML>
             |;
-        return($html);
+    return ($html);
 }
 
 sub submit {
@@ -78,15 +85,22 @@ sub submit {
 
     $TrIDs = $form->{TrIDs};
 
-    $cmd .= qq| "DBNAME=$form->{'DBNAME'}&mlt=$form->{'mlt'}&TrIDs=$TrIDs&$form->{noteType}=1"|; 
-    my $output = `$cmd 2>&1`;  # Capture both standard output and error output
-    my $exit_status = $? >> 8;  # Get the lower 8 bits of the exit status
-    if ($exit_status ne 0) {
-       # Command encountered an error
-       print "Command encountered an error. Exit status: $exit_status\n";
+    $cmd .=
+qq| "DBNAME=$form->{'DBNAME'}&mlt=$form->{'mlt'}&TrIDs=$TrIDs&$form->{noteType}=1"|;
+    my $output = `$cmd 2>&1`;    # Capture both standard output and error output
+    my $exit_status = $? >> 8;    # Get the lower 8 bits of the exit status
+    if ( $exit_status ne 0 ) {
+
+        # Command encountered an error
+        print "Command encountered an error. Exit status: $exit_status\n";
     }
 
-    $html = my $html = myHTML->newHTML($form,"UnReconcilled Queries",'CheckPopupWindow noclock countdown_10') . qq|
+    $html = my $html = myHTML->newHTML(
+        $form,
+        "UnReconcilled Queries",
+        'CheckPopupWindow noclock countdown_10'
+      )
+      . qq|
         <P>
         <P>
         <SCRIPT LANGUAGE="JavaScript" src="/cgi/js/novalidate.js"> </SCRIPT>
@@ -110,5 +124,5 @@ sub submit {
         </BODY>
         </HTML>
         |;
-    return($html);
+    return ($html);
 }

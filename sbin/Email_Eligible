@@ -1,73 +1,83 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 use DBA;
 use DBUtil;
 use MgrTree;
 use Time::Local;
-my $DT=localtime();
+my $DT = localtime();
 require("config.pl");
 ############################################################################
 # the accounts to work with
 my @DBS = $ARGV[0] eq 'test' ? @TEST_DBS : scalar(@ARGV) ? @ARGV : @ACTIVE_DBS;
 my $form;
 ############################################################################
-foreach my $dbname ( @DBS )
-{
-  print qq|Database: ${dbname}: ${DT}\n|;
-  $form = DBForm->new("DBNAME=$dbname");
-  my $dbh = $form->dbconnect();
-  $form->{'daterange'} = 'thismonth'; DBUtil->setDates($form);
-  my $sProvider = $dbh->prepare("select * from Provider where ProvID=?");
-  my $sEligible = $dbh->prepare("select * from Eligible where Eligible.ClientID=? and Eligible.FromDate>='$form->{FromDate}' order by Eligible.FromDate");
-  my $qClient = qq|select Client.*, Provider.LName as ProvLName, Provider.FName as ProvFName, Provider.Email, xInsurance.InsCode, xInsurance.Descr from Client left join Insurance on Insurance.ClientID=Client.ClientID and Priority=1 and Insurance.InsNumEffDate<=curdate() and (curdate()<=Insurance.InsNumExpDate or Insurance.InsNumExpDate is null) left join xInsurance on xInsurance.ID=Insurance.InsID left join Provider on Provider.ProvID=Client.ProvID where Client.Active=1 and xInsurance.Descr='medicaid' order by Client.LName, Client.FName|;
+foreach my $dbname (@DBS) {
+    print qq|Database: ${dbname}: ${DT}\n|;
+    $form = DBForm->new("DBNAME=$dbname");
+    my $dbh = $form->dbconnect();
+    $form->{'daterange'} = 'thismonth';
+    DBUtil->setDates($form);
+    my $sProvider = $dbh->prepare("select * from Provider where ProvID=?");
+    my $sEligible = $dbh->prepare(
+"select * from Eligible where Eligible.ClientID=? and Eligible.FromDate>='$form->{FromDate}' order by Eligible.FromDate"
+    );
+    my $qClient =
+qq|select Client.*, Provider.LName as ProvLName, Provider.FName as ProvFName, Provider.Email, xInsurance.InsCode, xInsurance.Descr from Client left join Insurance on Insurance.ClientID=Client.ClientID and Priority=1 and Insurance.InsNumEffDate<=curdate() and (curdate()<=Insurance.InsNumExpDate or Insurance.InsNumExpDate is null) left join xInsurance on xInsurance.ID=Insurance.InsID left join Provider on Provider.ProvID=Client.ProvID where Client.Active=1 and xInsurance.Descr='medicaid' order by Client.LName, Client.FName|;
 
-  my $cnt=0;
-  my $sClient = $dbh->prepare($qClient);
-  $sClient->execute();
-  while ( my $rClient = $sClient->fetchrow_hashref )
-  {
-    my ($flag,$StatusReason,$PriInsCode) = (0,'','');
-    $sEligible->execute($rClient->{ClientID});
-    if ( $rEligible = $sEligible->fetchrow_hashref )
-    {
+    my $cnt     = 0;
+    my $sClient = $dbh->prepare($qClient);
+    $sClient->execute();
+    while ( my $rClient = $sClient->fetchrow_hashref ) {
+        my ( $flag, $StatusReason, $PriInsCode ) = ( 0, '', '' );
+        $sEligible->execute( $rClient->{ClientID} );
+        if ( $rEligible = $sEligible->fetchrow_hashref ) {
+
     # if expired by date or code and this elgibility is their primary insurance?
-      if ( $rEligible->{PlanDescr} !~ /title 19/i ) 
-      { $flag=1; $StatusReason = 'Title 19 Expired'; }
-      elsif ( $rEligible->{Benefit} == 0 ) 
-      { $flag=1; $StatusReason = 'Eligibility Expired'; }
-      $StatusReason .= " ($rEligible->{FromDate}/$rEligible->{ToDate})";
-    }
-    else { $flag=1; $StatusReason = 'No Elgiblity found'; }
-    if ( $flag )
-    {
-      $cnt++;
-      $AgencyID = MgrTree->getAgency($form,$rClient->{ProvID});
-      $sProvider->execute($AgencyID);
-      $rAgency = $sProvider->fetchrow_hashref;
-      $Addrs = $rClient->{Email};
-#      ($Pgr = $rClient->{Pgr}) =~ s/\-//g;
-#      $Addrs .= qq| ${Pgr}\@page.metrocall.com| if ( ${Pgr} );
-      $Subject = qq|Eligible Status for Client ID: $rClient->{ClientID} ($rClient->{Descr}/$rClient->{InsCode})|;
-      $Message = qq|
+            if ( $rEligible->{PlanDescr} !~ /title 19/i ) {
+                $flag         = 1;
+                $StatusReason = 'Title 19 Expired';
+            }
+            elsif ( $rEligible->{Benefit} == 0 ) {
+                $flag         = 1;
+                $StatusReason = 'Eligibility Expired';
+            }
+            $StatusReason .= " ($rEligible->{FromDate}/$rEligible->{ToDate})";
+        }
+        else { $flag = 1; $StatusReason = 'No Elgiblity found'; }
+        if ($flag) {
+            $cnt++;
+            $AgencyID = MgrTree->getAgency( $form, $rClient->{ProvID} );
+            $sProvider->execute($AgencyID);
+            $rAgency = $sProvider->fetchrow_hashref;
+            $Addrs   = $rClient->{Email};
+
+            #      ($Pgr = $rClient->{Pgr}) =~ s/\-//g;
+            #      $Addrs .= qq| ${Pgr}\@page.metrocall.com| if ( ${Pgr} );
+            $Subject =
+qq|Eligible Status for Client ID: $rClient->{ClientID} ($rClient->{Descr}/$rClient->{InsCode})|;
+            $Message = qq|
 $rAgency->{Name}
 $rClient->{ProvFName} $rClient->{ProvLName},
    ClientID: $rClient->{ClientID}
      Reason: ${StatusReason}
 Eligibility: $rEligible->{PlanDescr}
 |;
-      if ( $Addrs eq '' ) { $Addrs = qq|>>>NOADDRESS|; }
-      elsif ( $rClient->{Active} != 1 ) { $Addrs = qq|>>>INACTIVE PROVIDER|; }
-#      else { DBUtil->email($form,$Addrs,$Subject,$Message,'',1); }
-      print qq|$Addrs, $Subject\n$Message\n|;
+            if    ( $Addrs eq '' ) { $Addrs = qq|>>>NOADDRESS|; }
+            elsif ( $rClient->{Active} != 1 ) {
+                $Addrs = qq|>>>INACTIVE PROVIDER|;
+            }
+
+            #      else { DBUtil->email($form,$Addrs,$Subject,$Message,'',1); }
+            print qq|$Addrs, $Subject\n$Message\n|;
+        }
     }
-  }
-  print qq|${dbname}: ${cnt} Clients Eligibility expired.\n\n|;
-  $sClient->finish();
-  $sProvider->finish();
-  $sEligible->finish();
-  $form->complete();
+    print qq|${dbname}: ${cnt} Clients Eligibility expired.\n\n|;
+    $sClient->finish();
+    $sProvider->finish();
+    $sEligible->finish();
+    $form->complete();
 }
 ############################################################################
 exit;

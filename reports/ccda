@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use Cwd;
 use DBI;
 use myForm;
@@ -15,68 +15,80 @@ binmode STDOUT, ":utf8";
 
 ############################################################################
 my $form = myForm->new();
-my $dbh = myDBI->dbconnect($form->{'DBNAME'});
-$form->{'Folder'}='testxxx';
-$form->{'InsID'}='100';
-$form->{'ProvIDs'}='2502';
-$form->{'ClientIDs'}="54635".chr(253)."53159";
-$form->{'FromDate'}='2015-01-01';
-$form->{'ToDate'}='2015-12-31';
+my $dbh  = myDBI->dbconnect( $form->{'DBNAME'} );
+$form->{'Folder'}    = 'testxxx';
+$form->{'InsID'}     = '100';
+$form->{'ProvIDs'}   = '2502';
+$form->{'ClientIDs'} = "54635" . chr(253) . "53159";
+$form->{'FromDate'}  = '2015-01-01';
+$form->{'ToDate'}    = '2015-12-31';
 
-  my $err = '';
-  my $Token = DBUtil->genToken();
-  my $Folder = $form->{'Folder'} ? $form->{'Folder'} : $Token;
-  my $ForProvID = $form->{'ForProvID'} ? $form->{'ForProvID'} : $form->{'LOGINPROVID'};
-  $form = DBUtil->setDates($form);
-  $form->{InsIDs} = $form->{InsID};      
+my $err    = '';
+my $Token  = DBUtil->genToken();
+my $Folder = $form->{'Folder'} ? $form->{'Folder'} : $Token;
+my $ForProvID =
+  $form->{'ForProvID'} ? $form->{'ForProvID'} : $form->{'LOGINPROVID'};
+$form = DBUtil->setDates($form);
+$form->{InsIDs} = $form->{InsID};
 foreach my $f ( sort keys %{$form} ) { warn "genCCDAs: form-$f=$form->{$f}\n"; }
-  # withClinicProvider uses InsIDs
-  my $with = qq|where Treatment.ContLogDate between '$form->{FromDate}' and '$form->{ToDate}' |;
-  $with .= DBA->withSelection($form,'and','Treatment.ClinicID','Treatment.ProvID','Treatment.ClientID','Treatment.TrID');
-  my $sTreatment = $dbh->prepare("select * from Treatment left join xSC on xSC.SCID=Treatment.SCID left join xInsurance on xInsurance.ID=xSC.InsID ${with}");
-warn qq|prepare("select * from Treatment left join xSC on xSC.SCID=Treatment.SCID left join xInsurance on xInsurance.ID=xSC.InsID ${with}");|;
-  my $cnt = 0;
-  $sTreatment->execute() || myDBI->dberror("genCCDAs: select failed! ${with}");
-  while ( my $r = $sTreatment->fetchrow_hashref )
-  {
+
+# withClinicProvider uses InsIDs
+my $with =
+qq|where Treatment.ContLogDate between '$form->{FromDate}' and '$form->{ToDate}' |;
+$with .=
+  DBA->withSelection( $form, 'and', 'Treatment.ClinicID', 'Treatment.ProvID',
+    'Treatment.ClientID', 'Treatment.TrID' );
+my $sTreatment = $dbh->prepare(
+"select * from Treatment left join xSC on xSC.SCID=Treatment.SCID left join xInsurance on xInsurance.ID=xSC.InsID ${with}"
+);
+warn
+qq|prepare("select * from Treatment left join xSC on xSC.SCID=Treatment.SCID left join xInsurance on xInsurance.ID=xSC.InsID ${with}");|;
+my $cnt = 0;
+$sTreatment->execute() || myDBI->dberror("genCCDAs: select failed! ${with}");
+while ( my $r = $sTreatment->fetchrow_hashref ) {
     $cnt++;
-warn qq|\n\nBEGIN ${cnt}: ($Token,$r->{ProvID},$r->{ClientID},$r->{TrID});\n|;
-    $err .= main->genFILES($Token,$r->{ProvID},$r->{ClientID},$r->{TrID});
-  }
+    warn
+      qq|\n\nBEGIN ${cnt}: ($Token,$r->{ProvID},$r->{ClientID},$r->{TrID});\n|;
+    $err .= main->genFILES( $Token, $r->{ProvID}, $r->{ClientID}, $r->{TrID} );
+}
 
 # create temporary directory for files created and zip from this shell...
-  my $BIN = myConfig->cfg('BIN');
-  my $shell = `${BIN}/zipFILEs $form->{'DOCROOT'} "CCDA_${Token}*" ${Folder} ${ForProvID} yes`;
+my $BIN = myConfig->cfg('BIN');
+my $shell =
+`${BIN}/zipFILEs $form->{'DOCROOT'} "CCDA_${Token}*" ${Folder} ${ForProvID} yes`;
 exit;
 ############################################################################
-sub genFILES
-{
-  my ($self,$Token,$NoteProvID,$ClientID,$TrID) = @_;
+sub genFILES {
+    my ( $self, $Token, $NoteProvID, $ClientID, $TrID ) = @_;
 ##
-# first generate the XML file...
-  my $xml = qq|<?xml version="1.0" encoding="utf-8"?>\n|.gXML->setXML($form,$NoteProvID,$ClientID,$TrID,'','','CCDA nonulls');
-  my $xmlfile = qq|/tmp/XML_${Token}_${TrID}.xml|;
-  my $xmlpath = qq|$form->{DOCROOT}${xmlfile}|;
-  open(XML, ">", $xmlpath) || die "Couldn't open '${xmlpath}' file: $!"; 
-  print XML $xml;
-  close(XML);
+    # first generate the XML file...
+    my $xml = qq|<?xml version="1.0" encoding="utf-8"?>\n|
+      . gXML->setXML( $form, $NoteProvID, $ClientID, $TrID, '', '',
+        'CCDA nonulls' );
+    my $xmlfile = qq|/tmp/XML_${Token}_${TrID}.xml|;
+    my $xmlpath = qq|$form->{DOCROOT}${xmlfile}|;
+    open( XML, ">", $xmlpath ) || die "Couldn't open '${xmlpath}' file: $!";
+    print XML $xml;
+    close(XML);
 
-# next the generate Visit CCDA file...
-  my $visitout = gXML->styleCCDA($form,$xmlfile,'Visit');
-  my $visitfile = qq|/tmp/CCDA_${Token}_${TrID}_Visit.xml|;
-  my $visitpath = qq|$form->{DOCROOT}${visitfile}|;
-  open(OUT, ">:encoding(UTF-8)", $visitpath) || die "Couldn't open '${visitpath}' file: $!"; 
-  print OUT $visitout;
-  close(OUT);
+    # next the generate Visit CCDA file...
+    my $visitout  = gXML->styleCCDA( $form, $xmlfile, 'Visit' );
+    my $visitfile = qq|/tmp/CCDA_${Token}_${TrID}_Visit.xml|;
+    my $visitpath = qq|$form->{DOCROOT}${visitfile}|;
+    open( OUT, ">:encoding(UTF-8)", $visitpath )
+      || die "Couldn't open '${visitpath}' file: $!";
+    print OUT $visitout;
+    close(OUT);
 
-# next the generate Referral CCDA file...
-  my $referralout = gXML->styleCCDA($form,$xmlfile,'Referral');
-  my $referralfile = qq|/tmp/CCDA_${Token}_${TrID}_Referral.xml|;
-  my $referralpath = qq|$form->{DOCROOT}${referralfile}|;
-  open(OUT, ">:encoding(UTF-8)", $referralpath) || die "Couldn't open '${referralpath}' file: $!"; 
-  print OUT $referralout;
-  close(OUT);
+    # next the generate Referral CCDA file...
+    my $referralout  = gXML->styleCCDA( $form, $xmlfile, 'Referral' );
+    my $referralfile = qq|/tmp/CCDA_${Token}_${TrID}_Referral.xml|;
+    my $referralpath = qq|$form->{DOCROOT}${referralfile}|;
+    open( OUT, ">:encoding(UTF-8)", $referralpath )
+      || die "Couldn't open '${referralpath}' file: $!";
+    print OUT $referralout;
+    close(OUT);
 
-  return();
+    return ();
 }
 ############################################################################

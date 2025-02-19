@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use Cwd;
 use DBI;
 use myForm;
@@ -16,80 +16,97 @@ my $debug = 1;
 
 ############################################################################
 my $form = myForm->new();
-my $dbh = myDBI->dbconnect($form->{'DBNAME'});
-warn qq|\n\ngenQRDAs: ENTER\n| if ( $debug );
-if ( $debug ) { foreach my $f ( sort keys %{$form} ) { warn "genQRDAs: form-$f=$form->{$f}<BR>\n"; } }
-if ( ! SysAccess->chkPriv($form,'MUAgent') )
-{ myDBI->error("Meaningful Use / Access Denied!"); }
+my $dbh  = myDBI->dbconnect( $form->{'DBNAME'} );
+warn qq|\n\ngenQRDAs: ENTER\n| if ($debug);
+if ($debug) {
+    foreach my $f ( sort keys %{$form} ) {
+        warn "genQRDAs: form-$f=$form->{$f}<BR>\n";
+    }
+}
+if ( !SysAccess->chkPriv( $form, 'MUAgent' ) ) {
+    myDBI->error("Meaningful Use / Access Denied!");
+}
 
 my $NextLocation;
-if ( $form->{submit} ) { $NextLocation = main->submit($form); }
-else { $NextLocation = main->report($form); }
+if   ( $form->{submit} ) { $NextLocation = main->submit($form); }
+else                     { $NextLocation = main->report($form); }
 myDBI->cleanup();
-warn qq|genQRDAs: NextLocation=${NextLocation}\n| if ( $debug );
+warn qq|genQRDAs: NextLocation=${NextLocation}\n| if ($debug);
 print $NextLocation;
 exit;
 
 ############################################################################
-sub report
-{
-  my ($self,$form) = @_;
-$pwd=cwd();
-warn qq|genQRDAs: pwd=${pwd}\n| if ( $debug );
-  my $cmd = qq|/home/okmis/mis/src/cgi/bin/GenReport.cgi Name=GenerateQRDAs\&daterange=2yago\&InsID=100\&ClinicIDs=2501\&ProvIDs=2502\&DBNAME=$form->{DBNAME}\&mlt=$form->{mlt}|;
-warn qq|genQRDAs: cmd=${cmd}\n| if ( $debug );
-  my $html = `${cmd}`;
-  my $html =  myHTML->close(1);
-  return($html);
+sub report {
+    my ( $self, $form ) = @_;
+    $pwd = cwd();
+    warn qq|genQRDAs: pwd=${pwd}\n| if ($debug);
+    my $cmd =
+qq|/var/www/okmis/src/cgi/bin/GenReport.cgi Name=GenerateQRDAs\&daterange=2yago\&InsID=100\&ClinicIDs=2501\&ProvIDs=2502\&DBNAME=$form->{DBNAME}\&mlt=$form->{mlt}|;
+    warn qq|genQRDAs: cmd=${cmd}\n| if ($debug);
+    my $html = `${cmd}`;
+    my $html = myHTML->close(1);
+    return ($html);
 }
-sub submit
-{
-  my ($self,$form) = @_;
-  my $Token = DBUtil->genToken();
-  my $Folder = $form->{'Folder'} ? $form->{'Folder'} : $Token;
-  my $ForProvID = $form->{'ForProvID'} ? $form->{'ForProvID'} : $form->{'LOGINPROVID'};
-  $form = DBUtil->setDates($form);
-  $form->{'ProvIDs'} = $form->{'ForProvID'} if ( $form->{'ProvIDs'} eq '' );
-  $form->{'MEASUREID'} = $form->{'CQM'};
-  my $cnt = 0;
-warn qq|genQRDAs: foreach: ClientIDs=$form->{ClientIDs}=\n| if ( $debug );
-  foreach my $ProvID ( split(chr(253),$form->{ProvIDs}) )
-  {
-    foreach my $ClientID ( split(chr(253),$form->{ClientIDs}) )
-    {
-warn qq|genQRDAs: setXML: ClientID=${ClientID}=\n| if ( $debug );
-      my $xml = qq|<?xml version="1.0" encoding="utf-8"?>\n|.gXML->setXML($form,$ProvID,$ClientID,'',$form->{FromDate},$form->{ToDate},'QRDA nonulls');
-      my $xmlfile = qq|/tmp/XML_${Token}_${ProvID}_${ClientID}.xml|;
-      my $xmlpath = qq|$form->{DOCROOT}${xmlfile}|;
-      open(XML, ">", $xmlpath) || die "Couldn't open '${xmlpath}' file: $!"; 
-      print XML $xml;
-      close(XML);
 
-      # next the generate QRDA file...
-      # IF you want to VIEw the QRDA change the suffix to '.htm'!!
-      my $visitout = gXML->styleQRDA($form,$xmlfile);
-      my $visitfile = qq|/tmp/QRDA_${Token}_${ProvID}_${ClientID}.xml|;
-      my $visitpath = qq|$form->{DOCROOT}${visitfile}|;
-      open(OUT, ">:encoding(UTF-8)", $visitpath) || die "Couldn't open '${visitpath}' file: $!"; 
-      print OUT $visitout;
-      close(OUT);
-      $cnt++;
+sub submit {
+    my ( $self, $form ) = @_;
+    my $Token  = DBUtil->genToken();
+    my $Folder = $form->{'Folder'} ? $form->{'Folder'} : $Token;
+    my $ForProvID =
+      $form->{'ForProvID'} ? $form->{'ForProvID'} : $form->{'LOGINPROVID'};
+    $form                = DBUtil->setDates($form);
+    $form->{'ProvIDs'}   = $form->{'ForProvID'} if ( $form->{'ProvIDs'} eq '' );
+    $form->{'MEASUREID'} = $form->{'CQM'};
+    my $cnt = 0;
+    warn qq|genQRDAs: foreach: ClientIDs=$form->{ClientIDs}=\n| if ($debug);
+
+    foreach my $ProvID ( split( chr(253), $form->{ProvIDs} ) ) {
+        foreach my $ClientID ( split( chr(253), $form->{ClientIDs} ) ) {
+            warn qq|genQRDAs: setXML: ClientID=${ClientID}=\n| if ($debug);
+            my $xml = qq|<?xml version="1.0" encoding="utf-8"?>\n|
+              . gXML->setXML( $form, $ProvID, $ClientID, '', $form->{FromDate},
+                $form->{ToDate}, 'QRDA nonulls' );
+            my $xmlfile = qq|/tmp/XML_${Token}_${ProvID}_${ClientID}.xml|;
+            my $xmlpath = qq|$form->{DOCROOT}${xmlfile}|;
+            open( XML, ">", $xmlpath )
+              || die "Couldn't open '${xmlpath}' file: $!";
+            print XML $xml;
+            close(XML);
+
+            # next the generate QRDA file...
+            # IF you want to VIEw the QRDA change the suffix to '.htm'!!
+            my $visitout  = gXML->styleQRDA( $form, $xmlfile );
+            my $visitfile = qq|/tmp/QRDA_${Token}_${ProvID}_${ClientID}.xml|;
+            my $visitpath = qq|$form->{DOCROOT}${visitfile}|;
+            open( OUT, ">:encoding(UTF-8)", $visitpath )
+              || die "Couldn't open '${visitpath}' file: $!";
+            print OUT $visitout;
+            close(OUT);
+            $cnt++;
+        }
     }
-  }
 
-  my $result = '';
-  if ( $cnt )  ## create temporary directory for files created and zip from this shell...
-  {
-    my $BIN = myConfig->cfg('BIN');
-    my $shell = `${BIN}/zipFILEs $form->{'DOCROOT'} "QRDA_${Token}*" ${Folder} ${ForProvID}`;
-warn qq|shell=${shell}\n| if ( $debug );
-    main->addEDoc($Folder,$ForProvID);
-    $result = $shell if ( $form->{'LOGINPROVID'} == 91 );
-  }
-  else { DBA->setAlert($form,"Count is zero selected!<BR>No files created!"); }
-  my $link = qq|/cgi/bin/mis.cgi?view=ListExportFiles.cgi&Provider_ProvID=${ForProvID}&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}|;
-warn qq|genQRDAs: setHTML: link=${link}=\n| if ( $debug );
-  my $html = myHTML->newHTML($form,'Send QRDA','CheckPopupWindow noclock countdown_1') . qq|
+    my $result = '';
+    if ($cnt
+      ) ## create temporary directory for files created and zip from this shell...
+    {
+        my $BIN = myConfig->cfg('BIN');
+        my $shell =
+`${BIN}/zipFILEs $form->{'DOCROOT'} "QRDA_${Token}*" ${Folder} ${ForProvID}`;
+        warn qq|shell=${shell}\n| if ($debug);
+        main->addEDoc( $Folder, $ForProvID );
+        $result = $shell if ( $form->{'LOGINPROVID'} == 91 );
+    }
+    else {
+        DBA->setAlert( $form, "Count is zero selected!<BR>No files created!" );
+    }
+    my $link =
+qq|/cgi/bin/mis.cgi?view=ListExportFiles.cgi&Provider_ProvID=${ForProvID}&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}|;
+    warn qq|genQRDAs: setHTML: link=${link}=\n| if ($debug);
+    my $html =
+      myHTML->newHTML( $form, 'Send QRDA',
+        'CheckPopupWindow noclock countdown_1' )
+      . qq|
 
 <TABLE CLASS="main" >
   <TR> <TD CLASS="hdrcol title" >Send QRDAs</TD> </TR>
@@ -115,24 +132,24 @@ document.QRDA.elements[0].focus();
 </BODY>
 </HTML>
 |;
-  return($html);
+    return ($html);
 }
 ############################################################################
-sub addEDoc
-{
-  my ($self,$Folder,$ForProvID) = @_;
-  my $r = ();
-  $r->{ProvID} = $ForProvID;
-  $r->{Title} = $Folder;
-  $r->{Descr} = "QRDA Zip file created ".localtime();
-  $r->{Path} = qq|/Provider/EDocs/${ForProvID}/${Folder}.zip|;
-  $r->{CreateProvID} = $form->{LOGINPROVID};
-  $r->{CreateDate} = $form->{TODAY};
-  $r->{Type} = 40;     # QRDAs
-  $r->{Public} = 0;
-  $query = DBA->genReplace($form,$dbh,'ProviderEDocs',$r,"Path='$r->{Path}'");
-  my $sql = $dbh->prepare($query);
-  $sql->execute() || myDBI->dberror($query);
-  return();
+sub addEDoc {
+    my ( $self, $Folder, $ForProvID ) = @_;
+    my $r = ();
+    $r->{ProvID}       = $ForProvID;
+    $r->{Title}        = $Folder;
+    $r->{Descr}        = "QRDA Zip file created " . localtime();
+    $r->{Path}         = qq|/Provider/EDocs/${ForProvID}/${Folder}.zip|;
+    $r->{CreateProvID} = $form->{LOGINPROVID};
+    $r->{CreateDate}   = $form->{TODAY};
+    $r->{Type}         = 40;                                             # QRDAs
+    $r->{Public}       = 0;
+    $query =
+      DBA->genReplace( $form, $dbh, 'ProviderEDocs', $r, "Path='$r->{Path}'" );
+    my $sql = $dbh->prepare($query);
+    $sql->execute() || myDBI->dberror($query);
+    return ();
 }
 ############################################################################

@@ -1,16 +1,16 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 ############################################################################
 $file = $ARGV[0];
-foreach my $file ( @ARGV )
-{
-  #print qq|\nparse file: $file\n|;
-  if ( open(FILE, $file) ) 
-  {
-    while ( $in = <FILE> )
-    { foreach my $line ( split('>',$in) ) { print qq|${line}>\n|;  } }
-    close(FILE);
-  }
+foreach my $file (@ARGV) {
+
+    #print qq|\nparse file: $file\n|;
+    if ( open( FILE, $file ) ) {
+        while ( $in = <FILE> ) {
+            foreach my $line ( split( '>', $in ) ) { print qq|${line}>\n|; }
+        }
+        close(FILE);
+    }
 }
 exit;
 ################################################################

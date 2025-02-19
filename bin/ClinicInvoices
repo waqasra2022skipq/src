@@ -1,23 +1,23 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use Cwd;
 use DBI;
 use DBForm;
 use DBA;
 use SysAccess;
 use Time::Local;
-my $DT=localtime();
+my $DT = localtime();
 ############################################################################
 $form = DBForm->new();
-$dbh = $form->dbconnect();
+$dbh  = $form->dbconnect();
 my $InvDate = $form->{TODAY};
 $InvDate = $form->{InvDate} if ( $form->{InvDate} );
-my $TheDate = DBUtil->Date($InvDate,'fmt','MM-DD-YYYY');
-my $InsID = '';       # for file name...we ignore Insurance.
+my $TheDate = DBUtil->Date( $InvDate, 'fmt', 'MM-DD-YYYY' );
+my $InsID   = '';    # for file name...we ignore Insurance.
 
 # put in the reports4 directory...
 chdir("$form->{DOCROOT}/reports4");
-$pwd=cwd();
+$pwd = cwd();
 ##
 # select the Invoices for InvDate.
 ##
@@ -31,33 +31,47 @@ my $sInvoices = $dbh->prepare($qInvoices);
 # select all the clinics to print by Clinic
 ##
 my $ForProvID = $form->{Provider} ? $form->{Provider} : $form->{LOGINPROVID};
-my $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Provider.ProvID','where');
-$qClinics = qq|select * from Provider ${ClinicSelection} order by Provider.Name|;
-$sClinics=$dbh->prepare($qClinics);
+my $ClinicSelection =
+  DBA->getClinicSelection( $form, $ForProvID, 'Provider.ProvID', 'where' );
+$qClinics =
+  qq|select * from Provider ${ClinicSelection} order by Provider.Name|;
+$sClinics = $dbh->prepare($qClinics);
 $sClinics->execute();
-while ( my $rClinics = $sClinics->fetchrow_hashref )
-{
-  print qq|Create PDF for $rClinics->{Name}, $rClinics->{Descr}, ${InvDate}\n|;
-  $sInvoices->execute($rClinics->{ProvID},${InvDate}) || $form->dberror($qInvoices);
-  my $Cmd = qq|/home/okmis/mis/src/bin/genInvPDF DBNAME=$form->{DBNAME}\\&IDs="|;
-  my $spc = '';
-  my $cnt = 0;
-  while ( my $rInvoices = $sInvoices->fetchrow_hashref )
-  { $Cmd .= $spc . $rInvoices->{ID}; $spc = ' '; $cnt++; }
-  $sInvoices->finish();
-  my $file = 'INV_Invoices_' . $rClinics->{ProvID} . '_' . $InsID . "_${InvDate}_" . ${cnt} . '_' . DBUtil->Date('','stamp') . '_' . DBUtil->genToken() . '.pdf';
-  $Cmd .= qq|" > ${file}|;
-  system("${Cmd}");
+while ( my $rClinics = $sClinics->fetchrow_hashref ) {
+    print
+      qq|Create PDF for $rClinics->{Name}, $rClinics->{Descr}, ${InvDate}\n|;
+    $sInvoices->execute( $rClinics->{ProvID}, ${InvDate} )
+      || $form->dberror($qInvoices);
+    my $Cmd =
+      qq|/var/www/okmis/src/bin/genInvPDF DBNAME=$form->{DBNAME}\\&IDs="|;
+    my $spc = '';
+    my $cnt = 0;
+    while ( my $rInvoices = $sInvoices->fetchrow_hashref ) {
+        $Cmd .= $spc . $rInvoices->{ID};
+        $spc = ' ';
+        $cnt++;
+    }
+    $sInvoices->finish();
+    my $file =
+        'INV_Invoices_'
+      . $rClinics->{ProvID} . '_'
+      . $InsID
+      . "_${InvDate}_"
+      . ${cnt} . '_'
+      . DBUtil->Date( '', 'stamp' ) . '_'
+      . DBUtil->genToken() . '.pdf';
+    $Cmd .= qq|" > ${file}|;
+    system("${Cmd}");
 }
 $sClinics->finish();
 ############################################################################
 # Send emails to all requested.
-my $Addrs = SysAccess->getPrivEmail($form,'Invoices2Print');
+my $Addrs   = SysAccess->getPrivEmail( $form, 'Invoices2Print' );
 my $Subject = qq|Generated Invoices to print ($form->{DBNAME})|;
-my $Text = qq|${DT}
+my $Text    = qq|${DT}
 To view these reports select on the MIS menus Administration->Notes->Invoices Print.
 |;
-DBUtil->email($form, $Addrs, $Subject, $Text);
+DBUtil->email( $form, $Addrs, $Subject, $Text );
 ############################################################################
 $form->complete();
 exit;

@@ -1,174 +1,174 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use Accounts;
 use DBForm;
 use DBUtil;
 use myConfig;
-my $debug = 0;
-my $FileID = '';
+my $debug    = 0;
+my $FileID   = '';
 my $FileName = '';
-my ($InsDescr,$ClaimCount,$DateTimeSent) = ('','','');
-my $DateUploaded = '';
-my $TypeofFile = '';
-my $DateProcessed = '';
-my $TotalCharges = 0;
+my ( $InsDescr, $ClaimCount, $DateTimeSent ) = ( '', '', '' );
+my $DateUploaded   = '';
+my $TypeofFile     = '';
+my $DateProcessed  = '';
+my $TotalCharges   = 0;
 my $ClaimsAccepted = 0;
 my $ClaimsRejected = 0;
-my $TaxID = '';
-my $DB = '';
-my $clinics=Accounts->TaxIDs(Accounts->dbs('active'));
-my $WWW = myConfig->cfg('WWW');
-my $Section_dlm = '==================================';
-my $Claim_dlm = '==================================================================================================================================================================';
-my $Claim_sec = '------------------------------------------------------------------------------------------------------------------------------------------------------------------';
+my $TaxID          = '';
+my $DB             = '';
+my $clinics        = Accounts->TaxIDs( Accounts->dbs('active') );
+my $WWW            = myConfig->cfg('WWW');
+my $Section_dlm    = '==================================';
+my $Claim_dlm =
+'==================================================================================================================================================================';
+my $Claim_sec =
+'------------------------------------------------------------------------------------------------------------------------------------------------------------------';
 ############################################################################
-foreach my $file ( @ARGV )
-{
-  print qq|\nparse file: $file\n|;
-  if ( open(FILE,$file) ) 
-  {
-    my $section = 0;
-    my $Header = main->getHeader($file);
-print qq|Header=$Header\n| if ( $debug );
-    my $Summary = main->getSummary($file);
-    my $Claims = main->getClaims($file);
-    main->wFile($file,$Header,$Summary,$Claims);
-    close(FILE);
-  } else { print qq|>>>ERROR: open ${file} $!\n|; }
+foreach my $file (@ARGV) {
+    print qq|\nparse file: $file\n|;
+    if ( open( FILE, $file ) ) {
+        my $section = 0;
+        my $Header  = main->getHeader($file);
+        print qq|Header=$Header\n| if ($debug);
+        my $Summary = main->getSummary($file);
+        my $Claims  = main->getClaims($file);
+        main->wFile( $file, $Header, $Summary, $Claims );
+        close(FILE);
+    }
+    else { print qq|>>>ERROR: open ${file} $!\n|; }
 }
 exit;
 ################################################################
-sub getHeader
-{
-  my ($self,$filename) = @_;
-  my ($out,$cnt) = ('',0);
-  while ( $line = <FILE> )
-  {
-    $line =~ s/\r?\n$//;
-print qq|getHeader: line=$line\n| if ( $debug );
-    $cnt++;
-    return($out) if ( $line eq $Section_dlm );
-    $out .= $line."\n" unless ( $cnt == 1 );
-  }
-  main->prtError($filename,'Header: NO =delimeter= FOUND!');
+sub getHeader {
+    my ( $self, $filename ) = @_;
+    my ( $out,  $cnt )      = ( '', 0 );
+    while ( $line = <FILE> ) {
+        $line =~ s/\r?\n$//;
+        print qq|getHeader: line=$line\n| if ($debug);
+        $cnt++;
+        return ($out) if ( $line eq $Section_dlm );
+        $out .= $line . "\n" unless ( $cnt == 1 );
+    }
+    main->prtError( $filename, 'Header: NO =delimeter= FOUND!' );
 }
-sub getSummary
-{
-  my ($self,$filename) = @_;
-  my ($out,$cnt,$type) = ('',0,'');
-  while ( $line = <FILE> )
-  {
-    $line =~ s/\r?\n$//;
-    $cnt++;
-print qq|Summary: line=:${line}:\n| if ( $debug );
-    return($out) if ( $line eq $Section_dlm );
-    $out .= $line."\n";
-    if ( $line =~ /File ID/ )
-    {
-      ($type,$FileID) = split(':',$line,2);
-      $FileID =~ s/^\s*(.*?)\s*$/$1/g;                   # trim leading/trailing spaces
+
+sub getSummary {
+    my ( $self, $filename ) = @_;
+    my ( $out, $cnt, $type ) = ( '', 0, '' );
+    while ( $line = <FILE> ) {
+        $line =~ s/\r?\n$//;
+        $cnt++;
+        print qq|Summary: line=:${line}:\n| if ($debug);
+        return ($out)                       if ( $line eq $Section_dlm );
+        $out .= $line . "\n";
+        if ( $line =~ /File ID/ ) {
+            ( $type, $FileID ) = split( ':', $line, 2 );
+            $FileID =~ s/^\s*(.*?)\s*$/$1/g;    # trim leading/trailing spaces
+        }
+        elsif ( $line =~ /File Name/ ) {
+            ( $type, $FileName ) = split( ':', $line, 2 );
+            $FileName =~ s/^\s*(.*?)\s*$/$1/g;    # trim leading/trailing spaces
+            ( $name, $InsDescr, $ClaimCount, $DateTimeSent, $sfx ) =
+              split( '\.', $FileName, 5 );
+            my ( $id, $db1, $db2 ) = split( '\_', $name, 3 );
+            $DB = $db1 . '_' . $db2;
+        }
+        elsif ( $line =~ /Date Uploaded/ ) {
+            my ( $type, $date ) = split( ':', $line, 2 );
+            $date =~ s/^\s*(.*?)\s*$/$1/g;        # trim leading/trailing spaces
+            my ( $mon, $day, $yr ) = split( '\/', $date, 3 );
+            $mon          = length($mon) == 1 ? '0' . $mon : $mon;
+            $day          = length($day) == 1 ? '0' . $day : $day;
+            $DateUploaded = $yr . '-' . $mon . '-' . $day;
+        }
+        elsif ( $line =~ /Type of File/ ) {
+            ( $type, $TypeOfFile ) = split( ':', $line, 2 );
+            $TypeofFile =~ s/^\s*(.*?)\s*$/$1/g;  # trim leading/trailing spaces
+        }
+        elsif ( $line =~ /Date Processed/ ) {
+            my ( $type, $date ) = split( ':', $line, 2 );
+            $date =~ s/^\s*(.*?)\s*$/$1/g;        # trim leading/trailing spaces
+            my ( $mon, $day, $yr ) = split( '\/', $date, 3 );
+            $mon           = length($mon) == 1 ? '0' . $mon : $mon;
+            $day           = length($day) == 1 ? '0' . $day : $day;
+            $DateProcessed = $yr . '-' . $mon . '-' . $day;
+        }
+        elsif ( $line =~ /Total Charges/ ) {
+            ( $type, $TotalCharges ) = split( ':', $line, 2 );
+            $TotalCharges =~
+              s/^\s*(.*?)\s*$/$1/g;               # trim leading/trailing spaces
+        }
+        elsif ( $line =~ /Claims Accepted/ ) {
+            ( $ClaimsAccepted, $txt ) = split( '\#', $line, 2 );
+            $ClaimsAccepted =~
+              s/^\s*(.*?)\s*$/$1/g;               # trim leading/trailing spaces
+        }
+        elsif ( $line =~ /Claims Rejected/ ) {
+            ( $ClaimsRejected, $txt ) = split( '\#', $line, 2 );
+            $ClaimsRejected =~
+              s/^\s*(.*?)\s*$/$1/g;               # trim leading/trailing spaces
+        }
     }
-    elsif ( $line =~ /File Name/ )
-    {
-      ($type,$FileName) = split(':',$line,2);
-      $FileName =~ s/^\s*(.*?)\s*$/$1/g;                 # trim leading/trailing spaces
-      ($name,$InsDescr,$ClaimCount,$DateTimeSent,$sfx) = split('\.',$FileName,5);
-      my ($id,$db1,$db2) = split('\_',$name,3);
-      $DB = $db1.'_'.$db2;
-    }
-    elsif ( $line =~ /Date Uploaded/ )
-    {
-      my ($type,$date) = split(':',$line,2);
-      $date =~ s/^\s*(.*?)\s*$/$1/g;             # trim leading/trailing spaces
-      my ($mon,$day,$yr) = split('\/',$date,3);
-      $mon = length($mon) == 1 ? '0'.$mon : $mon;
-      $day = length($day) == 1 ? '0'.$day : $day;
-      $DateUploaded = $yr.'-'.$mon.'-'.$day;
-    }
-    elsif ( $line =~ /Type of File/ )
-    {
-      ($type,$TypeOfFile) = split(':',$line,2);
-      $TypeofFile =~ s/^\s*(.*?)\s*$/$1/g;               # trim leading/trailing spaces
-    }
-    elsif ( $line =~ /Date Processed/ )
-    {
-      my ($type,$date) = split(':',$line,2);
-      $date =~ s/^\s*(.*?)\s*$/$1/g;             # trim leading/trailing spaces
-      my ($mon,$day,$yr) = split('\/',$date,3);
-      $mon = length($mon) == 1 ? '0'.$mon : $mon;
-      $day = length($day) == 1 ? '0'.$day : $day;
-      $DateProcessed = $yr.'-'.$mon.'-'.$day;
-    }
-    elsif ( $line =~ /Total Charges/ )
-    {
-      ($type,$TotalCharges) = split(':',$line,2);
-      $TotalCharges =~ s/^\s*(.*?)\s*$/$1/g;              # trim leading/trailing spaces
-    }
-    elsif ( $line =~ /Claims Accepted/ )
-    {
-      ($ClaimsAccepted,$txt) = split('\#',$line,2);
-      $ClaimsAccepted =~ s/^\s*(.*?)\s*$/$1/g;            # trim leading/trailing spaces
-    }
-    elsif ( $line =~ /Claims Rejected/ )
-    {
-      ($ClaimsRejected,$txt) = split('\#',$line,2);
-      $ClaimsRejected =~ s/^\s*(.*?)\s*$/$1/g;            # trim leading/trailing spaces
-    }
-  }
-  main->prtError($filename,'Summary: MISSING =delimeter=!');
+    main->prtError( $filename, 'Summary: MISSING =delimeter=!' );
 }
+
 #          1         2         3         4         5         6         7         8         9         10        11
 #012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
-#1)     861273328   568780360C2       BENEFIELD FELICIA   07/15/1988   05/22/2014 05/22/2014 90853   29680    275208075   876           1780029793 04312  
-#CLAIM# OA CLAIMID  PATIENT ID        LAST,FIRST          DOB          FROM DOS   TO DOS     CPT     DIAG     TAX ID      ACCNT#        PHYS.ID    PAYER 
+#1)     861273328   568780360C2       BENEFIELD FELICIA   07/15/1988   05/22/2014 05/22/2014 90853   29680    275208075   876           1780029793 04312
+#CLAIM# OA CLAIMID  PATIENT ID        LAST,FIRST          DOB          FROM DOS   TO DOS     CPT     DIAG     TAX ID      ACCNT#        PHYS.ID    PAYER
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------
-sub getClaims
-{
-  my ($self,$filename) = @_;
-  my ($out,$cnt,$scnt,$tax) = ('',0,0,0);
-  while ( $line = <FILE> )
-  {
-    $line =~ s/\r?\n$//;
-print qq|Claims: line=:${line}:\n| if ( $debug );
-    $cnt++;
-    $tax = 1 if ( $scnt == 2 && $TaxID eq '' );   # trigger on
-    $tax = 0 if ( $line eq $Claim_dlm );          # trigger off
-    if ( $tax )
-    {
+sub getClaims {
+    my ( $self, $filename ) = @_;
+    my ( $out, $cnt, $scnt, $tax ) = ( '', 0, 0, 0 );
+    while ( $line = <FILE> ) {
+        $line =~ s/\r?\n$//;
+        print qq|Claims: line=:${line}:\n| if ($debug);
+        $cnt++;
+        $tax = 1 if ( $scnt == 2 && $TaxID eq '' );    # trigger on
+        $tax = 0 if ( $line eq $Claim_dlm );           # trigger off
+        if ($tax) {
 ##      my $tax1 = substr($line,109,2);
 ##      my $tax2 = substr($line,111,7);
 ##print qq|Claims: tax1=:${tax1}:\n| if ( $debug );
 ##print qq|Claims: tax2=:${tax2}:\n| if ( $debug );
 ##      $TaxID = $tax1.'-'.$tax2;
-      $TaxID = substr($line,109,9);
-print qq|Claims: TaxID=:${TaxID}:\n| if ( $debug );
+            $TaxID = substr( $line, 109, 9 );
+            print qq|Claims: TaxID=:${TaxID}:\n| if ($debug);
+        }
+        $out .= $line . "\n";
+        $scnt++ if ( $line eq $Claim_sec );
     }
-    $out .= $line."\n";
-    $scnt++ if ( $line eq $Claim_sec );
-  }
-  return($out);
+    return ($out);
 }
 ##    if ( $in =~ /^Check#                         Amount/ )
-sub wFile
-{
-  my ($self,$filename,$header,$summary,$claims) = @_;
-  main->prtError($filename,'wFile: NO InsDescr FOUND!') if ( $InsDescr eq '' );
-  main->prtError($filename,'wFile: NO TAXID FOUND!') if ( $TaxID eq '' );
-  my $key = $InsDescr.'_'.$TaxID;
-  my $dbname = $clinics->{$key}->{DB};
-  my ($domain,$subdomain) = split('_',$dbname);
-  main->prtError($filename,'wFile: NO DB FOUND!') if ( $dbname eq '' );
-  my $ProvID = $clinics->{$key}->{ProvID};
-  main->prtError($filename,'wFile: NO PROVID FOUND!') if ( $ProvID eq '' );
-  my $Claims = $ClaimsAccepted + $ClaimsRejected;
-print qq|wFile: key=${key} (ProvID=$ProvID), dbname=${dbname} (DB=$DB)\n| if ( $debug );
-  my $form = DBForm->new("DBNAME=$dbname");
-  my $dbh = $form->dbconnect();
-  my $rptDir = $WWW.'/'.$subdomain.'/reports4';
-  my $fileName = 'EBT_resp_'.${ProvID}.'_'.$InsDescr.'_'.$DateUploaded.'_'.$Claims.'_'.DBUtil->Date('','stamp').'_'.DBUtil->genToken().'.htm';
-print qq|wFile:\n  rptDir=$rptDir\n  fileName=$fileName\n|;
-  $form->complete();
-  my $text = qq|<PRE>
+sub wFile {
+    my ( $self, $filename, $header, $summary, $claims ) = @_;
+    main->prtError( $filename, 'wFile: NO InsDescr FOUND!' )
+      if ( $InsDescr eq '' );
+    main->prtError( $filename, 'wFile: NO TAXID FOUND!' ) if ( $TaxID eq '' );
+    my $key    = $InsDescr . '_' . $TaxID;
+    my $dbname = $clinics->{$key}->{DB};
+    my ( $domain, $subdomain ) = split( '_', $dbname );
+    main->prtError( $filename, 'wFile: NO DB FOUND!' ) if ( $dbname eq '' );
+    my $ProvID = $clinics->{$key}->{ProvID};
+    main->prtError( $filename, 'wFile: NO PROVID FOUND!' ) if ( $ProvID eq '' );
+    my $Claims = $ClaimsAccepted + $ClaimsRejected;
+    print qq|wFile: key=${key} (ProvID=$ProvID), dbname=${dbname} (DB=$DB)\n|
+      if ($debug);
+    my $form   = DBForm->new("DBNAME=$dbname");
+    my $dbh    = $form->dbconnect();
+    my $rptDir = $WWW . '/' . $subdomain . '/reports4';
+    my $fileName =
+        'EBT_resp_'
+      . ${ProvID} . '_'
+      . $InsDescr . '_'
+      . $DateUploaded . '_'
+      . $Claims . '_'
+      . DBUtil->Date( '', 'stamp' ) . '_'
+      . DBUtil->genToken() . '.htm';
+    print qq|wFile:\n  rptDir=$rptDir\n  fileName=$fileName\n|;
+    $form->complete();
+    my $text = qq|<PRE>
 Electronic Batch Report
 ${filename}
 ${header}
@@ -178,21 +178,22 @@ ${Section_dlm}
 ${claims}
 </PRE>
 |;
-#print qq|\n\n${text}\n\n|;
-  if ( open(OUT,">${rptDir}/${fileName}") ) 
-  {
-    print OUT $text;
-    close(OUT);
-  } else { print qq|>>>ERROR: open ${fileName} $!\n|; }
-  return();
+
+    #print qq|\n\n${text}\n\n|;
+    if ( open( OUT, ">${rptDir}/${fileName}" ) ) {
+        print OUT $text;
+        close(OUT);
+    }
+    else { print qq|>>>ERROR: open ${fileName} $!\n|; }
+    return ();
 }
-sub prtError
-{
-  my ($self,$filename,$text) = @_;
-  print qq|
+
+sub prtError {
+    my ( $self, $filename, $text ) = @_;
+    print qq|
 >>> Error in processing file: ${filename}!
 ${text}
 |;
-  exit;
+    exit;
 }
 ################################################################

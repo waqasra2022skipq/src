@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use myConfig;
 use DBForm;
@@ -7,19 +7,19 @@ use DBA;
 use MIME::Base64;
 ############################################################################
 my $form = DBForm->new();
-my ($v1,$v2) = main->get($form->{t});
+my ( $v1, $v2 ) = main->get( $form->{t} );
 warn qq|v1=$v1, v2=$v2\n|;
-myConfig->settbl('CDCPA','DETAILID','DischargeID');
-myConfig->settbl('CDCPA','HEADERTABLE','Discharge');
-my ($v1,$v2) = main->get($form->{t});
+myConfig->settbl( 'CDCPA', 'DETAILID',    'DischargeID' );
+myConfig->settbl( 'CDCPA', 'HEADERTABLE', 'Discharge' );
+my ( $v1, $v2 ) = main->get( $form->{t} );
 warn qq|v1=$v1, v2=$v2\n|;
 exit;
-sub get
-{
-  my ($self,$t) = @_;
-my $ht = myConfig->tbl($t,'HEADERTABLE');
-my $id = myConfig->tbl($t,'DETAILID');
-warn qq|v1=$v1, v2=$v2\n|;
-  return($ht,$id);
+
+sub get {
+    my ( $self, $t ) = @_;
+    my $ht = myConfig->tbl( $t, 'HEADERTABLE' );
+    my $id = myConfig->tbl( $t, 'DETAILID' );
+    warn qq|v1=$v1, v2=$v2\n|;
+    return ( $ht, $id );
 }
 

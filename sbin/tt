@@ -1,35 +1,35 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBForm;
 use DBUtil;
 use Accounts;
 use myConfig;
+
 # Build the list of NPI/Organizations to find dbs.
-my $NPIs=Accounts->NPIRECs(Accounts->dbs('active'));
-my $WWW = myConfig->cfg('WWW');
+my $NPIs = Accounts->NPIRECs( Accounts->dbs('active') );
+my $WWW  = myConfig->cfg('WWW');
+
 #foreach my $key ( sort keys %{$NPIs} ) { warn qq|key=$key,DB=$NPIs->{$key}->{DB}\n|; }
-my $linecount=0;
+my $linecount = 0;
 ############################################################################
-foreach my $file ( @ARGV )
-{
-  print qq|\nparse file: $file\n|;
-  if ( open(FILE,$file) ) 
-  {
-    while ( $in = <FILE> )
-    {
-      chomp($in);
-      my $cnt = 0;
-      foreach my $val ( split(/\t/,$in) )
-      {
-#print "val=".$val."\n";
-        $cnt++;
-        if ( $cnt == 3 || $cnt == 14 || $cnt == 15 ) { null; }
-        elsif ( $cnt == 17 ) { print $val."\n"; $cnt = 0;}
-        else { print $val."\t"; }
-      }
+foreach my $file (@ARGV) {
+    print qq|\nparse file: $file\n|;
+    if ( open( FILE, $file ) ) {
+        while ( $in = <FILE> ) {
+            chomp($in);
+            my $cnt = 0;
+            foreach my $val ( split( /\t/, $in ) ) {
+
+                #print "val=".$val."\n";
+                $cnt++;
+                if    ( $cnt == 3 || $cnt == 14 || $cnt == 15 ) { null; }
+                elsif ( $cnt == 17 ) { print $val. "\n"; $cnt = 0; }
+                else                 { print $val. "\t"; }
+            }
+        }
+        close(FILE);
     }
-    close(FILE);
-  } else { print qq|>>>ERROR: open ${file} $!\n|; }
+    else { print qq|>>>ERROR: open ${file} $!\n|; }
 }
 exit;
 ################################################################

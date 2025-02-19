@@ -1,43 +1,39 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBForm;
 my $what = shift;
 ############################################################################
 my $form = myForm->new("DBNAME=okmis_mms");
-my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $dbh  = myDBI->dbconnect( $form->{'DBNAME'} );
 my $cdbh = myDBI->dbconnect('okmis_config');
 print qq|\n|;
-if ( $what eq 'bs' )
-{ main->xTable($dbh,'xBillStatus'); }
-elsif ( $what eq 'rs' )
-{ main->xTable($cdbh,'xRevStatus'); }
-elsif ( $what eq 'nt' )
-{ main->noteType(); }
+if    ( $what eq 'bs' ) { main->xTable( $dbh, 'xBillStatus' ); }
+elsif ( $what eq 'rs' ) { main->xTable( $cdbh, 'xRevStatus' ); }
+elsif ( $what eq 'nt' ) { main->noteType(); }
 else { print qq|command?\nbillstatus (bs)\nrevstatus (rs)\nnotetype (nt)\n|; }
 print qq|\n|;
 myDBI->cleanup();
 exit;
 ############################################################################
-sub xTable
-{
-  my ($self,$handle,$table) = @_;
-  my $s=$handle->prepare("select * from ${table} where Active=1 order by ID");
-  $s->execute();
-  while (my $r = $s->fetchrow_hashref)
-  {
-    print qq|$r->{'ID'}=$r->{'Descr'},$r->{'Text'}\n|;
-  }
-  $s->finish();
-  return();
+sub xTable {
+    my ( $self, $handle, $table ) = @_;
+    my $s =
+      $handle->prepare("select * from ${table} where Active=1 order by ID");
+    $s->execute();
+    while ( my $r = $s->fetchrow_hashref ) {
+        print qq|$r->{'ID'}=$r->{'Descr'},$r->{'Text'}\n|;
+    }
+    $s->finish();
+    return ();
 }
-sub noteType
-{
-  my ($self) = @_;
-  print qq|1=Progress\n|;
-  print qq|2=Physician\n|;
-  print qq|3=Electronic\n|;
-  print qq|4=Medicare\n|;
-  print qq|5=TFC\n|;
-  return();
+
+sub noteType {
+    my ($self) = @_;
+    print qq|1=Progress\n|;
+    print qq|2=Physician\n|;
+    print qq|3=Electronic\n|;
+    print qq|4=Medicare\n|;
+    print qq|5=TFC\n|;
+    return ();
 }
 ############################################################################

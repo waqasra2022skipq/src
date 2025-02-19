@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use myForm;
 use myDBI;
@@ -11,30 +11,43 @@ my $DT = localtime();
 # usage:
 #   MIPS134
 ############################################################################
-my $form = myForm->new();
-my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $form  = myForm->new();
+my $dbh   = myDBI->dbconnect( $form->{'DBNAME'} );
 my $debug = $form->{'LOGINPROVID'} == 91 ? 0 : 0;
-if ( $debug ) { foreach my $f ( sort keys %{$form} ) { print "form-$f=$form->{$f}\n"; } }
+if ($debug) {
+    foreach my $f ( sort keys %{$form} ) { print "form-$f=$form->{$f}\n"; }
+}
 $form = DBUtil->setDates($form);
 my $DateRange = qq|from $form->{FromDateD} thru $form->{ToDateD}|;
 
-my $multidel = 'ý';
+my $multidel  = 'ý';
 my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+
 # join xInsurance needed for withSelection
-my $withSelection = DBA->withSelection($form,'and','Client.clinicClinicID','Treatment.ProvID','Treatment.ClientID','Treatment.TrID');
+my $withSelection = DBA->withSelection( $form, 'and', 'Client.clinicClinicID',
+    'Treatment.ProvID', 'Treatment.ClientID', 'Treatment.TrID' );
 my $Header = DBA->withSelectionHeader($form);
-print qq|Header: ${Header}\n| if ( $debug );
+print qq|Header: ${Header}\n|              if ($debug);
 $withSelection .= qq| and Client.Active=1| if ( $form->{Active} );
-  $QID = qq|QID134|;
-  $TITLE = qq|Preventive Care and Screening: Screening for Depression and Follow-Up Plan - National Quality Strategy Domain: Community/Population Health - Meaningful Measure Area: Prevention, Treatment, and Management of Mental Health|;
-  $CTYPE = qq|MIPS CLINICAL QUALITY MEASURES (CQMS)|;
-  $MTYPE = qq|Process|;
-  $DESC = qq|Percentage of patients aged 12 years and older screened for depression on the date of the encounter using an age appropriate standardized depression screening tool AND if positive, a follow-up plan is documented on the date of the positive screen|;
-  $INST = qq|This measure is to be submitted a minimum of once per measurement period for patients seen during the measurement period. The most recent quality-data code submitted will be used for performance calculation. This measure may be submitted by Merit-based Incentive Payment System (MIPS) eligible clinicians who perform the quality actions described in the measure based on the services provided and the measure-specific denominator coding. The follow-up plan must be related to a positive depression screening, example: "Patient referred for psychiatric evaluation due to positive depression screening".|;
-  my @FLDS = ('ClinicName:ClinicName','LName:LastName','FName:FirstName','ClientID:ClientID','DOB:DateOfBirth','Age:Age','Race:Race','pcount:ProbAddr','PrimaryProvider:PrimaryProvider');
-  my $numFLDS = scalar(@FLDS)-3;
-print qq|numFLDS=${numFLDS}\n| if ( $debug );
-  my $qrecord = qq|
+$QID = qq|QID134|;
+$TITLE =
+qq|Preventive Care and Screening: Screening for Depression and Follow-Up Plan - National Quality Strategy Domain: Community/Population Health - Meaningful Measure Area: Prevention, Treatment, and Management of Mental Health|;
+$CTYPE = qq|MIPS CLINICAL QUALITY MEASURES (CQMS)|;
+$MTYPE = qq|Process|;
+$DESC =
+qq|Percentage of patients aged 12 years and older screened for depression on the date of the encounter using an age appropriate standardized depression screening tool AND if positive, a follow-up plan is documented on the date of the positive screen|;
+$INST =
+qq|This measure is to be submitted a minimum of once per measurement period for patients seen during the measurement period. The most recent quality-data code submitted will be used for performance calculation. This measure may be submitted by Merit-based Incentive Payment System (MIPS) eligible clinicians who perform the quality actions described in the measure based on the services provided and the measure-specific denominator coding. The follow-up plan must be related to a positive depression screening, example: "Patient referred for psychiatric evaluation due to positive depression screening".|;
+my @FLDS = (
+    'ClinicName:ClinicName', 'LName:LastName',
+    'FName:FirstName',       'ClientID:ClientID',
+    'DOB:DateOfBirth',       'Age:Age',
+    'Race:Race',             'pcount:ProbAddr',
+    'PrimaryProvider:PrimaryProvider'
+);
+my $numFLDS = scalar(@FLDS) - 3;
+print qq|numFLDS=${numFLDS}\n| if ($debug);
+my $qrecord = qq|
 select Treatment.TrID, Treatment.ContLogDate,xSC.SCNum
       ,Client.LName,Client.FName,Client.ClientID
       ,Clinic.Name as ClinicName
@@ -142,64 +155,74 @@ select Treatment.TrID, Treatment.ContLogDate,xSC.SCNum
 #   and Client.ClientID=55011
  group by Client.LName,Client.FName,Client.ClientID
 |;
+
 # group by Client.LName,Client.FName,Client.ClientID,xSC.SCNum,misICD10.ICD10
 # KLS
-print qq|qrecord=\n${qrecord}\n| if ( $debug );
-my $sExclude = $dbh->prepare("
+print qq|qrecord=\n${qrecord}\n| if ($debug);
+my $sExclude = $dbh->prepare( "
 select Treatment.TrID
  from Treatment 
   left join xSC on xSC.SCID=Treatment.SCID 
  where Treatment.ClientID=? and xSC.SCNum='G9717'
-");
-my $sGCode = $dbh->prepare("select Treatment.TrID, xSC.SCNum from Treatment left join xSC on xSC.SCID=Treatment.SCID where Treatment.ClientID=? and xSC.SCNum IN ('G8431','G8432','G8433','G8510','G8511')");
-my ($Denominator,$total, $PFMET, $DNEXCEPTION, $PFNOTMET) = (0,0,0,0,0);
+" );
+my $sGCode = $dbh->prepare(
+"select Treatment.TrID, xSC.SCNum from Treatment left join xSC on xSC.SCID=Treatment.SCID where Treatment.ClientID=? and xSC.SCNum IN ('G8431','G8432','G8433','G8510','G8511')"
+);
+my ( $Denominator, $total, $PFMET, $DNEXCEPTION, $PFNOTMET ) =
+  ( 0, 0, 0, 0, 0 );
 
 my $table_header = '';
-foreach my $f ( @FLDS ) { 
-  my ($fld,$hdr) = split(':',$f); 
-  $table_header .= qq|${hdr}\t|; 
+foreach my $f (@FLDS) {
+    my ( $fld, $hdr ) = split( ':', $f );
+    $table_header .= qq|${hdr}\t|;
 }
 $table_header .= qq|\n|;
 $table_entries = '';
 
 my $srecord = $dbh->prepare($qrecord);
 $srecord->execute();
-while (my $rrecord = $srecord->fetchrow_hashref)
-{ 
-  #  AND NOT DENOMINATOR EXCLUSION
+while ( my $rrecord = $srecord->fetchrow_hashref ) {
 
-  $sExclude->execute($rrecord->{'ClientID'});
-  my $rExclude = $sExclude->fetchrow_hashref;
-  my $cnt = $sExclude->rows;
-  print qq|Exclude cnt=${cnt}\n| if ( $debug );
-  next if ( $cnt );
+    #  AND NOT DENOMINATOR EXCLUSION
 
-  #  Numerator
-  $sGCode->execute($rrecord->{'ClientID'});
-  while (my $rGCode = $sGCode->fetchrow_hashref) {
-    if ($rGCode->{SCNum} == 'G8510' || $rGCode->{SCNum} == 'G8433') {
-      # Performance MET
-      $PFMET++;
+    $sExclude->execute( $rrecord->{'ClientID'} );
+    my $rExclude = $sExclude->fetchrow_hashref;
+    my $cnt      = $sExclude->rows;
+    print qq|Exclude cnt=${cnt}\n| if ($debug);
+    next                           if ($cnt);
 
-    } elsif ($rGCode->{SCNum} == 'G8510') {
-      # DENOMINATOR EXCEPTION
-      $DNEXCEPTION++;
+    #  Numerator
+    $sGCode->execute( $rrecord->{'ClientID'} );
+    while ( my $rGCode = $sGCode->fetchrow_hashref ) {
+        if ( $rGCode->{SCNum} == 'G8510' || $rGCode->{SCNum} == 'G8433' ) {
 
-    } elsif ($rGCode->{SCNum} == 'G8432' || $rGCode->{SCNum} == 'G8511') {
-      # Performance NOT MET
-      $PFNOTMET++;
+            # Performance MET
+            $PFMET++;
+
+        }
+        elsif ( $rGCode->{SCNum} == 'G8510' ) {
+
+            # DENOMINATOR EXCEPTION
+            $DNEXCEPTION++;
+
+        }
+        elsif ( $rGCode->{SCNum} == 'G8432' || $rGCode->{SCNum} == 'G8511' ) {
+
+            # Performance NOT MET
+            $PFNOTMET++;
+        }
     }
-  }
 
-  $Denominator++;
-  foreach my $f ( @FLDS ) { 
-    my ($fld,$hdr) = split(':',$f); 
-    $table_entries .= qq|$rrecord->{$fld}\t|; 
-  }
-  # print qq|$rClientAUDIT->{'q2'}\t$rClientSBIRT->{'q2'}\t|;
-  $table_entries .= qq|\n|; 
+    $Denominator++;
+    foreach my $f (@FLDS) {
+        my ( $fld, $hdr ) = split( ':', $f );
+        $table_entries .= qq|$rrecord->{$fld}\t|;
+    }
 
-  $total += $rrecord->{'pcount'};
+    # print qq|$rClientAUDIT->{'q2'}\t$rClientSBIRT->{'q2'}\t|;
+    $table_entries .= qq|\n|;
+
+    $total += $rrecord->{'pcount'};
 }
 
 my $Data_Completeness_Rate;
@@ -207,25 +230,29 @@ my $Performance_Rate;
 
 my $Data_Completeness_Numerator = $PFMET + $DNEXCEPTION + $PFNOTMET;
 
-if($Denominator eq 0) {
+if ( $Denominator eq 0 ) {
 
-  $Data_Completeness_Rate = 0;
-  $Performance_Rate = 0;
+    $Data_Completeness_Rate = 0;
+    $Performance_Rate       = 0;
 
-} else {
+}
+else {
 
-  $Data_Completeness_Rate = ($Data_Completeness_Numerator/ $Denominator) * 100;
-  $Performance_Rate = ($PFMET / ($Data_Completeness_Numerator - $DNEXCEPTION)) * 100;
+    $Data_Completeness_Rate =
+      ( $Data_Completeness_Numerator / $Denominator ) * 100;
+    $Performance_Rate =
+      ( $PFMET / ( $Data_Completeness_Numerator - $DNEXCEPTION ) ) * 100;
 }
 
-$Data_Completeness_Rate = sprintf("%.2f", $Data_Completeness_Rate);
-$Performance_Rate = sprintf("%.2f", $Performance_Rate);
+$Data_Completeness_Rate = sprintf( "%.2f", $Data_Completeness_Rate );
+$Performance_Rate       = sprintf( "%.2f", $Performance_Rate );
 
-
-
-my $nom_denom = qq|Numerator = Performance Met (${PFMET}) +  Denominator Exception (${DNEXCEPTION}) +  Performance Not Met (${PFNOTMET}) = ${Data_Completeness_Numerator} \n Denominator(Eligible Population) = ${Denominator}\n|;
-my $Data_Completeness_Rate_Text = qq|Data Completeness Rate = Numerator(${Data_Completeness_Numerator}) / Denominator(${Denominator}) = ${Data_Completeness_Rate}% \n|;
-my $Performance_Rate_Text = qq|Performance Rate = Performance Met (${PFMET}) / Numerator(${Data_Completeness_Numerator}) - Denominator Exception (${DNEXCEPTION}) = ${Performance_Rate}% \n|;
+my $nom_denom =
+qq|Numerator = Performance Met (${PFMET}) +  Denominator Exception (${DNEXCEPTION}) +  Performance Not Met (${PFNOTMET}) = ${Data_Completeness_Numerator} \n Denominator(Eligible Population) = ${Denominator}\n|;
+my $Data_Completeness_Rate_Text =
+qq|Data Completeness Rate = Numerator(${Data_Completeness_Numerator}) / Denominator(${Denominator}) = ${Data_Completeness_Rate}% \n|;
+my $Performance_Rate_Text =
+qq|Performance Rate = Performance Met (${PFMET}) / Numerator(${Data_Completeness_Numerator}) - Denominator Exception (${DNEXCEPTION}) = ${Performance_Rate}% \n|;
 
 $Header = qq|${DT}\n${QID} ${TITLE} ${DateRange} ${Header} \n ${nom_denom}|;
 
@@ -235,9 +262,7 @@ print $Performance_Rate_Text;
 print $table_header;
 print $table_entries;
 
-print qq|\t${Denominator}|."\t" x $numFLDS.qq|${total}\n|;
-
-
+print qq|\t${Denominator}| . "\t" x $numFLDS . qq|${total}\n|;
 
 $srecord->finish();
 $sExclude->finish();

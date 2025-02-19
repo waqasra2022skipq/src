@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use Accounts;
 use myConfig;
 use SysAccess;
@@ -8,51 +8,60 @@ use SysAccess;
 #   recreates the ACL tables
 ############################################################################
 # get the command name...
-my ($pw,$cmd) = $0 =~ m/(.*\/)(.*)$/;
+my ( $pw, $cmd ) = $0 =~ m/(.*\/)(.*)$/;
+
 # rebuild?
-my $rebuild = 0; if ( $ARGV[0] eq 'rebuild' ) { $rebuild = 1; shift; }
+my $rebuild = 0;
+if ( $ARGV[0] eq 'rebuild' ) { $rebuild = 1; shift; }
+
 # ProvID?
-my $ProvID = ''; if ( $ARGV[0] =~ /^ProvID=/i ) { ($Type,$ProvID,$rest) = split('=',$ARGV[0]); shift; }
+my $ProvID = '';
+if ( $ARGV[0] =~ /^ProvID=/i ) {
+    ( $Type, $ProvID, $rest ) = split( '=', $ARGV[0] );
+    shift;
+}
+
 # the databases to work with
-my @DBS = $ARGV[0] eq 'test' ? Accounts->dbs('test') : scalar(@ARGV) ? @ARGV : Accounts->dbs('active'); 
+my @DBS =
+    $ARGV[0] eq 'test' ? Accounts->dbs('test')
+  : scalar(@ARGV)      ? @ARGV
+  :                      Accounts->dbs('active');
 
 ############################################################################
-print qq|${cmd} Started: |.localtime().qq|\n\n|;
+print qq|${cmd} Started: | . localtime() . qq|\n\n|;
 print qq|======================================\n\n|;
 print qq|rebuild=${rebuild} ProvID=${ProvID}\n|;
-foreach my $dbname ( @DBS )
-{
-  print qq|\n--------------------------------------\n|;
-  print qq|begin: ${dbname}    |.localtime().qq|\n|;
-  my $form = DBForm->new("DBNAME=${dbname}");
-  print qq|  setSiteACL:       |.localtime().qq|\n|;
-  main->recreateSiteACL($form) if ( $rebuild );
-  my $COUNT = SysAccess->setSiteACL($form);
-  print qq|  setSiteACL     =${COUNT} \n|;
-  print qq|  setClientACL:     |.localtime().qq|\n|;
-  my $COUNT = SysAccess->setClientACL($form,1);
-  print qq|  setClientACL   =${COUNT} \n|;
-  print qq|  setManagerTree:   |.localtime().qq|\n|;
-  my $COUNT = SysAccess->setManagerTree($form);
-  print qq|  setManagerTree =${COUNT} \n|;
-  print qq|complete: ${dbname} |.localtime().qq|\n|;
-  $form->complete();
+foreach my $dbname (@DBS) {
+    print qq|\n--------------------------------------\n|;
+    print qq|begin: ${dbname}    | . localtime() . qq|\n|;
+    my $form = DBForm->new("DBNAME=${dbname}");
+    print qq|  setSiteACL:       | . localtime() . qq|\n|;
+    main->recreateSiteACL($form) if ($rebuild);
+    my $COUNT = SysAccess->setSiteACL($form);
+    print qq|  setSiteACL     =${COUNT} \n|;
+    print qq|  setClientACL:     | . localtime() . qq|\n|;
+    my $COUNT = SysAccess->setClientACL( $form, 1 );
+    print qq|  setClientACL   =${COUNT} \n|;
+    print qq|  setManagerTree:   | . localtime() . qq|\n|;
+    my $COUNT = SysAccess->setManagerTree($form);
+    print qq|  setManagerTree =${COUNT} \n|;
+    print qq|complete: ${dbname} | . localtime() . qq|\n|;
+    $form->complete();
 }
 print qq|\n\n======================================\n|;
-print qq|${cmd} Completed: |.localtime().qq|\n|;
+print qq|${cmd} Completed: | . localtime() . qq|\n|;
 exit;
 ############################################################################
-sub recreateSiteACL
-{
-  my ($self,$form) = @_;
-  print qq|    rebuild SiteACL...|;
-  my $dbh = $form->dbconnect();
-  my $sDrop=$dbh->prepare("DROP TABLE IF EXISTS SiteACL");
-  $sDrop->execute();
-  $sDrop->finish();
-  print qq|dropped...|;
+sub recreateSiteACL {
+    my ( $self, $form ) = @_;
+    print qq|    rebuild SiteACL...|;
+    my $dbh   = $form->dbconnect();
+    my $sDrop = $dbh->prepare("DROP TABLE IF EXISTS SiteACL");
+    $sDrop->execute();
+    $sDrop->finish();
+    print qq|dropped...|;
 
-  my $sCreate=$dbh->prepare("
+    my $sCreate = $dbh->prepare( "
 CREATE TABLE `SiteACL` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `ProvID` int(11) DEFAULT NULL,
@@ -66,11 +75,11 @@ CREATE TABLE `SiteACL` (
   KEY `AccessID` (`AccessID`),
   KEY `Type` (`Type`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-");
-  $sCreate->execute();
-  $sCreate->finish();
-  print qq|created.\n|;
+" );
+    $sCreate->execute();
+    $sCreate->finish();
+    print qq|created.\n|;
 
-  return(1);
+    return (1);
 }
 ############################################################################

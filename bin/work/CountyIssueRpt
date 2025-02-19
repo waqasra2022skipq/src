@@ -1,128 +1,128 @@
-cmd=/home/okmis/mis/src/bin/GetCountyIssue DBNAME=okmis_adv\&fix=yes
+cmd=/var/www/okmis/src/bin/GetCountyIssue DBNAME=okmis_adv\&fix=yes
 Started: Wed Jun  3 12:12:11 2020
 ======================================
 
-  database: okmis_adv: /home/okmis/mis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:11 2020
+  database: okmis_adv: /var/www/okmis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:11 2020
 DBNAME=okmis_adv
-cmd=/home/okmis/mis/src/bin/GetCountyIssue DBNAME=okmis_anv\&fix=yes
-  database: okmis_adv: /home/okmis/mis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:11 2020
+cmd=/var/www/okmis/src/bin/GetCountyIssue DBNAME=okmis_anv\&fix=yes
+  database: okmis_adv: /var/www/okmis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:11 2020
 
-  database: okmis_anv: /home/okmis/mis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:11 2020
+  database: okmis_anv: /var/www/okmis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:11 2020
 DBNAME=okmis_anv
-cmd=/home/okmis/mis/src/bin/GetCountyIssue DBNAME=okmis_ccc\&fix=yes
-  database: okmis_anv: /home/okmis/mis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:12 2020
+cmd=/var/www/okmis/src/bin/GetCountyIssue DBNAME=okmis_ccc\&fix=yes
+  database: okmis_anv: /var/www/okmis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:12 2020
 
-  database: okmis_ccc: /home/okmis/mis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:12 2020
+  database: okmis_ccc: /var/www/okmis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:12 2020
 DBNAME=okmis_ccc
 --6284,Misty,Bledso,Oklahoma County
 --6286,Matt,Hankinson,Oklahoma County
-cmd=/home/okmis/mis/src/bin/GetCountyIssue DBNAME=okmis_ccs\&fix=yes
-  database: okmis_ccc: /home/okmis/mis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:12 2020
+cmd=/var/www/okmis/src/bin/GetCountyIssue DBNAME=okmis_ccs\&fix=yes
+  database: okmis_ccc: /var/www/okmis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:12 2020
 
-  database: okmis_ccs: /home/okmis/mis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:12 2020
+  database: okmis_ccs: /var/www/okmis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:12 2020
 DBNAME=okmis_ccs
 --604,Jackquline,Baker,Canadian County
-cmd=/home/okmis/mis/src/bin/GetCountyIssue DBNAME=okmis_csl\&fix=yes
-  database: okmis_ccs: /home/okmis/mis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:12 2020
+cmd=/var/www/okmis/src/bin/GetCountyIssue DBNAME=okmis_csl\&fix=yes
+  database: okmis_ccs: /var/www/okmis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:12 2020
 
-  database: okmis_csl: /home/okmis/mis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:12 2020
+  database: okmis_csl: /var/www/okmis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:12 2020
 DBNAME=okmis_csl
-cmd=/home/okmis/mis/src/bin/GetCountyIssue DBNAME=okmis_cti\&fix=yes
-  database: okmis_csl: /home/okmis/mis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:12 2020
+cmd=/var/www/okmis/src/bin/GetCountyIssue DBNAME=okmis_cti\&fix=yes
+  database: okmis_csl: /var/www/okmis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:12 2020
 
-  database: okmis_cti: /home/okmis/mis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:12 2020
+  database: okmis_cti: /var/www/okmis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:12 2020
 DBNAME=okmis_cti
 --10361,Ty,Smith,Washington County
-cmd=/home/okmis/mis/src/bin/GetCountyIssue DBNAME=okmis_elf\&fix=yes
-  database: okmis_cti: /home/okmis/mis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:12 2020
+cmd=/var/www/okmis/src/bin/GetCountyIssue DBNAME=okmis_elf\&fix=yes
+  database: okmis_cti: /var/www/okmis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:12 2020
 
-  database: okmis_elf: /home/okmis/mis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:12 2020
+  database: okmis_elf: /var/www/okmis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:12 2020
 DBNAME=okmis_elf
-cmd=/home/okmis/mis/src/bin/GetCountyIssue DBNAME=okmis_fho\&fix=yes
-  database: okmis_elf: /home/okmis/mis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:13 2020
+cmd=/var/www/okmis/src/bin/GetCountyIssue DBNAME=okmis_fho\&fix=yes
+  database: okmis_elf: /var/www/okmis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:13 2020
 
-  database: okmis_fho: /home/okmis/mis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:13 2020
+  database: okmis_fho: /var/www/okmis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:13 2020
 DBNAME=okmis_fho
-cmd=/home/okmis/mis/src/bin/GetCountyIssue DBNAME=okmis_foh\&fix=yes
-  database: okmis_fho: /home/okmis/mis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:13 2020
+cmd=/var/www/okmis/src/bin/GetCountyIssue DBNAME=okmis_foh\&fix=yes
+  database: okmis_fho: /var/www/okmis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:13 2020
 
-  database: okmis_foh: /home/okmis/mis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:13 2020
+  database: okmis_foh: /var/www/okmis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:13 2020
 DBNAME=okmis_foh
-cmd=/home/okmis/mis/src/bin/GetCountyIssue DBNAME=okmis_gcs\&fix=yes
-  database: okmis_foh: /home/okmis/mis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:13 2020
+cmd=/var/www/okmis/src/bin/GetCountyIssue DBNAME=okmis_gcs\&fix=yes
+  database: okmis_foh: /var/www/okmis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:13 2020
 
-  database: okmis_gcs: /home/okmis/mis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:13 2020
+  database: okmis_gcs: /var/www/okmis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:13 2020
 DBNAME=okmis_gcs
-cmd=/home/okmis/mis/src/bin/GetCountyIssue DBNAME=okmis_gpr\&fix=yes
-  database: okmis_gcs: /home/okmis/mis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:13 2020
+cmd=/var/www/okmis/src/bin/GetCountyIssue DBNAME=okmis_gpr\&fix=yes
+  database: okmis_gcs: /var/www/okmis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:13 2020
 
-  database: okmis_gpr: /home/okmis/mis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:13 2020
+  database: okmis_gpr: /var/www/okmis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:13 2020
 DBNAME=okmis_gpr
 --7785,Tiana,Vancuren,Lincoln County
 --7786,Joshua,Vancuren,Lincoln County
-cmd=/home/okmis/mis/src/bin/GetCountyIssue DBNAME=okmis_ibf\&fix=yes
-  database: okmis_gpr: /home/okmis/mis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:13 2020
+cmd=/var/www/okmis/src/bin/GetCountyIssue DBNAME=okmis_ibf\&fix=yes
+  database: okmis_gpr: /var/www/okmis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:13 2020
 
-  database: okmis_ibf: /home/okmis/mis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:13 2020
+  database: okmis_ibf: /var/www/okmis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:13 2020
 DBNAME=okmis_ibf
-cmd=/home/okmis/mis/src/bin/GetCountyIssue DBNAME=okmis_ipi\&fix=yes
-  database: okmis_ibf: /home/okmis/mis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:14 2020
+cmd=/var/www/okmis/src/bin/GetCountyIssue DBNAME=okmis_ipi\&fix=yes
+  database: okmis_ibf: /var/www/okmis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:14 2020
 
-  database: okmis_ipi: /home/okmis/mis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:14 2020
+  database: okmis_ipi: /var/www/okmis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:14 2020
 DBNAME=okmis_ipi
-cmd=/home/okmis/mis/src/bin/GetCountyIssue DBNAME=okmis_lbhp\&fix=yes
-  database: okmis_ipi: /home/okmis/mis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:14 2020
+cmd=/var/www/okmis/src/bin/GetCountyIssue DBNAME=okmis_lbhp\&fix=yes
+  database: okmis_ipi: /var/www/okmis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:14 2020
 
-  database: okmis_lbhp: /home/okmis/mis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:14 2020
+  database: okmis_lbhp: /var/www/okmis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:14 2020
 DBNAME=okmis_lbhp
 --2301,Sunshine,Graham,Tulsa County
 --2302,Acey,Akien,Tulsa County
 --2303,Demarko,McMann,Tulsa County
-cmd=/home/okmis/mis/src/bin/GetCountyIssue DBNAME=okmis_lkt\&fix=yes
-  database: okmis_lbhp: /home/okmis/mis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:14 2020
+cmd=/var/www/okmis/src/bin/GetCountyIssue DBNAME=okmis_lkt\&fix=yes
+  database: okmis_lbhp: /var/www/okmis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:14 2020
 
-  database: okmis_lkt: /home/okmis/mis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:14 2020
+  database: okmis_lkt: /var/www/okmis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:14 2020
 DBNAME=okmis_lkt
-cmd=/home/okmis/mis/src/bin/GetCountyIssue DBNAME=okmis_mms\&fix=yes
-  database: okmis_lkt: /home/okmis/mis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:14 2020
+cmd=/var/www/okmis/src/bin/GetCountyIssue DBNAME=okmis_mms\&fix=yes
+  database: okmis_lkt: /var/www/okmis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:14 2020
 
-  database: okmis_mms: /home/okmis/mis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:14 2020
+  database: okmis_mms: /var/www/okmis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:14 2020
 DBNAME=okmis_mms
 --63967,Sarah,Everett,Stephens County
 --63968,Quetzali,Becerra,Hughes County
-cmd=/home/okmis/mis/src/bin/GetCountyIssue DBNAME=okmis_oays\&fix=yes
-  database: okmis_mms: /home/okmis/mis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:14 2020
+cmd=/var/www/okmis/src/bin/GetCountyIssue DBNAME=okmis_oays\&fix=yes
+  database: okmis_mms: /var/www/okmis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:14 2020
 
-  database: okmis_oays: /home/okmis/mis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:14 2020
+  database: okmis_oays: /var/www/okmis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:14 2020
 DBNAME=okmis_oays
-cmd=/home/okmis/mis/src/bin/GetCountyIssue DBNAME=okmis_opa\&fix=yes
-  database: okmis_oays: /home/okmis/mis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:15 2020
+cmd=/var/www/okmis/src/bin/GetCountyIssue DBNAME=okmis_opa\&fix=yes
+  database: okmis_oays: /var/www/okmis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:15 2020
 
-  database: okmis_opa: /home/okmis/mis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:15 2020
+  database: okmis_opa: /var/www/okmis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:15 2020
 DBNAME=okmis_opa
-cmd=/home/okmis/mis/src/bin/GetCountyIssue DBNAME=okmis_pcd\&fix=yes
-  database: okmis_opa: /home/okmis/mis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:15 2020
+cmd=/var/www/okmis/src/bin/GetCountyIssue DBNAME=okmis_pcd\&fix=yes
+  database: okmis_opa: /var/www/okmis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:15 2020
 
-  database: okmis_pcd: /home/okmis/mis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:15 2020
+  database: okmis_pcd: /var/www/okmis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:15 2020
 DBNAME=okmis_pcd
-cmd=/home/okmis/mis/src/bin/GetCountyIssue DBNAME=okmis_scs\&fix=yes
-  database: okmis_pcd: /home/okmis/mis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:15 2020
+cmd=/var/www/okmis/src/bin/GetCountyIssue DBNAME=okmis_scs\&fix=yes
+  database: okmis_pcd: /var/www/okmis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:15 2020
 
-  database: okmis_scs: /home/okmis/mis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:15 2020
+  database: okmis_scs: /var/www/okmis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:15 2020
 DBNAME=okmis_scs
-cmd=/home/okmis/mis/src/bin/GetCountyIssue DBNAME=okmis_tccp\&fix=yes
-  database: okmis_scs: /home/okmis/mis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:15 2020
+cmd=/var/www/okmis/src/bin/GetCountyIssue DBNAME=okmis_tccp\&fix=yes
+  database: okmis_scs: /var/www/okmis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:15 2020
 
-  database: okmis_tccp: /home/okmis/mis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:15 2020
+  database: okmis_tccp: /var/www/okmis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:15 2020
 DBNAME=okmis_tccp
-cmd=/home/okmis/mis/src/bin/GetCountyIssue DBNAME=okmis_tsi\&fix=yes
-  database: okmis_tccp: /home/okmis/mis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:15 2020
+cmd=/var/www/okmis/src/bin/GetCountyIssue DBNAME=okmis_tsi\&fix=yes
+  database: okmis_tccp: /var/www/okmis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:15 2020
 
-  database: okmis_tsi: /home/okmis/mis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:15 2020
+  database: okmis_tsi: /var/www/okmis/src/bin/GetCountyIssue: Started   Wed Jun  3 12:12:15 2020
 DBNAME=okmis_tsi
 --1772,Lanita,Lukert,Creek County
 --1773,Aimee,Hoffman,Tulsa County
-  database: okmis_tsi: /home/okmis/mis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:16 2020
+  database: okmis_tsi: /var/www/okmis/src/bin/GetCountyIssue: Completed Wed Jun  3 12:12:16 2020
 
 ======================================
 Completed: Wed Jun  3 12:12:16 2020

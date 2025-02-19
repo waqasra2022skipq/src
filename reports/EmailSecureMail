@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ############################################################################
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBA;
 use DBForm;
@@ -8,17 +8,22 @@ use DBUtil;
 ############################################################################
 # usage:
 ############################################################################
-my $cnt=0;
-my $form = DBForm->new();
+my $cnt    = 0;
+my $form   = DBForm->new();
 my $myDate = $form->{'d'} ? $form->{'d'} : $form->{'TODAY'};
 my $myAddr = "wade\@okmis.com";
-my $subj = qq|Secure Email for ${myDate} on $form->{'DBNAME'}|;
-my $msg = qq|You have a Secure message sent to you on ${myDate}\n|;
-my $dbh = $form->dbconnect();
-$sMail=$dbh->prepare("select ProviderMail.ProvID,ProviderMail.ToProvID,ProviderMail.DateSent,ProviderMail.CreateDate,Provider.Email from ProviderMail left join Provider on Provider.ProvID=ProviderMail.ProvID where Provider.Email=? and ProviderMail.CreateDate=? group by Provider.Email");
-$sMail->execute($myAddr,$myDate);
-while ($rMail = $sMail->fetchrow_hashref)
-{ $cnt++; DBUtil->email($form,$myAddr,$subj,$msg); }
+my $subj   = qq|Secure Email for ${myDate} on $form->{'DBNAME'}|;
+my $msg    = qq|You have a Secure message sent to you on ${myDate}\n|;
+my $dbh    = $form->dbconnect();
+$sMail = $dbh->prepare(
+"select ProviderMail.ProvID,ProviderMail.ToProvID,ProviderMail.DateSent,ProviderMail.CreateDate,Provider.Email from ProviderMail left join Provider on Provider.ProvID=ProviderMail.ProvID where Provider.Email=? and ProviderMail.CreateDate=? group by Provider.Email"
+);
+$sMail->execute( $myAddr, $myDate );
+
+while ( $rMail = $sMail->fetchrow_hashref ) {
+    $cnt++;
+    DBUtil->email( $form, $myAddr, $subj, $msg );
+}
 $sMail->finish();
 $form->complete();
 print qq|${cnt} emails found.\n|;

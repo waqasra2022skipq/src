@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 
 use DBI;
 use myForm;
@@ -10,33 +10,48 @@ use Time::Local;
 my $DT = localtime();
 ############################################################################
 # usage:
-#   MIPS 
+#   MIPS
 ############################################################################
-my $form = myForm->new();
-my $dbh = myDBI->dbconnect($form->{'DBNAME'});
+my $form  = myForm->new();
+my $dbh   = myDBI->dbconnect( $form->{'DBNAME'} );
 my $debug = $form->{'LOGINPROVID'} == 91 ? 0 : 0;
-if ( $debug ) { foreach my $f ( sort keys %{$form} ) { print "form-$f=$form->{$f}\n"; } }
+if ($debug) {
+    foreach my $f ( sort keys %{$form} ) { print "form-$f=$form->{$f}\n"; }
+}
 my $Type = $form->{'Type'};
 $form = DBUtil->setDates($form);
 my $DateRange = qq|from $form->{FromDateD} thru $form->{ToDateD}|;
 
-my $multidel = 'ý';
+my $multidel  = 'ý';
 my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+
 # join xInsurance needed for withSelection
-my $withSelection = DBA->withSelection($form,'and','Treatment.ClinicID','Treatment.ProvID','Treatment.ClientID','Treatment.TrID');
+my $withSelection =
+  DBA->withSelection( $form, 'and', 'Treatment.ClinicID', 'Treatment.ProvID',
+    'Treatment.ClientID', 'Treatment.TrID' );
 my $Header = DBA->withSelectionHeader($form);
+
 #warn qq|Header: ${Header}\n|;
 $withSelection .= qq| and Client.Active=1| if ( $form->{Active} );
-  $QID = qq|QID130|;
-  $TITLE = qq|Documentation of Current Medications in the Medical Record - National Quality Strategy Domain: Patient Safety - Meaningful Measure Area: Medication Management|;
-  $CTYPE = qq|MIPS CLINICAL QUALITY MEASURES (CQMS)|;
-  $MTYPE = qq|Process - High Priority|;
-  $DESC = qq|Percentage of visits for patients aged 18 years and older for which the MIPS eligible professional or MIPS eligible clinician attests to documenting a list of current medications using all immediate resources available on the date of the encounter. This list must include ALL known prescriptions, over-the-counters, herbals, and vitamin/mineral/dietary (nutritional) supplements AND must contain the medications name, dosage, frequency and route of administration|;
-  $INST = qq|This measure is to be submitted at each denominator eligible visit during the 12 month performance period. Merit-based Incentive Payment System (MIPS) eligible clinicians meet the intent of this measure by making their best effort to document a current, complete and accurate medication list during each encounter. There is no diagnosis associated with this measure. This measure may be submitted by MIPS eligible clinicians who perform the quality actions described in the measure based on the services provided and the measure-specific denominator coding.|;
-  my @FLDS = ('ClinicName:ClinicName','LName:LastName','FName:FirstName','ClientID:ClientID','DOB:DateOfBirth','Age:Age','Race:Race','pcount:ProbAddr','PrimaryProvider:PrimaryProvider', 'lastcontdate:Last Contact Date');
-  my $numFLDS = scalar(@FLDS)-3;
-print qq|numFLDS=${numFLDS}\n| if ( $debug );
-  my $qrecord = qq|
+$QID = qq|QID130|;
+$TITLE =
+qq|Documentation of Current Medications in the Medical Record - National Quality Strategy Domain: Patient Safety - Meaningful Measure Area: Medication Management|;
+$CTYPE = qq|MIPS CLINICAL QUALITY MEASURES (CQMS)|;
+$MTYPE = qq|Process - High Priority|;
+$DESC =
+qq|Percentage of visits for patients aged 18 years and older for which the MIPS eligible professional or MIPS eligible clinician attests to documenting a list of current medications using all immediate resources available on the date of the encounter. This list must include ALL known prescriptions, over-the-counters, herbals, and vitamin/mineral/dietary (nutritional) supplements AND must contain the medications name, dosage, frequency and route of administration|;
+$INST =
+qq|This measure is to be submitted at each denominator eligible visit during the 12 month performance period. Merit-based Incentive Payment System (MIPS) eligible clinicians meet the intent of this measure by making their best effort to document a current, complete and accurate medication list during each encounter. There is no diagnosis associated with this measure. This measure may be submitted by MIPS eligible clinicians who perform the quality actions described in the measure based on the services provided and the measure-specific denominator coding.|;
+my @FLDS = (
+    'ClinicName:ClinicName',           'LName:LastName',
+    'FName:FirstName',                 'ClientID:ClientID',
+    'DOB:DateOfBirth',                 'Age:Age',
+    'Race:Race',                       'pcount:ProbAddr',
+    'PrimaryProvider:PrimaryProvider', 'lastcontdate:Last Contact Date'
+);
+my $numFLDS = scalar(@FLDS) - 3;
+print qq|numFLDS=${numFLDS}\n| if ($debug);
+my $qrecord = qq|
 select Treatment.TrID,Treatment.ContLogDate,Treatment.ClinicID,xSC.SCNum
       ,Client.LName,Client.FName,Client.ClientID, Client.RecDOLC as lastcontdate
       ,Clinic.Name as ClinicName
@@ -162,46 +177,54 @@ select Treatment.TrID,Treatment.ContLogDate,Treatment.ClinicID,xSC.SCNum
   ${withSelection}
  group by Client.LName,Client.FName,Client.ClientID
 |;
+
 # group by Client.LName,Client.FName,Client.ClientID,xSC.SCNum,misICD10.ICD10
 #warn qq|qrecord=\n${qrecord}\n|;
-my ($Denominator,$total, $PFMET, $DNEXCEPTION, $PFNOTMET) = (0,0,0,0,0);
+my ( $Denominator, $total, $PFMET, $DNEXCEPTION, $PFNOTMET ) =
+  ( 0, 0, 0, 0, 0 );
 
 my $table_header = '';
-foreach my $f ( @FLDS ) { 
-  my ($fld,$hdr) = split(':',$f); 
-  $table_header .= qq|${hdr}\t|; 
+foreach my $f (@FLDS) {
+    my ( $fld, $hdr ) = split( ':', $f );
+    $table_header .= qq|${hdr}\t|;
 }
 $table_header .= qq|\n|;
 $table_entries = '';
 
-
-my $sGCode = $dbh->prepare("select Treatment.TrID, xSC.SCNum from Treatment left join xSC on xSC.SCID=Treatment.SCID where Treatment.ClientID=? and xSC.SCNum IN ('G8427','G8428','G8430')");
+my $sGCode = $dbh->prepare(
+"select Treatment.TrID, xSC.SCNum from Treatment left join xSC on xSC.SCID=Treatment.SCID where Treatment.ClientID=? and xSC.SCNum IN ('G8427','G8428','G8430')"
+);
 my $srecord = $dbh->prepare($qrecord);
 $srecord->execute();
-while (my $rrecord = $srecord->fetchrow_hashref)
-{ 
-  $sGCode->execute($rrecord->{'ClientID'});
-  while (my $rGCode = $sGCode->fetchrow_hashref) {
-    if ($rGCode->{SCNum} eq 'G8427') {
-      # Performance MET
-      $PFMET++;
-    } elsif ($rGCode->{SCNum} eq 'G8430') {
-      # DENOMINATOR EXCEPTION
-      $DNEXCEPTION++;
-    } elsif ($rGCode->{SCNum} eq 'G8428') {
-      # Performance NOT MET
-      $PFNOTMET++;
-    }
-  }
-  $Denominator++;
-  foreach my $f ( @FLDS ) { 
-    my ($fld,$hdr) = split(':',$f); 
-    $table_entries .= qq|$rrecord->{$fld}\t|; 
-  }
-  # print qq|$rClientAUDIT->{'q2'}\t$rClientSBIRT->{'q2'}\t|;
-  $table_entries .= qq|\n|; 
+while ( my $rrecord = $srecord->fetchrow_hashref ) {
+    $sGCode->execute( $rrecord->{'ClientID'} );
+    while ( my $rGCode = $sGCode->fetchrow_hashref ) {
+        if ( $rGCode->{SCNum} eq 'G8427' ) {
 
-  $total += $rrecord->{'pcount'};
+            # Performance MET
+            $PFMET++;
+        }
+        elsif ( $rGCode->{SCNum} eq 'G8430' ) {
+
+            # DENOMINATOR EXCEPTION
+            $DNEXCEPTION++;
+        }
+        elsif ( $rGCode->{SCNum} eq 'G8428' ) {
+
+            # Performance NOT MET
+            $PFNOTMET++;
+        }
+    }
+    $Denominator++;
+    foreach my $f (@FLDS) {
+        my ( $fld, $hdr ) = split( ':', $f );
+        $table_entries .= qq|$rrecord->{$fld}\t|;
+    }
+
+    # print qq|$rClientAUDIT->{'q2'}\t$rClientSBIRT->{'q2'}\t|;
+    $table_entries .= qq|\n|;
+
+    $total += $rrecord->{'pcount'};
 }
 
 my $Data_Completeness_Rate;
@@ -209,26 +232,30 @@ my $Performance_Rate;
 
 my $Data_Completeness_Numerator = $PFMET + $DNEXCEPTION + $PFNOTMET;
 
-if($Denominator eq 0) {
+if ( $Denominator eq 0 ) {
 
-  $Data_Completeness_Rate = 0;
-  $Performance_Rate = 0;
+    $Data_Completeness_Rate = 0;
+    $Performance_Rate       = 0;
 
-} else {
+}
+else {
 
-  $Data_Completeness_Rate = ($Data_Completeness_Numerator/ $Denominator) * 100;
-  $Performance_Rate = ($PFMET / ($Data_Completeness_Numerator - $DNEXCEPTION)) * 100;
+    $Data_Completeness_Rate =
+      ( $Data_Completeness_Numerator / $Denominator ) * 100;
+    $Performance_Rate =
+      ( $PFMET / ( $Data_Completeness_Numerator - $DNEXCEPTION ) ) * 100;
 
 }
 
-$Data_Completeness_Rate = sprintf("%.2f", $Data_Completeness_Rate);
-$Performance_Rate = sprintf("%.2f", $Performance_Rate);
+$Data_Completeness_Rate = sprintf( "%.2f", $Data_Completeness_Rate );
+$Performance_Rate       = sprintf( "%.2f", $Performance_Rate );
 
-
-
-my $nom_denom = qq|Numerator = Performance Met (${PFMET}) +  Denominator Exception (${DNEXCEPTION}) +  Performance Not Met (${PFNOTMET}) = ${Data_Completeness_Numerator} \n Denominator(Eligible Population) = ${Denominator}\n|;
-my $Data_Completeness_Rate_Text = qq|Data Completeness Rate = Numerator(${Data_Completeness_Numerator}) / Denominator(${Denominator}) = ${Data_Completeness_Rate}% \n|;
-my $Performance_Rate_Text = qq|Performance Rate = Performance Met (${PFMET}) / Numerator(${Data_Completeness_Numerator}) - Denominator Exception (${DNEXCEPTION}) = ${Performance_Rate}% \n|;
+my $nom_denom =
+qq|Numerator = Performance Met (${PFMET}) +  Denominator Exception (${DNEXCEPTION}) +  Performance Not Met (${PFNOTMET}) = ${Data_Completeness_Numerator} \n Denominator(Eligible Population) = ${Denominator}\n|;
+my $Data_Completeness_Rate_Text =
+qq|Data Completeness Rate = Numerator(${Data_Completeness_Numerator}) / Denominator(${Denominator}) = ${Data_Completeness_Rate}% \n|;
+my $Performance_Rate_Text =
+qq|Performance Rate = Performance Met (${PFMET}) / Numerator(${Data_Completeness_Numerator}) - Denominator Exception (${DNEXCEPTION}) = ${Performance_Rate}% \n|;
 
 $Header = qq|${DT}\n${QID} ${TITLE} ${DateRange} ${Header} \n ${nom_denom}|;
 
@@ -238,8 +265,7 @@ print $Performance_Rate_Text;
 print $table_header;
 print $table_entries;
 
-print qq|\t${Denominator}|."\t" x $numFLDS.qq|${total}\n|;
-
+print qq|\t${Denominator}| . "\t" x $numFLDS . qq|${total}\n|;
 
 $srecord->finish();
 $sGCode->finish();

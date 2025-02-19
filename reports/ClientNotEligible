@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/src/lib';
 use DBI;
 use DBForm;
 use DBA;
@@ -11,10 +11,10 @@ $DT = localtime();
 #   ClientNotEligible ForProvID=id
 ############################################################################
 my $form = DBForm->new;
-my $dbh = $form->dbconnect;
+my $dbh  = $form->dbconnect;
 
 my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
-my $multidel = 'ý';
+my $multidel  = 'ý';
 ############################################################################
 my $qInsurance = qq|
 select * 
@@ -26,7 +26,9 @@ select *
 |;
 my $sInsurance = $dbh->prepare($qInsurance);
 $sProvider = $dbh->prepare("select * from Provider where ProvID=?");
-my $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID','where');
+my $ClinicSelection =
+  DBA->getClinicSelection( $form, $ForProvID, 'Client.clinicClinicID',
+    'where' );
 $ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
 $qClient = qq|select Provider.Name as Clinic
      ,Client.LName, Client.FName, Client.ClientID, Client.Active
@@ -51,54 +53,78 @@ $qClient = qq|select Provider.Name as Clinic
   ${ClinicSelection}
   order by Provider.LName, Provider.FName, Client.LName, Client.FName
 |;
+
 #warn qq|q=\n$qClient\n| if ( $form->{LOGINPROVID} == 91 );
 ############################################################################
 print qq|${DT}\nClient Eligible Dropped or Not Primary Report\n|;
-print qq|Provider\tActive\tClient\tClientID\tActive\tDOB\tGend\tRace\tAge\tZip\tRefDate\tDays\tCustAgency\tPrimary\tStatus\tInsCode\tPlanDescr\tClinic\tReferred By\n|;
+print
+qq|Provider\tActive\tClient\tClientID\tActive\tDOB\tGend\tRace\tAge\tZip\tRefDate\tDays\tCustAgency\tPrimary\tStatus\tInsCode\tPlanDescr\tClinic\tReferred By\n|;
 my $sClient = $dbh->prepare($qClient);
 $sClient->execute() || $form->dberror($query);
-while ( my $rClient = $sClient->fetchrow_hashref )
-{
+while ( my $rClient = $sClient->fetchrow_hashref ) {
 
-  my ($flag,$StatusReason,$PriInsCode) = (0,'','');
-  $sInsurance->execute($rClient->{ClientID},1);
-  my $rInsurance = $sInsurance->fetchrow_hashref;
-  $PriInsCode = $rInsurance->{InsCode};
-  my $plan = $PriInsCode eq 'MB' ? " and PlanDescr='Medicare Part B'"
-           : $PriInsCode eq 'MC' ? " and (PlanDescr='Title 19' or PlanDescr='Mental Health and Substance Abuse') and Benefit IN ('0','1')"
-           : '';
-  my $qEligible = qq|select * from Eligible where ClientID=? ${plan} order by FromDate desc, ToDate desc|;
+    my ( $flag, $StatusReason, $PriInsCode ) = ( 0, '', '' );
+    $sInsurance->execute( $rClient->{ClientID}, 1 );
+    my $rInsurance = $sInsurance->fetchrow_hashref;
+    $PriInsCode = $rInsurance->{InsCode};
+    my $plan =
+        $PriInsCode eq 'MB' ? " and PlanDescr='Medicare Part B'"
+      : $PriInsCode eq 'MC'
+      ? " and (PlanDescr='Title 19' or PlanDescr='Mental Health and Substance Abuse') and Benefit IN ('0','1')"
+      : '';
+    my $qEligible =
+qq|select * from Eligible where ClientID=? ${plan} order by FromDate desc, ToDate desc|;
+
 #warn qq|ClientID=$rClient->{ClientID},InsCode=$rInsurance->{InsCode},Descr=$rInsurance->{Descr}\n| if ( $form->{LOGINPROVID} == 91 );
 #warn qq|qEligible=$qEligible\n| if ( $form->{LOGINPROVID} == 91 );
-  $sEligible = $dbh->prepare($qEligible);
-  $sEligible->execute($rClient->{ClientID});
-  if ( $rEligible = $sEligible->fetchrow_hashref )
-  {
+    $sEligible = $dbh->prepare($qEligible);
+    $sEligible->execute( $rClient->{ClientID} );
+    if ( $rEligible = $sEligible->fetchrow_hashref ) {
 
 #warn qq|ToDate=$rEligible->{ToDate},Benefit=$rEligible->{Benefit}\n| if ( $form->{LOGINPROVID} == 91 );
 #warn qq|InsCode=$rEligible->{InsCode},Benefit=$rEligible->{Benefit}\n| if ( $form->{LOGINPROVID} == 91 );
 # if expired by date or code and this elgibility is their primary insurance?
-    if ( $rEligible->{ToDate} ne '' && ($rEligible->{ToDate} lt $form->{TODAY} || $rEligible->{Benefit} == 0 ) 
-       && $rEligible->{InsCode} eq $rInsurance->{InsCode} )
-    { $flag=1; $StatusReason = 'Eligibility Expired'; }
-# if they have medicaid/medicare and elgibility is not their primary insurance?
-    if ( ($rInsurance->{Descr} eq 'medicaid' || $rInsurance->{Descr} eq 'medicare' ) 
-       && $rInsurance->{InsCode} ne $rEligible->{InsCode} )
-    { $flag=1; $StatusReason = 'Eligibility Not Primary'; }
-  }
+        if (
+            $rEligible->{ToDate} ne ''
+            && (   $rEligible->{ToDate} lt $form->{TODAY}
+                || $rEligible->{Benefit} == 0 )
+            && $rEligible->{InsCode} eq $rInsurance->{InsCode}
+          )
+        {
+            $flag         = 1;
+            $StatusReason = 'Eligibility Expired';
+        }
+
+ # if they have medicaid/medicare and elgibility is not their primary insurance?
+        if (
+            (
+                   $rInsurance->{Descr} eq 'medicaid'
+                || $rInsurance->{Descr} eq 'medicare'
+            )
+            && $rInsurance->{InsCode} ne $rEligible->{InsCode}
+          )
+        {
+            $flag         = 1;
+            $StatusReason = 'Eligibility Not Primary';
+        }
+    }
+
 #warn qq|flag=$flag,StatusReason=$StatusReason\n| if ( $form->{LOGINPROVID} == 91 );
-  if ( $flag )
-  {
-    print qq|$rClient->{ProvLName}, $rClient->{ProvFName} ($rClient->{ProvID})|;
-    print qq|\t$rClient->{PActive}|;
-    print qq|\t$rClient->{LName}, $rClient->{FName}\t$rClient->{ClientID}|;
-    print qq|\t$rClient->{Active}\t$rClient->{DOB}|;
-    print qq|\t$rClient->{Gend}\t$rClient->{Race}\t$rClient->{Age}\t$rClient->{Zip}|;
-    print qq|\t$rClient->{RefDate}\t$rClient->{Days}\t$rClient->{CustAgency}|;
-    print qq|\t${PriInsCode}\t${StatusReason}\t$rEligible->{InsCode}\t$rEligible->{PlanDescr}|;
-    print qq|\t$rClient->{Clinic}\t$rClient->{ProvOrgName}|;
-    print qq|\n|;
-  }
+    if ($flag) {
+        print
+          qq|$rClient->{ProvLName}, $rClient->{ProvFName} ($rClient->{ProvID})|;
+        print qq|\t$rClient->{PActive}|;
+        print qq|\t$rClient->{LName}, $rClient->{FName}\t$rClient->{ClientID}|;
+        print qq|\t$rClient->{Active}\t$rClient->{DOB}|;
+        print
+qq|\t$rClient->{Gend}\t$rClient->{Race}\t$rClient->{Age}\t$rClient->{Zip}|;
+        print
+          qq|\t$rClient->{RefDate}\t$rClient->{Days}\t$rClient->{CustAgency}|;
+        print
+qq|\t${PriInsCode}\t${StatusReason}\t$rEligible->{InsCode}\t$rEligible->{PlanDescr}|;
+        print qq|\t$rClient->{Clinic}\t$rClient->{ProvOrgName}|;
+        print qq|\n|;
+    }
 }
 $sInsurance->finish();
 $sProvider->finish();
