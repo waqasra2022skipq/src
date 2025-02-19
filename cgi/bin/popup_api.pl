@@ -9,6 +9,10 @@ use DBUtil;
 use JSON;
 use strict;
 
+use warnings;
+use LWP::UserAgent;
+use CGI;
+
 ############################################################################
 my $form = DBForm->parse();
 $form = login->chkLogin($form);
@@ -20,124 +24,21 @@ my $cdbh = $form->connectdb('okmis_config');
 ############################################################################
 my $json_str;
 
+use strict;
+use warnings;
+use LWP::UserAgent;
+use JSON;
+
+our %ClinicTypes = ( 'NPI-1' => "Individual", 'NPI-2' => "Organization" );
+
 if ( $form->{method} eq 'Agency' ) {
-    my @json = ();
     ( my $terms = $form->{'terms'} ) =~ s/"//g;
-    if ( $terms ne '' ) {
-        my ( $FLDS, $CodeFLD, $limit, $maxLimit ) =
-          ( 'Type ProvOrgName Addr1 City ST Zip NPI', 'NPI', 20, 500 );
 
-        my $SelectQ = qq|select *|;
-        my $CountQ  = qq|select count(*) as cnt|;
-        my $For     = qq| like "%${terms}%" |;
-        my $WhereQ = qq| and (NPI ${For} or ProvOrgName ${For} or Zip ${For}) |;
-
-        my $q = qq| from xNPI where EntityTypeCode>1|;
-        $q .= qq| ${WhereQ} | if $terms ne '*';
-
-        my $sxNPICount = $cdbh->prepare(qq|${CountQ} ${q}|);
-        $sxNPICount->execute() || $form->dberror(qq|${CountQ} ${q}|);
-
-        if ( my $rxNPICount = $sxNPICount->fetchrow_hashref ) {
-            if ( $rxNPICount->{'cnt'} > 0 ) {
-                my $cnt = $rxNPICount->{'cnt'};
-                my ( @codes, @data ) = ( (), () );
-                push( @json, $cnt );
-
-                $q .= qq| order by Type desc,ProvOrgName |;
-                if ( exists $form->{'maxList'} ) {
-                    $q .= qq| limit $maxLimit |;
-                }
-                else {
-                    $q .= qq| limit $limit |;
-                }
-
-                my $sxNPI = $cdbh->prepare(qq|${SelectQ} $q|);
-                $sxNPI->execute() || $form->dberror(qq|${SelectQ} $q|);
-
-                while ( my $rxNPI = $sxNPI->fetchrow_hashref ) {
-                    my @row = ();
-                    foreach my $fld ( split( ' ', $FLDS ) ) {
-                        if ( $fld eq $CodeFLD ) {
-                            push( @codes, $rxNPI->{$fld} );
-                        }
-                        $rxNPI->{$fld} = '' if $rxNPI->{$fld} eq '';
-                        push( @row, $rxNPI->{$fld} );
-                    }
-                    push( @data, \@row );
-                }
-                push( @json, \@codes );
-                push( @json, undef );
-                push( @json, \@data );
-
-                $sxNPI->finish();
-            }
-        }
-
-        $json_str = encode_json \@json;
-        $sxNPICount->finish();
-    }
+    $json_str = search_api_npi($terms);
 }
 elsif ( $form->{method} eq 'Physicians' ) {
-    my @json = ();
     ( my $terms = $form->{'terms'} ) =~ s/"//g;
-    if ( $terms ne '' ) {
-        my ( $FLDS, $CodeFLD, $limit, $maxLimit ) = (
-            'ProvLastName ProvFirstName Addr1 City ST Zip NPI',
-            'NPI', 20, 500
-        );
-
-        my $SelectQ = qq|select *|;
-        my $CountQ  = qq|select count(*) as cnt|;
-        my $For     = qq| like "%${terms}%" |;
-        my $WhereQ =
-          qq| and (NPI ${For} or ProvLastName ${For} or Zip ${For}) |;
-
-        my $q = qq| from xNPI where EntityTypeCode=1 |;
-        $q .= qq| ${WhereQ} | if $terms ne '*';
-
-        my $sxNPICount = $cdbh->prepare(qq|${CountQ} ${q}|);
-        $sxNPICount->execute() || $form->dberror(qq|${CountQ} ${q}|);
-
-        if ( my $rxNPICount = $sxNPICount->fetchrow_hashref ) {
-            if ( $rxNPICount->{'cnt'} > 0 ) {
-                my $cnt = $rxNPICount->{'cnt'};
-                my ( @codes, @data ) = ( (), () );
-                push( @json, $cnt );
-
-                $q .= qq| order by ProvLastName, ProvFirstName |;
-                if ( exists $form->{'maxList'} ) {
-                    $q .= qq| limit $maxLimit |;
-                }
-                else {
-                    $q .= qq| limit $limit |;
-                }
-
-                my $sxNPI = $cdbh->prepare(qq|${SelectQ} ${q}|);
-                $sxNPI->execute() || $form->dberror(qq|${SelectQ} ${q}|);
-
-                while ( my $rxNPI = $sxNPI->fetchrow_hashref ) {
-                    my @row = ();
-                    foreach my $fld ( split( ' ', $FLDS ) ) {
-                        if ( $fld eq $CodeFLD ) {
-                            push( @codes, $rxNPI->{$fld} );
-                        }
-                        $rxNPI->{$fld} = '' if $rxNPI->{$fld} eq '';
-                        push( @row, $rxNPI->{$fld} );
-                    }
-                    push( @data, \@row );
-                }
-                push( @json, \@codes );
-                push( @json, undef );
-                push( @json, \@data );
-
-                $sxNPI->finish();
-            }
-        }
-
-        $json_str = encode_json \@json;
-        $sxNPICount->finish();
-    }
+    $json_str = search_api_npi($terms);
 }
 elsif ( $form->{method} eq 'xLDO' ) {
     my @json = ();
@@ -402,3 +303,84 @@ $form->complete();
 exit;
 
 ############################################################################
+
+sub search_api_npi {
+    my ($terms) = @_;
+    my @json    = ();
+    my @data    = ();
+    my @codes   = ();
+
+    my $base_url = "https://npiregistry.cms.hhs.gov/api/";
+    my $version  = "2.1";
+    my @types    = ( 'NPI-2', 'NPI-1' );
+
+    foreach my $type (@types) {
+        my %query_params = (
+            'version'          => $version,
+            'enumeration_type' => $type,
+            "exact_match"      => "false"
+        );
+
+        if ( $terms =~ /^\d+$/ ) {
+            $query_params{'number'} = $terms;
+        }
+        else {
+            if ( 'NPI-1' eq $type ) {
+                my @names = split( ':', $terms );
+                $query_params{'first_name'} = $names[0] if defined $names[0];
+                $query_params{'last_name'}  = $names[1] if defined $names[1];
+            }
+            else {
+                $query_params{'organization_name'} = $terms;
+            }
+        }
+
+        my $query_string =
+          join( "&", map { "$_=$query_params{$_}" } keys %query_params );
+        my $api_url = "$base_url?$query_string";
+
+        my $ua       = LWP::UserAgent->new;
+        my $response = $ua->get($api_url);
+
+        if ( $response->is_success ) {
+            my $api_data = decode_json( $response->decoded_content );
+            if ( exists $api_data->{'results'} ) {
+                foreach my $provider ( @{ $api_data->{'results'} } ) {
+                    my @row  = ();
+                    my $npi  = $provider->{'number'} || '';
+                    my $name = $provider->{'basic'}->{'organization_name'}
+                      || ($provider->{'basic'}->{'first_name'} . " "
+                        . $provider->{'basic'}->{'last_name'} )
+                      || '';
+                    my $address =
+                      $provider->{'addresses'}[0]{'address_1'} || '';
+                    my $city  = $provider->{'addresses'}[0]{'city'}      || '';
+                    my $state = $provider->{'addresses'}[0]{'state'}     || '';
+                    my $zip = $provider->{'addresses'}[0]{'postal_code'} || '';
+
+                    push( @row,
+                        $ClinicTypes{$type}, $name, $address, $city, $state,
+                        $zip, $npi );
+                    push( @codes, $npi );
+                    push( @data,  \@row );
+                }
+            }
+        }
+        else {
+            push(
+                @json,
+                {
+                    "error" => "Failed to fetch data from API: "
+                      . $response->status_line
+                }
+            );
+        }
+    }
+
+    push( @json, scalar @data );
+    push( @json, \@codes );
+    push( @json, undef );
+    push( @json, \@data );
+
+    return encode_json \@json;
+}
