@@ -786,23 +786,46 @@ qq|<SELECT NAME="$form->{'name'}" ${size} ${multiple} >\n${opts}</SELECT>\n|;
 }
 elsif ( $form->{method} eq 'Agency' ) {
     ( my $pattern = $form->{'pattern'} ) =~ s/"//g;
-    my $For = qq| like "%${pattern}%" |;
-    @Display = (
-        'Type', ':', 'ProvOrgName', ',', 'Addr1', ',',
-        'City', ',', 'ST',          ',', 'Zip',   '[',
-        'NPI',  ']'
-    );
-    my $opts = main->selmatch( $form, $cdbh, "select * from xNPI where NPI=?",
-        $value, 'NPI', @Display );
-    my $q =
-      $pattern eq '*'
-      ? qq|select * from xNPI where EntityTypeCode>1 order by Type desc,ProvOrgName|
-      : qq|select * from xNPI where EntityTypeCode>1 and (NPI ${For} or ProvOrgName ${For} or Zip ${For}) order by Type desc,ProvOrgName|;
 
-    #warn qq|Agency: q=${q}\n|;
-    $opts .= main->seloptions( $form, $cdbh, $q, $pattern, 'NPI', @Display );
+#   my $For = qq| like "%${pattern}%" |;
+#   @Display = ('Type',':','ProvOrgName',',','Addr1',',','City',',','ST',',','Zip','[','NPI',']');
+#   my $opts = main->selmatch($form,$cdbh,"select * from xNPI where NPI=?",$value,'NPI',@Display);
+#   my $q = $pattern eq '*'
+#         ? qq|select * from xNPI where EntityTypeCode>1 order by Type desc,ProvOrgName|
+#         : qq|select * from xNPI where EntityTypeCode>1 and (NPI ${For} or ProvOrgName ${For} or Zip ${For}) order by Type desc,ProvOrgName|;
+# #warn qq|Agency: q=${q}\n|;
+#   $opts .= main->seloptions($form,$cdbh,$q,$pattern,'NPI',@Display);
+# #warn qq|Agency: opts=${opts}\n|;
 
-    #warn qq|Agency: opts=${opts}\n|;
+    if ( $pattern eq "" ) {
+        $pattern = $value;
+    }
+    $json_str = NPIRegistryAPI->search_api_npi($pattern);
+    my $api_data = decode_json($json_str);    # Decode the JSON response
+
+    # Handle API error
+    if ( ref $api_data eq 'ARRAY' && exists $api_data->[0]->{error} ) {
+        print STDERR "API Error: " . $api_data->[0]->{error} . "\n";
+        return main->ierr( $target, "API Error: " . $api_data->[0]->{error} );
+    }
+
+    # Extract data from JSON response
+    my $results = $api_data->[3];    # The actual data array from search_api_npi
+
+    my $opts = '<OPTION VALUE="">unselected';    # Default empty option
+
+    foreach my $row (@$results) {
+        my ( $type, $name, $address, $city, $state, $zip, $npi ) = @$row;
+        my $display_name = "$name, $address, $city, $state [$npi]";
+        if ( $npi eq $value ) {
+            $opts .= qq|<OPTION VALUE="$npi" SELECTED>$display_name</OPTION>\n|;
+        }
+        else {
+            $opts .= qq|<OPTION VALUE="$npi">$display_name</OPTION>\n|;
+
+        }
+    }
+
     my $list =
 qq|<SELECT NAME="$form->{'name'}" ${size} ${multiple} >\n${opts}</SELECT>\n|;
     $out = $err eq ''
@@ -860,19 +883,44 @@ qq|<SELECT NAME="$form->{'name'}" ${size} ${multiple} >\n${opts}</SELECT>\n|;
 }
 elsif ( $form->{method} eq 'Pharmacy' ) {
     ( my $pattern = $form->{'pattern'} ) =~ s/"//g;
-    my $For = qq| like "%${pattern}%" |;
-    @Display = (
-        'Type', ':', 'ProvOrgName', ',', 'Addr1', ',',
-        'City', ',', 'ST',          ',', 'Zip',   '[',
-        'NPI',  ']'
-    );
-    my $opts = main->selmatch( $form, $cdbh, "select * from xNPI where NPI=?",
-        $value, 'NPI', @Display );
-    my $q =
-      $pattern eq '*'
-      ? qq|select * from xNPI where EntityTypeCode>1 and (Taxonomy='3336C0003X' or Taxonomy='333600000X' or Taxonomy='332B00000X') order by Type desc,ProvOrgName|
-      : qq|select * from xNPI where EntityTypeCode>1 and (Taxonomy='3336C0003X' or Taxonomy='333600000X' or Taxonomy='332B00000X') and (NPI ${For} or ProvOrgName ${For} or Zip ${For}) order by Type desc,ProvOrgName|;
-    $opts .= main->seloptions( $form, $cdbh, $q, $pattern, 'NPI', @Display );
+
+# my $For = qq| like "%${pattern}%" |;
+# @Display = ('Type',':','ProvOrgName',',','Addr1',',','City',',','ST',',','Zip','[','NPI',']');
+# my $opts = main->selmatch($form,$cdbh,"select * from xNPI where NPI=?",$value,'NPI',@Display);
+# my $q = $pattern eq '*'
+#       ? qq|select * from xNPI where EntityTypeCode>1 and (Taxonomy='3336C0003X' or Taxonomy='333600000X' or Taxonomy='332B00000X') order by Type desc,ProvOrgName|
+#       : qq|select * from xNPI where EntityTypeCode>1 and (Taxonomy='3336C0003X' or Taxonomy='333600000X' or Taxonomy='332B00000X') and (NPI ${For} or ProvOrgName ${For} or Zip ${For}) order by Type desc,ProvOrgName|;
+# $opts .= main->seloptions($form,$cdbh,$q,$pattern,'NPI',@Display);
+
+    if ( $pattern eq "" ) {
+        $pattern = $value;
+    }
+    $json_str = NPIRegistryAPI->search_api_npi($pattern);
+    my $api_data = decode_json($json_str);    # Decode the JSON response
+
+    # Handle API error
+    if ( ref $api_data eq 'ARRAY' && exists $api_data->[0]->{error} ) {
+        print STDERR "API Error: " . $api_data->[0]->{error} . "\n";
+        return main->ierr( $target, "API Error: " . $api_data->[0]->{error} );
+    }
+
+    # Extract data from JSON response
+    my $results = $api_data->[3];    # The actual data array from search_api_npi
+
+    my $opts = '<OPTION VALUE="">unselected';    # Default empty option
+
+    foreach my $row (@$results) {
+        my ( $type, $name, $address, $city, $state, $zip, $npi ) = @$row;
+        my $display_name = "$name, $address, $city, $state [$npi]";
+        if ( $npi eq $value ) {
+            $opts .= qq|<OPTION VALUE="$npi" SELECTED>$display_name</OPTION>\n|;
+        }
+        else {
+            $opts .= qq|<OPTION VALUE="$npi">$display_name</OPTION>\n|;
+
+        }
+    }
+
     my $list =
 qq|<SELECT NAME="$form->{'name'}" ${size} ${multiple} >\n${opts}</SELECT>\n|;
     $out = $err eq ''
