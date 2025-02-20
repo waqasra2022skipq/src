@@ -3,14 +3,15 @@
 <SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/NoEnter.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vClientIntake.js?v=202009290648"> </SCRIPT>
 <SCRIPT type="text/javascript" src="/cgi/js/ajaxrequest.js"></SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vDate.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vDate.js?345345"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vTime.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vPhone.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vNum.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vZip.js"> </SCRIPT>
 <SCRIPT type="text/javascript" src="/cgi/js/vCheckAddress.js?v=202006032043"></SCRIPT>
 <SCRIPT TYPE="text/javascript" SRC="/cgi/jquery/jquery-1.12.4.js" ></SCRIPT>
-<SCRIPT TYPE="text/javascript" src="/cgi/lhc/autocomplete-lhc-17.0.3/autocomplete-lhc.min.js"></SCRIPT>
+<SCRIPT TYPE="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></SCRIPT>
+<script src="https://lhcforms-static.nlm.nih.gov/autocomplete-lhc-versions/17.0.3/autocomplete-lhc.min.js"></script>
 <SCRIPT TYPE="text/javascript" SRC="/cgi/jquery/jquery-ui-1.12.1/jquery-ui.min.js" ></SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" >
 $(document).ready(function() {
@@ -591,7 +592,7 @@ function initAutocomplete() {
     <TD CLASS="strcol" >
       <INPUT TYPE="date" NAME="Client_DOB_1" VALUE="<<Client_DOB_1>>" ONFOCUS="select()" ONCHANGE="return vDate(this,0,this.form,'Client_Age')" SIZE="10" >
       Age:
-      <INPUT TYPE="text" NAME="Client_Age" VALUE="<<Client_Age>>" ONFOCUS="form.ClientIntake_POB_1.focus();" SIZE="4" >
+      <INPUT TYPE="text" NAME="Client_Age" ID="Client_Age" VALUE="<<Client_Age>>" ONFOCUS="form.ClientIntake_POB_1.focus();" SIZE="4" >
     </TD>
   </TR>
   <TR >
