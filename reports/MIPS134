@@ -1,11 +1,14 @@
 #!/usr/bin/perl
 use lib '/var/www/okmis/src/lib';
+use CGI       qw(:standard escape);
+use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
 use DBI;
 use myForm;
 use myDBI;
 use DBA;
 use DBUtil;
 use Time::Local;
+use uCalc;
 my $DT = localtime();
 ############################################################################
 # usage:
@@ -39,35 +42,28 @@ qq|Percentage of patients aged 12 years and older screened for depression on the
 $INST =
 qq|This measure is to be submitted a minimum of once per measurement period for patients seen during the measurement period. The most recent quality-data code submitted will be used for performance calculation. This measure may be submitted by Merit-based Incentive Payment System (MIPS) eligible clinicians who perform the quality actions described in the measure based on the services provided and the measure-specific denominator coding. The follow-up plan must be related to a positive depression screening, example: "Patient referred for psychiatric evaluation due to positive depression screening".|;
 my @FLDS = (
-    'ClinicName:ClinicName', 'LName:LastName',
-    'FName:FirstName',       'ClientID:ClientID',
-    'DOB:DateOfBirth',       'Age:Age',
-    'Race:Race',             'pcount:ProbAddr',
-    'PrimaryProvider:PrimaryProvider'
+    'ClientName:ClientName', 'ClientID:ClientID',
+    'Age:Age',               'ProviderName:ProviderName'
 );
-my $numFLDS = scalar(@FLDS) - 3;
+my $numFLDS = scalar(@FLDS) - 2;
 print qq|numFLDS=${numFLDS}\n| if ($debug);
 my $qrecord = qq|
-select Treatment.TrID, Treatment.ContLogDate,xSC.SCNum
-      ,Client.LName,Client.FName,Client.ClientID
-      ,Clinic.Name as ClinicName
-      ,CONCAT(Counselor.LName,', ',Counselor.FName) as PrimaryProvider
-      ,Client.DOB,TIMESTAMPDIFF(YEAR, Client.DOB, CURDATE()) AS Age
-      ,xRaces.Descr as Race
-      ,misICD10.ICD10
-      ,count(*) as pcount
- from Treatment 
-  left join Client on Client.ClientID=Treatment.ClientID
-  left join Provider as Clinic on Clinic.ProvID=Client.clinicClinicID
-  left join Provider as Counselor on Counselor.ProvID=Client.ProvID
-  left join okmis_config.xRaces on xRaces.ID=SUBSTRING_INDEX(Client.Race,'${multidel}',1)
-  left join xSC on xSC.SCID=Treatment.SCID
-  left join xInsurance on xInsurance.ID=xSC.InsID
-  left join ClientNoteProblems on ClientNoteProblems.TrID=Treatment.TrID
-  left join okmis_config.misICD10 on misICD10.ID=ClientNoteProblems.UUID
- where (Treatment.ContLogDate >= '$form->{FromDate}' and Treatment.ContLogDate<='$form->{ToDate}')
-   and (TIMESTAMPDIFF(YEAR, Client.DOB, Treatment.ContLogDate) > 12)
-   and (xSC.SCNum='59400'
+    select Treatment.TrID, Treatment.ContLogDate,xSC.SCNum
+        ,Client.ClientID,Provider.ProvID
+        ,CONCAT(Provider.LName,', ',Provider.FName) as ProviderName
+        ,CONCAT(Client.LName,', ',Client.FName) as ClientName
+        ,Client.DOB,TIMESTAMPDIFF(YEAR, Client.DOB, CURDATE()) AS Age
+        ,count(*) as pcount
+    from Treatment 
+    left join Client on Client.ClientID=Treatment.ClientID
+    left join Provider on Provider.ProvID=Treatment.ProvID
+    left join xSC on xSC.SCID=Treatment.SCID
+    left join xInsurance on xInsurance.ID=xSC.InsID
+    WHERE Treatment.ContLogDate BETWEEN '2024-01-01' AND '2024-12-31'
+    and (TIMESTAMPDIFF(YEAR, Client.DOB, Treatment.ContLogDate) > 12)
+    ${withSelection}
+        AND Treatment.ProvID IN ("2118", "2128", "2686", "958")
+        AND (xSC.SCNum='59400'
         or xSC.SCNum='59510'
         or xSC.SCNum='59610'
         or xSC.SCNum='59618'
@@ -131,19 +127,6 @@ select Treatment.TrID, Treatment.ContLogDate,xSC.SCNum
         or xSC.SCNum LIKE '99401%'
         or xSC.SCNum LIKE '99402%'
         or xSC.SCNum LIKE '99403%'
-
-        or xSC.SCNum='99424'
-        or xSC.SCNum='99441'
-        or xSC.SCNum='99442'
-        or xSC.SCNum='99443'
-        or xSC.SCNum='99483'
-        or xSC.SCNum='99483'
-        or xSC.SCNum='99483'
-        or xSC.SCNum='99483'
-        or xSC.SCNum='99491'
-        or xSC.SCNum='99492'
-        or xSC.SCNum='99493'
-        or xSC.SCNum='99494'
         
         or xSC.SCNum='G0101'
         or xSC.SCNum='G0402'
@@ -151,122 +134,395 @@ select Treatment.TrID, Treatment.ContLogDate,xSC.SCNum
         or xSC.SCNum='G0439'
         or xSC.SCNum='G0444'
        )
-  ${withSelection}
-#   and Client.ClientID=55011
- group by Client.LName,Client.FName,Client.ClientID
+ group by Treatment.ClientID
 |;
-
-# group by Client.LName,Client.FName,Client.ClientID,xSC.SCNum,misICD10.ICD10
-# KLS
 print qq|qrecord=\n${qrecord}\n| if ($debug);
-my $sExclude = $dbh->prepare( "
+my $sDenomCheck = $dbh->prepare( "
 select Treatment.TrID
  from Treatment 
-  left join xSC on xSC.SCID=Treatment.SCID 
- where Treatment.ClientID=? and xSC.SCNum='G9717'
-" );
-my $sGCode = $dbh->prepare(
-"select Treatment.TrID, xSC.SCNum from Treatment left join xSC on xSC.SCID=Treatment.SCID where Treatment.ClientID=? and xSC.SCNum IN ('G8431','G8432','G8433','G8510','G8511')"
+  left join xSC on xSC.SCID=Treatment.SCID
+#   xSC.SCNum NOT LIKE '%G9717%' AND This is never there in 2024 so no need to check 
+ where Treatment.ClientID=? and Treatment.ContLogDate BETWEEN '2024-01-01' AND '2024-12-31' and "
 );
-my ( $Denominator, $total, $PFMET, $DNEXCEPTION, $PFNOTMET ) =
-  ( 0, 0, 0, 0, 0 );
+my $sGCode = $dbh->prepare(
+"select xSC.SCNum, Treatment.TrID from Treatment left join xSC on xSC.SCID=Treatment.SCID where Treatment.ContLogDate BETWEEN '2024-01-01' AND '2024-12-31'  AND Treatment.ClientID=? and (xSC.SCNum LIKE '%G8431%' OR xSC.SCNum LIKE '%G8433%' OR xSC.SCNum LIKE '%G8432%' OR xSC.SCNum LIKE '%G8510%' OR xSC.SCNum LIKE '%G8511%')"
+);
+
+my $sPHQ9 = $dbh->prepare(
+"SELECT * FROM ClientPHQ9 WHERE ClientID=? AND TestDate BETWEEN '2024-01-01' AND '2024-12-31' ORDER BY TestDate DESC LIMIT 1"
+);
+my $sPHQ2 = $dbh->prepare(
+"SELECT * FROM ClientPHQ2 WHERE ClientID=? AND TestDate BETWEEN '2024-01-01' AND '2024-12-31' ORDER BY TestDate DESC LIMIT 1"
+);
+
+my $sPHQ15 = $dbh->prepare(
+"SELECT * FROM ClientPHQ15 WHERE ClientID=? AND TestDate BETWEEN '2024-01-01' AND '2024-12-31'"
+);
+
+my $qClProbs = $dbh->prepare(
+    "SELECT cp.InitiatedDate, i.ICD10, i.sctName FROM ClientProblems cp
+                                LEFT JOIN okmis_config.misICD10 i ON cp.UUID = i.ID 
+                                WHERE cp.ClientID = ? AND cp.Active = 1 AND 
+                                i.ICD10 IN (
+    'F30.2', 'F30.3', 'F30.4', 'F30.8', 'F30.9', 'F30.10', 'F30.11', 'F30.12', 'F30.13',
+    'F31.0', 'F31.10', 'F31.11', 'F31.12', 'F31.13', 'F31.2', 'F31.30', 'F31.31', 'F31.32',
+    'F31.4', 'F31.5', 'F31.60', 'F31.61', 'F31.62', 'F31.63', 'F31.64', 'F31.70', 'F31.71',
+    'F31.72', 'F31.73', 'F31.74', 'F31.75', 'F31.76', 'F31.77', 'F31.78', 'F31.81', 'F31.89', 'F31.9'
+);"
+);
+my ( $rcount, $total, $PFMET, $DNEXCEPTION, $PFNOTMET, $DNOM, $DNEXl ) =
+  ( 0, 0, 0, 0, 0, 0, 0 );
 
 my $table_header = '';
 foreach my $f (@FLDS) {
     my ( $fld, $hdr ) = split( ':', $f );
     $table_header .= qq|${hdr}\t|;
 }
+$table_header .= qq|Status\t|;
+
 $table_header .= qq|\n|;
 $table_entries = '';
 
+our %providers = (
+    "2118" => {
+        'name'     => "Kizzy McCaskill",
+        "G8431"    => 0,
+        "G8510"    => 0,
+        "G8432"    => 0,
+        "G8511"    => 0,
+        "G8433"    => 0,
+        "DCNOTMET" => 0
+    },
+    "2128" => {
+        'name'     => "Rebecca Jones L",
+        "G8431"    => 0,
+        "G8510"    => 0,
+        "G8432"    => 0,
+        "G8511"    => 0,
+        "G8433"    => 0,
+        "DCNOTMET" => 0
+    },
+    "2686" => {
+        'name'     => "Shelby Lucas",
+        "G8431"    => 0,
+        "G8510"    => 0,
+        "G8432"    => 0,
+        "G8511"    => 0,
+        "G8433"    => 0,
+        "DCNOTMET" => 0
+    },
+    "958" => {
+        'name'     => "Mindy Jones K",
+        "G8431"    => 0,
+        "G8510"    => 0,
+        "G8432"    => 0,
+        "G8511"    => 0,
+        "G8433"    => 0,
+        "DCNOTMET" => 0
+    }
+);
+
+our %providers_rates = (
+    "2118" => {
+        'name'      => "Kizzy McCaskill",
+        "total_pop" => 0,
+        "PFMET"     => 0,
+        "PFNOTMET"  => 0
+    },
+    "2128" => {
+        'name'      => "Rebecca Jones L",
+        "total_pop" => 0,
+        "PFMET"     => 0,
+        "PFNOTMET"  => 0
+    },
+    "2686" => {
+        'name'      => "Shelby Lucas",
+        "total_pop" => 0,
+        "PFMET"     => 0,
+        "PFNOTMET"  => 0
+    },
+    "958" => {
+        'name'      => "Mindy Jones K",
+        "total_pop" => 0,
+        "PFMET"     => 0,
+        "PFNOTMET"  => 0
+    }
+);
+
 my $srecord = $dbh->prepare($qrecord);
 $srecord->execute();
+my $ProvID;
 while ( my $rrecord = $srecord->fetchrow_hashref ) {
+    $DNOM++;
+    $qClProbs->execute( $rrecord->{'ClientID'} );
+    my $rClProbs    = $qClProbs->fetchrow_hashref;
+    my $rClProbsCnt = $qClProbs->rows;
 
-    #  AND NOT DENOMINATOR EXCLUSION
+    if ($rClProbsCnt) {
 
-    $sExclude->execute( $rrecord->{'ClientID'} );
-    my $rExclude = $sExclude->fetchrow_hashref;
-    my $cnt      = $sExclude->rows;
-    print qq|Exclude cnt=${cnt}\n| if ($debug);
-    next                           if ($cnt);
+        $ICD10   = $rClProbs->{'ICD10'};
+        $sctName = $rClProbs->{'sctName'};
 
-    #  Numerator
-    $sGCode->execute( $rrecord->{'ClientID'} );
-    while ( my $rGCode = $sGCode->fetchrow_hashref ) {
-        if ( $rGCode->{SCNum} == 'G8510' || $rGCode->{SCNum} == 'G8433' ) {
+        $rrecord->{'status'} =
+"<p STYLE='background-color: red'><b>Denominator Excluded:</b> ${ICD10} ${sctName}</p>";
+        $DNEXl++;
+    }
+    else {
+        $ProvID = $rrecord->{'ProvID'};
 
-            # Performance MET
-            $PFMET++;
+        $providers_rates{$ProvID}{'total_pop'} += 1;
+
+        $sPHQ9->execute( $rrecord->{'ClientID'} );
+        my $rTotalPHQ9 = $sPHQ9->fetchrow_hashref;
+
+        $sPHQ2->execute( $rrecord->{'ClientID'} );
+        my $rTotalPHQ2 = $sPHQ2->fetchrow_hashref;
+
+        $sPHQ15->execute( $rrecord->{'ClientID'} );
+        my $rTotalPHQ15 = $sPHQ15->fetchrow_hashref;
+
+        my $positive = 0;
+        my $testDate;
+        my $val = 0;
+        if ( $rTotalPHQ9->{'TestDate'} ne "" ) {
+            $val = calcTotal( $rTotalPHQ9, "q", 1, 9 );
+            $rrecord->{'status'} = flagCountLabel( 'PHQ9', $val );
+
+            if ( $val >= 3 ) {
+                $PFMET++;
+                $providers_rates{$ProvID}{'PFMET'} += 1;
+
+                $providers{$ProvID}{'G8431'} += 1;
+            }
+            else {
+                $PFNOTMET++;
+                $providers_rates{$ProvID}{'PFNOTMET'} += 1;
+
+                $providers{$ProvID}{'G8432'} += 1;
+            }
+        }
+
+        if ( $rTotalPHQ2->{'TestDate'} ne "" ) {
+            $val = calcTotal( $rTotalPHQ2, "q", 1, 2 );
+            $rrecord->{'status'} = flagCountLabel( 'PHQ2', $val );
+
+            if ( $val >= 3 ) {
+                $PFMET++;
+                $providers_rates{$ProvID}{'PFMET'} += 1;
+
+                $providers{$ProvID}{'G8431'} += 1;
+            }
+            else {
+                $PFNOTMET++;
+                $providers_rates{$ProvID}{'PFNOTMET'} += 1;
+
+                $providers{$ProvID}{'G8432'} += 1;
+            }
+        }
+
+        # if ( $rTotalPHQ15->{'TestDate'} ne "" ) {
+        #     $val = calcTotal( $rTotalPHQ15, "q", 1, 15 );
+        #     $rrecord->{'status'} = flagCountLabel( 'PHQ15', $val );
+        # }
+
+        #  Numerator
+        if (   $rTotalPHQ9->{'TestDate'} eq ""
+            && $rTotalPHQ2->{'TestDate'} eq "" )
+        {
+
+            $rrecord->{'status'} =
+"<p STYLE='background-color: red'>Data Completeness Not Met, no PHQ recorded</p>";
+            $providers{$ProvID}{'DCNOTMET'} += 1;
 
         }
-        elsif ( $rGCode->{SCNum} == 'G8510' ) {
+        else {
 
-            # DENOMINATOR EXCEPTION
-            $DNEXCEPTION++;
+            # if ( $val >= 5 ) {
+            #     $PFMET++;
+            #     $providers_rates{$ProvID}{'PFMET'} += 1;
 
-        }
-        elsif ( $rGCode->{SCNum} == 'G8432' || $rGCode->{SCNum} == 'G8511' ) {
+            #     $providers{$ProvID}{'G8431'} += 1;
+            # }
+            # elsif ( $val >= 2 ) {
+            #     $PFNOTMET++;
+            #     $providers_rates{$ProvID}{'PFNOTMET'} += 1;
 
-            # Performance NOT MET
-            $PFNOTMET++;
+            #     $providers{$ProvID}{'G8432'} += 1;
+            # }
+            # else {
+            #     $PFMET++;
+            #     $providers_rates{$ProvID}{'PFMET'} += 1;
+
+            #     $providers{$ProvID}{'G8510'} += 1;
+            # }
         }
     }
 
-    $Denominator++;
+    $rcount++;
     foreach my $f (@FLDS) {
         my ( $fld, $hdr ) = split( ':', $f );
         $table_entries .= qq|$rrecord->{$fld}\t|;
     }
+    $table_entries .= qq|$rrecord->{'status'}\t|;
 
-    # print qq|$rClientAUDIT->{'q2'}\t$rClientSBIRT->{'q2'}\t|;
     $table_entries .= qq|\n|;
 
-    $total += $rrecord->{'pcount'};
 }
-
-my $Data_Completeness_Rate;
-my $Performance_Rate;
 
 my $Data_Completeness_Numerator = $PFMET + $DNEXCEPTION + $PFNOTMET;
-
-if ( $Denominator eq 0 ) {
-
-    $Data_Completeness_Rate = 0;
-    $Performance_Rate       = 0;
-
-}
-else {
-
-    $Data_Completeness_Rate =
-      ( $Data_Completeness_Numerator / $Denominator ) * 100;
-    $Performance_Rate =
-      ( $PFMET / ( $Data_Completeness_Numerator - $DNEXCEPTION ) ) * 100;
-}
-
-$Data_Completeness_Rate = sprintf( "%.2f", $Data_Completeness_Rate );
-$Performance_Rate       = sprintf( "%.2f", $Performance_Rate );
+my $final_DENOM                 = $DNOM - $DNEXl;
 
 my $nom_denom =
-qq|Numerator = Performance Met (${PFMET}) +  Denominator Exception (${DNEXCEPTION}) +  Performance Not Met (${PFNOTMET}) = ${Data_Completeness_Numerator} \n Denominator(Eligible Population) = ${Denominator}\n|;
-my $Data_Completeness_Rate_Text =
-qq|Data Completeness Rate = Numerator(${Data_Completeness_Numerator}) / Denominator(${Denominator}) = ${Data_Completeness_Rate}% \n|;
-my $Performance_Rate_Text =
-qq|Performance Rate = Performance Met (${PFMET}) / Numerator(${Data_Completeness_Numerator}) - Denominator Exception (${DNEXCEPTION}) = ${Performance_Rate}% \n|;
+qq|Initial Population(Denominator) = ${rcount} - Denominator Excluded(${DNEXl}) = ${final_DENOM}\n Numerator = Performance Met (${PFMET}) +  Denominator Exception (${DNEXCEPTION}) +  Performance Not Met (${PFNOTMET}) = ${Data_Completeness_Numerator} \n|;
 
 $Header = qq|${DT}\n${QID} ${TITLE} ${DateRange} ${Header} \n ${nom_denom}|;
 
+# Show Provider codes at the top
+print
+  "<div style='display: flex; flex-direction: column; gap: 20px; width:60%'>"
+  ;    # Flex container
+print
+"<div style='display: flex; flex-direction: row; justify-content: space-between'>Providers Code Count</div>"
+  ;    # Flex item
+
+foreach my $ProvID ( sort keys %providers ) {
+    print
+"<div style='display: flex; flex-direction: row; justify-content: space-between'>"
+      ;    # Flex item
+    print "<span><b>Provider ID:</b> $ProvID </span>";
+    foreach my $attribute ( reverse sort keys %{ $providers{$ProvID} } ) {
+        if ( $attribute eq "DCNOTMET" ) {
+            print
+"<span><b>Data Completness Not Met:</b> $providers{$ProvID}{$attribute}</span>";
+        }
+        else {
+            print
+              "<span><b>$attribute:</b> $providers{$ProvID}{$attribute}</span>";
+        }
+    }
+    print "</div>";    # Close Flex item
+}
+
+# Show Completion and Performance Rate
+
+print
+"<div style='display: flex; flex-direction: row; justify-content: space-between'>Completion and Performance Rate by Provider</div>"
+  ;    # Flex item
+
+foreach my $ProvID ( sort keys %providers_rates ) {
+    print
+"<div style='display: flex; flex-direction: row; justify-content: space-between'>"
+      ;    # Flex item
+    print "<span><b>Provider:</b> $providers_rates{$ProvID}{'name'} </span>";
+    my $pr_total_pop = $providers_rates{$ProvID}{'total_pop'};
+    my $pr_PFMET     = $providers_rates{$ProvID}{'PFMET'};
+    my $pr_PFNOTMET  = $providers_rates{$ProvID}{'PFNOTMET'};
+
+    if ( 0 == $pr_total_pop ) {
+        $pr_total_pop = 1;
+    }
+
+    my $data_completeness_rate =
+      ( ( $pr_PFMET + $pr_PFNOTMET ) / $pr_total_pop ) * 100;
+    my $performance_rate = ( $pr_PFMET / $pr_total_pop ) * 100;
+
+    $data_completeness_rate = sprintf( "%.2f", $data_completeness_rate );
+    $performance_rate       = sprintf( "%.2f", $performance_rate );
+
+    print
+      "<span><b>Data Completeness Rate:</b> ${data_completeness_rate}% </span>";
+    print "<span><b>Performance Rate:</b> ${performance_rate}% </span>";
+
+    print "</div>";    # Close Flex item
+}
+
+print "</div>\n";
+
 print $Header;
-print $Data_Completeness_Rate_Text;
-print $Performance_Rate_Text;
 print $table_header;
 print $table_entries;
 
-print qq|\t${Denominator}| . "\t" x $numFLDS . qq|${total}\n|;
+print qq|\t${rcount}| . "\t" x $numFLDS . "\n";
+
+sub flagCountLabel {
+    my ( $type, $val ) = @_;
+
+    my $max = 10;
+
+    if ( $type eq "PHQ2" ) {
+        $max = 3;
+    }
+
+    my $html =
+      $val >= $max
+      ? "<p STYLE='background-color: red'> <b>Major Depressive:</b> G8431, ${type} Total of ${val}<BR>screening for clinical depression is documented as being POSITIVE and a follow-up plan is documented</p>"
+      : "<p STYLE='background-color: orange'><b>Other Depressive:</b> G8432, ${type} Total of ${val}<BR>screening for clinical depression is documented as being NEGATIVE and a follow-up plan is not required</p>";
+    return ($html);
+}
+
+sub calcCount    # shaded areas are 2 and 3 values
+{
+    my ( $rPHQ, $pfx, $beg, $end, $isok ) = @_;
+
+#foreach my $f ( sort keys %{$rPHQ} ) { warn "uCalc-calcCount: rPHQ-$f=$rPHQ->{$f}\n"; }
+#warn qq|\nENTER: uCalc-calcCount: beg=${beg}, end=${end}, isok=${isok}\n|;
+    my ( $ok, $idx, $cnt ) = ( 0, 0, 0 );
+
+#warn qq|     : uCalc-calcCount: q2a=$rPHQ->{q2a}, q2b=$rPHQ->{q2b}, q2c=$rPHQ->{q2c}\n|;
+    for my $i ( $beg .. $end ) {
+        $idx++;    # 1st 2 checked or not?
+        my $f = $pfx . $i;
+        if ( $idx < 3 && $rPHQ->{$f} > 1 ) { $ok++; }
+
+        #warn qq| idx=${idx}, ok=${ok}\n|;
+        $cnt++ if ( $rPHQ->{$f} > 1 );
+
+        #warn qq| f=${f}, cnt=${cnt}\n|;
+    }
+    $cnt++ if ( $rPHQ->{$end} == 1 );    # last question is shaded in 1 value.
+    if ( $isok && !$ok ) { $cnt = 0; }
+
+    #warn qq|RETURN: uCalc-calcCount: isok=${isok}, ok=${ok}, cnt=${cnt}\n|;
+    return ($cnt);
+}
+
+sub calcTotal {
+    my ( $rPHQ, $pfx, $beg, $end ) = @_;
+
+#foreach my $f ( sort keys %{$rPHQ} ) { warn "uCalc-calcTotal: rPHQ-$f=$rPHQ->{$f}\n"; }
+    my $cnt = 0;
+    if ( $beg eq '' || $end eq '' ) {
+        $cnt = $rPHQ->{$pfx};
+    }    # no loop, just this field (pfx).
+    else {
+        for my $i ( $beg .. $end ) {
+
+            my $f = $pfx . $i;
+
+            my $f_a = $f . 'a';
+            my $f_b = $f . 'b';
+
+            if ( $rPHQ->{$f_a} ne '' ) {
+                $cnt += $rPHQ->{$f_a};
+            }
+
+            $cnt += $rPHQ->{$f};
+        }
+
+    }
+
+    # die qq|pfx=${pfx}, beg=${beg}, end=${end}, cnt=${cnt}\n|;
+    return ($cnt);
+}
 
 $srecord->finish();
-$sExclude->finish();
+
+# $sDenomCheck->finish();
 $sGCode->finish();
+$sPHQ9->finish();
+$sPHQ2->finish();
+$sPHQ15->finish();
+$qClProbs->finish();
 
 myDBI->cleanup();
 exit;
