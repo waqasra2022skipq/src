@@ -22,7 +22,8 @@ my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
 
 #my $ClinicSelection = DBA->getClinicSelection($form,$ForProvID,'Client.clinicClinicID');
 my $ClinicSelection =
-  DBA->withSelection( $form, 'and', 'Client.clinicClinicID', '', '', '' );
+  DBA->withSelection( $form, 'and', 'Client.clinicClinicID', 'Client.ProvID',
+    '', '' );
 $ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
 my $sProvider =
   $dbh->prepare("select LName, FName from Provider where ProvID=?");
@@ -36,10 +37,16 @@ select Client.LName, Client.FName, Client.ClientID, Client.DOB, Client.ProvID, C
   from Client 
     left join ClientACL on ClientACL.ClientID=Client.ClientID
     left join ClientVitalSigns on ClientVitalSigns.ClientID=Client.ClientID
+
+    left join ClientPrAuth on ClientPrAuth.ClientID=Client.ClientID
+    left join Insurance on Insurance.InsNumID=ClientPrAuth.InsuranceID
+    left join xInsurance on xInsurance.ID=Insurance.InsID
+
   where ClientACL.ProvID='${ForProvID}'
   ${ClinicSelection}
   group by Client.LName, Client.FName, Client.ClientID
 " );
+
 ##my $records = main->getLastLineOfReport($form,$sel,"ClientID");
 ##foreach $ClientID ( keys %{ $records } )
 print
