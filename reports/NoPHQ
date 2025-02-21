@@ -40,6 +40,7 @@ select Client.LName, Client.FName, Client.ClientID, Client.DOB, Client.ProvID, C
   from Client 
     left join ClientACL on ClientACL.ClientID=Client.ClientID
     left join ClientPHQ on ClientPHQ.ClientID=Client.ClientID
+    left join ClientPHQ2 on ClientPHQ2.ClientID=Client.ClientID
     left join ClientPHQ4 on ClientPHQ4.ClientID=Client.ClientID
     left join ClientPHQ9 on ClientPHQ9.ClientID=Client.ClientID
     left join ClientTPHQ9 on ClientTPHQ9.ClientID=Client.ClientID
@@ -53,6 +54,7 @@ select Client.LName, Client.FName, Client.ClientID, Client.DOB, Client.ProvID, C
     left join xInsurance on xInsurance.ID=Insurance.InsID
   where ClientACL.ProvID='${ForProvID}'
     and ( ClientPHQ.TestDate is null
+        and ClientPHQ2.TestDate is null
           and ClientPHQ4.TestDate is null
           and ClientPHQ9.TestDate is null
           and ClientTPHQ9.TestDate is null
