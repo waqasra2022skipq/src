@@ -56,8 +56,24 @@ qq|Client Name\tActive\tDOB\tAge\tTestDate\tHeight\tWeight\tBMI\tHbA1c\tProvider
 
 #print qq|ClinicSelection=${ClinicSelection}\n|;
 #print qq|with=${with}\n|;
+
+my $ProvIDs = $form->{'ProvIDs'};
+$form = DBUtil->setDates($form);
+
+my $qTreatment = qq|SELECT * FROM Treatment WHERE 
+    Treatment.ClientID = ? and 
+    Treatment.ProvID IN ($ProvIDs) and
+    (Treatment.ContLogDate >= '$form->{FromDate}' and Treatment.ContLogDate<='$form->{ToDate}')|;
+
 $sClient->execute();
 while ( my $rClient = $sClient->fetchrow_hashref ) {
+
+    $sTreatment = $dbh->prepare($qTreatment);
+    $sTreatment->execute( $rClient->{ClientID} );
+    my $rTreatment = $sTreatment->fetchrow_hashref;
+    if ( !$rTreatment ) {
+        next;
+    }
 
 #foreach my $f ( sort keys %{$rClient} ) { print "rClient-$f=$rClient->{$f}\n"; }
     my $ClientID     = $rClient->{'ClientID'};
