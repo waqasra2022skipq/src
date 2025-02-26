@@ -1,60 +1,102 @@
-// Function to calculate total score from all select elements
-function calculateBIMSScore() {
-	// Get all select elements that contribute to the score
-	const q2Element = document.getElementById("ClientBIMS_q2_1");
-	const q3Element = document.getElementById("ClientBIMS_q3_1");
-	const q4Element = document.getElementById("ClientBIMS_q4_1");
-	const q5Element = document.getElementById("ClientBIMS_q5_1");
-	const q6Element = document.getElementById("ClientBIMS_q6_1");
-	const q7Element = document.getElementById("ClientBIMS_q7_1");
-	const q8Element = document.getElementById("ClientBIMS_q8_1");
+/**
+ * Dynamic Assessment Score Calculator
+ * This script automatically calculates scores for different assessment forms
+ * including BIMS, MMSE, and other similar forms with select inputs.
+ */
 
-	// Get the select for question 1 (whether BIMS should be conducted)
-	const q1Element = document.getElementById("ClientBIMS_q1_1");
+// Main function to set up score calculators for all assessment forms
+function setupAssessmentCalculators() {
+	// Define form configurations (can be extended for other forms)
+	const formConfigs = [
+		// BIMS Assessment
+		{
+			scoreField: "ClientBIMS_Score_1",
+			selectPrefix: "ClientBIMS_q",
+			specialRules: [
+				// If q1 is "no" (value 1), set score to 99
+				{
+					field: "ClientBIMS_q1_1",
+					value: "1",
+					action: "setScore",
+					scoreValue: "99",
+				},
+			],
+		},
 
-	// Get the score input field
-	const scoreField = document.getElementsByName("ClientBIMS_Score_1")[0];
+		// MMSE Assessment
+		{
+			scoreField: "ClientMMSE_Score_1",
+			selectPrefix: "ClientMMSE_q",
+			// No special rules for MMSE, just sum all question values
+		},
 
-	// Check if BIMS should be conducted (q1 value is 0 for "yes")
-	if (q1Element && q1Element.value === "1") {
-		// If BIMS should not be conducted, set score to 99 (as per instructions)
-		scoreField.value = "99";
-		return;
+		// Add more form configurations here as needed
+	];
+
+	// Set up calculators for each form configuration
+	formConfigs.forEach(setupCalculator);
+}
+
+// Function to set up a calculator for a specific form
+function setupCalculator(config) {
+	// Find the score field for this form
+	const scoreField = document.getElementsByName(config.scoreField)[0];
+	if (!scoreField) return; // Skip if this form is not present on the page
+
+	// Find all select elements that match this form's prefix
+	const selectPrefix = config.selectPrefix;
+	const selectElements = Array.from(
+		document.querySelectorAll('select[id^="' + selectPrefix + '"]')
+	);
+
+	if (selectElements.length === 0) return; // Skip if no matching select elements
+
+	// Add event listeners to all select elements for this form
+	selectElements.forEach((select) => {
+		select.addEventListener("change", () =>
+			calculateScore(config, selectElements, scoreField)
+		);
+	});
+
+	// Do an initial calculation
+	calculateScore(config, selectElements, scoreField);
+}
+
+// Function to calculate the score for a specific form
+function calculateScore(config, selectElements, scoreField) {
+	// Check if any special rules apply first
+	if (config.specialRules) {
+		for (const rule of config.specialRules) {
+			const ruleElement = document.getElementById(rule.field);
+			if (ruleElement && ruleElement.value === rule.value) {
+				if (rule.action === "setScore") {
+					scoreField.value = rule.scoreValue;
+					return; // Exit early, no need to calculate
+				}
+			}
+		}
 	}
 
-	// Calculate the total score by adding the numeric values from each select
+	// Calculate sum of all selected values
 	let totalScore = 0;
 
-	if (q2Element) totalScore += parseInt(q2Element.value || 0);
-	if (q3Element) totalScore += parseInt(q3Element.value || 0);
-	if (q4Element) totalScore += parseInt(q4Element.value || 0);
-	if (q5Element) totalScore += parseInt(q5Element.value || 0);
-	if (q6Element) totalScore += parseInt(q6Element.value || 0);
-	if (q7Element) totalScore += parseInt(q7Element.value || 0);
-	if (q8Element) totalScore += parseInt(q8Element.value || 0);
+	for (const select of selectElements) {
+		// Skip fields that shouldn't contribute to the score (like q3b in MMSE)
+		if (select.id.includes("q3b")) continue;
+
+		const value = select.value;
+		if (value !== null && value !== "") {
+			totalScore += parseInt(value);
+		}
+	}
 
 	// Update the score field
 	scoreField.value = totalScore;
 }
 
-// Function to add event listeners to all select elements
-function setupBIMSCalculator() {
-	// Get all select elements
-	const selectElements = document.querySelectorAll(
-		'select[id^="ClientBIMS_q"]'
-	);
+// Initialize when the DOM is loaded
+document.addEventListener("DOMContentLoaded", setupAssessmentCalculators);
 
-	// Add change event listener to each select element
-	selectElements.forEach((select) => {
-		select.addEventListener("change", calculateBIMSScore);
-	});
-
-	// Initial calculation in case some values are already set
-	calculateBIMSScore();
-}
-
-// Run the setup when the DOM is fully loaded
-document.addEventListener("DOMContentLoaded", setupBIMSCalculator);
-
-// If the page might be loaded dynamically, also try to set up the calculator immediately
-setupBIMSCalculator();
+// Also try to initialize immediately in case DOM is already loaded
+// or the script is added after the page loads
+setupAssessmentCalculators();
