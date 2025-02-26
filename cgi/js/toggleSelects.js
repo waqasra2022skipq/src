@@ -1,92 +1,78 @@
-// function toggleSelectBoxes() {
-// 	var performedSelect = document.getElementsByName(
-// 		"ClientInterventionsPerformed_Intervention_1"
-// 	)[0];
-// 	var reasonSelect = document.getElementsByName(
-// 		"ClientInterventionsPerformed_Reason_1"
-// 	)[0].parentElement.parentElement;
-// 	var findingSelect = document.getElementsByName(
-// 		"ClientInterventionsPerformed_finding_1"
-// 	)[0].parentElement.parentElement;
-// 	var followUpSelect = document.getElementsByName(
-// 		"ClientInterventionsPerformed_FollowUpPlan_1"
-// 	)[0].parentElement.parentElement;
-// 	var notPerformedSelect = document.getElementsByName(
-// 		"ClientInterventionsPerformed_NotPerformed_1"
-// 	)[0].parentElement.parentElement;
-// 	var exclusionSelect = document.getElementsByName(
-// 		"ClientInterventionsPerformed_ReasonForExclusion_1"
-// 	)[0].parentElement.parentElement;
-// 	var rejectedSelect = document.getElementsByName(
-// 		"ClientInterventionsPerformed_Rejected_1"
-// 	)[0].parentElement.parentElement;
+document.addEventListener("DOMContentLoaded", async function () {
+	const performedSelect = document.getElementById("performedSelect");
+	const findingSelect = document.getElementById("finding");
+	const followUpPlan = document.getElementById("FollowUpPlan");
+	const notPerformed = document.getElementById("NotPerformed");
+	const reasonForExclusion = document.getElementById("ReasonForExclusion");
+	const ReasonForException = document.getElementById("ReasonForException");
 
-// 	// Hide all initially
-// 	reasonSelect.style.display = "none";
-// 	findingSelect.style.display = "none";
-// 	followUpSelect.style.display = "none";
-// 	exclusionSelect.style.display = "none";
-// 	rejectedSelect.style.display = "none";
+	// Set initial values
+	await setSelectValue(performedSelect);
+	await setSelectValue(findingSelect);
+	await setSelectValue(followUpPlan);
+	await setSelectValue(notPerformed);
+	await setSelectValue(reasonForExclusion);
+	await setSelectValue(ReasonForException);
 
-// 	// Get the selected value
-// 	var selectedValue = performedSelect.value;
-
-// 	// Apply logic to show/hide fields
-// 	if (selectedValue === "SNOMEDCT_171207006") {
-// 		reasonSelect.style.display = "";
-// 		findingSelect.style.display = "";
-// 	}
-
-// 	if (selectedValue === "some_value_for_followup") {
-// 		followUpSelect.style.display = "";
-// 	}
-// 	if (selectedValue === "some_value_for_not_performed") {
-// 		notPerformedSelect.style.display = "";
-// 	}
-// 	if (selectedValue === "some_value_for_exclusion") {
-// 		exclusionSelect.style.display = "";
-// 	}
-// 	if (selectedValue === "some_value_for_rejected") {
-// 		rejectedSelect.style.display = "";
-// 	}
-// }
-
-// // Attach event listener on page load
-window.onload = function () {
-	var performedSelect = document.getElementById("performedSelect");
-	trackSelectBoxChange(performedSelect, "SNOMEDCT_171207006", "Reason_TR");
-	trackSelectBoxChange(performedSelect, "SNOMEDCT_171207006", "finding_TR");
-
+	// Attach event listeners
 	performedSelect.addEventListener("change", () => {
-		trackSelectBoxChange(performedSelect, "SNOMEDCT_171207006", "Reason_TR");
-		trackSelectBoxChange(performedSelect, "SNOMEDCT_171207006", "finding_TR");
+		toggleVisibility(performedSelect, "SNOMEDCT_171207006", [
+			"Reason_TR",
+			"finding_TR",
+		]);
 	});
 
-	var findingSelect = document.getElementById("finding");
-
-	trackSelectBoxChange(findingSelect, "428181000124104", "FollowUpPlan_TR");
-
-	performedSelect.addEventListener("change", () => {
-		trackSelectBoxChange(findingSelect, "428181000124104", "FollowUpPlan_TR");
+	findingSelect.addEventListener("change", () => {
+		toggleVisibility(findingSelect, "428181000124104", ["FollowUpPlan_TR"]);
 	});
-};
 
-function trackSelectBoxChange(selectedElement, checkValue, targetElementId) {
-	var selectedValue = selectedElement.value;
+	notPerformed.addEventListener("change", () => {
+		toggleVisibility(notPerformed, "454841000124105", [
+			"ReasonForExclusion_TR",
+			"ReasonForException_TR",
+		]);
+		toggleVisibility(notPerformed, "", ["ReasonForRejected_TR"]);
+	});
 
-	if (selectedValue == null) return;
+	// Initial visibility check
+	toggleVisibility(performedSelect, "SNOMEDCT_171207006", [
+		"Reason_TR",
+		"finding_TR",
+	]);
+	toggleVisibility(findingSelect, "428181000124104", ["FollowUpPlan_TR"]);
+	toggleVisibility(notPerformed, "454841000124105", [
+		"ReasonForExclusion_TR",
+		"ReasonForException_TR",
+	]);
+	toggleVisibility(notPerformed, "", ["ReasonForRejected_TR"]);
+});
 
-	console.log("selectedValue", selectedValue);
-	console.log(selectedValue, checkValue, targetElementId);
-	console.log(selectedValue, checkValue, targetElementId);
-
-	if (selectedValue === checkValue) {
-		console.log("HERE ");
-
-		document.getElementById(targetElementId).style.display = "";
-	} else {
-		console.log("HERE NO");
-
-		document.getElementById(targetElementId).style.display = "none";
+/**
+ * Set the <select> value based on its data-value attribute
+ * @param {HTMLSelectElement} selectBox
+ * @returns {Promise<void>}
+ */
+async function setSelectValue(selectBox) {
+	if (!selectBox) return;
+	const dataValue = selectBox.getAttribute("data-value");
+	if (dataValue) {
+		selectBox.value = dataValue;
 	}
+}
+
+/**
+ * Show or hide elements based on a selected value
+ * @param {HTMLSelectElement} selectBox
+ * @param {String} expectedValue
+ * @param {Array<String>} targetElementIds
+ */
+function toggleVisibility(selectBox, expectedValue, targetElementIds) {
+	if (!selectBox) return;
+	const isMatch = selectBox.value === expectedValue;
+	targetElementIds.forEach((id) => {
+		const element = document.getElementById(id);
+		if (element) {
+			element.style.display = isMatch ? "" : "none";
+		}
+	});
 }

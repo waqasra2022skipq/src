@@ -51,8 +51,7 @@
       Finding
     </TD>
     <TD CLASS="strcol" >
-        <select NAME="ClientInterventionsPerformed_finding_1" ID="finding">
-            <OPTION VALUE="<<ClientInterventionsPerformed_finding_1>>"><<ClientInterventionsPerformed_finding_1>></OPTION>
+        <select NAME="ClientInterventionsPerformed_finding_1" ID="finding" data-value="<<ClientInterventionsPerformed_finding_1>>">
             <OPTION VALUE="428171000124102" >Depression screening negative (finding) | 428171000124102 | G8510</OPTION>
             <OPTION VALUE="428181000124104">Depression screening positive (finding) AND Follow-Up Plan Documented | 428181000124104 | G8431</OPTION>
             <OPTION VALUE="G8511">Depression screening positive (finding) BUT Follow-Up Plan not Documented, Reason not Given | G8511</OPTION>
@@ -65,8 +64,7 @@
       Follow-Up Plan
     </TD>
     <TD CLASS="strcol" >
-        <select NAME="ClientInterventionsPerformed_FollowUpPlan_1" ID="FollowUpPlan">
-            <OPTION VALUE="<<ClientInterventionsPerformed_FollowUpPlan_1>>"><<ClientInterventionsPerformed_FollowUpPlan_1>></OPTION>
+        <select NAME="ClientInterventionsPerformed_FollowUpPlan_1" ID="FollowUpPlan" data-value="<<ClientInterventionsPerformed_FollowUpPlan_1>>">
             <OPTION VALUE="306226009">Referral to a provider for additional evaluation and assessment to formulate a follow-up plan for a positive depression screen | 306226009</OPTION>
             <OPTION VALUE="698456001">Pharmacological interventions | 698456001</OPTION>
             <OPTION VALUE="306227000">Other interventions or follow-up for the diagnosis or treatment of depression | 306227000</OPTION>
@@ -74,30 +72,30 @@
     </TD>
   </TR>
 
-  <TR STYLE= "display:none;">
+  <TR>
     <TD CLASS="strcol" >
       Not Performed
     </TD>
     <TD CLASS="strcol" >
-        <select NAME="ClientInterventionsPerformed_NotPerformed_1">
+        <select NAME="ClientInterventionsPerformed_NotPerformed_1" ID="NotPerformed" data-value="<<ClientInterventionsPerformed_NotPerformed_1>>">
             <OPTION value="">unselected</OPTION>
             <OPTION VALUE="454841000124105">Depression screening not done | 454841000124105 | G0444</OPTION>
         </select>
     </TD>
   </TR>
 
-  <TR STYLE= "display:none;">
+  <TR STYLE= "display:none;" ID="ReasonForExclusion_TR">
     <TD CLASS="strcol" >
       Reason for Exclusion
     </TD>
     <TD CLASS="strcol" >
-        <select NAME="ClientInterventionsPerformed_ReasonForExclusion_1">
+        <select NAME="ClientInterventionsPerformed_ReasonForExclusion_1" ID="ReasonForExclusion" data-value="<<ClientInterventionsPerformed_ReasonForExclusion_1>>">
             <OPTION value="">unselected</OPTION>
             <OPTION VALUE="400998002">Documentation stating the patient has had a diagnosis of bipolar disorder | 400998002 | G9717</OPTION>
         </select>
     </TD>
   </TR>
-  <TR STYLE= "display:none;">
+  <TR STYLE= "display:none;" ID="ReasonForRejected_TR">
     <TD CLASS="strcol" >Rejected Reason</TD>
     <TD CLASS="strcol" COLSPAN="3" >
       <SELECT NAME="ClientInterventionsPerformed_Rejected_1">
@@ -105,14 +103,17 @@
       </SELECT>
     </TD>
   </TR>
-   <TR STYLE= "display:none;">
+   <TR STYLE= "display:none;" ID="ReasonForException_TR">
     <TD CLASS="strcol" >
       Reason for Exception
     </TD>
     <TD CLASS="strcol" >
-        <INPUT TYPE="radio" NAME="ClientInterventionsPerformed_ReasonForException_1" value="183944003"/>Patient refuses to participate in or complete the depression screening | 183944003 | G8433
-        <BR><INPUT TYPE="radio" NAME="ClientInterventionsPerformed_ReasonForException_1" value="G8433"/>
-        Documentation of medical reason for not screening patient for depression (e.g., cognitive, functional, or motivational limitations that may impact accuracy of results; patient is in an urgent or emergent situation where time is of the essence and to delay treatment would jeopardize the patient’s health status)  | G8433
+        <select STYLE="width: 100px;text-overflow: ellipsis;" NAME="ClientInterventionsPerformed_ReasonForException_1" ID="ReasonForException" data-value="<<ClientInterventionsPerformed_ReasonForException_1>>">
+            <OPTION value="">unselected</OPTION>
+            <OPTION VALUE="183944003">Patient refuses to participate in or complete the depression screening | 183944003 | G8433</OPTION>
+            <OPTION VALUE="G8433">Documentation of medical reason for not screening patient for depression 
+            (e.g., cognitive, functional, or motivational limitations that may impact accuracy of results; patient is in an urgent or emergent situation where time is of the essence and to delay treatment would jeopardize the patient’s health status)  | G8433</OPTION>
+        </select>
     </TD>
   </TR>
 </TABLE>
