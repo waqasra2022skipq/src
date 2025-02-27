@@ -1177,12 +1177,10 @@ sub setHTML
       $html .=  qq|
     <TR >
       <TD CLASS="strcol" ${style} >$rxTables->{theText}</TD>|;
-    }
-    else
-    {
-      $Help = qq|<A HREF="javascript:ReportWindow('/cgi/bin/show_c_id.cgi?IDs=$rxTables->{ID}&mlt=$form->{mlt}&action=xTableFields','PrintWindow')" ONMOUSEOVER="textMsg.show('help$rxTables->{theField}')" ONMOUSEOUT="textMsg.hide()" ><IMG WIDTH="15" HEIGHT="15" BORDER="0" SRC="/images/qm1.gif"></A>|;
-      $textlbl = $rxTables->{theText} . " ($rxTables->{theField}) $Help";
-      $html .=  qq|
+        }
+        else {
+            $textlbl = $rxTables->{theText};
+            $html .= qq|
     <TR >|;
     }
     if ( $type eq 'textonly' )
