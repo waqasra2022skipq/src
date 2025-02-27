@@ -2,7 +2,7 @@
 
 <SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/NoEnter.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vClientGDSL.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vClientGDSL.js?sdsdfds"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vDate.js"> </SCRIPT>
 
 <FORM NAME="ClientGDSL" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
