@@ -23,7 +23,7 @@
 
 Ask the questions in the order listed. Score one point for each correct response within each question or activity.
 </TD></TR>
-  <TR><TD ><div name="TotalDiv" id="TotalDiv"><b>TOTAL:</b> </div></TD></TR>
+  <TR><TD ><div name="TotalDiv" id="TotalDiv"><b>TOTAL: <<ClientMMSE_Score_1>></b> </div></TD></TR>
   <TR >
     <TD CLASS="port txt" >
 [[[myHTML->setHTML(%form+ClientMMSE)]]]
@@ -67,7 +67,6 @@ Language and Praxis (9 points):
 <SCRIPT LANGUAGE="JavaScript">
 document.ClientMMSE.elements[0].focus();
 function totalScore() {
-document.getElementById("TotalDiv").innerHTML = "Total: 0";
 }
 totalScore();
 // just to OPENTABLES...
