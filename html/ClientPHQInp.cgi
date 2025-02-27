@@ -11,7 +11,7 @@
     <TD CLASS="strcol" >
       <<<Client_FName_1>>> <<<Client_MName_1>>> <<<Client_LName_1>>> (<<<Client_ClientID_1>>>) <<<Client_SSN_1>>>
       <BR>
-      Substance Abuse View/Edit Page
+      Patient Health Questionnaire (PHQ) View/Edit Page
     </TD>
     <TD CLASS="numcol" >[[gHTML->setLINKS(%form+back)]]</TD>
   </TR>
