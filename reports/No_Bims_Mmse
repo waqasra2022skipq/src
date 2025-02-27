@@ -1,0 +1,84 @@
+#!/usr/bin/perl
+use lib '/var/www/okmis/src/lib';
+use DBI;
+use myForm;
+use myDBI;
+use DBA;
+use DBUtil;
+use Time::Local;
+my $DT = localtime();
+############################################################################
+# usage:
+#   NoPHQ ForProvID=id
+############################################################################
+my $form = myForm->new();
+my $dbh  = myDBI->dbconnect( $form->{'DBNAME'} );
+
+#foreach my $f ( sort keys %{$form} ) { warn "form-$f=$form->{$f}\n"; }
+
+my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+
+# join xInsurance needed for withSelection
+my $ClinicSelection =
+  DBA->withSelection( $form, 'and', 'c.clinicClinicID', 'c.ProvID', '', '' );
+my $Header = DBA->withSelectionHeader($form);
+$ClinicSelection .= qq| and c.Active=1| if ( $form->{Active} );
+my $sProvider =
+  $dbh->prepare("select LName, FName from Provider where ProvID=?");
+my $qClient = qq"SELECT 
+    c . *, c . RecDOLC as LastContDate
+FROM 
+    Client c
+    left join ClientPrAuth on ClientPrAuth.ClientID=c.ClientID
+    left join ClientPrAuthCDC on ClientPrAuthCDC.ClientPrAuthID=ClientPrAuth.ID
+    left join Insurance on Insurance.InsNumID=ClientPrAuth.InsuranceID
+    left join xInsurance on xInsurance.ID=Insurance.InsID
+WHERE 
+    -- Check if client has no BIMS entry in the date range
+    NOT EXISTS (
+        SELECT 1 
+        FROM ClientBIMS b 
+        WHERE 
+            b . ClientID = c . ClientID
+            AND b.TestDate BETWEEN '2024-01-01' AND '2024-12-31'
+    )
+    AND 
+    -- Check if client has no MMSE entry in the date range
+    NOT EXISTS (
+        SELECT 1 
+        FROM ClientMMSE m 
+        WHERE 
+            m.ClientID = c. ClientID
+            AND m.TestDate BETWEEN '2024-01-01' AND '2024-12-31'
+    )
+  ${ClinicSelection}
+  group by c.LName, c.FName, c.ClientID";
+
+#warn qq|qClient=\n${qClient}\n|;
+my $sClient = $dbh->prepare($qClient);
+print
+qq|${DT}\n${Header}Missing BIMS/MMSE Report.\nClients with missing any BIMS/MMSE Test report\n|;
+print
+qq|Client Name\tClientID\tActive\tDOB\tAge\tPA Number\tTransType\tProvider Name\tMessage\tLast Contact Date\n|;
+$sClient->execute();
+while ( my $rClient = $sClient->fetchrow_hashref ) {
+    my $ClientID     = $rClient->{'ClientID'};
+    my $ActiveFlag   = $rClient->{'Active'} ? 'Yes' : 'No';
+    my $LastContDate = $rClient->{'LastContDate'};
+    my $ClientName   = qq|$rClient->{'LName'}, $rClient->{'FName'}|;
+    my $Age          = DBUtil->Date( $rClient->{DOB}, 'age' );
+    my $msg          = 'NO CLIENT BIMS and MMSE TESTS';
+    $sProvider->execute( $rClient->{ProvID} );
+    my ( $ProvLName, $ProvFName ) = $sProvider->fetchrow_array;
+    my $ProvName = qq|$ProvLName, $ProvFName ($rClient->{ProvID})|;
+    print
+qq|${ClientName}\t${ClientID}\t${ActiveFlag}\t$rClient->{'DOB'}\t${Age}\t$rClient->{'PAnumber'}\t$rClient->{'TransType'}\t${ProvName}\t${msg}\t${LastContDate}\n|;
+
+#  print qq|Dates:\t$rClient->{'TestPHQ'}\t$rClient->{'TestPHQ4'}\t$rClient->{'TestPHQ9'}\t$rClient->{'TestTPHQ9'}\t$rClient->{'TestPHQ15'}\t$rClient->{'TestPHQBrief'}\t$rClient->{'TestPHQSADS'}\n|;
+}
+
+$sProvider->finish();
+$sClient->finish();
+myDBI->cleanup();
+exit;
+############################################################################
