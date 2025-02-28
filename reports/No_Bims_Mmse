@@ -14,6 +14,11 @@ my $DT = localtime();
 my $form = myForm->new();
 my $dbh  = myDBI->dbconnect( $form->{'DBNAME'} );
 
+$form->{'FromDate'} = '2024-01-01';
+$form->{'ToDate'}   = '2024-12-31';
+$form               = DBUtil->setDates($form);
+my $DateRange = qq|from $form->{FromDateD} thru $form->{ToDateD}|;
+
 #foreach my $f ( sort keys %{$form} ) { warn "form-$f=$form->{$f}\n"; }
 
 my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
@@ -40,7 +45,7 @@ WHERE
         FROM ClientBIMS b 
         WHERE 
             b . ClientID = c . ClientID
-            AND b.TestDate BETWEEN '2024-01-01' AND '2024-12-31'
+            AND b . TestDate BETWEEN '$form->{FromDate}' AND '$form->{ToDate}'
     )
     AND 
     -- Check if client has no MMSE entry in the date range
@@ -49,7 +54,7 @@ WHERE
         FROM ClientMMSE m 
         WHERE 
             m.ClientID = c. ClientID
-            AND m.TestDate BETWEEN '2024-01-01' AND '2024-12-31'
+            AND m.TestDate BETWEEN '$form->{FromDate}' AND '$form->{ToDate}'
     )
   ${ClinicSelection}
   group by c.LName, c.FName, c.ClientID";
@@ -57,7 +62,8 @@ WHERE
 #warn qq|qClient=\n${qClient}\n|;
 my $sClient = $dbh->prepare($qClient);
 print
-qq|${DT}\n${Header}Missing BIMS/MMSE Report.\nClients with missing any BIMS/MMSE Test report\n|;
+qq|${DT}\n${Header}Missing BIMS/MMSE Report.\nClients with missing any BIMS/MMSE Test report ${DateRange} \n|;
+
 print
 qq|Client Name\tClientID\tActive\tDOB\tAge\tPA Number\tTransType\tProvider Name\tMessage\tLast Contact Date\n|;
 $sClient->execute();
