@@ -57,12 +57,10 @@ qq|Client Name\tActive\tDOB\tAge\tTestDate\tHeight\tWeight\tBMI\tHbA1c\tProvider
 #print qq|ClinicSelection=${ClinicSelection}\n|;
 #print qq|with=${with}\n|;
 
-my $ProvIDs = $form->{'ProvIDs'};
 $form = DBUtil->setDates($form);
 
 my $qTreatment = qq|SELECT * FROM Treatment WHERE 
     Treatment.ClientID = ? and 
-    Treatment.ProvID IN ($ProvIDs) and
     (Treatment.ContLogDate >= '$form->{FromDate}' and Treatment.ContLogDate<='$form->{ToDate}')|;
 
 $sClient->execute();
