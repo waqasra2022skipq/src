@@ -816,7 +816,7 @@ elsif ( $form->{method} eq 'Agency' ) {
 
     foreach my $row (@$results) {
         my ( $type, $name, $address, $city, $state, $zip, $npi ) = @$row;
-        my $display_name = "$name, $address, $city, $state [$npi]";
+        my $display_name = "$type, $name, $address, $city, $state [$npi]";
         if ( $npi eq $value ) {
             $opts .= qq|<OPTION VALUE="$npi" SELECTED>$display_name</OPTION>\n|;
         }
@@ -859,7 +859,7 @@ elsif ( $form->{method} eq 'Physicians' ) {
 
     foreach my $row (@$results) {
         my ( $type, $name, $address, $city, $state, $zip, $npi ) = @$row;
-        my $display_name = "$name, $address, $city, $state [$npi]";
+        my $display_name = "$type, $name, $address, $city, $state [$npi]";
         if ( $npi eq $value ) {
             $opts .= qq|<OPTION VALUE="$npi" SELECTED>$display_name</OPTION>\n|;
         }
@@ -911,7 +911,7 @@ elsif ( $form->{method} eq 'Pharmacy' ) {
 
     foreach my $row (@$results) {
         my ( $type, $name, $address, $city, $state, $zip, $npi ) = @$row;
-        my $display_name = "$name, $address, $city, $state [$npi]";
+        my $display_name = "$type, $name, $address, $city, $state [$npi]";
         if ( $npi eq $value ) {
             $opts .= qq|<OPTION VALUE="$npi" SELECTED>$display_name</OPTION>\n|;
         }

@@ -9,7 +9,9 @@ use CGI::Carp qw(fatalsToBrowser);
 use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
 
 sub search_api_npi {
-    my ( $self, $terms ) = @_;
+    my ( $self, $terms, $tax_desc ) = @_;
+
+    $tax_desc = "Skilled Nursing Facility";
 
     my @json  = ();
     my @data  = ();
@@ -24,7 +26,11 @@ sub search_api_npi {
         my %query_params = (
             'version'          => $version,
             'enumeration_type' => $type,
-            "exact_match"      => "false"
+            "exact_match"      => "false",
+            "state"            => "OK",
+            "limit"            => 100,
+
+            # "taxonomy_description" => $tax_desc
         );
 
         if ( $terms =~ /^\d+$/ ) {
@@ -37,7 +43,7 @@ sub search_api_npi {
                 $query_params{'last_name'}  = $names[1] if defined $names[1];
             }
             else {
-                $query_params{'organization_name'} = $terms;
+                $query_params{'organization_name'} = "*" . $terms . "*";
             }
         }
 
