@@ -786,6 +786,7 @@ qq|<SELECT NAME="$form->{'name'}" ${size} ${multiple} >\n${opts}</SELECT>\n|;
 }
 elsif ( $form->{method} eq 'Agency' ) {
     ( my $pattern = $form->{'pattern'} ) =~ s/"//g;
+    my $types = $form->{'types'};
 
 #   my $For = qq| like "%${pattern}%" |;
 #   @Display = ('Type',':','ProvOrgName',',','Addr1',',','City',',','ST',',','Zip','[','NPI',']');
@@ -800,7 +801,7 @@ elsif ( $form->{method} eq 'Agency' ) {
     if ( $pattern eq "" ) {
         $pattern = $value;
     }
-    $json_str = NPIRegistryAPI->search_api_npi($pattern);
+    $json_str = NPIRegistryAPI->search_api_npi( $pattern, $types );
     my $api_data = decode_json($json_str);    # Decode the JSON response
 
     # Handle API error
@@ -839,11 +840,12 @@ qq|<SELECT NAME="$form->{'name'}" ${size} ${multiple} >\n${opts}</SELECT>\n|;
 }
 elsif ( $form->{method} eq 'Physicians' ) {
     ( my $pattern = $form->{'pattern'} ) =~ s/"//g;
+    my $types = $form->{'types'};
 
     if ( $pattern eq "" ) {
         $pattern = $value;
     }
-    $json_str = NPIRegistryAPI->search_api_npi($pattern);
+    $json_str = NPIRegistryAPI->search_api_npi( $pattern, $types );
     my $api_data = decode_json($json_str);    # Decode the JSON response
 
     # Handle API error
@@ -884,6 +886,8 @@ qq|<SELECT NAME="$form->{'name'}" ${size} ${multiple} >\n${opts}</SELECT>\n|;
 elsif ( $form->{method} eq 'Pharmacy' ) {
     ( my $pattern = $form->{'pattern'} ) =~ s/"//g;
 
+    my $types = $form->{'types'};
+
 # my $For = qq| like "%${pattern}%" |;
 # @Display = ('Type',':','ProvOrgName',',','Addr1',',','City',',','ST',',','Zip','[','NPI',']');
 # my $opts = main->selmatch($form,$cdbh,"select * from xNPI where NPI=?",$value,'NPI',@Display);
@@ -895,7 +899,7 @@ elsif ( $form->{method} eq 'Pharmacy' ) {
     if ( $pattern eq "" ) {
         $pattern = $value;
     }
-    $json_str = NPIRegistryAPI->search_api_npi($pattern);
+    $json_str = NPIRegistryAPI->search_api_npi( $pattern, $types );
     my $api_data = decode_json($json_str);    # Decode the JSON response
 
     # Handle API error

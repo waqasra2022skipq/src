@@ -27,13 +27,11 @@ my $cdbh = $form->connectdb('okmis_config');
 ############################################################################
 my $json_str;
 
-if ( $form->{method} eq 'Agency' ) {
+if ( $form->{method} eq 'Agency' || $form->{method} eq 'Physicians' ) {
     ( my $terms = $form->{'terms'} ) =~ s/"//g;
-    $json_str = NPIRegistryAPI->search_api_npi($terms);
-}
-elsif ( $form->{method} eq 'Physicians' ) {
-    ( my $terms = $form->{'terms'} ) =~ s/"//g;
-    $json_str = NPIRegistryAPI->search_api_npi($terms);
+    my $types = $form->{'types'};
+
+    $json_str = NPIRegistryAPI->search_api_npi( $terms, $types );
 }
 elsif ( $form->{method} eq 'xLDO' ) {
     my @json = ();

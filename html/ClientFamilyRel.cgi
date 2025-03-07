@@ -282,7 +282,7 @@ function uspsWindow(newName,h,w)
   <TR >
     <TD CLASS="strcol" >
       Usual living arrangements (past 3 years):
-      <BR>· Choose arrangements most representative of the past 3 years. If there is an even split in time between these arrangements, choose the most recent arrangement.
+      <BR>ï¿½ Choose arrangements most representative of the past 3 years. If there is an even split in time between these arrangements, choose the most recent arrangement.
     </TD>
     <TD CLASS="strcol" >
       <SELECT NAME="ClientRelations_FamUsualLivArr_1">

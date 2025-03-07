@@ -65,7 +65,7 @@
   <TR >
     <TD CLASS="strcol" >Primary Care Physician</TD>
     <TD CLASS="strcol" >
-      Search: <INPUT TYPE="text" ID="SearchPhysNPI" NAME="SearchPhysNPI" VALUE="" ONFOCUS="select()" ONCHANGE="callAjax('Physicians','<<ClientEmergency_PhysNPI_1>>','selPhysNPI','&name=ClientEmergency_PhysNPI_1&pattern='+this.value,'popup.pl');" SIZE="60" >
+      Search: <INPUT TYPE="text" ID="SearchPhysNPI" NAME="SearchPhysNPI" VALUE="" ONFOCUS="select()" ONCHANGE="callAjax('Physicians','<<ClientEmergency_PhysNPI_1>>','selPhysNPI','&types=NPI-1&name=ClientEmergency_PhysNPI_1&pattern='+this.value,'popup.pl');" SIZE="60" >
 <BR><SPAN ID="selPhysNPI"></SPAN>
     </TD>
   </TR>
@@ -132,7 +132,7 @@
   <TR >
     <TD CLASS="strcol" >Designated Dentist</TD>
     <TD CLASS="strcol" >
-      Search: <INPUT TYPE="text" ID="SearchDentist" NAME="SearchDentist" VALUE="" ONFOCUS="select()" ONCHANGE="callAjax('Agency','<<ClientEmergency_DentistNPI_1>>','selDentist','&name=ClientEmergency_DentistNPI_1&pattern='+this.value,'popup.pl');" SIZE="60" >
+      Search: <INPUT TYPE="text" ID="SearchDentist" NAME="SearchDentist" VALUE="" ONFOCUS="select()" ONCHANGE="callAjax('Agency','<<ClientEmergency_DentistNPI_1>>','selDentist','&types=NPI-1&name=ClientEmergency_DentistNPI_1&pattern='+this.value,'popup.pl');" SIZE="60" >
 <BR><SPAN ID="selDentist"></SPAN>
     </TD>
   </TR>
@@ -151,7 +151,7 @@
   <TR >
     <TD CLASS="strcol" >Designated Vision</TD>
     <TD CLASS="strcol" >
-      Search: <INPUT TYPE="text" ID="SearchVision" NAME="SearchVision" VALUE="" ONFOCUS="select()" ONCHANGE="callAjax('Agency','<<ClientEmergency_VisionNPI_1>>','selVision','&name=ClientEmergency_VisionNPI_1&pattern='+this.value,'popup.pl');" SIZE="60" >
+      Search: <INPUT TYPE="text" ID="SearchVision" NAME="SearchVision" VALUE="" ONFOCUS="select()" ONCHANGE="callAjax('Agency','<<ClientEmergency_VisionNPI_1>>','selVision','&types=NPI-1&name=ClientEmergency_VisionNPI_1&pattern='+this.value,'popup.pl');" SIZE="60" >
 <BR><SPAN ID="selVision"></SPAN>
     </TD>
   </TR>
@@ -170,7 +170,7 @@
   <TR >
     <TD CLASS="strcol" >Designated Hearing</TD>
     <TD CLASS="strcol" >
-      Search: <INPUT TYPE="text" ID="SearchHearing" NAME="SearchHearing" VALUE="" ONFOCUS="select()" ONCHANGE="callAjax('Agency','<<ClientEmergency_HearingNPI_1>>','selHearing','&name=ClientEmergency_HearingNPI_1&pattern='+this.value,'popup.pl');" SIZE="60" >
+      Search: <INPUT TYPE="text" ID="SearchHearing" NAME="SearchHearing" VALUE="" ONFOCUS="select()" ONCHANGE="callAjax('Agency','<<ClientEmergency_HearingNPI_1>>','selHearing','&types=NPI-1&name=ClientEmergency_HearingNPI_1&pattern='+this.value,'popup.pl');" SIZE="60" >
 <BR><SPAN ID="selHearing"></SPAN>
     </TD>
   </TR>

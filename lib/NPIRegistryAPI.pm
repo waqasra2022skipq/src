@@ -9,9 +9,9 @@ use CGI::Carp qw(fatalsToBrowser);
 use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
 
 sub search_api_npi {
-    my ( $self, $terms, $tax_desc ) = @_;
+    my ( $self, $terms, $types ) = @_;
 
-    $tax_desc = "Skilled Nursing Facility";
+    # $tax_desc = "Skilled Nursing Facility";
 
     my @json  = ();
     my @data  = ();
@@ -20,7 +20,12 @@ sub search_api_npi {
 
     my $base_url = "https://npiregistry.cms.hhs.gov/api/";
     my $version  = "2.1";
-    my @types    = ( 'NPI-2', 'NPI-1' );
+
+    if ( '' eq $types ) {
+        $types = 'NPI-2';
+    }
+
+    my @types = split( ',', $types );
 
     foreach my $type (@types) {
         my %query_params = (
@@ -30,7 +35,7 @@ sub search_api_npi {
             "state"            => "OK",
             "limit"            => 100,
 
-            # "taxonomy_description" => $tax_desc
+            # "taxonomy_description" => "General Acute Care Hospital"
         );
 
         if ( $terms =~ /^\d+$/ ) {

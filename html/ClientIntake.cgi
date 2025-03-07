@@ -737,7 +737,7 @@ $(document).ready(function() {
 
   new Def.Autocompleter.Search(
     'LHCAutocompletePrimaryReferral',
-    `/cgi/bin/popup_api.pl?method=Agency&mlt=<<mlt>>`,
+    `/cgi/bin/popup_api.pl?method=Agency&types=NPI-1,NPI-2&mlt=<<mlt>>`,
     {tableFormat: true, valueCols: [0, 1, 6],
       colHeaders: ['Type', 'Org Name', 'Address', 'City', 'State', 'Zip', 'NPI']
     });
@@ -749,7 +749,7 @@ $(document).ready(function() {
 
   new Def.Autocompleter.Search(
     'LHCAutocompleteSecondaryReferral',
-    `/cgi/bin/popup_api.pl?method=Agency&mlt=<<mlt>>`,
+    `/cgi/bin/popup_api.pl?method=Agency&types=NPI-1,NPI-2&mlt=<<mlt>>`,
     {tableFormat: true, valueCols: [0, 1, 6],
       colHeaders: ['Type', 'Org Name', 'Address', 'City', 'State', 'Zip', 'NPI']
     });
@@ -761,7 +761,7 @@ $(document).ready(function() {
 
   new Def.Autocompleter.Search(
     'LHCAutocompleteReferringPhysician',
-    `/cgi/bin/popup_api.pl?method=Physicians&mlt=<<mlt>>`,
+    `/cgi/bin/popup_api.pl?method=Physicians&types=NPI-1&mlt=<<mlt>>`,
     {tableFormat: true, valueCols: [0, 1, 6],
       colHeaders: ['Last Name', 'First Name', 'Address', 'City', 'State', 'Zip', 'NPI']
     });
