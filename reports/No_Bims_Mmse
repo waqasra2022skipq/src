@@ -61,6 +61,11 @@ WHERE
 
 #warn qq|qClient=\n${qClient}\n|;
 my $sClient = $dbh->prepare($qClient);
+
+my $qTreatment = qq|SELECT * FROM Treatment WHERE 
+    Treatment.ClientID = ? and 
+    (Treatment.ContLogDate >= '$form->{FromDate}' and Treatment.ContLogDate<='$form->{ToDate}')|;
+
 print
 qq|${DT}\n${Header}Missing BIMS/MMSE Report.\nClients with missing any BIMS/MMSE Test report ${DateRange} \n|;
 
@@ -68,6 +73,14 @@ print
 qq|Client Name\tClientID\tActive\tDOB\tAge\tPA Number\tTransType\tProvider Name\tMessage\tLast Contact Date\n|;
 $sClient->execute();
 while ( my $rClient = $sClient->fetchrow_hashref ) {
+
+    $sTreatment = $dbh->prepare($qTreatment);
+    $sTreatment->execute( $rClient->{ClientID} );
+    my $rTreatment = $sTreatment->fetchrow_hashref;
+    if ( !$rTreatment ) {
+        next;
+    }
+
     my $ClientID     = $rClient->{'ClientID'};
     my $ActiveFlag   = $rClient->{'Active'} ? 'Yes' : 'No';
     my $LastContDate = $rClient->{'LastContDate'};
