@@ -52,6 +52,7 @@
     </TD>
     <TD CLASS="strcol" >
         <select NAME="ClientInterventionsPerformed_finding_1" ID="finding" data-value="<<ClientInterventionsPerformed_finding_1>>">
+            <OPTION>unselected</OPTION>
             <OPTION VALUE="428171000124102" >Depression screening negative (finding) | 428171000124102 | G8510</OPTION>
             <OPTION VALUE="428181000124104">Depression screening positive (finding) AND Follow-Up Plan Documented | 428181000124104 | G8431</OPTION>
             <OPTION VALUE="G8511">Depression screening positive (finding) BUT Follow-Up Plan not Documented, Reason not Given | G8511</OPTION>
