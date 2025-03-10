@@ -63,7 +63,7 @@ WHERE
 my $sClient = $dbh->prepare($qClient);
 
 my $qTreatment = qq|SELECT * FROM Treatment WHERE 
-    Treatment.ClientID = ? and 
+    Treatment.ClientID = ? and Type = 1 and
     (Treatment.ContLogDate >= '$form->{FromDate}' and Treatment.ContLogDate<='$form->{ToDate}')|;
 
 print
