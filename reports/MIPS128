@@ -34,11 +34,11 @@ $withSelection .= qq| and Client.Active=1| if ( $form->{Active} );
 $QID = qq|QID128|;
 $TITLE =
 qq|Preventive Care and Screening: Body Mass Index (BMI) Screening and Follow-Up Plan - National Quality Strategy Domain: Community/Population Health - Meaningful Measure Area: Preventive Care|;
-$CTYPE = qq|MIPS CLINICAL QUALITY MEASURES (CQMS)|;
-$MTYPE = qq|Process|;
-$DESC =
+my $CTYPE = qq|MIPS CLINICAL QUALITY MEASURES (CQMS)|;
+my $MTYPE = qq|Process|;
+my $DESC =
 qq|Percentage of patients aged 18 years and older with a BMI documented during the current encounter or within the previous twelve months AND who had a follow-up plan documented if most recent BMI was outside of normal parameters|;
-$INST =
+my $INST =
 qq|There is no diagnosis associated with this measure. This measure is to be submitted a minimum of once per
 performance period for patients seen during the performance period. This measure may be submitted by Meritbased Incentive Payment System (MIPS) eligible clinicians who perform the quality actions described in the measure 
 based on the services provided at the time of the qualifying visit and the measure-specific denominator coding. The 
@@ -51,134 +51,48 @@ more than one BMI is submitted during the measurement period, the most recent BM
 performance has been met. Review the exclusions and exceptions criteria to determine those patients that BMI 
 measurement may not be appropriate or necessary.|;
 my @FLDS = (
-    'ClinicName:ClinicName', 'LName:LastName',
-    'FName:FirstName',       'ClientID:ClientID',
-    'DOB:DateOfBirth',       'Age:Age',
-    'Race:Race',             'pcount:ProbAddr',
-    'PrimaryProvider:PrimaryProvider'
+    'ClinicName:ClinicName',           'LName:LastName',
+    'FName:FirstName',                 'ClientID:ClientID',
+    'DOB:DateOfBirth',                 'Age:Age',
+    'Race:Race',                       'pcount:ProbAddr',
+    'PrimaryProvider:PrimaryProvider', "Insurance:Insurance",
+    "BMI:BMI"
 );
 my $numFLDS = scalar(@FLDS) - 2;
 print qq|numFLDS=${numFLDS}\n| if ($debug);
-my $qrecord = qq|
-select Treatment.TrID,Treatment.ContLogDate,Treatment.ClinicID, Treatment.POS, xSC.SCNum
-      ,Client.LName,Client.FName,Client.ClientID
+
+my $ClientSelection =
+  DBA->withSelection( $form, 'and', 'Client.clinicClinicID', 'Client.ProvID' );
+
+# Get the Client
+
+my $sClient = $dbh->prepare(
+"SELECT Client.*, ClientVitalSigns.*, xInsurance.Descr as Insurance, ClientEmergency.HospiceCheck
+    , Client.LName,Client.FName,Client.ClientID
       ,Clinic.Name as ClinicName
       ,CONCAT(Counselor.LName,', ',Counselor.FName) as PrimaryProvider
-      ,Client.DOB,TIMESTAMPDIFF(YEAR, Client.DOB, CURDATE()) AS Age
       ,xRaces.Descr as Race
+      ,Client.DOB,TIMESTAMPDIFF(YEAR, Client.DOB, CURDATE()) AS Age
       ,count(*) as pcount
- from Treatment 
-  left join Client on Client.ClientID=Treatment.ClientID
-  left join Provider as Clinic on Clinic.ProvID=Client.clinicClinicID
-  left join Provider as Counselor on Counselor.ProvID=Client.ProvID
-  left join okmis_config.xRaces on xRaces.ID=SUBSTRING_INDEX(Client.Race,'${multidel}',1)
-  left join xSC on xSC.SCID=Treatment.SCID
-  left join xInsurance on xInsurance.ID=xSC.InsID
-  left join ClientNoteProblems on ClientNoteProblems.TrID=Treatment.TrID
- where Client.ClientID>100
-   and (Treatment.ContLogDate >= '$form->{FromDate}' and Treatment.ContLogDate<='$form->{ToDate}')
-   and (TIMESTAMPDIFF(YEAR, Client.DOB, Treatment.ContLogDate) >= 18)
-   and (xSC.SCNum != 'G9996')
-   and (xSC.SCNum != 'G9997')
-   and (xSC.SCNum='90791'
-        or xSC.SCNum='90792'
-        or xSC.SCNum='90832'
-        or xSC.SCNum='90834'
-        or xSC.SCNum='90837'
-        or xSC.SCNum='96156'
-        or xSC.SCNum='96158'
-        or xSC.SCNum='97161'
-        or xSC.SCNum='97162'
-        or xSC.SCNum='97163'
-        or xSC.SCNum='97165'
-        or xSC.SCNum='97166'
-        or xSC.SCNum='97167'
-        or xSC.SCNum='97802'
-        or xSC.SCNum='97803'
-        or xSC.SCNum='99202'
-        or xSC.SCNum='99203'
-        or xSC.SCNum='99204'
-        or xSC.SCNum='99205'
-        or xSC.SCNum='99212'
-        or xSC.SCNum='99213'
-        or xSC.SCNum='99214'
-        or xSC.SCNum='99215'
-        or xSC.SCNum='99236'
-        or xSC.SCNum='99304'
-        or xSC.SCNum='99305'
-        or xSC.SCNum='99306'
-        or xSC.SCNum='99307'
-        or xSC.SCNum='99308'
-        or xSC.SCNum='99309'
-        or xSC.SCNum='99310'
-        or xSC.SCNum='99315'
-        or xSC.SCNum='99316'
-        or xSC.SCNum='99318'
-        or xSC.SCNum='99324'
-        or xSC.SCNum='99325'
-        or xSC.SCNum='99326'
-        or xSC.SCNum='99327'
-        or xSC.SCNum='99328'
-        or xSC.SCNum='99334'
-        or xSC.SCNum='99335'
-        or xSC.SCNum='99336'
-        or xSC.SCNum='99337'
-        or xSC.SCNum='99339'
-        or xSC.SCNum='99340'
-        
+ FROM Client
+    LEFT JOIN ClientEmergency ON Client.ClientID=ClientEmergency.ClientID
+    left join ClientACL on ClientACL.ClientID=Client.ClientID
+    left join Provider as Counselor on Counselor . ProvID = Client . ProvID
+    left join okmis_config . xRaces on xRaces . ID =
+  SUBSTRING_INDEX( Client . Race, '${multidel}', 1 )
 
-        or xSC.SCNum LIKE '99385%'
-        or xSC.SCNum LIKE '99386%'
-        or xSC.SCNum LIKE '99387%'
-        or xSC.SCNum LIKE '99395%'
-        or xSC.SCNum LIKE '99396%'
-        or xSC.SCNum LIKE '99397%'
-        or xSC.SCNum LIKE '99401%'
-        or xSC.SCNum LIKE '99402%'
+    left join ClientVitalSigns on ClientVitalSigns.ClientID=Client.ClientID
+    left join Provider as Clinic on Clinic . ProvID = Client . clinicClinicID
+    left join ClientPrAuth on ClientPrAuth.ClientID=Client.ClientID
+    left join Insurance on Insurance.InsNumID=ClientPrAuth.InsuranceID
+    left join xInsurance on xInsurance.ID=Insurance.InsID
+     WHERE Client.ClientID>100 ${ClientSelection}
+     group by Client.LName,Client.FName,Client.ClientID"
 
-
-        or xSC.SCNum='G0101'
-        or xSC.SCNum='G0108'
-        or xSC.SCNum='G0270'
-        or xSC.SCNum='G0271'
-        or xSC.SCNum='G0402'
-        or xSC.SCNum='G0438'
-        or xSC.SCNum='G0439'
-        or xSC.SCNum='G0447'
-        or xSC.SCNum='G0473'
-   
-        or xSC.SCNum='D7111'
-        or xSC.SCNum='D7140'
-        or xSC.SCNum='D7210'
-        or xSC.SCNum='D7220'
-        or xSC.SCNum='D7230'
-        or xSC.SCNum='D7240'
-        or xSC.SCNum='D7241'
-        or xSC.SCNum='D7250'
-        or xSC.SCNum='D7251'
-       )
-
-
-  ${withSelection}
- group by Client.LName,Client.FName,Client.ClientID
-|;
-
-my $sGCode = $dbh->prepare(
-    "select TrID 
- from Treatment left join xSC on xSC.SCID=Treatment.SCID 
- where Treatment.ClientID=? 
-   and (Treatment.ContLogDate >= '$form->{FromDate}' and Treatment.ContLogDate<='$form->{ToDate}')
-   and (xSC.SCNum='G8417'
-        or xSC.SCNum='G8418'
-        or xSC.SCNum='G9716'
-        or xSC.SCNum='G2181'
-        or xSC.SCNum='G8421'
-        or xSC.SCNum='G8420'
-        or xSC.SCNum='G8419')"
 );
 
-my ( $Denominator, $total, $PFMET, $DNEXCEPTION, $PFNOTMET ) =
-  ( 0, 0, 0, 0, 0 );
+my ( $Denominator, $total, $PFMET, $DNEXCEPTION, $PFNOTMET, $DNEXCLUDED ) =
+  ( 0, 0, 0, 0, 0, 0 );
 
 my $table_header = '';
 foreach my $f (@FLDS) {
@@ -188,42 +102,142 @@ foreach my $f (@FLDS) {
 $table_header .= qq|\n|;
 $table_entries = '';
 
-my $srecord = $dbh->prepare($qrecord);
-$srecord->execute();
-while ( my $rrecord = $srecord->fetchrow_hashref ) {
-    $sGCode->execute( $rrecord->{'ClientID'} );
-    while ( my $rGCode = $sGCode->fetchrow_hashref ) {
-        if (   $rGCode->{'SCNum'} == 'G8420'
-            || $rGCode->{'SCNum'} == 'G8417'
-            || $rGCode->{'SCNum'} == 'G8418' )
-        {
-            $PFMET++;
-        }
+$form = DBUtil->setDates($form);
 
-        if ( $rGCode->{'SCNum'} == 'G2181' || $rGCode->{'SCNum'} == 'G9716' ) {
-            $DNEXCEPTION++;
-        }
+my $qTreatment = qq|SELECT * FROM Treatment
+    left join xSC on xSC . SCID = Treatment . SCID
+    WHERE
+    Treatment.ClientID = ? and
+    (         Treatment . ContLogDate >= '$form->{FromDate}'
+          and Treatment . ContLogDate <= '$form->{ToDate}' )
+      and (
+           xSC . SCNum = '90791'
+        or xSC . SCNum = '90792'
+        or xSC . SCNum = '90832'
+        or xSC . SCNum = '90834'
+        or xSC . SCNum = '90837'
+        or xSC . SCNum = '96156'
+        or xSC . SCNum = '96158'
+        or xSC . SCNum = '97161'
+        or xSC . SCNum = '97162'
+        or xSC . SCNum = '97163'
+        or xSC . SCNum = '97165'
+        or xSC . SCNum = '97166'
+        or xSC . SCNum = '97167'
+        or xSC . SCNum = '97802'
+        or xSC . SCNum = '97803'
+        or xSC . SCNum = '99202'
+        or xSC . SCNum = '99203'
+        or xSC . SCNum = '99204'
+        or xSC . SCNum = '99205'
+        or xSC . SCNum = '99212'
+        or xSC . SCNum = '99213'
+        or xSC . SCNum = '99214'
+        or xSC . SCNum = '99215'
+        or xSC . SCNum = '99236'
+        or xSC . SCNum = '99304'
+        or xSC . SCNum = '99305'
+        or xSC . SCNum = '99306'
+        or xSC . SCNum = '99307'
+        or xSC . SCNum = '99308'
+        or xSC . SCNum = '99309'
+        or xSC . SCNum = '99310'
+        or xSC . SCNum = '99315'
+        or xSC . SCNum = '99316'
+        or xSC . SCNum = '99318'
+        or xSC . SCNum = '99324'
+        or xSC . SCNum = '99325'
+        or xSC . SCNum = '99326'
+        or xSC . SCNum = '99327'
+        or xSC . SCNum = '99328'
+        or xSC . SCNum = '99334'
+        or xSC . SCNum = '99335'
+        or xSC . SCNum = '99336'
+        or xSC . SCNum = '99337'
+        or xSC . SCNum = '99339'
+        or xSC . SCNum = '99340'
 
-        if ( $rGCode->{'SCNum'} == 'G8421' || $rGCode->{'SCNum'} == 'G8419' ) {
-            $PFNOTMET++;
-        }
+        or xSC . SCNum LIKE '99385%'
+        or xSC . SCNum LIKE '99386%'
+        or xSC . SCNum LIKE '99387%'
+        or xSC . SCNum LIKE '99395%'
+        or xSC . SCNum LIKE '99396%'
+        or xSC . SCNum LIKE '99397%'
+        or xSC . SCNum LIKE '99401%'
+        or xSC
+        . SCNum LIKE '99402%'
+
+        or xSC . SCNum = 'G0101'
+        or xSC . SCNum = 'G0108'
+        or xSC . SCNum = 'G0270'
+        or xSC . SCNum = 'G0271'
+        or xSC . SCNum = 'G0402'
+        or xSC . SCNum = 'G0438'
+        or xSC . SCNum = 'G0439'
+        or xSC . SCNum = 'G0447'
+        or xSC . SCNum = 'G0473'
+
+        or xSC . SCNum = 'D7111'
+        or xSC . SCNum = 'D7140'
+        or xSC . SCNum = 'D7210'
+        or xSC . SCNum = 'D7220'
+        or xSC . SCNum = 'D7230'
+        or xSC . SCNum = 'D7240'
+        or xSC . SCNum = 'D7241'
+        or xSC . SCNum = 'D7250'
+        or xSC . SCNum = 'D7251'
+      )
+|;
+
+my $sClientVitalSigns = $dbh->prepare(
+    "select * from ClientVitalSigns where ClientID=? and
+    (         VDate >= '$form->{FromDate}'
+          and VDate <= '$form->{ToDate}' ) order by VDate"
+);
+
+$sClient->execute();
+while ( my $rClient = $sClient->fetchrow_hashref ) {
+
+    $sTreatment = $dbh->prepare($qTreatment);
+    $sTreatment->execute( $rClient->{ClientID} );
+    my $rTreatment = $sTreatment->fetchrow_hashref;
+    if ( !$rTreatment ) {
+        next;
     }
     $Denominator++;
-    foreach my $f (@FLDS) {
-        my ( $fld, $hdr ) = split( ':', $f );
-        $table_entries .= qq|$rrecord->{$fld}\t|;
+    $rClient->{"BMI"} = "";
+
+    if ( $rClient->{'HospiceCheck'} eq 1 ) {
+        $DNEXCLUDED++;
+    }
+    else {
+        my $ClientID = $rClient->{'ClientID'};
+        $sClientVitalSigns->execute($ClientID);
+        my $rClientVitalSigns = $sClientVitalSigns->fetchrow_hashref;
+        if ( !$rClientVitalSigns || $rClientVitalSigns->{'BMI'} eq '' ) {
+            $PFNOTMET++;
+        }
+        else {
+            $PFMET++;
+            $rClient->{"BMI"} = $rClientVitalSigns->{'BMI'};
+        }
     }
 
-    # print qq|$rClientAUDIT->{'q2'}\t$rClientSBIRT->{'q2'}\t|;
+    foreach my $f (@FLDS) {
+        my ( $fld, $hdr ) = split( ':', $f );
+        $table_entries .= qq|$rClient->{$fld}\t|;
+    }
+
     $table_entries .= qq|\n|;
 
-    $total += $rrecord->{'pcount'};
+    $total += $rClient->{'pcount'};
 }
 
 my $Data_Completeness_Rate;
 my $Performance_Rate;
 
-my $Data_Completeness_Numerator = $PFMET + $DNEXCEPTION + $PFNOTMET;
+my $Data_Completeness_Numerator =
+  $PFMET + $DNEXCEPTION + $PFNOTMET + $DNEXCLUDED;
 
 if ( $Denominator eq 0 ) {
 
@@ -235,9 +249,11 @@ else {
 
     $Data_Completeness_Rate =
       ( $Data_Completeness_Numerator / $Denominator ) * 100;
-    if ( $Data_Completeness_Numerator > $DNEXCEPTION ) {
+    if ( $Data_Completeness_Numerator > ( $DNEXCEPTION + $DNEXCLUDED ) ) {
         $Performance_Rate =
-          ( $PFMET / ( $Data_Completeness_Numerator - $DNEXCEPTION ) ) * 100;
+          ( $PFMET /
+              ( $Data_Completeness_Numerator - $DNEXCLUDED - $DNEXCEPTION ) ) *
+          100;
     }
 }
 
@@ -245,11 +261,11 @@ $Data_Completeness_Rate = sprintf( "%.2f", $Data_Completeness_Rate );
 $Performance_Rate       = sprintf( "%.2f", $Performance_Rate );
 
 my $nom_denom =
-qq|Numerator = Performance Met (${PFMET}) +  Denominator Exception (${DNEXCEPTION}) +  Performance Not Met (${PFNOTMET}) = ${Data_Completeness_Numerator} \n Denominator(Eligible Population) = ${Denominator}\n|;
+qq|Numerator = Denominator Exclusion (${DNEXCLUDED}) + Performance Met (${PFMET}) +  Denominator Exception (${DNEXCEPTION}) +  Performance Not Met (${PFNOTMET})= ${Data_Completeness_Numerator} \n Denominator(Eligible Population) = ${Denominator}\n|;
 my $Data_Completeness_Rate_Text =
 qq|Data Completeness Rate = Numerator(${Data_Completeness_Numerator}) / Denominator(${Denominator}) = ${Data_Completeness_Rate}% \n|;
 my $Performance_Rate_Text =
-qq|Performance Rate = Performance Met (${PFMET}) / Numerator(${Data_Completeness_Numerator}) - Denominator Exception (${DNEXCEPTION}) = ${Performance_Rate}% \n|;
+qq|Performance Rate = Performance Met (${PFMET}) / Numerator(${Data_Completeness_Numerator}) - Denominator Exclusion (${DNEXCLUDED}) - Denominator Exception (${DNEXCEPTION}) = ${Performance_Rate}% \n|;
 
 $Header = qq|${DT}\n${QID} ${TITLE} ${DateRange} ${Header} \n ${nom_denom}|;
 
@@ -260,9 +276,10 @@ print $table_header;
 print $table_entries;
 
 print qq|${Denominator}| . "\t" x $numFLDS . qq|${total}\n|;
-$srecord->finish();
-$sGCode->finish();
 
+# $srecord->finish();
+$sClientVitalSigns->finish();
+$sClient->finish();
 myDBI->cleanup();
 exit;
 ############################################################################
