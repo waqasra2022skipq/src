@@ -36,7 +36,7 @@ $withSelection .= qq| and Client.Active=1| if ( $form->{Active} );
 our %MIPS = (
     128 => {
         TITLE =>
-'Dementia Associated Behavioral and Psychiatric Symptoms Screening and Management - National Quality Strategy Domain: Effective Clinical Care - Meaningful Measure Area: Prevention, Treatment, and Management of Mental Health',
+'Preventive Care and Screening: Body Mass Index (BMI) Screening and Follow-Up Plan',
         GCodes => [
             'G8416', 'G8417', 'G8418', 'G8419',
             'G8420', 'G8421', 'G8422', 'G8938'
