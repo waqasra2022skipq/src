@@ -111,7 +111,7 @@ if ($debug) {
 my $TITLE = $MIPS{$QID}{'TITLE'};
 my ( $withGCodes, $conj ) = ( ' and (', '' );
 foreach my $GCode ( @{ $MIPS{$QID}{'GCodes'} } ) {
-    $withGCodes .= qq|${conj}xSC.SCNum='${GCode}'\n|;
+    $withGCodes .= qq|${conj}xSC.SCNum LIKE '${GCode}%'\n|;
     $conj = qq|        or |;
 }
 $withGCodes .= qq|      )|;
@@ -174,7 +174,7 @@ while ( my $rrecord = $srecord->fetchrow_hashref ) {
         print qq|$rrecord->{$fld}\t|;
     }
     foreach my $GCode ( @{ $MIPS{$QID}{'GCodes'} } ) {
-        my $cnt = $rrecord->{'SCNum'} eq $GCode ? '1' : '0';
+        my $cnt = $rrecord->{'SCNum'} =~ /$GCode/ ? '1' : '0';
         print qq|${cnt}\t|;
         $totals->{$GCode} += $cnt;
     }
