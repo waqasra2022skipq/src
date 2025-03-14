@@ -64,33 +64,6 @@ print qq|numFLDS=${numFLDS}\n| if ($debug);
 my $ClientSelection =
   DBA->withSelection( $form, 'and', 'Client.clinicClinicID', 'Client.ProvID' );
 
-# Get the Client
-
-my $sClient = $dbh->prepare(
-"SELECT Client.*, ClientVitalSigns.*, xInsurance.Descr as Insurance, ClientEmergency.HospiceCheck
-    , Client.LName,Client.FName,Client.ClientID
-      ,Clinic.Name as ClinicName
-      ,CONCAT(Counselor.LName,', ',Counselor.FName) as PrimaryProvider
-      ,xRaces.Descr as Race
-      ,Client.DOB,TIMESTAMPDIFF(YEAR, Client.DOB, CURDATE()) AS Age
-      ,count(*) as pcount
- FROM Client
-    LEFT JOIN ClientEmergency ON Client.ClientID=ClientEmergency.ClientID
-    left join ClientACL on ClientACL.ClientID=Client.ClientID
-    left join Provider as Counselor on Counselor . ProvID = Client . ProvID
-    left join okmis_config . xRaces on xRaces . ID =
-  SUBSTRING_INDEX( Client . Race, '${multidel}', 1 )
-
-    left join ClientVitalSigns on ClientVitalSigns.ClientID=Client.ClientID
-    left join Provider as Clinic on Clinic . ProvID = Client . clinicClinicID
-    left join ClientPrAuth on ClientPrAuth.ClientID=Client.ClientID
-    left join Insurance on Insurance.InsNumID=ClientPrAuth.InsuranceID
-    left join xInsurance on xInsurance.ID=Insurance.InsID
-     WHERE Client.ClientID>100 ${ClientSelection}
-     group by Client.LName,Client.FName,Client.ClientID"
-
-);
-
 my ( $Denominator, $total, $PFMET, $DNEXCEPTION, $PFNOTMET, $DNEXCLUDED ) =
   ( 0, 0, 0, 0, 0, 0 );
 
@@ -104,133 +77,112 @@ $table_entries = '';
 
 $form = DBUtil->setDates($form);
 
-my $qTreatment = qq|SELECT * FROM Treatment
-    left join xSC on xSC . SCID = Treatment . SCID
-    WHERE
-    Treatment.ClientID = ? and
-    (         Treatment . ContLogDate >= '$form->{FromDate}'
-          and Treatment . ContLogDate <= '$form->{ToDate}' )
-      and (
-           xSC . SCNum = '90791'
-        or xSC . SCNum = '90792'
-        or xSC . SCNum = '90832'
-        or xSC . SCNum = '90834'
-        or xSC . SCNum = '90837'
-        or xSC . SCNum = '96156'
-        or xSC . SCNum = '96158'
-        or xSC . SCNum = '97161'
-        or xSC . SCNum = '97162'
-        or xSC . SCNum = '97163'
-        or xSC . SCNum = '97165'
-        or xSC . SCNum = '97166'
-        or xSC . SCNum = '97167'
-        or xSC . SCNum = '97802'
-        or xSC . SCNum = '97803'
-        or xSC . SCNum = '99202'
-        or xSC . SCNum = '99203'
-        or xSC . SCNum = '99204'
-        or xSC . SCNum = '99205'
-        or xSC . SCNum = '99212'
-        or xSC . SCNum = '99213'
-        or xSC . SCNum = '99214'
-        or xSC . SCNum = '99215'
-        or xSC . SCNum = '99236'
-        or xSC . SCNum = '99304'
-        or xSC . SCNum = '99305'
-        or xSC . SCNum = '99306'
-        or xSC . SCNum = '99307'
-        or xSC . SCNum = '99308'
-        or xSC . SCNum = '99309'
-        or xSC . SCNum = '99310'
-        or xSC . SCNum = '99315'
-        or xSC . SCNum = '99316'
-        or xSC . SCNum = '99318'
-        or xSC . SCNum = '99324'
-        or xSC . SCNum = '99325'
-        or xSC . SCNum = '99326'
-        or xSC . SCNum = '99327'
-        or xSC . SCNum = '99328'
-        or xSC . SCNum = '99334'
-        or xSC . SCNum = '99335'
-        or xSC . SCNum = '99336'
-        or xSC . SCNum = '99337'
-        or xSC . SCNum = '99339'
-        or xSC . SCNum = '99340'
-
-        or xSC . SCNum LIKE '99385%'
-        or xSC . SCNum LIKE '99386%'
-        or xSC . SCNum LIKE '99387%'
-        or xSC . SCNum LIKE '99395%'
-        or xSC . SCNum LIKE '99396%'
-        or xSC . SCNum LIKE '99397%'
-        or xSC . SCNum LIKE '99401%'
-        or xSC
-        . SCNum LIKE '99402%'
-
-        or xSC . SCNum = 'G0101'
-        or xSC . SCNum = 'G0108'
-        or xSC . SCNum = 'G0270'
-        or xSC . SCNum = 'G0271'
-        or xSC . SCNum = 'G0402'
-        or xSC . SCNum = 'G0438'
-        or xSC . SCNum = 'G0439'
-        or xSC . SCNum = 'G0447'
-        or xSC . SCNum = 'G0473'
-
-        or xSC . SCNum = 'D7111'
-        or xSC . SCNum = 'D7140'
-        or xSC . SCNum = 'D7210'
-        or xSC . SCNum = 'D7220'
-        or xSC . SCNum = 'D7230'
-        or xSC . SCNum = 'D7240'
-        or xSC . SCNum = 'D7241'
-        or xSC . SCNum = 'D7250'
-        or xSC . SCNum = 'D7251'
-      )
-|;
-
 my $sClientVitalSigns = $dbh->prepare(
     "select * from ClientVitalSigns where ClientID=? and
-    (         VDate >= '$form->{FromDate}'
-          and VDate <= '$form->{ToDate}' ) order by VDate"
+    vDate BETWEEN '2024-01-01' AND '2024-12-31' order by VDate"
 );
 
-$sClient->execute();
-while ( my $rClient = $sClient->fetchrow_hashref ) {
+my $qRecord = qq|
+    select Treatment . TrID, Treatment . ContLogDate, xSC . SCNum,
+      xInsurance . Descr as Insurance,
+    Client . LName, Client . FName
+    , Clinic . Name as ClinicName
+        , Client . ClientID, Provider . ProvID, ClientEmergency . HospiceCheck
+        , CONCAT( Provider . LName, ', ', Provider . FName ) as PrimaryProvider
+        ,CONCAT(Client.LName,', ',Client.FName) as ClientName
+        ,Client.DOB,TIMESTAMPDIFF(YEAR, Client.DOB, CURDATE()) AS Age
+        ,count(*) as pcount
+    from Treatment 
+    left join Client on Client.ClientID=Treatment.ClientID
+    LEFT JOIN ClientEmergency ON Client
+      . ClientID = ClientEmergency
+      . ClientID
+    left join Provider on Provider.ProvID=Treatment.ProvID
+    left join Provider as Clinic on Clinic . ProvID = Client . clinicClinicID
+    left join xSC on xSC.SCID=Treatment.SCID
+    left join xInsurance on xInsurance.ID=xSC.InsID
+    WHERE Treatment.ContLogDate BETWEEN '2024-01-01' AND '2024-12-31' AND
+    TIMESTAMPDIFF( YEAR, Client . DOB, CURDATE() ) >= 18
+    AND Treatment
+      . ProvID IN( "2118", "2128", "2686", "958" ) AND xInsurance
+      . ID = 212
+    AND(
+        xSC.SCNum IN(
+            '90791', '90792', '90832', '90834', '90837', '96156',
+            '96158', '97161', '97162', '97163', '97165', '97166',
+            '97167', '97802', '97803', '99202', '99203', '99204',
+            '99205', '99212', '99213', '99214', '99215', '99304',
+            '99305', '99306', '99307', '99308', '99309', '99310',
+            '99315', '99316', '99341', '99342', '99344', '99345',
+            '99347', '99348', '99349', '99350', '99424', '99491',
+            'D7111', 'D7140', 'D7210', 'D7220', 'D7230', 'D7240',
+            'D7241', 'D7250', 'D7251', 'G0101', 'G0108', 'G0270',
+            'G0271', 'G0402', 'G0438', 'G0439', 'G0447', 'G0473'
+        ) OR xSC
+        . SCNum LIKE '99385%' OR xSC
+        . SCNum LIKE '99386%' OR xSC
+        . SCNum LIKE '99387%' OR xSC
+        . SCNum LIKE '99395%' OR xSC
+        . SCNum LIKE '99396%' OR xSC
+        . SCNum LIKE '99397%' OR xSC
+        . SCNum LIKE '99401%' OR xSC
+        . SCNum LIKE '99402%'
+    )
 
-    $sTreatment = $dbh->prepare($qTreatment);
-    $sTreatment->execute( $rClient->{ClientID} );
-    my $rTreatment = $sTreatment->fetchrow_hashref;
-    if ( !$rTreatment ) {
-        next;
-    }
+
+ group by Treatment.ClientID
+|;
+
+my $sRecord = $dbh->prepare($qRecord);
+$sRecord->execute();
+while ( my $rRecord = $sRecord->fetchrow_hashref ) {
     $Denominator++;
-    $rClient->{"BMI"} = "";
+    $rRecord->{"BMI"} = "";
 
-    if ( $rClient->{'HospiceCheck'} eq 1 ) {
+    if ( $rRecord->{'HospiceCheck'} eq 1 ) {
         $DNEXCLUDED++;
     }
     else {
-        my $ClientID = $rClient->{'ClientID'};
+        my $ClientID = $rRecord->{'ClientID'};
         $sClientVitalSigns->execute($ClientID);
         my $rClientVitalSigns = $sClientVitalSigns->fetchrow_hashref;
-        if ( !$rClientVitalSigns || $rClientVitalSigns->{'BMI'} eq '' ) {
+        my $BMI               = $rClientVitalSigns->{BMI};
+        my $HeightFeet        = $rClientVitalSigns->{HeightFeet};
+        my $HeightInches      = $rClientVitalSigns->{HeightInches};
+        my $Weight            = $rClientVitalSigns->{Weight};
+
+        if ( !$rClientVitalSigns ) {
             $PFNOTMET++;
         }
         else {
-            $PFMET++;
-            $rClient->{"BMI"} = $rClientVitalSigns->{'BMI'};
+            if ( $BMI ne "" || ( $HeightFeet && $Weight ) ) {
+                $PFMET++;
+                if ( $rClientVitalSigns->{'BMI'} eq "" ) {
+
+                    my $height = ( $HeightFeet * 12 ) + $HeightInches;
+
+                    my $bmi = ( $Weight / ( $height * $height ) ) * 703;
+                    $bmi = sprintf( "%.2f", $bmi );
+
+                    $rClientVitalSigns->{'BMI'} = $bmi;
+                }
+                $rRecord->{"BMI"} = $rClientVitalSigns->{'BMI'};
+            }
+            else {
+                $PFNOTMET++;
+            }
         }
+
     }
 
     foreach my $f (@FLDS) {
         my ( $fld, $hdr ) = split( ':', $f );
-        $table_entries .= qq|$rClient->{$fld}\t|;
+        $table_entries .= qq|$rRecord->{$fld}\t|;
     }
 
     $table_entries .= qq|\n|;
 
-    $total += $rClient->{'pcount'};
+    $total += $rRecord->{'pcount'};
 }
 
 my $Data_Completeness_Rate;
@@ -277,9 +229,8 @@ print $table_entries;
 
 print qq|${Denominator}| . "\t" x $numFLDS . qq|${total}\n|;
 
-# $srecord->finish();
 $sClientVitalSigns->finish();
-$sClient->finish();
+$sRecord->finish();
 myDBI->cleanup();
 exit;
 ############################################################################

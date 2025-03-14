@@ -53,27 +53,6 @@ my @FLDS = (
 my $numFLDS = scalar(@FLDS) - 2;
 print qq|numFLDS=${numFLDS}\n| if ($debug);
 
-my $ClientSelection =
-  DBA->withSelection( $form, 'and', 'Client.clinicClinicID', 'Client.ProvID' );
-
-my $sClient = $dbh->prepare(
-    "SELECT Client.*, ClientVitalSigns.*, 
-ClientEmergency.HospiceCheck, Client.LName, Client.FName, Client.ClientID, Clinic.Name as ClinicName, 
-CONCAT(Counselor.LName, ', ', Counselor.FName) as PrimaryProvider, xRaces.Descr as Race, Client.DOB, 
-TIMESTAMPDIFF(YEAR, Client.DOB, CURDATE()) AS Age, count(*) as pcount 
-FROM Client LEFT JOIN ClientEmergency ON Client.ClientID=ClientEmergency.ClientID 
-LEFT JOIN Provider as Counselor ON Counselor.ProvID = Client.ProvID 
-LEFT JOIN okmis_config.xRaces ON xRaces.ID = SUBSTRING_INDEX(Client.Race, '${multidel}', 1) 
-LEFT JOIN ClientVitalSigns ON ClientVitalSigns.ClientID=Client.ClientID 
-LEFT JOIN Provider as Clinic ON Clinic.ProvID = Client.clinicClinicID 
-WHERE Client.ClientID>100 ${ClientSelection} AND 
-Client.ProvID IN ('2118', '2128', '2686', '958')"
-);
-
-my $sInsurance = $dbh->prepare(
-"SELECT * FROM Insurance WHERE ClientID=? AND InsID=212 AND InsNumActive=1 ORDER BY InsNumEffDate DESC"
-);
-
 my ( $Denominator, $total, $PFMET, $DNEXCEPTION, $PFNOTMET, $DNEXCLUDED ) =
   ( 0, 0, 0, 0, 0, 0 );
 
@@ -86,9 +65,6 @@ $table_header .= qq|\n|;
 my $table_entries = '';
 
 $form = DBUtil->setDates($form);
-
-my $qTreatment =
-qq|SELECT * FROM Treatment LEFT JOIN xSC ON xSC.SCID = Treatment.SCID WHERE Treatment.ClientID = ? AND (Treatment.ContLogDate >= '$form->{FromDate}' AND Treatment.ContLogDate <= '$form->{ToDate}') AND (xSC.SCNum = '90791' OR xSC.SCNum = '90792' OR xSC.SCNum = '90832' OR xSC.SCNum = '90834' OR xSC.SCNum = '90837' OR xSC.SCNum = '96156' OR xSC.SCNum = '96158' OR xSC.SCNum = '97161' OR xSC.SCNum = '97162' OR xSC.SCNum = '97163' OR xSC.SCNum = '97165' OR xSC.SCNum = '97166' OR xSC.SCNum = '97167' OR xSC.SCNum = '97802' OR xSC.SCNum = '97803' OR xSC.SCNum = '99202' OR xSC.SCNum = '99203' OR xSC.SCNum = '99204' OR xSC.SCNum = '99205' OR xSC.SCNum = '99212' OR xSC.SCNum = '99213' OR xSC.SCNum = '99214' OR xSC.SCNum = '99215' OR xSC.SCNum = '99236' OR xSC.SCNum = '99304' OR xSC.SCNum = '99305' OR xSC.SCNum = '99306' OR xSC.SCNum = '99307' OR xSC.SCNum = '99308' OR xSC.SCNum = '99309' OR xSC.SCNum = '99310' OR xSC.SCNum = '99315' OR xSC.SCNum = '99316' OR xSC.SCNum = '99318' OR xSC.SCNum = '99324' OR xSC.SCNum = '99325' OR xSC.SCNum = '99326' OR xSC.SCNum = '99327' OR xSC.SCNum = '99328' OR xSC.SCNum = '99334' OR xSC.SCNum = '99335' OR xSC.SCNum = '99336' OR xSC.SCNum = '99337' OR xSC.SCNum = '99339' OR xSC.SCNum = '99340' OR xSC.SCNum LIKE '99385%' OR xSC.SCNum LIKE '99386%' OR xSC.SCNum LIKE '99387%' OR xSC.SCNum LIKE '99395%' OR xSC.SCNum LIKE '99396%' OR xSC.SCNum LIKE '99397%' OR xSC.SCNum LIKE '99401%' OR xSC.SCNum LIKE '99402%' OR xSC.SCNum = 'G0101' OR xSC.SCNum = 'G0108' OR xSC.SCNum = 'G0270' OR xSC.SCNum = 'G0271' OR xSC.SCNum = 'G0402' OR xSC.SCNum = 'G0438' OR xSC.SCNum = 'G0439' OR xSC.SCNum = 'G0447' OR xSC.SCNum = 'G0473' OR xSC.SCNum = 'D7111' OR xSC.SCNum = 'D7140' OR xSC.SCNum = 'D7210' OR xSC.SCNum = 'D7220' OR xSC.SCNum = 'D7230' OR xSC.SCNum = 'D7240' OR xSC.SCNum = 'D7241' OR xSC.SCNum = 'D7250' OR xSC.SCNum = 'D7251')|;
 
 my $sClientVitalSigns = $dbh->prepare(
     "SELECT * FROM ClientVitalSigns WHERE ClientID=? ORDER BY VDate LIMIT 1");
@@ -135,35 +111,78 @@ our %providers_rates = (
     }
 );
 
-$sClient->execute();
 my $total_patients = 0;
 my $ProvID;
 my @missingVitals = ();
 
-while ( my $rClient = $sClient->fetchrow_hashref ) {
-    $ProvID = $rClient->{'ProvID'};
+my $qRecord = qq|
+    select Treatment.TrID, Treatment.ContLogDate,xSC.SCNum
+        , Client . ClientID, Provider . ProvID, ClientEmergency . HospiceCheck
+        ,CONCAT(Provider.LName,', ',Provider.FName) as ProviderName
+        ,CONCAT(Client.LName,', ',Client.FName) as ClientName
+        ,Client.DOB,TIMESTAMPDIFF(YEAR, Client.DOB, CURDATE()) AS Age
+        ,count(*) as pcount
+    from Treatment 
+    left join Client on Client.ClientID=Treatment.ClientID
+    LEFT JOIN ClientEmergency ON Client
+      . ClientID = ClientEmergency
+      . ClientID
+    left join Provider on Provider.ProvID=Treatment.ProvID
+    left join xSC on xSC.SCID=Treatment.SCID
+    left join xInsurance on xInsurance.ID=xSC.InsID
+    WHERE Treatment
+      . ContLogDate BETWEEN '2024-01-01' AND '2024-12-31' AND
+    TIMESTAMPDIFF( YEAR, Client . DOB, CURDATE() ) >= 18
+    AND Treatment
+      . ProvID IN( "2118", "2128", "2686", "958" ) AND xInsurance
+      . ID = 212
+    AND(
+        xSC.SCNum IN(
+            '90791', '90792', '90832', '90834', '90837', '96156',
+            '96158', '97161', '97162', '97163', '97165', '97166',
+            '97167', '97802', '97803', '99202', '99203', '99204',
+            '99205', '99212', '99213', '99214', '99215', '99304',
+            '99305', '99306', '99307', '99308', '99309', '99310',
+            '99315', '99316', '99341', '99342', '99344', '99345',
+            '99347', '99348', '99349', '99350', '99424', '99491',
+            'D7111', 'D7140', 'D7210', 'D7220', 'D7230', 'D7240',
+            'D7241', 'D7250', 'D7251', 'G0101', 'G0108', 'G0270',
+            'G0271', 'G0402', 'G0438', 'G0439', 'G0447', 'G0473'
+        ) OR xSC
+        . SCNum LIKE '99385%' OR xSC
+        . SCNum LIKE '99386%' OR xSC
+        . SCNum LIKE '99387%' OR xSC
+        . SCNum LIKE '99395%' OR xSC
+        . SCNum LIKE '99396%' OR xSC
+        . SCNum LIKE '99397%' OR xSC
+        . SCNum LIKE '99401%' OR xSC
+        . SCNum LIKE '99402%'
+    )
 
-    my $sTreatment = $dbh->prepare($qTreatment);
-    $sTreatment->execute( $rClient->{ClientID} );
-    my $rTreatment = $sTreatment->fetchrow_hashref;
-    next unless $rTreatment;
+ group by Treatment.ClientID
+|;
+
+my $sRecord = $dbh->prepare($qRecord);
+$sRecord->execute();
+
+my $ClientID;
+while ( my $rRecord = $sRecord->fetchrow_hashref ) {
+    $ProvID   = $rRecord->{'ProvID'};
+    $ClientID = $rRecord->{ClientID};
 
     $providers_rates{$ProvID}{'initial_pop'} += 1;
-    $sInsurance->execute( $rClient->{ClientID} )
-      || $form->dberror("select Insurance $rClient->{ClientID}");
-
-    my $rInsurance = $sInsurance->fetchrow_hashref;
-    next unless $rInsurance;
 
     $providers_rates{$ProvID}{'total_pop'} += 1;
 
-    if ( $rClient->{'HospiceCheck'} eq 1 ) {
+    if ( $rRecord->{'HospiceCheck'} eq 1 ) {
+
+        # Hospice Check is active so exclude the patient
         $DNEXCLUDED++;
         $providers_rates{$ProvID}{'DNEXCLUDED'} += 1;
         $providers{$ProvID}{'G9996'}            += 1;
     }
     else {
-        my $ClientID = $rClient->{'ClientID'};
+        my $ClientID = $rRecord->{'ClientID'};
         $sClientVitalSigns->execute($ClientID);
         my $rClientVitalSigns = $sClientVitalSigns->fetchrow_hashref;
         my $BMI               = $rClientVitalSigns->{BMI};
@@ -213,6 +232,10 @@ foreach my $ProvID ( sort keys %providers ) {
 
     my $Data_Completeness_Numerator =
       ( $pr_PFMET + $pr_PFNOTMET + $DNEXCLUDED );
+
+    if ( 0 eq $total_pop ) {
+        $total_pop = 1;
+    }
     my $Data_Completeness_Rate =
       ( $Data_Completeness_Numerator / $total_pop ) * 100;
     my $Performance_Rate =
@@ -235,7 +258,6 @@ print $table_header;
 print $table_entries;
 
 $sClientVitalSigns->finish();
-$sClient->finish();
-$sInsurance->finish();
+$sRecord->finish();
 myDBI->cleanup();
 exit;
