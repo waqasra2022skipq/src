@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 use lib '/var/www/okmis/src/lib';
+
 use DBI;
 use myForm;
 use myDBI;
@@ -67,7 +68,9 @@ my $table_entries = '';
 $form = DBUtil->setDates($form);
 
 my $sClientVitalSigns = $dbh->prepare(
-    "SELECT * FROM ClientVitalSigns WHERE ClientID=? ORDER BY VDate LIMIT 1");
+    "select * from ClientVitalSigns where ClientID=? and
+    vDate BETWEEN '2024-01-01' AND '2024-12-31' order by VDate"
+);
 
 our %providers = (
     "2118" =>
@@ -112,8 +115,7 @@ our %providers_rates = (
 );
 
 my $total_patients = 0;
-my $ProvID;
-my @missingVitals = ();
+my @missingVitals  = ();
 
 my $qRecord = qq|
     select Treatment.TrID, Treatment.ContLogDate,xSC.SCNum
@@ -133,6 +135,7 @@ my $qRecord = qq|
     WHERE Treatment
       . ContLogDate BETWEEN '2024-01-01' AND '2024-12-31' AND
     TIMESTAMPDIFF( YEAR, Client . DOB, CURDATE() ) >= 18
+    AND Treatment.ClinicID=101
     AND Treatment
       . ProvID IN( "2118", "2128", "2686", "958" ) AND xInsurance
       . ID = 212
@@ -166,6 +169,7 @@ my $sRecord = $dbh->prepare($qRecord);
 $sRecord->execute();
 
 my $ClientID;
+my $ProvID;
 while ( my $rRecord = $sRecord->fetchrow_hashref ) {
     $ProvID   = $rRecord->{'ProvID'};
     $ClientID = $rRecord->{ClientID};
@@ -189,7 +193,9 @@ while ( my $rRecord = $sRecord->fetchrow_hashref ) {
         my $HeightFeet        = $rClientVitalSigns->{HeightFeet};
         my $Weight            = $rClientVitalSigns->{Weight};
 
-        if ( !$rClientVitalSigns ) {
+        if (   $rClientVitalSigns->{ID} eq ""
+            || $rClientVitalSigns->{ID} eq "null" )
+        {
             $PFNOTMET++;
             $providers_rates{$ProvID}{'PFNOTMET'} += 1;
             $providers{$ProvID}{'G8421'}          += 1;

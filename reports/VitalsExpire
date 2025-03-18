@@ -1,5 +1,6 @@
 #!/usr/bin/perl
 use lib '/var/www/okmis/src/lib';
+
 use DBI;
 use DBForm;
 use DBA;
@@ -28,55 +29,93 @@ $ClinicSelection .= qq| and Client.Active=1| if ( $form->{Active} );
 my $sProvider =
   $dbh->prepare("select LName, FName from Provider where ProvID=?");
 my $sClientVitalSigns = $dbh->prepare(
-    "select * from ClientVitalSigns where ClientID=? order by VDate");
-my $sClient = $dbh->prepare( "
-select Client.LName, Client.FName, Client.ClientID, Client.DOB, Client.ProvID, Client.Active, Client.RecDOLC as LastContDate
-      ,ClientVitalSigns.ID, ClientVitalSigns.VDate
+    "select * from ClientVitalSigns where ClientID=? and
+    vDate BETWEEN '2024-01-01' AND '2024-12-31' order by VDate"
+);
+
+my $qRecord = qq|
+    select Treatment . TrID, Treatment . ContLogDate, xSC . SCNum,
+      xInsurance . Descr as Insurance, ClientEmergency . HospiceCheck,
+    Client . LName, Client . FName,Client.Active,Client.DOB
+    ,ClientVitalSigns.ID, ClientVitalSigns.VDate
       ,ClientVitalSigns.HeightFeet, ClientVitalSigns.HeightInches, ClientVitalSigns.Weight
       ,ClientVitalSigns.BMI, ClientVitalSigns.HbA1c
-  from Client 
-    left join ClientACL on ClientACL.ClientID=Client.ClientID
+    , Clinic . Name as ClinicName
+        , Client . ClientID, Provider . ProvID
+        , CONCAT( Provider . LName, ', ', Provider . FName ) as PrimaryProvider
+        ,CONCAT(Client.LName,', ',Client.FName) as ClientName
+        ,Client.DOB,TIMESTAMPDIFF(YEAR, Client.DOB, CURDATE()) AS Age
+        ,count(*) as pcount
+    from Treatment 
+    left join Client on Client.ClientID=Treatment.ClientID
     left join ClientVitalSigns on ClientVitalSigns.ClientID=Client.ClientID
+    LEFT JOIN ClientEmergency ON Client
+      . ClientID = ClientEmergency
+      . ClientID
+    left join Provider on Provider.ProvID=Treatment.ProvID
+    left join Provider as Clinic on Clinic . ProvID = Client . clinicClinicID
+    left join xSC on xSC.SCID=Treatment.SCID
+    left join xInsurance on xInsurance.ID=xSC.InsID
+    WHERE Treatment.ContLogDate BETWEEN '2024-01-01' AND '2024-12-31' AND
+    TIMESTAMPDIFF( YEAR, Client . DOB, CURDATE() ) >= 18
+    AND Treatment.ClinicID=101
+    AND Treatment
+      . ProvID IN( "2118", "2128", "2686", "958" ) AND xInsurance
+      . ID = 212
+      AND(
+        xSC.SCNum IN(
+            '90791', '90792', '90832', '90834', '90837', '96156',
+            '96158', '97161', '97162', '97163', '97165', '97166',
+            '97167', '97802', '97803', '99202', '99203', '99204',
+            '99205', '99212', '99213', '99214', '99215', '99304',
+            '99305', '99306', '99307', '99308', '99309', '99310',
+            '99315', '99316', '99341', '99342', '99344', '99345',
+            '99347', '99348', '99349', '99350', '99424', '99491',
+            'D7111', 'D7140', 'D7210', 'D7220', 'D7230', 'D7240',
+            'D7241', 'D7250', 'D7251', 'G0101', 'G0108', 'G0270',
+            'G0271', 'G0402', 'G0438', 'G0439', 'G0447', 'G0473'
+        ) OR xSC
+        . SCNum LIKE '99385%' OR xSC
+        . SCNum LIKE '99386%' OR xSC
+        . SCNum LIKE '99387%' OR xSC
+        . SCNum LIKE '99395%' OR xSC
+        . SCNum LIKE '99396%' OR xSC
+        . SCNum LIKE '99397%' OR xSC
+        . SCNum LIKE '99401%' OR xSC
+        . SCNum LIKE '99402%'
+    )
 
-    left join ClientPrAuth on ClientPrAuth.ClientID=Client.ClientID
-    left join Insurance on Insurance.InsNumID=ClientPrAuth.InsuranceID
-    left join xInsurance on xInsurance.ID=Insurance.InsID
-
-  where ClientACL.ProvID='${ForProvID}'
-  ${ClinicSelection}
-  group by Client.LName, Client.FName, Client.ClientID
-" );
+ group by Treatment.ClientID
+|;
+my $sClient = $dbh->prepare($qRecord);
 
 ##my $records = main->getLastLineOfReport($form,$sel,"ClientID");
 ##foreach $ClientID ( keys %{ $records } )
 print
 qq|${DT}\nMissing BMI Report.\nClients with Height/Weight missing from Vital Signs screening report.\n|;
 print
-qq|Client Name\tActive\tDOB\tAge\tTestDate\tHeight\tWeight\tBMI\tHbA1c\tProvider Name\tMessage\tLast Contact Date\n|;
+qq|Client Name\tActive\tDOB\tAge\tTestDate\tHeight\tWeight\tBMI\tHbA1c\tProvider Name\tMessage\tTrID\n|;
 
 #print qq|ClinicSelection=${ClinicSelection}\n|;
 #print qq|with=${with}\n|;
 
-$form = DBUtil->setDates($form);
+# $form = DBUtil->setDates($form);
 
-my $qTreatment = qq|SELECT * FROM Treatment WHERE 
-    Treatment.ClientID = ? and Type = 1 and
-    (Treatment.ContLogDate >= '$form->{FromDate}' and Treatment.ContLogDate<='$form->{ToDate}')|;
+# my $qTreatment = qq|SELECT * FROM Treatment WHERE
+#     Treatment.ClientID = ? and Type = 1 and
+#     (Treatment.ContLogDate >= '$form->{FromDate}' and Treatment.ContLogDate<='$form->{ToDate}')|;
 
 $sClient->execute();
+
 while ( my $rClient = $sClient->fetchrow_hashref ) {
 
-    $sTreatment = $dbh->prepare($qTreatment);
-    $sTreatment->execute( $rClient->{ClientID} );
-    my $rTreatment = $sTreatment->fetchrow_hashref;
-    if ( !$rTreatment ) {
-        next;
-    }
-
-#foreach my $f ( sort keys %{$rClient} ) { print "rClient-$f=$rClient->{$f}\n"; }
     my $ClientID     = $rClient->{'ClientID'};
     my $ActiveFlag   = $rClient->{'Active'} ? 'Yes' : 'No';
-    my $LastContDate = $rClient->{'LastContDate'};
+    my $HospiceCheck = $rClient->{'HospiceCheck'};
+    my $LastContDate = $rClient->{'TrID'};
+    if ( $HospiceCheck eq 1 ) {
+        next;
+    }
     my $ClientName =
       qq|$rClient->{'LName'}, $rClient->{'FName'} ($rClient->{'ClientID'})|;
     my $Age = DBUtil->Date( $rClient->{DOB}, 'age' );
@@ -105,7 +144,7 @@ qq|${ClientName}\t${ActiveFlag}\t$rClient->{'DOB'}\t${Age}\t$rClient->{'VDate'}\
 qq|${ClientName}\t${ActiveFlag}\t$rClient->{'DOB'}\t${Age}\t$r->{'VDate'}\t${LastHeight}\t${LastWeight}\t$r->{'BMI'}\t$r->{'HbA1c'}\t${ProvName}\t${msg}\t${LastContDate}\n|
           if ( $msg ne '' );
     }
-    elsif ( $Age > 17 ) {
+    elsif ( $Age >= 18 ) {
         my ( $r, $msg ) = main->getVitals( $form, $ClientID, 'ADULT' );
         my $LastHeight = qq|$r->{'HeightFeet'}ft $r->{'HeightInches'}in|
           if ( $r->{'HeightFeet'} ne '' || $r->{'HeightInches'} ne '' );
@@ -137,9 +176,12 @@ sub getVitals {
         $Height =~ s/\s+//g;
         $NoHeight  = $Height        if ( $Height ne '' );
         $NoWeight  = $r->{'Weight'} if ( $r->{'Weight'} ne '' );
-        $YesHeight = $Height if ( $Height ne '' && $TestDate > $BackDate );
-        $YesWeight = $r->{'Weight'}
-          if ( $r->{'Weight'} ne '' && $TestDate > $BackDate );
+        $YesHeight = $Height;
+
+        # if ( $Height ne '' && $TestDate > $BackDate );
+        $YesWeight = $r->{'Weight'};
+
+        # if ( $r->{'Weight'} ne '' && $TestDate > $BackDate );
 
         #print qq|Height=${Height}, Weight=$r->{Weight}, VDate=$r->{VDate}\n|;
         #print qq|NoHeight=${NoHeight}, NoWeight=${NoWeight}\n|;

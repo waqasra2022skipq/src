@@ -1,5 +1,6 @@
 #!/usr/bin/perl
 use lib '/var/www/okmis/src/lib';
+
 use DBI;
 use myForm;
 use myDBI;
@@ -106,6 +107,7 @@ my $qRecord = qq|
     AND Treatment
       . ProvID IN( "2118", "2128", "2686", "958" ) AND xInsurance
       . ID = 212
+    AND Treatment.ClinicID=101
     AND(
         xSC.SCNum IN(
             '90791', '90792', '90832', '90834', '90837', '96156',
@@ -137,10 +139,14 @@ my $sRecord = $dbh->prepare($qRecord);
 $sRecord->execute();
 while ( my $rRecord = $sRecord->fetchrow_hashref ) {
     $Denominator++;
+    my $HospiceCheck = $rRecord->{'HospiceCheck'};
+
     $rRecord->{"BMI"} = "";
 
-    if ( $rRecord->{'HospiceCheck'} eq 1 ) {
+    if ( $HospiceCheck eq 1 ) {
         $DNEXCLUDED++;
+        $rRecord->{"BMI"} = "Excluded";
+
     }
     else {
         my $ClientID = $rRecord->{'ClientID'};
@@ -151,14 +157,16 @@ while ( my $rRecord = $sRecord->fetchrow_hashref ) {
         my $HeightInches      = $rClientVitalSigns->{HeightInches};
         my $Weight            = $rClientVitalSigns->{Weight};
 
-        if ( !$rClientVitalSigns ) {
+        if (   $rClientVitalSigns->{ID} eq ""
+            || $rClientVitalSigns->{ID} eq "null" )
+        {
             $PFNOTMET++;
+            $rRecord->{"BMI"} = "No Vitals";
         }
         else {
             if ( $BMI ne "" || ( $HeightFeet && $Weight ) ) {
                 $PFMET++;
-                if ( $rClientVitalSigns->{'BMI'} eq "" ) {
-
+                if ( $BMI eq "" || $BMI eq "0.00" ) {
                     my $height = ( $HeightFeet * 12 ) + $HeightInches;
 
                     my $bmi = ( $Weight / ( $height * $height ) ) * 703;
@@ -166,10 +174,11 @@ while ( my $rRecord = $sRecord->fetchrow_hashref ) {
 
                     $rClientVitalSigns->{'BMI'} = $bmi;
                 }
-                $rRecord->{"BMI"} = $rClientVitalSigns->{'BMI'};
+                $rRecord->{"BMI"} = $rClientVitalSigns->{'BMI'} . " MET";
             }
             else {
                 $PFNOTMET++;
+                $rRecord->{"BMI"} = "No BMI";
             }
         }
 
