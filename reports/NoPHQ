@@ -77,42 +77,163 @@ my $sClient = $dbh->prepare($qClient);
 $form = DBUtil->setDates($form);
 my $DateRange = qq|from $form->{FromDateD} thru $form->{ToDateD}|;
 
-my $qTreatment = qq|SELECT * FROM Treatment WHERE 
-    Treatment.ClientID = ? and Type = 1 and
-    (Treatment.ContLogDate >= '$form->{FromDate}' and Treatment.ContLogDate<='$form->{ToDate}')|;
-
 print
 qq|${DT}\n${Header}Missing PHQ Report.\nClients with missing any PHQ Test report ${DateRange}\n|;
 print
-qq|Client Name\tClientID\tActive\tDOB\tAge\tPA Number\tTransType\tProvider Name\tMessage\tLast Contact Date\n|;
+qq|Client Name\tClientID\tActive\tDOB\tAge\tProvider Name\tMessage\tLast Contact Date\n|;
 $sClient->execute();
-while ( my $rClient = $sClient->fetchrow_hashref ) {
 
-    $sTreatment = $dbh->prepare($qTreatment);
-    $sTreatment->execute( $rClient->{ClientID} );
-    my $rTreatment = $sTreatment->fetchrow_hashref;
-    if ( !$rTreatment ) {
+my $qRecord = qq|
+    select Treatment . TrID, Treatment . ContLogDate, xSC . SCNum,
+      Client . RecDOLC as LastContDate,
+      xInsurance . Descr as Insurance,
+    Client . LName, Client . FName
+    , Clinic . Name as ClinicName
+        , Client . ClientID, Provider . ProvID, ClientEmergency . HospiceCheck
+        , CONCAT( Provider . LName, ', ', Provider . FName ) as PrimaryProvider
+        ,CONCAT(Client.LName,', ',Client.FName) as ClientName
+        ,Client.DOB,TIMESTAMPDIFF(YEAR, Client.DOB, CURDATE()) AS Age
+        ,count(*) as pcount
+    from Treatment 
+    left join Client on Client.ClientID=Treatment.ClientID
+    LEFT JOIN ClientEmergency ON Client
+      . ClientID = ClientEmergency
+      . ClientID
+    left join Provider on Provider.ProvID=Treatment.ProvID
+    left join Provider as Clinic on Clinic . ProvID = Client . clinicClinicID
+    left join xSC on xSC.SCID=Treatment.SCID
+    left join xInsurance on xInsurance.ID=xSC.InsID
+    WHERE Treatment.ContLogDate BETWEEN '2024-01-01' AND '2024-12-31' AND
+    TIMESTAMPDIFF( YEAR, Client . DOB, CURDATE() ) >= 12
+    AND Treatment
+      . ProvID IN( "2118", "2128", "2686", "958" ) AND xInsurance
+      . ID = 212
+    AND Treatment.ClinicID=101
+    AND(
+        xSC
+          . SCNum IN(
+            '59400', '59510', '59610', '59618', '90791', '90792',
+            '90832', '90834', '90837', '92622', '92625', '96112',
+            '96105', '96116', '96125', '96136', '96138', '96156',
+            '96158', '96161', '96162', '96163', '96164', '97165',
+            '97166', '97167', '97802', '97803', '98966', '98967',
+            '98968', '99078', '99202', '99203', '99204', '99205',
+            '99212', '99213', '99214', '99215', '99304', '99305',
+            '99306', '99307', '99308', '99309', '99310', '99315',
+            '99316', '99341', '99342', '99344', '99345', '99347',
+            '99348', '99349', '99350', 'G0101', 'G0270', 'G0271',
+            'G0402', 'G0438', 'G0439', 'G0444'
+          ) OR xSC
+          . SCNum LIKE '99384%' OR xSC
+          . SCNum LIKE '96110%' OR xSC
+          . SCNum LIKE '99385%' OR xSC
+          . SCNum LIKE '99386%' OR xSC
+          . SCNum LIKE '99387%' OR xSC
+          . SCNum LIKE '99394%' OR xSC
+          . SCNum LIKE '99395%' OR xSC
+          . SCNum LIKE '99396%' OR xSC
+          . SCNum LIKE '99397%'
+      )
+ group by Treatment.ClientID
+|;
+
+# my $qMissingPHQBrief = qq|
+#     SELECT * FROM ClientPHQBrief WHERE ClientID =? AND TestDate BETWEEN '2024-01-01' AND '2024-12-31';
+# |;
+
+my $qMissingPHQ2 = qq|
+    SELECT * FROM ClientPHQ2 WHERE ClientID =? AND TestDate BETWEEN '2024-01-01' AND '2024-12-31';
+|;
+
+my $qMissingPHQ9 = qq|
+    SELECT * FROM ClientPHQ9 WHERE ClientID =? AND TestDate BETWEEN '2024-01-01' AND '2024-12-31';
+|;
+
+my $qMissingGDSS = qq|
+    SELECT * FROM ClientGDSS WHERE ClientID =? AND TestDate BETWEEN '2024-01-01' AND '2024-12-31';
+|;
+
+my $qMissingGDSL = qq|
+    SELECT * FROM ClientGDSL WHERE ClientID =? AND TestDate BETWEEN '2024-01-01' AND '2024-12-31';
+|;
+
+my $sMissingPHQ2 = $dbh->prepare($qMissingPHQ2);
+my $sMissingPHQ9 = $dbh->prepare($qMissingPHQ9);
+my $sMissingGDSS = $dbh->prepare($qMissingGDSS);
+my $sMissingGDSL = $dbh->prepare($qMissingGDSL);
+
+my $qClProbs = $dbh->prepare(
+    "SELECT cp.InitiatedDate, i.ICD10, i.sctName FROM ClientProblems cp
+                                LEFT JOIN okmis_config.misICD10 i ON cp.UUID = i.ID 
+                                WHERE cp.ClientID = ? AND cp.Active = 1 AND 
+                                i.ICD10 IN (
+    'F30.2', 'F30.3', 'F30.4', 'F30.8', 'F30.9', 'F30.10', 'F30.11', 'F30.12', 'F30.13',
+    'F31.0', 'F31.10', 'F31.11', 'F31.12', 'F31.13', 'F31.2', 'F31.30', 'F31.31', 'F31.32',
+    'F31.4', 'F31.5', 'F31.60', 'F31.61', 'F31.62', 'F31.63', 'F31.64', 'F31.70', 'F31.71',
+    'F31.72', 'F31.73', 'F31.74', 'F31.75', 'F31.76', 'F31.77', 'F31.78', 'F31.81', 'F31.89', 'F31.9'
+);"
+);
+
+my $sPriorDepression = $dbh->prepare(
+    "SELECT cp.InitiatedDate, i.ICD10, i.sctName FROM ClientProblems cp
+                                LEFT JOIN okmis_config.misICD10 i ON cp.UUID = i.ID 
+                                WHERE cp.ClientID = ? AND cp.InitiatedDate < '2024-01-01' AND
+                                i.ICD10 IN ('F01.51', 'F32.0', 'F32.1', 'F32.2', 'F32.3', 'F32.4', 'F32.5', 'F32.89', 'F32.9', 'F33.0', 'F33.1', 'F33.2', 'F33.3', 'F33.40',
+'F33.41', 'F33.42', 'F33.8', 'F33.9', 'F34.1', 'F34.81', 'F34.89', 'F43.21', 'F43.23', 'F53.0', 'F53.1', 'O90.6', 'O99.340',
+'O99.341', 'O99.342', 'O99.343', 'O99.345'
+)"
+);
+
+my $sRecord = $dbh->prepare($qRecord);
+$sRecord->execute();
+
+my $total = 0;
+while ( my $rRecord = $sRecord->fetchrow_hashref ) {
+
+    my $ClientID     = $rRecord->{'ClientID'};
+    my $ActiveFlag   = $rRecord->{'Active'} ? 'Yes' : 'No';
+    my $LastContDate = $rRecord->{'LastContDate'};
+    my $ClientName   = qq|$rRecord->{'LName'}, $rRecord->{'FName'}|;
+    my $Age          = DBUtil->Date( $rRecord->{DOB}, 'age' );
+
+    $qClProbs->execute($ClientID);
+    my $rClProbsCnt = $qClProbs->rows;
+    next if $rClProbsCnt > 0;
+
+    $sPriorDepression->execute($ClientID);
+    my $rPriorDepressionCnt = $sPriorDepression->rows;
+    next if $rPriorDepressionCnt > 0;
+
+    $sMissingPHQ2->execute($ClientID);
+    my $PHQ2RowsCnt = $sMissingPHQ2->rows;
+
+    $sMissingPHQ9->execute($ClientID);
+    my $PHQ9RowsCnt = $sMissingPHQ9->rows;
+
+    $sMissingGDSS->execute($ClientID);
+    my $GDSSRowsCnt = $sMissingGDSS->rows;
+
+    $sMissingGDSL->execute($ClientID);
+    my $GDSLRowsCnt = $sMissingGDSL->rows;
+
+    if (   $PHQ2RowsCnt > 0
+        || $PHQ9RowsCnt > 0
+        || $GDSSRowsCnt > 0
+        || $GDSLRowsCnt > 0 )
+    {
         next;
     }
+    $total++;
 
-    my $ClientID     = $rClient->{'ClientID'};
-    my $ActiveFlag   = $rClient->{'Active'} ? 'Yes' : 'No';
-    my $LastContDate = $rClient->{'LastContDate'};
-    my $ClientName   = qq|$rClient->{'LName'}, $rClient->{'FName'}|;
-    my $Age          = DBUtil->Date( $rClient->{DOB}, 'age' );
-## in select  next unless ( $rClient->{'TestPHQ'} eq '' && $rClient->{'TestPHQ4'} eq '' && $rClient->{'TestPHQ9'} eq '' && $rClient->{'TestTPHQ9'} eq '' && $rClient->{'TestPHQ15'} eq '' && $rClient->{'TestPHQBrief'} eq '' && $rClient->{'TestPHQSADS'} eq '' );
-## in select  next if ( $rClient->{'PAnumber'} eq '' );
-## in select  next unless ( $rClient->{'TransType'} =~ /23|42/ );
-    next if ( $Age < 13 );
-    my $msg = 'NO CLIENT PHQ TESTS';
-    $sProvider->execute( $rClient->{ProvID} );
+    my $msg = 'NO CLIENT PHQ2/PHQ9/GDSS/GDSL TESTS';
+    $sProvider->execute( $rRecord->{ProvID} );
     my ( $ProvLName, $ProvFName ) = $sProvider->fetchrow_array;
-    my $ProvName = qq|$ProvLName, $ProvFName ($rClient->{ProvID})|;
+    my $ProvName = qq|$ProvLName, $ProvFName ($rRecord->{ProvID})|;
     print
-qq|${ClientName}\t${ClientID}\t${ActiveFlag}\t$rClient->{'DOB'}\t${Age}\t$rClient->{'PAnumber'}\t$rClient->{'TransType'}\t${ProvName}\t${msg}\t${LastContDate}\n|;
-
-#  print qq|Dates:\t$rClient->{'TestPHQ'}\t$rClient->{'TestPHQ4'}\t$rClient->{'TestPHQ9'}\t$rClient->{'TestTPHQ9'}\t$rClient->{'TestPHQ15'}\t$rClient->{'TestPHQBrief'}\t$rClient->{'TestPHQSADS'}\n|;
+qq|${ClientName}\t${ClientID}\t${ActiveFlag}\t$rRecord->{'DOB'}\t${Age}\t${ProvName}\t${msg}\t${LastContDate}\n|;
 }
+
+print qq|Total\t${total}|;
 
 $sProvider->finish();
 $sClient->finish();

@@ -1,0 +1,459 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use lib '/var/www/okmis/src/lib';
+
+use DBI;
+use myForm;
+use myDBI;
+use DBA;
+use DBUtil;
+use Time::Local;
+
+my $DT    = localtime();
+my $form  = myForm->new();
+my $dbh   = myDBI->dbconnect( $form->{'DBNAME'} );
+my $debug = $form->{'LOGINPROVID'} == 91 ? 0 : 0;
+
+if ($debug) {
+    foreach my $f ( sort keys %{$form} ) { print "form-$f=$form->{$f}\n"; }
+}
+
+$form = DBUtil->setDates($form);
+my $DateRange = qq|from $form->{FromDateD} thru $form->{ToDateD}|;
+my $multidel  = 'ý';
+my $ForProvID = $form->{ForProvID} || $form->{LOGINPROVID};
+
+my $withSelection = DBA->withSelection( $form, 'and', 'Client.clinicClinicID',
+    'Treatment.ProvID', 'Treatment.ClientID', 'Treatment.TrID' );
+my $Header = DBA->withSelectionHeader($form);
+$withSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+
+my $QID = qq|QID134|;
+my $TITLE =
+qq|Preventive Care and Screening: Screening for Depression and Follow-Up Plan|;
+
+my @FLDS = (
+    "ProvID:ProvID",
+    "Provider Name:Provider Name",
+    "total_pop:Total Population",
+    "G9717:Excluded(G9717)",
+    "denom:Denominator",
+    "G8431:Performance Met(G8431)",
+    "G8510:Performance Met(G8510)",
+    "G8432:Performance Not Met(G8432)",
+    "G8511:Performance Not Met(G8511)",
+    "Data Completeness Rate:Data Completeness Rate",
+    "Performance Rate:Performance Rate"
+);
+
+my $numFLDS = scalar(@FLDS) - 2;
+print qq|numFLDS=${numFLDS}\n| if ($debug);
+
+my ( $Denominator, $total, $PFMET, $DNEXCEPTION, $PFNOTMET, $DNEXCLUDED ) =
+  ( 0, 0, 0, 0, 0, 0 );
+
+my $table_header = qq|\n|;
+foreach my $f (@FLDS) {
+    my ( $fld, $hdr ) = split( ':', $f );
+    $table_header .= qq|${hdr}\t|;
+}
+$table_header .= qq|\n|;
+my $table_entries = '';
+
+$form = DBUtil->setDates($form);
+
+our %providers = (
+    "2118" => {
+        'name'  => "Kizzy McCaskill",
+        "G9717" => 0,
+        "G8431" => 0,
+        "G8510" => 0,
+        "G8432" => 0,
+        "G8511" => 0
+    },
+    "2128" => {
+        'name'  => "Rebecca Jones L",
+        "G9717" => 0,
+        "G8431" => 0,
+        "G8510" => 0,
+        "G8432" => 0,
+        "G8511" => 0
+    },
+    "2686" => {
+        'name'  => "Shelby Lucas",
+        "G9717" => 0,
+        "G8431" => 0,
+        "G8510" => 0,
+        "G8432" => 0,
+        "G8511" => 0
+    },
+    "958" => {
+        'name'  => "Mindy Jones K",
+        "G9717" => 0,
+        "G8431" => 0,
+        "G8510" => 0,
+        "G8432" => 0,
+        "G8511" => 0
+    }
+);
+
+our %providers_rates = (
+    "2118" => {
+        'name'        => "Kizzy McCaskill",
+        "total_pop"   => 0,
+        "PFMET"       => 0,
+        "PFNOTMET"    => 0,
+        "initial_pop" => 0
+    },
+    "2128" => {
+        'name'        => "Rebecca Jones L",
+        "total_pop"   => 0,
+        "PFMET"       => 0,
+        "PFNOTMET"    => 0,
+        "initial_pop" => 0
+    },
+    "2686" => {
+        'name'        => "Shelby Lucas",
+        "total_pop"   => 0,
+        "PFMET"       => 0,
+        "PFNOTMET"    => 0,
+        "initial_pop" => 0
+    },
+    "958" => {
+        'name'        => "Mindy Jones K",
+        "total_pop"   => 0,
+        "PFMET"       => 0,
+        "PFNOTMET"    => 0,
+        "initial_pop" => 0
+    }
+);
+
+my $qRecord = qq|
+    select Treatment . TrID, Treatment . ContLogDate, xSC . SCNum,
+      xInsurance . Descr as Insurance,
+    Client . LName, Client . FName
+    , Clinic . Name as ClinicName
+        , Client . ClientID, Provider . ProvID, ClientEmergency . HospiceCheck
+        , CONCAT( Provider . LName, ', ', Provider . FName ) as PrimaryProvider
+        ,CONCAT(Client.LName,', ',Client.FName) as ClientName
+        ,Client.DOB,TIMESTAMPDIFF(YEAR, Client.DOB, CURDATE()) AS Age
+        ,count(*) as pcount
+    from Treatment 
+    left join Client on Client.ClientID=Treatment.ClientID
+    LEFT JOIN ClientEmergency ON Client
+      . ClientID = ClientEmergency
+      . ClientID
+    left join Provider on Provider.ProvID=Treatment.ProvID
+    left join Provider as Clinic on Clinic . ProvID = Client . clinicClinicID
+    left join xSC on xSC.SCID=Treatment.SCID
+    left join xInsurance on xInsurance.ID=xSC.InsID
+    WHERE Treatment.ContLogDate BETWEEN '2024-01-01' AND '2024-12-31' AND
+    TIMESTAMPDIFF( YEAR, Client . DOB, CURDATE() ) >= 12
+    AND Treatment
+      . ProvID IN( "2118", "2128", "2686", "958" ) AND xInsurance
+    . ID = 212 AND Treatment . ClinicID = 101
+    AND(
+        xSC
+          . SCNum IN(
+            '59400', '59510', '59610', '59618', '90791', '90792',
+            '90832', '90834', '90837', '92622', '92625', '96112',
+            '96105', '96116', '96125', '96136', '96138', '96156',
+            '96158', '97161', '97162', '97163', '97164', '97165',
+            '97166', '97167', '97802', '97803', '98966', '98967',
+            '98968', '99078', '99202', '99203', '99204', '99205',
+            '99212', '99213', '99214', '99215', '99304', '99305',
+            '99306', '99307', '99308', '99309', '99310', '99315',
+            '99316', '99341', '99342', '99344', '99345', '99347',
+            '99348', '99349', '99350', 'G0101', 'G0270', 'G0271',
+            'G0402', 'G0438', 'G0439', 'G0444'
+          ) OR xSC
+          . SCNum LIKE '99384%' OR xSC
+          . SCNum LIKE '96110%' OR xSC
+          . SCNum LIKE '99385%' OR xSC
+          . SCNum LIKE '99386%' OR xSC
+          . SCNum LIKE '99387%' OR xSC
+          . SCNum LIKE '99394%' OR xSC
+          . SCNum LIKE '99395%' OR xSC
+          . SCNum LIKE '99396%' OR xSC
+          . SCNum LIKE '99397%'
+      )
+
+ group by Treatment.ClientID
+|;
+
+my $sRecord = $dbh->prepare($qRecord);
+$sRecord->execute();
+
+my $ClientID;
+my $ProvID;
+
+my $qClProbs = $dbh->prepare(
+    "SELECT cp.InitiatedDate, i.ICD10, i.sctName FROM ClientProblems cp
+                                LEFT JOIN okmis_config.misICD10 i ON cp.UUID = i.ID 
+                                WHERE cp.ClientID = ? AND cp.Active = 1 AND 
+                                i.ICD10 IN (
+    'F30.2', 'F30.3', 'F30.4', 'F30.8', 'F30.9', 'F30.10', 'F30.11', 'F30.12', 'F30.13',
+    'F31.0', 'F31.10', 'F31.11', 'F31.12', 'F31.13', 'F31.2', 'F31.30', 'F31.31', 'F31.32',
+    'F31.4', 'F31.5', 'F31.60', 'F31.61', 'F31.62', 'F31.63', 'F31.64', 'F31.70', 'F31.71',
+    'F31.72', 'F31.73', 'F31.74', 'F31.75', 'F31.76', 'F31.77', 'F31.78', 'F31.81', 'F31.89', 'F31.9'
+);"
+);
+
+my $qGDSS = qq|
+    SELECT * FROM ClientGDSS WHERE ClientID =? AND TestDate BETWEEN '2024-01-01' AND '2024-12-31';
+|;
+my $sGDSS = $dbh->prepare($qGDSS);
+
+my $qGDSL = qq|
+    SELECT * FROM ClientGDSL WHERE ClientID =? AND TestDate BETWEEN '2024-01-01' AND '2024-12-31';
+|;
+my $sGDSL = $dbh->prepare($qGDSL);
+
+my $sPHQ9 = $dbh->prepare(
+"SELECT * FROM ClientPHQ9 WHERE ClientID=? AND TestDate BETWEEN '2024-01-01' AND '2024-12-31' ORDER BY TestDate DESC"
+);
+my $sPHQ2 = $dbh->prepare(
+"SELECT * FROM ClientPHQ2 WHERE ClientID=? AND TestDate BETWEEN '2024-01-01' AND '2024-12-31' ORDER BY TestDate DESC"
+);
+
+my $sTRPlan = $dbh->prepare(
+"SELECT * FROM `ClientTrPlan` WHERE `ClientID` = ? AND `EffDate` BETWEEN '2024-01-01' AND '2024-12-31'"
+);
+
+my $sPriorDepression = $dbh->prepare(
+    "SELECT cp.InitiatedDate, i.ICD10, i.sctName FROM ClientProblems cp
+                                LEFT JOIN okmis_config.misICD10 i ON cp.UUID = i.ID 
+                                WHERE cp.ClientID = ? AND cp.InitiatedDate < '2024-01-01' AND
+                                i.ICD10 IN ('F01.51', 'F32.0', 'F32.1', 'F32.2', 'F32.3', 'F32.4', 'F32.5', 'F32.89', 'F32.9', 'F33.0', 'F33.1', 'F33.2', 'F33.3', 'F33.40',
+'F33.41', 'F33.42', 'F33.8', 'F33.9', 'F34.1', 'F34.81', 'F34.89', 'F43.21', 'F43.23', 'F53.0', 'F53.1', 'O90.6', 'O99.340',
+'O99.341', 'O99.342', 'O99.343', 'O99.345'
+)"
+);
+
+while ( my $rRecord = $sRecord->fetchrow_hashref ) {
+    $ProvID   = $rRecord->{'ProvID'};
+    $ClientID = $rRecord->{'ClientID'};
+
+    $providers_rates{$ProvID}{'initial_pop'} += 1;
+
+    $qClProbs->execute($ClientID);
+    my $rClProbsCnt = $qClProbs->rows;
+
+    $sPriorDepression->execute($ClientID);
+    my $rPriorDepressionCnt = $sPriorDepression->rows;
+
+    if ( $rClProbsCnt > 0 || $rPriorDepressionCnt > 0 ) {
+
+        # Patient has Bipolar Disorder
+        $DNEXCLUDED++;
+        $providers_rates{$ProvID}{'DNEXCLUDED'} += 1;
+        $providers{$ProvID}{'G9717'}            += 1;
+    }
+    else {
+        $providers_rates{$ProvID}{'total_pop'} += 1;
+
+        $sPHQ9->execute($ClientID);
+        my $sPHQ9Rows  = $sPHQ9->rows;
+        my $rTotalPHQ9 = $sPHQ9->fetchrow_hashref;
+
+        $sPHQ2->execute($ClientID);
+        my $sPHQ2Rows  = $sPHQ2->rows;
+        my $rTotalPHQ2 = $sPHQ2->fetchrow_hashref;
+
+        $sGDSS->execute($ClientID);
+        my $GDSSRowsCnt = $sGDSS->rows;
+        my $rGDSS       = $sGDSS->fetchrow_hashref;
+
+        $sGDSL->execute($ClientID);
+        my $GDSLRowsCnt = $sGDSL->rows;
+        my $rGDSL       = $sGDSL->fetchrow_hashref;
+
+        my $val = 0;
+
+        if ( $GDSLRowsCnt > 0 ) {
+            $val = $rGDSL->{"Score"};
+            if ( $val >= 20 ) {
+                if ( checkFollowUpPlan($ClientID) ) {
+                    updatePFMET( $ProvID, 'G8431' );
+                }
+                else {
+                    updatePFNOTMET( $ProvID, 'G8511' );
+                }
+            }
+            else {
+                updatePFMET( $ProvID, 'G8510' );
+            }
+        }
+        elsif ( $GDSSRowsCnt > 0 ) {
+            $val = $rGDSS->{"Score"};
+
+            if ( $val >= 5 ) {
+
+                if ( checkFollowUpPlan($ClientID) ) {
+                    updatePFMET( $ProvID, 'G8431' );
+                }
+                else {
+                    updatePFNOTMET( $ProvID, 'G8511' );
+                }
+            }
+            else {
+                updatePFMET( $ProvID, 'G8510' );
+            }
+        }
+        elsif ( $sPHQ9Rows > 0 ) {
+            $val = calcTotal( $rTotalPHQ9, "q", 1, 9 );
+
+            if ( $val >= 10 ) {
+                if ( checkFollowUpPlan($ClientID) ) {
+                    updatePFMET( $ProvID, 'G8431' );
+                }
+                else {
+                    updatePFNOTMET( $ProvID, 'G8511' );
+                }
+            }
+            else {
+                updatePFMET( $ProvID, 'G8510' );
+            }
+        }
+
+        elsif ( $sPHQ2Rows > 0 ) {
+            $val = calcTotal( $rTotalPHQ2, "q", 1, 2 );
+
+            if ( $val >= 3 ) {
+                if ( checkFollowUpPlan($ClientID) ) {
+                    updatePFMET( $ProvID, 'G8431' );
+
+                }
+                else {
+
+                    updatePFNOTMET( $ProvID, 'G8511' );
+                }
+            }
+            else {
+                updatePFMET( $ProvID, 'G8510' );
+            }
+        }
+
+        if (   $sPHQ2Rows eq 0
+            && $sPHQ9Rows eq 0
+            && $GDSSRowsCnt eq 0
+            && $GDSLRowsCnt eq 0 )
+        {
+            $PFNOTMET++;
+            $providers_rates{$ProvID}{'PFNOTMET'} += 1;
+            $providers{$ProvID}{'G8432'}          += 1;
+
+        }
+
+    }
+}
+
+foreach my $ProvID ( sort keys %providers ) {
+    $table_entries .= qq|$ProvID\t|;
+
+    my $provName = $providers{$ProvID}{'name'};
+    $table_entries .= qq|$provName\t|;
+    my $initial_pop = $providers_rates{$ProvID}{'initial_pop'};
+    $table_entries .= qq|$initial_pop\t|;
+
+    my $G9717 = $providers{$ProvID}{'G9717'};
+    $table_entries .= qq|$G9717\t|;
+
+    my $total_pop = $providers_rates{$ProvID}{'total_pop'};
+    $table_entries .= qq|$total_pop\t|;
+
+    my $G8431 = $providers{$ProvID}{'G8431'};
+    $table_entries .= qq|$G8431\t|;
+    my $G8510 = $providers{$ProvID}{'G8510'};
+    $table_entries .= qq|$G8510\t|;
+    my $G8432 = $providers{$ProvID}{'G8432'};
+    $table_entries .= qq|$G8432\t|;
+    my $G8511 = $providers{$ProvID}{'G8511'};
+    $table_entries .= qq|$G8511\t|;
+
+    my $pr_PFMET    = $providers_rates{$ProvID}{'PFMET'};
+    my $pr_PFNOTMET = $providers_rates{$ProvID}{'PFNOTMET'};
+    my $DNEXCLUDED  = $providers_rates{$ProvID}{'DNEXCLUDED'};
+
+    my $Data_Completeness_Numerator = ( $pr_PFMET + $pr_PFNOTMET );
+
+    if ( 0 eq $total_pop ) {
+        $total_pop = 1;
+    }
+    my $Data_Completeness_Rate =
+      ( $Data_Completeness_Numerator / $total_pop ) * 100;
+    my $Performance_Rate = ( $pr_PFMET / ($Data_Completeness_Numerator) ) * 100;
+
+    $Data_Completeness_Rate = sprintf( "%.2f", $Data_Completeness_Rate );
+    $Performance_Rate       = sprintf( "%.2f", $Performance_Rate );
+
+    $table_entries .= qq|$Data_Completeness_Rate\t|;
+    $table_entries .= qq|$Performance_Rate\t|;
+    $table_entries .= qq|\n|;
+}
+
+$Header = qq|${DT}\n${QID} ${TITLE} ${DateRange} ${Header}|;
+
+print $Header;
+print $table_header;
+print $table_entries;
+
+$sRecord->finish();
+myDBI->cleanup();
+exit;
+
+sub updatePFMET {
+    my ( $ProvID, $Code ) = @_;
+    $providers{$ProvID}{$Code}         += 1;
+    $providers_rates{$ProvID}{'PFMET'} += 1;
+    $PFMET                             += 1;
+}
+
+sub updatePFNOTMET {
+    my ( $ProvID, $Code ) = @_;
+    $providers{$ProvID}{$Code}            += 1;
+    $providers_rates{$ProvID}{'PFNOTMET'} += 1;
+    $PFNOTMET                             += 1;
+}
+
+sub calcTotal {
+    my ( $rPHQ, $pfx, $beg, $end ) = @_;
+
+#foreach my $f ( sort keys %{$rPHQ} ) { warn "uCalc-calcTotal: rPHQ-$f=$rPHQ->{$f}\n"; }
+    my $cnt = 0;
+    if ( $beg eq '' || $end eq '' ) {
+        $cnt = $rPHQ->{$pfx};
+    }    # no loop, just this field (pfx).
+    else {
+        for my $i ( $beg .. $end ) {
+
+            my $f = $pfx . $i;
+
+            my $f_a = $f . 'a';
+            my $f_b = $f . 'b';
+
+            if ( $rPHQ->{$f_a} ne '' ) {
+                $cnt += $rPHQ->{$f_a};
+            }
+
+            $cnt += $rPHQ->{$f};
+        }
+
+    }
+
+    # die qq|pfx=${pfx}, beg=${beg}, end=${end}, cnt=${cnt}\n|;
+    return ($cnt);
+}
+
+sub checkFollowUpPlan {
+    my ($ClientID) = @_;
+
+    $sTRPlan->execute($ClientID);
+    my $rTRPlan     = $sTRPlan->fetchrow_hashref;
+    my $sTRPlanRows = $sTRPlan->rows;
+    if ( $sTRPlanRows > 0 ) {
+        return 1;
+    }
+    return 0;
+}
