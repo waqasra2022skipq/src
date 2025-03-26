@@ -1,0 +1,431 @@
+#!/usr/bin/perl
+use lib '/var/www/okmis/src/lib';
+
+use DBI;
+use myForm;
+use myDBI;
+use DBA;
+use DBUtil;
+use Time::Local;
+my $DT = localtime();
+############################################################################
+# usage:
+#   MIPS
+############################################################################
+my $form  = myForm->new();
+my $dbh   = myDBI->dbconnect( $form->{'DBNAME'} );
+my $debug = $form->{'LOGINPROVID'} == 91 ? 0 : 0;
+if ($debug) {
+    foreach my $f ( sort keys %{$form} ) { print "form-$f=$form->{$f}\n"; }
+}
+my $Type = $form->{'Type'};
+$form = DBUtil->setDates($form);
+my $DateRange = qq|from $form->{FromDateD} thru $form->{ToDateD}|;
+
+my $multidel  = 'ý';
+my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+
+# join xInsurance needed for withSelection
+my $withSelection = DBA->withSelection( $form, 'and', 'Client.clinicClinicID',
+    'Treatment.ProvID', 'Treatment.ClientID', 'Treatment.TrID' );
+my $Header = DBA->withSelectionHeader($form);
+
+#warn qq|Header: ${Header}\n|;
+$withSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+$QID   = qq|QID370|;
+$TITLE = qq|Depression Remission at Twelve Months|;
+my @FLDS = (
+    "ProvID:ProvID",
+    "Provider Name:Provider Name",
+    "initial_pop:Total Population",
+    "Denominator:Denominator",
+    "M1019:Performance Met(M1019)",
+    "M1020:Performance Not Met(M1020)",
+    "Data Completeness Rate:Data Completeness Rate",
+    "Performance Rate:Performance Rate"
+);
+my $numFLDS = scalar(@FLDS) - 2;
+print qq|numFLDS=${numFLDS}\n| if ($debug);
+
+my $ClientSelection =
+  DBA->withSelection( $form, 'and', 'Client.clinicClinicID', 'Client.ProvID' );
+
+my ( $Denominator, $total, $PFMET, $DNEXCEPTION, $PFNOTMET, $DNEXCLUDED ) =
+  ( 0, 0, 0, 0, 0, 0 );
+
+my $table_header = '';
+foreach my $f (@FLDS) {
+    my ( $fld, $hdr ) = split( ':', $f );
+    $table_header .= qq|${hdr}\t|;
+}
+$table_header .= qq|\n|;
+$table_entries = '';
+
+our %providers = (
+    "2118" => {
+        'name'  => "Kizzy McCaskill",
+        "M1019" => 0,
+        "M1020" => 0
+    },
+    "2128" => {
+        'name'  => "Rebecca Jones L",
+        "M1019" => 0,
+        "M1020" => 0
+    },
+    "2686" => {
+        'name'  => "Shelby Lucas",
+        "M1019" => 0,
+        "M1020" => 0
+    },
+    "958" => {
+        'name'  => "Mindy Jones K",
+        "M1019" => 0,
+        "M1020" => 0
+    }
+);
+
+our %providers_rates = (
+    "2118" => {
+        'name'        => "Kizzy McCaskill",
+        "denominator" => 0,
+        "PFMET"       => 0,
+        "PFNOTMET"    => 0,
+        "initial_pop" => 0
+    },
+    "2128" => {
+        'name'        => "Rebecca Jones L",
+        "denominator" => 0,
+        "PFMET"       => 0,
+        "PFNOTMET"    => 0,
+        "initial_pop" => 0
+    },
+    "2686" => {
+        'name'        => "Shelby Lucas",
+        "denominator" => 0,
+        "PFMET"       => 0,
+        "PFNOTMET"    => 0,
+        "initial_pop" => 0
+    },
+    "958" => {
+        'name'        => "Mindy Jones K",
+        "denominator" => 0,
+        "PFMET"       => 0,
+        "PFNOTMET"    => 0,
+        "initial_pop" => 0
+    }
+);
+
+$form = DBUtil->setDates($form);
+
+my $qClients = qq|
+	select Treatment . TrID, Treatment . ContLogDate, xSC . SCNum,
+	  xInsurance . Descr as Insurance,
+	Client . LName, Client . FName
+	, Clinic . Name as ClinicName
+		, Client . ClientID, Provider . ProvID, ClientEmergency . HospiceCheck
+		, CONCAT( Provider . LName, ', ', Provider . FName ) as PrimaryProvider
+		,CONCAT(Client.LName,', ',Client.FName) as ClientName
+		,Client.DOB,TIMESTAMPDIFF(YEAR, Client.DOB, CURDATE()) AS Age
+		,count(*) as pcount
+	from Treatment 
+	left join Client on Client.ClientID=Treatment.ClientID
+	LEFT JOIN ClientEmergency ON Client
+	  . ClientID = ClientEmergency
+	  . ClientID
+	left join Provider on Provider.ProvID=Treatment.ProvID
+	left join Provider as Clinic on Clinic . ProvID = Client . clinicClinicID
+	left join xSC on xSC.SCID=Treatment.SCID
+	left join xInsurance on xInsurance.ID=xSC.InsID
+	WHERE Treatment.ContLogDate BETWEEN '2022-11-01' AND '2023-10-31'
+	AND Treatment
+	  . ProvID IN( "2118", "2128", "2686", "958" ) AND xInsurance
+	. ID = 212 AND Treatment . ClinicID = 101
+    AND(
+        xSC.SCNum IN(
+            '90791',   '90792', '90832', '90834', '90837', '90839', '96156',
+              '96158', '96159',
+              '99202', '99203', '99204', '99205', '99211', '99212', '99213',
+              '99214', '99215',
+              '99421', '99422', '99423', '99441', '99442', '99443',
+              'G0402', 'G0438', 'G0439'
+
+          ) OR xSC.SCNum LIKE '99384%' OR xSC
+          . SCNum LIKE '99394%'
+      )
+ group by Treatment.ClientID|;
+
+my $sClients = $dbh->prepare($qClients);
+$sClients->execute();
+
+my $qBipolarDisorder = $dbh->prepare(
+    "SELECT cp.InitiatedDate, i.ICD10, i.sctName FROM ClientProblems cp
+                                LEFT JOIN okmis_config.misICD10 i ON cp.UUID = i.ID 
+                                WHERE cp.ClientID = ? AND cp.Active = 1 AND 
+                                i.ICD10 IN (
+                                'F30.10', 'F30.11', 'F30.12', 'F30.13',
+    'F30.2', 'F30.3', 'F30.4', 'F30.8', 'F30.9', 'F30.10', 'F30.11', 'F30.12', 'F30.13',
+    'F31.0', 'F31.10', 'F31.11', 'F31.12', 'F31.13', 'F31.2', 'F31.30', 'F31.31', 'F31.32',
+    'F31.4', 'F31.5', 'F31.60', 'F31.61', 'F31.62', 'F31.63', 'F31.64', 'F31.70', 'F31.71',
+    'F31.72', 'F31.73', 'F31.74', 'F31.75', 'F31.76', 'F31.77', 'F31.78', 'F31.81', 'F31.89', 'F31.9'
+);"
+);
+
+my $sCheckDepOrDysthymia = $dbh->prepare(
+    "SELECT cp.InitiatedDate, i.ICD10, i.sctName FROM ClientProblems cp
+		LEFT JOIN okmis_config.misICD10 i ON cp.UUID = i.ID 
+		WHERE cp.ClientID = ? AND
+		i.ICD10 IN(
+            'F32.0', 'F32.1', 'F32.2', 'F32.3', 'F32.4', 'F32.5', 'F32.9',
+            'F33.0', 'F33.1', 'F33.2', 'F33.3', 'F33.40', 'F33.41', 'F33.42', 'F33.9', 'F34.1'
+		)"
+);
+
+my $sClientPHQ9 = $dbh->prepare(
+    qq|SELECT * FROM ClientPHQ9 WHERE
+    ClientID = ? 
+    AND TestDate BETWEEN '2022-11-01' AND '2023-10-31' ORDER BY TestDate DESC|
+);
+
+my $sCheckPersonalityDisorder = $dbh->prepare(
+    "SELECT cp.InitiatedDate, i.ICD10, i.sctName FROM ClientProblems cp
+		LEFT JOIN okmis_config.misICD10 i ON cp.UUID = i.ID 
+		WHERE cp.ClientID = ? AND
+		i.ICD10 IN(
+            'F34.0', 'F60.3', 'F60.4', 'F68.10', 'F68.11', 'F68.12', 'F68.13'
+		)"
+);
+
+my $sCheckSchizOrPsychoticDis = $dbh->prepare(
+    "SELECT cp.InitiatedDate, i.ICD10, i.sctName FROM ClientProblems cp
+		LEFT JOIN okmis_config.misICD10 i ON cp.UUID = i.ID 
+		WHERE cp.ClientID = ? AND
+		i.ICD10 IN(
+		'F20.0',  'F20.1', 'F20.2', 'F20.3', 'F20.5', 'F20.81',
+		'F20.89', 'F20.9', 'F25.0', 'F25.1', 'F25.8', 'F25.9','F28', 'F29'
+	  )"
+);
+
+my $sCheckPervasiveDis = $dbh->prepare(
+    "SELECT cp.InitiatedDate, i.ICD10, i.sctName FROM ClientProblems cp
+		LEFT JOIN okmis_config.misICD10 i ON cp.UUID = i.ID 
+		WHERE cp.ClientID = ? AND
+		i.ICD10 IN(
+                'F84.0', 'F84.3', 'F84.8', 'F84.9'
+	  )"
+);
+
+my $checkClientDied = $dbh->prepare(
+    "SELECT * FROM ClientDischargeCDC WHERE ClientID = ? AND TransType = '68'");
+
+my $sCheckHospice = $dbh->prepare(
+    "SELECT cp.InitiatedDate, i.ICD10, i.sctName FROM ClientProblems cp
+		LEFT JOIN okmis_config.misICD10 i ON cp.UUID = i.ID 
+		WHERE cp.ClientID = ? AND
+		i.ICD10 = 'Z51.5'"
+);
+
+my $checkRemission = $dbh->prepare(
+    "SELECT * FROM ClientPHQ9 
+        WHERE ClientID = ?
+        AND TestDate BETWEEN DATE_ADD(?, INTERVAL 10 MONTH) 
+        AND DATE_ADD(?, INTERVAL 14 MONTH) 
+        ORDER BY TestDate ASC"
+);
+
+# my $sClientTPHQ9 = $dbh->prepare(
+#     qq|SELECT * FROM ClientTPHQ9 WHERE
+#     ClientID = ?
+#     AND TestDate BETWEEN '2022-11-01' AND '2023-10-31' ORDER BY TestDate ASC|
+# );
+my $ProvID;
+while ( my $rClient = $sClients->fetchrow_hashref ) {
+    my $ClientID = $rClient->{'ClientID'};
+    $ProvID = $rClient->{'ProvID'};
+
+    # Check for ClientPHQ9 Score
+    $sClientPHQ9->execute($ClientID);
+
+    # Check for ClientPHQ9 Score
+    # $sClientTPHQ9->execute($ClientID);
+    my $indexDate = 0;
+
+    while ( my $rClientPHQ9 = $sClientPHQ9->fetchrow_hashref ) {
+        my $totalScore = calcTotal( $rClientPHQ9, 'q', 1, 9 );
+        if ( $totalScore >= 9 ) {
+            $indexDate =
+              "PHQ9 Score of ${totalScore} on " . $rClientPHQ9->{'TestDate'};
+            last;
+        }
+    }
+    if ($indexDate) {
+        $rClient->{Status} = $indexDate;
+    }
+    else {
+# No PHQ9 with score 9 or higher btw '2022-11-01' AND '2023-10-31' ...So Bail Out
+        next;
+    }
+
+    #Check Diagnosis for Major Depression or Dysthymia
+    $sCheckDepOrDysthymia->execute($ClientID);
+    if ( $sCheckDepOrDysthymia->rows == 0 ) {
+        next;
+    }
+
+    $qBipolarDisorder->execute($ClientID);
+    if ( $qBipolarDisorder->rows > 0 ) {
+        next;
+    }
+
+    $sCheckPersonalityDisorder->execute($ClientID);
+    if ( $sCheckPersonalityDisorder->rows > 0 ) {
+
+        # $rClient->{Status} = "Personality Disorder";
+        next;
+    }
+
+    $sCheckSchizOrPsychoticDis->execute($ClientID);
+    if ( $sCheckSchizOrPsychoticDis->rows > 0 ) {
+
+        # $rClient->{Status} = "Schizophrenia or Psychotic Disorder";
+        next;
+    }
+
+    $sCheckPervasiveDis->execute($ClientID);
+    if ( $sCheckPervasiveDis->rows > 0 ) {
+
+        # $rClient->{Status} = "Pervasive Developmental Disorder";
+        next;
+    }
+
+    $checkClientDied->execute($ClientID);
+    if ( $checkClientDied->rows > 0 ) {
+
+        # $rClient->{Status} = "Oh bhai ye to marr geya hai";
+        next;
+    }
+
+    $sCheckHospice->execute($ClientID);
+    if ( $sCheckHospice->rows > 0 ) {
+
+        # $rClient->{Status} = "Hospice";
+        next;
+    }
+    $providers_rates{$ProvID}{'initial_pop'} += 1;
+    $providers_rates{$ProvID}{'denominator'} += 1;
+
+    my $remissionDate = 0;
+
+    $checkRemission->execute( $ClientID, $indexDate, $indexDate );
+
+    while ( my $rRemission = $checkRemission->fetchrow_hashref ) {
+        my $totalScore = calcTotal( $rRemission, 'q', 1, 9 );
+        if ( $totalScore < 5 ) {
+            $remissionDate = $rRemission->{'TestDate'};
+            last;
+        }
+    }
+    if ( !$remissionDate ) {
+        $rClient->{Status} .= " : No Remission";
+        $providers{$ProvID}{'M1020'}          += 1;
+        $providers_rates{$ProvID}{'PFNOTMET'} += 1;
+    }
+    else {
+        $rClient->{Status} = $remissionDate;
+        $providers{$ProvID}{'M1019'}       += 1;
+        $providers_rates{$ProvID}{'PFMET'} += 1;
+    }
+
+    $rClient->{'TrID'} = $rClient->{TrID};
+
+    # foreach my $f (@FLDS) {
+    #     my ( $fld, $hdr ) = split( ':', $f );
+    #     $table_entries .= qq|$rClient->{$fld}\t|;
+    # }
+
+    # $table_entries .= qq|\n|;
+
+    $total += $rClient->{'pcount'};
+}
+foreach my $ProvID ( sort keys %providers ) {
+    $table_entries .= qq|$ProvID\t|;
+
+    my $provName = $providers{$ProvID}{'name'};
+    $table_entries .= qq|$provName\t|;
+    my $initial_pop = $providers_rates{$ProvID}{'initial_pop'};
+    $table_entries .= qq|$initial_pop\t|;
+
+    my $total_pop = $providers_rates{$ProvID}{'denominator'};
+    $table_entries .= qq|$total_pop\t|;
+
+    my $M1019 = $providers{$ProvID}{'M1019'};
+    $table_entries .= qq|$M1019\t|;
+    my $M1020 = $providers{$ProvID}{'M1020'};
+    $table_entries .= qq|$M1020\t|;
+
+    my $pr_PFMET    = $providers_rates{$ProvID}{'PFMET'};
+    my $pr_PFNOTMET = $providers_rates{$ProvID}{'PFNOTMET'};
+
+    my $Data_Completeness_Numerator = ( $pr_PFMET + $pr_PFNOTMET );
+    if ( 0 eq $total_pop ) {
+        $total_pop = 1;
+    }
+    my $Data_Completeness_Rate =
+      ( $Data_Completeness_Numerator / $total_pop ) * 100;
+
+    if ( 0 eq $Data_Completeness_Numerator ) {
+        my $Performance_Rate = 0;
+    }
+    else {
+        my $Performance_Rate =
+          ( $pr_PFMET / ($Data_Completeness_Numerator) ) * 100;
+    }
+
+    $Data_Completeness_Rate = sprintf( "%.2f", $Data_Completeness_Rate );
+    $Performance_Rate       = sprintf( "%.2f", $Performance_Rate );
+
+    $table_entries .= qq|$Data_Completeness_Rate\t|;
+    $table_entries .= qq|$Performance_Rate\t|;
+    $table_entries .= qq|\n|;
+}
+$Header = qq|${DT}\n${QID} ${TITLE} ${DateRange} ${Header} \n|;
+
+print $Header;
+
+# print $Data_Completeness_Rate_Text;
+# print $Performance_Rate_Text;
+print $table_header;
+print $table_entries;
+
+$sClients->finish();
+myDBI->cleanup();
+exit;
+############################################################################
+
+sub calcTotal {
+    my ( $rPHQ, $pfx, $beg, $end ) = @_;
+
+#foreach my $f ( sort keys %{$rPHQ} ) { warn "uCalc-calcTotal: rPHQ-$f=$rPHQ->{$f}\n"; }
+    my $cnt = 0;
+    if ( $beg eq '' || $end eq '' ) {
+        $cnt = $rPHQ->{$pfx};
+    }    # no loop, just this field (pfx).
+    else {
+        for my $i ( $beg .. $end ) {
+
+            my $f = $pfx . $i;
+
+            my $f_a = $f . 'a';
+            my $f_b = $f . 'b';
+
+            if ( $rPHQ->{$f_a} ne '' ) {
+                $cnt += $rPHQ->{$f_a};
+            }
+
+            $cnt += $rPHQ->{$f};
+        }
+
+    }
+
+    # die qq|pfx=${pfx}, beg=${beg}, end=${end}, cnt=${cnt}\n|;
+    return ($cnt);
+}
