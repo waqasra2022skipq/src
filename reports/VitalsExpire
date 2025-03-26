@@ -105,6 +105,13 @@ qq|Client Name\tActive\tDOB\tAge\tTestDate\tHeight\tWeight\tBMI\tHbA1c\tProvider
 #     Treatment.ClientID = ? and Type = 1 and
 #     (Treatment.ContLogDate >= '$form->{FromDate}' and Treatment.ContLogDate<='$form->{ToDate}')|;
 
+my $sCheckHospice = $dbh->prepare(
+    "SELECT cp.InitiatedDate, i.ICD10, i.sctName FROM ClientProblems cp
+		LEFT JOIN okmis_config.misICD10 i ON cp.UUID = i.ID 
+		WHERE cp.ClientID = ? AND
+		i.ICD10 = 'Z51.5'"
+);
+
 $sClient->execute();
 
 while ( my $rClient = $sClient->fetchrow_hashref ) {
@@ -113,7 +120,9 @@ while ( my $rClient = $sClient->fetchrow_hashref ) {
     my $ActiveFlag   = $rClient->{'Active'} ? 'Yes' : 'No';
     my $HospiceCheck = $rClient->{'HospiceCheck'};
     my $LastContDate = $rClient->{'TrID'};
-    if ( $HospiceCheck eq 1 ) {
+    $sCheckHospice->execute($ClientID);
+
+    if ( $sCheckHospice->rows > 0 ) {
         next;
     }
     my $ClientName =

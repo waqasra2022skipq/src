@@ -135,6 +135,13 @@ my $qRecord = qq|
  group by Treatment.ClientID
 |;
 
+my $sCheckHospice = $dbh->prepare(
+    "SELECT cp.InitiatedDate, i.ICD10, i.sctName FROM ClientProblems cp
+		LEFT JOIN okmis_config.misICD10 i ON cp.UUID = i.ID 
+		WHERE cp.ClientID = ? AND
+		i.ICD10 = 'Z51.5'"
+);
+
 my $sRecord = $dbh->prepare($qRecord);
 $sRecord->execute();
 while ( my $rRecord = $sRecord->fetchrow_hashref ) {
@@ -142,14 +149,16 @@ while ( my $rRecord = $sRecord->fetchrow_hashref ) {
     my $HospiceCheck = $rRecord->{'HospiceCheck'};
 
     $rRecord->{"BMI"} = "";
+    my $ClientID = $rRecord->{'ClientID'};
 
-    if ( $HospiceCheck eq 1 ) {
+    $sCheckHospice->execute($ClientID);
+
+    if ( $sCheckHospice->rows > 0 ) {
+
         $DNEXCLUDED++;
         $rRecord->{"BMI"} = "Excluded";
-
     }
     else {
-        my $ClientID = $rRecord->{'ClientID'};
         $sClientVitalSigns->execute($ClientID);
         my $rClientVitalSigns = $sClientVitalSigns->fetchrow_hashref;
         my $BMI               = $rClientVitalSigns->{BMI};
@@ -167,14 +176,22 @@ while ( my $rRecord = $sRecord->fetchrow_hashref ) {
             if ( $BMI ne "" || ( $HeightFeet && $Weight ) ) {
                 $PFMET++;
                 if ( $BMI eq "" || $BMI eq "0.00" ) {
-                    my $height = ( $HeightFeet * 12 ) + $HeightInches;
+                    if ( $HeightFeet > 0 && $Weight > 0 ) {
+                        my $height = ( $HeightFeet * 12 ) + $HeightInches;
 
-                    my $bmi = ( $Weight / ( $height * $height ) ) * 703;
-                    $bmi = sprintf( "%.2f", $bmi );
+                        my $bmi = ( $Weight / ( $height * $height ) ) * 703;
+                        $bmi = sprintf( "%.2f", $bmi );
 
-                    $rClientVitalSigns->{'BMI'} = $bmi;
+                        $rRecord->{"BMI"} = $bmi . " MET";
+                    }
+                    else {
+                        $PFNOTMET++;
+                        $rRecord->{"BMI"} = "No BMI";
+                    }
                 }
-                $rRecord->{"BMI"} = $rClientVitalSigns->{'BMI'} . " MET";
+                else {
+                    $rRecord->{"BMI"} = $BMI . " MET";
+                }
             }
             else {
                 $PFNOTMET++;

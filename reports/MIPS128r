@@ -168,6 +168,13 @@ my $qRecord = qq|
 my $sRecord = $dbh->prepare($qRecord);
 $sRecord->execute();
 
+my $sCheckHospice = $dbh->prepare(
+    "SELECT cp.InitiatedDate, i.ICD10, i.sctName FROM ClientProblems cp
+		LEFT JOIN okmis_config.misICD10 i ON cp.UUID = i.ID 
+		WHERE cp.ClientID = ? AND
+		i.ICD10 = 'Z51.5'"
+);
+
 my $ClientID;
 my $ProvID;
 while ( my $rRecord = $sRecord->fetchrow_hashref ) {
@@ -178,7 +185,9 @@ while ( my $rRecord = $sRecord->fetchrow_hashref ) {
 
     $providers_rates{$ProvID}{'total_pop'} += 1;
 
-    if ( $rRecord->{'HospiceCheck'} eq 1 ) {
+    $sCheckHospice->execute($ClientID);
+
+    if ( $sCheckHospice->rows > 0 ) {
 
         # Hospice Check is active so exclude the patient
         $DNEXCLUDED++;
