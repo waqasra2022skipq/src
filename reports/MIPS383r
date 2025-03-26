@@ -1,0 +1,311 @@
+#!/usr/bin/perl
+use lib '/var/www/okmis/src/lib';
+
+use DBI;
+use myForm;
+use myDBI;
+use DBA;
+use DBUtil;
+use Time::Local;
+my $DT = localtime();
+############################################################################
+# usage:
+#   MIPS
+############################################################################
+my $form  = myForm->new();
+my $dbh   = myDBI->dbconnect( $form->{'DBNAME'} );
+my $debug = $form->{'LOGINPROVID'} == 91 ? 0 : 0;
+if ($debug) {
+    foreach my $f ( sort keys %{$form} ) { print "form-$f=$form->{$f}\n"; }
+}
+my $Type = $form->{'Type'};
+$form = DBUtil->setDates($form);
+my $DateRange = qq|from $form->{FromDateD} thru $form->{ToDateD}|;
+
+my $multidel  = 'ý';
+my $ForProvID = $form->{ForProvID} ? $form->{ForProvID} : $form->{LOGINPROVID};
+
+# join xInsurance needed for withSelection
+my $withSelection = DBA->withSelection( $form, 'and', 'Client.clinicClinicID',
+    'Treatment.ProvID', 'Treatment.ClientID', 'Treatment.TrID' );
+my $Header = DBA->withSelectionHeader($form);
+
+#warn qq|Header: ${Header}\n|;
+$withSelection .= qq| and Client.Active=1| if ( $form->{Active} );
+$QID = qq|QID383|;
+$TITLE =
+qq|Adherence to Antipsychotic Medications For Individuals with Schizophrenia Domain: Patient Safety - Meaningful Measure Area: Prevention, Treatment, and Management of Mental Health|;
+my @FLDS = (
+    'ClinicName:ClinicName',           'LName:LastName',
+    'FName:FirstName',                 'ClientID:ClientID',
+    'DOB:DateOfBirth',                 'Age:Age',
+    'PrimaryProvider:PrimaryProvider', "TrID:TrID",
+    "Status:Status"
+);
+my $numFLDS = scalar(@FLDS) - 2;
+print qq|numFLDS=${numFLDS}\n| if ($debug);
+
+my $ClientSelection =
+  DBA->withSelection( $form, 'and', 'Client.clinicClinicID', 'Client.ProvID' );
+
+my ( $Denominator, $total, $PFMET, $DNEXCEPTION, $PFNOTMET, $DNEXCLUDED ) =
+  ( 0, 0, 0, 0, 0, 0 );
+
+my $table_header = '';
+foreach my $f (@FLDS) {
+    my ( $fld, $hdr ) = split( ':', $f );
+    $table_header .= qq|${hdr}\t|;
+}
+$table_header .= qq|\n|;
+$table_entries = '';
+
+$form = DBUtil->setDates($form);
+
+my $qClients = qq|
+	select Treatment . TrID, Treatment . ContLogDate, xSC . SCNum,
+	  xInsurance . Descr as Insurance,
+	Client . LName, Client . FName
+	, Clinic . Name as ClinicName
+		, Client . ClientID, Provider . ProvID, ClientEmergency . HospiceCheck
+		, CONCAT( Provider . LName, ', ', Provider . FName ) as PrimaryProvider
+		,CONCAT(Client.LName,', ',Client.FName) as ClientName
+		,Client.DOB,TIMESTAMPDIFF(YEAR, Client.DOB, CURDATE()) AS Age
+		,count(*) as pcount
+	from Treatment 
+	left join Client on Client.ClientID=Treatment.ClientID
+	LEFT JOIN ClientEmergency ON Client
+	  . ClientID = ClientEmergency
+	  . ClientID
+	left join Provider on Provider.ProvID=Treatment.ProvID
+	left join Provider as Clinic on Clinic . ProvID = Client . clinicClinicID
+	left join xSC on xSC.SCID=Treatment.SCID
+	left join xInsurance on xInsurance.ID=xSC.InsID
+	WHERE Treatment.ContLogDate BETWEEN '2024-01-01' AND '2024-12-31'
+	AND Treatment
+	  . ProvID IN( "2118", "2128", "2686", "958" ) AND xInsurance
+	. ID = 212 AND Treatment . ClinicID = 101
+ group by Treatment.ClientID|;
+
+my $sClients = $dbh->prepare($qClients);
+$sClients->execute();
+
+my $checkInpatient = $dbh->prepare(
+    qq|SELECT Treatment.*
+	FROM Treatment
+	LEFT JOIN ClientNoteProblems on ClientNoteProblems.TrID=Treatment.TrID
+	LEFT JOIN okmis_config.misICD10 on misICD10.ID=ClientNoteProblems.UUID
+	LEFT JOIN xSC on xSC . SCID = Treatment . SCID
+	WHERE Treatment.ClientID = ? AND Treatment.ContLogDate BETWEEN '2024-01-01' AND '2024-12-31'
+	AND Treatment.ProvID IN( "2118", "2128", "2686", "958" )
+	AND misICD10.ICD10 IN(
+		'F20.0',  'F20.1', 'F20.2', 'F20.3', 'F20.5', 'F20.81',
+		'F20.89', 'F20.9', 'F25.0', 'F25.1', 'F25.8', 'F25.9'
+	  )
+	AND Treatment.POS IN ('21', '51')
+	AND (SCNum IN(
+		'90791', '90792', '90832', '90834', '90837', '90839',
+		'90845', '90847', '90849', '90853', '90867', '90868',
+		'90869', '90870', '99221', '99222',
+		'99223', '99231', '99232', '99233', '99238', '99239',
+		'99291'
+	  ) OR SCNum LIKE '90875%' 
+	 OR SCNum LIKE '90876%' 
+	 OR SCNum LIKE '99252%' 
+	 OR SCNum LIKE '99253%' 
+	 OR SCNum LIKE '99254%' 
+	 OR SCNum LIKE '99255%') |
+);
+
+my $checkOutpatient = $dbh->prepare(
+    qq|SELECT Treatment.*
+	FROM Treatment
+	LEFT JOIN ClientNoteProblems on ClientNoteProblems.TrID=Treatment.TrID
+	LEFT JOIN okmis_config.misICD10 on misICD10.ID=ClientNoteProblems.UUID
+	LEFT JOIN xSC on xSC . SCID = Treatment . SCID
+	WHERE Treatment.ClientID = ? AND Treatment.ContLogDate BETWEEN '2024-01-01' AND '2024-12-31'
+	AND Treatment.ProvID IN( "2118", "2128", "2686", "958" )
+	AND misICD10.ICD10 IN(
+		'F20.0',  'F20.1', 'F20.2', 'F20.3', 'F20.5', 'F20.81',
+		'F20.89', 'F20.9', 'F25.0', 'F25.1', 'F25.8', 'F25.9'
+	  )
+	AND
+		Treatment.POS IN(
+			'02', '03', '04', '05', '07', '09', '10', '11', '12', '13', '14', '15', '16', '17', '19', 20,
+			'22', '24', '33', '49', '50', '52', '53', '54', '57', '58', '62', '65', '71', '72','23',
+			'31', '32', '55', '56', '61'
+		  )      
+	AND(
+		SCNum IN(
+			'90791', '90792', '90832', '90834', '90837', '90839',
+			'90845', '90847', '90849', '90853', '90867', '90868',
+			'90869', '90870', '90880', '98960', '98961', '98962',
+			'99078', '99202', '99203', '99204', '99205', '99211',
+			'99212', '99213', '99214', '99215', '99238', '99239',
+			'99281', '99282', '99283', '99284', '99304', '99305',
+			'99306', '99307', '99308', '99309', '99310', '99315',
+			'99316', '99341', '99342', '99344', '99345', '99347',
+			'99348', '99349', '99350', '99424', '99426', '99490',
+			'99491', '99510', 'G0409', 'H0017', 'H0018', 'H0019', 'T2048'
+		  ) OR SCNum LIKE '90875%' OR SCNum LIKE '90876%' OR SCNum LIKE
+		  '99242%' OR SCNum LIKE '99243%' OR SCNum LIKE '99244%' OR SCNum LIKE
+		  '99245%' OR SCNum LIKE '99252%' OR SCNum LIKE '99253%' OR SCNum LIKE
+		  '99254%' OR SCNum LIKE '99255%' OR SCNum LIKE '99285%' OR SCNum LIKE
+		  '99385%' OR SCNum LIKE '99386%' OR SCNum LIKE '99387%' OR SCNum LIKE
+		  '99395%' OR SCNum LIKE '99396%' OR SCNum LIKE '99397%' OR SCNum LIKE
+		  '99401%' OR SCNum LIKE '99402%' OR SCNum LIKE '99403%' OR SCNum LIKE
+		  '99404%' OR SCNum LIKE '99411%' OR SCNum LIKE '99412%' OR SCNum LIKE
+		  '99429%' OR SCNum LIKE 'G0155%' OR SCNum LIKE 'G0176%' OR SCNum LIKE
+		  'G0177%' OR SCNum LIKE 'G0410%' OR SCNum LIKE 'G0411%' OR SCNum LIKE
+		  'G0463%' OR SCNum LIKE 'G0469%' OR SCNum LIKE 'G0470%' OR SCNum LIKE
+		  'H0002%' OR SCNum LIKE 'H0004%' OR SCNum LIKE 'H0031%' OR SCNum LIKE
+		  'H0034%' OR SCNum LIKE 'H0035%' OR SCNum LIKE 'H0036%' OR SCNum LIKE
+		  'H0037%' OR SCNum LIKE 'H0039%' OR SCNum LIKE 'H0040%' OR SCNum LIKE
+		  'H2000%' OR SCNum LIKE 'H2001%' OR SCNum LIKE 'H2010%' OR SCNum LIKE
+		  'H2011%' OR SCNum LIKE 'H2012%' OR SCNum LIKE 'H2013%' OR SCNum LIKE
+		  'H2014%' OR SCNum LIKE 'H2015%' OR SCNum LIKE 'H2016%' OR SCNum LIKE
+		  'H2017%' OR SCNum LIKE 'H2018%' OR SCNum LIKE 'H2019%' OR SCNum LIKE
+		  'H2020%' OR SCNum LIKE 'S0201%' OR SCNum LIKE 'S9480%' OR SCNum LIKE
+		  'S9484%' OR SCNum LIKE 'S9485%' OR SCNum LIKE 'T1015%'
+	  )
+ |
+);
+
+my $checkMedicationFills = $dbh->prepare(
+    qq|SELECT * FROM ClientMeds WHERE
+	ClientID = ? 
+    AND PrescriptionDate BETWEEN '2024-01-01' AND '2024-12-31'
+	AND (DrugName LIKE 'chlorpromazine%' 
+	OR DrugName LIKE 'fluphenazine%' OR DrugName LIKE 'risperidone%' 
+	OR DrugName LIKE 'aripiprazole%' OR DrugName LIKE 'Haloperidol%' OR DrugName LIKE 'loxapine%' OR DrugName LIKE 'molindone%' OR DrugName LIKE 'perphenazine%' 
+	OR DrugName LIKE 'prochlorperazine%' OR DrugName LIKE 'thioridazine%' OR DrugName LIKE 'thiothixene%' OR DrugName LIKE 'trifluoperazine%'
+	OR DrugName LIKE 'asenapine%' OR DrugName LIKE 'brexpiprazole%' OR DrugName LIKE 'cariprazine%' OR DrugName LIKE 'clozapine%' OR DrugName LIKE 'olanzapine%' 
+	OR DrugName LIKE 'iloperidone%' OR DrugName LIKE 'lumateperone%' OR DrugName LIKE 'lurasidone%' OR DrugName LIKE 'paliperidone%' OR DrugName LIKE 'quetiapine%'
+	OR DrugName LIKE 'fumarate(Seroquel)%' OR DrugName LIKE 'ziprasidone%')|
+);
+
+my $sCheckDementiaDiagnoses = $dbh->prepare(
+    "SELECT cp.InitiatedDate, i.ICD10, i.sctName FROM ClientProblems cp
+		LEFT JOIN okmis_config.misICD10 i ON cp.UUID = i.ID 
+		WHERE cp.ClientID = ? AND
+		i.ICD10 IN(
+			'E75.00', 'E75.01', 'E75.02', 'E75.09', 'E75.10', 'E75.11', 'E75.19',
+			'E75.244', 'E75.4', 'F01.50', 'F01.51', 'F01.511', 'F01.518', 'F01.52', 'F01.53', 
+			'F01.54', 'F01.A0', 'F01.A11', 'F01.A18', 'F01.A2', 'F01.A3', 'F01.A4', 'F01.B0', 
+			'F01.B11', 'F01.B18', 'F01.B2', 'F01.B3', 'F01.B4', 'F01.C0', 'F01.C11', 'F01.C18', 
+			'F01.C2', 'F01.C3', 'F01.C4', 'F02.80', 'F02.81', 'F02.811', 'F02.818', 'F02.82', 
+			'F02.83', 'F02.84', 'F02.A0', 'F02.A11', 'F02.A18', 'F02.A2', 'F02.A3', 'F02.A4', 
+			'F02.B0', 'F02.B11', 'F02.B18', 'F02.B2', 'F02.B3', 'F02.B4', 'F02.C0', 'F02.C11', 
+			'F02.C18', 'F02.C2', 'F02.C3', 'F02.C4', 'F03.90', 'F03.91', 'F03.911', 'F03.918', 
+			'F03.92', 'F03.93', 'F03.94', 'F03.A0', 'F03.A11', 'F03.A18', 'F03.A2', 'F03.A3', 
+			'F03.A4', 'F03.B0', 'F03.B11', 'F03.B18', 'F03.B2', 'F03.B3', 'F03.B4', 'F03.C0', 
+			'F03.C11', 'F03.C18', 'F03.C2', 'F03.C3', 'F03.C4', 'F05', 'F10.27', 'F11.122', 
+			'F13.27', 'F13.97', 'F18.17', 'F18.27', 'F18.97', 'F19.17', 'F19.27', 'F19.97', 
+			'G30.0', 'G30.1', 'G30.8', 'G30.9', 'G31.09', 'G31.83'
+		)"
+);
+
+while ( my $rClient = $sClients->fetchrow_hashref ) {
+    my $ClientID = $rClient->{'ClientID'};
+
+    $checkInpatient->execute($ClientID);
+    $checkOutpatient->execute($ClientID);
+
+    if ( $checkInpatient->rows < 1 && $checkOutpatient->rows < 2 ) {
+        next;
+    }
+
+    $sCheckDementiaDiagnoses->execute($ClientID);
+    my $sCheckDementiaDiagnosesRows = $sCheckDementiaDiagnoses->rows;
+    if ( $sCheckDementiaDiagnosesRows > 0 ) {
+
+        # Patient ever had a diagnosis of dementia
+        next;
+    }
+
+    $checkMedicationFills->execute($ClientID);
+
+    # my ($fillCount) = $checkMedicationFills->rows;
+
+    # if ( $fillCount < 1 ) {
+    #     next;
+    # }
+    my $rcheckMedicationFills = $checkMedicationFills->fetchrow_hashref;
+
+    # if ( !$rcheckMedicationFills ) {
+    #     next;
+    # }
+    $rClient->{"Status"} =
+      $rcheckMedicationFills->{"DrugName"}
+      ? "Performance Met"
+      : "No antipsychotic drug 2024";
+
+    my $rcheckInpatient  = $checkInpatient->fetchrow_hashref;
+    my $rcheckOutpatient = $checkOutpatient->fetchrow_hashref;
+    $rClient->{'TrID'} =
+        $rcheckInpatient->{'TrID'}
+      ? $rcheckInpatient->{'TrID'}
+      : $rcheckOutpatient->{'TrID'};
+
+    $Denominator++;
+
+    foreach my $f (@FLDS) {
+        my ( $fld, $hdr ) = split( ':', $f );
+        $table_entries .= qq|$rClient->{$fld}\t|;
+    }
+
+    $table_entries .= qq|\n|;
+
+    $total += $rClient->{'pcount'};
+}
+
+my $Data_Completeness_Rate;
+my $Performance_Rate;
+
+my $Data_Completeness_Numerator =
+  $PFMET + $DNEXCEPTION + $PFNOTMET + $DNEXCLUDED;
+
+if ( $Denominator eq 0 ) {
+
+    $Data_Completeness_Rate = 0;
+    $Performance_Rate       = 0;
+
+}
+else {
+
+    $Data_Completeness_Rate =
+      ( $Data_Completeness_Numerator / $Denominator ) * 100;
+    if ( $Data_Completeness_Numerator > ( $DNEXCEPTION + $DNEXCLUDED ) ) {
+        $Performance_Rate =
+          ( $PFMET /
+              ( $Data_Completeness_Numerator - $DNEXCLUDED - $DNEXCEPTION ) ) *
+          100;
+    }
+}
+
+$Data_Completeness_Rate = sprintf( "%.2f", $Data_Completeness_Rate );
+$Performance_Rate       = sprintf( "%.2f", $Performance_Rate );
+
+my $nom_denom =
+qq|Numerator = Denominator Exclusion (${DNEXCLUDED}) + Performance Met (${PFMET}) +  Denominator Exception (${DNEXCEPTION}) +  Performance Not Met (${PFNOTMET})= ${Data_Completeness_Numerator} \n Denominator(Eligible Population) = ${Denominator}\n|;
+my $Data_Completeness_Rate_Text =
+qq|Data Completeness Rate = Numerator(${Data_Completeness_Numerator}) / Denominator(${Denominator}) = ${Data_Completeness_Rate}% \n|;
+my $Performance_Rate_Text =
+qq|Performance Rate = Performance Met (${PFMET}) / Numerator(${Data_Completeness_Numerator}) - Denominator Exclusion (${DNEXCLUDED}) - Denominator Exception (${DNEXCEPTION}) = ${Performance_Rate}% \n|;
+
+$Header = qq|${DT}\n${QID} ${TITLE} ${DateRange} ${Header} \n|;
+
+print $Header;
+
+# print $Data_Completeness_Rate_Text;
+# print $Performance_Rate_Text;
+print $table_header;
+print $table_entries;
+
+print qq|Total Clients\t${Denominator}\n|;
+
+$sClients->finish();
+myDBI->cleanup();
+exit;
+############################################################################
+# where (Client.ClientID=50234 or Client.ClientID=60348 or Client.ClientID=46424 or Client.ClientID=56680 or Client.ClientID=49679)
+
