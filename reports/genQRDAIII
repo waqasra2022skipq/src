@@ -1,6 +1,5 @@
 #!/usr/bin/perl
 use lib '/var/www/okmis/src/lib';
-
 use CGI::Carp qw(warningsToBrowser);
 use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
 use Cwd;
@@ -41,7 +40,7 @@ sub report {
     $pwd = cwd();
     warn qq|genQRDAs: pwd=${pwd}\n| if ($debug);
     my $cmd =
-qq|/wamp64_updated/www/src/cgi/bin/GenReport.cgi Name=GenerateQRDAIII&daterange=lastyear&ProvIDs=$form->{'ProvIDs'}&DBNAME=$form->{DBNAME}&mlt=$form->{mlt}|;
+qq|/home/okmis/mis/src/cgi/bin/GenReport.cgi Name=GenerateQRDAIII&daterange=lastyear&ProvIDs=$form->{'ProvIDs'}&DBNAME=$form->{DBNAME}&mlt=$form->{mlt}|;
     warn qq|genQRDAIII: cmd=${cmd}\n| if ($debug);
     my $html = `${cmd}`;
     my $html = myHTML->close(1);
@@ -89,7 +88,13 @@ sub submit {
         my $shell =
 `${BIN}/zipFILEs $form->{'DOCROOT'} "QRDAIII_${Token}*" ${Folder} ${ForProvID}`;
         warn qq|shell=${shell}\n| if ($debug);
-        main->addEDoc( $Folder, $ForProvID );
+        main->addEDoc( $Folder, $ForProvID, 40 );
+        main->addEDoc( $Folder, $ForProvID, 27 );
+
+        foreach my $ProvID ( split( chr(253), $form->{ProvIDs} ) ) {
+            main->addEDoc( $Folder, $ProvID, 40 );
+            main->addEDoc( $Folder, $ProvID, 27 );
+        }
         $result = $shell if ( $form->{'LOGINPROVID'} == 91 );
     }
     else {
@@ -131,15 +136,15 @@ document.QRDA.elements[0].focus();
 }
 ############################################################################
 sub addEDoc {
-    my ( $self, $Folder, $ForProvID ) = @_;
+    my ( $self, $Folder, $ForProvID, $type ) = @_;
     my $r = ();
     $r->{ProvID}       = $ForProvID;
     $r->{Title}        = $Folder;
-    $r->{Descr}        = "QRDA Zip file created " . localtime();
+    $r->{Descr}        = "QRDAIII Zip file created " . localtime();
     $r->{Path}         = qq|/Provider/EDocs/${ForProvID}/${Folder}.zip|;
     $r->{CreateProvID} = $form->{LOGINPROVID};
     $r->{CreateDate}   = $form->{TODAY};
-    $r->{Type}         = 40;                                             # QRDAs
+    $r->{Type}         = $type;                                          # QRDAs
     $r->{Public}       = 0;
     $query =
       DBA->genReplace( $form, $dbh, 'ProviderEDocs', $r, "Path='$r->{Path}'" );

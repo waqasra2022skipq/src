@@ -41,7 +41,7 @@ sub report {
     $pwd = cwd();
     warn qq|genQRDAs: pwd=${pwd}\n| if ($debug);
     my $cmd =
-qq|/var/www/okmis/src/cgi/bin/GenReport.cgi Name=GenerateQRDAs\&daterange=2yago\&InsID=100\&ClinicIDs=2501\&ProvIDs=2502\&DBNAME=$form->{DBNAME}\&mlt=$form->{mlt}|;
+qq|/home/okmis/mis/src/cgi/bin/GenReport.cgi Name=GenerateQRDAs\&daterange=2yago\&InsID=100\&ClinicIDs=2501\&ProvIDs=2502\&DBNAME=$form->{DBNAME}\&mlt=$form->{mlt}|;
     warn qq|genQRDAs: cmd=${cmd}\n| if ($debug);
     my $html = `${cmd}`;
     my $html = myHTML->close(1);
@@ -94,7 +94,13 @@ sub submit {
         my $shell =
 `${BIN}/zipFILEs $form->{'DOCROOT'} "QRDA_${Token}*" ${Folder} ${ForProvID}`;
         warn qq|shell=${shell}\n| if ($debug);
-        main->addEDoc( $Folder, $ForProvID );
+        main->addEDoc( $Folder, $ForProvID, 40 );
+        main->addEDoc( $Folder, $ForProvID, 27 );
+
+        foreach my $ProvID ( split( chr(253), $form->{ProvIDs} ) ) {
+            main->addEDoc( $Folder, $ProvID, 40 );
+            main->addEDoc( $Folder, $ProvID, 27 );
+        }
         $result = $shell if ( $form->{'LOGINPROVID'} == 91 );
     }
     else {
@@ -144,7 +150,7 @@ sub addEDoc {
     $r->{Path}         = qq|/Provider/EDocs/${ForProvID}/${Folder}.zip|;
     $r->{CreateProvID} = $form->{LOGINPROVID};
     $r->{CreateDate}   = $form->{TODAY};
-    $r->{Type}         = 40;                                             # QRDAs
+    $r->{Type}         = $type;                                          # QRDAs
     $r->{Public}       = 0;
     $query =
       DBA->genReplace( $form, $dbh, 'ProviderEDocs', $r, "Path='$r->{Path}'" );
