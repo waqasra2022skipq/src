@@ -2777,6 +2777,65 @@
 
             </entry>
           </xsl:when>
+          <xsl:when test="/QRDA/CQMNumber = '149'">
+            <entry>
+              <organizer classCode="CLUSTER" moodCode="EVN">
+                <!-- This is the templateId for Measure Reference -->
+                <templateId root="2.16.840.1.113883.10.20.24.3.98"/>
+
+                <!-- Measure Reference and Results (V4) template ID -->
+                <templateId root="2.16.840.1.113883.10.20.27.3.1" extension="2020-12-01"/>
+                <!-- Measure Reference and Results - CMS (V5) template ID -->
+                <templateId root="2.16.840.1.113883.10.20.27.3.17" extension="2022-05-01"/>
+                <statusCode code="completed"/>
+                <!-- Containing isBranch external references -->
+                <reference typeCode="REFR">
+                  <externalDocument classCode="DOC" moodCode="EVN">
+                    <!-- SHALL: This is the version specific identifier for eMeasure: QualityMeasureDocument/id it is a GUID-->
+                    <id root="2.16.840.1.113883.4.738" extension="  7c443b9b-1ad1-4467-b527-defc445701ff"/>
+                    <code code="57024-2" displayName="Health Quality Measure Document" codeSystemName="LOINC" codeSystem="2.16.840.1.113883.6.1" />
+                    <!-- SHOULD This is the title of the eMeasure -->
+                    <text>Dementia: Cognative Assessment</text>
+                  </externalDocument>
+                </reference>
+
+                <!--Performance Rate 1-->
+                <component>
+                  <observation classCode="OBS" moodCode="EVN">
+                    <templateId root="2.16.840.1.113883.10.20.27.3.30" extension="2016-09-01"/>
+                    <templateId root="2.16.840.1.113883.10.20.27.3.14" extension="2016-09-01"/>
+                    <templateId root="2.16.840.1.113883.10.20.27.3.25" extension="2016-11-01"/>
+                    <code code="72510-1" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC" displayName="Performance Rate"/>
+                    <statusCode code="completed"/>
+                    <value xsi:type="INT">
+                      <xsl:attribute name="value">
+                        <xsl:value-of select="/QRDA/measures/PFRATES/RATE_1"/>
+                      </xsl:attribute>
+                    </value>
+                    <reference typeCode="REFR">
+                      <externalObservation classCode="OBS" moodCode="EVN">
+                        <id root="E384D9B0-6AD6-45BC-B562-A57E46FC1E90"/>
+                        <code code="NUMER" codeSystem="2.16.840.1.113883.5.4" codeSystemName="ActCode" displayName="Numerator"/>
+                      </externalObservation>
+                    </reference>
+                  </observation>
+                </component>
+
+                <!--IPOP Population-->
+                <xsl:call-template name="IPOP_Component"/>
+                
+                <!--DENOM Population-->
+                <xsl:call-template name="DENOM_Component"/>
+
+                <!--NUMERATOR Population-->
+                <xsl:call-template name="NUMERATOR_Component"/>
+
+                <!--DENEXCEP Population-->
+                <xsl:call-template name="DENEXCEP_Component"/>
+              </organizer>
+
+            </entry>
+          </xsl:when>
         </xsl:choose>
       </section>
     </component>
@@ -4043,8 +4102,8 @@
         <code code="76689-9" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC" displayName="Sex assigned at birth"/>
         <statusCode code="completed"/>
         <effectiveTime>
-          <low value="20230101"/>
-          <high value="20231231"/>
+          <low value="20240101"/>
+          <high value="20241231"/>
         </effectiveTime>
         <value xsi:type="CD" codeSystem="2.16.840.1.113883.5.1" codeSystemName="AdministrativeGenderCode" >
           
@@ -4091,8 +4150,8 @@
         <code code="69490-1" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC" displayName="Ethnicity"/>
         <statusCode code="completed"/>
         <effectiveTime>
-          <low value="20230101"/>
-          <high value="20231231"/>
+          <low value="20240101"/>
+          <high value="20241231"/>
         </effectiveTime>
         <value xsi:type="CD" code="2186-5" codeSystem="2.16.840.1.113883.6.238" codeSystemName="Race &amp; Ethnicity - CDC" displayName="Not Hispanic or Latino"/>
         <!-- Count-->
@@ -4128,8 +4187,8 @@
         <code code="69490-1" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC" displayName="Ethnicity"/>
         <statusCode code="completed"/>
         <effectiveTime>
-          <low value="20230101"/>
-          <high value="20231231"/>
+          <low value="20240101"/>
+          <high value="20241231"/>
         </effectiveTime>
         <value xsi:type="CD" code="2135-2" codeSystem="2.16.840.1.113883.6.238" codeSystemName="Race &amp; Ethnicity - CDC" displayName="Hispanic or Latino"/>
         <!-- Count-->
@@ -4163,8 +4222,8 @@
         <code code="72826-1" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC" displayName="Race"/>
         <statusCode code="completed"/>
         <effectiveTime>
-          <low value="20230101"/>
-          <high value="20231231"/>
+          <low value="20240101"/>
+          <high value="20241231"/>
         </effectiveTime>
         <value xsi:type="CD" code="2054-5" codeSystem="2.16.840.1.113883.6.238" codeSystemName="Race &amp; Ethnicity - CDC" displayName="Black or African American"/>
         <!-- Count-->
@@ -4199,8 +4258,8 @@
         <code code="72826-1" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC" displayName="Race"/>
         <statusCode code="completed"/>
         <effectiveTime>
-          <low value="20230101"/>
-          <high value="20231231"/>
+          <low value="20240101"/>
+          <high value="20241231"/>
         </effectiveTime>
         <value xsi:type="CD" code="2106-3" codeSystem="2.16.840.1.113883.6.238" codeSystemName="Race &amp; Ethnicity - CDC" displayName="White"/>
         <!-- Count-->
@@ -4235,8 +4294,8 @@
         <code code="72826-1" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC" displayName="Race"/>
         <statusCode code="completed"/>
         <effectiveTime>
-          <low value="20230101"/>
-          <high value="20231231"/>
+          <low value="20240101"/>
+          <high value="20241231"/>
         </effectiveTime>
         <value xsi:type="CD" code="2028-9" codeSystem="2.16.840.1.113883.6.238" codeSystemName="Race &amp; Ethnicity - CDC" displayName="Asian"/>
         <!-- Count-->
@@ -4270,8 +4329,8 @@
         <code code="72826-1" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC" displayName="Race"/>
         <statusCode code="completed"/>
         <effectiveTime>
-          <low value="20230101"/>
-          <high value="20231231"/>
+          <low value="20240101"/>
+          <high value="20241231"/>
         </effectiveTime>
         <value xsi:type="CD" code="1002-5" codeSystem="2.16.840.1.113883.6.238" codeSystemName="Race &amp; Ethnicity - CDC" displayName="American Indian or Alaska Native"/>
         <!-- Count-->
@@ -4305,8 +4364,8 @@
         <code code="72826-1" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC" displayName="Race"/>
         <statusCode code="completed"/>
         <effectiveTime>
-          <low value="20230101"/>
-          <high value="20231231"/>
+          <low value="20240101"/>
+          <high value="20241231"/>
         </effectiveTime>
         <value xsi:type="CD" code="2076-8" codeSystem="2.16.840.1.113883.6.238" codeSystemName="Race &amp; Ethnicity - CDC" displayName="Native Hawaiian or Other Pacific Islander"/>
         <!-- Count-->
@@ -4343,8 +4402,8 @@
         <code code="72826-1" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC" displayName="Race"/>
         <statusCode code="completed"/>
         <effectiveTime>
-          <low value="20230101"/>
-          <high value="20231231"/>
+          <low value="20240101"/>
+          <high value="20241231"/>
         </effectiveTime>
         <value xsi:type="CD" code="2131-1" codeSystem="2.16.840.1.113883.6.238" codeSystemName="Race &amp; Ethnicity - CDC" displayName="Other Race"/>
         <!-- Count-->
@@ -4379,8 +4438,8 @@
         <code code="48768-6" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC" displayName="Payment Source"/>
         <statusCode code="completed"/>
         <effectiveTime>
-          <low value="20230101"/>
-          <high value="20231231"/>
+          <low value="20240101"/>
+          <high value="20241231"/>
         </effectiveTime>
         <value xsi:type="CD" nullFlavor="OTH">
           <translation code="A" codeSystem="2.16.840.1.113883.3.249.12" codeSystemName="CMS Clinical Codes" displayName="Medicare"/>
@@ -4417,8 +4476,8 @@
         <code code="48768-6" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC" displayName="Payment Source"/>
         <statusCode code="completed"/>
         <effectiveTime>
-          <low value="20230101"/>
-          <high value="20231231"/>
+          <low value="20240101"/>
+          <high value="20241231"/>
         </effectiveTime>
         <value xsi:type="CD" nullFlavor="OTH">
           <translation code="B" codeSystem="2.16.840.1.113883.3.249.12" codeSystemName="CMS Clinical Codes" displayName="Medicaid"/>
@@ -4455,8 +4514,8 @@
         <code code="48768-6" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC" displayName="Payment Source"/>
         <statusCode code="completed"/>
         <effectiveTime>
-          <low value="20230101"/>
-          <high value="20231231"/>
+          <low value="20240101"/>
+          <high value="20241231"/>
         </effectiveTime>
         <value xsi:type="CD" nullFlavor="OTH">
           <translation code="C" codeSystem="2.16.840.1.113883.3.249.12" codeSystemName="CMS Clinical Codes" displayName="Private Health Insurance"/>
@@ -4493,8 +4552,8 @@
         <code code="48768-6" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC" displayName="Payment Source"/>
         <statusCode code="completed"/>
         <effectiveTime>
-          <low value="20230101"/>
-          <high value="20231231"/>
+          <low value="20240101"/>
+          <high value="20241231"/>
         </effectiveTime>
         <value xsi:type="CD" nullFlavor="OTH">
           <translation code="D" codeSystem="2.16.840.1.113883.3.249.12" codeSystemName="CMS Clinical Codes" displayName="Other"/>
