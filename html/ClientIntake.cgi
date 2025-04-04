@@ -132,7 +132,7 @@ function initAutocomplete() {
   <TR >
     <TD CLASS="strcol" >Primary Referral</TD>
     <TD CLASS="strcol" >
-      Search: <INPUT ID="LHCAutocompletePrimaryReferral" TYPE="text" VALUE="[[DBA->getxref(%form+xNPI+<<<ClientReferrals_ReferredBy1NPI_1>>>+Type ProvOrgName NPI+++ - )]]" ONFOCUS="select()" SIZE="60" />
+      Search: <INPUT ID="LHCAutocompletePrimaryReferral" TYPE="text" ONFOCUS="select()" SIZE="60" />
       <INPUT TYPE="hidden" ID="ClientReferrals_ReferredBy1NPI_1" NAME="ClientReferrals_ReferredBy1NPI_1" VALUE="<<ClientReferrals_ReferredBy1NPI_1>>" >
     </TD>
   </TR>
@@ -161,7 +161,7 @@ function initAutocomplete() {
   <TR >
     <TD CLASS="strcol" >Secondary Referral</TD>
     <TD CLASS="strcol" >
-      Search: <INPUT ID="LHCAutocompleteSecondaryReferral" TYPE="text" VALUE="[[DBA->getxref(%form+xNPI+<<<ClientReferrals_ReferredBy2NPI_1>>>+Type ProvOrgName NPI+++ - )]]" ONFOCUS="select()" SIZE="60" />
+      Search: <INPUT ID="LHCAutocompleteSecondaryReferral" TYPE="text" ONFOCUS="select()" SIZE="60" />
       <INPUT TYPE="hidden" ID="ClientReferrals_ReferredBy2NPI_1" NAME="ClientReferrals_ReferredBy2NPI_1" VALUE="<<ClientReferrals_ReferredBy2NPI_1>>" >
     </TD>
   </TR>
@@ -206,7 +206,7 @@ function initAutocomplete() {
   <TR >
     <TD CLASS="strcol" >Referring Physician</TD>
     <TD CLASS="strcol" >
-      Search: <INPUT ID="LHCAutocompleteReferringPhysician" TYPE="text" VALUE="[[DBA->getxref(%form+xNPI+<<<ClientReferrals_RefPhysNPI_1>>>+ProvLastName ProvFirstName NPI+++ - )]]" ONFOCUS="select()" SIZE="60" />
+      Search: <INPUT ID="LHCAutocompleteReferringPhysician" TYPE="text"  ONFOCUS="select()" SIZE="60" />
       <INPUT TYPE="hidden" ID="ClientReferrals_RefPhysNPI_1" NAME="ClientReferrals_RefPhysNPI_1" VALUE="<<ClientReferrals_RefPhysNPI_1>>" >
     </TD>
   </TR>
@@ -736,42 +736,6 @@ $(document).ready(function() {
   initClientAddressForm('Client_AddressManualInput', 'Client_AddressManualInput_Link', 'Client_', 2);
 
   new Def.Autocompleter.Search(
-    'LHCAutocompletePrimaryReferral',
-    `/cgi/bin/popup_api.pl?method=Agency&types=NPI-1,NPI-2&mlt=<<mlt>>`,
-    {tableFormat: true, valueCols: [0, 1, 6],
-      colHeaders: ['Type', 'Org Name', 'Address', 'City', 'State', 'Zip', 'NPI']
-    });
-  Def.Autocompleter.Event.observeListSelections('LHCAutocompletePrimaryReferral', function(data) {
-    var code = data.item_code;
-    if (data.item_code === null) code = '';
-    $('#ClientReferrals_ReferredBy1NPI_1').val(code);
-  });
-
-  new Def.Autocompleter.Search(
-    'LHCAutocompleteSecondaryReferral',
-    `/cgi/bin/popup_api.pl?method=Agency&types=NPI-1,NPI-2&mlt=<<mlt>>`,
-    {tableFormat: true, valueCols: [0, 1, 6],
-      colHeaders: ['Type', 'Org Name', 'Address', 'City', 'State', 'Zip', 'NPI']
-    });
-  Def.Autocompleter.Event.observeListSelections('LHCAutocompleteSecondaryReferral', function(data) {
-    var code = data.item_code;
-    if (data.item_code === null) code = '';
-    $('#ClientReferrals_ReferredBy2NPI_1').val(code);
-  });
-
-  new Def.Autocompleter.Search(
-    'LHCAutocompleteReferringPhysician',
-    `/cgi/bin/popup_api.pl?method=Physicians&types=NPI-1&mlt=<<mlt>>`,
-    {tableFormat: true, valueCols: [0, 1, 6],
-      colHeaders: ['Last Name', 'First Name', 'Address', 'City', 'State', 'Zip', 'NPI']
-    });
-  Def.Autocompleter.Event.observeListSelections('LHCAutocompleteReferringPhysician', function(data) {
-    var code = data.item_code;
-    if (data.item_code === null) code = '';
-    $('#ClientReferrals_RefPhysNPI_1').val(code);
-  });
-
-  new Def.Autocompleter.Search(
     'LHCAutocompleteReferredto',
     `/cgi/bin/popup_api.pl?method=Agency&mlt=<<mlt>>`,
     {tableFormat: true, valueCols: [0, 1, 6],
@@ -781,6 +745,9 @@ $(document).ready(function() {
     var code = data.item_code;
     if (data.item_code === null) code = '';
     $('#ClientReferrals_ReferredToNPI_1').val(code);
-  });
+  });  
 });
 </script>
+
+<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/clinicalTable.js"> </SCRIPT>
+
