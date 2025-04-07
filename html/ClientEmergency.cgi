@@ -1,8 +1,12 @@
-[[myHTML->newPage(%form+Client Emergency)]]
+[[myHTML->newPage(%form+Client Emergency+++++lhcautocomplete)]]
 
 <SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vClientEmergency.js"> </SCRIPT>
 <SCRIPT type="text/javascript" src="/cgi/js/ajaxrequest.js"></SCRIPT>
+<SCRIPT TYPE="text/javascript" SRC="/cgi/jquery/jquery-1.12.4.js" ></SCRIPT>
+<SCRIPT TYPE="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></SCRIPT>
+<script src="https://lhcforms-static.nlm.nih.gov/autocomplete-lhc-versions/17.0.3/autocomplete-lhc.min.js"></script>
+<SCRIPT TYPE="text/javascript" SRC="/cgi/jquery/jquery-ui-1.12.1/jquery-ui.min.js" ></SCRIPT>
 
 [[[DBA->setAddress(%form+Physician)]]]
 [[[DBA->setAddress(%form+Hospital)]]]
@@ -65,8 +69,8 @@
   <TR >
     <TD CLASS="strcol" >Primary Care Physician</TD>
     <TD CLASS="strcol" >
-      Search: <INPUT TYPE="text" ID="SearchPhysNPI" NAME="SearchPhysNPI" VALUE="" ONFOCUS="select()" ONCHANGE="callAjax('Physicians','<<ClientEmergency_PhysNPI_1>>','selPhysNPI','&types=NPI-1&name=ClientEmergency_PhysNPI_1&pattern='+this.value,'popup.pl');" SIZE="60" >
-<BR><SPAN ID="selPhysNPI"></SPAN>
+      Search: <INPUT TYPE="text" class="search_field" ID="SearchPhysNPI" NAME="SearchPhysNPI" VALUE="" ONFOCUS="select()" SIZE="60" >
+        <INPUT TYPE="hidden" ID="ClientEmergency_PhysNPI_1" NAME="ClientEmergency_PhysNPI_1" VALUE="<<ClientEmergency_PhysNPI_1>>" >
     </TD>
   </TR>
   <TR >
@@ -88,8 +92,8 @@
   <TR >
     <TD CLASS="strcol" >Designated Hospital</TD>
     <TD CLASS="strcol" >
-      Search: <INPUT TYPE="text" ID="SearchHosp" NAME="SearchHosp" VALUE="" ONFOCUS="select()" ONCHANGE="callAjax('Agency','<<ClientEmergency_DesigHospNPI_1>>','selHosp','&name=ClientEmergency_DesigHospNPI_1&pattern='+this.value,'popup.pl');" SIZE="60" >
-<BR><SPAN ID="selHosp"></SPAN>
+      Search: <INPUT TYPE="text" class="search_field" ID="SearchHosp" NAME="SearchHosp" VALUE="" ONFOCUS="select()" SIZE="60" >
+        <INPUT TYPE="hidden" ID="ClientEmergency_DesigHospNPI_1" NAME="ClientEmergency_DesigHospNPI_1" VALUE="<<ClientEmergency_DesigHospNPI_1>>" >
     </TD>
   </TR>
   <TR >
@@ -113,8 +117,8 @@
   <TR >
     <TD CLASS="strcol" >Designated Pharmacy</TD>
     <TD CLASS="strcol" >
-      Search: <INPUT TYPE="text" ID="SearchPharmacy" NAME="SearchPharmacy" VALUE="" ONFOCUS="select()" ONCHANGE="callAjax('Pharmacy','<<ClientEmergency_PharmacyNPI_1>>','selPharmacy','&name=ClientEmergency_PharmacyNPI_1&pattern='+this.value,'popup.pl');" SIZE="60" >
-<BR><SPAN ID="selPharmacy"></SPAN>
+      Search: <INPUT TYPE="text" class="search_field" ID="SearchPharmacy" NAME="SearchPharmacy" VALUE="" ONFOCUS="select()" SIZE="60" >
+        <INPUT TYPE="hidden" ID="ClientEmergency_PharmacyNPI_1" NAME="ClientEmergency_PharmacyNPI_1" VALUE="<<ClientEmergency_PharmacyNPI_1>>" >
     </TD>
   </TR>
   <TR >
@@ -132,8 +136,9 @@
   <TR >
     <TD CLASS="strcol" >Designated Dentist</TD>
     <TD CLASS="strcol" >
-      Search: <INPUT TYPE="text" ID="SearchDentist" NAME="SearchDentist" VALUE="" ONFOCUS="select()" ONCHANGE="callAjax('Agency','<<ClientEmergency_DentistNPI_1>>','selDentist','&types=NPI-1&name=ClientEmergency_DentistNPI_1&pattern='+this.value,'popup.pl');" SIZE="60" >
-<BR><SPAN ID="selDentist"></SPAN>
+      Search: <INPUT TYPE="text" class="search_field" ID="SearchDentist" NAME="SearchDentist" VALUE="" ONFOCUS="select()" SIZE="60" >
+        <INPUT TYPE="hidden" ID="ClientEmergency_DentistNPI_1" NAME="ClientEmergency_DentistNPI_1" VALUE="<<ClientEmergency_DentistNPI_1>>" >
+
     </TD>
   </TR>
   <TR >
@@ -151,8 +156,9 @@
   <TR >
     <TD CLASS="strcol" >Designated Vision</TD>
     <TD CLASS="strcol" >
-      Search: <INPUT TYPE="text" ID="SearchVision" NAME="SearchVision" VALUE="" ONFOCUS="select()" ONCHANGE="callAjax('Agency','<<ClientEmergency_VisionNPI_1>>','selVision','&types=NPI-1&name=ClientEmergency_VisionNPI_1&pattern='+this.value,'popup.pl');" SIZE="60" >
-<BR><SPAN ID="selVision"></SPAN>
+      Search: <INPUT TYPE="text" ID="SearchVision" NAME="SearchVision" VALUE="" ONFOCUS="select()" SIZE="60" >
+        <INPUT TYPE="hidden" ID="ClientEmergency_VisionNPI_1" NAME="ClientEmergency_VisionNPI_1" VALUE="<<ClientEmergency_VisionNPI_1>>" >
+
     </TD>
   </TR>
   <TR >
@@ -170,8 +176,9 @@
   <TR >
     <TD CLASS="strcol" >Designated Hearing</TD>
     <TD CLASS="strcol" >
-      Search: <INPUT TYPE="text" ID="SearchHearing" NAME="SearchHearing" VALUE="" ONFOCUS="select()" ONCHANGE="callAjax('Agency','<<ClientEmergency_HearingNPI_1>>','selHearing','&types=NPI-1&name=ClientEmergency_HearingNPI_1&pattern='+this.value,'popup.pl');" SIZE="60" >
-<BR><SPAN ID="selHearing"></SPAN>
+      Search: <INPUT TYPE="text" ID="SearchHearing" NAME="SearchHearing" VALUE="" ONFOCUS="select()" SIZE="60" >
+        <INPUT TYPE="hidden" ID="ClientEmergency_HearingNPI_1" NAME="ClientEmergency_HearingNPI_1" VALUE="<<ClientEmergency_HearingNPI_1>>" >
+
     </TD>
   </TR>
   <TR >
@@ -232,12 +239,8 @@
 </FORM>
 <SCRIPT LANGUAGE="JavaScript">
 document.ClientEmergency.elements[0].focus();
-callAjax('Physicians','<<ClientEmergency_PhysNPI_1>>','selPhysNPI','&name=ClientEmergency_PhysNPI_1','popup.pl');
-callAjax('Agency','<<ClientEmergency_DesigHospNPI_1>>','selHosp','&name=ClientEmergency_DesigHospNPI_1','popup.pl');
-callAjax('Pharmacy','<<ClientEmergency_PharmacyNPI_1>>','selPharmacy','&name=ClientEmergency_PharmacyNPI_1','popup.pl');
-callAjax('Agency','<<ClientEmergency_DentistNPI_1>>','selDentist','&name=ClientEmergency_DentistNPI_1','popup.pl');
-callAjax('Agency','<<ClientEmergency_VisionNPI_1>>','selVision','&name=ClientEmergency_VisionNPI_1','popup.pl');
-callAjax('Agency','<<ClientEmergency_HearingNPI_1>>','selHearing','&name=ClientEmergency_HearingNPI_1','popup.pl');
 </SCRIPT>
 
 [[myHTML->rightpane(%form+search)]]
+
+<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/clinicalTable.js"> </SCRIPT>

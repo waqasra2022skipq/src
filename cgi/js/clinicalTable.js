@@ -1,154 +1,83 @@
-new Def.Autocompleter.Search(
-	"LHCAutocompletePrimaryReferral",
-	"https://clinicaltables.nlm.nih.gov/api/npi_idv/v3/search",
-	{
+// Define field mappings: [autocompleteFieldId, hiddenFieldId]
+const referralFields = [
+	["LHCAutocompletePrimaryReferral", "ClientReferrals_ReferredBy1NPI_1"],
+	["LHCAutocompleteSecondaryReferral", "ClientReferrals_ReferredBy2NPI_1"],
+	["LHCAutocompleteReferringPhysician", "ClientReferrals_RefPhysNPI_1"],
+
+	// Client Emergency Page
+	["SearchPhysNPI", "ClientEmergency_PhysNPI_1"],
+	["SearchHosp", "ClientEmergency_DesigHospNPI_1", "NPI-2"],
+	["SearchPharmacy", "ClientEmergency_PharmacyNPI_1", "NPI-2"],
+	["SearchDentist", "ClientEmergency_DentistNPI_1"],
+	["SearchVision", "ClientEmergency_VisionNPI_1", "NPI-2"],
+	["SearchHearing", "ClientEmergency_HearingNPI_1", "NPI-2"],
+	// Add more pairs here if needed
+];
+
+let apiUrl;
+
+// Initialize autocomplete and set up selection observer
+function initAutocomplete(inputId, hiddenId, type) {
+	const hiddenEl = document.getElementById(hiddenId);
+	if (!hiddenEl) return;
+
+	if ("NPI-2" === type) {
+		apiUrl =
+			"https://clinicaltables.nlm.nih.gov/api/npi_org/v3/search?q=state=OK";
+	} else {
+		apiUrl =
+			"https://clinicaltables.nlm.nih.gov/api/npi_idv/v3/search?q=state=OK";
+	}
+
+	new Def.Autocompleter.Search(inputId, apiUrl, {
 		tableFormat: true,
 		valueCols: [0, 1],
 		colHeaders: ["Name", "NPI", "Type", "Practice Address"],
-	}
-);
+	});
 
-Def.Autocompleter.Event.observeListSelections(
-	"LHCAutocompletePrimaryReferral",
-	function (data) {
-		var code = data.item_code;
-		if (data.item_code === null) code = "";
-		$("#ClientReferrals_ReferredBy1NPI_1").val(code);
-	}
-);
+	Def.Autocompleter.Event.observeListSelections(inputId, function (data) {
+		let code = data.item_code ?? "";
+		document.getElementById(hiddenId).value = code;
+	});
+}
 
-new Def.Autocompleter.Search(
-	"LHCAutocompleteSecondaryReferral",
-	"https://clinicaltables.nlm.nih.gov/api/npi_idv/v3/search",
-	{
-		tableFormat: true,
-		valueCols: [0, 1],
-		colHeaders: ["Name", "NPI", "Type", "Practice Address"],
-	}
-);
+// Fetch saved NPI and fill display input
+function fillSavedProvider(inputId, hiddenId, type) {
+	const hiddenEl = document.getElementById(hiddenId);
+	if (!hiddenEl) return;
 
-Def.Autocompleter.Event.observeListSelections(
-	"LHCAutocompleteSecondaryReferral",
-	function (data) {
-		var code = data.item_code;
-		if (data.item_code === null) code = "";
-		$("#ClientReferrals_ReferredBy2NPI_1").val(code);
-	}
-);
+	const savedNPI = document.getElementById(hiddenId)?.value;
+	if (!savedNPI) return;
 
-new Def.Autocompleter.Search(
-	"LHCAutocompleteReferringPhysician",
-	"https://clinicaltables.nlm.nih.gov/api/npi_idv/v3/search",
-	{
-		tableFormat: true,
-		valueCols: [0, 1],
-		colHeaders: ["Name", "NPI", "Type", "Practice Address"],
+	if ("NPI-2" === type) {
+		apiUrl = "https://clinicaltables.nlm.nih.gov/api/npi_org/v3/search";
+	} else {
+		apiUrl = "https://clinicaltables.nlm.nih.gov/api/npi_idv/v3/search";
 	}
-);
+	console.log(`Filling saved provider for ${savedNPI} and ${apiUrl}`);
 
-Def.Autocompleter.Event.observeListSelections(
-	"LHCAutocompleteReferringPhysician",
-	function (data) {
-		var code = data.item_code;
-		if (data.item_code === null) code = "";
-		$("#ClientReferrals_RefPhysNPI_1").val(code);
-	}
-);
+	fetch(
+		`${apiUrl}?terms=${encodeURIComponent(
+			savedNPI
+		)}&ef=Name,NPI,Type,Practice%20Address`
+	)
+		.then((res) => res.json())
+		.then((data) => {
+			const results = data[3];
+			const match = results.find((item) => item[1] === savedNPI);
+			if (match) {
+				document.getElementById(
+					inputId
+				).value = `${match[0]} (${match[1]}), ${match[2]}, ${match[3]}`;
+			}
+		})
+		.catch((err) => console.error(`NPI Lookup failed for ${savedNPI}:`, err));
+}
 
+// Run everything on DOM ready
 document.addEventListener("DOMContentLoaded", function () {
-	var savedNPI = document.getElementById(
-		"ClientReferrals_ReferredBy1NPI_1"
-	).value;
-
-	if (savedNPI) {
-		var apiUrl = "https://clinicaltables.nlm.nih.gov/api/npi_idv/v3/search";
-
-		// Make GET request with saved NPI as the query
-		fetch(
-			apiUrl +
-				"?terms=" +
-				encodeURIComponent(savedNPI) +
-				"&ef=Name,NPI,Type,Practice%20Address"
-		)
-			.then((response) => response.json())
-			.then((data) => {
-				const results = data[3]; // actual results array
-
-				// Find the result that matches our saved NPI
-				const match = results.find((item) => item[1] === savedNPI);
-
-				if (match) {
-					const displayText = `${match[0]} (${match[1]})`; // Name (NPI)
-					document.getElementById("LHCAutocompletePrimaryReferral").value =
-						displayText;
-				}
-			})
-			.catch((error) => {
-				console.error("NPI Lookup failed:", error);
-			});
-	}
-
-	var savedNPI2 = document.getElementById(
-		"ClientReferrals_ReferredBy2NPI_1"
-	).value;
-
-	if (savedNPI2) {
-		var apiUrl = "https://clinicaltables.nlm.nih.gov/api/npi_idv/v3/search";
-
-		// Make GET request with saved NPI as the query
-		fetch(
-			apiUrl +
-				"?terms=" +
-				encodeURIComponent(savedNPI2) +
-				"&ef=Name,NPI,Type,Practice%20Address"
-		)
-			.then((response) => response.json())
-			.then((data) => {
-				const results = data[3]; // actual results array
-
-				// Find the result that matches our saved NPI
-				const match = results.find((item) => item[1] === savedNPI2);
-
-				if (match) {
-					const displayText = `${match[0]} (${match[1]})`; // Name (NPI)
-					document.getElementById("LHCAutocompleteSecondaryReferral").value =
-						displayText;
-				}
-			})
-			.catch((error) => {
-				console.error("NPI Lookup failed:", error);
-			});
-	}
-
-	var RefPhysNPI = document.getElementById(
-		"ClientReferrals_RefPhysNPI_1"
-	).value;
-
-	if (RefPhysNPI) {
-		var apiUrl = "https://clinicaltables.nlm.nih.gov/api/npi_idv/v3/search";
-
-		// Make GET request with saved NPI as the query
-		fetch(
-			apiUrl +
-				"?terms=" +
-				encodeURIComponent(RefPhysNPI) +
-				"&ef=Name,NPI,Type,Practice%20Address"
-		)
-			.then((response) => response.json())
-			.then((data) => {
-				const results = data[3]; // actual results array
-
-				// Find the result that matches our saved NPI
-				const match = results.find((item) => item[1] === RefPhysNPI);
-
-				if (match) {
-					const displayText = `${match[0]} (${match[1]})`; // Name (NPI)
-					document.getElementById("LHCAutocompleteReferringPhysician").value =
-						displayText;
-				}
-			})
-			.catch((error) => {
-				console.error("NPI Lookup failed:", error);
-			});
-	}
+	referralFields.forEach(([inputId, hiddenId, type]) => {
+		initAutocomplete(inputId, hiddenId, type);
+		fillSavedProvider(inputId, hiddenId, type);
+	});
 });
