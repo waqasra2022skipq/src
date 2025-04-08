@@ -178,6 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		checkbox.addEventListener("change", toggleSelectBox);
 	});
 	const selectBox = document.getElementById("Treatment_SCID2_1");
+	if (!selectBox) return;
 	selectBox.addEventListener("change", () => {
 		toggleSelectBox("selectChange");
 	});
