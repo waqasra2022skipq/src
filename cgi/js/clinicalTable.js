@@ -1,33 +1,89 @@
-// Define field mappings: [autocompleteFieldId, hiddenFieldId]
+// Define static field mappings for fields that always use NPI-1 or NPI-2
 const referralFields = [
-	["LHCAutocompletePrimaryReferral", "ClientReferrals_ReferredBy1NPI_1"],
-	["LHCAutocompleteSecondaryReferral", "ClientReferrals_ReferredBy2NPI_1"],
 	["LHCAutocompleteReferringPhysician", "ClientReferrals_RefPhysNPI_1"],
-
-	// Client Emergency Page
+	["LHCAutocompleteReferredto", "ClientReferrals_ReferredToNPI_1"],
 	["SearchPhysNPI", "ClientEmergency_PhysNPI_1"],
 	["SearchHosp", "ClientEmergency_DesigHospNPI_1", "NPI-2"],
 	["SearchPharmacy", "ClientEmergency_PharmacyNPI_1", "NPI-2"],
 	["SearchDentist", "ClientEmergency_DentistNPI_1"],
 	["SearchVision", "ClientEmergency_VisionNPI_1", "NPI-2"],
 	["SearchHearing", "ClientEmergency_HearingNPI_1", "NPI-2"],
-	// Add more pairs here if needed
 ];
 
-let apiUrl;
+// These two are dynamic based on select field
+const dynamicReferralFields = [
+	{
+		inputId: "LHCAutocompletePrimaryReferral",
+		hiddenId: "ClientReferrals_ReferredBy1NPI_1",
+		selectId: "ClientReferrals_ReferredBy1Type_1", // example id of select
+	},
+	{
+		inputId: "LHCAutocompleteSecondaryReferral",
+		hiddenId: "ClientReferrals_ReferredBy2NPI_1",
+		selectId: "ClientReferrals_ReferredBy2Type_1",
+	},
+];
 
-// Initialize autocomplete and set up selection observer
+function getNpiTypeFromValue(selectValue) {
+	const npi2Values = [
+		"3",
+		"8",
+		"9",
+		"10",
+		"11",
+		"12",
+		"14",
+		"18",
+		"21",
+		"22",
+		"23",
+		"25",
+		"26",
+		"28",
+		"30",
+		"31",
+		"32",
+		"34",
+		"35",
+		"36",
+		"37",
+		"38",
+		"39",
+		"40",
+		"41",
+		"42",
+		"43",
+		"44",
+		"45",
+		"46",
+		"47",
+		"48",
+		"49",
+		"50",
+		"51",
+		"52",
+		"65",
+		"66",
+		"67",
+		"68",
+		"91",
+		"92",
+		"93",
+		"94",
+		"95",
+		"96",
+	];
+	return npi2Values.includes(selectValue) ? "NPI-2" : "NPI-1";
+}
+
 function initAutocomplete(inputId, hiddenId, type) {
 	const hiddenEl = document.getElementById(hiddenId);
 	if (!hiddenEl) return;
 
-	if ("NPI-2" === type) {
-		apiUrl =
-			"https://clinicaltables.nlm.nih.gov/api/npi_org/v3/search?q=state=OK";
-	} else {
-		apiUrl =
-			"https://clinicaltables.nlm.nih.gov/api/npi_idv/v3/search?q=state=OK";
-	}
+	apiUrl =
+		type === "NPI-2"
+			? "https://clinicaltables.nlm.nih.gov/api/npi_org/v3/search?q=state=OK"
+			: "https://clinicaltables.nlm.nih.gov/api/npi_idv/v3/search?q=state=OK";
 
 	new Def.Autocompleter.Search(inputId, apiUrl, {
 		tableFormat: true,
@@ -36,25 +92,21 @@ function initAutocomplete(inputId, hiddenId, type) {
 	});
 
 	Def.Autocompleter.Event.observeListSelections(inputId, function (data) {
-		let code = data.item_code ?? "";
-		document.getElementById(hiddenId).value = code;
+		document.getElementById(hiddenId).value = data.item_code ?? "";
 	});
 }
 
-// Fetch saved NPI and fill display input
 function fillSavedProvider(inputId, hiddenId, type) {
 	const hiddenEl = document.getElementById(hiddenId);
 	if (!hiddenEl) return;
 
-	const savedNPI = document.getElementById(hiddenId)?.value;
+	const savedNPI = hiddenEl.value;
 	if (!savedNPI) return;
 
-	if ("NPI-2" === type) {
-		apiUrl = "https://clinicaltables.nlm.nih.gov/api/npi_org/v3/search";
-	} else {
-		apiUrl = "https://clinicaltables.nlm.nih.gov/api/npi_idv/v3/search";
-	}
-	console.log(`Filling saved provider for ${savedNPI} and ${apiUrl}`);
+	apiUrl =
+		type === "NPI-2"
+			? "https://clinicaltables.nlm.nih.gov/api/npi_org/v3/search"
+			: "https://clinicaltables.nlm.nih.gov/api/npi_idv/v3/search";
 
 	fetch(
 		`${apiUrl}?terms=${encodeURIComponent(
@@ -74,10 +126,25 @@ function fillSavedProvider(inputId, hiddenId, type) {
 		.catch((err) => console.error(`NPI Lookup failed for ${savedNPI}:`, err));
 }
 
-// Run everything on DOM ready
 document.addEventListener("DOMContentLoaded", function () {
+	// Initialize static mappings
 	referralFields.forEach(([inputId, hiddenId, type]) => {
 		initAutocomplete(inputId, hiddenId, type);
 		fillSavedProvider(inputId, hiddenId, type);
+	});
+
+	// Initialize dynamic fields based on select box
+	dynamicReferralFields.forEach(({ inputId, hiddenId, selectId }) => {
+		const selectEl = document.getElementById(selectId);
+		if (!selectEl) return;
+
+		function updateField() {
+			const type = getNpiTypeFromValue(selectEl.value);
+			initAutocomplete(inputId, hiddenId, type);
+			fillSavedProvider(inputId, hiddenId, type);
+		}
+
+		selectEl.addEventListener("change", updateField);
+		updateField(); // run once on load
 	});
 });

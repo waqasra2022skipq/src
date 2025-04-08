@@ -139,7 +139,7 @@ function initAutocomplete() {
   <TR >
     <TD CLASS="strcol" >Referral Type</TD>
     <TD CLASS="strcol" >
-      <SELECT NAME="ClientReferrals_ReferredBy1Type_1" >
+      <SELECT NAME="ClientReferrals_ReferredBy1Type_1" ID="ClientReferrals_ReferredBy1Type_1">
         [[DBA->selxTable(%form+xReferralTypes+<<ClientReferrals_ReferredBy1Type_1>>+CDC Descr)]]
       </SELECT>
     </TD>
@@ -168,7 +168,7 @@ function initAutocomplete() {
   <TR >
     <TD CLASS="strcol" >Referral Type</TD>
     <TD CLASS="strcol" >
-      <SELECT NAME="ClientReferrals_ReferredBy2Type_1" >
+      <SELECT NAME="ClientReferrals_ReferredBy2Type_1" ID="ClientReferrals_ReferredBy2Type_1">
         [[DBA->selxTable(%form+xReferralTypes+<<ClientReferrals_ReferredBy2Type_1>>+CDC Descr)]]
       </SELECT>
     </TD>
@@ -424,7 +424,7 @@ function initAutocomplete() {
   <TR >
     <TD CLASS="strcol" >Inappropriate/Ineligible for services, Referred to</TD>
     <TD CLASS="strcol" >
-      Search: <INPUT ID="LHCAutocompleteReferredto" TYPE="text" VALUE="[[DBA->getxref(%form+xNPI+<<<ClientReferrals_ReferredToNPI_1>>>+Type ProvOrgName NPI+++ - )]]" ONFOCUS="select()" SIZE="60" />
+      Search: <INPUT ID="LHCAutocompleteReferredto" TYPE="text" ONFOCUS="select()" SIZE="60" />
       <INPUT TYPE="hidden" ID="ClientReferrals_ReferredToNPI_1" NAME="ClientReferrals_ReferredToNPI_1" VALUE="<<ClientReferrals_ReferredToNPI_1>>" >
     </TD>
   </TR>
@@ -733,19 +733,7 @@ vDate(document.Intake.Client_DOB_1,1,document.Intake,'Client_Age');
 <script LANGUAGE="JavaScript">
 $(document).ready(function() {
   initClientAddressForm('Trans_AddressManualInput', 'Trans_AddressManualInput_Link', 'ClientReferrals_Trans', 1);
-  initClientAddressForm('Client_AddressManualInput', 'Client_AddressManualInput_Link', 'Client_', 2);
-
-  new Def.Autocompleter.Search(
-    'LHCAutocompleteReferredto',
-    `/cgi/bin/popup_api.pl?method=Agency&mlt=<<mlt>>`,
-    {tableFormat: true, valueCols: [0, 1, 6],
-      colHeaders: ['Type', 'Org Name', 'Address', 'City', 'State', 'Zip', 'NPI']
-    });
-  Def.Autocompleter.Event.observeListSelections('LHCAutocompleteReferredto', function(data) {
-    var code = data.item_code;
-    if (data.item_code === null) code = '';
-    $('#ClientReferrals_ReferredToNPI_1').val(code);
-  });  
+  initClientAddressForm('Client_AddressManualInput', 'Client_AddressManualInput_Link', 'Client_', 2); 
 });
 </script>
 
