@@ -87,7 +87,7 @@ $sNoteTrans = $dbh->prepare(
 ###$sNoteTrans = $dbh->prepare("select NoteTrans.*, Treatment.ContLogDate, Treatment.ContLogBegTime, Treatment.ContLogEndTime from NoteTrans left join Treatment on Treatment.TrID=NoteTrans.TrID where NoteTrans.ID=? and NoteTrans.BillDate='2015-10-05'");   # RERUN
 
 $sProvider = $dbh->prepare(
-"select Provider.ProvID,Provider.LName,Provider.FName,Provider.MName,Provider.Addr1,Provider.Addr2,Provider.City,Provider.ST,Provider.Zip,Provider.SSN,ProviderControl.NPI,ProviderControl.ContractZip from Provider left join ProviderControl on ProviderControl.ProvID=Provider.ProvID where Provider.ProvID=?"
+"select Provider.ProvID,Provider.Name,Provider.LName,Provider.FName,Provider.MName,Provider.Addr1,Provider.Addr2,Provider.City,Provider.ST,Provider.Zip,Provider.SSN,ProviderControl.NPI,ProviderControl.ContractZip from Provider left join ProviderControl on ProviderControl.ProvID=Provider.ProvID where Provider.ProvID=?"
 );
 $sCredentials = $dbh->prepare(
 "select Credentials.*,xCredentials.Abbr from Credentials left join okmis_config.xCredentials on xCredentials.ID=Credentials.CredID where InsID=? and ProvID=? order by Credentials.Rank"
@@ -880,15 +880,9 @@ sub ProviderHeader    # Transaction Set Segment
     ( my $RecName = uc substr( $rContracts->{RecName}, 0, 60 ) ) =~
       s/^\s*(.*?)\s*$/$1/g;
     ( my $RecID = $rContracts->{RecID} ) =~ s/[- ]//g;    # no spaces
-    my $UseName =
-      $rContracts->{Name} eq ''
-      ? qq|$rContracts->{FName} $rContracts->{LName}|
-      : $rContracts->{Name};
 
-    # trim white space, upper case, 1-60
-    ( my $OrgName = uc substr( $UseName, 0, 60 ) ) =~ s/^\s*(.*?)\s*$/$1/g;
-    ( my $TaxID   = $rContracts->{TaxID} )         =~ s/[- ]//g;
-    ( my $NPI     = $rContracts->{NPI} )           =~ s/[- ]//g;
+    ( my $TaxID = $rContracts->{TaxID} ) =~ s/[- ]//g;
+    ( my $NPI   = $rContracts->{NPI} )   =~ s/[- ]//g;
     my $Taxonomy = $rContracts->{Taxonomy};
 
     my $ClinicID = $rContracts->{ProvID};
@@ -898,7 +892,15 @@ sub ProviderHeader    # Transaction Set Segment
       if ( $rContracts->{UseAgency} );
     $sProvider->execute($ClinicID);
     my $rProvider = $sProvider->fetchrow_hashref;
-    ( my $Addr = uc substr( $rProvider->{Addr1}, 0, 55 ) ) =~
+
+    my $UseName =
+      $rProvider->{Name} eq ''
+      ? qq|$rProvider->{FName} $rProvider->{LName}|
+      : $rProvider->{Name};
+
+    # trim white space, upper case, 1-60
+    ( my $OrgName = uc substr( $UseName, 0, 60 ) ) =~ s/^\s*(.*?)\s*$/$1/g;
+    ( my $Addr    = uc substr( $rProvider->{Addr1}, 0, 55 ) ) =~
       s/^\s*(.*?)\s*$/$1/g;
     ( my $City = uc substr( $rProvider->{City}, 0, 30 ) ) =~
       s/^\s*(.*?)\s*$/$1/g;
@@ -1125,10 +1127,12 @@ sub SubmitterHeader    # Interchange Control Segment
     ( my $SenderID =
           $rSubmitter->{SenderID} ? $rSubmitter->{SenderID} : $SubID ) =~
       s/[- ]//g;
-    ( my $ReceiverID =
+    (
+        my $ReceiverID =
           $rSubmitter->{ReceiverID}
         ? $rSubmitter->{ReceiverID}
-        : $rSubmitter->{RecID} ) =~ s/[- ]//g;
+        : $rSubmitter->{RecID}
+    ) =~ s/[- ]//g;
     my $FmtSID =
       DBUtil->FmtStr( $SenderID, 15, 'L' );    # fixed length with spaces
     my $FmtRID =
@@ -1138,10 +1142,12 @@ qq|ISA*${AuthInfoQ}*${AuthInfo}*${SecuInfoQ}*${SecuInfo}*${ISASQ}*${FmtSID}*${IS
     ( my $SenderCode =
           $rSubmitter->{SenderCode} ? $rSubmitter->{SenderCode} : $SenderID )
       =~ s/[- ]//g;
-    ( my $ReceiverCode =
+    (
+        my $ReceiverCode =
           $rSubmitter->{ReceiverCode}
         ? $rSubmitter->{ReceiverCode}
-        : $ReceiverID ) =~ s/[- ]//g;
+        : $ReceiverID
+    ) =~ s/[- ]//g;
     $str .=
 qq|GS*HC*${SenderCode}*${ReceiverCode}*${YYYYMMDD}*${HHMM}*${GCN}*X*${Version}${Eol}|;
     return ( 2, $str );
