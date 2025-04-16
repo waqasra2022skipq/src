@@ -87,7 +87,7 @@ $sNoteTrans = $dbh->prepare(
 ###$sNoteTrans = $dbh->prepare("select NoteTrans.*, Treatment.ContLogDate, Treatment.ContLogBegTime, Treatment.ContLogEndTime from NoteTrans left join Treatment on Treatment.TrID=NoteTrans.TrID where NoteTrans.ID=? and NoteTrans.BillDate='2015-10-05'");   # RERUN
 
 $sProvider = $dbh->prepare(
-"select Provider.ProvID,Provider.Name,Provider.LName,Provider.FName,Provider.MName,Provider.Addr1,Provider.Addr2,Provider.City,Provider.ST,Provider.Zip,Provider.SSN,ProviderControl.NPI,ProviderControl.ContractZip from Provider left join ProviderControl on ProviderControl.ProvID=Provider.ProvID where Provider.ProvID=?"
+"select Provider.ProvID,Provider.LName,Provider.FName,Provider.MName,Provider.Addr1,Provider.Addr2,Provider.City,Provider.ST,Provider.Zip,Provider.SSN,ProviderControl.NPI,ProviderControl.ContractZip from Provider left join ProviderControl on ProviderControl.ProvID=Provider.ProvID where Provider.ProvID=?"
 );
 $sCredentials = $dbh->prepare(
 "select Credentials.*,xCredentials.Abbr from Credentials left join okmis_config.xCredentials on xCredentials.ID=Credentials.CredID where InsID=? and ProvID=? order by Credentials.Rank"
@@ -881,6 +881,14 @@ sub ProviderHeader    # Transaction Set Segment
       s/^\s*(.*?)\s*$/$1/g;
     ( my $RecID = $rContracts->{RecID} ) =~ s/[- ]//g;    # no spaces
 
+    my $UseName =
+      $rContracts->{Name} eq ''
+      ? qq|$rContracts->{FName} $rContracts->{LName}|
+      : $rContracts->{Name};
+
+    # trim white space, upper case, 1-60
+    ( my $OrgName = uc substr( $UseName, 0, 60 ) ) =~ s/^\s*(.*?)\s*$/$1/g;
+
     ( my $TaxID = $rContracts->{TaxID} ) =~ s/[- ]//g;
     ( my $NPI   = $rContracts->{NPI} )   =~ s/[- ]//g;
     my $Taxonomy = $rContracts->{Taxonomy};
@@ -893,14 +901,7 @@ sub ProviderHeader    # Transaction Set Segment
     $sProvider->execute($ClinicID);
     my $rProvider = $sProvider->fetchrow_hashref;
 
-    my $UseName =
-      $rProvider->{Name} eq ''
-      ? qq|$rProvider->{FName} $rProvider->{LName}|
-      : $rProvider->{Name};
-
-    # trim white space, upper case, 1-60
-    ( my $OrgName = uc substr( $UseName, 0, 60 ) ) =~ s/^\s*(.*?)\s*$/$1/g;
-    ( my $Addr    = uc substr( $rProvider->{Addr1}, 0, 55 ) ) =~
+    ( my $Addr = uc substr( $rProvider->{Addr1}, 0, 55 ) ) =~
       s/^\s*(.*?)\s*$/$1/g;
     ( my $City = uc substr( $rProvider->{City}, 0, 30 ) ) =~
       s/^\s*(.*?)\s*$/$1/g;
