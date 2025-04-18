@@ -30,3 +30,23 @@ function validate(form)
   return true;
 }
 //  DeCloak -->
+
+jQuery(document).ready(() => {
+	function addIntervention() {
+		const $wrapper = $("#interventions_wrapper");
+		const $lastEntry = $wrapper.find(".intervention-entry").last();
+		const $newEntry = $lastEntry.clone();
+		$wrapper.append($newEntry);
+	}
+	$("#addIntervention").on("click", function (e) {
+		e.preventDefault();
+		addIntervention();
+		$("#interventions_wrapper")
+			.find(".intervention-entry")
+			.last()
+			.find("input")
+			.first()
+			.focus();
+	});
+});
+

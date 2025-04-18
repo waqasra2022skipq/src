@@ -9,7 +9,7 @@
 <SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vNum.js"> </SCRIPT>
 [[gHTML->vNoteServiceType(%form+<<<LOGINPROVID>>>+<<<Client_ClientID_1>>>+Agent]]
 [[gHTML->vNoteInt(%form)]]
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vNoteMedi.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vNoteMedi.js?438534"> </SCRIPT>
 <SCRIPT type="text/javascript" src="/cgi/js/ajaxrequest.js"></SCRIPT>
 </HEAD>
 
@@ -50,3 +50,4 @@ callAjax('vNote','<<<Treatment_ContLogDate_1>>>','ContDate','&p=<<<Treatment_Pro
 </FORM>
 
 [[myHTML->rightpane(%form+search)]]
+

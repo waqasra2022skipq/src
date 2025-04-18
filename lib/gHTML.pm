@@ -900,6 +900,7 @@ sub setNoteTxt3 {
 
 sub setNoteTxt4 {
     my ( $self, $form, $Locked ) = @_;
+    my $dbh = myDBI->dbconnect( $form->{'DBNAME'} );
 
     my $out = '';
     $out .= $self->setIntComp( $form, $Locked );
@@ -925,111 +926,256 @@ sub setNoteTxt4 {
     <TD CLASS="strcol" >
 |;
 
-    $out .= qq|
-        <TABLE CLASS="home fullsize" >
-            <TR ><TD CLASS="port hdrcol" COLSPAN="2" >Intervention Performed</TD></TR>
-            <TR >
-                <TD CLASS="strcol" >
-                Performed Date
-                </TD>
-                <TD CLASS="strcol" >
-                <INPUT TYPE="text" NAME="ClientInterventionsPerformed_VisitDate_1[]" VALUE="<<ClientInterventionsPerformed_VisitDate_1>>" ONFOCUS="select()" ONCHANGE="return vDate(this)" MAXLENGTH="10" SIZE="10" >
-                </TD>
-            </TR>
-            <TR STYLE= "margin-botton:5px;">
-                <TD CLASS="strcol" >Performed</TD>
-                <TD CLASS="strcol" COLSPAN="3" >
-                <SELECT NAME="ClientInterventionsPerformed_Intervention_1" ID="performedSelect">
-                    [[DBA->selxTable(%form+xInterventionPerformed+<<ClientInterventionsPerformed_Intervention_1>>+ConceptName ConceptCode)]]
-                </SELECT>
-                </TD>
-            </TR>
-            <BR><BR>
-            <TR ID="Reason_TR" STYLE= "display:none;">
-                <TD CLASS="strcol" >Reason</TD>
-                <TD CLASS="strcol" COLSPAN="3" >
-                <SELECT NAME="ClientInterventionsPerformed_Reason_1">
-                    [[DBA->selxTable(%form+xInterventionPerformedReason+<<ClientInterventionsPerformed_Reason_1>>+ConceptName ConceptCode)]]
-                </SELECT>
-                </TD>
-                
-            </TR>
-            
-            <TR ID="finding_TR" STYLE= "display:none;">
-                <TD CLASS="strcol" >
-                Finding
-                </TD>
-                <TD CLASS="strcol" >
-                    <select NAME="ClientInterventionsPerformed_finding_1" ID="finding" data-value="<<ClientInterventionsPerformed_finding_1>>">
-                        <OPTION>unselected</OPTION>
-                        <OPTION VALUE="428171000124102" >Depression screening negative (finding)  428171000124102  G8510</OPTION>
-                        <OPTION VALUE="428181000124104">Depression screening positive (finding) AND Follow-Up Plan Documented  428181000124104  G8431</OPTION>
-                        <OPTION VALUE="G8511">Depression screening positive (finding) BUT Follow-Up Plan not Documented, Reason not Given  G8511</OPTION>
-                    </select>
-                </TD>
-            </TR>
+    if ( $form->{Treatment_TrID_1} ) {
 
-            <TR ID="FollowUpPlan_TR" STYLE= "display:none;">
-                <TD CLASS="strcol" >
-                Follow-Up Plan
-                </TD>
-                <TD CLASS="strcol" >
-                    <select NAME="ClientInterventionsPerformed_FollowUpPlan_1" ID="FollowUpPlan" data-value="<<ClientInterventionsPerformed_FollowUpPlan_1>>">
-                        <OPTION VALUE="306226009">Referral to a provider for additional evaluation and assessment to formulate a follow-up plan for a positive depression screen  306226009</OPTION>
-                        <OPTION VALUE="698456001">Pharmacological interventions  698456001</OPTION>
-                        <OPTION VALUE="306227000">Other interventions or follow-up for the diagnosis or treatment of depression  306227000</OPTION>
-                    </select>
-                </TD>
-            </TR>
+        # die( $form->{Treatment_TrID_1} );
+        my $sIntPerformed =
+          $dbh->prepare(
+qq|SELECT * FROM `ClientInterventionsPerformed` WHERE TrID = $form->{Treatment_TrID_1}|
+          );
+        $sIntPerformed->execute
+          || myDBI->dberror( $sIntPerformed->{Statement} );
 
-            <TR>
-                <TD CLASS="strcol" >
-                Not Performed
-                </TD>
-                <TD CLASS="strcol" >
-                    <select NAME="ClientInterventionsPerformed_NotPerformed_1" ID="NotPerformed" data-value="<<ClientInterventionsPerformed_NotPerformed_1>>">
-                        <OPTION value="">unselected</OPTION>
-                        <OPTION VALUE="454841000124105">Depression screening not done  454841000124105  G0444</OPTION>
-                    </select>
-                </TD>
-            </TR>
+        while ( my $r = $sIntPerformed->fetchrow_hashref ) {
+            my $IntPerformed = $r->{Intervention};
+            my $IntDate      = $r->{VisitDate};
+            my $IntReason    = $r->{Reason};
+            my $IntFinding   = $r->{Finding};
+            my $IntFollowUp  = $r->{FollowUpPlan};
+            my $IntNotPerf   = $r->{NotPerformed};
+            my $IntExcl      = $r->{ReasonForExclusion};
+            my $IntRejected  = $r->{RejectedReason};
+            my $IntException = $r->{ReasonForException};
 
-            <TR STYLE= "display:none;" ID="ReasonForExclusion_TR">
-                <TD CLASS="strcol" >
-                Reason for Exclusion
-                </TD>
-                <TD CLASS="strcol" >
-                    <select NAME="ClientInterventionsPerformed_ReasonForExclusion_1" ID="ReasonForExclusion" data-value="<<ClientInterventionsPerformed_ReasonForExclusion_1>>">
-                        <OPTION value="">unselected</OPTION>
-                        <OPTION VALUE="400998002">Documentation stating the patient has had a diagnosis of bipolar disorder  400998002  G9717</OPTION>
-                    </select>
-                </TD>
-            </TR>
-            <TR STYLE= "display:none;" ID="ReasonForRejected_TR">
-                <TD CLASS="strcol" >Rejected Reason</TD>
-                <TD CLASS="strcol" COLSPAN="3" >
-                <SELECT NAME="ClientInterventionsPerformed_Rejected_1">
-                    [[DBA->selxTable(%form+xInterventionPerformedRejected+<<ClientInterventionsPerformed_Rejected_1>>+ConceptName ConceptCode)]]
-                </SELECT>
-                </TD>
-            </TR>
-            <TR STYLE= "display:none;" ID="ReasonForException_TR">
-                <TD CLASS="strcol" >
-                Reason for Exception
-                </TD>
-                <TD CLASS="strcol" >
-                    <select STYLE="width: 100px;text-overflow: ellipsis;" NAME="ClientInterventionsPerformed_ReasonForException_1" ID="ReasonForException" data-value="<<ClientInterventionsPerformed_ReasonForException_1>>">
-                        <OPTION value="">unselected</OPTION>
-                        <OPTION VALUE="183944003">Patient refuses to participate in or complete the depression screening  183944003  G8433</OPTION>
-                        <OPTION VALUE="G8433">Documentation of medical reason for not screening patient for depression 
-                        (e.g., cognitive, functional, or motivational limitations that may impact accuracy of results; patient is in an urgent or emergent situation where time is of the essence and to delay treatment would jeopardize the patient’s health status)   G8433</OPTION>
-                    </select>
-                </TD>
-            </TR>
-        </TABLE>|;
+            $out .= qq|
+            <div class="intervention-entry">
+                        <TABLE CLASS="home fullsize" >
+                        <TR ><TD CLASS="port hdrcol" COLSPAN="2" >Intervention Performed</TD></TR>
+                        <TR >
+                            <TD CLASS="strcol" >
+                            Performed Date
+                            </TD>
+                            <TD CLASS="strcol" >
+<INPUT TYPE="text" NAME="ClientInterventionsPerformed_VisitDate_1[]" VALUE="$IntDate" ONFOCUS="select()" ONCHANGE="return vDate(this)" MAXLENGTH="10" SIZE="10" >
+                            </TD>
+                        </TR>
+                        <TR STYLE= "margin-botton:5px;">
+                            <TD CLASS="strcol" >Performed</TD>
+                            <TD CLASS="strcol" COLSPAN="3" >
+            <SELECT NAME="ClientInterventionsPerformed_Intervention_1[]" ID="performedSelect">
+                                [[DBA->selxTable(%form+xInterventionPerformed+${IntPerformed}+ConceptName ConceptCode)]]
+                            </SELECT>
+                            </TD>
+                        </TR>
+                        <BR><BR>
+                        <TR  >
+                            <TD CLASS="strcol" >Reason</TD>
+                            <TD CLASS="strcol" COLSPAN="3" >
+                            <SELECT NAME="ClientInterventionsPerformed_Reason_1[]">
+                                [
+                                    [
+                                        DBA->selxTable(
+                                            %form +
+                                              xInterventionPerformedReason +
+                                              ${IntReason} +
+                                              ConceptName ConceptCode
+                                        )
+                                    ]
+                                ]
+                            </SELECT>
+                            </TD>
+                            
+                        </TR>
+                        
+                        <TR  >
+                            <TD CLASS="strcol" >
+                            Finding
+                            </TD>
+                            <TD CLASS="strcol" >
+                                <select NAME="ClientInterventionsPerformed_finding_1[]" ID="finding" data-value="<<ClientInterventionsPerformed_finding_1>>">
+                                    <OPTION>unselected</OPTION>
+                                    <OPTION VALUE="428171000124102" >Depression screening negative (finding)  428171000124102  G8510</OPTION>
+                                    <OPTION VALUE="428181000124104">Depression screening positive (finding) AND Follow-Up Plan Documented  428181000124104  G8431</OPTION>
+                                    <OPTION VALUE="G8511">Depression screening positive (finding) BUT Follow-Up Plan not Documented, Reason not Given  G8511</OPTION>
+                                </select>
+                            </TD>
+                        </TR>
+
+                        <TR  >
+                            <TD CLASS="strcol" >
+                            Follow-Up Plan
+                            </TD>
+                            <TD CLASS="strcol" >
+                                <select NAME="ClientInterventionsPerformed_FollowUpPlan_1[]" ID="FollowUpPlan" data-value="<<ClientInterventionsPerformed_FollowUpPlan_1>>">
+                                    <OPTION VALUE="306226009">Referral to a provider for additional evaluation and assessment to formulate a follow-up plan for a positive depression screen  306226009</OPTION>
+                                    <OPTION VALUE="698456001">Pharmacological interventions  698456001</OPTION>
+                                    <OPTION VALUE="306227000">Other interventions or follow-up for the diagnosis or treatment of depression  306227000</OPTION>
+                                </select>
+                            </TD>
+                        </TR>
+
+                        <TR>
+                            <TD CLASS="strcol" >
+                            Not Performed
+                            </TD>
+                            <TD CLASS="strcol" >
+                                <select NAME="ClientInterventionsPerformed_NotPerformed_1[]" ID="NotPerformed" data-value="<<ClientInterventionsPerformed_NotPerformed_1>>">
+                                    <OPTION value="">unselected</OPTION>
+                                    <OPTION VALUE="454841000124105">Depression screening not done  454841000124105  G0444</OPTION>
+                                </select>
+                            </TD>
+                        </TR>
+
+                        <TR  >
+                            <TD CLASS="strcol" >
+                            Reason for Exclusion
+                            </TD>
+                            <TD CLASS="strcol" >
+                                <select NAME="ClientInterventionsPerformed_ReasonForExclusion_1[]" ID="ReasonForExclusion" data-value="<<ClientInterventionsPerformed_ReasonForExclusion_1>>">
+                                    <OPTION value="">unselected</OPTION>
+                                    <OPTION VALUE="400998002">Documentation stating the patient has had a diagnosis of bipolar disorder  400998002  G9717</OPTION>
+                                </select>
+                            </TD>
+                        </TR>
+                        <TR  >
+                            <TD CLASS="strcol" >Rejected Reason</TD>
+                            <TD CLASS="strcol" COLSPAN="3" >
+                            <SELECT NAME="ClientInterventionsPerformed_Rejected_1[]">
+                                [[DBA->selxTable(%form+xInterventionPerformedRejected+<<ClientInterventionsPerformed_Rejected_1>>+ConceptName ConceptCode)]]
+                            </SELECT>
+                            </TD>
+                        </TR>
+                        <TR  >
+                            <TD CLASS="strcol" >
+                            Reason for Exception
+                            </TD>
+                            <TD CLASS="strcol" >
+                                <select STYLE="width: 100px;text-overflow: ellipsis;" NAME="ClientInterventionsPerformed_ReasonForException_1[]" ID="ReasonForException" data-value="<<ClientInterventionsPerformed_ReasonForException_1>>">
+                                    <OPTION value="">unselected</OPTION>
+                                    <OPTION VALUE="183944003">Patient refuses to participate in or complete the depression screening  183944003  G8433</OPTION>
+                                    <OPTION VALUE="G8433">Documentation of medical reason for not screening patient for depression 
+                                    (e.g., cognitive, functional, or motivational limitations that may impact accuracy of results; patient is in an urgent or emergent situation where time is of the essence and to delay treatment would jeopardize the patient’s health status)   G8433</OPTION>
+                                </select>
+                            </TD>
+                        </TR>
+                    </TABLE>
+            </div>
+|;
+        }
+    }
+
+    $out .= qq|<div id="interventions_wrapper">
+            <div class="intervention-entry">
+                        <TABLE CLASS="home fullsize" >
+                        <TR ><TD CLASS="port hdrcol" COLSPAN="2" >Intervention Performed</TD></TR>
+                        <TR >
+                            <TD CLASS="strcol" >
+                            Performed Date
+                            </TD>
+                            <TD CLASS="strcol" >
+                            <INPUT TYPE="text" NAME="ClientInterventionsPerformed_VisitDate_1[]" VALUE="<<ClientInterventionsPerformed_VisitDate_1>>" ONFOCUS="select()" ONCHANGE="return vDate(this)" MAXLENGTH="10" SIZE="10" >
+                            </TD>
+                        </TR>
+                        <TR STYLE= "margin-botton:5px;">
+                            <TD CLASS="strcol" >Performed</TD>
+                            <TD CLASS="strcol" COLSPAN="3" >
+            <SELECT NAME="ClientInterventionsPerformed_Intervention_1[]" ID="performedSelect">
+                                [[DBA->selxTable(%form+xInterventionPerformed+<<ClientInterventionsPerformed_Intervention_1>>+ConceptName ConceptCode)]]
+                            </SELECT>
+                            </TD>
+                        </TR>
+                        <BR><BR>
+                        <TR  >
+                            <TD CLASS="strcol" >Reason</TD>
+                            <TD CLASS="strcol" COLSPAN="3" >
+                            <SELECT NAME="ClientInterventionsPerformed_Reason_1[]">
+                                [[DBA->selxTable(%form+xInterventionPerformedReason+<<ClientInterventionsPerformed_Reason_1>>+ConceptName ConceptCode)]]
+                            </SELECT>
+                            </TD>
+                            
+                        </TR>
+                        
+                        <TR  >
+                            <TD CLASS="strcol" >
+                            Finding
+                            </TD>
+                            <TD CLASS="strcol" >
+                                <select NAME="ClientInterventionsPerformed_finding_1[]" ID="finding" data-value="<<ClientInterventionsPerformed_finding_1>>">
+                                    <OPTION>unselected</OPTION>
+                                    <OPTION VALUE="428171000124102" >Depression screening negative (finding)  428171000124102  G8510</OPTION>
+                                    <OPTION VALUE="428181000124104">Depression screening positive (finding) AND Follow-Up Plan Documented  428181000124104  G8431</OPTION>
+                                    <OPTION VALUE="G8511">Depression screening positive (finding) BUT Follow-Up Plan not Documented, Reason not Given  G8511</OPTION>
+                                </select>
+                            </TD>
+                        </TR>
+
+                        <TR  >
+                            <TD CLASS="strcol" >
+                            Follow-Up Plan
+                            </TD>
+                            <TD CLASS="strcol" >
+                                <select NAME="ClientInterventionsPerformed_FollowUpPlan_1[]" ID="FollowUpPlan" data-value="<<ClientInterventionsPerformed_FollowUpPlan_1>>">
+                                    <OPTION VALUE="306226009">Referral to a provider for additional evaluation and assessment to formulate a follow-up plan for a positive depression screen  306226009</OPTION>
+                                    <OPTION VALUE="698456001">Pharmacological interventions  698456001</OPTION>
+                                    <OPTION VALUE="306227000">Other interventions or follow-up for the diagnosis or treatment of depression  306227000</OPTION>
+                                </select>
+                            </TD>
+                        </TR>
+
+                        <TR>
+                            <TD CLASS="strcol" >
+                            Not Performed
+                            </TD>
+                            <TD CLASS="strcol" >
+                                <select NAME="ClientInterventionsPerformed_NotPerformed_1[]" ID="NotPerformed" data-value="<<ClientInterventionsPerformed_NotPerformed_1>>">
+                                    <OPTION value="">unselected</OPTION>
+                                    <OPTION VALUE="454841000124105">Depression screening not done  454841000124105  G0444</OPTION>
+                                </select>
+                            </TD>
+                        </TR>
+
+                        <TR  >
+                            <TD CLASS="strcol" >
+                            Reason for Exclusion
+                            </TD>
+                            <TD CLASS="strcol" >
+                                <select NAME="ClientInterventionsPerformed_ReasonForExclusion_1[]" ID="ReasonForExclusion" data-value="<<ClientInterventionsPerformed_ReasonForExclusion_1>>">
+                                    <OPTION value="">unselected</OPTION>
+                                    <OPTION VALUE="400998002">Documentation stating the patient has had a diagnosis of bipolar disorder  400998002  G9717</OPTION>
+                                </select>
+                            </TD>
+                        </TR>
+                        <TR  >
+                            <TD CLASS="strcol" >Rejected Reason</TD>
+                            <TD CLASS="strcol" COLSPAN="3" >
+                            <SELECT NAME="ClientInterventionsPerformed_Rejected_1[]">
+                                [[DBA->selxTable(%form+xInterventionPerformedRejected+<<ClientInterventionsPerformed_Rejected_1>>+ConceptName ConceptCode)]]
+                            </SELECT>
+                            </TD>
+                        </TR>
+                        <TR  >
+                            <TD CLASS="strcol" >
+                            Reason for Exception
+                            </TD>
+                            <TD CLASS="strcol" >
+                                <select STYLE="width: 100px;text-overflow: ellipsis;" NAME="ClientInterventionsPerformed_ReasonForException_1[]" ID="ReasonForException" data-value="<<ClientInterventionsPerformed_ReasonForException_1>>">
+                                    <OPTION value="">unselected</OPTION>
+                                    <OPTION VALUE="183944003">Patient refuses to participate in or complete the depression screening  183944003  G8433</OPTION>
+                                    <OPTION VALUE="G8433">Documentation of medical reason for not screening patient for depression 
+                                    (e.g., cognitive, functional, or motivational limitations that may impact accuracy of results; patient is in an urgent or emergent situation where time is of the essence and to delay treatment would jeopardize the patient’s health status)   G8433</OPTION>
+                                </select>
+                            </TD>
+                        </TR>
+                    </TABLE>
+            </div>
+
+            </div>
+            <button type="button" ID="addIntervention"> + Add Intervention </button><BR><BR>
+
+            |;
     $out .=
       ${Locked}
-      ? qq|THERAPY Intervention: [[DBA->getxref(%form+xNoteInt+<<ProgNotes_Intervention_1>>)]] &nbsp; <INPUT TYPE="hidden" NAME="ProgNotes_Intervention_1" VALUE="<<ProgNotes_Intervention_1>>" > |
+      ? qq|THERAPY INTERVENTION: [[DBA->getxref(%form+xNoteInt+<<ProgNotes_Intervention_1>>)]] &nbsp; <INPUT TYPE="hidden" NAME="ProgNotes_Intervention_1" VALUE="<<ProgNotes_Intervention_1>>" > |
       : qq|THERAPY INTERVENTION: <SELECT NAME="ProgNotes_Intervention_1" ONCHANGE="fillSelect(this,techniquearray,this.form.ProgNotes_Techniques_1)" >[[DBA->selxTable(%form+xNoteInt+<<ProgNotes_Intervention_1>>]]</SELECT> |;
     $out .= qq|
     </TD>

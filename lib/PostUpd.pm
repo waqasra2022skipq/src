@@ -757,21 +757,62 @@ sub updNoteFamilyP {
 
 sub updIntPerformed {
     my ( $self, $form, $ClientID, $TrID ) = @_;
-    return () unless ($ClientID);
-    return () unless ($TrID);
+    return () unless ( $ClientID && $TrID );
+
     my $dbh = myDBI->dbconnect( $form->{'DBNAME'} );
 
-    # Delete the old ones...
+    # Delete old entries
     my $dIntPerformed =
       $dbh->prepare("DELETE FROM ClientInterventionsPerformed WHERE TrID=?");
     $dIntPerformed->execute($TrID)
-      || myDBI->dberror("updIntPerformed: delete  ${TrID}");
+      || myDBI->dberror("updIntPerformed: delete ${TrID}");
 
-    # my @ClientInterventionsPerformed_VisitDate_1 =
-    #   $form->{'ClientInterventionsPerformed_VisitDate_1'};
+    # Get reference arrays
+    my $dates = $form->{'ClientInterventionsPerformed_VisitDate_1[]'};
+    my $interventions =
+      $form->{'ClientInterventionsPerformed_Intervention_1[]'};
+    my $reasons      = $form->{'ClientInterventionsPerformed_Reason_1[]'};
+    my $findings     = $form->{'ClientInterventionsPerformed_finding_1[]'};
+    my $followups    = $form->{'ClientInterventionsPerformed_FollowUpPlan_1[]'};
+    my $notperformed = $form->{'ClientInterventionsPerformed_NotPerformed_1[]'};
+    my $exclusions =
+      $form->{'ClientInterventionsPerformed_ReasonForExclusion_1[]'};
+    my $rejected = $form->{'ClientInterventionsPerformed_Rejected_1[]'};
+    my $exceptions =
+      $form->{'ClientInterventionsPerformed_ReasonForException_1[]'};
 
-    die( $form->{'ClientInterventionsPerformed_VisitDate_1'} );
+    my @dates         = split( chr(253), $dates );
+    my @interventions = split( chr(253), $interventions );
+    my @reasons       = split( chr(253), $reasons );
+    my @findings      = split( chr(253), $findings );
+    my @followups     = split( chr(253), $followups );
+    my @notperformed  = split( chr(253), $notperformed );
+    my @exclusions    = split( chr(253), $exclusions );
+    my @rejected      = split( chr(253), $rejected );
+    my @exceptions    = split( chr(253), $exceptions );
 
+    # Prepare insert statement
+    my $insert = $dbh->prepare(
+        qq{
+        INSERT INTO ClientInterventionsPerformed (
+            ClientID, TrID, CreateProvID, CreateDate, ChangeProvID,
+            VisitDate, Intervention, Reason, Finding, FollowUpPlan,
+            NotPerformed, ReasonForExclusion, Rejected, ReasonForException
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    }
+    );
+
+    for ( my $i = 0 ; $i < @dates ; $i++ ) {
+        $insert->execute(
+            $ClientID,          $TrID,                  $form->{'LOGINPROVID'},
+            $form->{'TODAY'},   $form->{'LOGINPROVID'}, $dates[$i],
+            $interventions[$i], $reasons[$i],           $findings[$i],
+            $followups[$i],     $notperformed[$i],      $exclusions[$i],
+            $rejected[$i],      $exceptions[$i]
+        ) or myDBI->dberror("updIntPerformed: insert row $i");
+    }
+
+    return 1;
 }
 
 sub updNoteMeds {
