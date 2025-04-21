@@ -972,16 +972,7 @@ qq|SELECT * FROM `ClientInterventionsPerformed` WHERE TrID = $form->{Treatment_T
                             <TD CLASS="strcol" >Reason</TD>
                             <TD CLASS="strcol" COLSPAN="3" >
                             <SELECT NAME="ClientInterventionsPerformed_Reason_1[]">
-                                [
-                                    [
-                                        DBA->selxTable(
-                                            %form +
-                                              xInterventionPerformedReason +
-                                              ${IntReason} +
-                                              ConceptName ConceptCode
-                                        )
-                                    ]
-                                ]
+                                [[DBA->selxTable(%form+xInterventionPerformedReason+${IntReason}+ConceptName ConceptCode)]]
                             </SELECT>
                             </TD>
                             
