@@ -125,10 +125,15 @@ function initAutocomplete() {
 </TABLE>
 <TABLE CLASS="home fullsize" >
   <TR ><TD CLASS="port hdrtxt" COLSPAN="2" >REFERRAL SOURCE / REASON</TD></TR>
-  <TR >
-    <TD CLASS="strcol" >&nbsp;</TD>
-    <TD CLASS="strcol" >ie: or you may enter partial zipcode</TD>
+    <TR >
+    <TD CLASS="strcol" >Referral Type</TD>
+    <TD CLASS="strcol" >
+      <SELECT NAME="ClientReferrals_ReferredBy1Type_1" ID="ClientReferrals_ReferredBy1Type_1">
+        [[DBA->selxTable(%form+xReferralTypes+<<ClientReferrals_ReferredBy1Type_1>>+CDC Descr)]]
+      </SELECT>
+    </TD>
   </TR>
+  
   <TR >
     <TD CLASS="strcol" >Primary Referral</TD>
     <TD CLASS="strcol" >
@@ -137,12 +142,8 @@ function initAutocomplete() {
     </TD>
   </TR>
   <TR >
-    <TD CLASS="strcol" >Referral Type</TD>
-    <TD CLASS="strcol" >
-      <SELECT NAME="ClientReferrals_ReferredBy1Type_1" ID="ClientReferrals_ReferredBy1Type_1">
-        [[DBA->selxTable(%form+xReferralTypes+<<ClientReferrals_ReferredBy1Type_1>>+CDC Descr)]]
-      </SELECT>
-    </TD>
+    <TD CLASS="strcol" >&nbsp;</TD>
+    <TD CLASS="strcol" >ie: or you may enter partial zipcode</TD>
   </TR>
   <TR >
     <TD CLASS="strcol" >Alternate Contact Person</TD>
@@ -158,13 +159,7 @@ function initAutocomplete() {
       <INPUT TYPE=text NAME="ClientReferrals_ExpDate_1" VALUE="<<ClientReferrals_ExpDate_1>>" ONFOCUS="select()" ONCHANGE="return vDate(this)" MAXLENGTH="10" SIZE="10" >
     </TD>
   </TR>
-  <TR >
-    <TD CLASS="strcol" >Secondary Referral</TD>
-    <TD CLASS="strcol" >
-      Search: <INPUT ID="LHCAutocompleteSecondaryReferral" TYPE="text" ONFOCUS="select()" SIZE="60" />
-      <INPUT TYPE="hidden" ID="ClientReferrals_ReferredBy2NPI_1" NAME="ClientReferrals_ReferredBy2NPI_1" VALUE="<<ClientReferrals_ReferredBy2NPI_1>>" >
-    </TD>
-  </TR>
+  
   <TR >
     <TD CLASS="strcol" >Referral Type</TD>
     <TD CLASS="strcol" >
@@ -173,6 +168,14 @@ function initAutocomplete() {
       </SELECT>
     </TD>
   </TR>
+  <TR >
+    <TD CLASS="strcol" >Secondary Referral</TD>
+    <TD CLASS="strcol" >
+      Search: <INPUT ID="LHCAutocompleteSecondaryReferral" TYPE="text" ONFOCUS="select()" SIZE="60" />
+      <INPUT TYPE="hidden" ID="ClientReferrals_ReferredBy2NPI_1" NAME="ClientReferrals_ReferredBy2NPI_1" VALUE="<<ClientReferrals_ReferredBy2NPI_1>>" >
+    </TD>
+  </TR>
+  
   <TR >
     <TD CLASS="strcol" >Alternate Contact Person</TD>
     <TD CLASS="strcol" >
