@@ -139,6 +139,18 @@ document.addEventListener("DOMContentLoaded", function () {
 		if (!selectEl) return;
 
 		function updateField() {
+			// Auto-fill for specific Referral Types
+			const referralTypeMap = {
+				1: "Self",
+				2: "Significant other",
+			};
+
+			const referralText = referralTypeMap[selectEl.value];
+			if (referralText) {
+				document.getElementById(inputId).value = referralText;
+				return;
+			}
+
 			const type = getNpiTypeFromValue(selectEl.value);
 			initAutocomplete(inputId, hiddenId, type);
 			fillSavedProvider(inputId, hiddenId, type);
