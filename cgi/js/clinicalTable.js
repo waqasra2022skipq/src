@@ -103,10 +103,18 @@ function initAutocompleteNPI(inputId, hiddenId, type) {
 
 function fillSavedProvider(inputId, hiddenId, type) {
 	const hiddenEl = document.getElementById(hiddenId);
-	if (!hiddenEl) return;
+	const inputEl = document.getElementById(inputId);
+	if (!hiddenEl || !inputEl) return;
 
 	const savedNPI = hiddenEl.value;
 	if (!savedNPI) return;
+
+	// For Employer or Union (non-NPI), just fill in place name or address
+	if (type === "GOOGLE_PLACE") {
+		// You may have stored the place name, or you can call Places Details API with place_id if needed
+		fillGooglePlaceFromPlaceId(inputEl, savedNPI);
+		return;
+	}
 
 	apiUrl =
 		type === "NPI-2"
@@ -156,6 +164,31 @@ document.addEventListener("DOMContentLoaded", function () {
 				return;
 			}
 
+			const selectedBoxValue = selectEl.value;
+			const inputEl = document.getElementById(inputId);
+			const hiddenEl = document.getElementById(hiddenId);
+
+			if (selectedBoxValue === "4") {
+				setTimeout(() => {
+					const autocomplete = new google.maps.places.Autocomplete(inputEl, {
+						types: ["establishment"],
+						componentRestrictions: { country: "us" }, // Optional
+					});
+
+					autocomplete.addListener("place_changed", function () {
+						const place = autocomplete.getPlace();
+						if (place && place.name) {
+							inputEl.value = place.name;
+							hiddenEl.value = place.place_id || ""; // or place.formatted_address
+						}
+					});
+					console.log("Wait over 2 seconds");
+					fillSavedProvider(inputId, hiddenId, "GOOGLE_PLACE");
+				}, 2000);
+
+				return;
+			}
+
 			const type = getNpiTypeFromValue(selectEl.value);
 			initAutocompleteNPI(inputId, hiddenId, type);
 			fillSavedProvider(inputId, hiddenId, type);
@@ -165,3 +198,32 @@ document.addEventListener("DOMContentLoaded", function () {
 		updateField(); // run once on load
 	});
 });
+
+function fillGooglePlaceFromPlaceId(inputEl, placeId) {
+	if (!placeId || !window.google || !google.maps || !google.maps.places) {
+		console.error("Google Maps API is not loaded or placeId missing");
+		return;
+	}
+
+	const service = new google.maps.places.PlacesService(
+		document.createElement("div")
+	);
+	console.log(service);
+
+	service.getDetails({ placeId: placeId }, (place, status) => {
+		console.log(status);
+
+		if (status === google.maps.places.PlacesServiceStatus.OK) {
+			// Use formatted_address or name or both depending on your need
+			const display = place.name
+				? `${place.name}, ${place.formatted_address}`
+				: place.formatted_address;
+
+			console.log(display);
+
+			inputEl.value = display;
+		} else {
+			console.error("Failed to retrieve place details:", status);
+		}
+	});
+}
