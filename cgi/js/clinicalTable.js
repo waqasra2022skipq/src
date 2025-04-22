@@ -76,13 +76,25 @@ function getNpiTypeFromValue(selectValue) {
 	return npi2Values.includes(selectValue) ? "NPI-2" : "NPI-1";
 }
 
-function initAutocompleteNPI(inputId, hiddenId, type) {
+function initAutocompleteNPI(inputId, hiddenId, type, selectedBoxValue) {
 	const hiddenEl = document.getElementById(hiddenId);
 	if (!hiddenEl) return;
 
+	let condition = "";
+
+	if ("3" === selectedBoxValue) {
+		condition =
+			"q=addr_practice.state:OK AND licenses.taxonomy.code:251300000X OR licenses.taxonomy.code:251K00000X";
+	} else if ("41" === selectedBoxValue) {
+		condition =
+			"q=addr_practice.state:OK AND licenses.taxonomy.code:283Q00000X";
+	} else if ("12" === selectedBoxValue || "14" === selectedBoxValue) {
+		condition =
+			"q=addr_practice.state:OK AND licenses.taxonomy.code:251K00000X";
+	}
 	apiUrl =
 		type === "NPI-2"
-			? "https://clinicaltables.nlm.nih.gov/api/npi_org/v3/search?df=name.full,NPI,provider_type,addr_practice.full,licenses.taxonomy.grouping"
+			? `https://clinicaltables.nlm.nih.gov/api/npi_org/v3/search?df=name.full,NPI,provider_type,addr_practice.full,licenses.taxonomy.classification&${condition}`
 			: "https://clinicaltables.nlm.nih.gov/api/npi_idv/v3/search";
 
 	let colHeaders = ["Name", "NPI", "Type", "Practice Address"];
