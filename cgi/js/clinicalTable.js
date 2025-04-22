@@ -76,6 +76,38 @@ function getNpiTypeFromValue(selectValue) {
 	return npi2Values.includes(selectValue) ? "NPI-2" : "NPI-1";
 }
 
+const getNonNPIStatus = (selectValue) => {
+	const nonNPIValues = [
+		"4",
+		"5",
+		"6",
+		"12",
+		"22",
+		"23",
+		"25",
+		"26",
+		"28",
+		"31",
+		"32",
+		"33",
+		"34",
+		"35",
+		"36",
+		"38",
+		"39",
+		"48",
+		"49",
+		"50",
+		"51",
+		"52",
+		"65",
+		"66",
+		"67",
+		"68",
+	];
+	return nonNPIValues.includes(selectValue) ? 1 : 0;
+};
+
 function initAutocompleteNPI(inputId, hiddenId, type, selectedBoxValue) {
 	const hiddenEl = document.getElementById(hiddenId);
 	if (!hiddenEl) return;
@@ -180,7 +212,9 @@ document.addEventListener("DOMContentLoaded", function () {
 			const inputEl = document.getElementById(inputId);
 			const hiddenEl = document.getElementById(hiddenId);
 
-			if (selectedBoxValue === "4") {
+			const checkNonNPIStatus = getNonNPIStatus(selectedBoxValue);
+
+			if (checkNonNPIStatus) {
 				setTimeout(() => {
 					const autocomplete = new google.maps.places.Autocomplete(inputEl, {
 						types: ["establishment"],
@@ -202,7 +236,7 @@ document.addEventListener("DOMContentLoaded", function () {
 			}
 
 			const type = getNpiTypeFromValue(selectEl.value);
-			initAutocompleteNPI(inputId, hiddenId, type);
+			initAutocompleteNPI(inputId, hiddenId, type, selectedBoxValue);
 			fillSavedProvider(inputId, hiddenId, type);
 		}
 
