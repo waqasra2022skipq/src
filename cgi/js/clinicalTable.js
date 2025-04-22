@@ -76,7 +76,7 @@ function getNpiTypeFromValue(selectValue) {
 	return npi2Values.includes(selectValue) ? "NPI-2" : "NPI-1";
 }
 
-function initAutocomplete(inputId, hiddenId, type) {
+function initAutocompleteNPI(inputId, hiddenId, type) {
 	const hiddenEl = document.getElementById(hiddenId);
 	if (!hiddenEl) return;
 
@@ -134,7 +134,7 @@ function fillSavedProvider(inputId, hiddenId, type) {
 document.addEventListener("DOMContentLoaded", function () {
 	// Initialize static mappings
 	referralFields.forEach(([inputId, hiddenId, type]) => {
-		initAutocomplete(inputId, hiddenId, type);
+		initAutocompleteNPI(inputId, hiddenId, type);
 		fillSavedProvider(inputId, hiddenId, type);
 	});
 
@@ -157,7 +157,7 @@ document.addEventListener("DOMContentLoaded", function () {
 			}
 
 			const type = getNpiTypeFromValue(selectEl.value);
-			initAutocomplete(inputId, hiddenId, type);
+			initAutocompleteNPI(inputId, hiddenId, type);
 			fillSavedProvider(inputId, hiddenId, type);
 		}
 
