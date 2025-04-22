@@ -82,13 +82,18 @@ function initAutocomplete(inputId, hiddenId, type) {
 
 	apiUrl =
 		type === "NPI-2"
-			? "https://clinicaltables.nlm.nih.gov/api/npi_org/v3/search"
+			? "https://clinicaltables.nlm.nih.gov/api/npi_org/v3/search?df=name.full,NPI,provider_type,addr_practice.full,licenses.taxonomy.grouping"
 			: "https://clinicaltables.nlm.nih.gov/api/npi_idv/v3/search";
+
+	let colHeaders = ["Name", "NPI", "Type", "Practice Address"];
+	if (type === "NPI-2") {
+		colHeaders.push("Taxonomy Grouping");
+	}
 
 	new Def.Autocompleter.Search(inputId, apiUrl, {
 		tableFormat: true,
 		valueCols: [0, 1],
-		colHeaders: ["Name", "NPI", "Type", "Practice Address"],
+		colHeaders: colHeaders,
 	});
 
 	Def.Autocompleter.Event.observeListSelections(inputId, function (data) {
