@@ -112,6 +112,12 @@ function initAutocompleteNPI(inputId, hiddenId, type, selectedBoxValue) {
 	const hiddenEl = document.getElementById(hiddenId);
 	if (!hiddenEl) return;
 
+	const checkNonNPIStatus = getNonNPIStatus(selectedBoxValue);
+
+	if (checkNonNPIStatus) {
+		applyGooglePlace(inputId, hiddenId);
+	} else {
+	}
 	let condition = "";
 
 	if ("3" === selectedBoxValue) {
@@ -131,7 +137,7 @@ function initAutocompleteNPI(inputId, hiddenId, type, selectedBoxValue) {
 
 	let colHeaders = ["Name", "NPI", "Type", "Practice Address"];
 	if (type === "NPI-2") {
-		colHeaders.push("Taxonomy Grouping");
+		colHeaders.push("Taxonomy Classification");
 	}
 
 	new Def.Autocompleter.Search(inputId, apiUrl, {
@@ -209,31 +215,6 @@ document.addEventListener("DOMContentLoaded", function () {
 			}
 
 			const selectedBoxValue = selectEl.value;
-			const inputEl = document.getElementById(inputId);
-			const hiddenEl = document.getElementById(hiddenId);
-
-			const checkNonNPIStatus = getNonNPIStatus(selectedBoxValue);
-
-			if (checkNonNPIStatus) {
-				setTimeout(() => {
-					const autocomplete = new google.maps.places.Autocomplete(inputEl, {
-						types: ["establishment"],
-						componentRestrictions: { country: "us" }, // Optional
-					});
-
-					autocomplete.addListener("place_changed", function () {
-						const place = autocomplete.getPlace();
-						if (place && place.name) {
-							inputEl.value = place.name;
-							hiddenEl.value = place.place_id || ""; // or place.formatted_address
-						}
-					});
-					console.log("Wait over 2 seconds");
-					fillSavedProvider(inputId, hiddenId, "GOOGLE_PLACE");
-				}, 2000);
-
-				return;
-			}
 
 			const type = getNpiTypeFromValue(selectEl.value);
 			initAutocompleteNPI(inputId, hiddenId, type, selectedBoxValue);
@@ -245,6 +226,23 @@ document.addEventListener("DOMContentLoaded", function () {
 	});
 });
 
+const applyGooglePlace = (inputId, hiddenId) => {
+	const inputEl = document.getElementById(inputId);
+	const hiddenEl = document.getElementById(hiddenId);
+
+	const autocomplete = new google.maps.places.Autocomplete(inputEl, {
+		types: ["establishment"],
+		componentRestrictions: { country: "us" }, // Optional
+	});
+
+	autocomplete.addListener("place_changed", function () {
+		const place = autocomplete.getPlace();
+		if (place && place.name) {
+			inputEl.value = place.name;
+			hiddenEl.value = place.place_id || ""; // or place.formatted_address
+		}
+	});
+};
 function fillGooglePlaceFromPlaceId(inputEl, placeId) {
 	if (!placeId || !window.google || !google.maps || !google.maps.places) {
 		console.error("Google Maps API is not loaded or placeId missing");

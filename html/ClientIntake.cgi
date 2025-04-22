@@ -109,6 +109,31 @@ function initAutocomplete() {
       document.getElementById('autoCompleteTransportedBy'), {types: []});
   autocompleteTransportedBy.setFields(['address_component']);
   autocompleteTransportedBy.addListener('place_changed', () => { fillInAddress(autocompleteTransportedBy, 'ClientReferrals_Trans', 1); });
+
+
+    var PrimaryReferralMaps = new google.maps.places.Autocomplete(
+      document.getElementById('PrimaryReferralMaps'), {types: []});
+
+	PrimaryReferralMaps.addListener("place_changed", function () {
+		const place = PrimaryReferralMaps.getPlace();
+		if (place && place.name) {
+			document.getElementById('LHCAutocompletePrimaryReferral').value = place.name;
+			document.getElementById('ClientReferrals_ReferredBy1NPI_1').value = place.place_id;
+		}
+	});
+
+    var SecondaryReferralMaps = new google.maps.places.Autocomplete(
+      document.getElementById('SecondaryReferralMaps'), {types: []});
+
+	SecondaryReferralMaps.addListener("place_changed", function () {
+		const place = SecondaryReferralMaps.getPlace();
+		if (place && place.name) {
+			document.getElementById('LHCAutocompleteSecondaryReferral').value = place.name;
+			document.getElementById('ClientReferrals_ReferredBy2NPI_1').value = place.place_id;
+		}
+	});
+
+  
 }
 </SCRIPT>
 
@@ -137,7 +162,8 @@ function initAutocomplete() {
   <TR >
     <TD CLASS="strcol" >Primary Referral</TD>
     <TD CLASS="strcol" >
-      Search: <INPUT ID="LHCAutocompletePrimaryReferral" TYPE="text" ONFOCUS="select()" SIZE="60" />
+      Search: <INPUT ID="LHCAutocompletePrimaryReferral" TYPE="text" ONFOCUS="select()" SIZE="60" /><BR>
+      Search MAP: <INPUT TYPE="text" ID="PrimaryReferralMaps">
       <INPUT TYPE="hidden" ID="ClientReferrals_ReferredBy1NPI_1" NAME="ClientReferrals_ReferredBy1NPI_1" VALUE="<<ClientReferrals_ReferredBy1NPI_1>>" >
     </TD>
   </TR>
@@ -171,7 +197,9 @@ function initAutocomplete() {
   <TR >
     <TD CLASS="strcol" >Secondary Referral</TD>
     <TD CLASS="strcol" >
-      Search: <INPUT ID="LHCAutocompleteSecondaryReferral" TYPE="text" ONFOCUS="select()" SIZE="60" />
+      Search: <INPUT ID="LHCAutocompleteSecondaryReferral" TYPE="text" ONFOCUS="select()" SIZE="60" /><BR>
+      Search MAP: <INPUT TYPE="text" ID="SecondaryReferralMaps" >
+
       <INPUT TYPE="hidden" ID="ClientReferrals_ReferredBy2NPI_1" NAME="ClientReferrals_ReferredBy2NPI_1" VALUE="<<ClientReferrals_ReferredBy2NPI_1>>" >
     </TD>
   </TR>
