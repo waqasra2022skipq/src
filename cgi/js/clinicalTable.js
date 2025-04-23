@@ -76,53 +76,15 @@ function getNpiTypeFromValue(selectValue) {
 	return npi2Values.includes(selectValue) ? "NPI-2" : "NPI-1";
 }
 
-const getNonNPIStatus = (selectValue) => {
-	const nonNPIValues = [
-		"4",
-		"5",
-		"6",
-		"12",
-		"22",
-		"23",
-		"25",
-		"26",
-		"28",
-		"31",
-		"32",
-		"33",
-		"34",
-		"35",
-		"36",
-		"38",
-		"39",
-		"48",
-		"49",
-		"50",
-		"51",
-		"52",
-		"65",
-		"66",
-		"67",
-		"68",
-	];
-	return nonNPIValues.includes(selectValue) ? 1 : 0;
-};
-
 function initAutocompleteNPI(inputId, hiddenId, type, selectedBoxValue) {
 	const hiddenEl = document.getElementById(hiddenId);
 	if (!hiddenEl) return;
 
-	const checkNonNPIStatus = getNonNPIStatus(selectedBoxValue);
-
-	if (checkNonNPIStatus) {
-		applyGooglePlace(inputId, hiddenId);
-	} else {
-	}
 	let condition = "";
 
 	if ("3" === selectedBoxValue) {
 		condition =
-			"q=addr_practice.state:OK AND licenses.taxonomy.code:251300000X OR licenses.taxonomy.code:251K00000X";
+			"q=addr_practice.state:OK AND (licenses.taxonomy.code:251300000X OR licenses.taxonomy.code:251K00000X)";
 	} else if ("41" === selectedBoxValue) {
 		condition =
 			"q=addr_practice.state:OK AND licenses.taxonomy.code:283Q00000X";
@@ -158,13 +120,6 @@ function fillSavedProvider(inputId, hiddenId, type) {
 
 	const savedNPI = hiddenEl.value;
 	if (!savedNPI) return;
-
-	// For Employer or Union (non-NPI), just fill in place name or address
-	if (type === "GOOGLE_PLACE") {
-		// You may have stored the place name, or you can call Places Details API with place_id if needed
-		fillGooglePlaceFromPlaceId(inputEl, savedNPI);
-		return;
-	}
 
 	apiUrl =
 		type === "NPI-2"
@@ -212,6 +167,8 @@ document.addEventListener("DOMContentLoaded", function () {
 			if (referralText) {
 				document.getElementById(inputId).value = referralText;
 				return;
+			} else {
+				document.getElementById(inputId).value = "";
 			}
 
 			const selectedBoxValue = selectEl.value;
@@ -226,24 +183,7 @@ document.addEventListener("DOMContentLoaded", function () {
 	});
 });
 
-const applyGooglePlace = (inputId, hiddenId) => {
-	const inputEl = document.getElementById(inputId);
-	const hiddenEl = document.getElementById(hiddenId);
-
-	const autocomplete = new google.maps.places.Autocomplete(inputEl, {
-		types: ["establishment"],
-		componentRestrictions: { country: "us" }, // Optional
-	});
-
-	autocomplete.addListener("place_changed", function () {
-		const place = autocomplete.getPlace();
-		if (place && place.name) {
-			inputEl.value = place.name;
-			hiddenEl.value = place.place_id || ""; // or place.formatted_address
-		}
-	});
-};
-function fillGooglePlaceFromPlaceId(inputEl, placeId) {
+function fillGooglePlaceFromPlaceId($inputEl, placeId) {
 	if (!placeId || !window.google || !google.maps || !google.maps.places) {
 		console.error("Google Maps API is not loaded or placeId missing");
 		return;
@@ -252,22 +192,102 @@ function fillGooglePlaceFromPlaceId(inputEl, placeId) {
 	const service = new google.maps.places.PlacesService(
 		document.createElement("div")
 	);
-	console.log(service);
 
 	service.getDetails({ placeId: placeId }, (place, status) => {
-		console.log(status);
-
 		if (status === google.maps.places.PlacesServiceStatus.OK) {
-			// Use formatted_address or name or both depending on your need
 			const display = place.name
 				? `${place.name}, ${place.formatted_address}`
 				: place.formatted_address;
 
-			console.log(display);
-
-			inputEl.value = display;
+			console.log("Google Place Found:", display);
+			$inputEl.val(display);
 		} else {
 			console.error("Failed to retrieve place details:", status);
 		}
 	});
 }
+
+$(document).ready(function () {
+	const $select = $("#ClientReferrals_ReferredBy1Type_1");
+	const $npiField = $("#LHCAutocompletePrimaryReferral");
+	const $googleField = $("#PrimaryReferralMaps");
+
+	const $select2 = $("#ClientReferrals_ReferredBy2Type_1");
+	const $npiField2 = $("#LHCAutocompleteSecondaryReferral");
+	const $googleField2 = $("#SecondaryReferralMaps");
+
+	function toggleReferralFields() {
+		const selectedValue = $select.val();
+		let isNonNPI = getNonNPIStatus(selectedValue);
+
+		if (isNonNPI) {
+			$googleField.show();
+			$npiField.hide();
+
+			// Autofill address from place ID if available
+			const placeId = $("#ClientReferrals_ReferredBy1NPI_1").val();
+			if (placeId) {
+				fillGooglePlaceFromPlaceId($googleField, placeId);
+			}
+		} else {
+			$googleField.hide();
+			$npiField.show();
+		}
+
+		const selectedValue2 = $select2.val();
+		isNonNPI = getNonNPIStatus(selectedValue2);
+
+		if (isNonNPI) {
+			$googleField2.show();
+			$npiField2.hide();
+
+			const placeId2 = $("#ClientReferrals_ReferredBy2NPI_1").val();
+			if (placeId2) {
+				fillGooglePlaceFromPlaceId($googleField2, placeId2);
+			}
+		} else {
+			$googleField2.hide();
+			$npiField2.show();
+		}
+	}
+
+	// Run on page load
+	toggleReferralFields();
+
+	// Re-run on change
+	$select.on("change", toggleReferralFields);
+	$select2.on("change", toggleReferralFields);
+});
+
+// Utility from you
+const getNonNPIStatus = (selectValue) => {
+	const nonNPIValues = [
+		"4",
+		"5",
+		"6",
+		"12",
+		"22",
+		"23",
+		"25",
+		"26",
+		"28",
+		"31",
+		"32",
+		"33",
+		"34",
+		"35",
+		"36",
+		"38",
+		"39",
+		"48",
+		"49",
+		"50",
+		"51",
+		"52",
+		"65",
+		"66",
+		"67",
+		"68",
+	];
+	return nonNPIValues.includes(selectValue) ? 1 : 0;
+};
