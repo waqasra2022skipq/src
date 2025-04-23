@@ -46,7 +46,6 @@ function getNpiTypeFromValue(selectValue) {
 		"34",
 		"35",
 		"36",
-		"37",
 		"38",
 		"39",
 		"40",
@@ -91,6 +90,25 @@ function initAutocompleteNPI(inputId, hiddenId, type, selectedBoxValue) {
 	} else if ("11" === selectedBoxValue || "14" === selectedBoxValue) {
 		condition =
 			"q=addr_practice.state:OK AND licenses.taxonomy.code:251K00000X";
+	} else if ("9" === selectedBoxValue) {
+		condition =
+			"q=addr_practice.state:OK AND (licenses.taxonomy.code:261QV0200X OR licenses.taxonomy.code:261QM1100X OR licenses.taxonomy.code:261QM1101X OR licenses.taxonomy.code:2865M2000X OR licenses.taxonomy.code:282N00000X)";
+	} else if ("10" === selectedBoxValue) {
+		condition =
+			"q=addr_practice.state:OK AND (licenses.taxonomy.code:282N00000X OR licenses.taxonomy.code:261Q00000X OR licenses.taxonomy.code:261QA1903X OR licenses.taxonomy.code:261QF0400X OR licenses.taxonomy.code:261QP0904X OR licenses.taxonomy.code:251K00000X)";
+	} else if (
+		"18" === selectedBoxValue ||
+		"21" === selectedBoxValue ||
+		"37" === selectedBoxValue ||
+		"40" === selectedBoxValue ||
+		"42" === selectedBoxValue ||
+		"43" === selectedBoxValue ||
+		"44" === selectedBoxValue ||
+		"45" === selectedBoxValue ||
+		"46" === selectedBoxValue ||
+		"47" === selectedBoxValue
+	) {
+		condition = "q=addr_practice.state:OK";
 	}
 	apiUrl =
 		type === "NPI-2"
