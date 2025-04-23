@@ -88,7 +88,7 @@ function initAutocompleteNPI(inputId, hiddenId, type, selectedBoxValue) {
 	} else if ("41" === selectedBoxValue) {
 		condition =
 			"q=addr_practice.state:OK AND licenses.taxonomy.code:283Q00000X";
-	} else if ("12" === selectedBoxValue || "14" === selectedBoxValue) {
+	} else if ("11" === selectedBoxValue || "14" === selectedBoxValue) {
 		condition =
 			"q=addr_practice.state:OK AND licenses.taxonomy.code:251K00000X";
 	}
