@@ -37,6 +37,11 @@ function setupAssessmentCalculators() {
 			selectPrefix: "ClientDAS_q",
 			// No special rules for MMSE, just sum all question values
 		},
+		{
+			scoreField: "ClientSDS_Score_1",
+			selectPrefix: "ClientSDS_q",
+			// No special rules for MMSE, just sum all question values
+		},
 	];
 
 	// Set up calculators for each form configuration
