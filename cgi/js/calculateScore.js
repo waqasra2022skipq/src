@@ -31,6 +31,12 @@ function setupAssessmentCalculators() {
 		},
 
 		// Add more form configurations here as needed
+
+		{
+			scoreField: "ClientDAS_Score_1",
+			selectPrefix: "ClientDAS_q",
+			// No special rules for MMSE, just sum all question values
+		},
 	];
 
 	// Set up calculators for each form configuration
@@ -49,7 +55,21 @@ function setupCalculator(config) {
 		document.querySelectorAll('select[id^="' + selectPrefix + '"]')
 	);
 
-	if (selectElements.length === 0) return; // Skip if no matching select elements
+	if (selectElements.length === 0) {
+		// If no select elements found, check for radio buttons
+		const radioElements = Array.from(
+			document.querySelectorAll(
+				'input[type="radio"][name^="' + selectPrefix + '"]'
+			)
+		);
+
+		// If radio buttons are found, use them instead
+		if (radioElements.length > 0) {
+			selectElements.push(...radioElements);
+		}
+	}
+
+	if (selectElements.length === 0) return; // Skip if no matching select or radio elements
 
 	// Add event listeners to all select elements for this form
 	selectElements.forEach((select) => {
@@ -85,8 +105,17 @@ function calculateScore(config, selectElements, scoreField) {
 		if (select.id.includes("q3b")) continue;
 
 		const value = select.value;
-		if (value !== null && value !== "") {
-			totalScore += parseInt(value);
+		const type = select.type;
+		// Handle radio buttons differently
+		if (type === "radio") {
+			// Check if the radio button is checked
+			if (select.checked) {
+				totalScore += parseInt(value);
+			}
+		} else {
+			if (value !== null && value !== "") {
+				totalScore += parseInt(value);
+			}
 		}
 	}
 

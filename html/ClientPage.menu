@@ -70,6 +70,8 @@
             <UL CLASS="sub" >
                 <LI><A HREF="/cgi/bin/mis.cgi?view=ListClientMMSE.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">MMSE</A></LI>
                 <LI><A HREF="/cgi/bin/mis.cgi?view=ListClientBIMS.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">BIMS</A></LI>
+                <LI><A HREF="/cgi/bin/mis.cgi?view=ListClientDAS.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">WHO Disability Assessment Schedule</A></LI>
+                <LI><A HREF="/cgi/bin/mis.cgi?view=ListClientSDS.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Sheehan Disability Scale</A></LI>
             </UL>
           </LI>
           <LI><A HREF="/cgi/bin/mis.cgi?view=ListClientBasis32.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Behavior & Symptom ID Scale (BASIS 32)</A></LI>
@@ -150,6 +152,7 @@
       <LI><A HREF="/cgi/bin/mis.cgi?view=ListClientProcedures.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Medical Procedures</A></LI>
     </UL>
   </LI>
+  
   <LI><A HREF="javascript:ReportWindow('/cgi/bin/printFaceSheet.pl?IDs=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>','FaceSheet')" ONMOUSEOVER="window.status='Print Client Intake Face Sheet'; return true;" ONMOUSEOUT="window.status=''">Print Face Sheet</A></LI>
   <LI>[[DBA->setPrintClientIntake(%form+<<Client_ClientID>>++Print  CARF Intake)]]</LI> 
   [[SysAccess->verify(%form+Privilege=ClientAccess)<LI><A HREF="/cgi/bin/ClientAccess.cgi?Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Access Control</A></LI> ]]
