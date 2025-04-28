@@ -1,4 +1,4 @@
-[[myHTML->newPage(%form+Client Intake)]]
+[[myHTML->newPage(%form+Client Intake+++++lhcautocomplete)]]
 
 <SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/NoEnter.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
@@ -35,6 +35,29 @@ function initAutocomplete() {
       document.getElementById('autoCompleteTransportedBy'), {types: []});
   autocompleteTransportedBy.setFields(['address_component']);
   autocompleteTransportedBy.addListener('place_changed', () => { fillInAddress(autocompleteTransportedBy, 'ClientReferrals_Trans', 1); });
+
+
+  var PrimaryReferralMaps = new google.maps.places.Autocomplete(
+      document.getElementById('PrimaryReferralMaps'), {types: []});
+
+  PrimaryReferralMaps.addListener("place_changed", function () {
+    const place = PrimaryReferralMaps.getPlace();
+    if (place && place.name) {
+      document.getElementById('LHCAutocompletePrimaryReferral').value = place.name;
+      document.getElementById('ClientReferrals_ReferredBy1NPI_1').value = place.place_id;
+    }
+  });
+
+    var SecondaryReferralMaps = new google.maps.places.Autocomplete(
+      document.getElementById('SecondaryReferralMaps'), {types: []});
+
+  SecondaryReferralMaps.addListener("place_changed", function () {
+    const place = SecondaryReferralMaps.getPlace();
+    if (place && place.name) {
+      document.getElementById('LHCAutocompleteSecondaryReferral').value = place.name;
+      document.getElementById('ClientReferrals_ReferredBy2NPI_1').value = place.place_id;
+    }
+  });
 }
 </SCRIPT>
 
@@ -52,20 +75,26 @@ function initAutocomplete() {
 </TABLE>
 <TABLE CLASS="home fullsize" >
   <TR ><TD CLASS="port hdrtxt" >REFERRAL SOURCE / REASON</TD><TD>&nbsp;</TD></TR>
-  <TR >
-    <TD CLASS="strcol" >Primary Referral</TD>
-    <TD CLASS="strcol" >
-      Search: <INPUT TYPE="text" ID="SearchRefBy1" NAME="SearchRefBy1" VALUE="" ONFOCUS="select()" ONCHANGE="callAjax('Agency','<<ClientReferrals_ReferredBy1NPI_1>>','selRefBy1','&name=ClientReferrals_ReferredBy1NPI_1&pattern='+this.value,'popup.pl');" SIZE="60" >
-<BR><SPAN ID="selRefBy1"></SPAN>
-    </TD>
-  </TR>
-  <TR >
+  <TR ><TD CLASS="port hdrtxt" COLSPAN="2" >REFERRAL SOURCE / REASON</TD></TR>
+    <TR >
     <TD CLASS="strcol" >Referral Type</TD>
     <TD CLASS="strcol" >
-      <SELECT NAME="ClientReferrals_ReferredBy1Type_1" >
+      <SELECT NAME="ClientReferrals_ReferredBy1Type_1" ID="ClientReferrals_ReferredBy1Type_1">
         [[DBA->selxTable(%form+xReferralTypes+<<ClientReferrals_ReferredBy1Type_1>>+CDC Descr)]]
       </SELECT>
     </TD>
+  </TR>
+  
+  <TR >
+    <TD CLASS="strcol" >Primary Referral</TD>
+    <TD CLASS="strcol" >
+      Search: <INPUT ID="LHCAutocompletePrimaryReferral" TYPE="text" ONFOCUS="select()" SIZE="60" /><INPUT TYPE="text" ID="PrimaryReferralMaps" SIZE="60">
+      <INPUT TYPE="hidden" ID="ClientReferrals_ReferredBy1NPI_1" NAME="ClientReferrals_ReferredBy1NPI_1" VALUE="<<ClientReferrals_ReferredBy1NPI_1>>" >
+    </TD>
+  </TR>
+  <TR >
+    <TD CLASS="strcol" >&nbsp;</TD>
+    <TD CLASS="strcol" >ie: or you may enter partial zipcode</TD>
   </TR>
   <TR >
     <TD CLASS="strcol" >Alternate Contact Person</TD>
@@ -81,19 +110,20 @@ function initAutocomplete() {
       <INPUT TYPE=text NAME="ClientReferrals_ExpDate_1" VALUE="<<ClientReferrals_ExpDate_1>>" ONFOCUS="select()" ONCHANGE="return vDate(this)" MAXLENGTH="10" SIZE="10" >
     </TD>
   </TR>
-  <TR >
-    <TD CLASS="strcol" >Secondary Referral</TD>
+    <TR >
+    <TD CLASS="strcol" >Referral Type</TD>
     <TD CLASS="strcol" >
-      Search: <INPUT TYPE="text" ID="SearchRefBy2" NAME="SearchRefBy2" VALUE="" ONFOCUS="select()" ONCHANGE="callAjax('Agency','<<ClientReferrals_ReferredBy2NPI_1>>','selRefBy2','&name=ClientReferrals_ReferredBy2NPI_1&pattern='+this.value,'popup.pl');" SIZE="60" >
-<BR><SPAN ID="selRefBy2"></SPAN>
+      <SELECT NAME="ClientReferrals_ReferredBy2Type_1" ID="ClientReferrals_ReferredBy2Type_1">
+        [[DBA->selxTable(%form+xReferralTypes+<<ClientReferrals_ReferredBy2Type_1>>+CDC Descr)]]
+      </SELECT>
     </TD>
   </TR>
   <TR >
-    <TD CLASS="strcol" >Referral Type</TD>
+    <TD CLASS="strcol" >Secondary Referral</TD>
     <TD CLASS="strcol" >
-      <SELECT NAME="ClientReferrals_ReferredBy2Type_1" >
-        [[DBA->selxTable(%form+xReferralTypes+<<ClientReferrals_ReferredBy2Type_1>>+CDC Descr)]]
-      </SELECT>
+      Search: <INPUT ID="LHCAutocompleteSecondaryReferral" TYPE="text" ONFOCUS="select()" SIZE="60" /><INPUT TYPE="text" ID="SecondaryReferralMaps" SIZE="60">
+
+      <INPUT TYPE="hidden" ID="ClientReferrals_ReferredBy2NPI_1" NAME="ClientReferrals_ReferredBy2NPI_1" VALUE="<<ClientReferrals_ReferredBy2NPI_1>>" >
     </TD>
   </TR>
   <TR >
@@ -780,8 +810,6 @@ function initAutocomplete() {
 </FORM>
 <SCRIPT LANGUAGE="JavaScript">
 document.Intake.elements[0].focus();
-callAjax('Agency','<<ClientReferrals_ReferredBy1NPI_1>>','selRefBy1','&name=ClientReferrals_ReferredBy1NPI_1','popup.pl');
-callAjax('Agency','<<ClientReferrals_ReferredBy2NPI_1>>','selRefBy2','&name=ClientReferrals_ReferredBy2NPI_1','popup.pl');
 callAjax('Physicians','<<ClientReferrals_RefPhysNPI_1>>','selPhysNPI','&name=ClientReferrals_RefPhysNPI_1','popup.pl');
 callAjax('Agency','<<ClientReferrals_ReferredToNPI_1>>','selRefTo','&name=ClientReferrals_ReferredToNPI_1','popup.pl');
 callAjax('Agency','<<ClientRelations_FacIDNPI_1>>','selFac','&name=ClientRelations_FacIDNPI_1','popup.pl');
@@ -791,7 +819,7 @@ vDate(document.Intake.Client_DOB_1,1,document.Intake,'Client_Age');
 </SCRIPT>
 
 [[myHTML->rightpane(%form+search)]]
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAG2JfgYWgk7Q3FDfZQJauF-M4o4H1wqVw&libraries=places&callback=initAutocomplete"
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCk-R_kefNqBgvMBYyOYHGVJOoODPDtCIo&libraries=places&callback=initAutocomplete"
         async defer></script>
 <script LANGUAGE="JavaScript" src="/cgi/js/vClientAddressForm.js?v=202006242248"></script>
 <script LANGUAGE="JavaScript">
@@ -800,3 +828,5 @@ $(document).ready(function() {
   initClientAddressForm('Client_AddressManualInput', 'Client_AddressManualInput_Link', 'Client_', 2);
 });
 </script>
+
+<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/clinicalTable.js"> </SCRIPT>
