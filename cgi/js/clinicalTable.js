@@ -275,6 +275,18 @@ $(document).ready(function () {
 	// Re-run on change
 	$select.on("change", toggleReferralFields);
 	$select2.on("change", toggleReferralFields);
+
+	// apply clinical tables to probelms search
+
+	const $problemsSearch = $("#problemregexp");
+	if ($problemsSearch.length) {
+		// $problemsSearch.on("focus", runClinicalTables);
+		new Def.Autocompleter.Search(
+			"problemregexp",
+			"https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code,name",
+			{ tableFormat: true, valueCols: [0], colHeaders: ["Code", "Name"] }
+		);
+	}
 });
 
 // Utility from you
