@@ -361,26 +361,39 @@ elsif ( $form->{method} eq 'sProblem' ) {
 
     #my $pattern = $form->{'pattern'};
     # pattern is what user enter to check/find.
-    ( my $pattern = $form->{'pattern'} ) =~ s/"/'/g;
+    ( my $userEntered = $form->{'pattern'} ) =~ s/"/'/g;
 
     #warn qq|popup: sProblem: pattern=${pattern}=, value=${value}=\n|;
     my $FINDING  = $form->{'FINDING'};
+    my $CORE     = $form->{'CORE'};
     my $DISORDER = $form->{'DISORDER'};
-    $pattern .= $FINDING eq 'true'  ? ".*[(]finding[)]\$"  : '';
-    $pattern .= $DISORDER eq 'true' ? ".*[(]disorder[)]\$" : '';
 
-#warn qq|: pattern=$pattern,value=$value, FINDING=${FINDING}, DISORDER=${DISORDER}\n|;
+    my $check     = qq|"%a%"|;
+    my $coreCheck = "";
+
+    if ( $FINDING eq 'true' ) {
+        $check = qq|"%(finding)%"|;
+    }
+    if ( $DISORDER eq 'true' ) {
+        $check = qq|"%(disorder)%"|;
+    }
+    if ( $CORE eq 'true' ) {
+        $coreCheck = qq|and Type LIKE "%core%"|;
+    }
+
+#warn qq|: userEntered=$userEntered,value=$value, FINDING=${FINDING}, DISORDER=${DISORDER}\n|;
     my ( $selected, $err, $FLDS, $bynum ) =
       ( '', '', 'sctName SNOMEDID icdName ICD10 Type', 0 );
     my $items = ();
     my $found = ();
     my $dbh   = $form->connectdb('okmis_config');
     my $with =
-        $value eq '' && $pattern eq '' ? ''
-      : $pattern eq ''                 ? qq|and ID="${value}"|
+        $value eq '' && $userEntered eq '' ? ''
+      : $userEntered eq ''                 ? qq|and ID="${value}"|
       : $value eq ''
-      ? qq| and (sctName REGEXP "${pattern}" or icdName REGEXP "${pattern}" or ICD10 REGEXP "${pattern}" or SNOMEDID REGEXP "${pattern}")|
-      : qq| and (ID="${value}" or (sctName REGEXP "${pattern}" or icdName REGEXP "${pattern}" or ICD10 REGEXP "${pattern}" or SNOMEDID REGEXP "${pattern}") )|;
+      ? qq| and (ICD10 = "${userEntered}" and (sctName LIKE ${check} or icdName LIKE ${check}) ${coreCheck}) |
+      : qq| and (ID="${value}" or (ICD10 = "${userEntered}" and (sctName LIKE ${check} or icdName LIKE ${check}) ${coreCheck}) )|;
+
     my $q =
       qq|select * from misICD10 where Active=1 ${with} group by SNOMEDID,ICD10|;
 
