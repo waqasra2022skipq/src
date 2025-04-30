@@ -45,7 +45,9 @@
       &nbsp;&nbsp;
       <INPUT TYPE="radio" NAME="LIMSEL" VALUE="1" > finding only
       &nbsp;&nbsp;
-      <INPUT TYPE="radio" NAME="LIMSEL" VALUE="2" > disorder only
+      <INPUT TYPE="radio" NAME="LIMSEL" VALUE="2" > core only
+      &nbsp;&nbsp;
+        <INPUT TYPE="radio" NAME="LIMSEL" VALUE="3" > disorder only
       &nbsp;&nbsp;
       <INPUT TYPE="radio" NAME="LIMSEL" VALUE="0" > all
     </TD>
