@@ -14,6 +14,7 @@ use CGI::Carp qw(fatalsToBrowser);
 use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
 
 use NPIRegistryAPI;
+use UMLSAPI;
 use JSON;
 
 ############################################################################
@@ -312,6 +313,49 @@ function extractLast( term ) {
 |
       : main->ierr( $target, $err );
 }
+elsif ( $form->{method} eq 'umlsProblem' ) {
+    my $target  = 'ICD10Search';
+    my $pattern = $form->{'pattern'} || '';
+    $pattern =~ s/"/'/g;
+
+    my $FINDING  = $form->{'FINDING'};
+    my $DISORDER = $form->{'DISORDER'};
+
+    # $pattern .= $FINDING eq 'true'  ? " finding"  : '';
+    # $pattern .= $DISORDER eq 'true' ? " disorder" : '';
+
+    my $results = UMLSAPI::search_umls($pattern);
+
+    my $items = {};
+    my $found = {};
+    my $value = $form->{'value'} || '';
+
+    foreach my $item (@$results) {
+        my $name = $item->{name} . " ; " . $item->{ui};
+
+        my $ID    = $item->{name};
+        my $match = PopUp->matchSelect( $value, $ID );
+
+        $items->{$name}->{name}  = $name;
+        $items->{$name}->{val}   = $ID;
+        $items->{$name}->{match} = $match;
+        $found->{$match}->{name} = $name if $match ne '';
+    }
+
+    my $unSel =
+      PopUp->unMatched( $form, $value, $found, 'misICD10',
+        'sctName SNOMEDID icdName ICD10 Type' );
+    my $Sel     = PopUp->makeSelect( $items, 0 );
+    my $SelStmt = $unSel . $Sel;
+
+    $out = qq|
+  <command method="setcontent">
+    <target>${target}</target>
+    <content><![CDATA[${SelStmt}]]></content>
+  </command>
+|;
+}
+
 elsif ( $form->{method} eq 'sProblem' ) {
     my $target = 'ICD10Search';
 
