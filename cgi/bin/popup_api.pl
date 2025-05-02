@@ -15,6 +15,7 @@ use warnings;
 use LWP::UserAgent;
 use CGI;
 use NPIRegistryAPI;
+use SNOMEDAPI;
 
 ############################################################################
 my $form = DBForm->parse();
@@ -32,6 +33,36 @@ if ( $form->{method} eq 'Agency' || $form->{method} eq 'Physicians' ) {
     my $types = $form->{'types'};
 
     $json_str = NPIRegistryAPI->search_api_npi( $terms, $types );
+}
+elsif ( $form->{method} eq 'snomedSearch' ) {
+
+    my $terms = $form->{terms};
+
+    my $results = SNOMEDAPI::fetchSNOMED($terms);
+
+    # Get the count of the results
+    my $count = scalar(@$results);
+    my @json  = ();
+    my @items = ($count);
+
+    my @data  = ();
+    my @codes = ();
+    foreach my $item (@$results) {
+        my $code = $item->{ui};
+        my $name = $item->{name};
+        my $type = $item->{rootSource};
+
+        push( @codes, $code );
+        push( @data,  [ $code, $name, $type ] );
+    }
+
+    push( @items, [@codes] );
+    push( @items, undef );
+    push( @items, [@data] );
+
+    # @json = [@items];
+
+    $json_str = encode_json \@items;
 }
 elsif ( $form->{method} eq 'xLDO' ) {
     my @json = ();

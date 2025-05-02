@@ -7,27 +7,53 @@ use JSON;
 use CGI       qw(:standard);
 use CGI::Carp qw(fatalsToBrowser warningsToBrowser);
 
+use LWP::UserAgent;
+use JSON;
+use URI::Escape;
+
+my $UMLS_APIKEY = 'b5d6de26-2803-473a-ac00-96e0e8c33c9a';
+
 sub fetchSNOMED {
-    my ( $term, $tag ) = @_;
-    $tag ||= "finding";    # Default tag if not provided
+    my ($term) = @_;
 
-    my $base_url =
-"https://browser.ihtsdotools.org/snowstorm/snomed-ct/browser/MAIN%2FSNOMEDCT-US/descriptions";
-    my $query_string =
-"?term=depression&active=true&conceptActive=true&lang=english&semanticTags=finding&groupByConcept=true";
+    # $term = "depression";
+    return { error => "Missing search term" } unless $term;
 
-    my $ua       = LWP::UserAgent->new;
-    my $response = $ua->get( $base_url . $query_string );
+    my $ua = LWP::UserAgent->new( timeout => 10 );
+    $ua->agent("snomed-fetcher/1.0");
 
-    if ( $response->is_success ) {
+    # Step 1: Get TGT
+    my $tgt_res = $ua->post( 'https://utslogin.nlm.nih.gov/cas/v1/api-key',
+        { apikey => $UMLS_APIKEY } );
 
-        # my $data = decode_json( $response->decoded_content );
-        return $response->{'items'};    # Return matched SNOMED items
+    unless ( $tgt_res->is_success ) {
+        return { error => "TGT error: " . $tgt_res->status_line };
     }
-    else {
-        return { "error" => "Failed to fetch SNOMED data: "
-              . $response->status_line };
-    }
+
+    my ($tgt_url) = $tgt_res->decoded_content =~ /action="([^"]+)"/;
+    return { error => "TGT URL not found" } unless $tgt_url;
+
+    # Step 2: Get ST
+    my $st_res =
+      $ua->post( $tgt_url, { service => 'http://umlsks.nlm.nih.gov' } );
+    return { error => "ST error: " . $st_res->status_line }
+      unless $st_res->is_success;
+    my $service_ticket = $st_res->decoded_content;
+
+    # Step 3: Search SNOMEDCT_US
+    my $encoded = uri_escape($term);
+    my $search_url =
+"https://uts-ws.nlm.nih.gov/rest/search/current?string=$encoded&ticket=$service_ticket&sabs=SNOMEDCT_US,ICD10CM&returnIdType=code&pageSize=100";
+
+    my $res = $ua->get($search_url);
+    return { error => "Search failed: " . $res->status_line }
+      unless $res->is_success;
+
+    my $data = eval { decode_json( $res->decoded_content ) };
+    return { error => "JSON parse error" } unless $data;
+
+    my $results = $data->{result}->{results} || [];
+    return $results;
 }
 
 sub fetchSNOMEDByConceptId {
