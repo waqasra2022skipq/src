@@ -391,8 +391,8 @@ elsif ( $form->{method} eq 'sProblem' ) {
         $value eq '' && $userEntered eq '' ? ''
       : $userEntered eq ''                 ? qq|and ID="${value}"|
       : $value eq ''
-      ? qq| and (ICD10 = "${userEntered}" and (sctName LIKE ${check} or icdName LIKE ${check}) ${coreCheck}) |
-      : qq| and (ID="${value}" or (ICD10 = "${userEntered}" and (sctName LIKE ${check} or icdName LIKE ${check}) ${coreCheck}) )|;
+      ? qq| and ((ICD10 LIKE "%${userEntered}%" or SNOMEDID LIKE "%${userEntered}%") and (sctName LIKE ${check} or icdName LIKE ${check}) ${coreCheck}) |
+      : qq| and (ID="${value}" or ((ICD10 LIKE "%${userEntered}%" or SNOMEDID LIKE "%${userEntered}%") and (sctName LIKE ${check} or icdName LIKE ${check}) ${coreCheck}) )|;
 
     my $q =
       qq|select * from misICD10 where Active=1 ${with} group by SNOMEDID,ICD10|;
