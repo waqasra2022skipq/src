@@ -1,3 +1,5 @@
+var mlt;
+
 // Define static field mappings for fields that always use NPI-1 or NPI-2
 const referralFields = [
 	["LHCAutocompleteReferringPhysician", "ClientReferrals_RefPhysNPI_1"],
@@ -226,6 +228,8 @@ function fillGooglePlaceFromPlaceId($inputEl, placeId) {
 }
 
 $(document).ready(function () {
+	mlt = $("input[name='mlt']").val();
+
 	const $select = $("#ClientReferrals_ReferredBy1Type_1");
 	const $npiField = $("#LHCAutocompletePrimaryReferral");
 	const $googleField = $("#PrimaryReferralMaps");
@@ -281,13 +285,24 @@ $(document).ready(function () {
 	const $problemsSearch = $("#problemregexp");
 	if ($problemsSearch.length) {
 		// $problemsSearch.on("focus", runClinicalTables);
-		new Def.Autocompleter.Search(
-			"problemregexp",
-			"https://clinicaltables.nlm.nih.gov/api/icd10cm/v3/search?sf=code,name",
-			{ tableFormat: true, valueCols: [0], colHeaders: ["Code", "Name"] }
-		);
+		runClinicalTables();
 	}
 });
+
+function runClinicalTables(element) {
+	new Def.Autocompleter.Search(
+		"problemregexp",
+		"/cgi/bin/popup_api.pl?method=snomedSearch&mlt=" +
+			mlt +
+			"&DISORDER=" +
+			document.ClientProblems.LIMSEL[1].checked,
+		{
+			tableFormat: true,
+			valueCols: [0],
+			colHeaders: ["Code", "Name", "Type"],
+		}
+	);
+}
 
 // Utility from you
 const getNonNPIStatus = (selectValue) => {
