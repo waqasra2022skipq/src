@@ -42,14 +42,13 @@
   </TR>
   <TR >
     <TD CLASS="strcol" COLSPAN="2" >
-      &nbsp;&nbsp;
-      <INPUT TYPE="radio" NAME="LIMSEL" VALUE="1" > finding only
-      &nbsp;&nbsp;
-      <INPUT TYPE="radio" NAME="LIMSEL" VALUE="2" > core only
-      &nbsp;&nbsp;
-        <INPUT TYPE="radio" NAME="LIMSEL" VALUE="3" > disorder only
-      &nbsp;&nbsp;
-      <INPUT TYPE="radio" NAME="LIMSEL" VALUE="0" > all
+        <INPUT TYPE="radio" NAME="LIMSEL" VALUE="0" checked> all
+        &nbsp;&nbsp;
+        <INPUT TYPE="radio" NAME="LIMSEL" VALUE="1" > disorder only
+        &nbsp;&nbsp;
+        <INPUT TYPE="radio" NAME="LIMSEL" VALUE="2" > core only
+        &nbsp;&nbsp;
+        <INPUT TYPE="radio" NAME="LIMSEL" VALUE="3" > finding only
     </TD>
   </TR>
   <TR >

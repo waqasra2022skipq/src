@@ -33,11 +33,11 @@ function problemlist(selectobj) {
 			"&value=" +
 			document.ClientProblems.ICD10Search.value +
 			"&FINDING=" +
-			document.ClientProblems.LIMSEL[0].checked +
+			document.ClientProblems.LIMSEL[3].checked +
 			"&CORE=" +
-			document.ClientProblems.LIMSEL[1].checked +
+			document.ClientProblems.LIMSEL[2].checked +
 			"&DISORDER=" +
-			document.ClientProblems.LIMSEL[2].checked;
+			document.ClientProblems.LIMSEL[1].checked;
 		//alert("url="+script+" params="+params+" value="+this.value);
 		req.loadXMLDoc(script, params);
 	};
