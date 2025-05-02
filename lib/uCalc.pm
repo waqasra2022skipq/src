@@ -81,6 +81,25 @@ sub flagTotal {
     return ($html);
 }
 
+sub flagBIMSandMMSE {
+    my ( $self, $form, $rPHQ, $pfx, $beg, $end, $min, $med, $max, $severe ) =
+      @_;
+    my $val = $self->calcTotal( $form, $rPHQ, $pfx, $beg, $end );
+    my $html =
+         $severe ne ''
+      && $val <= $severe ? $val . chr(253) . qq|STYLE="background-color: blue"|
+      : $max ne ''
+      && $val <= $max ? $val . chr(253) . qq|STYLE="background-color: red"|
+      : $med ne ''
+      && $val <= $med ? $val . chr(253) . qq|STYLE="background-color: orange"|
+      : $min ne ''
+      && $val <= $min ? $val . chr(253) . qq|STYLE="background-color: yellow"|
+      : $min ne ''
+      && $val <= 1 ? $val . chr(253) . qq|STYLE="background-color: lightgreen"|
+      : $val;
+    return ($html);
+}
+
 sub flagTotalLabel {
     my ( $self, $form, $rPHQ, $pfx, $beg, $end, $min, $med, $max, $severe ) =
       @_;
