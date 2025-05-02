@@ -93,7 +93,7 @@ sub flagBIMSandMMSE {
       : $med ne ''
       && $val <= $med ? $val . chr(253) . qq|STYLE="background-color: orange"|
       : $min ne ''
-      && $val <= $min ? $val . chr(253) . qq|STYLE="background-color: yellow"|
+      && $val <= $min ? $val . chr(253) . qq|STYLE="background-color: green"|
       : $min ne ''
       && $val <= 1 ? $val . chr(253) . qq|STYLE="background-color: lightgreen"|
       : $val;
