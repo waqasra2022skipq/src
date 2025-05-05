@@ -1340,7 +1340,7 @@ qq|<SCRIPT LANGUAGE="JavaScript">newtextMsg('help$rxTables->{theField}','$rxTabl
             if ( $rxTables->{'theType'} ne 'selectlist' ) {
                 $html .= qq|
       <TR >
-        <TD CLASS="strcol heading" >$rxTables->{'thePreText'}&nbsp;</TD>|;
+        <TD CLASS="strcol heading" >$rxTables->{'thePreText'}</TD>|;
                 foreach my $descriptor (@d) {
                     $html .= qq|      <TD CLASS="hdrtxt" >${descriptor}</TD>\n|;
                 }
@@ -1358,7 +1358,7 @@ qq|    <TR >\n      <TD CLASS="strcol heading" >$rxTables->{'thePreText'}</TD></
         my ( $textrow, $textcol, $textlbl ) = ( '', '', '' );
         if ( $rxTables->{'theArgs'} =~ /separate-rows/ ) {
             $html .= qq|
-    <TR > <TD CLASS="strcol" ${style} > $rxTables->{theText} </TD> </TR>
+    <TR > <TD CLASS="strcol" ${style} > $rxTables->{theText}</TD> </TR>
     <TR >|;
         }
         elsif ( $rxTables->{'theArgs'} =~ /separate-columns/ ) {
@@ -1375,14 +1375,12 @@ qq|    <TR >\n      <TD CLASS="strcol heading" >$rxTables->{'thePreText'}</TD></
             $html .= qq|
       <TD CLASS="strcol" ${style} >
         ${textlbl}
-        &nbsp;
       </TD>|;
         }
         elsif ( $type eq 'text' ) {
             $html .= qq|
       <TD CLASS="strcol" ${style} >
-        ${textlbl}
-        <INPUT TYPE="text" NAME="${name}" VALUE="<<${name}>>" ONFOCUS="select()" ${onchange} ${size} >
+        ${textlbl}<INPUT TYPE="text" NAME="${name}" VALUE="<<${name}>>" ONFOCUS="select()" ${onchange} ${size} >
       </TD>|;
         }
         elsif ( $type eq 'textarea' ) {
@@ -1446,8 +1444,7 @@ qq|          <OPTION VALUE="${value}" <<${name}=${value}=selectlist>> >${desc}\n
             }
             $html .= qq|
       <TD CLASS="strcol" ${style}>
-        ${textlbl}
-        <SELECT ID="${name}" NAME="${name}" style="max-width: 800px;">
+        ${textlbl}<SELECT ID="${name}" NAME="${name}" style="max-width: 800px;">
           ${opts}
         </SELECT>
       </TD>
