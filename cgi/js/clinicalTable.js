@@ -285,7 +285,7 @@ $(document).ready(function () {
 	const $problemsSearch = $("#problemregexp");
 	if ($problemsSearch.length) {
 		// $problemsSearch.on("focus", runClinicalTables);
-		runClinicalTables();
+		// runClinicalTables();
 	}
 });
 

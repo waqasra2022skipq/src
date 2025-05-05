@@ -28,7 +28,7 @@ function problemlist(selectobj) {
 		var req = new AjaxRequest();
 		var script = "/cgi/bin/popup.pl";
 		var params =
-			"method=sProblem&pattern=" +
+			"method=umlsProblem&pattern=" +
 			encodeURIComponent(pattern) +
 			"&value=" +
 			document.ClientProblems.ICD10Search.value +

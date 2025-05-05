@@ -16,6 +16,7 @@ use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
 use NPIRegistryAPI;
 use UMLSAPI;
 use JSON;
+use SNOMEDAPI;
 
 ############################################################################
 my $form = DBForm->parse();
@@ -324,16 +325,17 @@ elsif ( $form->{method} eq 'umlsProblem' ) {
     # $pattern .= $FINDING eq 'true'  ? " finding"  : '';
     # $pattern .= $DISORDER eq 'true' ? " disorder" : '';
 
-    my $results = UMLSAPI::search_umls($pattern);
+    my $results = SNOMEDAPI::fetchSNOMED( $pattern, $DISORDER, $FINDING );
 
     my $items = {};
     my $found = {};
     my $value = $form->{'value'} || '';
 
     foreach my $item (@$results) {
-        my $name = $item->{name} . " ; " . $item->{ui};
+        my $name =
+          "SOURCE: $item->{rootSource}, CODE: $item->{ui}, NAME: $item->{name}";
 
-        my $ID    = $item->{name};
+        my $ID    = $item->{ui};
         my $match = PopUp->matchSelect( $value, $ID );
 
         $items->{$name}->{name}  = $name;
@@ -348,12 +350,14 @@ elsif ( $form->{method} eq 'umlsProblem' ) {
     my $Sel     = PopUp->makeSelect( $items, 0 );
     my $SelStmt = $unSel . $Sel;
 
-    $out = qq|
+    $out = $err eq ''
+      ? qq|
   <command method="setcontent">
     <target>${target}</target>
     <content><![CDATA[${SelStmt}]]></content>
   </command>
-|;
+|
+      : main->ierr( $target, $err );
 }
 
 elsif ( $form->{method} eq 'sProblem' ) {
@@ -438,8 +442,10 @@ elsif ( $form->{method} eq 'pProblem' ) {
     my ( $err, $cnt ) = ( '', 0 );
     my $dbh = $form->connectdb('okmis_config');
     my $s   = $dbh->prepare(
-        "select sctName,SNOMEDID,icdName,ICD10 from misICD10 where ID=?");
-    $s->execute($value) || $form->dberror("pProblem: select misICD10 ${value}");
+"select sctName,SNOMEDID,icdName,ICD10 from misICD10 where SNOMEDID=? OR ICD10=?"
+    );
+    $s->execute( $value, $value )
+      || $form->dberror("pProblem: select misICD10 ${value}");
     my ( $sctName, $SNOMEDID, $icdName, $ICD10 ) = $s->fetchrow_array;
     my $html = qq|${sctName}: ${SNOMEDID}: ${icdName} ${ICD10}<BR><BR>|;
     my $q =
