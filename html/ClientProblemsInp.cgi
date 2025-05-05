@@ -58,7 +58,7 @@
     <TD CLASS="strcol" COLSPAN="2" >
       Select one from the checklist below:<BR>
       <SELECT NAME="ICD10Search" ID="ICD10Search" ONCHANGE="callAjax('pProblem',this.value,this.id,'&name=ClientProblems_UUID_1','popup.pl');" >
-        [[DBA->iselxTable(%form+misICD10+<<ClientProblems_UUID_1>>+sctName SNOMEDID icdName ICD10)]]
+        [[DBA->iselxTable(%form+umlsICD10+<<ClientProblems_UUID_1>>+sctName referencedComponentId icdName mapTarget)]]
       </SELECT>
 [[gHTML->setFilterScript(problem+ClientProblems+ICD10Search)]]
     </TD>
@@ -68,7 +68,7 @@
     <TD CLASS="strcol" COLSPAN="2" >
       Bio Medical Problem:<BR>
       <SPAN ID="ICD10Check" >
-        [[DBA->ichkxTable(%form+misICD10+<<ClientProblems_UUID_1>>+sctName SNOMEDID icdName ICD10 Rule+ClientProblems_UUID_1)]]
+        [[DBA->ichkxTable(%form+umlsICD10+<<ClientProblems_UUID_1>>+sctName referencedComponentId icdName mapTarget Rule+ClientProblems_UUID_1)]]
       </SPAN>
     </TD>
   </TR>

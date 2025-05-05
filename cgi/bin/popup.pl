@@ -345,8 +345,8 @@ elsif ( $form->{method} eq 'umlsProblem' ) {
     }
 
     my $unSel =
-      PopUp->unMatched( $form, $value, $found, 'misICD10',
-        'sctName SNOMEDID icdName ICD10 Type' );
+      PopUp->unMatched( $form, $value, $found, 'umlsICD10',
+        'sctName referencedComponentId icdName mapTarget Type' );
     my $Sel     = PopUp->makeSelect( $items, 0 );
     my $SelStmt = $unSel . $Sel;
 
@@ -442,21 +442,21 @@ elsif ( $form->{method} eq 'pProblem' ) {
     my ( $err, $cnt ) = ( '', 0 );
     my $dbh = $form->connectdb('okmis_config');
     my $s   = $dbh->prepare(
-"select sctName,SNOMEDID,icdName,ICD10 from misICD10 where SNOMEDID=? OR ICD10=?"
+"select sctName,referencedComponentId,icdName,mapTarget from umlsICD10 where referencedComponentId=? OR mapTarget=?"
     );
     $s->execute( $value, $value )
-      || $form->dberror("pProblem: select misICD10 ${value}");
+      || $form->dberror("pProblem: select umlsICD10 ${value}");
     my ( $sctName, $SNOMEDID, $icdName, $ICD10 ) = $s->fetchrow_array;
     my $html = qq|${sctName}: ${SNOMEDID}: ${icdName} ${ICD10}<BR><BR>|;
     my $q =
-      qq|select * from misICD10 where Active=1 and ICD10=? and SNOMEDID=?|;
+      qq|select * from umlsICD10 where Active=1 and referencedComponentId=?|;
 
     #warn qq|pProblem: q=$q\n|;
     my $smisICD10 = $dbh->prepare($q);
-    $smisICD10->execute( $ICD10, $SNOMEDID ) || $form->dberror($q);
+    $smisICD10->execute($SNOMEDID) || $form->dberror($q);
     while ( my $rmisICD10 = $smisICD10->fetchrow_hashref ) {
         $cnt++;
-        my $descr   = qq|$rmisICD10->{'Rule'} $rmisICD10->{'Advice'}|;
+        my $descr   = qq|$rmisICD10->{'mapRule'} $rmisICD10->{'mapAdvice'}|;
         my $ID      = $rmisICD10->{'ID'};
         my $match   = PopUp->matchSelect( $value, $ID );
         my $checked = $match eq '' ? '' : 'CHECKED';
