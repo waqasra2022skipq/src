@@ -20,6 +20,12 @@ my $RECID = myDBI->getTableConfig( $table, 'RECID' );
 #warn qq|select * from ${table} where ${RECID}=?, ID=${ID}\n|;
 my ( $printfile, $pathname, $url ) = ( '', '', '<TR><TD>no xml</TD></TR>' );
 my $s1 = $dbh->prepare("select * from ${table} where ${RECID}=?");
+
+# if table name starts with "x" then connect to okmis_config db
+
+if ( $table =~ /^x/ ) {
+    $s1 = $dbh->prepare("select * from okmis_config.${table} where ${RECID}=?");
+}
 $s1->execute($ID);
 my $r1 = $s1->fetchrow_hashref;
 $s1->finish();
