@@ -37,7 +37,9 @@ function problemlist(selectobj) {
 			"&CORE=" +
 			document.ClientProblems.LIMSEL[2].checked +
 			"&DISORDER=" +
-			document.ClientProblems.LIMSEL[1].checked;
+			document.ClientProblems.LIMSEL[1].checked +
+			"&NURING=" +
+			document.ClientProblems.LIMSEL[4].checked;
 		//alert("url="+script+" params="+params+" value="+this.value);
 		req.loadXMLDoc(script, params);
 	};

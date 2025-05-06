@@ -14,7 +14,7 @@ use URI::Escape;
 my $UMLS_APIKEY = 'b5d6de26-2803-473a-ac00-96e0e8c33c9a';
 
 sub fetchSNOMED {
-    my ( $term, $DISORDER, $FINDING ) = @_;
+    my ( $term, $DISORDER, $FINDING, $NURING ) = @_;
 
     # $term = "depression";
     return { error => "Missing search term" } unless $term;
@@ -43,7 +43,7 @@ sub fetchSNOMED {
     # Step 3: Search SNOMEDCT_US
     my $encoded = uri_escape($term);
 
-    my $sabs = "";
+    my $sabs = "SNOMEDCT_US,ICD10CM";
 
     if ( $DISORDER eq "true" ) {
         $sabs = "ICD10CM";
@@ -51,8 +51,8 @@ sub fetchSNOMED {
     elsif ( $FINDING eq "true" ) {
         $sabs = "SNOMEDCT_US";
     }
-    else {
-        $sabs = "SNOMEDCT_US,ICD10CM";
+    elsif ( $NURING eq "true" ) {
+        $sabs = "ICNP";
     }
     my $search_url =
 "https://uts-ws.nlm.nih.gov/rest/search/current?string=$encoded&ticket=$service_ticket&sabs=${sabs}&pageSize=100&returnIdType=code";

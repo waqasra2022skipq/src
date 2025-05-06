@@ -49,6 +49,8 @@
         <INPUT TYPE="radio" NAME="LIMSEL" VALUE="2" > core only
         &nbsp;&nbsp;
         <INPUT TYPE="radio" NAME="LIMSEL" VALUE="3" > finding only
+        &nbsp;&nbsp;
+        <INPUT TYPE="radio" NAME="LIMSEL" VALUE="4" > nursing only
     </TD>
   </TR>
   <TR >

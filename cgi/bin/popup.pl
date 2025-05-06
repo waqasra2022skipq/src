@@ -321,11 +321,10 @@ elsif ( $form->{method} eq 'umlsProblem' ) {
 
     my $FINDING  = $form->{'FINDING'};
     my $DISORDER = $form->{'DISORDER'};
+    my $NURING   = $form->{'NURING'};
 
-    # $pattern .= $FINDING eq 'true'  ? " finding"  : '';
-    # $pattern .= $DISORDER eq 'true' ? " disorder" : '';
-
-    my $results = SNOMEDAPI::fetchSNOMED( $pattern, $DISORDER, $FINDING );
+    my $results =
+      SNOMEDAPI::fetchSNOMED( $pattern, $DISORDER, $FINDING, $NURING );
 
     my $items = {};
     my $found = {};
