@@ -68,6 +68,7 @@
         <UL CLASS="sub" >
           <LI><A HREF="javascript:void(0)" ONMOUSEOVER="window.status='Depression Menu'; return true;" ONMOUSEOUT="window.status=''" >Cognitive</A>
             <UL CLASS="sub" >
+                <LI><A HREF="/cgi/bin/mis.cgi?view=ListClientBristol.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Bristol</A></LI>
                 <LI><A HREF="/cgi/bin/mis.cgi?view=ListClientMMSE.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">MMSE</A></LI>
                 <LI><A HREF="/cgi/bin/mis.cgi?view=ListClientBIMS.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">BIMS</A></LI>
                 <LI><A HREF="/cgi/bin/mis.cgi?view=ListClientDAS.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">WHO Disability Assessment Schedule</A></LI>
