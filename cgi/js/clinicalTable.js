@@ -112,6 +112,12 @@ function initAutocompleteNPI(inputId, hiddenId, type, selectedBoxValue) {
 	) {
 		condition = "q=addr_practice.state:OK";
 	}
+
+	if ("SearchPharmacy" === inputId) {
+		condition =
+			"q=addr_practice.state:OK AND (licenses.taxonomy.code:3336C0003X OR licenses.taxonomy.code:333600000X)";
+	}
+
 	apiUrl =
 		type === "NPI-2"
 			? `https://clinicaltables.nlm.nih.gov/api/npi_org/v3/search?df=name.full,NPI,provider_type,addr_practice.full,licenses.taxonomy.classification&${condition}`
