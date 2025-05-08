@@ -8,8 +8,8 @@ const referralFields = [
 	["SearchHosp", "ClientEmergency_DesigHospNPI_1", "NPI-2"],
 	["SearchPharmacy", "ClientEmergency_PharmacyNPI_1", "NPI-2"],
 	["SearchDentist", "ClientEmergency_DentistNPI_1"],
-	["SearchVision", "ClientEmergency_VisionNPI_1", "NPI-2"],
-	["SearchHearing", "ClientEmergency_HearingNPI_1", "NPI-2"],
+	["SearchVision", "ClientEmergency_VisionNPI_1"],
+	["SearchHearing", "ClientEmergency_HearingNPI_1"],
 ];
 
 // These two are dynamic based on select field
