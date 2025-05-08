@@ -115,7 +115,12 @@ function initAutocompleteNPI(inputId, hiddenId, type, selectedBoxValue) {
 
 	if ("SearchPharmacy" === inputId) {
 		condition =
-			"q=addr_practice.state:OK AND (licenses.taxonomy.code:3336C0003X OR licenses.taxonomy.code:333600000X)";
+			"q=addr_practice.state:OK AND licenses.taxonomy.classification:Pharmacy";
+	}
+
+	if ("SearchHosp" === inputId) {
+		condition =
+			"q=addr_practice.state:OK AND licenses.taxonomy.classification:Hospital";
 	}
 
 	apiUrl =
