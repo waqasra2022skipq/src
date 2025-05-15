@@ -213,7 +213,7 @@ main->post() if ($post_update);
 $disLoc = $NextLocation if ( $disLoc eq '' );
 myDBI->cleanup();
 
-warn qq|\n\nnow print NextLocation=\n$NextLocation| if ( $form->{LOGINPROVID} );
+# warn qq|\n\nnow print NextLocation=\n$NextLocation| if ( $form->{LOGINPROVID} );
 print $NextLocation;
 exit;
 

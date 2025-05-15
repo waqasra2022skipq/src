@@ -137,7 +137,7 @@ function initAutocomplete() {
 }
 </SCRIPT>
 
-<FORM NAME="Intake" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="Intake" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >
@@ -311,8 +311,15 @@ function initAutocomplete() {
       <INPUT TYPE="TEL" NAME="ClientReferrals_TransPh_1" VALUE="<<ClientReferrals_TransPh_1>>" ONFOCUS="select()" ONCHANGE="return vPhone(this)" SIZE="20" >
     </TD>
   </TR>
+  <TR>
+    <TD CLASS="strcol">Referring Physician Gender</TD>
+    <TD CLASS="strcol">
+      <SELECT NAME="ClientReferrals_RefPhysGend_1">
+          [[BDA->selxTable(%form+xGend+<<ClientReferrals_RefPhysGend_1>>+Descr)]]
+      </SELECT>
+    </TD>
+  </TR>
 
-  
   <TR > <TD CLASS="strcol" COLSPAN="2" ><HR></TD> </TR>
   <TR >
     <TD CLASS="strcol" >
