@@ -1,12 +1,12 @@
 [[myHTML->newPage(%form+SOGSGSI)]]
 
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/NoEnter.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vSOGSGSI.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vDate.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vTime.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vSSN.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vNum.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/NoEnter.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vSOGSGSI.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vDate.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vTime.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vSSN.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vNum.js"> </SCRIPT>
 
 <FORM NAME="SOGSGSI" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
@@ -138,7 +138,7 @@
   </TR>
   <TR >
     <TD CLASS="strcol" >
-      A12. Oklahoma Lottery (Powerball, Mega Millions, Megaplier, Hot Lotto, Cash 5, Pick 3, scratch tickets and other “instant” games)
+      A12. Oklahoma Lottery (Powerball, Mega Millions, Megaplier, Hot Lotto, Cash 5, Pick 3, scratch tickets and other ï¿½instantï¿½ games)
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE="text" NAME="SOGSGSI_A12_1" VALUE="<<SOGSGSI_A12_1>>" ONFOCUS="select()" ONCHANGE="return validateLost(this.form,this);" SIZE="10" >
@@ -899,7 +899,7 @@
   <TR ><TD CLASS="port hdrtxt" COLSPAN="2" > INTERVIEWER SEVERITY RATING </TD></TR>
   <TR >
     <TD CLASS="strcol" >
-      41. How would you rate the patient’s need for gambling counseling?<BR>
+      41. How would you rate the patientï¿½s need for gambling counseling?<BR>
 0=None necessary to 9-treatment needed to intervene in a life threatening situation
     </TD>
     <TD CLASS="strcol" >

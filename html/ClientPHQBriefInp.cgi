@@ -1,9 +1,9 @@
 [[myHTML->newPage(%form+Client PHQBrief)]]
 
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/NoEnter.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vClientPHQBrief.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vDate.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/NoEnter.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vClientPHQBrief.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vDate.js"> </SCRIPT>
 
 <FORM NAME="ClientPHQBrief" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >

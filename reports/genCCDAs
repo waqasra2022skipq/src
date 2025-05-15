@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use Cwd;
 use DBI;
 use myForm;
@@ -39,7 +39,7 @@ sub report {
     #$pwd=cwd();
     #warn qq|genCCDAs: pwd=${pwd}\n|;
     my $cmd =
-qq|/var/www/okmis/src/cgi/bin/GenReport.cgi Name=GenerateCCDAs\&daterange=2yago\&InsID=100\&ClinicIDs=2501\&ProvIDs=2502\&DBNAME=$form->{DBNAME}\&mlt=$form->{mlt}|;
+qq|C:/xampp/htdocs/src/cgi/bin/GenReport.cgi Name=GenerateCCDAs\&daterange=2yago\&InsID=100\&ClinicIDs=2501\&ProvIDs=2502\&DBNAME=$form->{DBNAME}\&mlt=$form->{mlt}|;
     my $html = `${cmd}`;
     my $html = myHTML->close(1);
     return ($html);

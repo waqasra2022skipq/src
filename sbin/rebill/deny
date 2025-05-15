@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use Time::Local;
 my ( $sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst ) =
   localtime();

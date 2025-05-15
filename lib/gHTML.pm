@@ -54,7 +54,7 @@ null,|;
     }
     $script .= qq|\n)\n);
 </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/fillSelect.js" ></SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/fillSelect.js" ></SCRIPT>
 |;
 
     #warn qq|script=\n${script}\n|;
@@ -127,7 +127,7 @@ ${a0}
 ${a1})
 );
 </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/fillSelect.js" ></SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/fillSelect.js" ></SCRIPT>
 |;
 
     #warn qq|script=\n${script}\n|;
@@ -2898,31 +2898,30 @@ sub setLINKS {
     if ( $type =~ /back/i ) {
         if ( $form->{'Provider_ProvID'} && $form->{Provider_ProvID} ne 'new' ) {
             $html .= qq|
-      <A HREF="/cgi/bin/ChartList.cgi?Provider_ProvID=$form->{'LOGINPROVID'}&mlt=$form->{mlt}" TITLE="Click here to <BR>access your own Chart List. <BR>Make sure you commit any update first with the Add/Update button." ><IMG SRC="/images/MyNotes.gif" WIDTH="30" HEIGHT="30" BORDER="0" ></A>
-      <A HREF="/cgi/bin/ClientList.cgi?Provider_ProvID=$form->{'LOGINPROVID'}&mlt=$form->{mlt}" TITLE="Click here to <BR>access your own Client List. <BR>Make sure you commit any updates first with the Add/Update button." ><IMG SRC="/images/MyClients.gif" ALT="" WIDTH="30" HEIGHT="30" BORDER="0" ></A>
+      <A HREF="/src/cgi/bin/ChartList.cgi?Provider_ProvID=$form->{'LOGINPROVID'}&mlt=$form->{mlt}" TITLE="Click here to <BR>access your own Chart List. <BR>Make sure you commit any update first with the Add/Update button." ><IMG SRC="/src/images/MyNotes.gif" WIDTH="30" HEIGHT="30" BORDER="0" ></A>
+      <A HREF="/src/cgi/bin/ClientList.cgi?Provider_ProvID=$form->{'LOGINPROVID'}&mlt=$form->{mlt}" TITLE="Click here to <BR>access your own Client List. <BR>Make sure you commit any updates first with the Add/Update button." ><IMG SRC="/src/images/MyClients.gif" ALT="" WIDTH="30" HEIGHT="30" BORDER="0" ></A>
 |;
             if ( $form->{'LOGINPROVID'} != $form->{Provider_ProvID} ) {
                 $html .= qq|
-      <A HREF="/cgi/bin/ChartList.cgi?Provider_ProvID=$form->{'Provider_ProvID'}&mlt=$form->{mlt}" TITLE="Use this button to access the selected Providers Chart List. <BR>Make sure you commit any updates first with the Add/Update button." ><IMG SRC="/images/clipboard.gif" ALT="" WIDTH="30" HEIGHT="30" BORDER="0" ></A>
-      <A HREF="/cgi/bin/ClientList.cgi?Provider_ProvID=$form->{'Provider_ProvID'}&mlt=$form->{mlt}" TITLE="Use this button to access the selected Providers Client List. <BR>Make sure you commit any updates first with the Add/Update button." ><IMG SRC="/images/icon_folder.gif" ALT="" WIDTH="30" HEIGHT="30" BORDER="0" ></A>
+      <A HREF="/src/cgi/bin/ChartList.cgi?Provider_ProvID=$form->{'Provider_ProvID'}&mlt=$form->{mlt}" TITLE="Use this button to access the selected Providers Chart List. <BR>Make sure you commit any updates first with the Add/Update button." ><IMG SRC="/src/images/clipboard.gif" ALT="" WIDTH="30" HEIGHT="30" BORDER="0" ></A>
+      <A HREF="/src/cgi/bin/ClientList.cgi?Provider_ProvID=$form->{'Provider_ProvID'}&mlt=$form->{mlt}" TITLE="Use this button to access the selected Providers Client List. <BR>Make sure you commit any updates first with the Add/Update button." ><IMG SRC="/src/images/icon_folder.gif" ALT="" WIDTH="30" HEIGHT="30" BORDER="0" ></A>
 |;
             }
             $html .= qq|
-      <A HREF="/cgi/bin/ProviderPage.cgi?Provider_ProvID=$form->{'Provider_ProvID'}&mlt=$form->{mlt}" TITLE="Use this button to access the Provider Page. <BR>Make sure you commit any updates first with the Add/Update button." ><IMG SRC="/images/icon_profile.gif" ALT="" WIDTH="30" HEIGHT="30" BORDER="0" ></A>
+      <A HREF="/src/cgi/bin/ProviderPage.cgi?Provider_ProvID=$form->{'Provider_ProvID'}&mlt=$form->{mlt}" TITLE="Use this button to access the Provider Page. <BR>Make sure you commit any updates first with the Add/Update button." ><IMG SRC="/src/images/icon_profile.gif" ALT="" WIDTH="30" HEIGHT="30" BORDER="0" ></A>
 |;
         }
         if ( $form->{'Client_ClientID'} && $form->{Client_ClientID} ne 'new' ) {
             my $ClientPage =
-qq|/cgi/bin/ClientPage.cgi?Client_ClientID=$form->{Client_ClientID}&mlt=$form->{mlt}|;
+            qq| /src/cgi/bin/ClientPage.cgi?Client_ClientID=$form->{Client_ClientID}&mlt=$form->{mlt}|;
             $html .= qq|
-      <A HREF="/cgi/bin/ChartList.cgi?Client_ClientID=$form->{'Client_ClientID'}&mlt=$form->{mlt}" TITLE="Use this button to access this Clients Chart List. <BR>Make sure you commit any updates first with the Add/Update button." ><IMG SRC="/images/ClientCharts.gif" ALT="" WIDTH="30" HEIGHT="30" BORDER="0" ></A>
-      <A HREF="${ClientPage}" TITLE="Use this button to access the Client Page. <BR>Make sure you commit any updates first with the Add/Update button." ><IMG SRC="/images/icon_profile.gif" ALT="" WIDTH="30" HEIGHT="30" BORDER="0" ></A>
+      <A HREF="/src/cgi/bin/ChartList.cgi?Client_ClientID=$form->{'Client_ClientID'}&mlt=$form->{mlt}" TITLE="Use this button to access this Clients Chart List. <BR>Make sure you commit any updates first with the Add/Update button." ><IMG SRC="/src/images/ClientCharts.gif" ALT="" WIDTH="30" HEIGHT="30" BORDER="0" ></A>
+      <A HREF="${ClientPage}" TITLE="Use this button to access the Client Page. <BR>Make sure you commit any updates first with the Add/Update button." ><IMG SRC="/src/images/icon_profile.gif" ALT="" WIDTH="30" HEIGHT="30" BORDER="0" ></A>
 |;
         }
         $html .= qq|
-      <A HREF="/cgi/bin/mis.cgi?misPOP=${misPOP}&mlt=$form->{mlt}&misLINKS=$form->{misLINKS}" TITLE="Use this button to CANCEL and go back <BR>without making any updates." ><IMG SRC="|
-          . myConfig->cfgfile( 'undo_green.png', 1 )
-          . qq|" HEIGHT="30" WIDTH="40" BORDER="0" ></A>\n|;
+      <A HREF="/src/cgi/bin/mis.cgi?misPOP=${misPOP}&mlt=$form->{mlt}&misLINKS=$form->{misLINKS}" TITLE="Use this button to CANCEL and go back <BR>without making any updates." >
+      <IMG SRC="/src/img/basic/undo_green.png" HEIGHT="30" WIDTH="40" BORDER="0" ></A>\n|;
     }
     return ($html);
 }
@@ -3079,11 +3078,11 @@ sub misFeatures {
   <TR ><TD CLASS="port hdrcol" >Additional FEATUREs<BR>click on the links below for more information</TD></TR>
   <TR><TD CLASS="home" >
     <A HREF="javascript:ReportWindow('http://forms.okmis.com/misdocs/EmailReminders.htm','HelpWindow')" >Emailing Reminders</A> from the Administration->Set up Reminder menu option.
-    <A HREF="javascript:ReportWindow('http://forms.okmis.com/misdocs/EmailReminders.htm','HelpWindow')" ><IMG " HEIGHT="20" WIDTH="20" SRC="/images/ques.jpg" ALT="" BORDER="0" ></A>
+    <A HREF="javascript:ReportWindow('http://forms.okmis.com/misdocs/EmailReminders.htm','HelpWindow')" ><IMG " HEIGHT="20" WIDTH="20" SRC="/src/images/ques.jpg" ALT="" BORDER="0" ></A>
   </TD></TR>
   <TR><TD CLASS="home" >
     <A HREF="javascript:ReportWindow('http://forms.okmis.com/misdocs/SecureEmail.htm','HelpWindow')" >Secure Email within MIS</A> using the 'Email' icon under the date/time on the left side of your screen.
-    <A HREF="javascript:ReportWindow('http://forms.okmis.com/misdocs/SecureEmail.htm','HelpWindow')" ><IMG " HEIGHT="20" WIDTH="20" SRC="/images/ques.jpg" ALT="" BORDER="0" ></A>
+    <A HREF="javascript:ReportWindow('http://forms.okmis.com/misdocs/SecureEmail.htm','HelpWindow')" ><IMG " HEIGHT="20" WIDTH="20" SRC="/src/images/ques.jpg" ALT="" BORDER="0" ></A>
   </TD></TR>
 </TABLE>
 |;
@@ -3098,12 +3097,12 @@ sub misGuide {
   <TR CLASS="home" >
     <TD CLASS="strcol title" >
     Notes updated every 30 minutes.
-    <BR>Select <IMG SRC="/images/icon_folder.gif" ALT="Client-List by Provider" BORDER="0" > for Client list by Provider.
-    <BR>Select <IMG SRC="/images/clipboard.gif" ALT="Chart-List by Provider" BORDER="0" > for Chart list by Provider.
+    <BR>Select <IMG SRC="/src/images/icon_folder.gif" ALT="Client-List by Provider" BORDER="0" > for Client list by Provider.
+    <BR>Select <IMG SRC="/src/images/clipboard.gif" ALT="Chart-List by Provider" BORDER="0" > for Chart list by Provider.
     <BR>Click the <FONT COLOR=blue >Provider Name</FONT> for personal information.
     <BR>(Unreviewed/Unbilled) notes: A <FONT COLOR=red >Red Number</FONT> indicates attention needed.
     <BR>Click the <FONT COLOR=blue >Email Address</FONT> to email the provider.
-    <BR>Select <IMG SRC="/images/hideshow_infoshown.gif" ALT="Hide or Show Client-List" BORDER="0" > for list of active Clients assigned to this Provider.
+    <BR>Select <IMG SRC="/src/images/hideshow_infoshown.gif" ALT="Hide or Show Client-List" BORDER="0" > for list of active Clients assigned to this Provider.
     </TD>
   </TR>
 </TABLE>
@@ -3252,8 +3251,8 @@ sub rptSQL {
     }
 
     $html = qq|
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/tablesort.js"> </SCRIPT>
-<LINK HREF="/cgi/css/tablesort.css" REL="stylesheet" TYPE="text/css">
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/tablesort.js"> </SCRIPT>
+<LINK HREF="/src/cgi/css/tablesort.css" REL="stylesheet" TYPE="text/css">
 <TABLE class="chartsort table-autosort table-stripeclass:alternate">
 <THEAD>|;
     for ( $i = 0 ; $i <= $#colhdrs ; $i++ ) {
@@ -3294,9 +3293,9 @@ sub htmlReport {
     my @coljust = ();
     my @colsort = ();
     my $html    = qq|
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/utils.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/tablesort.js"> </SCRIPT>
-<LINK HREF="/cgi/css/tablesort.css" REL="stylesheet" TYPE="text/css">
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/utils.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/tablesort.js"> </SCRIPT>
+<LINK HREF="/src/cgi/css/tablesort.css" REL="stylesheet" TYPE="text/css">
 |;
     my $cnt = 0;
     foreach my $line ( split( "\n", $rpt ) ) {

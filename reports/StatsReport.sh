@@ -6,4 +6,4 @@
 ##\&ToDate=2019-08-31
 ##\&mlt=p49oUYHRSNga
 # from pp (ps command) for gpr
-#/var/www/okmis/src/reports/ClientStats DBNAME=okmis_gpr&mlt=xQB8iPd2ToGu&Type=&hdrline=3&output=html&AMSType=&Active=&ActivityName=&CQM=&ClientIDs=&ClinicIDs=&CronDay=&CronMonth=&CronTime=&CronWeek=&CustAgency=&Days=&Folder=&Format=&FromDate=&InsCode=&InsID=&ProvIDs=&ToDate=&daterange=last3m&sYearMonth=&ReportDescr=Quarterly Statistics by Note for Clients&xtable=&submit=1
+#C:/xampp/htdocs/src/reports/ClientStats DBNAME=okmis_gpr&mlt=xQB8iPd2ToGu&Type=&hdrline=3&output=html&AMSType=&Active=&ActivityName=&CQM=&ClientIDs=&ClinicIDs=&CronDay=&CronMonth=&CronTime=&CronWeek=&CustAgency=&Days=&Folder=&Format=&FromDate=&InsCode=&InsID=&ProvIDs=&ToDate=&daterange=last3m&sYearMonth=&ReportDescr=Quarterly Statistics by Note for Clients&xtable=&submit=1

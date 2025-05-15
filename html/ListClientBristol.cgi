@@ -1,6 +1,6 @@
 [[myHTML->newHTML(%form+THE BRISTOL ACTIVITIES OF DAILY LIVING SCALE+clock mail managertree collapseipad mismenu)]]
 
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/novalidate.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/novalidate.js"> </SCRIPT>
 
 <FORM NAME="BIMS" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ###########################################
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use DBI;
 use DBForm;
 use DBUtil;
@@ -15,7 +15,7 @@ chdir("$form->{DOCROOT}/tmp");
 # calls TrSum: uses pdf/CARS.pdt
 ##
 my $cmd =
-qq|/var/www/okmis/src/reports/TrSum DBNAME=$form->{DBNAME}\\&Type=cars\\&output=pdf\\&ClientCARSReview_ID=${ID}\\&sYearMonth=$form->{'YYYYMM'}\\&submit=1\\&mlt=$form->{mlt}|;
+qq|C:/xampp/htdocs/src/reports/TrSum DBNAME=$form->{DBNAME}\\&Type=cars\\&output=pdf\\&ClientCARSReview_ID=${ID}\\&sYearMonth=$form->{'YYYYMM'}\\&submit=1\\&mlt=$form->{mlt}|;
 
 #warn "cmd=$cmd\n";
 my $diskfile = DBUtil->ExecCmd( $cmd, '.err' );

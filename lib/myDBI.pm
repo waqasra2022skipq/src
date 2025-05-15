@@ -48,8 +48,9 @@ sub cleanup
     delete $CONNECTIONS->{$dbname};
   }
   $cnt++ if ( $dbhandle );
+
   $dbhandle->disconnect() if ( $dbhandle );
-  die "ERROR: $errmsg (myDBI::cleanup)\n" if ( $errmsg );
+  die "ERROR: $errmsg (myDBI::cleanup)\n" if ( 0 );
 #warn qq|myDBI: cleanup: cnt=${cnt}\n|;
 #warn qq|CHECK CONNECTIONS 2: \n|;
 #foreach my $f ( sort keys %{$CONNECTIONS} ) { foreach my $a ( sort keys %{$CONNECTIONS->{$f}} ) { warn qq|CONNECTIONS: $f-$a=$CONNECTIONS->{$f}->{$a}\n|; } }
@@ -81,7 +82,7 @@ sub error
     <TR VALIGN="center" >
       <FONT SIZE="+2" >
       <TD ALIGN="left" ><A HREF="$form->{HTTPSERVER}" TARGET="_top" >Home</A></TD>
-      <TD ALIGN="right" ><A HREF="/cgi/bin/mis.cgi?misPOP=1&mlt=$form->{mlt}&misLINKS=$form->{misLINKS}" TARGET="_top" >Back</A>
+      <TD ALIGN="right" ><A HREF="/src/cgi/bin/mis.cgi?misPOP=1&mlt=$form->{mlt}&misLINKS=$form->{misLINKS}" TARGET="_top" >Back</A>
       </FONT>
     </TR>
   </TABLE>
@@ -96,6 +97,7 @@ sub error
   }
 
   my $LOGDIR = myConfig->cfg('LOGDIR');
+  print($LOGDIR);
   open AERR, ">>${LOGDIR}/access_errors" or warn "Can't open errors file ($!).";
   $now = localtime();
   print AERR qq|\n$form->{LOGINUSERNAME}: ${msg} @ $now\n|;

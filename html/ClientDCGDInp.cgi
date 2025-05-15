@@ -1,9 +1,9 @@
 [[myHTML->newPage(%form+Client DCGD)]]
 
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/NoEnter.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vClientDCGD.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vDate.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/NoEnter.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vClientDCGD.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vDate.js"> </SCRIPT>
 
 <FORM NAME="ClientDCGD" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >

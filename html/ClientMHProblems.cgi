@@ -1,7 +1,7 @@
 [[myHTML->newPage(%form+Presenting Problems)]]
 
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vClientMHProblems.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vClientMHProblems.js"> </SCRIPT>
 
 <FORM NAME="Problems" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >

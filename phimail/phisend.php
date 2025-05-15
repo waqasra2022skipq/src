@@ -8,7 +8,7 @@
  * modified without the express written consent of EMR Direct, except as 
  * permitted by the DLA.
  */
-include ('/var/www/okmis/src/phimail/PhiMailConnector.php');
+include ('C:/xampp/htdocs/src/phimail/PhiMailConnector.php');
 
 /**
  *
@@ -44,7 +44,7 @@ class PhiMailExample {
 	    echo('argv2 = ' . $argv[2] . "\n");
 	    echo('outboundRecipient = ' . $outboundRecipient . "\n");
 
-            PhiMailConnector::setServerCertificate("/var/www/okmis/src/phimail/EMRDirectTestCA.pem");
+            PhiMailConnector::setServerCertificate("C:/xampp/htdocs/src/phimail/EMRDirectTestCA.pem");
             
             $c = new PhiMailConnector($phiMailServer, $phiMailPort);
             echo("inititated connector\n");

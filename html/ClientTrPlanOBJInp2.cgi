@@ -1,11 +1,11 @@
 [[myHTML->newHTML(%form+Objectives+allleft mismenu checkpopupwindow)]]
 
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vClientTrPlanOBJ.js"> </SCRIPT>
-<SCRIPT type="text/javascript" src="/cgi/js/ajaxrequest.js"></SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/mDate.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vDate.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vNum.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vClientTrPlanOBJ.js"> </SCRIPT>
+<SCRIPT type="text/javascript" src="/src/cgi/js/ajaxrequest.js"></SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/mDate.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vDate.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vNum.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript">
 function TPPG(e)
 { InputWindow('/cgi/bin/TPPG.cgi?mlt=<<<mlt>>>&id='+e,'ViewPG'); }

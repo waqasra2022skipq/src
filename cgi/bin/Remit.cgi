@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use DBI;
 use myForm;
 use myDBI;
@@ -54,11 +54,11 @@ sub html() {
       myHTML->newHTML( $form, 'Reconcile',
         'CheckPopupWindow noclock countdown_30' )
       . qq|
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/NoEnter.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
-<SCRIPT type="text/javascript" SRC="/cgi/js/ajaxrequest.js"></SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vDate.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vNum.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/NoEnter.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT type="text/javascript" SRC="/src/cgi/js/ajaxrequest.js"></SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vDate.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vNum.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" >
 function validate(form)
 {   

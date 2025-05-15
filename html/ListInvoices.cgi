@@ -1,6 +1,6 @@
 [[myHTML->newPage(%form+Client Invoices)]]
 
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/novalidate.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/novalidate.js"> </SCRIPT>
 <FORM NAME="ListInvoices" ACTION="/cgi/bin/genInvoices.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >

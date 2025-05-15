@@ -1,13 +1,13 @@
 [[myHTML->newPage(%form+Client ASI)]]
 [[[DBA->setClientASI(%form)]]]
 
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/NoEnter.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vClientASI.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vDate.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vTime.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vSSN.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vNum.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/NoEnter.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vClientASI.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vDate.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vTime.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vSSN.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vNum.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" > 
 function setSP(form,id,fld)
 {
@@ -216,7 +216,7 @@ function setSP(form,id,fld)
       <INPUT TYPE="radio" NAME="ClientASI_G19_1" VALUE=5 <<ClientASI_G19_1=5>> > Psychiatric Treatment<BR>
       <INPUT TYPE="radio" NAME="ClientASI_G19_1" VALUE=6 <<ClientASI_G19_1=6>> > Other:
       <INPUT TYPE="TEXT" NAME="ClientASI_G19T_1" VALUE="<<ClientASI_G19T_1>>" ONFOCUS="select()" SIZE=30>
-      <BR>· A place, theoretically, without access to drugs/alcohol.
+      <BR>ï¿½ A place, theoretically, without access to drugs/alcohol.
     </TD>
   </TR>
   <TR >
@@ -225,7 +225,7 @@ function setSP(form,id,fld)
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE=text NAME="ClientASI_G20_1" VALUE="<<ClientASI_G20_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,30);" SIZE="2" >
-      ·"0" if Question G19 is No.
+      ï¿½"0" if Question G19 is No.
       <BR>Refers to total number of days detained in the past 30 days.
     </TD>
   </TR>
@@ -289,7 +289,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       M1. How many times in your life have you been hospitalized for medical problems?
-      <BR>· Include O.D.'s and D.T.'s. Exclude detox, alcohol/drug, psychiatric treatment and childbirth (if no complications). Enter the number of overnight hospitalizations for medical problems.
+      <BR>ï¿½ Include O.D.'s and D.T.'s. Exclude detox, alcohol/drug, psychiatric treatment and childbirth (if no complications). Enter the number of overnight hospitalizations for medical problems.
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE=text NAME="ClientASI_M1_1" VALUE="<<ClientASI_M1_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,99);" SIZE="2" >
@@ -298,7 +298,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       M2. How long ago was your last hospitalization for a physical problem?
-      <BR>· If no hospitalizations in Question M1, then this is coded "NN".
+      <BR>ï¿½ If no hospitalizations in Question M1, then this is coded "NN".
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE=text NAME="ClientASI_M2Y_1" VALUE="<<ClientASI_M2Y_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,99,'NN');" SIZE="2" > Years
@@ -310,31 +310,31 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       M3. Do you have any chronic medical problems which continue to interfere with your life?
-      <BR>· A chronic medical condition is a serious physical condition that requires regular care, (i.e., medication, dietary restriction) preventing full advantage of their abilities.
+      <BR>ï¿½ A chronic medical condition is a serious physical condition that requires regular care, (i.e., medication, dietary restriction) preventing full advantage of their abilities.
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE="radio" NAME="ClientASI_M3_1" VALUE=0 <<ClientASI_M3_1=0>> > No
-      <INPUT TYPE="radio" NAME="ClientASI_M3_1" VALUE=1 <<ClientASI_M3_1=1>> > Yes · If "Yes", specify in comments.
+      <INPUT TYPE="radio" NAME="ClientASI_M3_1" VALUE=1 <<ClientASI_M3_1=1>> > Yes ï¿½ If "Yes", specify in comments.
     </TD>
   </TR>
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       M4. Are you taking any prescribed medication on a regular basis for a physical problem?
-      <BR>· Medication prescribed by a MD for medical conditions; not psychiatric medicines. Include medicines prescribed whether or not the patient is currently taking them. The intent is to verify chronic medical problems.
+      <BR>ï¿½ Medication prescribed by a MD for medical conditions; not psychiatric medicines. Include medicines prescribed whether or not the patient is currently taking them. The intent is to verify chronic medical problems.
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE="radio" NAME="ClientASI_M4_1" VALUE=0 <<ClientASI_M4_1=0>> > No
-      <INPUT TYPE="radio" NAME="ClientASI_M4_1" VALUE=1 <<ClientASI_M4_1=1>> > Yes · If Yes, specify in comments.
+      <INPUT TYPE="radio" NAME="ClientASI_M4_1" VALUE=1 <<ClientASI_M4_1=1>> > Yes ï¿½ If Yes, specify in comments.
     </TD>
   </TR>
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       M5. Do you receive a pension for a physical disability?
-      <BR>· Include Workers' compensation, exclude psychiatric disability.
+      <BR>ï¿½ Include Workers' compensation, exclude psychiatric disability.
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE="radio" NAME="ClientASI_M5_1" VALUE=0 <<ClientASI_M5_1=0>> > No
-      <INPUT TYPE="radio" NAME="ClientASI_M5_1" VALUE=1 <<ClientASI_M5_1=1>> > Yes · If Yes, specify in comments.
+      <INPUT TYPE="radio" NAME="ClientASI_M5_1" VALUE=1 <<ClientASI_M5_1=1>> > Yes ï¿½ If Yes, specify in comments.
     </TD>
   </TR>
     </TABLE></TD></TR>
@@ -342,7 +342,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       M6. How many days have you experienced medical problems in the past 30 days?
-      <BR>· Include flu, colds, etc. Include serious ailments related to drugs/alcohol, which would continue even if the patient were abstinent (e.g., cirrhosis of liver, abscesses from needles, etc.).
+      <BR>ï¿½ Include flu, colds, etc. Include serious ailments related to drugs/alcohol, which would continue even if the patient were abstinent (e.g., cirrhosis of liver, abscesses from needles, etc.).
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE=text NAME="ClientASI_M6_1" VALUE="<<ClientASI_M6_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,30);" SIZE="2" >
@@ -356,7 +356,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       M7. How troubled or bothered have you been by these medical problems in the past 30 days?
-      <BR>· Restrict response to problem days of Question M6.
+      <BR>ï¿½ Restrict response to problem days of Question M6.
     </TD>
     <TD CLASS="strcol" >
       <SELECT NAME="ClientASI_M7_1">[[DBA->selxTable(%form+xRateScale+<<ClientASI_M7_1>>+ID Descr)]]</SELECT> 
@@ -365,7 +365,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       M8. How important to you now is treatment for these medical problems?
-      <BR>· If client is currently receiving medical treatment, refer to the need for additional medical treatment by the patient.
+      <BR>ï¿½ If client is currently receiving medical treatment, refer to the need for additional medical treatment by the patient.
     </TD>
     <TD CLASS="strcol" >
       <SELECT NAME="ClientASI_M8_1">[[DBA->selxTable(%form+xRateScale+<<ClientASI_M8_1>>+ID Descr)]]</SELECT> 
@@ -381,7 +381,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       M9. How would you rate the patient's need for medical treatment?
-      <BR>· Refers to the patient's need for additional medical treatment.
+      <BR>ï¿½ Refers to the patient's need for additional medical treatment.
     </TD>
     <TD CLASS="strcol" >
       <SELECT NAME="ClientASI_M9_1" ONCHANGE="return setSP(this.form,'M9',this);" >[[DBA->selxTable(%form+xSeverityRatings+<<ClientASI_M9_1>>+ID Descr)]]</SELECT> 
@@ -429,8 +429,8 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       E1. Education completed:
-      <BR>· GED = 12 years, note in comments.
-      <BR>· Include formal education only.
+      <BR>ï¿½ GED = 12 years, note in comments.
+      <BR>ï¿½ Include formal education only.
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE=text NAME="ClientASI_E1Y_1" VALUE="<<ClientASI_E1Y_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,99);" SIZE="2" > Years
@@ -440,7 +440,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       E2. Training or Technical education completed:
-      <BR>· Formal/organized training only. For military training, only include training that can be used in civilian life (i.e., electronics, computers)
+      <BR>ï¿½ Formal/organized training only. For military training, only include training that can be used in civilian life (i.e., electronics, computers)
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE=text NAME="ClientASI_E2_1" VALUE="<<ClientASI_E2_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,99);" SIZE="2" > Months
@@ -451,7 +451,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       E3. Do you have a profession, trade, or skill?
-      <BR>· Employable, transferable skill acquired through training.
+      <BR>ï¿½ Employable, transferable skill acquired through training.
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE="radio" NAME="ClientASI_E3_1" VALUE=0 <<ClientASI_E3_1=0>> > No
@@ -461,7 +461,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >&nbsp;</TD>
     <TD CLASS="strcol" >
-      · If "Yes" (specify)
+      ï¿½ If "Yes" (specify)
       <INPUT TYPE="TEXT" NAME="ClientASI_E3T_1" VALUE="<<ClientASI_E3T_1>>" ONFOCUS="select()" SIZE=30>
     </TD>
   </TR>
@@ -473,17 +473,17 @@ function setSP(form,id,fld)
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE="radio" NAME="ClientASI_E4_1" VALUE=0 <<ClientASI_E4_1=0>> > No
-      <INPUT TYPE="radio" NAME="ClientASI_E4_1" VALUE=1 <<ClientASI_E4_1=1>> > Yes · Valid license; not suspended/revoked. 
+      <INPUT TYPE="radio" NAME="ClientASI_E4_1" VALUE=1 <<ClientASI_E4_1=1>> > Yes ï¿½ Valid license; not suspended/revoked. 
     </TD>
   </TR>
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       E5. Do you have an automobile available for use?
-      <BR> · Does not require ownership, only requires availability on a regular basis.
+      <BR> ï¿½ Does not require ownership, only requires availability on a regular basis.
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE="radio" NAME="ClientASI_E5_1" VALUE=0 <<ClientASI_E5_1=0>> > No
-      <INPUT TYPE="radio" NAME="ClientASI_E5_1" VALUE=1 <<ClientASI_E5_1=1>> > Yes · If answer to E4 is "No", then E5 must be "No". 
+      <INPUT TYPE="radio" NAME="ClientASI_E5_1" VALUE=1 <<ClientASI_E5_1=1>> > Yes ï¿½ If answer to E4 is "No", then E5 must be "No". 
     </TD>
   </TR>
     </TABLE></TD></TR>
@@ -491,7 +491,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       E6. How long was your longest full time job?
-      <BR>· Full time = 35+ hours weekly; does not necessarily mean most recent job.
+      <BR>ï¿½ Full time = 35+ hours weekly; does not necessarily mean most recent job.
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE=text NAME="ClientASI_E6Y_1" VALUE="<<ClientASI_E6Y_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,99);" SIZE="2" > Years
@@ -519,7 +519,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       E8. Does someone contribute to your support in any way?
-      <BR>· Is patient receiving any regular support (i.e., cash, food, housing) from family/friend. Include spouse's contribution; exclude support by an institution.
+      <BR>ï¿½ Is patient receiving any regular support (i.e., cash, food, housing) from family/friend. Include spouse's contribution; exclude support by an institution.
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE="radio" NAME="ClientASI_E8_1" VALUE=0 <<ClientASI_E8_1=0>> > No
@@ -531,7 +531,7 @@ function setSP(form,id,fld)
       E9. Does this constitute the majority of your support?
     </TD>
     <TD CLASS="strcol" >
-      <INPUT TYPE="radio" NAME="ClientASI_E9_1" VALUE=0 <<ClientASI_E9_1=0>> > No · If E8 is "No", then E9 is "N".
+      <INPUT TYPE="radio" NAME="ClientASI_E9_1" VALUE=0 <<ClientASI_E9_1=0>> > No ï¿½ If E8 is "No", then E9 is "N".
       <INPUT TYPE="radio" NAME="ClientASI_E9_1" VALUE=1 <<ClientASI_E9_1=1>> > Yes
     </TD>
   </TR>
@@ -540,7 +540,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       E10. Usual employment pattern, past three years?
-      <BR>· Answer should represent the majority of the last 3 years, not just the most recent selection. If there are equal times for more than one category, select that which best represents the current situation.
+      <BR>ï¿½ Answer should represent the majority of the last 3 years, not just the most recent selection. If there are equal times for more than one category, select that which best represents the current situation.
     </TD>
     <TD CLASS="strcol" >
       <SELECT NAME="ClientASI_E10_1">[[DBA->selxTable(%form+xEmployment+<<ClientASI_E10_1>>+ID Descr)]]</SELECT> 
@@ -551,7 +551,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       E11. How many days were you paid for working in the past 30?
-      <BR>· Include "under the table" work, paid sick days and vacation.
+      <BR>ï¿½ Include "under the table" work, paid sick days and vacation.
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE=text NAME="ClientASI_E11_1" VALUE="<<ClientASI_E11_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,30);" SIZE="2" >
@@ -570,7 +570,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       E12. Employment?
-      <BR>· Net or "take home" pay, include any "under the table" money.
+      <BR>ï¿½ Net or "take home" pay, include any "under the table" money.
     </TD>
     <TD CLASS="strcol" >
       $<INPUT TYPE=text NAME="ClientASI_E12_1" VALUE="<<ClientASI_E12_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,99999);" SIZE="12" >
@@ -587,7 +587,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       E14. Welfare?
-      <BR>· Include food stamps, transportation money provided by an agency to go to and from treatment.
+      <BR>ï¿½ Include food stamps, transportation money provided by an agency to go to and from treatment.
     </TD>
     <TD CLASS="strcol" >
       $<INPUT TYPE=text NAME="ClientASI_E14_1" VALUE="<<ClientASI_E14_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,99999);" SIZE="12" >
@@ -596,7 +596,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       E15. Pensions, benefits or Social Security?
-      <BR>· Include disability, pensions, retirement, veteran's benefits, SSI & workers' compensation.
+      <BR>ï¿½ Include disability, pensions, retirement, veteran's benefits, SSI & workers' compensation.
     </TD>
     <TD CLASS="strcol" >
       $<INPUT TYPE=text NAME="ClientASI_E15_1" VALUE="<<ClientASI_E15_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,99999);" SIZE="12" >
@@ -605,7 +605,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       E16. Mate, family, or friends?
-      <BR>· Money for personal expenses, (i.e. clothing), include unreliable sources of income.  Record cash payments only, include windfalls (unexpected), money from loans, legal gambling, inheritance, tax returns, etc.).
+      <BR>ï¿½ Money for personal expenses, (i.e. clothing), include unreliable sources of income.  Record cash payments only, include windfalls (unexpected), money from loans, legal gambling, inheritance, tax returns, etc.).
     </TD>
     <TD CLASS="strcol" >
       $<INPUT TYPE=text NAME="ClientASI_E16_1" VALUE="<<ClientASI_E16_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,99999);" SIZE="12" >
@@ -616,7 +616,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       E17. Illegal?
-      <BR>· Cash obtained from drug dealing, stealing, fencing stolen goods, illegal gambling, prostitution, etc. Do not attempt to convert drugs exchanged to a dollar value.
+      <BR>ï¿½ Cash obtained from drug dealing, stealing, fencing stolen goods, illegal gambling, prostitution, etc. Do not attempt to convert drugs exchanged to a dollar value.
     </TD>
     <TD CLASS="strcol" >
       $<INPUT TYPE=text NAME="ClientASI_E17_1" VALUE="<<ClientASI_E17_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,99999);" SIZE="12" >
@@ -627,7 +627,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       E18. How many people depend on you for the majority of their food, shelter, etc.?
-      <BR>· Must be regularly depending on patient, do include alimony/child support, do not include the patient or self-supporting spouse, etc.
+      <BR>ï¿½ Must be regularly depending on patient, do include alimony/child support, do not include the patient or self-supporting spouse, etc.
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE=text NAME="ClientASI_E18_1" VALUE="<<ClientASI_E18_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,30);" SIZE="2" >
@@ -638,7 +638,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       E19. How many days have you experienced employment problems in the past 30?
-      <BR>· Include inability to find work, if they are actively looking for work, or problems with present job in which that job is jeopardized.
+      <BR>ï¿½ Include inability to find work, if they are actively looking for work, or problems with present job in which that job is jeopardized.
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE=text NAME="ClientASI_E19_1" VALUE="<<ClientASI_E19_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,30);" SIZE="2" >
@@ -652,7 +652,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       E20. How troubled or bothered have you been by these employment problems in the past 30 days?
-      <BR>· If the patient has been incarcerated or detained during the past 30 days, they cannot have employment problems.  In that case an "N" response is indicated.
+      <BR>ï¿½ If the patient has been incarcerated or detained during the past 30 days, they cannot have employment problems.  In that case an "N" response is indicated.
     </TD>
     <TD CLASS="strcol" >
       <SELECT NAME="ClientASI_E20_1">[[DBA->selxTable(%form+xRateScale+<<ClientASI_E20_1>>+ID Descr)]]</SELECT> 
@@ -661,7 +661,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       E21. How important to you now is counseling for these employment problems?
-      <BR>· Stress help in finding or preparing for a job, not giving them a job.
+      <BR>ï¿½ Stress help in finding or preparing for a job, not giving them a job.
     </TD>
     <TD CLASS="strcol" >
       <SELECT NAME="ClientASI_E21_1">[[DBA->selxTable(%form+xRateScale+<<ClientASI_E21_1>>+ID Descr)]]</SELECT> 
@@ -729,7 +729,7 @@ function setSP(form,id,fld)
     <TD CLASS="strcol" COLSPAN="4" >
       Route of Administration Types: 1. Oral 2. Nasal 3. Smoking 4. Non-IV injection 5. IV
       <BR>
-      · Note the usual or most recent route. For more than one route, choose the most severe. The routes are listed from least severe to most severe.
+      ï¿½ Note the usual or most recent route. For more than one route, choose the most severe. The routes are listed from least severe to most severe.
     </TD>
   </TR>
   <TR >
@@ -931,7 +931,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       D14. According to the interviewer, which substance(s) is/are the major problem?
-      <BR>· Interviewer should determine the major drug or drugs of abuse. Code the number next to the drug in questions 01-12, or "00" = no problem, "15" = alcohol & one or more drugs, "16" = more than one drug but no alcohol. Ask patient when not clear.
+      <BR>ï¿½ Interviewer should determine the major drug or drugs of abuse. Code the number next to the drug in questions 01-12, or "00" = no problem, "15" = alcohol & one or more drugs, "16" = more than one drug but no alcohol. Ask patient when not clear.
     </TD>
     <TD CLASS="strcol" COLSPAN="3" >
       <INPUT TYPE=text NAME="ClientASI_D14_1" VALUE="<<ClientASI_D14_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,16);" SIZE="2" >
@@ -940,7 +940,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       D15. How long was your last period of voluntary abstinence from this major substance?
-      <BR>· Last attempt of at least one month, not necessarily Mos.  the longest. Periods of hospitalization/incarceration do not count.  Periods of antabuse, methadone, or naltrexone use during abstinence do count.  ·"00" = never abstinent
+      <BR>ï¿½ Last attempt of at least one month, not necessarily Mos.  the longest. Periods of hospitalization/incarceration do not count.  Periods of antabuse, methadone, or naltrexone use during abstinence do count.  ï¿½"00" = never abstinent
     </TD>
     <TD CLASS="strcol" COLSPAN="3" >
       <INPUT TYPE=text NAME="ClientASI_D15_1" VALUE="<<ClientASI_D15_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,99);" SIZE="2" > Months
@@ -952,8 +952,8 @@ function setSP(form,id,fld)
     </TD>
     <TD CLASS="strcol" COLSPAN="3" >
       <INPUT TYPE=text NAME="ClientASI_D16_1" VALUE="<<ClientASI_D16_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,99,'NN');" SIZE="2" > Months
-      <BR>· If D15 = "00" then D16 = "NN" Months.
-      <BR>· "00" = still abstinent.
+      <BR>ï¿½ If D15 = "00" then D16 = "NN" Months.
+      <BR>ï¿½ "00" = still abstinent.
     </TD>
   </TR>
   </TABLE></TD></TR>
@@ -966,7 +966,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       D17. Alcohol DT's?
-      <BR>· Delirium Tremens (DT's): Occur 24-48 hours after last drink, or significant decrease in alcohol intake, shaking, severe disorientation, fever, hallucinations, they usually require medical attention.
+      <BR>ï¿½ Delirium Tremens (DT's): Occur 24-48 hours after last drink, or significant decrease in alcohol intake, shaking, severe disorientation, fever, hallucinations, they usually require medical attention.
     </TD>
     <TD CLASS="strcol" COLSPAN="3" >
       <INPUT TYPE=text NAME="ClientASI_D17_1" VALUE="<<ClientASI_D17_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,99);" SIZE="2" >
@@ -975,7 +975,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       D18 Overdosed on Drugs?
-      <BR>· Overdoses (OD): Requires intervention by someone to recover, not simply sleeping it off, include suicide attempts by OD.
+      <BR>ï¿½ Overdoses (OD): Requires intervention by someone to recover, not simply sleeping it off, include suicide attempts by OD.
     </TD>
     <TD CLASS="strcol" COLSPAN="3" >
       <INPUT TYPE=text NAME="ClientASI_D18_1" VALUE="<<ClientASI_D18_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,99);" SIZE="2" >
@@ -994,7 +994,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       D19. Alcohol abuse?
-      <BR>·Include detoxification, halfway houses, in/outpatient counseling, and AA (if 3+ meetings within one month period).
+      <BR>ï¿½Include detoxification, halfway houses, in/outpatient counseling, and AA (if 3+ meetings within one month period).
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE=text NAME="ClientASI_D19_1" VALUE="<<ClientASI_D19_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,99);" SIZE="2" >
@@ -1037,7 +1037,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       D20. Drug abuse?
-      <BR>· Include detoxification, halfway houses, in/outpatient counseling, and NA (if 3+ meetings within one month period).
+      <BR>ï¿½ Include detoxification, halfway houses, in/outpatient counseling, and NA (if 3+ meetings within one month period).
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE=text NAME="ClientASI_D20_1" VALUE="<<ClientASI_D20_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,99);" SIZE="2" >
@@ -1051,7 +1051,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       D22. Drugs?
-      <BR>· If D19 = "00", then question D21 is "NN" If D20 = "00", then question D22 is "NN"
+      <BR>ï¿½ If D19 = "00", then question D21 is "NN" If D20 = "00", then question D22 is "NN"
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE=text NAME="ClientASI_D22_1" VALUE="<<ClientASI_D22_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,99,'NN');" SIZE="2" >
@@ -1065,7 +1065,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       D24. Drugs?
-      <BR>· Only count actual money spent. What is the financial burden caused by drugs/alcohol?
+      <BR>ï¿½ Only count actual money spent. What is the financial burden caused by drugs/alcohol?
     </TD>
     <TD CLASS="strcol" >
       $<INPUT TYPE=text NAME="ClientASI_D24_1" VALUE="<<ClientASI_D24_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,99999);" SIZE="12" >
@@ -1079,7 +1079,7 @@ function setSP(form,id,fld)
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE=text NAME="ClientASI_D25_1" VALUE="<<ClientASI_D25_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,30);" SIZE="2" >
-      <BR>· Include AA/NA
+      <BR>ï¿½ Include AA/NA
     </TD>
   </TR>
   </TABLE></TD></TR>
@@ -1092,7 +1092,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       D26. Alcohol problems?
-      · Include: Craving, withdrawal symptoms, disturbing effects of use, or wanting to stop and being unable to.
+      ï¿½ Include: Craving, withdrawal symptoms, disturbing effects of use, or wanting to stop and being unable to.
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE=text NAME="ClientASI_D26_1" VALUE="<<ClientASI_D26_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,30);" SIZE="2" >
@@ -1112,7 +1112,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       D28. Alcohol problems?</TD>
-      <BR>· Include: Craving, withdrawal symptoms, disturbing effects of use, or wanting to stop and being unable to.
+      <BR>ï¿½ Include: Craving, withdrawal symptoms, disturbing effects of use, or wanting to stop and being unable to.
     <TD CLASS="strcol" >
       <SELECT NAME="ClientASI_D28_1">[[DBA->selxTable(%form+xRateScale+<<ClientASI_D28_1>>+ID Descr)]]</SELECT> 
     </TD>
@@ -1142,7 +1142,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       D27. Drug problems?
-      <BR>· Include: Craving, withdrawal symptoms, disturbing effects of use, or wanting to stop and being unable to.
+      <BR>ï¿½ Include: Craving, withdrawal symptoms, disturbing effects of use, or wanting to stop and being unable to.
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE=text NAME="ClientASI_D27_1" VALUE="<<ClientASI_D27_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,30);" SIZE="2" >
@@ -1256,7 +1256,7 @@ function setSP(form,id,fld)
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE="radio" NAME="ClientASI_L1_1" VALUE=0 <<ClientASI_L1_1=0>> > No
-      <INPUT TYPE="radio" NAME="ClientASI_L1_1" VALUE=1 <<ClientASI_L1_1=1>> > Yes · Judge, probation/parole officer, etc.
+      <INPUT TYPE="radio" NAME="ClientASI_L1_1" VALUE=1 <<ClientASI_L1_1=1>> > Yes ï¿½ Judge, probation/parole officer, etc.
     </TD>
   </TR>
   <TR >
@@ -1265,7 +1265,7 @@ function setSP(form,id,fld)
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE="radio" NAME="ClientASI_L2_1" VALUE=0 <<ClientASI_L2_1=0>> > No
-      <INPUT TYPE="radio" NAME="ClientASI_L2_1" VALUE=1 <<ClientASI_L2_1=1>> > Yes · Note duration and level in comments. 
+      <INPUT TYPE="radio" NAME="ClientASI_L2_1" VALUE=1 <<ClientASI_L2_1=1>> > Yes ï¿½ Note duration and level in comments. 
     </TD>
   </TR>
   </TABLE></TD></TR>
@@ -1348,8 +1348,8 @@ function setSP(form,id,fld)
   </TR>
   <TR >
     <TD CLASS="strcol" COLSPAN="2" >
-· Include total number of counts, not just convictions. Do not include juvenile (pre-age 18) crimes, unless they were charged as an adult.
-· Include formal charges only.
+ï¿½ Include total number of counts, not just convictions. Do not include juvenile (pre-age 18) crimes, unless they were charged as an adult.
+ï¿½ Include formal charges only.
     </TD>
   </TR>
   </TABLE></TD></TR>
@@ -1357,9 +1357,9 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       L17. How many of these charges resulted in convictions?
-      <BR>· If L3-16 = 00, then question L17 = "NN".
-      <BR>· Do not include misdemeanor offenses from questions L18-20 below.
-      <BR>· Convictions include fines, probation, incarcerations, suspended sentences, guilty pleas, and plea bargaining.
+      <BR>ï¿½ If L3-16 = 00, then question L17 = "NN".
+      <BR>ï¿½ Do not include misdemeanor offenses from questions L18-20 below.
+      <BR>ï¿½ Convictions include fines, probation, incarcerations, suspended sentences, guilty pleas, and plea bargaining.
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE=text NAME="ClientASI_L17_1" VALUE="<<ClientASI_L17_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,99,'NN');" SIZE="2" >
@@ -1391,7 +1391,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       L20. Major driving violations?
-      <BR>· Moving violations: speeding, reckless driving, no license, etc.
+      <BR>ï¿½ Moving violations: speeding, reckless driving, no license, etc.
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE=text NAME="ClientASI_L20_1" VALUE="<<ClientASI_L20_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,99);" SIZE="2" >
@@ -1402,7 +1402,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       L21 How many months were you incarcerated in your life?
-      <BR>· If incarcerated 2 weeks or more, round this up to 1 month. List total number of months incarcerated.
+      <BR>ï¿½ If incarcerated 2 weeks or more, round this up to 1 month. List total number of months incarcerated.
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE=text NAME="ClientASI_L21_1" VALUE="<<ClientASI_L21_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,9999);" SIZE="2" >
@@ -1411,7 +1411,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       L22. How long was your last incarceration?
-      <BR>· Of 2 weeks or more. Enter "NN" if never incarcerated.
+      <BR>ï¿½ Of 2 weeks or more. Enter "NN" if never incarcerated.
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE=text NAME="ClientASI_L22_1" VALUE="<<ClientASI_L22_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,999,'NN');" SIZE="2" >
@@ -1420,7 +1420,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       L23. What was it for?
-      <BR>· Use code 03-16, 18-20. If multiple charges, choose most severe. Enter "NN" if never incarcerated.
+      <BR>ï¿½ Use code 03-16, 18-20. If multiple charges, choose most severe. Enter "NN" if never incarcerated.
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE=text NAME="ClientASI_L23_1" VALUE="<<ClientASI_L23_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,999,'NN');" SIZE="2" >
@@ -1440,8 +1440,8 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       L25. What for?
-      <BR>· Use the number of the type of crime committed: 03-16 and 18-20
-      <BR>· Refers to Q. L24. If more than one, choose most severe.
+      <BR>ï¿½ Use the number of the type of crime committed: 03-16 and 18-20
+      <BR>ï¿½ Refers to Q. L24. If more than one, choose most severe.
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE=text NAME="ClientASI_L25_1" VALUE="<<ClientASI_L25_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,20);" SIZE="2" >
@@ -1455,7 +1455,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       L26. How many days in the past 30, were you detained or incarcerated?
-      <BR>· Include being arrested and released on the same day.
+      <BR>ï¿½ Include being arrested and released on the same day.
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE=text NAME="ClientASI_L26_1" VALUE="<<ClientASI_L26_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,30);" SIZE="2" >
@@ -1464,7 +1464,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       L27. How many days in the past 30 have you engaged in illegal activities for profit?
-      <BR>· Exclude simple drug possession. Include drug dealing, prostitution, selling stolen goods, etc. May be cross checked with Question E17 under Employment/Family Support Section.
+      <BR>ï¿½ Exclude simple drug possession. Include drug dealing, prostitution, selling stolen goods, etc. May be cross checked with Question E17 under Employment/Family Support Section.
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE=text NAME="ClientASI_L27_1" VALUE="<<ClientASI_L27_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,30);" SIZE="2" >
@@ -1480,7 +1480,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       L28. How serious do you feel your present legal problems are?
-      <BR>· Exclude civil problems
+      <BR>ï¿½ Exclude civil problems
     </TD>
     <TD CLASS="strcol" >
       <SELECT NAME="ClientASI_L28_1">[[DBA->selxTable(%form+xRateScale+<<ClientASI_L28_1>>+ID Descr)]]</SELECT> 
@@ -1489,7 +1489,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       L29. How important to you now is counseling or referral for these legal problems?
-      <BR>· Patient is rating a need for referral to legal counsel for defense against criminal charges.
+      <BR>ï¿½ Patient is rating a need for referral to legal counsel for defense against criminal charges.
     </TD>
     <TD CLASS="strcol" >
       <SELECT NAME="ClientASI_L29_1">[[DBA->selxTable(%form+xRateScale+<<ClientASI_L29_1>>+ID Descr)]]</SELECT> 
@@ -1756,7 +1756,7 @@ function setSP(form,id,fld)
       <BR>1 = Clearly Yes for any relatives in that category 
       <BR>X = Uncertain or don't know
       <BR>N = Never was a relative
-      <BR>·In cases where there is more than one person for a category, record the occurrence of problems for any in that group. Accept the patient's judgment on these questions.
+      <BR>ï¿½In cases where there is more than one person for a category, record the occurrence of problems for any in that group. Accept the patient's judgment on these questions.
     </TD>
   </TR>
   </TABLE></TD></TR>
@@ -1767,7 +1767,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       F1. Marital Status:
-      <BR>· Common-law marriage = 1. Specify in comments.
+      <BR>ï¿½ Common-law marriage = 1. Specify in comments.
     </TD>
     <TD CLASS="strcol" >
       <SELECT NAME="ClientASI_F1_1">[[DBA->selxTable(%form+xMaritalStat+<<ClientASI_F1_1>>+ID Descr)]]</SELECT> 
@@ -1776,7 +1776,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       F2. How long have you been in this marital status (Q #F1)?
-      <BR>· If never married, then since age 18.
+      <BR>ï¿½ If never married, then since age 18.
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE=text NAME="ClientASI_F2Y_1" VALUE="<<ClientASI_F2Y_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,99);" SIZE="2" > Years
@@ -1786,8 +1786,8 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       F3. Are you satisfied with this situation?
-      <BR>· Satisfied = generally liking the situation.
-      <BR>· Refers to Questions F1 & F2.
+      <BR>ï¿½ Satisfied = generally liking the situation.
+      <BR>ï¿½ Refers to Questions F1 & F2.
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE="radio" NAME="ClientASI_F3_1" VALUE=0 <<ClientASI_F3_1=0>> > No
@@ -1800,7 +1800,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       F4. Usual living arrangements (past 3 years):
-      <BR>· Choose arrangements most representative of the past 3 years. If there is an even split in time between these arrangements, choose the most recent arrangement.
+      <BR>ï¿½ Choose arrangements most representative of the past 3 years. If there is an even split in time between these arrangements, choose the most recent arrangement.
     </TD>
     <TD CLASS="strcol" >
       <SELECT NAME="ClientASI_F4_1">[[DBA->selxTable(%form+xLivingArrASI+<<ClientASI_F4_1>>+ID Descr)]]</SELECT> 
@@ -1809,8 +1809,8 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       F5. How long have you lived in these arrangements?
-      <BR>· If with parents or family, since age 18.
-      <BR>· Code years and months living in arrangements from Question F4.
+      <BR>ï¿½ If with parents or family, since age 18.
+      <BR>ï¿½ Code years and months living in arrangements from Question F4.
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE=text NAME="ClientASI_F5Y_1" VALUE="<<ClientASI_F5Y_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,99);" SIZE="2" > Years
@@ -1858,7 +1858,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       F9. With whom do you spend most of your free time?
-      <BR>· If a girlfriend/boyfriend is considered as family by patient, then they must refer to them as family throughout this section, not a friend.
+      <BR>ï¿½ If a girlfriend/boyfriend is considered as family by patient, then they must refer to them as family throughout this section, not a friend.
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE="radio" NAME="ClientASI_F9_1" VALUE=1 <<ClientASI_F9_1=1>> > Family
@@ -1869,7 +1869,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       F10. Are you satisfied with spending your free time this way? 
-      <BR>· A satisfied response must indicate that the person generally likes the situation. Referring to Question F9.
+      <BR>ï¿½ A satisfied response must indicate that the person generally likes the situation. Referring to Question F9.
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE="radio" NAME="ClientASI_F10_1" VALUE=0 <<ClientASI_F10_1=0>> > No
@@ -1882,7 +1882,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       F11. How many close friends do you have?
-      <BR>· Stress that you mean close. Exclude family members. These are "reciprocal" relationships or mutually supportive relationships.
+      <BR>ï¿½ Stress that you mean close. Exclude family members. These are "reciprocal" relationships or mutually supportive relationships.
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE=text NAME="ClientASI_F11_1" VALUE="<<ClientASI_F11_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,9);" SIZE="2" >
@@ -1945,7 +1945,7 @@ function setSP(form,id,fld)
       <BR>1 = Clearly Yes for any in class 
       <BR>X = Uncertain or "I don't know
       <BR>N = Never was a relative
-      <BR>· By reciprocal, you mean "that you would do anything you could to help them out and vice versa".
+      <BR>ï¿½ By reciprocal, you mean "that you would do anything you could to help them out and vice versa".
     </TD>
   </TR>
     </TABLE></TD></TR>
@@ -2087,8 +2087,8 @@ function setSP(form,id,fld)
   </TR>
   <TR >
     <TD CLASS="strcol" COLSPAN="3" >
-      · "Serious problems" mean those that endangered the relationship.
-      <BR>· A "problem" requires contact of some sort, either by telephone or in person. If no contact code "N"
+      ï¿½ "Serious problems" mean those that endangered the relationship.
+      <BR>ï¿½ A "problem" requires contact of some sort, either by telephone or in person. If no contact code "N"
     </TD>
   </TR>
   </TABLE></TD></TR>
@@ -2110,7 +2110,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       F27. Emotionally?
-      · Made you feel bad through harsh words.
+      ï¿½ Made you feel bad through harsh words.
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE="radio" NAME="ClientASI_F27D_1" VALUE=0 <<ClientASI_F27D_1=0>> > No
@@ -2124,7 +2124,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       F28. Physically?
-      · Caused you physical harm.
+      ï¿½ Caused you physical harm.
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE="radio" NAME="ClientASI_F28D_1" VALUE=0 <<ClientASI_F28D_1=0>> > No
@@ -2138,7 +2138,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       F29. Sexually?
-      · Forced sexual advances/acts.
+      ï¿½ Forced sexual advances/acts.
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE="radio" NAME="ClientASI_F29D_1" VALUE=0 <<ClientASI_F29D_1=0>> > No
@@ -2190,7 +2190,7 @@ function setSP(form,id,fld)
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       F34. Family problems
-      <BR>· Patient is rating his/her need for counseling for family problems, not whether they would be willing to attend.
+      <BR>ï¿½ Patient is rating his/her need for counseling for family problems, not whether they would be willing to attend.
     </TD>
     <TD CLASS="strcol" COLSPAN="2" >
       <SELECT NAME="ClientASI_F34_1">[[DBA->selxTable(%form+xRateScale+<<ClientASI_F34_1>>+ID Descr)]]</SELECT> 
@@ -2237,7 +2237,7 @@ How important to you now is treatment or counseling for these:
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       F35. Social problems
-      <BR>· Include patient's need to seek treatment for such social problems as loneliness, inability to socialize, and dissatisfaction with friends. Patient rating should refer to dissatisfaction, conflicts, or other serious problems.
+      <BR>ï¿½ Include patient's need to seek treatment for such social problems as loneliness, inability to socialize, and dissatisfaction with friends. Patient rating should refer to dissatisfaction, conflicts, or other serious problems.
     </TD>
     <TD CLASS="strcol" COLSPAN="2" >
       <SELECT NAME="ClientASI_F35_1">[[DBA->selxTable(%form+xRateScale+<<ClientASI_F35_1>>+ID Descr)]]</SELECT> 
@@ -2317,11 +2317,11 @@ F38. Patient's inability to understand?
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       P2. Outpatient/private patient?
-      <BR>· Do not include substance abuse, employment, or family counseling. Treatment episode = a series of more or less continuous visits or treatment days, not the number of visits or treatment days.
+      <BR>ï¿½ Do not include substance abuse, employment, or family counseling. Treatment episode = a series of more or less continuous visits or treatment days, not the number of visits or treatment days.
     </TD>
     <TD CLASS="strcol" COLSPAN="2" >
       <INPUT TYPE=text NAME="ClientASI_P2_1" VALUE="<<ClientASI_P2_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,99);" SIZE="2" >
-      <BR>· Enter diagnosis in comments if known.
+      <BR>ï¿½ Enter diagnosis in comments if known.
     </TD>
   </TR>
   </TABLE></TD></TR>
@@ -2379,7 +2379,7 @@ F38. Patient's inability to understand?
   </TR>
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
-      P6. Experienced hallucinations-saw things/heard voices that others didn’t see/hear?
+      P6. Experienced hallucinations-saw things/heard voices that others didnï¿½t see/hear?
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE="radio" NAME="ClientASI_P6D_1" VALUE=0 <<ClientASI_P6D_1=0>> > No
@@ -2422,7 +2422,7 @@ F38. Patient's inability to understand?
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       P8. Experienced trouble controlling violent behavior including episodes of rage, or violence?
-      <BR>· Patient can be under the influence of alcohol / drugs.
+      <BR>ï¿½ Patient can be under the influence of alcohol / drugs.
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE="radio" NAME="ClientASI_P8D_1" VALUE=0 <<ClientASI_P8D_1=0>> > No
@@ -2436,7 +2436,7 @@ F38. Patient's inability to understand?
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       P9. Experienced serious thoughts of suicide?
-      <BR>· Patient seriously considered a plan for taking his/her life. Patient can be under the influence of alcohol/drugs.
+      <BR>ï¿½ Patient seriously considered a plan for taking his/her life. Patient can be under the influence of alcohol/drugs.
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE="radio" NAME="ClientASI_P9D_1" VALUE=0 <<ClientASI_P9D_1=0>> > No
@@ -2450,8 +2450,8 @@ F38. Patient's inability to understand?
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       P10. Attempted suicide?
-      <BR>· Include actual suicidal gestures or attempts.
-      <BR>· Patient can be under the influence of alcohol / drugs.
+      <BR>ï¿½ Include actual suicidal gestures or attempts.
+      <BR>ï¿½ Patient can be under the influence of alcohol / drugs.
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE="radio" NAME="ClientASI_P10D_1" VALUE=0 <<ClientASI_P10D_1=0>> > No
@@ -2467,7 +2467,7 @@ F38. Patient's inability to understand?
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       P11. Been prescribed medication for any psychological or emotional problems?
-      <BR>· Prescribed for the patient by a physician. Record "Yes" if a medication was prescribed even if the patient is not taking it.
+      <BR>ï¿½ Prescribed for the patient by a physician. Record "Yes" if a medication was prescribed even if the patient is not taking it.
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE="radio" NAME="ClientASI_P11D_1" VALUE=0 <<ClientASI_P11D_1=0>> > No
@@ -2483,7 +2483,7 @@ F38. Patient's inability to understand?
   <TR >
     <TD CLASS="strcol" WIDTH="60%" >
       P12. How many days in the past 30 have you experienced these psychological or emotional problems?
-      <BR>· This refers to problems noted in Questions P4-P10.
+      <BR>ï¿½ This refers to problems noted in Questions P4-P10.
     </TD>
     <TD CLASS="strcol" COLSPAN="2" >
       <INPUT TYPE=text NAME="ClientASI_P12_1" VALUE="<<ClientASI_P12_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,30);" SIZE="2" >
@@ -2500,7 +2500,7 @@ F38. Patient's inability to understand?
     </TD>
     <TD CLASS="strcol" COLSPAN="2" >
       <SELECT NAME="ClientASI_P13_1">[[DBA->selxTable(%form+xRateScale+<<ClientASI_P13_1>>+ID Descr)]]</SELECT> 
-      · Patient should be rating the problem days from Question P12.
+      ï¿½ Patient should be rating the problem days from Question P12.
     </TD>
   </TR>
   <TR >

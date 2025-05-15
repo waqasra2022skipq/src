@@ -1,8 +1,8 @@
 [[myHTML->newPage(%form+Electonic Documents)]]
 
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/NoEnter.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vProviderEDocs.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/NoEnter.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vProviderEDocs.js"> </SCRIPT>
 
 <FORM NAME="ProviderEDocs" METHOD=POST ACTION="/cgi/bin/mis.cgi" > 
 <TABLE CLASS="main fullsize" >

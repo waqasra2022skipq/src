@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use CGI qw(:standard escape);
 use DBI;
 use myForm;
@@ -370,11 +370,11 @@ my $html = myHTML->new($form) . qq|
     <TD WIDTH="84%" ALIGN="center" >
 | . myHTML->hdr($form) . myHTML->menu($form) . qq|
 <FORM NAME="ChartList" ACTION="/cgi/bin/ChartList.cgi" METHOD="POST" >
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vChartList.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vNum.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/tablesort.js"> </SCRIPT>
-<LINK HREF="/cgi/css/tablesort.css" REL="stylesheet" TYPE="text/css">
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vChartList.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vNum.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/tablesort.js"> </SCRIPT>
+<LINK HREF="/src/cgi/css/tablesort.css" REL="stylesheet" TYPE="text/css">
 <A NAME="top">
 <TABLE CLASS="main fullsize" >
   <TR >

@@ -113,7 +113,7 @@ qq|select * from UserLogin where BINARY UserLogin.loginid='$self->{LOGINID}' and
             #warn qq|login: setLogin: loginscreen=$r->{'loginscreen'}\n|;
             #warn qq|login: setLogin: LoginScreen=${LoginScreen}\n|;
             $Location =
-              qq|Location: /cgi/bin/${LoginScreen}?mlt=$self->{mlt}\n\n|;
+              qq|Location: /src/cgi/bin/${LoginScreen}?mlt=$self->{mlt}\n\n|;
 
             #warn qq|login: setLogin: Location=$Location\n|;
             #warn qq|login: setLogin: ID=$r->{ID}\n|;
@@ -351,18 +351,18 @@ sub login {
 
 sub logintxt {
     my ( $self, $msg, $renew ) = @_;
-    my $fn = "/var/www/okmis/src/html/$self->{DBNAME}.login";
-    unless ( -f $fn ) { $fn = qq|/var/www/okmis/src/html/default.login| }
+    my $fn = "C:/xampp/htdocs/src/html/$self->{DBNAME}.login";
+    unless ( -f $fn ) { $fn = qq|C:/xampp/htdocs/src/html/default.login| }
     if     ( $renew == 1 ) {
-        $fn = "/var/www/okmis/src/html/$self->{DBNAME}.renewpasswd";
+        $fn = "C:/xampp/htdocs/src/html/$self->{DBNAME}.renewpasswd";
         unless ( -f $fn ) {
-            $fn = qq|/var/www/okmis/src/html/default.renewpasswd|;
+            $fn = qq|C:/xampp/htdocs/src/html/default.renewpasswd|;
         }
     }
     elsif ( $renew == 2 ) {
-        $fn = "/var/www/okmis/src/html/$self->{DBNAME}.renewlogin";
+        $fn = "C:/xampp/htdocs/src/html/$self->{DBNAME}.renewlogin";
         unless ( -f $fn ) {
-            $fn = qq|/var/www/okmis/src/html/default.renewlogin|;
+            $fn = qq|C:/xampp/htdocs/src/html/default.renewlogin|;
         }
     }
 

@@ -1,9 +1,9 @@
 [[myHTML->newHTML(%form+Problems and Goals+allleft mismenu checkpopupwindow)]]
 
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/NoEnter.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vClientTrPlanPG.js"> </SCRIPT>
-<SCRIPT type="text/javascript" src="/cgi/js/ajaxrequest.js"></SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/NoEnter.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vClientTrPlanPG.js"> </SCRIPT>
+<SCRIPT type="text/javascript" src="/src/cgi/js/ajaxrequest.js"></SCRIPT>
 <SCRIPT LANGUAGE="JavaScript">
 function TPPG(e)
 { InputWindow('/cgi/bin/TPPG.cgi?mlt=<<<mlt>>>&id='+e.value,'ViewPG'); }

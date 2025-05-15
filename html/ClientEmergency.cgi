@@ -1,8 +1,8 @@
 [[myHTML->newPage(%form+Client Emergency+++++lhcautocomplete)]]
 
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vClientEmergency.js"> </SCRIPT>
-<SCRIPT type="text/javascript" src="/cgi/js/ajaxrequest.js"></SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vClientEmergency.js"> </SCRIPT>
+<SCRIPT type="text/javascript" src="/src/cgi/js/ajaxrequest.js"></SCRIPT>
 <SCRIPT TYPE="text/javascript" SRC="/cgi/jquery/jquery-1.12.4.js" ></SCRIPT>
 <SCRIPT TYPE="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></SCRIPT>
 <script src="https://lhcforms-static.nlm.nih.gov/autocomplete-lhc-versions/17.0.3/autocomplete-lhc.min.js"></script>
@@ -243,4 +243,4 @@ document.ClientEmergency.elements[0].focus();
 
 [[myHTML->rightpane(%form+search)]]
 
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/clinicalTable.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/clinicalTable.js"> </SCRIPT>

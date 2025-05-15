@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ###########################################
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use DBI;
 use DBForm;
 use MgrTree;
@@ -32,7 +32,7 @@ qq|select InsPaid.*,Client.clinicClinicID,Client.FName,Client.LName,Client.DOB,C
 my $sInsPaid = $dbh->prepare($qInsPaid);
 
 ############################################################################
-$pdf = PDF->start("/var/www/okmis/src/pdf/Receipt.pdt");
+$pdf = PDF->start("C:/xampp/htdocs/src/pdf/Receipt.pdt");
 my $cnt = 0;
 foreach my $id (@RecIDs) {
     $sInsPaid->execute($id) || $form->dberror($qInsPaid);

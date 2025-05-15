@@ -9,7 +9,7 @@ Content-Type: text/html; charset=ISO-8859-1
  H1    { font-size: 18pt; color: orange; }
  TABLE { background-color: #FBFFE7; padding: 20px; }
 </STYLE>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" >
 function vLogin(form)
 { return vEntry("notnull",form.newpass,form.verpass); }

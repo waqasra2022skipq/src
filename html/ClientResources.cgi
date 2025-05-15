@@ -1,8 +1,8 @@
 [[myHTML->newPage(%form+Resources)]]
 
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vClientResources.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vNum.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vClientResources.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vNum.js"> </SCRIPT>
 
 <FORM NAME="Resources" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
@@ -50,17 +50,17 @@
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE="radio" NAME="ClientResources_ValidDL_1" VALUE=0 <<ClientResources_ValidDL_1=0>> > No
-      <INPUT TYPE="radio" NAME="ClientResources_ValidDL_1" VALUE=1 <<ClientResources_ValidDL_1=1>> > Yes · Valid license; not suspended/revoked. 
+      <INPUT TYPE="radio" NAME="ClientResources_ValidDL_1" VALUE=1 <<ClientResources_ValidDL_1=1>> > Yes ï¿½ Valid license; not suspended/revoked. 
     </TD>
   </TR>
   <TR >
     <TD CLASS="strcol" >
       Do you have an automobile available for use?
-      <BR> · Does not require ownership, only requires availability on a regular basis. (ASI E5)
+      <BR> ï¿½ Does not require ownership, only requires availability on a regular basis. (ASI E5)
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE="radio" NAME="ClientResources_AutoForUse_1" VALUE=0 <<ClientResources_AutoForUse_1=0>> > No
-      <INPUT TYPE="radio" NAME="ClientResources_AutoForUse_1" VALUE=1 <<ClientResources_AutoForUse_1=1>> > Yes · If above is "No", then "No". 
+      <INPUT TYPE="radio" NAME="ClientResources_AutoForUse_1" VALUE=1 <<ClientResources_AutoForUse_1=1>> > Yes ï¿½ If above is "No", then "No". 
     </TD>
   </TR>
   <TR>
@@ -135,7 +135,7 @@ and/or substance abuse concerns?
       Does this constitute the majority of your support? (ASI E9)
     </TD>
     <TD CLASS="strcol" COLSPAN="2" WIDTH="50%" >
-      <INPUT TYPE="radio" NAME="ClientResources_MajSupport_1" VALUE=0 <<ClientResources_MajSupport_1=0>> > No · If above is "No", then "No".
+      <INPUT TYPE="radio" NAME="ClientResources_MajSupport_1" VALUE=0 <<ClientResources_MajSupport_1=0>> > No ï¿½ If above is "No", then "No".
       <INPUT TYPE="radio" NAME="ClientResources_MajSupport_1" VALUE=1 <<ClientResources_MajSupport_1=1>> > Yes
     </TD>
   </TR>

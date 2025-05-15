@@ -1,6 +1,6 @@
-#!/usr/bin/perl
+#!C:/Strawberry/perl/bin/perl
 ############################################################################
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use CGI qw(:standard escape);
 use DBI;
 use DBForm;
@@ -120,8 +120,8 @@ sub ProviderList() {
       || $form->dberror($qClinicProvider);
     if ( my ($ClinicProvider) = $sClinicProvider->fetchrow_array ) {
         $links = qq| 
-      <A HREF="/cgi/bin/ClientList.cgi?Provider_ProvID=$r->{ProvID}&${addURL}" ONMOUSEOVER="window.status=${ws2}; return true;" ONMOUSEOUT="window.status=''" ><IMG BORDER=0 ALT="Client-List by Provider" SRC="/images/icon_folder.gif"></A>
-      <A HREF="/cgi/bin/ChartList.cgi?Provider_ProvID=$r->{ProvID}&SortType=NotBilled&${addURL}" ONMOUSEOVER="window.status=${ws1}; return true;" ONMOUSEOUT="window.status=''" ><IMG BORDER=0 ALT="Chart-List by Provider" SRC="/images/clipboard.gif"></A>
+      <A HREF="/src/cgi/bin/ClientList.cgi?Provider_ProvID=$r->{ProvID}&${addURL}" ONMOUSEOVER="window.status=${ws2}; return true;" ONMOUSEOUT="window.status=''" ><IMG BORDER=0 ALT="Client-List by Provider" SRC="/src/images/icon_folder.gif"></A>
+      <A HREF="/src/cgi/bin/ChartList.cgi?Provider_ProvID=$r->{ProvID}&SortType=NotBilled&${addURL}" ONMOUSEOVER="window.status=${ws1}; return true;" ONMOUSEOUT="window.status=''" ><IMG BORDER=0 ALT="Chart-List by Provider" SRC="/src/images/clipboard.gif"></A>
       <A HREF="${page}" ONMOUSEOVER="window.status=${ws3}; return true;" ONMOUSEOUT="window.status=''" >${ProviderName}</A>
 |;
     }

@@ -1,16 +1,16 @@
 [[myHTML->newPage(%form+Client Intake+++++lhcautocomplete)]]
 
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/NoEnter.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vNewClientIntake.js?v=202006032043"> </SCRIPT>
-<SCRIPT type="text/javascript" src="/cgi/js/ajaxrequest.js"></SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vZip.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/Utils.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vDate.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vTime.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vPhone.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vNum.js"> </SCRIPT>
-<SCRIPT type="text/javascript" src="/cgi/js/vCheckAddress.js?v=202006032043"></SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/NoEnter.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vNewClientIntake.js?v=202006032043"> </SCRIPT>
+<SCRIPT type="text/javascript" src="/src/cgi/js/ajaxrequest.js"></SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vZip.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/Utils.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vDate.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vTime.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vPhone.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vNum.js"> </SCRIPT>
+<SCRIPT type="text/javascript" src="/src/cgi/js/vCheckAddress.js?v=202006032043"></SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" >
 $(document).ready(function() {
   var addressVerified = document.getElementsByName('Client_addressVerified_1')[0].value;
@@ -63,7 +63,7 @@ function initAutocomplete() {
 
 [[*SysAccess->verify(%form+Privilege=NewClient)]]
 
-<FORM NAME="Intake" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="Intake" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >
@@ -217,6 +217,15 @@ function initAutocomplete() {
       <INPUT TYPE="TEL" NAME="ClientReferrals_TransPh_1" VALUE="<<ClientReferrals_TransPh_1>>" ONFOCUS="select()" ONCHANGE="return vPhone(this)" SIZE="20" >
     </TD>
   </TR>
+  <TR>
+  <TD CLASS="strcol">Referring Physician Gender</TD>
+  <TD CLASS="strcol">
+    <SELECT NAME="ClientReferrals_RefPhysGend_1">
+      [[DBA->selxTable(%form+xGend+<<ClientReferrals_RefPhysGend_1>>+Descr)]]
+    </SELECT>
+  </TD>
+  </TR>
+  
   <TR > <TD CLASS="strcol" COLSPAN="2" ><HR></TD> </TR>
   <TR >
     <TD CLASS="strcol" >
@@ -821,7 +830,7 @@ vDate(document.Intake.Client_DOB_1,1,document.Intake,'Client_Age');
 [[myHTML->rightpane(%form+search)]]
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCk-R_kefNqBgvMBYyOYHGVJOoODPDtCIo&libraries=places&callback=initAutocomplete"
         async defer></script>
-<script LANGUAGE="JavaScript" src="/cgi/js/vClientAddressForm.js?v=202006242248"></script>
+<script LANGUAGE="JavaScript" src="/src/cgi/js/vClientAddressForm.js?v=202006242248"></script>
 <script LANGUAGE="JavaScript">
 $(document).ready(function() {
   initClientAddressForm('Trans_AddressManualInput', 'Trans_AddressManualInput_Link', 'ClientReferrals_Trans', 1);
@@ -829,4 +838,4 @@ $(document).ready(function() {
 });
 </script>
 
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/clinicalTable.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/clinicalTable.js"> </SCRIPT>

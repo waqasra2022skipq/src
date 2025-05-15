@@ -15,19 +15,19 @@
             <div class="left">
                 <b>Management</b>
                 <div>
-      <A HREF="javascript:ReportWindow('/cgi/bin/mf.cgi?mlt=<<mlt>>&misLINKS=<<misLINKS>>','MillenniumForms',700,1200)" >Corporate Forms</A> <BR />
-      <A HREF="javascript:ReportWindow('/cgi/bin/mf.cgi?ProvID=90&mlt=<<mlt>>&misLINKS=<<misLINKS>>','MillenniumForms',700,1200)" >Forms / Links</A> <BR />
-      [[SysAccess->verify(%form+Privilege=NewProvider)<A HREF="/cgi/bin/mis.cgi?Provider_ProvID=new&view=Provider.cgi&&mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='Add New Providers'; return true;" ONMOUSEOUT="window.status=''" >Add Provider</A> <BR /> ]]
-      [[SysAccess->verify(%form+Privilege=InActiveProvider)<A HREF="/cgi/bin/mis.cgi?MIS_Action=ManagerTreeIA.cgi&mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='List Inactive Providers'; return true;" ONMOUSEOUT="window.status=''" >Inactive Providers List</A> <BR /> ]]
-      [[SysAccess->verify(%form+Privilege=BillingRemit)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=vInsID.cgi&title=Reconcile or Scholarship Notes&action=Remit&mlt=<<mlt>>&misLINKS=<<misLINKS>>','Remit',700,1400)" ONMOUSEOVER="window.status='Manual Reconcile'; return true;" ONMOUSEOUT="window.status=''" >Reconcile / Scholarship</A> <BR /> ]]
-      [[SysAccess->verify(%form+Privilege=Agent)<A HREF="javascript:ReportWindow('/cgi/bin/sm.pl?heading=This report has been retired.&title=If needed please contact MIS Support&mlt=<<mlt>>','SM')" ONMOUSEOVER="window.status='Generate Notes'; return true;" ONMOUSEOUT="window.status=''" >Generate Progress Notes</A> <BR /> ]]
-      [[SysAccess->verify(%form+Privilege=Agent)<A HREF="javascript:ReportWindow('/cgi/bin/sm.pl?heading=This report has been retired.&title=If needed please contact MIS Support&mlt=<<mlt>>','SM')" ONMOUSEOVER="window.status='Generate Notes'; return true;" ONMOUSEOUT="window.status=''" >Generate Physician Notes</A> <BR /> ]]
-      [[SysAccess->verify(%form+Privilege=BillingRemit)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=vInsID.cgi&title=Generate 2nd HCFA&action=2ndHCFA&mlt=<<mlt>>&misLINKS=<<misLINKS>>','2ndHCFA',700,1400)" ONMOUSEOVER="window.status='Generate 2nd HCFA'; return true;" ONMOUSEOUT="window.status=''" >Generate 2nd HCFA (select Primary)</A> <BR /> ]]
-      [[SysAccess->isHelpDesk(%form) <A HREF="javascript:ReportWindow('/cgi/bin/adminPortal.pl?mlt=<<mlt>>&misLINKS=<<misLINKS>>','SysAdmin')" ONMOUSEOVER="window.status='Forms Listing'; return true;" ONMOUSEOUT="window.status=''" >System Administration</A> <BR /> ]]
+      <A HREF="javascript:ReportWindow('/src/cgi/bin/mf.cgi?mlt=<<mlt>>&misLINKS=<<misLINKS>>','MillenniumForms',700,1200)" >Corporate Forms</A> <BR />
+      <A HREF="javascript:ReportWindow('/src/cgi/bin/mf.cgi?ProvID=90&mlt=<<mlt>>&misLINKS=<<misLINKS>>','MillenniumForms',700,1200)" >Forms / Links</A> <BR />
+      [[SysAccess->verify(%form+Privilege=NewProvider)<A HREF="/src/cgi/bin/mis.cgi?Provider_ProvID=new&view=Provider.cgi&&mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='Add New Providers'; return true;" ONMOUSEOUT="window.status=''" >Add Provider</A> <BR /> ]]
+      [[SysAccess->verify(%form+Privilege=InActiveProvider)<A HREF="/src/cgi/bin/mis.cgi?MIS_Action=ManagerTreeIA.cgi&mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='List Inactive Providers'; return true;" ONMOUSEOUT="window.status=''" >Inactive Providers List</A> <BR /> ]]
+      [[SysAccess->verify(%form+Privilege=BillingRemit)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=vInsID.cgi&title=Reconcile or Scholarship Notes&action=Remit&mlt=<<mlt>>&misLINKS=<<misLINKS>>','Remit',700,1400)" ONMOUSEOVER="window.status='Manual Reconcile'; return true;" ONMOUSEOUT="window.status=''" >Reconcile / Scholarship</A> <BR /> ]]
+      [[SysAccess->verify(%form+Privilege=Agent)<A HREF="javascript:ReportWindow('/src/cgi/bin/sm.pl?heading=This report has been retired.&title=If needed please contact MIS Support&mlt=<<mlt>>','SM')" ONMOUSEOVER="window.status='Generate Notes'; return true;" ONMOUSEOUT="window.status=''" >Generate Progress Notes</A> <BR /> ]]
+      [[SysAccess->verify(%form+Privilege=Agent)<A HREF="javascript:ReportWindow('/src/cgi/bin/sm.pl?heading=This report has been retired.&title=If needed please contact MIS Support&mlt=<<mlt>>','SM')" ONMOUSEOVER="window.status='Generate Notes'; return true;" ONMOUSEOUT="window.status=''" >Generate Physician Notes</A> <BR /> ]]
+      [[SysAccess->verify(%form+Privilege=BillingRemit)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=vInsID.cgi&title=Generate 2nd HCFA&action=2ndHCFA&mlt=<<mlt>>&misLINKS=<<misLINKS>>','2ndHCFA',700,1400)" ONMOUSEOVER="window.status='Generate 2nd HCFA'; return true;" ONMOUSEOUT="window.status=''" >Generate 2nd HCFA (select Primary)</A> <BR /> ]]
+      [[SysAccess->isHelpDesk(%form) <A HREF="javascript:ReportWindow('/src/cgi/bin/adminPortal.pl?mlt=<<mlt>>&misLINKS=<<misLINKS>>','SysAdmin')" ONMOUSEOVER="window.status='Forms Listing'; return true;" ONMOUSEOUT="window.status=''" >System Administration</A> <BR /> ]]
                 </div>
             </div>
             <div class="left" style="text-align:right; width:100px;">
-                <img src="/cgi/images/admin.jpeg" style="width:128px; height:128px;" />
+                <img src="/src/cgi/images/admin.jpeg" style="width:128px; height:128px;" />
             </div>
             <div style='clear: both;'></div>
             <div class="left">
@@ -71,7 +71,7 @@
                 </div>
             </div>
             <div class="left" style="border-left: 44px solid #F7F7F7; text-align:right; width:100px;">
-                <img src="/cgi/images/reports.jpeg" style="width:128px; height:128px;" />
+                <img src="/src/cgi/images/reports.jpeg" style="width:128px; height:128px;" />
             </div>
             <div style='clear: both;'></div>
             <div class="left">
@@ -121,7 +121,7 @@
                 </div>
             </div>
             <div class="right" >
-                <img src="/cgi/images/mail.png" style="width:128px; height:128px;" /> <BR />
+                <img src="/src/cgi/images/mail.png" style="width:128px; height:128px;" /> <BR />
                 <b>Contact Us</b> <BR />
                 <A HREF="mailto:wade@okmis.com">Wade Hamil</A> <BR />
                 <A HREF="mailto:keith@okmis.com">Keith Stephenson</A> <BR />

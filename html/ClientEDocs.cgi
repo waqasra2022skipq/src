@@ -1,9 +1,9 @@
 [[myHTML->newPage(%form+Electronic Documents+++++lhcautocomplete)]]
 
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/NoEnter.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vClientEDocs.js?v=202009141810"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vNum.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/NoEnter.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vClientEDocs.js?v=202009141810"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vNum.js"> </SCRIPT>
 <SCRIPT TYPE="text/javascript" SRC="/cgi/jquery/jquery-1.12.4.js" ></SCRIPT>
 <SCRIPT TYPE="text/javascript" src="/cgi/lhc/autocomplete-lhc-17.0.3/autocomplete-lhc.min.js"></SCRIPT>
 <SCRIPT TYPE="text/javascript" SRC="/cgi/jquery/jquery-ui-1.12.1/jquery-ui.min.js" ></SCRIPT>
@@ -109,7 +109,7 @@
 <INPUT TYPE="hidden" NAME="post_update" VALUE="PostUpd->updEDocs(%form+ClientEDocs+<<<ClientEDocs_ID_1>>>)" >
 </LOADHIDDEN>
 </FORM>
-<SCRIPT type="text/javascript" src="/cgi/js/vEDocsAutocomplete.js?v=202009120626"></SCRIPT>
+<SCRIPT type="text/javascript" src="/src/cgi/js/vEDocsAutocomplete.js?v=202009120626"></SCRIPT>
 <SCRIPT LANGUAGE="JavaScript">
 document.ClientEDocs.elements[0].focus();
 $(document).ready(function() {

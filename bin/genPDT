@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ############################################################################
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use DBForm;
 use PDF;
 use Time::Local;
@@ -11,7 +11,7 @@ my $acct = shift;
 
 # this is the pdf template we need
 my $name    = shift;
-my $pdtpath = "/var/www/okmis/src/pdf/${name}.pdt";
+my $pdtpath = "C:/xampp/htdocs/src/pdf/${name}.pdt";
 my $form    = DBForm->new("DBNAME=$acct");
 my $dbh     = $form->dbconnect();
 ############################################################################

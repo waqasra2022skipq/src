@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ##
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use DBForm;
 $form = DBForm->new();
 my $dbh = $form->dbconnect;

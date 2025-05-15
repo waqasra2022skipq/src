@@ -1,9 +1,9 @@
 [[myHTML->newPage(%form+Client Review)]]
 
-<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript" SRC="/cgi/js/tabs.js"></SCRIPT>
-<LINK REL="STYLESHEET" TYPE="text/css" HREF="/cgi/css/tabs.css" />
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vDate.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript" SRC="/src/cgi/js/tabs.js"></SCRIPT>
+<LINK REL="STYLESHEET" TYPE="text/css" HREF="/src/cgi/css/tabs.css" />
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vDate.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript">
 function validate(form) { return true; } 
 </SCRIPT>

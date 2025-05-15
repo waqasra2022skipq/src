@@ -1,11 +1,11 @@
 [[myHTML->newHTML(%form+Client Probation and Parole)]]
 
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/NoEnter.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vClientLegalPP.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vPhone.js"> </SCRIPT>
-<SCRIPT type="text/javascript" src="/cgi/js/ajaxrequest.js"></SCRIPT>
-<SCRIPT type="text/javascript" src="/cgi/js/vCheckAddress.js?v=202006032043"></SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/NoEnter.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vClientLegalPP.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vPhone.js"> </SCRIPT>
+<SCRIPT type="text/javascript" src="/src/cgi/js/ajaxrequest.js"></SCRIPT>
+<SCRIPT type="text/javascript" src="/src/cgi/js/vCheckAddress.js?v=202006032043"></SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" >
 $(document).ready(function() {
   var addressVerified = document.getElementsByName('ClientLegalPP_addressVerified_1')[0].value;
@@ -137,7 +137,7 @@ document.ClientLegalPP.elements[0].focus();
 [[myHTML->rightpane(%form+search)]]
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAG2JfgYWgk7Q3FDfZQJauF-M4o4H1wqVw&libraries=places&callback=initAutocomplete"
         async defer></script>
-<script LANGUAGE="JavaScript" src="/cgi/js/vClientAddressForm.js?v=202006242248"></script>
+<script LANGUAGE="JavaScript" src="/src/cgi/js/vClientAddressForm.js?v=202006242248"></script>
 <script LANGUAGE="JavaScript">
 $(document).ready(function() {
   initClientAddressForm('ClientLegalPP_AddressManualInput', 'ClientLegalPP_AddressManualInput_Link', 'ClientLegalPP_', 1);

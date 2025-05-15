@@ -1,5 +1,5 @@
-#!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+#!C:/Strawberry/perl/bin/perl.exe
+use lib 'C:/xampp/htdocs/src/lib';
 use DBI;
 use myForm;
 use myDBI;
@@ -89,8 +89,8 @@ my $rProvider = $sProvider->fetchrow_hashref;
 my $PrimaryProvider =
   qq|$rProvider->{'FName'} $rProvider->{'LName'} $rProvider->{'Suffix'}|;
 my $MailLink = qq|
-<A HREF="/cgi/bin/ClientMail.cgi?Client_ClientID=${ClientID}&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}">
-  <IMG ALT="send mail" SRC="/cgi/images/user-mail.png">
+<A HREF="/src/cgi/bin/ClientMail.cgi?Client_ClientID=${ClientID}&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}">
+  <IMG ALT="send mail" SRC="/src/cgi/images/user-mail.png">
 </A>
 |;
 
@@ -110,18 +110,18 @@ my $html = myHTML->new( $form, $title, 'noclock accordion' ) . qq|
 <LINK HREF="|
   . myConfig->cfgfile( 'menuV2.css', 1 )
   . qq|" REL="stylesheet" TYPE="text/css" >
-<script src="/cgi/menu/js/menuV2.js" type="text/javascript"></script>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/ajaxrequest.js"> </SCRIPT>
+<script src="/src/cgi/menu/js/menuV2.js" type="text/javascript"></script>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/src/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/src/cgi/js/ajaxrequest.js"> </SCRIPT>
 <LINK HREF="|
   . myConfig->cfgfile( 'tabcontent/template6/tabcontent.css', 1 )
   . qq|" REL="stylesheet" TYPE="text/css" >
 <SCRIPT SRC="|
   . myConfig->cfgfile( 'tabcontent/tabcontent.js', 1 )
   . qq|" TYPE="text/javascript" ></SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript" SRC="/cgi/js/tabs.js"></SCRIPT>
-<LINK REL="STYLESHEET" TYPE="text/css" HREF="/cgi/css/tabs.css" />
-<FORM NAME="ClientPage" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript" SRC="/src/src/cgi/js/tabs.js"></SCRIPT>
+<LINK REL="STYLESHEET" TYPE="text/css" HREF="/src/cgi/css/tabs.css" />
+<FORM NAME="ClientPage" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main normsize" >
   <TR >
     <TD CLASS="strcol" >
@@ -170,7 +170,7 @@ my $html = myHTML->new( $form, $title, 'noclock accordion' ) . qq|
   <TR>
     <TD CLASS="port" COLSPAN="3" >
   <div class="accordionItem">
-    <h2>Problems<IMG ALT="down" ID="accordionImageProblems" CLASS="accordionImage" SRC="/images/sorted_down.gif" ></h2>
+    <h2>Problems<IMG ALT="down" ID="accordionImageProblems" CLASS="accordionImage" SRC="/src/images/sorted_down.gif" ></h2>
     <div>
 <SPAN ID="ShowClientProblems" >
 |
@@ -186,7 +186,7 @@ my $html = myHTML->new( $form, $title, 'noclock accordion' ) . qq|
   <TR>
     <TD CLASS="port" COLSPAN="3" >
   <div class="accordionItem">
-    <h2>Vital Signs<IMG ALT="down" ID="accordionImageVitalSigns" CLASS="accordionImage" SRC="/images/sorted_down.gif" ></h2>
+    <h2>Vital Signs<IMG ALT="down" ID="accordionImageVitalSigns" CLASS="accordionImage" SRC="/src/images/sorted_down.gif" ></h2>
     <div>
 <SPAN ID="ShowClientVitalSigns" >
 |
@@ -202,7 +202,7 @@ my $html = myHTML->new( $form, $title, 'noclock accordion' ) . qq|
   <TR>
     <TD CLASS="port" COLSPAN="3" >
   <div class="accordionItem">
-    <h2>Past Visit Summaries<IMG ALT="down" ID="accordionImageVisit" CLASS="accordionImage" SRC="/images/sorted_down.gif" ></h2>
+    <h2>Past Visit Summaries<IMG ALT="down" ID="accordionImageVisit" CLASS="accordionImage" SRC="/src/images/sorted_down.gif" ></h2>
     <div>
 <SPAN ID="ShowClientNotes" >
 |
@@ -217,7 +217,7 @@ my $html = myHTML->new( $form, $title, 'noclock accordion' ) . qq|
   <TR>
     <TD CLASS="port" COLSPAN="3" >
   <div class="accordionItem">
-    <h2>Secure Mail to Provider<IMG ALT="down" ID="accordionImageMail" CLASS="accordionImage" SRC="/images/sorted_down.gif" ></h2>
+    <h2>Secure Mail to Provider<IMG ALT="down" ID="accordionImageMail" CLASS="accordionImage" SRC="/src/images/sorted_down.gif" ></h2>
     <div>
 <SPAN ID="ShowClientMail" >
 | . ${MailList} . qq|

@@ -1,5 +1,5 @@
-#!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+#!C:/Strawberry/perl/bin/perl.exe
+use lib 'C:/xampp/htdocs/src/lib';
 use CGI qw(:standard escape);
 use DBI;
 use myForm;
@@ -190,7 +190,7 @@ while ( $rClient = $sClient->fetchrow_hashref ) {
     }
     else { $ClientDischargeStatus = ''; }
     $ClientHREF =
-qq|/cgi/bin/ClientPage.cgi?Client_ClientID=$rClient->{ClientID}&${addLinks}|;
+qq|/src/cgi/bin/ClientPage.cgi?Client_ClientID=$rClient->{ClientID}&${addLinks}|;
     $ClinicName =
         $rClient->{clinicClinicID}
       ? $ClinicList{ $rClient->{clinicClinicID} }{Name}
@@ -357,22 +357,22 @@ sub searchFor {
     my $AddNewMsg =
 qq|New Clients can only be added from a Providers Client List, not from a Client search.  This is because the Client has to be added for a specific Provider.|;
     my $AddNewHREF =
-qq|    <A HREF="javascript:void(0);" ><IMG BORDER="0" SRC="/images/edit.gif" ONMOUSEOVER="textMsg.show('AddNewClient')" ONMOUSEOUT="textMsg.hide()" ></A>|;
+qq|    <A HREF="javascript:void(0);" ><IMG BORDER="0" SRC="/src/images/edit.gif" ONMOUSEOVER="textMsg.show('AddNewClient')" ONMOUSEOUT="textMsg.hide()" ></A>|;
     if ($ProviderID) {
         $sProvider->execute($ProviderID);
         $rProvider = $sProvider->fetchrow_hashref;
         $hdr       = "Provider: $rProvider->{FName} $rProvider->{LName}";
         $ChartListByProv =
-qq{<A HREF="/cgi/bin/ChartList.cgi?Provider_ProvID=${ProviderID}&SortType=Not Billed&${addLinks}" ONMOUSEOVER="textMsg.show('chartlist')" ONMOUSEOUT="textMsg.hide()" ><IMG BORDER="0" ALT="Chart-List by Provider" SRC="/images/clipboard.gif"></A>};
+qq{<A HREF="/src/cgi/bin/ChartList.cgi?Provider_ProvID=${ProviderID}&SortType=Not Billed&${addLinks}" ONMOUSEOVER="textMsg.show('chartlist')" ONMOUSEOUT="textMsg.hide()" ><IMG BORDER="0" ALT="Chart-List by Provider" SRC="/src/images/clipboard.gif"></A>};
         if ( SysAccess->verify( $form, 'Privilege=NewClient' ) ) {
             $AddNewMsg =
 qq|Click here to add New Clients for $rProvider->{FName} $rProvider->{LName}.|;
             $AddNewHREF = qq|
-		  <A HREF=/cgi/bin/mis.cgi?view=vSSN.cgi&ProviderID=${ProviderID}&${addLinks}>
-			<IMG BORDER="0" SRC="/images/edit.gif" ONMOUSEOVER="textMsg.show('AddNewClient')" ONMOUSEOUT="textMsg.hide()" >
+		  <A HREF=/src/cgi/bin/mis.cgi?view=vSSN.cgi&ProviderID=${ProviderID}&${addLinks}>
+			<IMG BORDER="0" SRC="/src/images/edit.gif" ONMOUSEOVER="textMsg.show('AddNewClient')" ONMOUSEOUT="textMsg.hide()" >
 		  </A>
 		  <A HREF="javascript:ReportWindow('http://okmis.helpdocsonline.com/getting-started-2','HelpNewClient')" TITLE="Click here for Instructions on how to add a New Client" >
-			<IMG SRC="/images/qm1.gif" ALT="" BORDER="0" HEIGHT="20" WIDTH="20" >
+			<IMG SRC="/src/images/qm1.gif" ALT="" BORDER="0" HEIGHT="20" WIDTH="20" >
 		  </A>
 |;
         }
@@ -430,23 +430,23 @@ qq|select distinct Client.* from Client left join Insurance on Insurance.ClientI
 sub ClientList {
     my ($self) = @_;
     my $ElecNotesLink .=
-qq|<A HREF="/cgi/bin/mis.cgi?MIS_Action=Note&NoteType=3&Client_ClientID=$rClient->{ClientID}&Client_ClinicID=$rClient->{clinicClinicID}&Treatment_TrID=new&${addLinks}" > <IMG BORDER="0" HEIGHT="15" WIDTH="15" ALT="Electronic Note Entry" SRC="/images/lightning.gif"> </A> |
+qq|<A HREF="/src/cgi/bin/mis.cgi?MIS_Action=Note&NoteType=3&Client_ClientID=$rClient->{ClientID}&Client_ClinicID=$rClient->{clinicClinicID}&Treatment_TrID=new&${addLinks}" > <IMG BORDER="0" HEIGHT="15" WIDTH="15" ALT="Electronic Note Entry" SRC="/src/images/lightning.gif"> </A> |
       if ($ElecNotesFlag);
     my $TFCNotesLink =
-qq|<A HREF="/cgi/bin/mis.cgi?MIS_Action=Note&NoteType=tfc&Client_ClientID=$rClient->{ClientID}&Treatment_TrID=new&${addLinks}" > <IMG BORDER="0" HEIGHT="15" WIDTH="15" ALT="TFC Note Entry" SRC="/images/homeicon.gif"> </A> |
+qq|<A HREF="/src/cgi/bin/mis.cgi?MIS_Action=Note&NoteType=tfc&Client_ClientID=$rClient->{ClientID}&Treatment_TrID=new&${addLinks}" > <IMG BORDER="0" HEIGHT="15" WIDTH="15" ALT="TFC Note Entry" SRC="/src/images/homeicon.gif"> </A> |
       if ($TFCNotesFlag);
     my $pblink = $rInsurance->{Copay} > 0 ? qq|CLASS="blink-image"| : '';
     my $CashTransLink =
-qq|<A HREF="/cgi/bin/ListInsPaid.cgi?Client_ClientID=$rClient->{ClientID}&${addLinks}" ><IMG ${pblink} BORDER="0" HEIGHT="15" WIDTH="15" ALT="Insurance Payments Entry" SRC="/images/piggybank.gif"></A> |
+qq|<A HREF="/src/cgi/bin/ListInsPaid.cgi?Client_ClientID=$rClient->{ClientID}&${addLinks}" ><IMG ${pblink} BORDER="0" HEIGHT="15" WIDTH="15" ALT="Insurance Payments Entry" SRC="/src/images/piggybank.gif"></A> |
       if ($CashTransFlag);
     my $PhysNotesLink =
-qq|<A HREF="/cgi/bin/mis.cgi?MIS_Action=Note&NoteType=2&Client_ClientID=$rClient->{ClientID}&Treatment_TrID=new&${addLinks}" > <IMG SRC="/cgi/images/caduceusblack.png" WIDTH="24" HEIGHT="24" > </A> |
+qq|<A HREF="/src/cgi/bin/mis.cgi?MIS_Action=Note&NoteType=2&Client_ClientID=$rClient->{ClientID}&Treatment_TrID=new&${addLinks}" > <IMG SRC="/src/cgi/images/caduceusblack.png" WIDTH="24" HEIGHT="24" > </A> |
       if ( ${Physician} );
     my $MedicareLink =
-qq|<A HREF="/cgi/bin/mis.cgi?MIS_Action=Note&NoteType=4&Client_ClientID=$rClient->{ClientID}&Treatment_TrID=new&${addLinks}" > <IMG SRC="/img/note_medicare.png" WIDTH="24" HEIGHT="24" > </A> |
+qq|<A HREF="/src/cgi/bin/mis.cgi?MIS_Action=Note&NoteType=4&Client_ClientID=$rClient->{ClientID}&Treatment_TrID=new&${addLinks}" > <IMG SRC="/src/img/note_medicare.png" WIDTH="24" HEIGHT="24" > </A> |
       if ( $rMedicareInsurance->{'Descr'} ne '' );
     my $InvPrintLink .=
-qq|<A HREF="/cgi/bin/mis.cgi?view=ListInvoices.cgi&Client_ClientID=$rClient->{ClientID}&${addLinks}" > <IMG BORDER="0" ALT="List Client Invoices" SRC="/images/invoice.gif"> </A> |
+qq|<A HREF="/src/cgi/bin/mis.cgi?view=ListInvoices.cgi&Client_ClientID=$rClient->{ClientID}&${addLinks}" > <IMG BORDER="0" ALT="List Client Invoices" SRC="/src/images/invoice.gif"> </A> |
       if ( SysAccess->verify( $form, 'Privilege=Invoices2Print' ) );
     my $checkEB =
       $rInsurance->{'Descr'} =~ /medicaid/i
@@ -460,7 +460,7 @@ qq|<A HREF="/cgi/bin/mis.cgi?view=ListInvoices.cgi&Client_ClientID=$rClient->{Cl
     my $jblink = $sClientJournals->rows() > 0 ? qq|CLASS="blink-image"| : '';
     my $HealthHomeImg =
       $rInsurance->{'Descr'} =~ /healthhome/i
-      ? qq|<IMG BORDER="0" HEIGHT="15" WIDTH="15" ALT="HealthHome" SRC="/images/homeicon.gif">|
+      ? qq|<IMG BORDER="0" HEIGHT="15" WIDTH="15" ALT="HealthHome" SRC="/src/images/homeicon.gif">|
       : '';
     ( my $ws =
 qq|$rClient->{FName} $rClient->{MName} $rClient->{LName} ($rClient->{ClientID})|
@@ -490,19 +490,19 @@ qq|$rClient->{FName} $rClient->{MName} $rClient->{LName} ($rClient->{ClientID})|
 
 #foreach my $f ( sort keys %{ $rInsurance } ) { warn "  sub ClientList: rInsurance-${f} is $rInsurance->{$f}\n"; }
     my $str = qq|
-${UnitsPopup}
+${UnitsPopup}                                           
   <TR >
 	<TD STYLE="background-color: ${StatusColor}" WIDTH="${HdrWidth}" ROWSPAN="3" >
-	  <A HREF="/cgi/bin/mis.cgi?MIS_Action=Note&Client_ClientID=$rClient->{ClientID}&Treatment_TrID=new&${addLinks}" > <IMG BORDER="0" ALT="General Chart Entry" SRC="/images/facesicon.gif"> </A>
-	  <A HREF="/cgi/bin/ChartList.cgi?Client_ClientID=$rClient->{ClientID}&SortType=NotReconciled&${addLinks}" > <IMG BORDER="0" HEIGHT="15" WIDTH="15" ALT="Chart List by Client" SRC="/images/clipboard.gif"> </A>
-	  <A HREF="/cgi/bin/mis.cgi?view=ListClientJournals.cgi&Client_ClientID=$rClient->{ClientID}&${addLinks}"> <IMG ${jblink} BORDER="0" HEIGHT="15" WIDTH="15" ALT="Journal List by Client" SRC="/images/journal.gif"> </A>
+	  <A HREF="/src/cgi/bin/mis.cgi?MIS_Action=Note&Client_ClientID=$rClient->{ClientID}&Treatment_TrID=new&${addLinks}" > <IMG BORDER="0" ALT="General Chart Entry" SRC="/src/images/facesicon.gif"> </A>
+	  <A HREF="/src/cgi/bin/ChartList.cgi?Client_ClientID=$rClient->{ClientID}&SortType=NotReconciled&${addLinks}" > <IMG BORDER="0" HEIGHT="15" WIDTH="15" ALT="Chart List by Client" SRC="/src/images/clipboard.gif"> </A>
+	  <A HREF="/src/cgi/bin/mis.cgi?view=ListClientJournals.cgi&Client_ClientID=$rClient->{ClientID}&${addLinks}"> <IMG ${jblink} BORDER="0" HEIGHT="15" WIDTH="15" ALT="Journal List by Client" SRC="/src/images/journal.gif"> </A>
 	  ${MedicareLink}
 	  ${ElecNotesLink}
 	  ${TFCNotesLink}
 	  ${PhysNotesLink}
 	  ${CashTransLink}
 	  ${InvPrintLink}
-	  <A HREF="javascript: ReportWindow('/cgi/bin/ClientSC.cgi?ClientID=$rClient->{ClientID}&mlt=$form->{mlt}','ClientSC',600,1100)" > <IMG BORDER="0" ALT="Service Codes for Clients Insurance" SRC="/images/paper.gif" > </A>
+	  <A HREF="javascript: ReportWindow('/src/cgi/bin/ClientSC.cgi?ClientID=$rClient->{ClientID}&mlt=$form->{mlt}','ClientSC',600,1100)" > <IMG BORDER="0" ALT="Service Codes for Clients Insurance" SRC="/src/images/paper.gif" > </A>
 	</TD>
 	<TD CLASS="strcol" WIDTH="${NameWidth}" >
 		<A HREF="${ClientHREF}" ONMOUSEOVER="window.status='${ws}'; return true;" ONMOUSEOUT="window.status=''" >${ClientName}</A> / ${ClinicName} <BR> ${ClientActiveStatus}
@@ -517,7 +517,7 @@ ${UnitsPopup}
 	<TD CLASS="strcol" WIDTH="${ColWidth}" VALIGN="top" >
 	  <SPAN CLASS="subtitle" STYLE="color: ${InsColor}" >$rInsurance->{Name} &nbsp; </SPAN> ${HealthHomeImg}<BR>
 	  $rInsurance->{InsIDNum} &nbsp; <BR>
-	  <A HREF="javascript: ReportWindow('/cgi/bin/EBReport.cgi?ClientID=$rClient->{ClientID}&FName=$rClient->{FName}&LName=$rClient->{LName}&mlt=$form->{mlt}','EBReport',400,1200)" ONMOUSEOVER="textMsg.show('eligibility')" ONMOUSEOUT="textMsg.hide()" ><SPAN CLASS="subtitle" STYLE='color:${EBColor}' >${ActiveStatus}</SPAN></A>
+	  <A HREF="javascript: ReportWindow('/src/cgi/bin/EBReport.cgi?ClientID=$rClient->{ClientID}&FName=$rClient->{FName}&LName=$rClient->{LName}&mlt=$form->{mlt}','EBReport',400,1200)" ONMOUSEOVER="textMsg.show('eligibility')" ONMOUSEOUT="textMsg.hide()" ><SPAN CLASS="subtitle" STYLE='color:${EBColor}' >${ActiveStatus}</SPAN></A>
 	  ${checkEB}
 	</TD>
   </TR>
@@ -540,7 +540,7 @@ sub hdr {
     my $out = qq|
   <TR >
 	<TD CLASS="port" WIDTH="$HdrWidth" ROWSPAN="3" >
-	  <A HREF="javascript:ReportWindow('${printfile}','PrintWindow')" ONMOUSEOVER="textMsg.show('print')" ONMOUSEOUT="textMsg.hide()" ><IMG BORDER="0" SRC="/images/icon_print.gif" ></A>
+	  <A HREF="javascript:ReportWindow('${printfile}','PrintWindow')" ONMOUSEOVER="textMsg.show('print')" ONMOUSEOUT="textMsg.hide()" ><IMG BORDER="0" SRC="/src/images/icon_print.gif" ></A>
 	  &nbsp;${ChartListByProv}&nbsp;
 	</TD>
 	<TD CLASS="strcol" WIDTH="${NameWidth}" >
@@ -556,7 +556,7 @@ sub hdr {
 	  <B>Insurance Type</B><BR>
 	  <B>Insurance Num</B><BR>
 	  <B>Eligibility</B>
-	  <A HREF="javascript:ReportWindow('http://forms.okmis.com/misdocs/Eligible.htm','HelpWindow')" ><IMG BORDER="0" WIDTH="20" HEIGHT="20" SRC="/images/qm1.gif" ></A>
+	  <A HREF="javascript:ReportWindow('http://forms.okmis.com/misdocs/Eligible.htm','HelpWindow')" ><IMG BORDER="0" WIDTH="20" HEIGHT="20" SRC="/src/images/qm1.gif" ></A>
 	</TD>
   </TR>
   <TR >
@@ -787,10 +787,10 @@ qq|select ClientPrAuth.*,ClientPrAuthCDC.Reason,Insurance.Priority,Insurance.Ins
           : '';
         my $HealthHomeImg =
           $inv->{'InsDescr'} =~ /healthhome/i
-          ? qq|<IMG BORDER="0" HEIGHT="15" WIDTH="15" ALT="HealthHome" SRC="/images/homeicon.gif"><SPAN STYLE="color: green" >Health Home|
+          ? qq|<IMG BORDER="0" HEIGHT="15" WIDTH="15" ALT="HealthHome" SRC="/src/images/homeicon.gif"><SPAN STYLE="color: green" >Health Home|
           : '';
         my $text =
-qq|<BR>${HealthHomeImg} $inv->{'PAgroup'} <A HREF="javascript: ReportWindow('/cgi/bin/PAPeriods.cgi?IDs=${PrAuthID}&mlt=$form->{mlt}','PAPeriods',600,1100)" ONMOUSEOVER="textMsg.show('pa${ClientID}_${PrAuthID}')" ONMOUSEOUT="textMsg.hide()" ><SPAN STYLE="color: ${PAColor}" >$r->{Priority}-$inv->{InsDescr}: $inv->{fPAEffDate}-$inv->{fPAExpDate}: $inv->{PAnumber}: |;
+qq|<BR>${HealthHomeImg} $inv->{'PAgroup'} <A HREF="javascript: ReportWindow('/src/cgi/bin/PAPeriods.cgi?IDs=${PrAuthID}&mlt=$form->{mlt}','PAPeriods',600,1100)" ONMOUSEOVER="textMsg.show('pa${ClientID}_${PrAuthID}')" ONMOUSEOUT="textMsg.hide()" ><SPAN STYLE="color: ${PAColor}" >$r->{Priority}-$inv->{InsDescr}: $inv->{fPAEffDate}-$inv->{fPAExpDate}: $inv->{PAnumber}: |;
         my $Length1 =
           DBA->getxref( $form, 'xPAgroups', $inv->{'PAgroup'}, 'Length1' );
         $Length1 = 'month' if ( $Length1 eq '' );

@@ -1,5 +1,5 @@
-#!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+#!C:/Strawberry/perl/bin/perl.exe
+use lib 'C:/xampp/htdocs/src/lib';
 use DBI;
 use myForm;
 use myDBI;
@@ -33,13 +33,13 @@ $sProviderPrefs->finish();
 #warn qq|ManagerTree: ListClients=$rProviderPrefs->{'ListClients'}=\n|;
 
 my $addURL     = "mlt=$form->{mlt}&misLINKS=$form->{misLINKS}";
-my $ChartList  = '/cgi/bin/ChartList.cgi';
-my $ClientList = '/cgi/bin/ClientList.cgi';
+my $ChartList  = '/src/cgi/bin/ChartList.cgi';
+my $ClientList = '/src/cgi/bin/ClientList.cgi';
 myForm->pushLINK();    # save this link/page to return to.
 my $tabclients = $rProviderPrefs->{'ListClients'}
   ? qq|
-<script language="JavaScript" type="text/javascript" src="/cgi/js/tabs.js"></script>
-<link rel="STYLESHEET" type="text/css" href="/cgi/css/tabs.css" />
+<script language="JavaScript" type="text/javascript" src="/src/src/cgi/js/tabs.js"></script>
+<link rel="STYLESHEET" type="text/css" href="/src/cgi/css/tabs.css" />
 |
   : '';
 
@@ -57,7 +57,7 @@ ${tabclients}
 | . myHTML->leftpane( $form, 'clock mail managertree collapseipad' ) . qq|
     <TD WIDTH="84%" ALIGN="center" >
 | . myHTML->hdr($form) . myHTML->menu($form) . qq|
-    <FORM NAME="MgrTree" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+    <FORM NAME="MgrTree" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR ALIGN="left" >
     <TD >
@@ -288,17 +288,17 @@ sub genHTML {
     my $ClientListURL =
       $ClientList . qq|?Provider_ProvID=$r->{ListProvID}&| . $addURL;
     my $ClientListIMG =
-qq|<IMG BORDER=0 ALT="Client-List by Provider" SRC="/images/icon_folder.gif">|;
+qq|<IMG BORDER=0 ALT="Client-List by Provider" SRC="/src/images/icon_folder.gif">|;
     my $ChartListURL =
         $ChartList
       . qq|?Provider_ProvID=$r->{ListProvID}&SortType=NotBilled&|
       . $addURL;
     my $ChartListIMG =
-qq|<IMG BORDER=0 ALT="Chart-List by Provider" SRC="/images/clipboard.gif">|;
+qq|<IMG BORDER=0 ALT="Chart-List by Provider" SRC="/src/images/clipboard.gif">|;
 
     my $Email = qq|<A HREF="mailto:$r->{Email}">$r->{Email}</A>|;
     my $Spacer =
-      qq|  <IMG HEIGHT=1 WIDTH="$r->{Indent}" SRC="/images/blank.gif">|;
+      qq|  <IMG HEIGHT=1 WIDTH="$r->{Indent}" SRC="/src/images/blank.gif">|;
     my $ProvInfo = '';
     my $Info     = '';
     if ( $r->{Clinician} ) {
@@ -316,7 +316,7 @@ qq|<IMG BORDER=0 ALT="Chart-List by Provider" SRC="/images/clipboard.gif">|;
       |;
     my $ws = $dbh->quote("$r->{Name} Information ID=$r->{ListProvID}");
     $ProvInfo .=
-qq| <A HREF="/cgi/bin/ProviderPage.cgi?Provider_ProvID=$r->{ListProvID}&${addURL}" ONMOUSEOVER="window.status=${ws}; return true;" ONMOUSEOUT="window.status=''" >$r->{Name}</A> |;
+qq| <A HREF="/src/cgi/bin/ProviderPage.cgi?Provider_ProvID=$r->{ListProvID}&${addURL}" ONMOUSEOVER="window.status=${ws}; return true;" ONMOUSEOUT="window.status=''" >$r->{Name}</A> |;
     $out .= qq|
       <TD CLASS="title" > ${Spacer} ${ProvInfo} ${Info} ${Email} </TD>
 |;
@@ -334,7 +334,7 @@ qq| <A HREF="/cgi/bin/ProviderPage.cgi?Provider_ProvID=$r->{ListProvID}&${addURL
             my $ClientID = $r->{'ClientID'};
             ( my $ClientName = "$r->{'LName'}, $r->{'FName'}" ) =~ s/'/&#39;/g;
             my $ClientPage =
-              qq|/cgi/bin/ClientPage.cgi?Client_ClientID=${ClientID}&${addURL}|;
+              qq|/src/cgi/bin/ClientPage.cgi?Client_ClientID=${ClientID}&${addURL}|;
             $ClientTxt .= qq|
       ${BR}
       <A HREF="/cgi/bin/mis.cgi?MIS_Action=Note&Client_ClientID=${ClientID}&Treatment_TrID=new&${addURL}" >
@@ -359,7 +359,7 @@ qq| <A HREF="/cgi/bin/ProviderPage.cgi?Provider_ProvID=$r->{ListProvID}&${addURL
           . qq|?Provider_ProvID=$r->{ListProvID}&SearchType=ByAccess&|
           . $addURL;
         my $CLIMG =
-qq|<IMG BORDER=0 ALT="Client-List by Provider Access" SRC="/images/icon_folder.gif">|;
+qq|<IMG BORDER=0 ALT="Client-List by Provider Access" SRC="/src/images/icon_folder.gif">|;
         my $ws1   = $dbh->quote("$r->{Name} Client List ID=$r->{ListProvID}");
         my $tabid = DBUtil->genToken();
         $CLout = qq|
@@ -367,7 +367,7 @@ qq|<IMG BORDER=0 ALT="Client-List by Provider Access" SRC="/images/icon_folder.g
         <DIV STYLE="display:none" ID="${tabid}1">
           <UL CLASS="tab">
             <LI ONCLICK="showTab('${tabid}',2,1,2);" >
-              <IMG BORDER=0 ALT="Hide Client-List" SRC="/images/hideshow_infohidden.gif" > ${ClientCnt}
+              <IMG BORDER=0 ALT="Hide Client-List" SRC="/src/images/hideshow_infohidden.gif" > ${ClientCnt}
             </LI>
           </UL>
           ${ClientTxt}
@@ -375,7 +375,7 @@ qq|<IMG BORDER=0 ALT="Client-List by Provider Access" SRC="/images/icon_folder.g
         <DIV STYLE="display:block" ID="${tabid}2">
           <UL CLASS="tab">
             <LI ONCLICK="showTab('${tabid}',1,1,2);" >
-              <IMG BORDER=0 ALT="Show Client-List" SRC="/images/hideshow_infoshown.gif" > ${ClientCnt}
+              <IMG BORDER=0 ALT="Show Client-List" SRC="/src/images/hideshow_infoshown.gif" > ${ClientCnt}
             </LI>
           </UL>
         </DIV>

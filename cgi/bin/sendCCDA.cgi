@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use Cwd;
 use DBI;
 use DBForm;
@@ -39,7 +39,7 @@ for ( my $i = 0 ; $i <= 10 ; $i++ ) {
 }
 $outtext = qq|failed to send!| if ( $outtext eq '' );
 
-#  my $cmd = qq|php /var/www/okmis/src/phimail/PhiMail.php ${sendfile} ${to}|;
+#  my $cmd = qq|php C:/xampp/htdocs/src/phimail/PhiMail.php ${sendfile} ${to}|;
 #warn qq|cmd:${cmd}\n|;
 #  my $outfile = $form->{DOCROOT}.$sendfile.'.out';
 #  system("${cmd} > ${outfile} 2>${outfile}");

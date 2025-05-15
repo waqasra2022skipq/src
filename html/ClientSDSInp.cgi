@@ -1,8 +1,8 @@
 [[myHTML->newPage(%form+Client SDS)]]
 
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/NoEnter.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vDate.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/NoEnter.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vDate.js"> </SCRIPT>
 
 <FORM NAME="ClientSDS" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
@@ -44,5 +44,5 @@ document.ClientSDS.elements[0].focus();
 [[myHTML->rightpane(%form+search)]]
 
 
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/calculateScore.js?sdfsdf"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/calculateScore.js?sdfsdf"> </SCRIPT>
 

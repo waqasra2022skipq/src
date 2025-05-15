@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ############################################################################
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use Cwd;
 use DBI;
 use DBA;
@@ -1129,7 +1129,7 @@ sub prtpdf {
     #warn "PDFPath=$PDFPath\n";
     my $Text = &PDF::genFDF( $PDFPath, $form );
     if ( $form->{LOGINPROVID} == 91 ) {
-        open OUT, ">/var/www/okmis/src/debug/Stats.out"
+        open OUT, ">C:/xampp/htdocs/src/debug/Stats.out"
           or die "Couldn't open file: $!";
         print OUT qq|${Text}|;
         close(OUT);

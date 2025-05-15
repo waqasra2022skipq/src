@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use strict;
 use DBI;
 use login;

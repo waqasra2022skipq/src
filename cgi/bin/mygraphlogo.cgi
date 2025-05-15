@@ -33,7 +33,7 @@ $mygraph->set(
     show_values => 1,
 ) or warn $mygraph->error;
 
-$mygraph->set( logo          => '/var/www/okmis/src/images/eti_logo.jpg' );
+$mygraph->set( logo          => 'C:/xampp/htdocs/src/images/eti_logo.jpg' );
 $mygraph->set( logo_resize   => 0.5 );
 $mygraph->set( logo_position => 'LL' );
 $mygraph->set_legend_font(GD::gdMediumBoldFont);

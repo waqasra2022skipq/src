@@ -1,7 +1,7 @@
 [[myHTML->newPage(%form+Needs and Skills)]]
 
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vxNS.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vxNS.js"> </SCRIPT>
 
 [[*SysAccess->verify(%form+Privilege=AdminTables)]]
 

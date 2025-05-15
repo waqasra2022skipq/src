@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use Cwd;
 use DBI;
 use DBForm;
@@ -43,7 +43,7 @@ while ( my $rClinics = $sClinics->fetchrow_hashref ) {
     $sInvoices->execute( $rClinics->{ProvID}, ${InvDate} )
       || $form->dberror($qInvoices);
     my $Cmd =
-      qq|/var/www/okmis/src/bin/genInvPDF DBNAME=$form->{DBNAME}\\&IDs="|;
+      qq|C:/xampp/htdocs/src/bin/genInvPDF DBNAME=$form->{DBNAME}\\&IDs="|;
     my $spc = '';
     my $cnt = 0;
     while ( my $rInvoices = $sInvoices->fetchrow_hashref ) {

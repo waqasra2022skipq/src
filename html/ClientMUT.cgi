@@ -1,7 +1,7 @@
 [[myHTML->newPage(%form+Client Intake)]]
 
-<SCRIPT type="text/javascript" SRC="/cgi/js/ajaxrequest.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/novalidate.js"> </SCRIPT>
+<SCRIPT type="text/javascript" SRC="/src/cgi/js/ajaxrequest.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/novalidate.js"> </SCRIPT>
 <LINK HREF="/cfg/menuV2.css" REL="stylesheet" TYPE="text/css" >
 <SCRIPT type="text/javascript" src="/cgi/menu/js/menuV2.js" ></SCRIPT>
 

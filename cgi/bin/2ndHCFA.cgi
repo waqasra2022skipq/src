@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ############################################################################
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use myConfig;
 use Cwd;
 use DBI;
@@ -67,11 +67,11 @@ qq|This screen selects notes for the client's secondary insurance payments for t
       myHTML->newHTML( $form, '2nd HCFA',
         'CheckPopupWindow noclock countdown_60' )
       . qq|
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/NoEnter.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/serverREQ.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vDate.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vNum.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/NoEnter.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/serverREQ.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vDate.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vNum.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" >
 function validate(form) { return(1); }
 </SCRIPT>
@@ -207,7 +207,7 @@ qq|HCFA_2nd_$form->{ClinicID}_$form->{InsID}_$form->{TODAY}_${cnt}_${stamp}_${to
     warn qq|2ndHCFA: TrIDs: ${TrIDs}\n|;
 ### InsID DOES NOT MATTER...TEST WITHOUT IT...
     my $cmd =
-qq|/var/www/okmis/src/cgi/bin/printHCFA.pl DBNAME=$form->{DBNAME}\\&Secondary=1\\&InsID=$form->{InsID}\\&HCFAtype=$form->{HCFAtype}\\&TrIDs=${TrIDs}\\&file=${file}\\&mlt=$form->{mlt}|;
+qq|C:/xampp/htdocs/src/cgi/bin/printHCFA.pl DBNAME=$form->{DBNAME}\\&Secondary=1\\&InsID=$form->{InsID}\\&HCFAtype=$form->{HCFAtype}\\&TrIDs=${TrIDs}\\&file=${file}\\&mlt=$form->{mlt}|;
     warn qq|2ndHCFA: cmd: $cmd\n|;
     system($cmd);
     my $html =

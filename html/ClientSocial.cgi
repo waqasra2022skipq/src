@@ -1,8 +1,8 @@
 [[myHTML->newPage(%form+Client Social)]]
 
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vClientSocial.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vNum.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vClientSocial.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vNum.js"> </SCRIPT>
 
 <FORM NAME="Social" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
@@ -255,7 +255,7 @@
   <TR ><TD CLASS="port hdrtxt" COLSPAN="2" >Recreational/Leisure</TD></TR>
   <TR >
     <TD CLASS="strcol" COLSPAN="2" >
-      · If a girlfriend/boyfriend is considered as family by patient, then they must refer to them as family throughout this section, not a friend.
+      ï¿½ If a girlfriend/boyfriend is considered as family by patient, then they must refer to them as family throughout this section, not a friend.
     </TD>
   </TR>
   <TR >
@@ -271,7 +271,7 @@
   <TR >
     <TD CLASS="strcol" >
       Are you satisfied with spending your free time this way?
-      · A satisfied response must indicate that the person generally likes the situation. Referring to above.
+      ï¿½ A satisfied response must indicate that the person generally likes the situation. Referring to above.
     </TD>
     <TD CLASS="strcol" ALIGN=left >
       <INPUT TYPE="radio" NAME="ClientSocial_SatSpendTime_1" VALUE=0 <<ClientSocial_SatSpendTime_1=0>> > No
@@ -282,7 +282,7 @@
   <TR >
     <TD CLASS="strcol" >
       How many close friends do you have?
-      · Stress that you mean close. Exclude family members. These are "reciprocal" relationships or mutually supportive relationships.
+      ï¿½ Stress that you mean close. Exclude family members. These are "reciprocal" relationships or mutually supportive relationships.
     </TD>
     <TD CLASS="strcol" ALIGN=left >
       <INPUT TYPE=text NAME="ClientSocial_NumCloseFriends_1" VALUE="<<ClientSocial_NumCloseFriends_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,9);" SIZE="2" >

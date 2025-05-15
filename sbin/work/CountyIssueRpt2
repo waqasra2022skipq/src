@@ -1,116 +1,116 @@
-cmd=/var/www/okmis/src/sbin/work/GetCountyIssue DBNAME=okmis_adv\&fix=yes
+cmd=C:/xampp/htdocs/src/sbin/work/GetCountyIssue DBNAME=okmis_adv\&fix=yes
 Started: Wed Jun  3 14:11:42 2020
 ======================================
 
-  database: okmis_adv: /var/www/okmis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:42 2020
+  database: okmis_adv: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:42 2020
 DBNAME=okmis_adv
-cmd=/var/www/okmis/src/sbin/work/GetCountyIssue DBNAME=okmis_anv\&fix=yes
-  database: okmis_adv: /var/www/okmis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:42 2020
+cmd=C:/xampp/htdocs/src/sbin/work/GetCountyIssue DBNAME=okmis_anv\&fix=yes
+  database: okmis_adv: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:42 2020
 
-  database: okmis_anv: /var/www/okmis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:42 2020
+  database: okmis_anv: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:42 2020
 DBNAME=okmis_anv
-cmd=/var/www/okmis/src/sbin/work/GetCountyIssue DBNAME=okmis_ccc\&fix=yes
-  database: okmis_anv: /var/www/okmis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:42 2020
+cmd=C:/xampp/htdocs/src/sbin/work/GetCountyIssue DBNAME=okmis_ccc\&fix=yes
+  database: okmis_anv: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:42 2020
 
-  database: okmis_ccc: /var/www/okmis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:42 2020
+  database: okmis_ccc: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:42 2020
 DBNAME=okmis_ccc
-cmd=/var/www/okmis/src/sbin/work/GetCountyIssue DBNAME=okmis_ccs\&fix=yes
-  database: okmis_ccc: /var/www/okmis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:43 2020
+cmd=C:/xampp/htdocs/src/sbin/work/GetCountyIssue DBNAME=okmis_ccs\&fix=yes
+  database: okmis_ccc: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:43 2020
 
-  database: okmis_ccs: /var/www/okmis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:43 2020
+  database: okmis_ccs: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:43 2020
 DBNAME=okmis_ccs
-cmd=/var/www/okmis/src/sbin/work/GetCountyIssue DBNAME=okmis_csl\&fix=yes
-  database: okmis_ccs: /var/www/okmis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:43 2020
+cmd=C:/xampp/htdocs/src/sbin/work/GetCountyIssue DBNAME=okmis_csl\&fix=yes
+  database: okmis_ccs: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:43 2020
 
-  database: okmis_csl: /var/www/okmis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:43 2020
+  database: okmis_csl: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:43 2020
 DBNAME=okmis_csl
-cmd=/var/www/okmis/src/sbin/work/GetCountyIssue DBNAME=okmis_cti\&fix=yes
-  database: okmis_csl: /var/www/okmis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:43 2020
+cmd=C:/xampp/htdocs/src/sbin/work/GetCountyIssue DBNAME=okmis_cti\&fix=yes
+  database: okmis_csl: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:43 2020
 
-  database: okmis_cti: /var/www/okmis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:43 2020
+  database: okmis_cti: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:43 2020
 DBNAME=okmis_cti
-cmd=/var/www/okmis/src/sbin/work/GetCountyIssue DBNAME=okmis_elf\&fix=yes
-  database: okmis_cti: /var/www/okmis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:43 2020
+cmd=C:/xampp/htdocs/src/sbin/work/GetCountyIssue DBNAME=okmis_elf\&fix=yes
+  database: okmis_cti: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:43 2020
 
-  database: okmis_elf: /var/www/okmis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:43 2020
+  database: okmis_elf: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:43 2020
 DBNAME=okmis_elf
-cmd=/var/www/okmis/src/sbin/work/GetCountyIssue DBNAME=okmis_fho\&fix=yes
-  database: okmis_elf: /var/www/okmis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:43 2020
+cmd=C:/xampp/htdocs/src/sbin/work/GetCountyIssue DBNAME=okmis_fho\&fix=yes
+  database: okmis_elf: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:43 2020
 
-  database: okmis_fho: /var/www/okmis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:43 2020
+  database: okmis_fho: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:43 2020
 DBNAME=okmis_fho
-cmd=/var/www/okmis/src/sbin/work/GetCountyIssue DBNAME=okmis_foh\&fix=yes
-  database: okmis_fho: /var/www/okmis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:44 2020
+cmd=C:/xampp/htdocs/src/sbin/work/GetCountyIssue DBNAME=okmis_foh\&fix=yes
+  database: okmis_fho: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:44 2020
 
-  database: okmis_foh: /var/www/okmis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:44 2020
+  database: okmis_foh: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:44 2020
 DBNAME=okmis_foh
-cmd=/var/www/okmis/src/sbin/work/GetCountyIssue DBNAME=okmis_gcs\&fix=yes
-  database: okmis_foh: /var/www/okmis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:44 2020
+cmd=C:/xampp/htdocs/src/sbin/work/GetCountyIssue DBNAME=okmis_gcs\&fix=yes
+  database: okmis_foh: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:44 2020
 
-  database: okmis_gcs: /var/www/okmis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:44 2020
+  database: okmis_gcs: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:44 2020
 DBNAME=okmis_gcs
-cmd=/var/www/okmis/src/sbin/work/GetCountyIssue DBNAME=okmis_gpr\&fix=yes
-  database: okmis_gcs: /var/www/okmis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:44 2020
+cmd=C:/xampp/htdocs/src/sbin/work/GetCountyIssue DBNAME=okmis_gpr\&fix=yes
+  database: okmis_gcs: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:44 2020
 
-  database: okmis_gpr: /var/www/okmis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:44 2020
+  database: okmis_gpr: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:44 2020
 DBNAME=okmis_gpr
-cmd=/var/www/okmis/src/sbin/work/GetCountyIssue DBNAME=okmis_ibf\&fix=yes
-  database: okmis_gpr: /var/www/okmis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:44 2020
+cmd=C:/xampp/htdocs/src/sbin/work/GetCountyIssue DBNAME=okmis_ibf\&fix=yes
+  database: okmis_gpr: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:44 2020
 
-  database: okmis_ibf: /var/www/okmis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:44 2020
+  database: okmis_ibf: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:44 2020
 DBNAME=okmis_ibf
-cmd=/var/www/okmis/src/sbin/work/GetCountyIssue DBNAME=okmis_ipi\&fix=yes
-  database: okmis_ibf: /var/www/okmis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:44 2020
+cmd=C:/xampp/htdocs/src/sbin/work/GetCountyIssue DBNAME=okmis_ipi\&fix=yes
+  database: okmis_ibf: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:44 2020
 
-  database: okmis_ipi: /var/www/okmis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:44 2020
+  database: okmis_ipi: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:44 2020
 DBNAME=okmis_ipi
-cmd=/var/www/okmis/src/sbin/work/GetCountyIssue DBNAME=okmis_lbhp\&fix=yes
-  database: okmis_ipi: /var/www/okmis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:45 2020
+cmd=C:/xampp/htdocs/src/sbin/work/GetCountyIssue DBNAME=okmis_lbhp\&fix=yes
+  database: okmis_ipi: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:45 2020
 
-  database: okmis_lbhp: /var/www/okmis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:45 2020
+  database: okmis_lbhp: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:45 2020
 DBNAME=okmis_lbhp
-cmd=/var/www/okmis/src/sbin/work/GetCountyIssue DBNAME=okmis_lkt\&fix=yes
-  database: okmis_lbhp: /var/www/okmis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:45 2020
+cmd=C:/xampp/htdocs/src/sbin/work/GetCountyIssue DBNAME=okmis_lkt\&fix=yes
+  database: okmis_lbhp: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:45 2020
 
-  database: okmis_lkt: /var/www/okmis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:45 2020
+  database: okmis_lkt: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:45 2020
 DBNAME=okmis_lkt
-cmd=/var/www/okmis/src/sbin/work/GetCountyIssue DBNAME=okmis_mms\&fix=yes
-  database: okmis_lkt: /var/www/okmis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:45 2020
+cmd=C:/xampp/htdocs/src/sbin/work/GetCountyIssue DBNAME=okmis_mms\&fix=yes
+  database: okmis_lkt: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:45 2020
 
-  database: okmis_mms: /var/www/okmis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:45 2020
+  database: okmis_mms: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:45 2020
 DBNAME=okmis_mms
 --63967,Sarah,Everett,Stephens County
-cmd=/var/www/okmis/src/sbin/work/GetCountyIssue DBNAME=okmis_oays\&fix=yes
-  database: okmis_mms: /var/www/okmis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:45 2020
+cmd=C:/xampp/htdocs/src/sbin/work/GetCountyIssue DBNAME=okmis_oays\&fix=yes
+  database: okmis_mms: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:45 2020
 
-  database: okmis_oays: /var/www/okmis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:45 2020
+  database: okmis_oays: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:45 2020
 DBNAME=okmis_oays
-cmd=/var/www/okmis/src/sbin/work/GetCountyIssue DBNAME=okmis_opa\&fix=yes
-  database: okmis_oays: /var/www/okmis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:46 2020
+cmd=C:/xampp/htdocs/src/sbin/work/GetCountyIssue DBNAME=okmis_opa\&fix=yes
+  database: okmis_oays: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:46 2020
 
-  database: okmis_opa: /var/www/okmis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:46 2020
+  database: okmis_opa: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:46 2020
 DBNAME=okmis_opa
-cmd=/var/www/okmis/src/sbin/work/GetCountyIssue DBNAME=okmis_pcd\&fix=yes
-  database: okmis_opa: /var/www/okmis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:46 2020
+cmd=C:/xampp/htdocs/src/sbin/work/GetCountyIssue DBNAME=okmis_pcd\&fix=yes
+  database: okmis_opa: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:46 2020
 
-  database: okmis_pcd: /var/www/okmis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:46 2020
+  database: okmis_pcd: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:46 2020
 DBNAME=okmis_pcd
-cmd=/var/www/okmis/src/sbin/work/GetCountyIssue DBNAME=okmis_scs\&fix=yes
-  database: okmis_pcd: /var/www/okmis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:46 2020
+cmd=C:/xampp/htdocs/src/sbin/work/GetCountyIssue DBNAME=okmis_scs\&fix=yes
+  database: okmis_pcd: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:46 2020
 
-  database: okmis_scs: /var/www/okmis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:46 2020
+  database: okmis_scs: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:46 2020
 DBNAME=okmis_scs
-cmd=/var/www/okmis/src/sbin/work/GetCountyIssue DBNAME=okmis_tccp\&fix=yes
-  database: okmis_scs: /var/www/okmis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:46 2020
+cmd=C:/xampp/htdocs/src/sbin/work/GetCountyIssue DBNAME=okmis_tccp\&fix=yes
+  database: okmis_scs: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:46 2020
 
-  database: okmis_tccp: /var/www/okmis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:46 2020
+  database: okmis_tccp: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:46 2020
 DBNAME=okmis_tccp
-cmd=/var/www/okmis/src/sbin/work/GetCountyIssue DBNAME=okmis_tsi\&fix=yes
-  database: okmis_tccp: /var/www/okmis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:46 2020
+cmd=C:/xampp/htdocs/src/sbin/work/GetCountyIssue DBNAME=okmis_tsi\&fix=yes
+  database: okmis_tccp: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:46 2020
 
-  database: okmis_tsi: /var/www/okmis/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:46 2020
+  database: okmis_tsi: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Started   Wed Jun  3 14:11:46 2020
 DBNAME=okmis_tsi
-  database: okmis_tsi: /var/www/okmis/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:47 2020
+  database: okmis_tsi: C:/xampp/htdocs/src/sbin/work/GetCountyIssue: Completed Wed Jun  3 14:11:47 2020
 
 ======================================
 Completed: Wed Jun  3 14:11:47 2020

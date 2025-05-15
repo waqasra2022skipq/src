@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use File::Copy;
 use DBA;
 use DBForm;
@@ -8,7 +8,7 @@ use myConfig;
 use XML::LibXML;
 ############################################################################
 my $dbname = 'okmis_mms';
-my $dir    = qq|/var/www/okmis/src/phimail/received|;
+my $dir    = qq|C:/xampp/htdocs/src/phimail/received|;
 my $form   = DBForm->new("DBNAME=$dbname");
 my $dbh    = $form->dbconnect();
 my $ProvID = 2500;

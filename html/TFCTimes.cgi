@@ -1,8 +1,8 @@
 [[myHTML->newPage(%form+TFC Times)]]
 
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/NoEnter.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vTFCTimes.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/NoEnter.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vTFCTimes.js"> </SCRIPT>
 
 <<<Client_FName_1>>> <<<Client_MName_1>>> <<<Client_LName_1>>> 
 <FONT CLASS=subtitle > (<<<Client_ClientID_1>>>) <<<Client_SSN_1>>> </FONT>

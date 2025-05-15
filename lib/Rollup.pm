@@ -147,7 +147,7 @@ qq|select TrID from Treatment where ${with} order by ClientID,ContLogDate,ContLo
 
     unless ( $TrIDs eq '' ) {
         my $cmd =
-qq|/var/www/okmis/src/cgi/bin/printNotes.pl DBNAME=$form->{'DBNAME'}\\&TrIDs=${TrIDs}\\&mlt=$form->{mlt}\\&file=${RootName}|;
+qq|C:/xampp/htdocs/src/cgi/bin/printNotes.pl DBNAME=$form->{'DBNAME'}\\&TrIDs=${TrIDs}\\&mlt=$form->{mlt}\\&file=${RootName}|;
 
         #warn qq|Notes: cmd:${cmd}\n|;
         system("${cmd}");
@@ -319,7 +319,7 @@ qq|select ${Table}.${RECID} from ${Table} ${join} where ${Table}.G1=? ${daterang
 
         # Adding action parameter as required by printClientPHQ.cgi
         my $cmd =
-qq|/var/www/okmis/src/cgi/bin/${PrintRoutine}.cgi DBNAME=$form->{'DBNAME'}\\&IDs=${IDs}\\&Client_ClientID=${ClientID}\\&mlt=$form->{mlt}\\&file=${RootName}\\&action=${Table}|;
+qq|C:/xampp/htdocs/src/cgi/bin/${PrintRoutine}.cgi DBNAME=$form->{'DBNAME'}\\&IDs=${IDs}\\&Client_ClientID=${ClientID}\\&mlt=$form->{mlt}\\&file=${RootName}\\&action=${Table}|;
 
         #warn qq|edocs: cmd:${cmd}\n|;
         system("${cmd}");
@@ -400,10 +400,10 @@ qq|select ${Table}.${RECID} from ${Table} where ${Table}.ProvID=? and Type !=40|
 
     unless ( $IDs eq '' ) {
         my $cmd =
-qq|/var/www/okmis/src/cgi/bin/${PrintRoutine}.cgi DBNAME=$form->{'DBNAME'}\\&IDs=${IDs}\\&Provider_ProvID=${ProvID}\\&mlt=$form->{mlt}\\&file=${RootName}|;
+qq|C:/xampp/htdocs/src/cgi/bin/${PrintRoutine}.cgi DBNAME=$form->{'DBNAME'}\\&IDs=${IDs}\\&Provider_ProvID=${ProvID}\\&mlt=$form->{mlt}\\&file=${RootName}|;
         if ( $Table eq "Treatment" ) {
             $cmd =
-qq|/var/www/okmis/src/cgi/bin/printHCFA.pl DBNAME=$form->{'DBNAME'}\\&TrIDs=${IDs}\\&Provider_ProvID=${ProvID}\\&mlt=$form->{mlt}\\&file=${RootName}|;
+qq|C:/xampp/htdocs/src/cgi/bin/printHCFA.pl DBNAME=$form->{'DBNAME'}\\&TrIDs=${IDs}\\&Provider_ProvID=${ProvID}\\&mlt=$form->{mlt}\\&file=${RootName}|;
         }
 
         #warn qq|edocs: cmd:${cmd}\n|;
@@ -434,11 +434,11 @@ sub RollupFiles {
 
     my $RootPath = $form->{DOCROOT} . ${HomePath};
     my @commands = (
-qq|/var/www/okmis/src/reports/BillAmt mlt=$form->{mlt}\\&DBNAME=$form->{'DBNAME'}\\&Type=\\&hdrline=4\\&output=pdf\\&Active=\\&ClinicIDs=$ProvID\\&CustAgency=\\&Days=\\&Format=\\&FromDate=\\&InsCode=\\&InsID=\\&ProvIDs=\\&ToDate=\\&daterange=all\\&sYearMonth=\\&ReportDescr=Billed Report by Week 1> ${RootPath}/BillingRecAmt.pdf|,
-qq|/var/www/okmis/src/reports/BillAmt mlt=$form->{mlt}\\&DBNAME=$form->{'DBNAME'}\\&Type=\\&hdrline=4\\&output=ss\\&Active=\\&ClinicIDs=$ProvID\\&CustAgency=\\&Days=\\&Format=\\&FromDate=\\&InsCode=\\&InsID=\\&ProvIDs=\\&ToDate=\\&daterange=all\\&sYearMonth=\\&ReportDescr=Billed Report by Week 1> ${RootPath}/BillingRecAmt.xls|,
-qq|/var/www/okmis/src/reports/noteReport mlt=$form->{mlt}\\&DBNAME=$form->{'DBNAME'}\\&Type=BilledDate\\&hdrline=\\&output=ss\\&Active=\\&ClinicIDs=$ProvID\\&CustAgency=\\&Days=\\&Format=Extended\\&FromDate=\\&InsCode=\\&InsID=\\&ProvIDs=\\&ToDate=\\&daterange=all\\&sYearMonth=\\&ReportDescr=Note Report for BILLED Date 1> ${RootPath}/Billing.xls|,
-qq|/var/www/okmis/src/reports/ClientByClinic mlt=$form->{mlt}\\&DBNAME=$form->{'DBNAME'}\\&ForProvID=$ProvID\\&Type=\\&hdrline=\\&output=ss\\&Active=\\&ClinicIDs=\\&CustAgency=\\&Days=\\&Format=\\&FromDate=\\&InsCode=\\&InsID=\\&ProvIDs=\\&ToDate=\\&daterange=\\&sYearMonth=\\&ReportDescr=Client By Clinic 1> ${RootPath}/Clients.xls|,
-qq|/var/www/okmis/src/reports/ProvEmpl mlt=$form->{mlt}\\&DBNAME=$form->{'DBNAME'}\\&ForProvID=$ProvID\\&Type=\\&hdrline=\\&output=ss\\&Active=\\&ClinicIDs=\\&CustAgency=\\&Days=\\&Format=\\&FromDate=\\&InsCode=\\&InsID=\\&ProvIDs=\\&ToDate=\\&daterange=\\&sYearMonth=\\&ReportDescr=Provider/Employee w/Lic+Cred 1> ${RootPath}/Providers.xls|
+qq|C:/xampp/htdocs/src/reports/BillAmt mlt=$form->{mlt}\\&DBNAME=$form->{'DBNAME'}\\&Type=\\&hdrline=4\\&output=pdf\\&Active=\\&ClinicIDs=$ProvID\\&CustAgency=\\&Days=\\&Format=\\&FromDate=\\&InsCode=\\&InsID=\\&ProvIDs=\\&ToDate=\\&daterange=all\\&sYearMonth=\\&ReportDescr=Billed Report by Week 1> ${RootPath}/BillingRecAmt.pdf|,
+qq|C:/xampp/htdocs/src/reports/BillAmt mlt=$form->{mlt}\\&DBNAME=$form->{'DBNAME'}\\&Type=\\&hdrline=4\\&output=ss\\&Active=\\&ClinicIDs=$ProvID\\&CustAgency=\\&Days=\\&Format=\\&FromDate=\\&InsCode=\\&InsID=\\&ProvIDs=\\&ToDate=\\&daterange=all\\&sYearMonth=\\&ReportDescr=Billed Report by Week 1> ${RootPath}/BillingRecAmt.xls|,
+qq|C:/xampp/htdocs/src/reports/noteReport mlt=$form->{mlt}\\&DBNAME=$form->{'DBNAME'}\\&Type=BilledDate\\&hdrline=\\&output=ss\\&Active=\\&ClinicIDs=$ProvID\\&CustAgency=\\&Days=\\&Format=Extended\\&FromDate=\\&InsCode=\\&InsID=\\&ProvIDs=\\&ToDate=\\&daterange=all\\&sYearMonth=\\&ReportDescr=Note Report for BILLED Date 1> ${RootPath}/Billing.xls|,
+qq|C:/xampp/htdocs/src/reports/ClientByClinic mlt=$form->{mlt}\\&DBNAME=$form->{'DBNAME'}\\&ForProvID=$ProvID\\&Type=\\&hdrline=\\&output=ss\\&Active=\\&ClinicIDs=\\&CustAgency=\\&Days=\\&Format=\\&FromDate=\\&InsCode=\\&InsID=\\&ProvIDs=\\&ToDate=\\&daterange=\\&sYearMonth=\\&ReportDescr=Client By Clinic 1> ${RootPath}/Clients.xls|,
+qq|C:/xampp/htdocs/src/reports/ProvEmpl mlt=$form->{mlt}\\&DBNAME=$form->{'DBNAME'}\\&ForProvID=$ProvID\\&Type=\\&hdrline=\\&output=ss\\&Active=\\&ClinicIDs=\\&CustAgency=\\&Days=\\&Format=\\&FromDate=\\&InsCode=\\&InsID=\\&ProvIDs=\\&ToDate=\\&daterange=\\&sYearMonth=\\&ReportDescr=Provider/Employee w/Lic+Cred 1> ${RootPath}/Providers.xls|
     );
 
     foreach my $command (@commands) {

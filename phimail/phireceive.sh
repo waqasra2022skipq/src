@@ -1,6 +1,6 @@
 #!/bin/bash
 export DATESTAMP=`date +%Y%m%d%H%M%S`
-cd /var/www/okmis/src/phimail
+cd C:/xampp/htdocs/src/phimail
 echo -e "Check messages...\n"
 echo -e "\nfirst check (b1) messages"
 echo -e "php phireceive.php okmis-edge2015@directtest.interopengine.com ${DATESTAMP}\n"

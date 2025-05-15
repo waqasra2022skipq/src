@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use DBI;
 use DBA;
 use myForm;
@@ -148,7 +148,7 @@ if ( $form->{output} eq 'pdf' ) {
       . main->addSort($form);
     $sTreatment = $dbh->prepare($qTreatment);
     warn qq|qTreatment=\n$qTreatment\n| if ($debug);
-    $pdf = PDF->start("/var/www/okmis/src/pdf/NoteRpt.pdt");
+    $pdf = PDF->start("C:/xampp/htdocs/src/pdf/NoteRpt.pdt");
     $qPC =
         $select
       . $where
@@ -175,7 +175,7 @@ else {
     #print qq|addSelection=\n$addSelection\n| if ( $debug );
     #print qq|qTreatment=\n$qTreatment\n| if ( $debug );
     if ( $form->{LOGINPROVID} == 91 ) {
-        open OUT, ">/var/www/okmis/src/debug/NoteRpt.out"
+        open OUT, ">C:/xampp/htdocs/src/debug/NoteRpt.out"
           or die "Couldn't open file: $!";
         foreach my $f ( sort keys %{$form} ) {
             print OUT ": form-$f=$form->{$f}\n";
@@ -221,10 +221,10 @@ sub hdr {
     # could be (was) 5 used in      TABLE table-autosort: 5
 ##
     my $out .= qq|
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vChartList.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vNum.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/tablesort.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vChartList.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vNum.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/tablesort.js"> </SCRIPT>
 <div>
 <TABLE CLASS="port fullsize" >
   <TR CLASS="port" >

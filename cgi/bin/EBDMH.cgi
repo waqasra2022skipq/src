@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ############################################################################
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use CGI qw(:standard escape);
 use DBI;
 use myForm;

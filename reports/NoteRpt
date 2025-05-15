@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use DBI;
 use DBA;
 use myForm;
@@ -136,7 +136,7 @@ if ( $form->{output} eq 'pdf' ) {
       . main->addSort($form);
     $sTreatment = $dbh->prepare($qTreatment);
     warn qq|qTreatment=\n$qTreatment\n| if ($debug);
-    $pdf = PDF->start("/var/www/okmis/src/pdf/NoteRpt.pdt");
+    $pdf = PDF->start("C:/xampp/htdocs/src/pdf/NoteRpt.pdt");
     $qPC =
         $select
       . $where
@@ -162,7 +162,7 @@ else {
     warn qq|addSelection=\n$addSelection\n| if ($debug);
     warn qq|qTreatment=\n$qTreatment\n|     if ($debug);
     if ( $form->{LOGINPROVID} == 91 ) {
-        open OUT, ">/var/www/okmis/src/debug/NoteRpt.out"
+        open OUT, ">C:/xampp/htdocs/src/debug/NoteRpt.out"
           or die "Couldn't open file: $!";
         foreach my $f ( sort keys %{$form} ) {
             print OUT ": form-$f=$form->{$f}\n";

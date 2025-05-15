@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use myConfig;
 use Cwd;
 use DBI;
@@ -75,12 +75,12 @@ my $rxTable = $sxTable->fetchrow_hashref;
 ##foreach my $f ( sort keys %{$rxTable} ) { warn "GenReport: rxTable-$f=$rxTable->{$f}\n"; }
 if ( $rxTable->{Inputs} eq 'none' ) {
     my $cmd =
-qq|/var/www/okmis/src/reports/$rxTable->{Script} DBNAME=$form->{DBNAME}\\&mlt=$form->{mlt}\\&hdrline=$form->{hdrline}\\&output=$form->{output}|;
+qq|C:/xampp/htdocs/src/reports/$rxTable->{Script} DBNAME=$form->{DBNAME}\\&mlt=$form->{mlt}\\&hdrline=$form->{hdrline}\\&output=$form->{output}|;
     $result = main->runReport("${cmd}");
 }
 elsif ( $rxTable->{Inputs} eq 'shell' ) {
     my $cmd =
-qq|/var/www/okmis/src/reports/$rxTable->{Script} $form->{$rxTable->{Args}} $form->{mlt}|;
+qq|C:/xampp/htdocs/src/reports/$rxTable->{Script} $form->{$rxTable->{Args}} $form->{mlt}|;
     $result = main->runReport("${cmd}");
 }
 elsif ( $form->{report} || $form->{save} ) { $result = main->submit(); }
@@ -206,15 +206,15 @@ sub check {
         "checkinputwindow noclock countdown_10" )
       . qq|
   <link rel="stylesheet" type="text/css" href="/cgi/jcal/calendar-forest.css" >
-  <link rel="stylesheet" type="text/css" href="/cgi/css/StyleYearMonth.css"> 
-  <SCRIPT type="text/javascript" src="/cgi/js/ajaxrequest.js"></SCRIPT>
+  <link rel="stylesheet" type="text/css" href="/src/cgi/css/StyleYearMonth.css"> 
+  <SCRIPT type="text/javascript" src="/src/cgi/js/ajaxrequest.js"></SCRIPT>
   <script type="text/javascript" src="/cgi/jcal/calendar.js"></script>
   <script type="text/javascript" src="/cgi/jcal/calendar-en.js"></script>
   <script type="text/javascript" src="/cgi/jcal/calendar-setup.js"></script>
-  <script type="text/javascript" src="/cgi/js/vDate.js"></script>
-  <script type="text/javascript" src="/cgi/js/vTime.js"></script>
-  <script type="text/javascript" src="/cgi/js/vNum.js"></script>
-  <script type="text/javascript" src="/cgi/js/YearMonth.js"></script>
+  <script type="text/javascript" src="/src/cgi/js/vDate.js"></script>
+  <script type="text/javascript" src="/src/cgi/js/vTime.js"></script>
+  <script type="text/javascript" src="/src/cgi/js/vNum.js"></script>
+  <script type="text/javascript" src="/src/cgi/js/YearMonth.js"></script>
   <SCRIPT TYPE="text/javascript" >
 function validate(form)
 {
@@ -264,7 +264,7 @@ sub submit {
       if ($debug);
     my $hdrline = $form->{hdrline} ? $form->{hdrline} : 3;
     my $cmd =
-qq|/var/www/okmis/src/reports/$rxTable->{Script} 'DBNAME=$form->{DBNAME}&mlt=$form->{mlt}&Type=$form->{Type}&hdrline=$form->{hdrline}&output=$form->{output}&Descr=$rxTable->{Descr}|;
+qq|C:/xampp/htdocs/src/reports/$rxTable->{Script} 'DBNAME=$form->{DBNAME}&mlt=$form->{mlt}&Type=$form->{Type}&hdrline=$form->{hdrline}&output=$form->{output}&Descr=$rxTable->{Descr}|;
 ##  foreach my $inp ( split(':',$rxTable->{Inputs}) )
     foreach my $inp ( sort keys %{Args} ) {
         $cmd .= qq|&${inp}=$form->{$inp}|;

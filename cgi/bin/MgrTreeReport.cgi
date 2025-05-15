@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use DBI;
 use DBForm;
 use SysAccess;
@@ -69,12 +69,12 @@ sub genTreeFlat {
 sub genHTML {
     my ( $self, $form, $r ) = @_;
     my $Spacer =
-      qq|  <IMG HEIGHT=1 WIDTH="$r->{Indent}" SRC="/images/blank.gif">|;
+      qq|  <IMG HEIGHT=1 WIDTH="$r->{Indent}" SRC="/src/images/blank.gif">|;
     my $ProvInfo = '';
     if ( $r->{Clinician} ) {
         $ProvInfo .= qq|
-      <IMG BORDER=0 ALT="Client-List by Provider" SRC="/images/icon_folder.gif">
-      <IMG BORDER=0 ALT="Chart-List by Provider" SRC="/images/clipboard.gif">
+      <IMG BORDER=0 ALT="Client-List by Provider" SRC="/src/images/icon_folder.gif">
+      <IMG BORDER=0 ALT="Chart-List by Provider" SRC="/src/images/clipboard.gif">
       &nbsp;
 |;
     }

@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use DBI;
 use DBForm;
 use cBill;
@@ -41,7 +41,7 @@ $sClinics->execute;
 
 while ( $rClinics = $sClinics->fetchrow_hashref ) {
     my $cmd =
-qq|/var/www/okmis/src/reports/NoteRpt DBNAME=$form->{DBNAME}\\&Type=TransBilled\\&Format=JOLTS\\&output=ss|;
+qq|C:/xampp/htdocs/src/reports/NoteRpt DBNAME=$form->{DBNAME}\\&Type=TransBilled\\&Format=JOLTS\\&output=ss|;
     $cmd .= qq|\\&ClinicIDs=$rClinics->{ProvID}|;
     $cmd .= qq|\\&InsID=$rClinics->{InsID}|;
     $cmd .= qq|\\&FromDate=${BillDate}\\&ToDate=${BillDate}|;

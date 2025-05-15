@@ -1,12 +1,12 @@
 #!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use Accounts;
 use myConfig;
 use Cwd;
 use DBI;
 use DBForm;
 
-my $sqlfile = "/var/www/okmis/src/sbin/work/AlterTableDL.sql";
+my $sqlfile = "C:/xampp/htdocs/src/sbin/work/AlterTableDL.sql";
 
 my @DBS = scalar(@ARGV) ? @ARGV : Accounts->dbs('live');
 

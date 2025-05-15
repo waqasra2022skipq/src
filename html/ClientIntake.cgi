@@ -1,29 +1,29 @@
 [[myHTML->newPage(%form+Client Intake+++++lhcautocomplete)]]
 
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/NoEnter.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vClientIntake.js?v=202009290648"> </SCRIPT>
-<SCRIPT type="text/javascript" src="/cgi/js/ajaxrequest.js"></SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vDate.js?345345"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vTime.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vPhone.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vNum.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vZip.js"> </SCRIPT>
-<SCRIPT type="text/javascript" src="/cgi/js/vCheckAddress.js?v=202006032043"></SCRIPT>
-<SCRIPT TYPE="text/javascript" SRC="/cgi/jquery/jquery-1.12.4.js" ></SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/NoEnter.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vClientIntake.js?v=202009290648"> </SCRIPT>
+<SCRIPT type="text/javascript" src="/src/cgi/js/ajaxrequest.js"></SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vDate.js?345345"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vTime.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vPhone.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vNum.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vZip.js"> </SCRIPT>
+<SCRIPT type="text/javascript" src="/src/cgi/js/vCheckAddress.js?v=202006032043"></SCRIPT>
+<SCRIPT TYPE="text/javascript" SRC="/src/cgi/jquery/jquery-1.12.4.js" ></SCRIPT>
 <SCRIPT TYPE="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></SCRIPT>
 <script src="https://lhcforms-static.nlm.nih.gov/autocomplete-lhc-versions/17.0.3/autocomplete-lhc.min.js"></script>
-<SCRIPT TYPE="text/javascript" SRC="/cgi/jquery/jquery-ui-1.12.1/jquery-ui.min.js" ></SCRIPT>
+<SCRIPT TYPE="text/javascript" SRC="/src/cgi/jquery/jquery-ui-1.12.1/jquery-ui.min.js" ></SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" >
 $(document).ready(function() {
   var addressVerified = document.getElementsByName('Client_addressVerified_1')[0].value;
   if (addressVerified == 1) {
     document.getElementById('Client_Check_Address_1').innerHTML
-      = `<img src="/images/check.jpg" width="20" height="20" style="vertical-align: middle;margin-right: 8px;"><span>Verified</span>`;
+      = `<img src="/src/images/check.jpg" width="20" height="20" style="vertical-align: middle;margin-right: 8px;"><span>Verified</span>`;
   }
   var addressVerifiedTransBy = document.getElementsByName('ClientReferrals_TransaddressVerified_1')[0].value;
   if (addressVerifiedTransBy == 1) {
     document.getElementById('ClientReferrals_TransCheck_Address_1').innerHTML
-      = `<img src="/images/check.jpg" width="20" height="20" style="vertical-align: middle;margin-right: 8px;"><span>Verified</span>`;
+      = `<img src="/src/images/check.jpg" width="20" height="20" style="vertical-align: middle;margin-right: 8px;"><span>Verified</span>`;
   }
 
   var homeless = $("#Client_Homeless_1").prop("checked");
@@ -311,6 +311,8 @@ function initAutocomplete() {
       <INPUT TYPE="TEL" NAME="ClientReferrals_TransPh_1" VALUE="<<ClientReferrals_TransPh_1>>" ONFOCUS="select()" ONCHANGE="return vPhone(this)" SIZE="20" >
     </TD>
   </TR>
+
+  
   <TR > <TD CLASS="strcol" COLSPAN="2" ><HR></TD> </TR>
   <TR >
     <TD CLASS="strcol" >
@@ -758,7 +760,7 @@ vDate(document.Intake.Client_DOB_1,1,document.Intake,'Client_Age');
 [[myHTML->rightpane(%form+search)]]
 <script src="https://maps.googleapis.com/maps/api/js?libraries=places&callback=initAutocomplete"
         async defer></script>
-<script LANGUAGE="JavaScript" src="/cgi/js/vClientAddressForm.js?v=202006242248"></script>
+<script LANGUAGE="JavaScript" src="/src/cgi/js/vClientAddressForm.js?v=202006242248"></script>
 <script LANGUAGE="JavaScript">
 $(document).ready(function() {
   initClientAddressForm('Trans_AddressManualInput', 'Trans_AddressManualInput_Link', 'ClientReferrals_Trans', 1);
@@ -766,5 +768,5 @@ $(document).ready(function() {
 });
 </script>
 
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/clinicalTable.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/clinicalTable.js"> </SCRIPT>
 

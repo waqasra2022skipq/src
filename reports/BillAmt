@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ###########################################
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use DBI;
 use DBForm;
 use MgrTree;
@@ -51,7 +51,7 @@ my $sClinics = $dbh->prepare($qClinics);
 $sClinics->execute() || $form->dberror($qClinics);
 my $Cnt = $sClinics->rows;
 if ( $form->{output} eq 'pdf' ) {
-    $pdf = PDF->start("/var/www/okmis/src/pdf/BillAmt.pdt");
+    $pdf = PDF->start("C:/xampp/htdocs/src/pdf/BillAmt.pdt");
     while ( my $rClinics = $sClinics->fetchrow_hashref ) {
         main->genPDFBR($rClinics);
     }

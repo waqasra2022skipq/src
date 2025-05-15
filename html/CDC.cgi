@@ -1,15 +1,15 @@
 [[myHTML->newPage(%form+Customer Data Core Information)]]
 
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/chkLock.js" > </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/NoEnter.js" > </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js" > </SCRIPT>
-<SCRIPT type="text/javascript" src="/cgi/js/ajaxrequest.js"></SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vCDC.js" > </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vZip.js" > </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/Utils.js" > </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vDate.js" > </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vTime.js" > </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vNum.js" > </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/chkLock.js" > </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/NoEnter.js" > </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js" > </SCRIPT>
+<SCRIPT type="text/javascript" src="/src/cgi/js/ajaxrequest.js"></SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vCDC.js" > </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vZip.js" > </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/Utils.js" > </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vDate.js" > </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vTime.js" > </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vNum.js" > </SCRIPT>
 
 <FORM NAME="CDC" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >

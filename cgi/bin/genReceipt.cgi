@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ###########################################
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use Cwd;
 use DBI;
 use DBForm;
@@ -15,7 +15,7 @@ $pwd = cwd();
 
 #warn qq|genReceipt.cgi: pwd=$pwd, file=$file\n|;
 my $cmd =
-qq|/var/www/okmis/src/bin/genReceipt DBNAME=$form->{DBNAME}\\&RecIDs=$form->{InsPaid_ID}\\&mlt=$form->{mlt}|;
+qq|C:/xampp/htdocs/src/bin/genReceipt DBNAME=$form->{DBNAME}\\&RecIDs=$form->{InsPaid_ID}\\&mlt=$form->{mlt}|;
 
 #warn "cmd=$cmd\n";
 my $diskfile = DBUtil->ExecCmd( $cmd, '.err' );

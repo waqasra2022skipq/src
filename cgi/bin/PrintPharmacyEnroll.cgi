@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use myConfig;
 use DBI;
 use DBForm;
@@ -51,7 +51,7 @@ $xdp .= qq|
 </xdp:xdp>
 |;
 if ( $form->{LOGINPROVID} == 91 ) {
-    open XML, ">/var/www/okmis/src/debug/PrintPharmacyEnroll.out"
+    open XML, ">C:/xampp/htdocs/src/debug/PrintPharmacyEnroll.out"
       or die "Couldn't open file: $!";
     print XML ${xdp};
     close(XML);

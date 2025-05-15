@@ -1,13 +1,13 @@
 [[myHTML->newPage(%form+Provider and Client Survey)]]
 
 <LINK REL="stylesheet" TYPE="text/css" HREF="/cgi/jcal/calendar-forest.css" >
-<SCRIPT TYPE="text/javascript" SRC="/cgi/js/vEntry.js"></SCRIPT>
-<SCRIPT TYPE="text/javascript" SRC="/cgi/js/utils.js"></SCRIPT>
+<SCRIPT TYPE="text/javascript" SRC="/src/cgi/js/vEntry.js"></SCRIPT>
+<SCRIPT TYPE="text/javascript" SRC="/src/cgi/js/utils.js"></SCRIPT>
 <SCRIPT TYPE="text/javascript" SRC="/cgi/jcal/calendar.js"></SCRIPT>
 <SCRIPT TYPE="text/javascript" SRC="/cgi/jcal/calendar-en.js"></SCRIPT>
 <SCRIPT TYPE="text/javascript" SRC="/cgi/jcal/calendar-setup.js"></SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vSurveys.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vDate.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vSurveys.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vDate.js"> </SCRIPT>
 
 <FORM NAME="Surveys" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >

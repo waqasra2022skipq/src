@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 ############################################################################
 $file = $ARGV[0];
 foreach my $file (@ARGV) {

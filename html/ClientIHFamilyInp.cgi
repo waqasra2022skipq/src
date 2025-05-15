@@ -1,12 +1,12 @@
 [[myHTML->newPage(%form+Family Relations)]]
 
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/NoEnter.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vClientFamily.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vNum.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/ajaxrequest.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/NoEnter.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vClientFamily.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vNum.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/ajaxrequest.js"> </SCRIPT>
 <SCRIPT TYPE="text/javascript" SRC="/cgi/jquery/jquery-ui-1.11.2/jquery-ui.min.js" ></SCRIPT>
-<LINK HREF="/cgi/css/autocomplete.css?v=202008071708" REL="stylesheet">
+<LINK HREF="/src/cgi/css/autocomplete.css?v=202008071708" REL="stylesheet">
 
 <FORM NAME="ClientFamily" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
@@ -86,7 +86,7 @@ document.ClientFamily.elements[0].focus();
 
 [[myHTML->rightpane(%form+search)]]
 
-<SCRIPT type="text/javascript" src="/cgi/js/vMCAutocomplete.js?v=202006082124"></SCRIPT>
+<SCRIPT type="text/javascript" src="/src/cgi/js/vMCAutocomplete.js?v=202006082124"></SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" >
 callAjax('xRelationship','','','&Autocomplete=MCAutocomplete&Target=ClientFamily_Rel_1','popup.pl');
 </SCRIPT>

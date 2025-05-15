@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ############################################################################
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use DBI;
 use myForm;
 use myDBI;
@@ -67,7 +67,7 @@ sub submit {
       . qq|
 <P>
 <P>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/novalidate.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/novalidate.js"> </SCRIPT>
 <FORM NAME="submit" ACTION="/cgi/bin/adminJob.pl" METHOD="POST">
 <DIV CLASS="strcol" >
 JOB executed ${typename}: ${job}
@@ -106,7 +106,7 @@ sub status {
       . qq|
 <P>
 <P>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/novalidate.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/novalidate.js"> </SCRIPT>
 <FORM NAME="submit" ACTION="/cgi/bin/adminJob.pl" METHOD="POST">
 <DIV CLASS="strcol" >
 JOB status ${typename}: ${job}
@@ -143,7 +143,7 @@ sub verify {
       . qq|
 <P>
 <P>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/novalidate.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/novalidate.js"> </SCRIPT>
 <FORM NAME="submit" ACTION="/cgi/bin/adminJob.pl" METHOD="POST">
 <DIV CLASS="strcol" >
   Do you want to execute JOB ${typename}: ${job}

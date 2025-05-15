@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ############################################################################
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use Cwd;
 use DBI;
 use myForm;
@@ -26,7 +26,7 @@ my $javaor = "||";
 
 ############################################################################
 if ( $form->{LOGINPROVID} == 91 ) {
-    open OUT, ">/var/www/okmis/src/debug/graphs.out"
+    open OUT, ">C:/xampp/htdocs/src/debug/graphs.out"
       or die "Couldn't open file: $!";
     foreach my $f ( sort keys %{$form} ) {
         print OUT "graphs.cgi: form-$f=$form->{$f}\n";
@@ -61,16 +61,16 @@ my $html = myHTML->new(
     'STYLE="background-color: white"'
   )
   . qq|
-<SCRIPT TYPE="text/javascript" SRC="/cgi/js/ajaxrequest.js"></SCRIPT>
+<SCRIPT TYPE="text/javascript" SRC="/src/cgi/js/ajaxrequest.js"></SCRIPT>
   <LINK REL="stylesheet" TYPE="text/css" HREF="/cgi/jcal/calendar-forest.css" >
-  <LINK REL="stylesheet" TYPE="text/css" HREF="/cgi/css/StyleYearMonth.css"> 
-  <SCRIPT TYPE="text/javascript" SRC="/cgi/js/utils.js"></SCRIPT>
+  <LINK REL="stylesheet" TYPE="text/css" HREF="/src/cgi/css/StyleYearMonth.css"> 
+  <SCRIPT TYPE="text/javascript" SRC="/src/cgi/js/utils.js"></SCRIPT>
   <SCRIPT TYPE="text/javascript" SRC="/cgi/jcal/calendar.js"></SCRIPT>
   <SCRIPT TYPE="text/javascript" SRC="/cgi/jcal/calendar-en.js"></SCRIPT>
   <SCRIPT TYPE="text/javascript" SRC="/cgi/jcal/calendar-setup.js"></SCRIPT>
-  <SCRIPT TYPE="text/javascript" SRC="/cgi/js/vDate.js"></SCRIPT>
-  <SCRIPT TYPE="text/javascript" SRC="/cgi/js/vNum.js"></SCRIPT>
-  <SCRIPT TYPE="text/javascript" SRC="/cgi/js/YearMonth.js"></SCRIPT>
+  <SCRIPT TYPE="text/javascript" SRC="/src/cgi/js/vDate.js"></SCRIPT>
+  <SCRIPT TYPE="text/javascript" SRC="/src/cgi/js/vNum.js"></SCRIPT>
+  <SCRIPT TYPE="text/javascript" SRC="/src/cgi/js/YearMonth.js"></SCRIPT>
 <SCRIPT TYPE="text/javascript" >
 function validate(form)
 {
@@ -233,7 +233,7 @@ select 'Amt' as MyKey, DATE_FORMAT(Treatment.ContLogDate,'%Y-%m') as MyX, SUM(Tr
  group by MyKey, MyX |;
 
     if ( $form->{LOGINPROVID} == 91 ) {
-        open OUT, ">>/var/www/okmis/src/debug/graphs.out"
+        open OUT, ">>C:/xampp/htdocs/src/debug/graphs.out"
           or die "Couldn't open file: $!";
         print OUT qq|graphs.cgi: s=\n$s\n|;
         close(OUT);

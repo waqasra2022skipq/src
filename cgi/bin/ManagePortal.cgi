@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use DBI;
 use DBForm;
 use SysAccess;
@@ -34,16 +34,16 @@ my $html = myHTML->new( $form, $title, 'noclock' ) . qq|
   . myConfig->cfgfile( 'menuV2.css', 1 )
   . qq|" REL="stylesheet" TYPE="text/css" >
 <script src="/cgi/menu/js/menuV2.js" type="text/javascript"></script>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/ajaxrequest.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/ajaxrequest.js"> </SCRIPT>
 <LINK HREF="|
   . myConfig->cfgfile( 'tabcontent/template6/tabcontent.css', 1 )
   . qq|" REL="stylesheet" TYPE="text/css" >
 <SCRIPT SRC="|
   . myConfig->cfgfile( 'tabcontent/tabcontent.js', 1 )
   . qq|" TYPE="text/javascript" ></SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript" SRC="/cgi/js/tabs.js"></SCRIPT>
-<LINK REL="STYLESHEET" TYPE="text/css" HREF="/cgi/css/tabs.css" />
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript" SRC="/src/cgi/js/tabs.js"></SCRIPT>
+<LINK REL="STYLESHEET" TYPE="text/css" HREF="/src/cgi/css/tabs.css" />
 <FORM NAME="ClientPage" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >

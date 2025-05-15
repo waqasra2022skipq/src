@@ -1,2 +1,2 @@
 #!/bin/bash
-/var/www/okmis/src/sbin/lockunlock DBNAME=$1\&table=ClientPrAuth\&lock=0\&myID=$2
+C:/xampp/htdocs/src/sbin/lockunlock DBNAME=$1\&table=ClientPrAuth\&lock=0\&myID=$2

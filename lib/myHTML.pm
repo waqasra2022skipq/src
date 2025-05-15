@@ -169,7 +169,7 @@ button, html input[type=button], input[type=reset], input[type=submit] {
     }
     my $countdown = $flags =~ /countdown/i
       ? qq|
-  <SCRIPT TYPE="text/javascript" SRC="/cgi/js/countdown.js?v=20161101"></SCRIPT>
+  <SCRIPT TYPE="text/javascript" SRC="src/src/cgi/js/countdown.js?v=20161101"></SCRIPT>
 |
       : '';
 
@@ -187,16 +187,16 @@ button, html input[type=button], input[type=reset], input[type=submit] {
 #  <SCRIPT SRC="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></SCRIPT>
     my $jquery = qq|
   <!-- JQuery Dependencies -->
-  <LINK REL="stylesheet" HREF="/cgi/jquery/jquery.mobile-1.4.5.min.css" >
-  <LINK REL="stylesheet" HREF="/cgi/jquery/jquery-ui-1.12.1/jquery-ui.css" >
-  <SCRIPT TYPE="text/javascript" SRC="/cgi/jquery/jquery-1.12.4.js" ></SCRIPT>
-  <SCRIPT TYPE="text/javascript" SRC="/cgi/jquery/jquery-ui-1.12.1/jquery-ui.js" ></SCRIPT>
+  <LINK REL="stylesheet" HREF="/src/cgi/jquery/jquery.mobile-1.4.5.min.css" >
+  <LINK REL="stylesheet" HREF="/src/cgi/jquery/jquery-ui-1.12.1/jquery-ui.css" >
+  <SCRIPT TYPE="text/javascript" SRC="/src/cgi/jquery/jquery-1.12.4.js" ></SCRIPT>
+  <SCRIPT TYPE="text/javascript" SRC="/src/cgi/jquery/jquery-ui-1.12.1/jquery-ui.js" ></SCRIPT>
   <LINK HREF="|
       . myConfig->cfgfile( 'jquery.css', 1 )
       . qq|" REL="stylesheet" TYPE="text/css" >
-  <SCRIPT TYPE="text/javascript" SRC="/cgi/jquery/myJQuery.js" ></SCRIPT>
-  <LINK REL="stylesheet" HREF="/cgi/jquery/timepicker/jquery.timepicker.css" />
-  <SCRIPT TYPE="text/javascript" SRC="/cgi/jquery/timepicker/jquery.timepicker.js" ></SCRIPT>
+  <SCRIPT TYPE="text/javascript" SRC="/src/cgi/jquery/myJQuery.js" ></SCRIPT>
+  <LINK REL="stylesheet" HREF="/src/cgi/jquery/timepicker/jquery.timepicker.css" />
+  <SCRIPT TYPE="text/javascript" SRC="/src/cgi/jquery/timepicker/jquery.timepicker.js" ></SCRIPT>
 |;
 
     #| : '';
@@ -209,7 +209,7 @@ button, html input[type=button], input[type=reset], input[type=submit] {
       . qq|" REL="stylesheet" TYPE="text/css" >
   <SCRIPT TYPE="text/javascript" SRC="|
       . myConfig->cfgfile( 'tabcontent/tabcontent.js', 1 ) . qq|" ></SCRIPT>
-  <SCRIPT TYPE="text/javascript" SRC="/cgi/js/tabs.js"></SCRIPT>
+  <SCRIPT TYPE="text/javascript" SRC="/src/src/cgi/js/tabs.js"></SCRIPT>
 |
       : '';
 
@@ -256,13 +256,13 @@ button, html input[type=button], input[type=reset], input[type=submit] {
     .itemBorder { border: 1px solid red }
     .itemText { text-align: center; text-decoration: none; color: black; font: 12px Arial, Helvetica }
   </STYLE>
-  <SCRIPT TYPE="text/javascript" SRC="/cgi/js/Login.js?v=20160628" ></SCRIPT>
+  <SCRIPT TYPE="text/javascript" SRC="/src/cgi/js/Login.js?v=20160628" ></SCRIPT>
   <SCRIPT TYPE="text/javascript" >setCookie('MillenniumIS','$form->{mlt}','60');</SCRIPT>
   <SCRIPT TYPE="text/javascript" >javascript:window.history.forward(1);</SCRIPT>
-  <SCRIPT TYPE="text/javascript" SRC="/cgi/menu/js/centerAlign.js?v=20200911"> </SCRIPT>
-  <SCRIPT TYPE="text/javascript" SRC="/cgi/js/utils.js?v=20170828" ></SCRIPT>
-  <SCRIPT TYPE="text/javascript" SRC="/cgi/js/NoEnter.js" ></SCRIPT>
-  <SCRIPT TYPE="text/javascript" SRC="/cgi/js/accordion.js" ></SCRIPT>
+  <SCRIPT TYPE="text/javascript" SRC="/src/cgi/menu/js/centerAlign.js?v=20200911"> </SCRIPT>
+  <SCRIPT TYPE="text/javascript" SRC="/src/cgi/js/utils.js?v=20170828" ></SCRIPT>
+  <SCRIPT TYPE="text/javascript" SRC="/src/cgi/js/NoEnter.js" ></SCRIPT>
+  <SCRIPT TYPE="text/javascript" SRC="/src/cgi/js/accordion.js" ></SCRIPT>
   ${addHEAD}
   <SCRIPT TYPE="text/javascript" >window.focus();</SCRIPT>
   ${countdown}
@@ -271,7 +271,7 @@ button, html input[type=button], input[type=reset], input[type=submit] {
       myAlert("Logout in less than " + min + " minutes.\\nPlease click the Update button or goto another screen.","LOGOUT Notice");
     }
     function refreshCurrentPage() {
-      window.location = logoutURL('$form->{HTTPSERVER}/cgi/bin/mis.cgi?logout=1&mlt=$form->{mlt}');
+      window.location = logoutURL('$form->{HTTPSERVER}/src/cgi/bin/mis.cgi?logout=1&mlt=$form->{mlt}');
     }
     function logoutURL(url) { return url; }
     var minTOlogout = ${minTOlogout}
@@ -348,7 +348,7 @@ sub menu {
 sub leftpane {
     my ( $self, $form, $lpflags )        = @_;
     my ( $ClockLink, $TreeLink )         = ( '', '' );
-    my ( $MailLink, $MailMsg, $MailImg ) = ( '', '', '/img/mail-ok.png' );
+    my ( $MailLink, $MailMsg, $MailImg ) = ( '', '', '/src/img/mail-ok.png' );
     my ( $ApptLink, $ApptMsg )           = ( '', '' );
     my ( $RenewLink, $RenewMsg )         = ( '', '' );
     my ( $IPADLink, $CountDown )         = ( '', '' );
@@ -367,8 +367,8 @@ sub leftpane {
     }
     if ( $lpflags =~ /managertree/i || $lpflags =~ /allleft/i ) {
         $TreeLink = qq|
-      <A HREF="/cgi/bin/mis.cgi?MIS_Action=ManagerTree&mlt=$form->{mlt}" TITLE="Click here to return to the <BR><STRONG>MANAGERIAL TREE</STRONG>" >
-        <IMG ALT="tree" SRC="/cgi/images/tree.png" WIDTH="30" HEIGHT="30" >
+      <A HREF="mis.cgi?MIS_Action=ManagerTree&mlt=$form->{mlt}" TITLE="Click here to return to the <BR><STRONG>MANAGERIAL TREE</STRONG>" >
+        <IMG ALT="tree" SRC="/src/cgi/images/tree.png" WIDTH="30" HEIGHT="30" >
       </A>|;
     }
     if ( $lpflags =~ /mail/i || $lpflags =~ /allleft/i ) {
@@ -397,7 +397,7 @@ sub leftpane {
         }
         $MailLink = qq|
       <BR>
-      <A HREF="/cgi/bin/ProviderMail.cgi?mlt=$form->{mlt}" TITLE="Click here for you <BR><STRONG>MAIL LISTING</STRONG>" ><IMG ALT="your mail" SRC="${MailImg}" HEIGHT="40" WIDTH="40" >
+      <A HREF="/src/cgi/bin/ProviderMail.cgi?mlt=$form->{mlt}" TITLE="Click here for you <BR><STRONG>MAIL LISTING</STRONG>" ><IMG ALT="your mail" SRC="${MailImg}" HEIGHT="40" WIDTH="40" >
       </A>${MailMsg}|;
         $sProvider->finish();
         $sProviderMail->finish();
@@ -445,7 +445,7 @@ sub leftpane {
     if ( $lpflags =~ /collapseipad/i || $lpflags =~ /allleft/i ) {
         $IPADLink = qq|
       <BR>
-      <A HREF="javascript: void(0)" TITLE="Click here to collapse the menus <BR><STRONG>left open on your iPAD</STRONG>" ><IMG ALT="close ipad menu" SRC="/images/redx.gif" >
+      <A HREF="javascript: void(0)" TITLE="Click here to collapse the menus <BR><STRONG>left open on your iPAD</STRONG>" ><IMG ALT="close ipad menu" SRC="/src/images/redx.gif" >
       </A>|;
     }
     my $html = qq|
@@ -496,7 +496,7 @@ sub rightpane {
         $msg        .= qq|and Providers| if ($ok);
         $msg        .= qq|.|;
         $SearchLink .= qq|
-      <FORM NAME="Search" ACTION="/cgi/bin/Search.cgi" METHOD="POST">
+      <FORM NAME="Search" ACTION="/src/cgi/bin/Search.cgi" METHOD="POST">
       <DIV CLASS="main subtitle" >${msg}</DIV>
       <DIV CLASS="port subtitle hdrcol" >
         <A HREF="javascript:void(0)" TITLE="Enter search string into the text box.<BR>Then select the type of search needed by clicking on one of the radio buttons.<BR>wildcards such as John... may also be used except in the ID#." >
@@ -562,7 +562,7 @@ sub rightpane {
     if ( $flags =~ /search/i || $flags =~ /login/i ) {
         $SearchLink = qq|
       <DIV CLASS="main hdrcol" >
-           <A HREF="/cgi/bin/mis.cgi?logout=1&mlt=$form->{mlt}" ONMOUSEOVER="ImgShow('logout')" ONMOUSEOUT="ImgHide()" ><IMG ALT="logout" NAME="logout" BORDER=0 SRC="/images/logout_hide.gif"></A>
+           <A HREF="/src/cgi/bin/mis.cgi?logout=1&mlt=$form->{mlt}"  ><IMG ALT="logout" NAME="logout" BORDER=0 SRC="/images/logout_hide.gif"></A>
         <BR>${SearchLink}
       </DIV>
       <SCRIPT LANGUAGE="JavaScript" >document.Search.elements[0].focus();</SCRIPT>
@@ -771,15 +771,15 @@ qq|            <INPUT TYPE="submit" ONCLICK="return validate(this.form)" NAME="$
                     my ( $print_routine, $page, $msg ) = split( ':', $button );
                     $msg = 'click to print' if ( $msg eq '' );    # ON MOUSEOVER
                     $display =
-qq|<A HREF="javascript:ReportWindow('/cgi/bin/${print_routine}.cgi?IDs=$r->{$RECID}&mlt=$form->{mlt}&action=${table}\&page=${page}','PrintWindow')" TITLE="${msg}" ><IMG ALT="print" SRC="/img/print-ok.png" HEIGHT="21" WIDTH="21" BORDER="0" ></A><BR>${fldval}|;
+qq|<A HREF="javascript:ReportWindow('/src/cgi/bin/${print_routine}.cgi?IDs=$r->{$RECID}&mlt=$form->{mlt}&action=${table}\&page=${page}','PrintWindow')" TITLE="${msg}" ><IMG ALT="print" SRC="/src/img/print-ok.png" HEIGHT="21" WIDTH="21" BORDER="0" ></A><BR>${fldval}|;
                 }
                 elsif ( $typeFunc eq 'D' )    # DISPLAY (EDocs)
                 {
                   #warn qq|ListSel: DISPLAY: fldval=$fldval, $fld=$r->{$fld}\n|;
                     $display =
                       $fldval eq ''
-                      ? qq|<A HREF="javascript:void()" TITLE="NO LINK AVAILABLE!" ><IMG ALT="print" SRC="/img/print-warn.png" HEIGHT="21" WIDTH="21" BORDER="0" ></A><BR>|
-                      : qq|<A HREF="javascript:ReportWindow('${fldval}','display')" TITLE="Click here to view." ><IMG ALT="print" SRC="/img/print-ok.png" HEIGHT="21" WIDTH="21" BORDER="0" ></A><BR>|;
+                      ? qq|<A HREF="javascript:void()" TITLE="NO LINK AVAILABLE!" ><IMG ALT="print" SRC="/src/img/print-warn.png" HEIGHT="21" WIDTH="21" BORDER="0" ></A><BR>|
+                      : qq|<A HREF="javascript:ReportWindow('${fldval}','display')" TITLE="Click here to view." ><IMG ALT="print" SRC="/src/img/print-ok.png" HEIGHT="21" WIDTH="21" BORDER="0" ></A><BR>|;
                 }
                 elsif ( $typeFunc eq 'O' )    # ORDER
                 {
@@ -852,10 +852,10 @@ qq|            <INPUT TYPE="submit" ONCLICK="return validate(this.form)" NAME="$
             if ( $fldcnt == 1 && SysAccess->verify( $form, 'Privilege=Agent' ) )
             {
                 $show_id =
-qq|<A HREF="javascript:ReportWindow('/cgi/bin/show_id.cgi?IDs=$r->{$RECID}&mlt=$form->{mlt}&action=${table}\&page=${page}','PrintWindow')" TITLE="${TABLEID}: $r->{$RECID}" ><IMG ALT="show" SRC="/img/zoom.png" HEIGHT="20" WIDTH="20" ></A>|
+qq|<A HREF="javascript:ReportWindow('/src/cgi/bin/show_id.cgi?IDs=$r->{$RECID}&mlt=$form->{mlt}&action=${table}\&page=${page}','PrintWindow')" TITLE="${TABLEID}: $r->{$RECID}" ><IMG ALT="show" SRC="/src/img/zoom.png" HEIGHT="20" WIDTH="20" ></A>|
                   if ( $form->{'LOGINPROVID'} == 91 );
                 $show_id .=
-qq|<A HREF="javascript:ReportWindow('/cgi/bin/show_log.cgi?IDs=$r->{$RECID}&mlt=$form->{mlt}&action=${table}\&page=${page}','PrintWindow')" TITLE="${TABLEID}: $r->{$RECID}" ><IMG ALT="history" SRC="/img/history.png" HEIGHT="20" WIDTH="20" ></A>|
+qq|<A HREF="javascript:ReportWindow('/src/cgi/bin/show_log.cgi?IDs=$r->{$RECID}&mlt=$form->{mlt}&action=${table}\&page=${page}','PrintWindow')" TITLE="${TABLEID}: $r->{$RECID}" ><IMG ALT="history" SRC="/src/img/history.png" HEIGHT="20" WIDTH="20" ></A>|
                   if ( myDBI->getTableLogFlag( $form, $table ) );
             }
             if ( $fldcnt == 1
@@ -869,10 +869,10 @@ qq|<A HREF="javascript:ReportWindow('/cgi/bin/show_log.cgi?IDs=$r->{$RECID}&mlt=
                 my ($DOB) = $sAge->fetchrow_array;
                 my $Age = DBUtil->Date( $DOB, 'age', $form->{'TODAY'} );
                 $show_id .=
-qq|<A HREF="javascript:ReportWindow('http://apps2.nlm.nih.gov/medlineplus/services/mpconnect.cfm?mainSearchCriteria.v.cs=2.16.840.1.113883.6.90&mainSearchCriteria.v.c=$r->{'ICD10'}&informationRecipient.languageCode.c=en&age.v.u=a&age.v.v=${Age}','InfoLink')" TITLE="${TABLEID}: $r->{$RECID}" ><IMG ALT="info" SRC="/img/user-info.png" HEIGHT="20" WIDTH="20" ></A>|
+qq|<A HREF="javascript:ReportWindow('http://apps2.nlm.nih.gov/medlineplus/services/mpconnect.cfm?mainSearchCriteria.v.cs=2.16.840.1.113883.6.90&mainSearchCriteria.v.c=$r->{'ICD10'}&informationRecipient.languageCode.c=en&age.v.u=a&age.v.v=${Age}','InfoLink')" TITLE="${TABLEID}: $r->{$RECID}" ><IMG ALT="info" SRC="/src/img/user-info.png" HEIGHT="20" WIDTH="20" ></A>|
                   if ( $table eq 'ClientProblems' );
                 $show_id .=
-qq|<A HREF="javascript:ReportWindow('http://apps2.nlm.nih.gov/medlineplus/services/mpconnect.cfm?mainSearchCriteria.v.cs=2.16.840.1.113883.6.88&mainSearchCriteria.v.c=$r->{'rxcui'}&informationRecipient.languageCode.c=en&age.v.u=a&age.v.v=${Age}','InfoLink')" TITLE="${TABLEID}: $r->{$RECID}" ><IMG ALT="info" SRC="/img/user-info.png" HEIGHT="20" WIDTH="20" ></A>|
+qq|<A HREF="javascript:ReportWindow('http://apps2.nlm.nih.gov/medlineplus/services/mpconnect.cfm?mainSearchCriteria.v.cs=2.16.840.1.113883.6.88&mainSearchCriteria.v.c=$r->{'rxcui'}&informationRecipient.languageCode.c=en&age.v.u=a&age.v.v=${Age}','InfoLink')" TITLE="${TABLEID}: $r->{$RECID}" ><IMG ALT="info" SRC="/src/img/user-info.png" HEIGHT="20" WIDTH="20" ></A>|
                   if ( $table eq 'ClientMeds' );
                 $sAge->finish();
             }
@@ -1006,8 +1006,8 @@ qq|          <TD ${style} STYLE="text-align: ${jst}" >${show_id}${display}</TD>\
       : qq|<INPUT TYPE="submit" ONCLICK="return validate(this.form,'Add New information','')" ONMOUSEOVER="window.status='add button'; return true;" ONMOUSEOUT="window.status=''" NAME="${addnew}&${TABLEID}=new&${links}&fwdTABLE=${table}${updall}&pushID=${pushID}" VALUE="Add New" >|;
     my $html = qq|
 ${scripts}
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/tablesort.js"> </SCRIPT>
-<LINK HREF="/cgi/css/tablesort.css" REL="stylesheet" TYPE="text/css">
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/tablesort.js"> </SCRIPT>
+<LINK HREF="/src/cgi/css/tablesort.css" REL="stylesheet" TYPE="text/css">
 <TABLE CLASS="port fullsize" >
   <TR>
     <TD ALIGN="left" ><B>${title}</B> ${newbutton}</TD>
@@ -1079,9 +1079,11 @@ sub getHTML {
     ####################################
     my $SRC          = myConfig->cfg('SRC');
     my $htmlpathname = $SRC . "/html/" . $htmlname;
+
     if ( !open( TEMPLATE, $htmlpathname ) ) {
         myDBI->error("Can't open $htmlname ($!).");
     }
+
 
     ####################################
     # MAIN loop goes through the html template we just opened
@@ -1110,6 +1112,8 @@ sub getHTML {
         $html .= $line_copy . $line;
     }
 
+
+
     ####################################
     # next search for any prepare functions...
     ####################################
@@ -1124,6 +1128,8 @@ sub getHTML {
           myDBI->exFunc( $form, $whatmatch ); #   plus what the function returns
         ####################################
     }
+
+
     $html = $line_copy . $line;
 
     ####################################
@@ -1167,6 +1173,7 @@ sub getHTML {
     ####################################
     # Initialize our variables
     ####################################
+
     my $skip  = {};
     my $radio = {};
 
@@ -1236,6 +1243,8 @@ sub getHTML {
         }
     }
     $html = $line_copy . $line;
+
+
 
     ####################################
     # EXECUTES ANY FUNCTIONS WITHIN THE HTML PAGE.

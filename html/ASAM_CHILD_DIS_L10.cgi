@@ -1,10 +1,10 @@
 [[myHTML->newHTML(%form+American Society of Addiction Medicine)]]
 
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/NoEnter.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vClientASAM.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vNum.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vDate.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/NoEnter.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vClientASAM.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vNum.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vDate.js"> </SCRIPT>
 
 <FORM NAME="ASAM" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
@@ -125,7 +125,7 @@ Check all items in each dimension that apply to the client. Place a check in the
   <TR >
     <TD CLASS="strcol" COLSPAN="2" >
       <INPUT TYPE="checkbox" NAME="ClientASAM_D2v1_1" VALUE=1 <<ClientASAM_D2v1_1=checkbox>> >
-      a. The client’s biomedical conditions, if any, have diminished or stabilized to the extent they can be managed through outpatient appointments at the client’s discretion, and the client does not meet any of the continued stay criteria in this or another dimension that indicates the need for further treatment in ASAM Level I; or
+      a. The clientï¿½s biomedical conditions, if any, have diminished or stabilized to the extent they can be managed through outpatient appointments at the clientï¿½s discretion, and the client does not meet any of the continued stay criteria in this or another dimension that indicates the need for further treatment in ASAM Level I; or
     </TD>
     <TD CLASS="strcol" COLSPAN="2" >&nbsp;</TD>
   </TR>
@@ -155,7 +155,7 @@ Check all items in each dimension that apply to the client. Place a check in the
   <TR >
     <TD CLASS="strcol" COLSPAN="2" >
       <INPUT TYPE="checkbox" NAME="ClientASAM_D3v1_1" VALUE=1 <<ClientASAM_D3v1_1=checkbox>> >
-      a. The client’s emotional, behavioral or cognitive conditions, if any, have diminished or stabilized to the extent they can be managed through outpatient appointments at the client’s discretion, and the client does not meet any of the continued stay criteria in this or another dimension that indicates the need for further treatment in ASAM Level I; or
+      a. The clientï¿½s emotional, behavioral or cognitive conditions, if any, have diminished or stabilized to the extent they can be managed through outpatient appointments at the clientï¿½s discretion, and the client does not meet any of the continued stay criteria in this or another dimension that indicates the need for further treatment in ASAM Level I; or
     </TD>
     <TD CLASS="strcol" COLSPAN="2" >&nbsp;</TD>
   </TR>
@@ -185,7 +185,7 @@ Check all items in each dimension that apply to the client. Place a check in the
   <TR >
     <TD CLASS="strcol" COLSPAN="2" >
       <INPUT TYPE="checkbox" NAME="ClientASAM_D4v1_1" VALUE=1 <<ClientASAM_D4v1_1=checkbox>> >
-      a. The client’s awareness and acceptance of his/her addiction problem and commitment to recovery is sufficient to expect maintenance of a self-directed aftercare plan, based on the following evidence: 1) the client recognizes the severity of the substance abuse problem; 2) the client has an understanding of the self-defeating relationship with substances; 3) the client is applying the skills necessary to maintain sobriety in a mutual self-help group and/or with post-treatment support care; and 4) the client does not meet any of the continued stay criteria in this or another dimension that indicates the need for further treatment in ASAM Level I; or
+      a. The clientï¿½s awareness and acceptance of his/her addiction problem and commitment to recovery is sufficient to expect maintenance of a self-directed aftercare plan, based on the following evidence: 1) the client recognizes the severity of the substance abuse problem; 2) the client has an understanding of the self-defeating relationship with substances; 3) the client is applying the skills necessary to maintain sobriety in a mutual self-help group and/or with post-treatment support care; and 4) the client does not meet any of the continued stay criteria in this or another dimension that indicates the need for further treatment in ASAM Level I; or
     </TD>
     <TD CLASS="strcol" COLSPAN="2" >&nbsp;</TD>
   </TR>
@@ -215,7 +215,7 @@ Check all items in each dimension that apply to the client. Place a check in the
   <TR >
     <TD CLASS="strcol" COLSPAN="2" >
       <INPUT TYPE="checkbox" NAME="ClientASAM_D5v1_1" VALUE=1 <<ClientASAM_D5v1_1=checkbox>> >
-      a. The client’s therapeutic gains in addressing craving and relapse issues have been internalized and integrated so the client does not meet any of the ASAM Level I continued stay criteria in this or another dimension that indicates the need for further treatment in ASAM Level I; or
+      a. The clientï¿½s therapeutic gains in addressing craving and relapse issues have been internalized and integrated so the client does not meet any of the ASAM Level I continued stay criteria in this or another dimension that indicates the need for further treatment in ASAM Level I; or
     </TD>
     <TD CLASS="strcol" COLSPAN="2" >&nbsp;</TD>
   </TR>
@@ -245,7 +245,7 @@ Check all items in each dimension that apply to the client. Place a check in the
   <TR >
     <TD CLASS="strcol" COLSPAN="2" >
       <INPUT TYPE="checkbox" NAME="ClientASAM_D6v1_1" VALUE=1 <<ClientASAM_D6v1_1=checkbox>> >
-      a. The client’s social system and significant others are supportive of recovery to an extent that the client can adhere to a self-directed treatment plan without substantial risk of relapse/continued use and the client does not meet any of the continued stay criteria in this or another dimension that indicates the need for further treatment at ASAM Level I; or
+      a. The clientï¿½s social system and significant others are supportive of recovery to an extent that the client can adhere to a self-directed treatment plan without substantial risk of relapse/continued use and the client does not meet any of the continued stay criteria in this or another dimension that indicates the need for further treatment at ASAM Level I; or
     </TD>
     <TD CLASS="strcol" COLSPAN="2" >&nbsp;</TD>
   </TR>
@@ -259,7 +259,7 @@ Check all items in each dimension that apply to the client. Place a check in the
   <TR >
     <TD CLASS="strcol" COLSPAN="2" >
       <INPUT TYPE="checkbox" NAME="ClientASAM_D6v3_1" VALUE=1 <<ClientASAM_D6v3_1=checkbox>> >
-      c. The client’s social system remains non-supportive or has deteriorated. The client is having difficulty in coping with this environment and is at substantial risk of relapse and requires placement in a more intensive level of care.
+      c. The clientï¿½s social system remains non-supportive or has deteriorated. The client is having difficulty in coping with this environment and is at substantial risk of relapse and requires placement in a more intensive level of care.
     </TD>
     <TD CLASS="strcol" COLSPAN="2" >&nbsp;</TD>
   </TR>

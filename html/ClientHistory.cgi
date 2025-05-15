@@ -1,10 +1,10 @@
 [[myHTML->newHTML(%form+Client History+allleft mismenu checkpopupwindow)]]
 
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vClientHistory.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/serverREQ.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vNum.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/qDate.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vClientHistory.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/serverREQ.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vNum.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/qDate.js"> </SCRIPT>
 
 <FORM NAME="History" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
@@ -73,7 +73,7 @@
   <TR>
     <TD CLASS="strcol" COLSPAN="3" >
       How many months of Training or Technical education have you satisfactorily completed?
-      <BR>· Formal/organized training only. For military training, only include training that can be used in civilian life (i.e., electronics, computers)
+      <BR>ï¿½ Formal/organized training only. For military training, only include training that can be used in civilian life (i.e., electronics, computers)
     </TD>
     <TD CLASS="strcol" >
       <INPUT TYPE=text NAME="ClientEducation_MonthsTechEd_1" VALUE="<<ClientEducation_MonthsTechEd_1>>" ONFOCUS="select()" ONCHANGE="return vNum(this,0,99);" SIZE="2" > Months

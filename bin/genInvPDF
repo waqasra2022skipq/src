@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ###########################################
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use DBI;
 use DBForm;
 use MgrTree;
@@ -10,7 +10,7 @@ use PDF;
 ###########################################
 # anything piped to us?
 ##
-open DEBUG, ">/var/www/okmis/src/debug/genInvPDF.out"
+open DEBUG, ">C:/xampp/htdocs/src/debug/genInvPDF.out"
   or die "Couldn't open file: $!";
 my @InvIDs = ();
 if ( !-t STDIN ) {
@@ -37,7 +37,7 @@ my $qInvItems =
 my $sInvItems = $dbh->prepare($qInvItems);
 
 ############################################################################
-$pdf = PDF->start("/var/www/okmis/src/pdf/Invoice.pdt");
+$pdf = PDF->start("C:/xampp/htdocs/src/pdf/Invoice.pdt");
 my $cnt = 0;
 foreach my $id (@InvIDs) {
     print DEBUG qq|now: id=$id\n|;

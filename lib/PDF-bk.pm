@@ -5,12 +5,12 @@ use Compress::Zlib;
 
 ############################################################################
 # warnings come from...
-# Using an array as a reference is deprecated at /var/www/okmis/src/lib/PDF.pm line 178.
-# Using an array as a reference is deprecated at /var/www/okmis/src/lib/PDF.pm line 225.
-# Using an array as a reference is deprecated at /var/www/okmis/src/lib/PDF.pm line 250.
-# Using an array as a reference is deprecated at /var/www/okmis/src/lib/PDF.pm line 268.
-# Using an array as a reference is deprecated at /var/www/okmis/src/lib/PDF.pm line 287.
-# Using an array as a reference is deprecated at /var/www/okmis/src/lib/PDF.pm line 299.
+# Using an array as a reference is deprecated at C:/xampp/htdocs/src/lib/PDF.pm line 178.
+# Using an array as a reference is deprecated at C:/xampp/htdocs/src/lib/PDF.pm line 225.
+# Using an array as a reference is deprecated at C:/xampp/htdocs/src/lib/PDF.pm line 250.
+# Using an array as a reference is deprecated at C:/xampp/htdocs/src/lib/PDF.pm line 268.
+# Using an array as a reference is deprecated at C:/xampp/htdocs/src/lib/PDF.pm line 287.
+# Using an array as a reference is deprecated at C:/xampp/htdocs/src/lib/PDF.pm line 299.
 # so we suppress the warnings...
 no warnings;
 

@@ -1,13 +1,13 @@
 [[myHTML->newPage(%form+Professional License)]]
 
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/NoEnter.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vProviderLicenses.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vDate.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vNum.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/NoEnter.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vProviderLicenses.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vDate.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vNum.js"> </SCRIPT>
 <SCRIPT TYPE="text/javascript" SRC="/cgi/jquery/jquery-ui-1.11.2/jquery-ui.min.js" ></SCRIPT>
-<SCRIPT type="text/javascript" src="/cgi/js/ajaxrequest.js"></SCRIPT>
-<LINK HREF="/cgi/css/autocomplete.css?v=202008071708" REL="stylesheet">
+<SCRIPT type="text/javascript" src="/src/cgi/js/ajaxrequest.js"></SCRIPT>
+<LINK HREF="/src/cgi/css/autocomplete.css?v=202008071708" REL="stylesheet">
 
 <FORM NAME="ProviderLicenses" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
@@ -114,7 +114,7 @@ document.ProviderLicenses.elements[0].focus();
 
 [[myHTML->rightpane(%form+search)]]
 
-<SCRIPT type="text/javascript" src="/cgi/js/vMCAutocomplete.js?v=202006082124"></SCRIPT>
+<SCRIPT type="text/javascript" src="/src/cgi/js/vMCAutocomplete.js?v=202006082124"></SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" >
 callAjax('xOccupationSnomed','','','&Autocomplete=MCAutocompleteSpecialty&Target=ProviderLicenses_Specialty_1','popup.pl');
 callAjax('xTaxonomy','','','&Autocomplete=MCAutocompleteTaxonomy&Target=ProviderLicenses_Taxonomy_1','popup.pl');

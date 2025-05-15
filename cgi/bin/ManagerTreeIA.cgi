@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use DBI;
 use myForm;
 use myDBI;
@@ -135,14 +135,14 @@ sub genHTML {
     my $ClientListURL =
       qq|/cgi/bin/ClientList.cgi?Provider_ProvID=$r->{ProvID}|;
     my $ClientListIMG =
-qq|<IMG BORDER=0 ALT="Client-List by Provider" SRC="/images/icon_folder.gif">|;
+qq|<IMG BORDER=0 ALT="Client-List by Provider" SRC="/src/images/icon_folder.gif">|;
     my $ChartListURL =
 qq|/cgi/bin/ChartList.cgi?Provider_ProvID=$r->{ProvID}&SortType=NotBilled|;
     my $ChartListIMG =
-qq|<IMG BORDER=0 ALT="Chart-List by Provider" SRC="/images/clipboard.gif">|;
+qq|<IMG BORDER=0 ALT="Chart-List by Provider" SRC="/src/images/clipboard.gif">|;
 
     my $Email    = qq|<A HREF="mailto:$r->{Email}">$r->{Email}</A>|;
-    my $Spacer   = qq|  <IMG HEIGHT=1 WIDTH="$Width" SRC="/images/blank.gif">|;
+    my $Spacer   = qq|  <IMG HEIGHT=1 WIDTH="$Width" SRC="/src/images/blank.gif">|;
     my $ProvName = qq|$r->{'Name'}|;
     if ( $r->{Type} == 4 ) {
         $ProvName = qq|$r->{'LName'}, $r->{'FName'} $r->{'Suffix'}|;

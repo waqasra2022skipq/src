@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ###########################################
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use Cwd;
 use DBI;
 use DBForm;
@@ -71,7 +71,7 @@ $sClinics->execute();
 while ( my $rClinics = $sClinics->fetchrow_hashref ) {
     print qq|Black print HCFA: $rClinics->{Name}, $rClinics->{Descr}\n|;
     my $Cmd =
-qq|/var/www/okmis/src/cgi/bin/printHCFA.pl DBNAME=$form->{DBNAME}\\&InsID=$rClinics->{InsID}\\&HCFAtype=Black\\&TrIDs=|;
+qq|C:/xampp/htdocs/src/cgi/bin/printHCFA.pl DBNAME=$form->{DBNAME}\\&InsID=$rClinics->{InsID}\\&HCFAtype=Black\\&TrIDs=|;
     my $spc = '';
     my $cnt = 0;
 
@@ -120,7 +120,7 @@ $sClinics->execute();
 while ( my $rClinics = $sClinics->fetchrow_hashref ) {
     print qq|Red Pre-printed HCFA: $rClinics->{Name}, $rClinics->{Descr}\n|;
     my $Cmd =
-qq|/var/www/okmis/src/cgi/bin/printHCFA.pl DBNAME=$form->{DBNAME}\\&InsID=$rClinics->{InsID}\\&HCFAtype=Red\\&TrIDs=|;
+qq|C:/xampp/htdocs/src/cgi/bin/printHCFA.pl DBNAME=$form->{DBNAME}\\&InsID=$rClinics->{InsID}\\&HCFAtype=Red\\&TrIDs=|;
     my $spc = '';
     my $cnt = 0;
 
@@ -155,7 +155,7 @@ my $Addrs   = SysAccess->getPrivEmail( $form, 'HCFA2Print' );
 my $Subject = qq|Generated HCFAs to print|;
 my $Text    = qq|${DT}
 To view these reports select on the menus Administration->Notes->HCFA 1500 Print.
-($form->{DBNAME})
+($form->{})
 |;
 DBUtil->email( $form, $Addrs, $Subject, $Text, '', 1 );
 ############################################################################

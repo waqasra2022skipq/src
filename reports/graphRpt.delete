@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #############################################################################
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use DBI;
 use DBForm;
 use DBA;
@@ -57,7 +57,7 @@ my ( $ReportDescr, $DatesHeader, $RecordCount, $SelByDate, $SelByDateName ) =
   ( '', '', 0, '', '' );
 
 if ( $form->{LOGINPROVID} == 91 ) {
-    open OUT, ">/var/www/okmis/src/debug/graphRpt.out"
+    open OUT, ">C:/xampp/htdocs/src/debug/graphRpt.out"
       or die "Couldn't open file: $!";
     foreach my $f ( sort keys %{$form} ) {
         print OUT ": form-$f=$form->{$f}\n";
@@ -91,7 +91,7 @@ else { $data = main->graphAmt($form); }
 $form->complete();
 
 if ( $form->{LOGINPROVID} == 91 ) {
-    open OUT, ">>/var/www/okmis/src/debug/graphRpt.out"
+    open OUT, ">>C:/xampp/htdocs/src/debug/graphRpt.out"
       or die "Couldn't open file: $!";
     print OUT qq|qTreatment=\n$qTreatment\n|;
     print OUT qq|data=\n$data\n|;

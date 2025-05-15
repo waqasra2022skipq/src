@@ -19,7 +19,7 @@ if [ $# -eq 0 ]; then usage; fi
 # ------------------------------------
 ACCT=$1; shift;
 ACCTDIR=${MISWWW}/okmis_${ACCT}
-SCHRES=/var/www/okmis/src/addons/schedorg_3.14.4
+SCHRES=C:/xampp/htdocs/src/addons/schedorg_3.14.4
 SCHDIR=sched_${ACCT}
 # ------------------------------------
   print "\n======================================"

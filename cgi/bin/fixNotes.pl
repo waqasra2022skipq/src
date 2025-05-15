@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use DBI;
 use myForm;
 use myDBI;
@@ -109,7 +109,7 @@ sub fixNotes {
         foreach my $tran ( split( ':', $Trans ) ) {
             my ( $Amount, $DenCode ) = split( '_', $tran, 2 );
             my $cmd =
-qq|/var/www/okmis/src/cgi/bin/adjNote.pl DBNAME=$form->{DBNAME}\\&submit=1\\&TrID=${TrID}\\&PaidAmt=${Amount}\\&DenCode=${DenCode}\\&RefID=${RefID}\\&ICN=${ICN}\\&mlt=$form->{mlt}|;
+qq|C:/xampp/htdocs/src/cgi/bin/adjNote.pl DBNAME=$form->{DBNAME}\\&submit=1\\&TrID=${TrID}\\&PaidAmt=${Amount}\\&DenCode=${DenCode}\\&RefID=${RefID}\\&ICN=${ICN}\\&mlt=$form->{mlt}|;
             system($cmd);
         }
     }

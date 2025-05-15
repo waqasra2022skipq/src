@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #############################################################################
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use DBI;
 use myForm;
 use DBA;
@@ -77,7 +77,7 @@ qq|Notes for ServiceDate from ${fdayname} $form->{FromDateD} - ${tdayname} $form
 my $dbh = myDBI->dbconnect( $form->{'DBNAME'} );
 
 if ( $form->{LOGINPROVID} == 91 ) {
-    open OUT, ">/var/www/okmis/src/debug/graphs.out"
+    open OUT, ">C:/xampp/htdocs/src/debug/graphs.out"
       or die "Couldn't open file: $!";
     foreach my $f ( sort keys %{$form} ) {
         print OUT "graphs.cgi: form-$f=$form->{$f}\n";
@@ -1676,7 +1676,7 @@ sub selCARScores {
     where Client.Active=1 ${addsel}
    order by Client.LName,Client.FName,Client.ClientID,ClientPrAuth.EffDate desc
 |;
-        open OUT, ">>/var/www/okmis/src/debug/graphs.out"
+        open OUT, ">>C:/xampp/htdocs/src/debug/graphs.out"
           or die "Couldn't open file: $!";
         print OUT qq|sel=\n$sel\n|;
         print OUT qq|y_values=$y_values\n|;
@@ -1800,7 +1800,7 @@ select ProgNotes.*,Treatment.*,Client.LName,Client.FName,Clinic.Name as ClinicNa
     my $s = $dbh->prepare($q);
 
     if ( $form->{LOGINPROVID} == 91 ) {
-        open OUT, ">>/var/www/okmis/src/debug/graphs.out"
+        open OUT, ">>C:/xampp/htdocs/src/debug/graphs.out"
           or die "Couldn't open file: $!";
         print OUT qq|q=\n${q}\n|;
         close(OUT);
@@ -2108,7 +2108,7 @@ select ProgNotes.*
     my $s = $dbh->prepare($q);
 
     if ( $form->{LOGINPROVID} == 91 ) {
-        open OUT, ">>/var/www/okmis/src/debug/graphs.out"
+        open OUT, ">>C:/xampp/htdocs/src/debug/graphs.out"
           or die "Couldn't open file: $!";
         print OUT qq|q=\n${q}\n|;
         close(OUT);

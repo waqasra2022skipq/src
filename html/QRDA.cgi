@@ -1,6 +1,6 @@
 [[myHTML->newPage(%form+Agency Control)]]
 
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/NoEnter.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/NoEnter.js"> </SCRIPT>
 
 [[*SysAccess->verify(%form+Privilege=Agent)]]
 

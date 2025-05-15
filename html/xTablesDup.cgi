@@ -1,7 +1,7 @@
 [[myHTML->newPage(%form+MIS database Tables Duplicate)]]
 
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vxTableDup.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vxTableDup.js"> </SCRIPT>
 
 [[*SysAccess->verify(%form+Privilege=AdminTables)]]
 

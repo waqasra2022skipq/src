@@ -1,3 +1,0 @@
-# fix PaidAmt and AmtDue...
-INSERT INTO `NoteTrans` (`ID`, `TrID`, `ClientID`, `ProvID`, `BillDate`, `ContDate`, `SCID`, `SCNum`, `Units`, `Duration`, `BillAmt`, `InsCode`, `RefID`, `RecDate`, `PaidAmt`, `DenCode`, `CreateProvID`, `CreateDate`, `ChangeProvID`, `ChangeDate`, `Code`, `ICN`, `PaidDate`, `ReasonCode`, `SRC`, `AdjCode`, `RenProvID`, `InsPaidID`, `PayerID`) VALUES (NULL,83966,1952,157,'2019-05-13','2019-05-08',7791,'90837',1.00,3300,97.79,'15','7556206','2019-05-21',-67.79,NULL,NULL,NULL,91,'2019-08-19 15:22:46','ER','190515N00397',NULL,'3','ER',NULL,NULL,NULL,'73143');
-update Treatment set BillStatus=9,StatusDate='2019-08-19',AmtDue=97.79 where TrID=83966;

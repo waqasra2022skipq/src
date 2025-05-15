@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use myConfig;
 use Cwd;
 use DBI;
@@ -41,8 +41,8 @@ sub viewedit() {
 
     #$form->error("MISEmails->${ID} Not Found!") if ( $rEmail->{'ID'} eq '' );
     my $html = myHTML->new($form) . qq|
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/NoEnter.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/NoEnter.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript">
 function validate(form)
 {
@@ -131,7 +131,7 @@ sub update() {
     $s->execute();
     if ( $form->{'email'} ) {
         my $outfile =
-          DBUtil->ExecCmd("/var/www/okmis/src/reports/MISEmail ${ID}");
+          DBUtil->ExecCmd("C:/xampp/htdocs/src/reports/MISEmail ${ID}");
         $out = DBUtil->ReadFile($outfile);
     }
     return ( main->list($out) );
@@ -143,8 +143,8 @@ sub list() {
     my $Hdr =
 qq|Emails listed with a SentDate were sent Globally on that date. Those without a SentDate have been entered but not yet sent. To send those or to resend a message to all MIS providers across all data sites, View/Edit the message and click on the Add/Update/Email button.|;
     my $html = myHTML->new($form) . qq|
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/NoEnter.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/NoEnter.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" >function validate(form) { return(1); }</SCRIPT>
 
 <FORM NAME="MISEmails" ACTION="/cgi/bin/ListMISEmails.cgi" METHOD="POST" >

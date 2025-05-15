@@ -1,6 +1,6 @@
-#!/usr/bin/perl
+#!C:/Strawberry/perl/bin/perl.exe
 ############################################################################
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use CGI qw(:standard escape);
 use DBI;
 use myForm;
@@ -26,7 +26,7 @@ if ( !SysAccess->verify( $form, 'hasProviderAccess' ) ) {
 }
 
 #############################################################################
-$backURL = "/cgi/bin/mis.cgi?MIS_Action=MgrTree&mlt=$form->{mlt}";
+$backURL = "/src/cgi/bin/mis.cgi?MIS_Action=MgrTree&mlt=$form->{mlt}";
 my $BackLinks =
   gHTML->setLINKS( $form, 'back', 2 );    # don't pop back to here on this page.
 
@@ -98,8 +98,8 @@ my $html = myHTML->newHTML(
 <LINK HREF="|
   . myConfig->cfgfile( 'menuV2.css', 1 )
   . qq|" REL="stylesheet" TYPE="text/css" >
-<script src="/cgi/menu/js/menuV2.js" type="text/javascript"></script>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
+<script src="/src/cgi/menu/js/menuV2.js" type="text/javascript"></script>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/src/cgi/js/vEntry.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript">
 <!--
 function validate(form)
@@ -107,7 +107,7 @@ function validate(form)
 // -->
 </SCRIPT>
 
-<FORM NAME="ProviderPage" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="ProviderPage" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 |;
 
 #warn qq|LOGINPROVID=$form->{LOGINPROVID}\n|;
@@ -250,7 +250,7 @@ sub viewhtml {
   <TR >
     <TD CLASS="strcol" >View ${PageDescr} ($form->{Provider_ProvID})</TD>
     <TD CLASS="numcol" >
-      <A HREF="${backURL}" ><IMG BORDER=0 ALT="" SRC="/images/chartback.gif" WIDTH=40 HEIGHT=40 ></A>
+      <A HREF="${backURL}" ><IMG BORDER=0 ALT="" SRC="/src/images/chartback.gif" WIDTH=40 HEIGHT=40 ></A>
     </TD>
   </TR>
 </TABLE>

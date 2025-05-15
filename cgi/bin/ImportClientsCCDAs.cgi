@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use DBI;
 use DBForm;
 use DBA;
@@ -75,7 +75,7 @@ sub html {
 
 #  my $INfile = $form->{'file'};
 #  my $XMLfile = 'XML'.$INfile;
-#  my $result = `php /var/www/okmis/src/MU/parseCCDA.php ${INfile} > ${XMLfile} 2>${XMLfile}.err`;
+#  my $result = `php C:/xampp/htdocs/src/MU/parseCCDA.php ${INfile} > ${XMLfile} 2>${XMLfile}.err`;
 
     my ( $list, $cnt ) = ( '', 0 );
     my $XMLfile = $form->{'DOCROOT'} . $form->{'file'};

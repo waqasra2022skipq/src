@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ############################################################################
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use DBI;
 use myForm;
 use myDBI;
@@ -98,8 +98,8 @@ my $html    = myHTML->new( $form, $TITLE, 'CheckPopupWindow', $BodyArg ) . qq|
 <SCRIPT SRC="|
   . myConfig->cfgfile( 'tabcontent/tabcontent.js', 1 )
   . qq|" TYPE="text/javascript" ></SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript" SRC="/cgi/js/tabs.js"></SCRIPT>
-<LINK REL="STYLESHEET" TYPE="text/css" HREF="/cgi/css/tabs.css" />
+<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript" SRC="/src/cgi/js/tabs.js"></SCRIPT>
+<LINK REL="STYLESHEET" TYPE="text/css" HREF="/src/cgi/css/tabs.css" />
 <P>
 <P>
 <TABLE STYLE="background-color:steelblue" CLASS="list fullsize" >

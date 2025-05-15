@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use DBI;
 use myForm;
 use myDBI;
@@ -50,7 +50,7 @@ my $html = qq|Content-type: text/html
 <HEAD>
 <TITLE>Client Insurances Service Code Listing</TITLE>
 <META HTTP-EQUIV="expires" CONTENT="Mon, 23 Mar 1998 20:00:00 GMT">
-<LINK REL="stylesheet" HREF="/cgi/css/mis.css" TYPE="text/css" TITLE="Millennium style sheet">
+<LINK REL="stylesheet" HREF="/src/cgi/css/mis.css" TYPE="text/css" TITLE="Millennium style sheet">
 </HEAD>
 <BODY>
 <DIV ALIGN="center" >

@@ -1,5 +1,5 @@
-#!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+#!C:/Strawberry/perl/bin/perl.exe
+use lib 'C:/xampp/htdocs/src/lib';
 ############################################################################
 use CGI       qw(:standard escape);
 use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
@@ -147,7 +147,7 @@ elsif ($form->{'MIS_Action'} eq 'MgrTree'
 {
     #warn qq|mis-MgrTree: Action=$form->{'MIS_Action'}\n|;
     $NextLocation =
-qq|Location: /cgi/bin/ManagerTree.cgi?mlt=$form->{mlt}&misLINKS=$form->{misLINKS}\n\n|;
+qq|Location: /src/cgi/bin/ManagerTree.cgi?mlt=$form->{mlt}&misLINKS=$form->{misLINKS}\n\n|;
     $disLoc = 'MgrTree';
 }
 elsif ( $form->{'MIS_Action'} eq 'Note' ) {
@@ -160,15 +160,15 @@ elsif ( $form->{'MIS_Action'} eq 'Note' ) {
 }
 elsif ( $form->{'MIS_Action'} eq 'ClientList' ) {
     $NextLocation =
-qq|Location: /cgi/bin/ClientList.cgi?Provider_ProvID=$form->{Provider_ProvID}&mlt=$form->{mlt}&misLINKS=$form->{misLINKS}\n\n|;
+qq|Location: /src/cgi/bin/ClientList.cgi?Provider_ProvID=$form->{Provider_ProvID}&mlt=$form->{mlt}&misLINKS=$form->{misLINKS}\n\n|;
 }
 elsif ( $form->{'MIS_Action'} eq 'ChartList' ) {
     $NextLocation =
-qq|Location: /cgi/bin/ChartList.cgi?Provider_ProvID=$form->{Provider_ProvID}&mlt=$form->{mlt}&misLINKS=$form->{misLINKS}\n\n|;
+qq|Location: /src/cgi/bin/ChartList.cgi?Provider_ProvID=$form->{Provider_ProvID}&mlt=$form->{mlt}&misLINKS=$form->{misLINKS}\n\n|;
 }
 elsif ( $form->{'MIS_Action'} eq 'ClientPage' ) {
     $NextLocation =
-qq|Location: /cgi/bin/ClientPage.cgi?Client_ClientID=$form->{Client_ClientID}&mlt=$form->{mlt}&misLINKS=$form->{misLINKS}&FULL=$form->{FULL}\n\n|;
+qq|Location: /src/cgi/bin/ClientPage.cgi?Client_ClientID=$form->{Client_ClientID}&mlt=$form->{mlt}&misLINKS=$form->{misLINKS}&FULL=$form->{FULL}\n\n|;
 }
 elsif ( defined( $form->{'view'} ) ) {
 
@@ -176,6 +176,7 @@ elsif ( defined( $form->{'view'} ) ) {
     my $html = myHTML->getHTML( $form, $form->{view} );
     $NextLocation = $html;
     $disLoc       = $form->{view};
+
 }
 elsif ( defined( $form->{'newurl'} ) ) {
     ( my $url = $form->{'newurl'} ) =~ s/\^/\?/;
@@ -187,15 +188,15 @@ elsif ( defined( $form->{'newurl'} ) ) {
 }
 elsif ( $form->{'MIS_Action'} eq 'ClientPortal' ) {
     $NextLocation =
-qq|Location: /cgi/bin/ClientPortal.cgi?mlt=$form->{mlt}&misLINKS=$form->{misLINKS}\n\n|;
+qq|Location: /src/cgi/bin/ClientPortal.cgi?mlt=$form->{mlt}&misLINKS=$form->{misLINKS}\n\n|;
 }
 elsif ( $form->{'MIS_Action'} eq 'ManagePortal' ) {
     $NextLocation =
-qq|Location: /cgi/bin/ManagePortal.cgi?mlt=$form->{mlt}&misLINKS=$form->{misLINKS}\n\n|;
+qq|Location: /src/cgi/bin/ManagePortal.cgi?mlt=$form->{mlt}&misLINKS=$form->{misLINKS}\n\n|;
 }
 elsif ( $form->{'LOGINSCREEN'} ne '' ) {
     $NextLocation =
-qq|Location: /cgi/bin/$form->{LOGINSCREEN}?mlt=$form->{mlt}&misLINKS=$form->{misLINKS}\n\n|;
+qq|Location: /src/cgi/bin/$form->{LOGINSCREEN}?mlt=$form->{mlt}&misLINKS=$form->{misLINKS}\n\n|;
 }
 else {
     warn "WARN: Access Denied at END OF mis.cgi\n";
@@ -212,7 +213,7 @@ main->post() if ($post_update);
 $disLoc = $NextLocation if ( $disLoc eq '' );
 myDBI->cleanup();
 
-#warn qq|\n\nnow print NextLocation=\n$NextLocation| if ( $form->{LOGINPROVID} == 91 );
+warn qq|\n\nnow print NextLocation=\n$NextLocation| if ( $form->{LOGINPROVID} );
 print $NextLocation;
 exit;
 
@@ -224,7 +225,7 @@ sub post {
     print myHTML->new( $form, "Continue" );
     print qq|
 
-<FORM ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <DIV ALIGN="center" >
 <HR WIDTH="90%" >
 ${post_update}

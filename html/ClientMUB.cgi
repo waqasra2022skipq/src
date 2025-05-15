@@ -1,10 +1,10 @@
 [[myHTML->newPage(%form+Client Health History+++++accordion)]]
 
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vClientHealthHistory.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/ajaxrequest.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vDate.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vNum.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vClientHealthHistory.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/ajaxrequest.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vDate.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vNum.js"> </SCRIPT>
 <LINK HREF="/cfg/menuV2.css" REL="stylesheet" TYPE="text/css" >
 <SCRIPT type="text/javascript" src="/cgi/menu/js/menuV2.js" ></SCRIPT>
 
@@ -27,7 +27,7 @@
   <TR >
     <TD CLASS="strcol" COLSPAN="2" >
       How many times in your life have you been hospitalized overnight for medical problems?
-      <BR>· Include O.D.'s and D.T.'s. Exclude detox, alcohol/drug, psychiatric treatment and childbirth (if no complications).
+      <BR>ï¿½ Include O.D.'s and D.T.'s. Exclude detox, alcohol/drug, psychiatric treatment and childbirth (if no complications).
     </TD>
   </TR>
   <TR >

@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use DBI;
 use myForm;
 use myDBI;
@@ -104,7 +104,7 @@ sub genReport {
 
     # run the Report...
     my $Cmd =
-qq|/var/www/okmis/src/reports/$r->{Script} DBNAME=$form->{DBNAME}\\&GenProvReport=1\\&ForProvID=$r->{ProvID}|;
+qq|C:/xampp/htdocs/src/reports/$r->{Script} DBNAME=$form->{DBNAME}\\&GenProvReport=1\\&ForProvID=$r->{ProvID}|;
     $Cmd .= qq|\\&$r->{Args}| if ( $r->{Args} );
     my $sfx     = $r->{Args} =~ /output=pdf/ ? 'pdf' : 'xls';
     my $tmpFile = "provreport." . $sfx;

@@ -1,4 +1,4 @@
-/var/www/okmis/src/cgi/bin
+C:/xampp/htdocs/src/cgi/bin
 
 <?xml version="1.0" encoding="utf-8"?>
 

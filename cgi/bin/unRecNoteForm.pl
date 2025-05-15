@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 
 use CGI::Carp qw(fatalsToBrowser);
 use DBI;
@@ -38,9 +38,9 @@ sub printNotesType {
       . qq|
                     <P>
                     <P>
-                    <SCRIPT LANGUAGE="JavaScript" src="/cgi/js/novalidate.js"> </SCRIPT>
-                    <SCRIPT LANGUAGE="JavaScript" src="/cgi/js/tablesort.js"> </SCRIPT>
-                    <LINK href="/cgi/css/tablesort.css" REL="stylesheet" TYPE="text/css">
+                    <SCRIPT LANGUAGE="JavaScript" src="/src/cgi/js/novalidate.js"> </SCRIPT>
+                    <SCRIPT LANGUAGE="JavaScript" src="/src/cgi/js/tablesort.js"> </SCRIPT>
+                    <LINK href="/src/cgi/css/tablesort.css" REL="stylesheet" TYPE="text/css">
                     <DIV CLASS="home title hdrcol" >
                         <FORM  ACTION='/cgi/bin/unRecNoteForm.pl' NAME='submit' METHOD='POST'>
                             <TABLE CLASS='home hdrcol' >
@@ -103,7 +103,7 @@ qq| "DBNAME=$form->{'DBNAME'}&mlt=$form->{'mlt'}&TrIDs=$TrIDs&$form->{noteType}=
       . qq|
         <P>
         <P>
-        <SCRIPT LANGUAGE="JavaScript" src="/cgi/js/novalidate.js"> </SCRIPT>
+        <SCRIPT LANGUAGE="JavaScript" src="/src/cgi/js/novalidate.js"> </SCRIPT>
         <FORM NAME="submit" ACTION="" METHOD="POST">
         <DIV CLASS="strcol" >
         Results:

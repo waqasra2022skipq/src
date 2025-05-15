@@ -8,7 +8,7 @@ sub selData {
     #warn qq|selData: sel=$sel, y_values=$y_values, charttype=$charttype\n|;
     my $dbh = myDBI->dbconnect( $form->{'DBNAME'} );
     if ( $form->{LOGINPROVID} == 91 ) {
-        open OUT, ">>/var/www/okmis/src/debug/graphs.out"
+        open OUT, ">>C:/xampp/htdocs/src/debug/graphs.out"
           or die "Couldn't open file: $!";
         print OUT qq|sel=\n$sel\n|;
         print OUT qq|y_values=$y_values\n|;
@@ -390,7 +390,7 @@ sub setData {
     #warn qq|data=kls${data}kls\n|;
     #if ( $form->{LOGINPROVID} == 91 )
     #{
-    open OUT, ">>/var/www/okmis/src/debug/graphs.out"
+    open OUT, ">>C:/xampp/htdocs/src/debug/graphs.out"
       or die "Couldn't open file: $!";
     print OUT qq|data=\n${data}\n|;
     close(OUT);

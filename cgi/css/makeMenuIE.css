@@ -1,7 +1,7 @@
 /* that IE 5+ conditional comment makes this only visible in IE 5+ */
 ul.makeMenu li    /* the behaviour to mimic the li:hover rules in IE 5+ */
 {
-  behavior: url( /cgi/css/IEmen.htc );
+  behavior: url( /src/cgi/css/IEmen.htc );
 }
 ul.makeMenu ul    /* copy of above declaration without the > selector */
 {  

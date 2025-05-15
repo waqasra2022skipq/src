@@ -197,7 +197,7 @@ sub parse {
     my $min = length($min) == 2 ? $min : '0' . $min;
     my $sec = length($sec) == 2 ? $sec : '0' . $sec;
     $FORM->{'NOW'}   = "${hrs}:${min}:${sec}";    # save time.
-    $FORM->{LOGINID} = $ENV{HTTP_USER_AGENT} ? $FORM->{user} : getpwuid($>);
+    $FORM->{LOGINID} = $ENV{HTTP_USER_AGENT} ? $FORM->{user} : ($ENV{USERNAME} || 'unknown');
     myForm->getRoot();                            # set the root directory.
 
     #warn qq|myForm-parse: return\n|;

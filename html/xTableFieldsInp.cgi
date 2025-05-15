@@ -1,7 +1,7 @@
 [[myHTML->newPage(%form+MIS database Tables Input generator)]]
 
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vxTableFields.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vxTableFields.js"> </SCRIPT>
 
 [[*SysAccess->verify(%form+Privilege=AdminTables)]]
 

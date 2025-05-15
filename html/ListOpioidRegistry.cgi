@@ -1,6 +1,6 @@
 [[myHTML->newPage(%form+Client Opioid Registry)]]
 
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/novalidate.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/novalidate.js"> </SCRIPT>
 
 [[*SysAccess->verify(%form+Privilege=OpioidRegistry)]]
 

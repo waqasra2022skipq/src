@@ -54,7 +54,7 @@ null,|;
   }
   $script .= qq|\n)\n);
 </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/fillSelect.js" ></SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/fillSelect.js" ></SCRIPT>
 |;
 #warn qq|script=\n${script}\n|;
   return($script);
@@ -113,7 +113,7 @@ ${a0}
 ${a1})
 );
 </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/fillSelect.js" ></SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/fillSelect.js" ></SCRIPT>
 |;
 #warn qq|script=\n${script}\n|;
   return($script);
@@ -2196,30 +2196,30 @@ sub setLINKS
     if ( $form->{'Provider_ProvID'} && $form->{Provider_ProvID} ne 'new' )
     {
       $html .= qq|
-      <A HREF="/cgi/bin/ChartList.cgi?Provider_ProvID=$form->{'LOGINPROVID'}&mlt=$form->{mlt}" TITLE="Click here to <BR>access your own Chart List. <BR>Make sure you commit any update first with the Add/Update button." ><IMG SRC="/images/MyNotes.gif" WIDTH="30" HEIGHT="30" BORDER="0" ></A>
-      <A HREF="/cgi/bin/ClientList.cgi?Provider_ProvID=$form->{'LOGINPROVID'}&mlt=$form->{mlt}" TITLE="Click here to <BR>access your own Client List. <BR>Make sure you commit any updates first with the Add/Update button." ><IMG SRC="/images/MyClients.gif" ALT="" WIDTH="30" HEIGHT="30" BORDER="0" ></A>
+      <A HREF="/src/cgi/bin/ChartList.cgi?Provider_ProvID=$form->{'LOGINPROVID'}&mlt=$form->{mlt}" TITLE="Click here to <BR>access your own Chart List. <BR>Make sure you commit any update first with the Add/Update button." ><IMG SRC="/src/images/MyNotes.gif" WIDTH="30" HEIGHT="30" BORDER="0" ></A>
+      <A HREF="/src/cgi/bin/ClientList.cgi?Provider_ProvID=$form->{'LOGINPROVID'}&mlt=$form->{mlt}" TITLE="Click here to <BR>access your own Client List. <BR>Make sure you commit any updates first with the Add/Update button." ><IMG SRC="/src/images/MyClients.gif" ALT="" WIDTH="30" HEIGHT="30" BORDER="0" ></A>
 |;
       if ( $form->{'LOGINPROVID'} != $form->{Provider_ProvID} )
       {
         $html .= qq|
-      <A HREF="/cgi/bin/ChartList.cgi?Provider_ProvID=$form->{'Provider_ProvID'}&mlt=$form->{mlt}" TITLE="Use this button to access the selected Providers Chart List. <BR>Make sure you commit any updates first with the Add/Update button." ><IMG SRC="/images/clipboard.gif" ALT="" WIDTH="30" HEIGHT="30" BORDER="0" ></A>
-      <A HREF="/cgi/bin/ClientList.cgi?Provider_ProvID=$form->{'Provider_ProvID'}&mlt=$form->{mlt}" TITLE="Use this button to access the selected Providers Client List. <BR>Make sure you commit any updates first with the Add/Update button." ><IMG SRC="/images/icon_folder.gif" ALT="" WIDTH="30" HEIGHT="30" BORDER="0" ></A>
+      <A HREF="/src/cgi/bin/ChartList.cgi?Provider_ProvID=$form->{'Provider_ProvID'}&mlt=$form->{mlt}" TITLE="Use this button to access the selected Providers Chart List. <BR>Make sure you commit any updates first with the Add/Update button." ><IMG SRC="/src/images/clipboard.gif" ALT="" WIDTH="30" HEIGHT="30" BORDER="0" ></A>
+      <A HREF="/src/cgi/bin/ClientList.cgi?Provider_ProvID=$form->{'Provider_ProvID'}&mlt=$form->{mlt}" TITLE="Use this button to access the selected Providers Client List. <BR>Make sure you commit any updates first with the Add/Update button." ><IMG SRC="/src/images/icon_folder.gif" ALT="" WIDTH="30" HEIGHT="30" BORDER="0" ></A>
 |;
       }
       $html .= qq|
-      <A HREF="/cgi/bin/ProviderPage.cgi?Provider_ProvID=$form->{'Provider_ProvID'}&mlt=$form->{mlt}" TITLE="Use this button to access the Provider Page. <BR>Make sure you commit any updates first with the Add/Update button." ><IMG SRC="/images/icon_profile.gif" ALT="" WIDTH="30" HEIGHT="30" BORDER="0" ></A>
+      <A HREF="/src/cgi/bin/ProviderPage.cgi?Provider_ProvID=$form->{'Provider_ProvID'}&mlt=$form->{mlt}" TITLE="Use this button to access the Provider Page. <BR>Make sure you commit any updates first with the Add/Update button." ><IMG SRC="/src/images/icon_profile.gif" ALT="" WIDTH="30" HEIGHT="30" BORDER="0" ></A>
 |;
     }
     if ( $form->{'Client_ClientID'} && $form->{Client_ClientID} ne 'new' )
     {
-      my $ClientPage = qq|/cgi/bin/ClientPage.cgi?Client_ClientID=$form->{Client_ClientID}&mlt=$form->{mlt}|;
+      my $ClientPage = qq|src/cgi/bin/ClientPage.cgi?Client_ClientID=$form->{Client_ClientID}&mlt=$form->{mlt}|;
       $html .= qq|
-      <A HREF="/cgi/bin/ChartList.cgi?Client_ClientID=$form->{'Client_ClientID'}&mlt=$form->{mlt}" TITLE="Use this button to access this Clients Chart List. <BR>Make sure you commit any updates first with the Add/Update button." ><IMG SRC="/images/ClientCharts.gif" ALT="" WIDTH="30" HEIGHT="30" BORDER="0" ></A>
-      <A HREF="${ClientPage}" TITLE="Use this button to access the Client Page. <BR>Make sure you commit any updates first with the Add/Update button." ><IMG SRC="/images/icon_profile.gif" ALT="" WIDTH="30" HEIGHT="30" BORDER="0" ></A>
+      <A HREF="/src/cgi/bin/ChartList.cgi?Client_ClientID=$form->{'Client_ClientID'}&mlt=$form->{mlt}" TITLE="Use this button to access this Clients Chart List. <BR>Make sure you commit any updates first with the Add/Update button." ><IMG SRC="/src/images/ClientCharts.gif" ALT="" WIDTH="30" HEIGHT="30" BORDER="0" ></A>
+      <A HREF="${ClientPage}" TITLE="Use this button to access the Client Page. <BR>Make sure you commit any updates first with the Add/Update button." ><IMG SRC="/src/images/icon_profile.gif" ALT="" WIDTH="30" HEIGHT="30" BORDER="0" ></A>
 |;
     }
     $html .= qq|
-      <A HREF="/cgi/bin/mis.cgi?misPOP=${misPOP}&mlt=$form->{mlt}&misLINKS=$form->{misLINKS}" TITLE="Use this button to CANCEL and go back <BR>without making any updates." ><IMG SRC="|.myConfig->cfgfile('undo_green.png',1).qq|" HEIGHT="30" WIDTH="40" BORDER="0" ></A>\n|;
+      <A HREF="/src/cgi/bin/mis.cgi?misPOP=${misPOP}&mlt=$form->{mlt}&misLINKS=$form->{misLINKS}" TITLE="Use this button to CANCEL and go back <BR>without making any updates." ><IMG SRC="|.myConfig->cfgfile('undo_green.png',1).qq|" HEIGHT="30" WIDTH="40" BORDER="0" ></A>\n|;
   }
   return($html);
 }
@@ -2514,8 +2514,8 @@ sub rptSQL
   }
   
   $html = qq|
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/tablesort.js"> </SCRIPT>
-<LINK HREF="/cgi/css/tablesort.css" REL="stylesheet" TYPE="text/css">
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/tablesort.js"> </SCRIPT>
+<LINK HREF="/src/cgi/css/tablesort.css" REL="stylesheet" TYPE="text/css">
 <TABLE class="chartsort table-autosort table-stripeclass:alternate">
 <THEAD>|;
   for ($i=0; $i<=$#colhdrs; $i++)
@@ -2555,9 +2555,9 @@ sub htmlReport
   my @coljust = ();
   my @colsort = ();
   my $html = qq|
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/utils.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/tablesort.js"> </SCRIPT>
-<LINK HREF="/cgi/css/tablesort.css" REL="stylesheet" TYPE="text/css">
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/utils.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/tablesort.js"> </SCRIPT>
+<LINK HREF="/src/cgi/css/tablesort.css" REL="stylesheet" TYPE="text/css">
 |;
   my $cnt=0;
   foreach my $line ( split("\n",$rpt) )

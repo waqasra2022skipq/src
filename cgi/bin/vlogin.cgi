@@ -11,8 +11,8 @@ print qq|Content-Type: text/html; charset=ISO-8859-1
 <HTML>
 <HEAD>
 <TITLE>MIS-Health Care Version 2.1</TITLE>
-<LINK REL="stylesheet" HREF="/cgi/css/mis.css" TYPE="text/css" TITLE="Millennium style sheet">
-<SCRIPT Language="JavaScript" SRC="/cgi/js/Login.js" ></SCRIPT>
+<LINK REL="stylesheet" HREF="/src/cgi/css/mis.css" TYPE="text/css" TITLE="Millennium style sheet">
+<SCRIPT Language="JavaScript" SRC="/src/cgi/js/Login.js" ></SCRIPT>
 <SCRIPT Language="JavaScript" >
 function checkLoginCookies() 
 {

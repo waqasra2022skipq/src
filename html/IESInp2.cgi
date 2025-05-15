@@ -1,7 +1,7 @@
 [[myHTML->newHTML(%form+Client IES+clock)]]
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vIES.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vNum.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vIES.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vNum.js"> </SCRIPT>
 <FORM NAME="submit" ACTION="/cgi/bin/mis.cgi" METHOD="POST">
   <TABLE CLASS="home fullsize" >
     <TR ><TD CLASS="port hdrtxt" COLSPAN="2" >Impact of Events Scale-Revised (IES-R)</TD></TR>

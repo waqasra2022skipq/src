@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use CGI qw(:standard escape);
 use Cwd;
 use DBI;
@@ -99,7 +99,7 @@ my $sHours = $dbh->prepare($qHours);
 ############################################################################
 # this is the pdf template we need
 #   it is the first 3 objects with 2 font objects and the content object
-$pdtpath = '/var/www/okmis/src/pdf/CARS.pdt';
+$pdtpath = 'C:/xampp/htdocs/src/pdf/CARS.pdt';
 if ( $form->{Client_ClientID} ) {
     $pdf = PDF->start($pdtpath);
     $sClient->execute( $form->{Client_ClientID} ) || myDBI->dberror($qClient);

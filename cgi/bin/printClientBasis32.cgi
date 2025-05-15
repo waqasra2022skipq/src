@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use DBI;
 use DBForm;
 use MgrTree;
@@ -27,7 +27,7 @@ qq|select * from ClientBasis32 left join Client on Client.ClientID=ClientBasis32
 #warn "qClientBasis32=\n$qClientBasis32\n";
 my $sClientBasis32 = $dbh->prepare($qClientBasis32);
 warn "\nGenerating ClientBasis32:\n";
-$pdf = PDF->start("/var/www/okmis/src/pdf/ClientBasis32.pdt");
+$pdf = PDF->start("C:/xampp/htdocs/src/pdf/ClientBasis32.pdt");
 my $Cnt = 0;
 foreach my $ID ( split( ' ', $form->{'IDs'} ) ) {
     $sClientBasis32->execute($ID) || $form->dberror($qClientBasis32);

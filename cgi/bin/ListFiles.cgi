@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use DBI;
 use DBForm;
 use SysAccess;
@@ -144,7 +144,7 @@ my $html = myHTML->new($form) . qq|
     <TD CLASS="hdrcol header" >$form->{Type} files available to View</TD>
   </TR>
 </TABLE>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/novalidate.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/novalidate.js"> </SCRIPT>
 <FORM NAME="ListFiles" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
 |;
 $MainLinks = '';

@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use Cwd;
 use DBUtil;
 use myConfig;
@@ -9,7 +9,7 @@ use Time::Local;
 # usage: sysfile
 ############################################################################
 my $rm      = shift;
-my $cmdpath = qq|/var/www/okmis/src/sbin|;    # location of CMD
+my $cmdpath = qq|C:/xampp/htdocs/src/sbin|;    # location of CMD
 
 my $DT = localtime();
 print "sysfile started @ $DT\n";

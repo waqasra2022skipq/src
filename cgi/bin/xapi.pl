@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use DBI;
 use myForm;
 use myDBI;
@@ -87,10 +87,10 @@ sub htmljson {
 sub htmlpost {
     my ($self) = @_;
     my $html = myHTML->new( $form, "Search Patient" ) . qq|
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/NoEnter.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vClientInfo.js?v=20190501"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vDate.js"> </SCRIPT>
-<FORM NAME="ClientAccess" ACTION="/cgi/bin/xapi.pl" METHOD="POST" >
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/src/cgi/js/NoEnter.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/src/cgi/js/vClientInfo.js?v=20190501"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/src/cgi/js/vDate.js"> </SCRIPT>
+<FORM NAME="ClientAccess" ACTION="/src/cgi/bin/xapi.pl" METHOD="POST" >
 <TABLE CLASS="home halfsize" >
   <TR ><TD CLASS="port hdrtxt heading" COLSPAN="2" >Enter patient information</TD></TR>
   <TR >
@@ -137,7 +137,7 @@ sub htmlpost {
   </TR>
   <TR>
     <TD CLASS="hdrcol" >
-<A HREF="/cgi/bin/mis.cgi?logout=1&mlt=PBPQzssnx32a&LOGINSCREEN=xapi.pl" ONMOUSEOVER="window.status='Logout of MIS'; return true;" ONMOUSEOUT="window.status=''" >close</A>
+<A HREF="/src/cgi/bin/mis.cgi?logout=1&mlt=PBPQzssnx32a&LOGINSCREEN=xapi.pl" ONMOUSEOVER="window.status='Logout of MIS'; return true;" ONMOUSEOUT="window.status=''" >close</A>
 </ul>
     </TD>
   </TR>

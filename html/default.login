@@ -11,7 +11,7 @@ Content-Type: text/html; charset=ISO-8859-1
  TD    { text-align: center; }
  TH    { text-align: right; }
 </STYLE>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/src/cgi/js/vEntry.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" >
 function vLogin(form)
 { return vEntry("notnull",form.user,form.pass); }
@@ -29,7 +29,7 @@ function vLogin(form)
     <IMG ALT="logo" BORDER=0 SRC="{LOGO}" >
     <H2 >{SITENAME}</H2>
 <P>
-<FORM NAME="login" METHOD="post" ACTION="/cgi/bin/mis.cgi" >
+<FORM NAME="login" METHOD="post" ACTION="/src/cgi/bin/mis.cgi" >
       <TABLE WIDTH="100%" >
 	<TR>
 	  <TD ALIGN="center" >
@@ -58,7 +58,7 @@ function vLogin(form)
 	<TR><TD >&nbsp;</TD></TR>
 	<TR>
 	  <TD ALIGN="center" >
-            <A HREF="/cgi/bin/mis.cgi?RenewLogin=yes">Forgot password</A>
+            <A HREF="/src/cgi/bin/mis.cgi?RenewLogin=yes">Forgot password</A>
 	  </TD>
 	</TR>
       </TABLE>

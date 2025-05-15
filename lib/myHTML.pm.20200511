@@ -87,7 +87,7 @@ sub new
     $myClockONLOAD = '';    # countdown conflicts with the clock.
   }
   my $countdown = $flags =~ /countdown/i ? qq|
-  <SCRIPT TYPE="text/javascript" SRC="/cgi/js/countdown.js?v=20161101"></SCRIPT>
+  <SCRIPT TYPE="text/javascript" SRC="/src/cgi/js/countdown.js?v=20161101"></SCRIPT>
 | : '';
 
   my $d3lib = $flags =~ /setd3lib/i ? qq|
@@ -116,7 +116,7 @@ my $jquery = qq|
   <!-- Tabs Dependencies -->
   <LINK HREF="|.myConfig->cfgfile('tabcontent/template6/tabcontent.css',1).qq|" REL="stylesheet" TYPE="text/css" >
   <SCRIPT TYPE="text/javascript" SRC="|.myConfig->cfgfile('tabcontent/tabcontent.js',1).qq|" ></SCRIPT>
-  <SCRIPT TYPE="text/javascript" SRC="/cgi/js/tabs.js"></SCRIPT>
+  <SCRIPT TYPE="text/javascript" SRC="/src/cgi/js/tabs.js"></SCRIPT>
 | : '';
 
 # if set 'checkinputwindow' then when focus goes to Parent, Child will close.
@@ -145,13 +145,13 @@ my $jquery = qq|
     .itemBorder { border: 1px solid red }
     .itemText { text-align: center; text-decoration: none; color: black; font: 12px Arial, Helvetica }
   </STYLE>
-  <SCRIPT TYPE="text/javascript" SRC="/cgi/js/Login.js?v=20160628" ></SCRIPT>
+  <SCRIPT TYPE="text/javascript" SRC="/src/cgi/js/Login.js?v=20160628" ></SCRIPT>
   <SCRIPT TYPE="text/javascript" >setCookie('MillenniumIS','$form->{mlt}','60');</SCRIPT>
   <SCRIPT TYPE="text/javascript" >javascript:window.history.forward(1);</SCRIPT>
   <SCRIPT TYPE="text/javascript" SRC="/cgi/menu/js/centerAlign.js"> </SCRIPT>
-  <SCRIPT TYPE="text/javascript" SRC="/cgi/js/utils.js?v=20170828" ></SCRIPT>
-  <SCRIPT TYPE="text/javascript" SRC="/cgi/js/NoEnter.js" ></SCRIPT>
-  <SCRIPT TYPE="text/javascript" SRC="/cgi/js/accordion.js" ></SCRIPT>
+  <SCRIPT TYPE="text/javascript" SRC="/src/cgi/js/utils.js?v=20170828" ></SCRIPT>
+  <SCRIPT TYPE="text/javascript" SRC="/src/cgi/js/NoEnter.js" ></SCRIPT>
+  <SCRIPT TYPE="text/javascript" SRC="/src/cgi/js/accordion.js" ></SCRIPT>
   ${addHEAD}
   <SCRIPT TYPE="text/javascript" >window.focus();</SCRIPT>
   ${countdown}
@@ -777,8 +777,8 @@ sub ListSel
   my $newbutton = $addnew eq '' || $islocked || ($only1 && $row > 0) ? '' : qq|<INPUT TYPE="submit" ONCLICK="return validate(this.form,'Add New information','')" ONMOUSEOVER="window.status='add button'; return true;" ONMOUSEOUT="window.status=''" NAME="${addnew}&${TABLEID}=new&${links}&fwdTABLE=${table}${updall}&pushID=${pushID}" VALUE="Add New" >|;
   my $html = qq|
 ${scripts}
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/tablesort.js"> </SCRIPT>
-<LINK HREF="/cgi/css/tablesort.css" REL="stylesheet" TYPE="text/css">
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/tablesort.js"> </SCRIPT>
+<LINK HREF="/src/cgi/css/tablesort.css" REL="stylesheet" TYPE="text/css">
 <TABLE CLASS="port fullsize" >
   <TR>
     <TD ALIGN="left" ><B>${title}</B> ${newbutton}</TD>

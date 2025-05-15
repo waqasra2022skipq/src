@@ -3,7 +3,7 @@
 <SCRIPT TYPE="text/javascript" SRC="/cgi/jquery/jquery-1.12.4.js" ></SCRIPT>
 <SCRIPT TYPE="text/javascript" src="/cgi/lhc/autocomplete-lhc-17.0.3/autocomplete-lhc.min.js"></SCRIPT>
 <SCRIPT TYPE="text/javascript" SRC="/cgi/jquery/jquery-ui-1.12.1/jquery-ui.min.js" ></SCRIPT>
-<LINK HREF="/cgi/css/autocomplete.css?v=202008071708" REL="stylesheet">
+<LINK HREF="/src/cgi/css/autocomplete.css?v=202008071708" REL="stylesheet">
 <FORM NAME="Intake" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
@@ -44,8 +44,8 @@
 </FORM>
 
 [[myHTML->rightpane(%form+search)]]
-<SCRIPT type="text/javascript" src="/cgi/js/vMCAutocomplete.js?v=202008241747"></SCRIPT>
-<SCRIPT type="text/javascript" src="/cgi/js/vMCAutocompleteAsyncTest.js?v=202009101505"></SCRIPT>
+<SCRIPT type="text/javascript" src="/src/cgi/js/vMCAutocomplete.js?v=202008241747"></SCRIPT>
+<SCRIPT type="text/javascript" src="/src/cgi/js/vMCAutocompleteAsyncTest.js?v=202009101505"></SCRIPT>
 <script LANGUAGE="JavaScript">
 $(document).ready(function() {
   mcAutocompleteAsyncTest('autocomplete', 'test', '<<mlt>>');

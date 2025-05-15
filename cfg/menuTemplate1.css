@@ -8,11 +8,11 @@
     /*following "behavior" works for IE6, IE7, and IE8. Other browsers will ignore it.*/
     /*Note: htc file path(if using relative path) inside the CSS file should be relative to the page, not to the CSS file (this is unlike image path inside the CSS that is relative to the CSS file location only). 
     So we recommend using the absolute path for the behavior file.*/
-    behavior: url("/cfg/cssmenu.htc");
+    behavior: url("/src/cfg/cssmenu.htc");
     position:relative;
     z-index:4;
     height: 36px;
-    background: #D4D4D4 url("/cgi/images/bg1.gif");
+    background: #D4D4D4 url("/src/cgi/images/bg1.gif");
     border: 1px solid #BBB;
     font-family: Arial, Helvetica, sans-serif;
     list-style: none;
@@ -42,13 +42,13 @@
 }
 .menuTemplate1 li:hover a, .menuTemplate1 li.onhover a
 {
-    background: white url("/cgi/images/bg1.gif") repeat-x 0 -48px;
+    background: white url("/src/cgi/images/bg1.gif") repeat-x 0 -48px;
     color: #000;
     z-index: 9;
 }
 .menuTemplate1 a.arrow
 {
-    background: url("/cgi/images/arrow1.gif") no-repeat right center;
+    background: url("/src/cgi/images/arrow1.gif") no-repeat right center;
 }
  
         
@@ -104,13 +104,13 @@
 .menuTemplate1 li:hover .drop, .menuTemplate1 li.onhover .drop
 {
     left: -1px;/*Use this property to change offset of the dropdown*/
-    background:white url(/cgi/images/bg1-right.png) no-repeat right bottom;
+    background:white url(/src/cgi/images/bg1-right.png) no-repeat right bottom;
 }
 .menuTemplate1 li:hover .dropToLeft, .menuTemplate1 li.onhover .dropToLeft
 {
     left: auto;
     right: -1px;
-    background:white url(/cgi/images/bg1-left.png) no-repeat 0 bottom;
+    background:white url(/src/cgi/images/bg1-left.png) no-repeat 0 bottom;
 }
 .menuTemplate1 li:hover .dropToLeft2, .menuTemplate1 li.onhover .dropToLeft2
 {

@@ -24,7 +24,7 @@ ul.tabs li a
     padding: 6px 14px;
     border: 1px solid #B7B7B7;
     color: #000;
-    background: #F7F7F7 url(tabbg2.gif) repeat-x 0 0;
+    background: #F7F7F7 url(src\cfg\tabcontent\template2\tabbg2.gif) repeat-x 0 0;
     border-radius: 3px 3px 0 0;
     outline:none;
 }
@@ -36,7 +36,7 @@ ul.tabs li a:visited
         
 ul.tabs li a:hover
 {
-    background:White url(tabbg.gif) repeat-x 0 0;
+    background:White url(src\cfg\tabcontent\template2\tabbg.gif) repeat-x 0 0;
 }
         
 ul.tabs li.selected a

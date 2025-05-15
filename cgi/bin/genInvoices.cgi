@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ###########################################
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use Cwd;
 use DBI;
 use DBForm;
@@ -14,7 +14,7 @@ chdir("$form->{DOCROOT}/tmp");
 $pwd = cwd();
 warn qq|genInvoices.cgi: pwd=$pwd, file=$file\n|;
 my $cmd =
-qq|/var/www/okmis/src/bin/genInvoices DBNAME=$form->{DBNAME}\\&ClientID=$form->{Client_ClientID}\\&mlt=$form->{mlt}|;
+qq|C:/xampp/htdocs/src/bin/genInvoices DBNAME=$form->{DBNAME}\\&ClientID=$form->{Client_ClientID}\\&mlt=$form->{mlt}|;
 warn "cmd=$cmd\n";
 my $diskfile = DBUtil->ExecCmd( $cmd, '.err' );
 warn qq|diskfile=$diskfile\n|;

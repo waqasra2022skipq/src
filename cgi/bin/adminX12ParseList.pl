@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use DBI;
 use myForm;
 use myDBI;
@@ -29,8 +29,8 @@ my $html =
   . qq|
 <P>
 <P>
-<SCRIPT LANGUAGE="JavaScript" src="/src/cgi/js/novalidate.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" src="/src/cgi/js/tablesort.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" src="/src/src/cgi/js/novalidate.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" src="/src/src/cgi/js/tablesort.js"> </SCRIPT>
 <LINK href="/src/cgi/css/tablesort.css" REL="stylesheet" TYPE="text/css">
 <DIV CLASS="home title hdrcol" >
 ${desc}

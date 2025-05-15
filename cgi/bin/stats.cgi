@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 ############################################################################
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use DBI;
 use DBA;
 use myForm;
@@ -13,7 +13,7 @@ my $form = myForm->new();
 #foreach my $f ( sort keys %{$form} ) { warn "vitals.cgi: 2: form-$f=$form->{$f}\n"; }
 my $dbh = myDBI->dbconnect( $form->{'DBNAME'} );
 if ( $form->{LOGINPROVID} == 91 ) {
-    open OUT, ">/var/www/okmis/src/debug/stats.out"
+    open OUT, ">C:/xampp/htdocs/src/debug/stats.out"
       or die "Couldn't open file: $!";
     foreach my $f ( sort keys %{$form} ) {
         print OUT "vitals.cgi: form-$f=$form->{$f}\n";

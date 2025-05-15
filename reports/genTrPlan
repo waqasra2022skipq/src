@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use CGI qw(:standard escape);
 use Cwd;
 use DBI;
@@ -12,7 +12,7 @@ use Time::Local;
 my $form = DBForm->new();
 $form = DBUtil->setDates($form);
 my $DateRange = qq|from $form->{FromDateD} thru $form->{ToDateD}|;
-open DBG, ">/var/www/okmis/src/debug/genTrPlan.out"
+open DBG, ">C:/xampp/htdocs/src/debug/genTrPlan.out"
   or die "Couldn't open file: $!";
 foreach my $f ( sort keys %{$form} ) { print DBG ": form-$f=$form->{$f}\n"; }
 ############################################################################
@@ -40,7 +40,7 @@ my $sClinic   = $dbh->prepare('select * from Provider where ProvID=?');
 ############################################################################
 # this is the pdf template we need
 #   it is the first 3 objects with 2 font objects and the content object
-$pdtpath = '/var/www/okmis/src/pdf/TrPlan.pdt';
+$pdtpath = 'C:/xampp/htdocs/src/pdf/TrPlan.pdt';
 if ( $form->{IDs} ) {
     $pdf = PDF->start($pdtpath);
     &printPDF( $form->{'IDs'} );

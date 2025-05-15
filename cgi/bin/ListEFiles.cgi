@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use DBI;
 use DBForm;
 use SysAccess;
@@ -29,7 +29,7 @@ my $html = myHTML->new($form) . qq|
 </TABLE>
 <P>
 <P>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/novalidate.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/novalidate.js"> </SCRIPT>
 | . main->gen837() . main->gen835() . qq|
 </BODY>
 </HTML>

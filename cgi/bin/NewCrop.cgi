@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 use strict;
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use Cwd;
 use DBI;
 use myForm;

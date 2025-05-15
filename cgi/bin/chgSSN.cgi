@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use DBI;
 use myForm;
 use myDBI;
@@ -67,7 +67,7 @@ sub html {
   <TR><TD CLASS="hdrcol banner" >${MAINHDR}</TD></TR>
   <TR> <TD CLASS="hdrcol title" >${SUBHDR1}</TD> </TR>
 </TABLE>
-<script TYPE="text/javascript" SRC="/cgi/js/ajaxrequest.js"></script>
+<script TYPE="text/javascript" SRC="/src/cgi/js/ajaxrequest.js"></script>
 <SCRIPT LANGUAGE="JavaScript" >
 function validate(form)
 {

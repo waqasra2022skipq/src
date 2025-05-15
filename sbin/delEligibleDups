@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use DBI;
 use DBForm;
 ############################################################################
@@ -10,8 +10,8 @@ my $debug   = 0;
 my $form    = DBForm->new();
 my $dbh     = $form->dbconnect();
 my $sDelete = $dbh->prepare("delete from Eligible where ID=?");
-open O1, ">/var/www/okmis/src/sbin/o1" or die "Couldn't open file: $!";
-open O2, ">/var/www/okmis/src/sbin/o2" or die "Couldn't open file: $!";
+open O1, ">C:/xampp/htdocs/src/sbin/o1" or die "Couldn't open file: $!";
+open O2, ">C:/xampp/htdocs/src/sbin/o2" or die "Couldn't open file: $!";
 my @flds = (
     'ClientID', 'InsCode',      'Benefit',      'BenefitDescr',
     'Coverage', 'ServiceType',  'PlanDescr',    'FromDate',

@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use DBI;
 use myForm;
 use myDBI;
@@ -51,9 +51,9 @@ while ( my $rxTable = $sxTable->fetchrow_hashref ) {
 
 ############################################################################
 # UNUSED???
-#<link rel="STYLESHEET" type="text/css" href="/cgi/css/tabs.css" />
+#<link rel="STYLESHEET" type="text/css" href="/src/cgi/css/tabs.css" />
 #<LINK REL="stylesheet" TYPE="text/css" HREF="/cgi/jcal/calendar-forest.css" >
-#<script language="JavaScript" type="text/javascript" src="/cgi/js/tabs.js"></script>
+#<script language="JavaScript" type="text/javascript" src="/src/cgi/js/tabs.js"></script>
 #<SCRIPT TYPE="text/javascript" SRC="/cgi/jcal/calendar.js"></SCRIPT>
 #<SCRIPT TYPE="text/javascript" SRC="/cgi/jcal/calendar-en.js"></SCRIPT>
 #<SCRIPT TYPE="text/javascript" SRC="/cgi/jcal/calendar-setup.js"></SCRIPT>

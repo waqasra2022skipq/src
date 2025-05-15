@@ -100,7 +100,7 @@ warn qq|xmlfile=${xmlfile}=\n| if ( $debug );
   my $xmlfile = '/tmp/XML_'.DBUtil->genToken().'.xml';
   my $xmlpath = $form->{'DOCROOT'}.$xmlfile;
 warn qq|write: xmlpath=${xmlpath}=\n| if ( $debug );
-  my $result = `php /var/www/okmis/src/MU/parseCCDA.php ${filepath} > ${xmlpath} 2>${xmlpath}.err`;
+  my $result = `php C:/xampp/htdocs/src/MU/parseCCDA.php ${filepath} > ${xmlpath} 2>${xmlpath}.err`;
 warn qq|addXML: xmlfile=${xmlfile}=\n| if ( $debug );
   return($xmlfile);
 }

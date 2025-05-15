@@ -1,9 +1,9 @@
 [[myHTML->newPage(%form+Legal)]]
 
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vClientLegal.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vPhone.js"> </SCRIPT>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vNum.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vClientLegal.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vPhone.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vNum.js"> </SCRIPT>
 
 <FORM NAME="Legal" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
@@ -68,7 +68,7 @@
     <TD CLASS="strcol" >Are you on parole or probation?</TD>
     <TD CLASS="strcol" >
       <INPUT TYPE="radio" NAME="ClientLegal_OnPP_1" VALUE=0 <<ClientLegal_OnPP_1=0>> > No
-      <INPUT TYPE="radio" NAME="ClientLegal_OnPP_1" VALUE=1 <<ClientLegal_OnPP_1=1>> > Yes · Note duration and level in comments. 
+      <INPUT TYPE="radio" NAME="ClientLegal_OnPP_1" VALUE=1 <<ClientLegal_OnPP_1=1>> > Yes ï¿½ Note duration and level in comments. 
     </TD>
   </TR>
   <TR >

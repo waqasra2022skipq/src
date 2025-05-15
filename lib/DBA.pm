@@ -2959,7 +2959,7 @@ sub processNewCrop
 {
   my ($self,$form,$ClientID) = @_;
   chdir("$form->{DOCROOT}/tmp");
-  my $cmd = qq|/var/www/okmis/src/bin/gp6 DBNAME=$form->{DBNAME}\\&mlt=$form->{mlt}\\&ClientID=${ClientID}|;
+  my $cmd = qq|C:/xampp/htdocs/src/bin/gp6 DBNAME=$form->{DBNAME}\\&mlt=$form->{mlt}\\&ClientID=${ClientID}|;
   my $diskfile = DBUtil->ExecCmd($cmd);
   my $out = DBUtil->ReadFile($diskfile);
   return('<PRE>'.$out.'</PRE>');
@@ -3437,7 +3437,7 @@ sub allowDelTrPlanS
   my ($self,$form,$TrPlanSID,$row,$links) = @_;
   my $out = '';
   $out .= qq|
-      <A HREF="javascript:callAjax('ListClientTrPlanS','delete','ListClientTrPlanS','&sid=${TrPlanSID}&${links}&row=${row}&LOGINPROVID=$form->{LOGINPROVID}&LOGINUSERID=$form->{LOGINUSERID}&LOGINUSERDB=$form->{LOGINUSERDB}&mlt=$form->{mlt}&misLINKS=$form->{misLINKS}&LINKID=$form->{LINKID}','popup.pl');" TITLE="Click to delete"><IMG SRC="/img/delete.png" HEIGHT="20" WIDTH="20" ></A>
+      <A HREF="javascript:callAjax('ListClientTrPlanS','delete','ListClientTrPlanS','&sid=${TrPlanSID}&${links}&row=${row}&LOGINPROVID=$form->{LOGINPROVID}&LOGINUSERID=$form->{LOGINUSERID}&LOGINUSERDB=$form->{LOGINUSERDB}&mlt=$form->{mlt}&misLINKS=$form->{misLINKS}&LINKID=$form->{LINKID}','popup.pl');" TITLE="Click to delete"><IMG SRC="/src/img/delete.png" HEIGHT="20" WIDTH="20" ></A>
 | if ( SysAccess->verify($form,'Privilege=Agent') );
   return($out);
 }

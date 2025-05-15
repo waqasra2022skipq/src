@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 # This is also a new file
 ############################################################################
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use DBI;
 use myForm;
 use myDBI;

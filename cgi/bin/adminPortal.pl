@@ -1,9 +1,11 @@
 #!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+#use lib 'C:/xampp/htdocs/src/lib';
+use lib 'E:/src/lib';  
 use DBI;
 use myForm;
 use myDBI;
 use myHTML;
+use myConfig;
 
 ############################################################################
 my $form = myForm->new();

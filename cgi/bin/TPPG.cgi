@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use myConfig;
 use DBA;
 use myForm;
@@ -65,7 +65,7 @@ sub html {
   <LINK REL="stylesheet" TYPE="text/css" HREF="|
       . myConfig->cfgfile( 'main.css', 1 ) . qq|" >
   <LINK REL="stylesheet" TYPE="text/css" HREF="/cgi/jcal/calendar-forest.css" >
-  <SCRIPT TYPE="text/javascript" SRC="/cgi/js/utils.js"></SCRIPT>
+  <SCRIPT TYPE="text/javascript" SRC="/src/cgi/js/utils.js"></SCRIPT>
   <SCRIPT TYPE="text/javascript" SRC="/cgi/jcal/calendar.js"></SCRIPT>
   <SCRIPT TYPE="text/javascript" SRC="/cgi/jcal/calendar-en.js"></SCRIPT>
   <SCRIPT TYPE="text/javascript" SRC="/cgi/jcal/calendar-setup.js"></SCRIPT>

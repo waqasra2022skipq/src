@@ -1,5 +1,5 @@
 
-Scheduler Reminders pwd=/var/www/okmis/src/scheduler...
+Scheduler Reminders pwd=C:/xampp/htdocs/src/scheduler...
 
 Reminders for mms.okmis.com ...
 --2024-05-08 22:55:01--  https://mms.okmis.com/scheduler/mms/index.php?nts-reminder=1
@@ -7,11 +7,11 @@ Resolving mms.okmis.com (mms.okmis.com)... 64.20.50.18
 Connecting to mms.okmis.com (mms.okmis.com)|64.20.50.18|:443... connected.
 HTTP request sent, awaiting response... 200 OK
 Length: unspecified [text/html]
-Saving to: ‘/var/www/okmis/src/scheduler/reminders.out’
+Saving to: ‘C:/xampp/htdocs/src/scheduler/reminders.out’
 
      0K                                                        0.00 =0s
 
-2024-05-08 22:55:02 (0.00 B/s) - ‘/var/www/okmis/src/scheduler/reminders.out’ saved [0]
+2024-05-08 22:55:02 (0.00 B/s) - ‘C:/xampp/htdocs/src/scheduler/reminders.out’ saved [0]
 
 
 Reminders for lbhp.okmis.com ...
@@ -20,11 +20,11 @@ Resolving lbhp.okmis.com (lbhp.okmis.com)... 64.20.50.18
 Connecting to lbhp.okmis.com (lbhp.okmis.com)|64.20.50.18|:443... connected.
 HTTP request sent, awaiting response... 200 OK
 Length: unspecified [text/html]
-Saving to: ‘/var/www/okmis/src/scheduler/reminders.out’
+Saving to: ‘C:/xampp/htdocs/src/scheduler/reminders.out’
 
      0K                                                        0.00 =0s
 
-2024-05-08 22:55:02 (0.00 B/s) - ‘/var/www/okmis/src/scheduler/reminders.out’ saved [0]
+2024-05-08 22:55:02 (0.00 B/s) - ‘C:/xampp/htdocs/src/scheduler/reminders.out’ saved [0]
 
 
 Reminders for tsi.okmis.com ...
@@ -33,9 +33,9 @@ Resolving tsi.okmis.com (tsi.okmis.com)... 64.20.50.18
 Connecting to tsi.okmis.com (tsi.okmis.com)|64.20.50.18|:443... connected.
 HTTP request sent, awaiting response... 200 OK
 Length: unspecified [text/html]
-Saving to: ‘/var/www/okmis/src/scheduler/reminders.out’
+Saving to: ‘C:/xampp/htdocs/src/scheduler/reminders.out’
 
      0K                                                        0.00 =0s
 
-2024-05-08 22:55:02 (0.00 B/s) - ‘/var/www/okmis/src/scheduler/reminders.out’ saved [0]
+2024-05-08 22:55:02 (0.00 B/s) - ‘C:/xampp/htdocs/src/scheduler/reminders.out’ saved [0]
 

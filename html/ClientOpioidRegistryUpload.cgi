@@ -37,7 +37,7 @@
 </LOADHIDDEN>
 </FORM>
 [[myHTML->rightpane(%form+search)]]
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vOpioidRegistry.js?202010261243"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vOpioidRegistry.js?202010261243"> </SCRIPT>
 <SCRIPT LANGUAGE="Javascript">
 $(document).ready(function() {
   createOpioidRegistryDownloadLink("get_opioid_registry_link", "<<<Client_ClientID>>>", "<<<mlt>>>");

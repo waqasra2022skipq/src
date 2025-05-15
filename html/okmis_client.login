@@ -11,7 +11,7 @@ Content-Type: text/html; charset=ISO-8859-1
  TD    { text-align: center; }
  TH    { text-align: right; }
 </STYLE>
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" >
 function vLogin(form)
 { return vEntry("notnull",form.user,form.pass); }

@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
 use DBI;
 use DBForm;
 use DBA;
@@ -25,7 +25,7 @@ $s->finish;
 ############################################################################
 # Start out the display.
 my $html = myHTML->new($form) . qq|
-<SCRIPT LANGUAGE="JavaScript" SRC="/cgi/js/novalidate.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/novalidate.js"> </SCRIPT>
 <TABLE CLASS="main" >
   <TR ALIGN="center" >
 | . myHTML->leftpane( $form, 'clock mail managertree collapseipad' ) . qq|

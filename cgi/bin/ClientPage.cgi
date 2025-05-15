@@ -1,6 +1,8 @@
-#!/usr/bin/perl
+#!C:/Strawberry/perl/bin/perl.exe
 ############################################################################
-use lib '/var/www/okmis/src/lib';
+use lib 'C:/xampp/htdocs/src/lib';
+use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
+
 use DBI;
 use myForm;
 use myDBI;
@@ -76,9 +78,9 @@ my $DOB    = DBUtil->Date( $rClient->{DOB}, 'fmt', 'MM/DD/YYYY' );
 my $DOBSSN = $BillingReports ? qq|${DOB} $rClient->{'SSN'}| : '';
 my $chgSSN = $NewClient
   ? qq|
-          <A HREF="javascript:ReportWindow('/cgi/bin/chgSSN.cgi?ClientID=$rClient->{'ClientID'}&mlt=$form->{mlt}','PrintWindow')" TITLE="Click here to change the Social Security Number (SSN)" >
+          <A HREF="javascript:ReportWindow('/src/cgi/bin/chgSSN.cgi?ClientID=$rClient->{'ClientID'}&mlt=$form->{mlt}','PrintWindow')" TITLE="Click here to change the Social Security Number (SSN)" >
             $rClient->{'SSN'}
-            <IMG SRC="/img/tab-edit.png" ALT="" BORDER="0" HEIGHT="20" WIDTH="20" >
+            <IMG SRC="/src/img/tab-edit.png" ALT="" BORDER="0" HEIGHT="20" WIDTH="20" >
           </A>
            |
   : qq|
@@ -134,11 +136,11 @@ my $Physician = DBA->isPhysician($form);
 # Add a new note button...
 my $AddNote =
   $ClientInfo
-  ? qq|     <SCRIPT type="text/javascript" >newtextMsg('ClientNote','Use this button to enter a new note for ${ClientName}.');</SCRIPT> <A HREF="/cgi/bin/mis.cgi?MIS_Action=Note&Client_ClientID=$form->{Client_ClientID}&Treatment_TrID=new&${addLinks}" ONMOUSEOVER="textMsg.show('ClientNote');" ONMOUSEOUT="textMsg.hide()" ><IMG BORDER=0 SRC="/images/edit.gif" WIDTH="35" HEIGHT="35" ></A>|
+  ? qq|     <SCRIPT type="text/javascript" >newtextMsg('ClientNote','Use this button to enter a new note for ${ClientName}.');</SCRIPT> <A HREF="/src/cgi/bin/mis.cgi?MIS_Action=Note&Client_ClientID=$form->{Client_ClientID}&Treatment_TrID=new&${addLinks}" ONMOUSEOVER="textMsg.show('ClientNote');" ONMOUSEOUT="textMsg.hide()" ><IMG BORDER=0 SRC="/src/images/edit.gif" WIDTH="35" HEIGHT="35" ></A>|
   : '';
 my $PhysNote =
   $Physician
-  ? qq|     <A HREF="/cgi/bin/mis.cgi?MIS_Action=Note&NoteType=2&Client_ClientID=$form->{Client_ClientID}&Treatment_TrID=new&${addLinks}" ONMOUSEOVER="textMsg.show('physnote')" ONMOUSEOUT="textMsg.hide()" > <IMG SRC="/cgi/images/caduceuswhite.png" WIDTH="24" HEIGHT="24" > </A>|
+  ? qq|     <A HREF="/src/cgi/bin/mis.cgi?MIS_Action=Note&NoteType=2&Client_ClientID=$form->{Client_ClientID}&Treatment_TrID=new&${addLinks}" ONMOUSEOVER="textMsg.show('physnote')" ONMOUSEOUT="textMsg.hide()" > <IMG SRC="/src/cgi/images/caduceuswhite.png" WIDTH="24" HEIGHT="24" > </A>|
   : '';
 
 ############################################################################
@@ -174,9 +176,9 @@ my $html =
 <LINK HREF="|
   . myConfig->cfgfile( 'menuV2.css', 1 )
   . qq|" REL="stylesheet" TYPE="text/css" >
-<script type="text/javascript" src="/cgi/menu/js/menuV2.js" ></script>
-<SCRIPT type="text/javascript" SRC="/cgi/js/vEntry.js"> </SCRIPT>
-<SCRIPT type="text/javascript" SRC="/cgi/js/ajaxrequest.js"> </SCRIPT>
+<script type="text/javascript" src="/src/cgi/menu/js/menuV2.js" ></script>
+<SCRIPT type="text/javascript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT type="text/javascript" SRC="/src/cgi/js/ajaxrequest.js"> </SCRIPT>
 <SCRIPT type="text/javascript" >
 <!--
 function validate(form,ok,no)
@@ -195,10 +197,10 @@ function validate(form,ok,no)
 <SCRIPT type="text/javascript" SRC="|
   . myConfig->cfgfile( 'tabcontent/tabcontent.js', 1 )
   . qq|" ></SCRIPT>
-<SCRIPT type="text/javascript" SRC="/cgi/js/tabs.js"></SCRIPT>
-<LINK REL="STYLESHEET" TYPE="text/css" HREF="/cgi/css/tabs.css" />
+<SCRIPT type="text/javascript" SRC="/src/cgi/js/tabs.js"></SCRIPT>
+<LINK REL="STYLESHEET" TYPE="text/css" HREF="/src/cgi/css/tabs.css" />
 ${medAlerts}
-<FORM ID="form" NAME="ClientPage" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM ID="form" NAME="ClientPage" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >
@@ -230,7 +232,7 @@ ${medAlerts}
 |;
 $html .= qq|
       <DIV STYLE="float:right; clear:right;">
-        <img src="/images/check.jpg" width="20" height="20" style="vertical-align: middle;">
+        <img src="/src/images/check.jpg" width="20" height="20" style="vertical-align: middle;">
         <span>Verified</span>
       </DIV>
 | if $rClient->{addressVerified} eq 1;
@@ -343,7 +345,7 @@ if ($ClientInfo) {
       <BR>To PRINT the PA Packet 'Click On' the print icon link next to 'TransType'.
       <BR>Prior Authorizations are displayed listing the last 5 entered by date.
       <BR>To Display all the Prior Authorizations click on the button below.
-      <BR><INPUT TYPE="button" VALUE="List All Prior Authorizations" ONCLICK="window.location='/cgi/bin/ClientPage.cgi?Client_ClientID=$form->{Client_ClientID}&FULL=ALL&mlt=$form->{mlt}&misLINKS=$form->{misLINKS}'">
+      <BR><INPUT TYPE="button" VALUE="List All Prior Authorizations" ONCLICK="window.location='/src/cgi/bin/ClientPage.cgi?Client_ClientID=$form->{Client_ClientID}&FULL=ALL&mlt=$form->{mlt}&misLINKS=$form->{misLINKS}'">
     </TD>
   </TR>
 </TABLE>
