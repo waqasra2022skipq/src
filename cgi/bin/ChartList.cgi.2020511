@@ -309,7 +309,7 @@ qq|$rClient->{FName} $rClient->{LName} ($rClient->{ClientID}) $rClient->{SSN}|;
     $ChartType = 'by Client';
     ( my $ClientName = qq|$rClient->{FName} $rClient->{LName}| ) =~ s/'/\\'/g;
     $ClientInsURL =
-qq|<A HREF="javascript:ReportWindow('/cgi/bin/ListInsPaid.cgi?Client_ClientID=${ClientID}&${addLinks}','ClientInsPaid')" TITLE="Click here for <BR>${ClientName}\'s Manual Insurance Payments." ><IMG SRC="/images/piggybank.gif" BORDER="0" HEIGHT="20" WIDTH="20" ALT="Manual Insurance Payments" ></A>|;
+qq|<A HREF="javascript:ReportWindow('/src/cgi/bin/ListInsPaid.cgi?Client_ClientID=${ClientID}&${addLinks}','ClientInsPaid')" TITLE="Click here for <BR>${ClientName}\'s Manual Insurance Payments." ><IMG SRC="/images/piggybank.gif" BORDER="0" HEIGHT="20" WIDTH="20" ALT="Manual Insurance Payments" ></A>|;
     $sClient->finish();
     $sProvider->execute( $rClient->{ProvID} );
     $rProvider = $sProvider->fetchrow_hashref;
@@ -756,14 +756,14 @@ qq|<SPAN CLASS="sublabel" >review:${MgrRevName}${MgrRevDate}${MgrRevStatus}</SPA
       :                      'no';
     my $adjNoteURL =
       $ADDTransACCESS
-      ? qq|<BR><A HREF="javascript:ReportWindow('/cgi/bin/adjNote.pl?TrID=$r->{TrID}&InsID=$rxSC->{InsID}&${addLinks}','adjNote')" TITLE="Click here to <BR>add Transaction<BR>for $r->{TrID}" ><IMG SRC="/img/dollarsign.png" HEIGHT="21" WIDTH="21" BORDER="0" ></A>|
+      ? qq|<BR><A HREF="javascript:ReportWindow('/src/cgi/bin/adjNote.pl?TrID=$r->{TrID}&InsID=$rxSC->{InsID}&${addLinks}','adjNote')" TITLE="Click here to <BR>add Transaction<BR>for $r->{TrID}" ><IMG SRC="/img/dollarsign.png" HEIGHT="21" WIDTH="21" BORDER="0" ></A>|
       : '';
 
     #warn qq|ChartList: TrID=$r->{TrID}, AmtDue=$r->{AmtDue},$AmtDue\n|;
     my $prtBlackHCFA =
-qq|<A HREF="javascript:ReportWindow('/cgi/bin/printHCFA.pl?TrIDs=$r->{TrID}&InsID=$rxSC->{InsID}&HCFAtype=black&${addLinks}','HCFAB')" TITLE="Click here to <BR>generate HCFA 1500 on blank paper <BR>for $r->{TrID}" ><IMG SRC="/img/print-ok.png" HEIGHT="21" WIDTH="21" BORDER="0" ></A>|;
+qq|<A HREF="javascript:ReportWindow('/src/cgi/bin/printHCFA.pl?TrIDs=$r->{TrID}&InsID=$rxSC->{InsID}&HCFAtype=black&${addLinks}','HCFAB')" TITLE="Click here to <BR>generate HCFA 1500 on blank paper <BR>for $r->{TrID}" ><IMG SRC="/img/print-ok.png" HEIGHT="21" WIDTH="21" BORDER="0" ></A>|;
     my $prtRedHCFA =
-qq|<A HREF="javascript:ReportWindow('/cgi/bin/printHCFA.pl?TrIDs=$r->{TrID}&InsID=$rxSC->{InsID}&HCFAtype=red&${addLinks}','HCFAR')" TITLE="Click here to <BR>generate HCFA 1500 on pre-printed forms <BR>for $r->{TrID}" ><IMG SRC="/img/print-ok.png" HEIGHT="21" WIDTH="21" BORDER="0" ></A>|;
+qq|<A HREF="javascript:ReportWindow('/src/cgi/bin/printHCFA.pl?TrIDs=$r->{TrID}&InsID=$rxSC->{InsID}&HCFAtype=red&${addLinks}','HCFAR')" TITLE="Click here to <BR>generate HCFA 1500 on pre-printed forms <BR>for $r->{TrID}" ><IMG SRC="/img/print-ok.png" HEIGHT="21" WIDTH="21" BORDER="0" ></A>|;
     my $Remarks = '';
     if ($BillingRemitACCESS) {
         if ( $sClientInsRemarksDetail->execute( $r->{TrID} ) ) {
@@ -771,7 +771,7 @@ qq|<A HREF="javascript:ReportWindow('/cgi/bin/printHCFA.pl?TrIDs=$r->{TrID}&InsI
                 $sClientInsRemarksDetail->fetchrow_hashref )
             {
                 $Remarks =
-qq|<A HREF="javascript:ReportWindow('/cgi/bin/disHTML.cgi?${addLinks}&IDs=$rClientInsRemarksDetail->{ID}&action=ClientInsRemarksDetail&page=HTMLText','PrintWindow',1000,1440)" TITLE="Click here to view." ><IMG SRC="/images/note.jpg" BORDER="5" ></A>|;
+qq|<A HREF="javascript:ReportWindow('/src/cgi/bin/disHTML.cgi?${addLinks}&IDs=$rClientInsRemarksDetail->{ID}&action=ClientInsRemarksDetail&page=HTMLText','PrintWindow',1000,1440)" TITLE="Click here to view." ><IMG SRC="/images/note.jpg" BORDER="5" ></A>|;
             }
         }
     }
@@ -779,21 +779,21 @@ qq|<A HREF="javascript:ReportWindow('/cgi/bin/disHTML.cgi?${addLinks}&IDs=$rClie
     $NoteNmbrLink =
 qq|<A HREF="/cgi/bin/mis.cgi?MIS_Action=Note&Client_ClientID=$r->{ClientID}&Treatment_TrID=$r->{TrID}&${addLinks}&pushID=$form->{LINKID}" TITLE="${TrIDMesg} <BR>Click here to <BR>Edit Note $r->{TrID}" >${NoteIMG}|;
     $NotePrintLink .=
-qq|<A HREF="javascript:ReportWindow('/cgi/bin/printNotes.pl?TrIDs=$r->{TrID}&${addLinks}','printNote')" TITLE="Click here to <BR>New print Note $r->{TrID} as pdf file." ><IMG SRC="/images/adobelogo_bt.gif" BORDER="0" HEIGHT="18" WIDTH="18" ></A>|;
+qq|<A HREF="javascript:ReportWindow('/src/cgi/bin/printNotes.pl?TrIDs=$r->{TrID}&${addLinks}','printNote')" TITLE="Click here to <BR>New print Note $r->{TrID} as pdf file." ><IMG SRC="/images/adobelogo_bt.gif" BORDER="0" HEIGHT="18" WIDTH="18" ></A>|;
     $NotePrintLink .=
 qq|<A HREF="javascript:ReportWindow('$r->{Path}','PrintNote')" TITLE="Click here to <BR>Print the attachment for Note $r->{TrID}." ><IMG SRC="/images/paperclip_black.png" BORDER="0" HEIGHT="18" WIDTH="18" ></A>|
       if ( $r->{'Type'} == 3 );
     $NoteCCDALink =
-qq|<A HREF="javascript:ReportWindow('/cgi/bin/genCCDA.pl?ProvID=$r->{ProvID}&ClientID=$r->{ClientID}&TrIDs=$r->{TrID}&${addLinks}','genCCDA',500,1200)" TITLE="Click here to <BR>generate the CCDA." ><IMG SRC="/img/document-export.png" HEIGHT="21" WIDTH="21" BORDER="0" ></A>|
+qq|<A HREF="javascript:ReportWindow('/src/cgi/bin/genCCDA.pl?ProvID=$r->{ProvID}&ClientID=$r->{ClientID}&TrIDs=$r->{TrID}&${addLinks}','genCCDA',500,1200)" TITLE="Click here to <BR>generate the CCDA." ><IMG SRC="/img/document-export.png" HEIGHT="21" WIDTH="21" BORDER="0" ></A>|
       if ($AgentACCESS);
     $NoteAmendLink =
-qq|<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ClientNoteAmendmentInp.cgi&Client_ClientID=$r->{ClientID}&Treatment_TrID=$r->{TrID}&${addLinks}','setNoteAmend')" TITLE="Click here to <BR>add or update the Ammendment to this note." ><IMG SRC="/img/notepad-info.png" HEIGHT="21" WIDTH="21" BORDER="0" ></A><BR>|
+qq|<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ClientNoteAmendmentInp.cgi&Client_ClientID=$r->{ClientID}&Treatment_TrID=$r->{TrID}&${addLinks}','setNoteAmend')" TITLE="Click here to <BR>add or update the Ammendment to this note." ><IMG SRC="/img/notepad-info.png" HEIGHT="21" WIDTH="21" BORDER="0" ></A><BR>|
       if ($AgentACCESS);
     my ($PrAuthLink) = ('');
 
     if ( $r->{PrAuthID} ) {
         $PrAuthLink =
-qq|<A HREF="javascript:ReportWindow('/cgi/bin/printClientPrAuth.cgi?IDs=$r->{PrAuthID}&mlt=$form->{mlt}','PrAuth')" TITLE="Click here to <BR>print the Prior Authorization this Note is associated with." >$r->{PrAuthID}</A>|;
+qq|<A HREF="javascript:ReportWindow('/src/cgi/bin/printClientPrAuth.cgi?IDs=$r->{PrAuthID}&mlt=$form->{mlt}','PrAuth')" TITLE="Click here to <BR>print the Prior Authorization this Note is associated with." >$r->{PrAuthID}</A>|;
     }
 
 #warn qq|ChartList: SCID=$rxSC->{SCID}, InsDescr=$rxSC->{InsDescr}\n|;

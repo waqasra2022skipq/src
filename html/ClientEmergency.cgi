@@ -110,7 +110,7 @@
   </TR>
   <TR >
     <TD CLASS="strcol" >
-     <A HREF="javascript:ReportWindow('/cgi/bin/PrintPharmacyEnroll.cgi?IDs=<<<Client_ClientID_1>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','PrintPharmacyEnroll')" ONMOUSEOVER="window.status='Print Pharmacy Enrollment Form'; return true;" ONMOUSEOUT="window.status=''"><IMG SRC="/images/icon_print.gif" ALT="" BORDER="0" >Print Enrollment Form</A>
+     <A HREF="javascript:ReportWindow('/src/cgi/bin/PrintPharmacyEnroll.cgi?IDs=<<<Client_ClientID_1>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','PrintPharmacyEnroll')" ONMOUSEOVER="window.status='Print Pharmacy Enrollment Form'; return true;" ONMOUSEOUT="window.status=''"><IMG SRC="/images/icon_print.gif" ALT="" BORDER="0" >Print Enrollment Form</A>
     </TD>
     <TD CLASS="strcol" >ie: wal-mart (or you may enter partial zipcode)</TD>
   </TR>

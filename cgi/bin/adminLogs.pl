@@ -46,7 +46,7 @@ my $html =
 <P>
 <P>
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/novalidate.js"> </SCRIPT>
-<FORM NAME="adminFiles" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="adminFiles" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 | . main->listFiles( $directory, $wildcard ) . qq|
 <INPUT TYPE="hidden" NAME="mlt" VALUE="$form->{mlt}" >
 <INPUT TYPE="hidden" NAME="misLINKS" VALUE="$form->{misLINKS}" >
@@ -98,11 +98,11 @@ sub listFiles {
               $file =~ /\.([^.]*)$/;    # get the suffix/sfx of the filename
             my $href =
               $sfx =~ /log|txt|out/
-              ? qq|javascript:ReportWindow('/cgi/bin/disHTML.cgi?IDs=${file}&page=ADMINDIR&subpage=${dir}&action=read&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','DisplayFile')|
+              ? qq|javascript:ReportWindow('/src/cgi/bin/disHTML.cgi?IDs=${file}&page=ADMINDIR&subpage=${dir}&action=read&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','DisplayFile')|
               : $sfx =~ /999/
-              ? qq|javascript:ReportWindow('/cgi/bin/disHTML.cgi?IDs=${file}&page=ADMINDIR&subpage=${dir}&process=${process}&action=read&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','DisplayFile')|
+              ? qq|javascript:ReportWindow('/src/cgi/bin/disHTML.cgi?IDs=${file}&page=ADMINDIR&subpage=${dir}&process=${process}&action=read&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','DisplayFile')|
               : $sfx =~ /rsp/
-              ? qq|javascript:ReportWindow('/cgi/bin/disHTML.cgi?IDs=${file}&page=ADMINDIR&subpage=${dir}&process=${process}&action=read&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','DisplayFile')|
+              ? qq|javascript:ReportWindow('/src/cgi/bin/disHTML.cgi?IDs=${file}&page=ADMINDIR&subpage=${dir}&process=${process}&action=read&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','DisplayFile')|
               : $htmpath . '/' . $file;
             $html .= qq|
   <TR >

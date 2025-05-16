@@ -74,7 +74,7 @@ while ( my $r = $p->fetchrow_hashref ) {
         $i++;
         my $val =
           $GetPatientList == 0 && $form->{'output'} eq 'html' && $i == 1
-          ? qq|<A HREF="javascript:ReportWindow('/cgi/bin/GenReport.cgi?Name=AMSReport&mlt=$form->{mlt}&hdrline=4&output=html&AMSType=$form->{AMSType}&ActivityName=$r->{$fld}&ClientIDs=$form->{ClientIDs}&ClinicIDs=$form->{ClinicIDs}&FromDate=$form->{FromDate}&ProvIDs=$form->{ProvIDs}&ToDate=$form->{ToDate}&daterange=$form->{daterange}&xtable=xAMSReports&submit=1','AMSrpt',900,1000)" >$r->{$fld}</A>|
+          ? qq|<A HREF="javascript:ReportWindow('/src/cgi/bin/GenReport.cgi?Name=AMSReport&mlt=$form->{mlt}&hdrline=4&output=html&AMSType=$form->{AMSType}&ActivityName=$r->{$fld}&ClientIDs=$form->{ClientIDs}&ClinicIDs=$form->{ClinicIDs}&FromDate=$form->{FromDate}&ProvIDs=$form->{ProvIDs}&ToDate=$form->{ToDate}&daterange=$form->{daterange}&xtable=xAMSReports&submit=1','AMSrpt',900,1000)" >$r->{$fld}</A>|
           : $r->{$fld};
         $val =
           DBA->getxref( $form, 'Client', $r->{$fld}, 'FName LName' )

@@ -6,7 +6,7 @@
 
 [[*DBUtil->isEQ(<<LOGINPROVID>>+91)]]
 
-<FORM NAME="ProviderACL" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="ProviderACL" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

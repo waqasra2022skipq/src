@@ -111,8 +111,8 @@
       <INPUT TYPE=radio NAME="EmplInfo_Supervision_1" VALUE="N" <<EmplInfo_Supervision_1=N>> > N/A
     </TD>
     <TD CLASS="strcol" COLSPAN="2" >
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
     </TD>
   </TR>
   <TR >
@@ -123,8 +123,8 @@
       <INPUT TYPE=radio NAME="EmplInfo_DocOnFile_1" VALUE="N" <<EmplInfo_DocOnFile_1=N>> > N/A
     </TD>
     <TD CLASS="strcol" COLSPAN="2" >
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
     </TD>
   </TR>
   <TR >
@@ -135,8 +135,8 @@
       <INPUT TYPE=radio NAME="EmplInfo_Diploma_1" VALUE="N" <<EmplInfo_Diploma_1=N>> > N/A
     </TD>
     <TD CLASS="strcol" COLSPAN="2" >
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
     </TD>
   </TR>
   <TR >
@@ -147,8 +147,8 @@
       <INPUT TYPE=radio NAME="EmplInfo_Transcript_1" VALUE="N" <<EmplInfo_Transcript_1=N>> > N/A
     </TD>
     <TD CLASS="strcol" COLSPAN="2" >
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
     </TD>
   </TR>
   <TR >
@@ -159,8 +159,8 @@
       <INPUT TYPE=radio NAME="EmplInfo_Credential_1" VALUE="N" <<EmplInfo_Credential_1=N>> > N/A
     </TD>
     <TD CLASS="strcol" COLSPAN="2" >
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
     </TD>
   </TR>
   <TR >
@@ -171,8 +171,8 @@
       <INPUT TYPE=radio NAME="EmplInfo_CodeOfEthics_1" VALUE="N" <<EmplInfo_CodeOfEthics_1=N>> > N/A
     </TD>
     <TD CLASS="strcol" COLSPAN="2" >
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
     </TD>
   </TR>
   <TR >
@@ -183,8 +183,8 @@
       <INPUT TYPE=radio NAME="EmplInfo_JobDescr_1" VALUE="N" <<EmplInfo_JobDescr_1=N>> > N/A
     </TD>
     <TD CLASS="strcol" COLSPAN="2" >
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
     </TD>
   </TR>
   <TR >
@@ -195,8 +195,8 @@
       <INPUT TYPE=radio NAME="EmplInfo_HireForm_1" VALUE="N" <<EmplInfo_HireForm_1=N>> > N/A
     </TD>
     <TD CLASS="strcol" COLSPAN="2" >
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
     </TD>
   </TR>
   <TR >
@@ -207,8 +207,8 @@
       <INPUT TYPE=radio NAME="EmplInfo_InfoForm_1" VALUE="N" <<EmplInfo_InfoForm_1=N>> > N/A
     </TD>
     <TD CLASS="strcol" COLSPAN="2" >
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
     </TD>
   </TR>
   <TR >
@@ -217,8 +217,8 @@
       <INPUT TYPE="text" NAME="EmplInfo_AgreeDate_1" VALUE="<<EmplInfo_AgreeDate_1>>" ONFOCUS="select()" ONCHANGE="return vDate(this,1)" SIZE=10>
     </TD>
     <TD CLASS="strcol" COLSPAN="2" >
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
     </TD>
   </TR>
   <TR >
@@ -236,8 +236,8 @@
       <INPUT TYPE=radio NAME="EmplInfo_SSNonFile_1" VALUE="N" <<EmplInfo_SSNonFile_1=N>> > N/A
     </TD>
     <TD CLASS="strcol" COLSPAN="2" >
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
     </TD>
   </TR>
   <TR >
@@ -248,8 +248,8 @@
       <INPUT TYPE=radio NAME="EmplInfo_I9_1" VALUE="N" <<EmplInfo_I9_1=N>> > N/A
     </TD>
     <TD CLASS="strcol" COLSPAN="2" >
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
     </TD>
   </TR>
   <TR >
@@ -265,8 +265,8 @@
       <INPUT TYPE="text" NAME="EmplInfo_DLNum_1" VALUE="<<EmplInfo_DLNum_1>>" ONFOCUS="select()" SIZE=12>
     </TD>
     <TD CLASS="strcol" COLSPAN="2" >
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
     </TD>
   </TR>
   <TR >
@@ -312,8 +312,8 @@
       <INPUT TYPE="text" NAME="EmplInfo_PolicyNum_1" VALUE="<<EmplInfo_PolicyNum_1>>" ONFOCUS="select()" SIZE=50>
     </TD>
     <TD CLASS="strcol" COLSPAN="2" >
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
     </TD>
   </TR>
   <TR >
@@ -345,8 +345,8 @@
       <INPUT TYPE=radio NAME="EmplInfo_W4_1" VALUE="N" <<EmplInfo_W4_1=N>> > N/A
     </TD>
     <TD CLASS="strcol" COLSPAN="2" >
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
     </TD>
   </TR>
   <TR >
@@ -380,8 +380,8 @@
       <INPUT TYPE=radio NAME="EmplInfo_W9_1" VALUE="N" <<EmplInfo_W9_1=N>> > N/A
     </TD>
     <TD CLASS="strcol" COLSPAN="2" >
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
     </TD>
   </TR>
   <TR >
@@ -392,8 +392,8 @@
       <INPUT TYPE=radio NAME="EmplInfo_WorkersComp_1" VALUE="N" <<EmplInfo_WorkersComp_1=N>> > N/A
     </TD>
     <TD CLASS="strcol" COLSPAN="2" >
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
     </TD>
   </TR>
   <TR >
@@ -430,8 +430,8 @@
       <INPUT TYPE="text" NAME="EmplInfo_CPRAdultExpDate_1" VALUE="<<EmplInfo_CPRAdultExpDate_1>>" ONFOCUS="select()" ONCHANGE="return vDate(this,1)" SIZE=10>
     </TD>
     <TD CLASS="strcol" COLSPAN="2" >
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
     </TD>
   </TR>
   <TR >
@@ -440,8 +440,8 @@
       <INPUT TYPE="text" NAME="EmplInfo_CPRChildExpDate_1" VALUE="<<EmplInfo_CPRChildExpDate_1>>" ONFOCUS="select()" ONCHANGE="return vDate(this,1)" SIZE=10>
     </TD>
     <TD CLASS="strcol" COLSPAN="2" >
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
     </TD>
   </TR>
   <TR >
@@ -450,8 +450,8 @@
       <INPUT TYPE="text" NAME="EmplInfo_FirstAidExpDate_1" VALUE="<<EmplInfo_FirstAidExpDate_1>>" ONFOCUS="select()" ONCHANGE="return vDate(this,1)" SIZE=10>
     </TD>
     <TD CLASS="strcol" COLSPAN="2" >
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
     </TD>
   </TR>
   <TR >
@@ -460,8 +460,8 @@
       <INPUT TYPE="text" NAME="EmplInfo_CPIExpDate_1" VALUE="<<EmplInfo_CPIExpDate_1>>" ONFOCUS="select()" ONCHANGE="return vDate(this,1)" SIZE=10>
     </TD>
     <TD CLASS="strcol" COLSPAN="2" >
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
     </TD>
   </TR>
   <TR >
@@ -470,8 +470,8 @@
       <INPUT TYPE="text" NAME="EmplInfo_MandtExpDate_1" VALUE="<<EmplInfo_MandtExpDate_1>>" ONFOCUS="select()" ONCHANGE="return vDate(this,1)" SIZE=10>
     </TD>
     <TD CLASS="strcol" COLSPAN="2" >
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
     </TD>
   </TR>
   <TR >
@@ -480,8 +480,8 @@
       <INPUT TYPE="text" NAME="EmplInfo_CapeExpDate_1" VALUE="<<EmplInfo_CapeExpDate_1>>" ONFOCUS="select()" ONCHANGE="return vDate(this,1)" SIZE=10>
     </TD>
     <TD CLASS="strcol" COLSPAN="2" >
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
     </TD>
   </TR>
   <TR >
@@ -490,8 +490,8 @@
       <INPUT TYPE="text" NAME="EmplInfo_MABExpDate_1" VALUE="<<EmplInfo_MABExpDate_1>>" ONFOCUS="select()" ONCHANGE="return vDate(this,1)" SIZE=10>
     </TD>
     <TD CLASS="strcol" COLSPAN="2" >
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Document</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">Add Document</A> ]]
     </TD>
   </TR>
   <TR >

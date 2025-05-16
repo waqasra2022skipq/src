@@ -1425,13 +1425,13 @@ sub listPAStatus
   my $reason = qq|<BR>**<BR>${Reason}<BR>**| if ( $Reason ne '' );
   my $popup = qq|TransDate/Time: ${TransDate} @ ${TransTime}<BR>${AgencyName}${reason}|;
 #warn qq|listPAStatus: Reason=${Reason}, reason=${reason}, popup=${popup}\n|;
-  my $print = qq|<A HREF="javascript:ReportWindow('/cgi/bin/PrintCDCLog.cgi?IDs=${PrAuthID}&mlt=$form->{mlt}&action=ClientPrAuth','PrintWindow')" TITLE="Click here to print the logged activity" ><IMG SRC="/img/print-ok.png" HEIGHT="21" WIDTH="21" BORDER="0" ></A>|;
+  my $print = qq|<A HREF="javascript:ReportWindow('/src/cgi/bin/PrintCDCLog.cgi?IDs=${PrAuthID}&mlt=$form->{mlt}&action=ClientPrAuth','PrintWindow')" TITLE="Click here to print the logged activity" ><IMG SRC="/img/print-ok.png" HEIGHT="21" WIDTH="21" BORDER="0" ></A>|;
   my $send = qq|MIS_Action=DMHws.pl&Client_ClientID=$form->{'Client_ClientID'}&myID=${PrAuthID}&action=ClientPrAuth&mlt=$form->{mlt}|;
   my $view = qq|view=CDC${listCARS}.cgi&fwdTABLE=ClientPrAuthCDC&ClientPrAuthCDC_ID=${ID}&ClientPrAuth_ID=${PrAuthID}&${links}&pushID=$form->{'LINKID'}&UpdateTables=all|;
 #warn qq|listPAStatus: PrAuthID=${PrAuthID}, Agent=|.SysAccess->chkPriv($form,'Agent')."\n";
 #warn qq|listPAStatus: PrAuthID=${PrAuthID}, Locked=${Locked}\n|;
   my $auth = (SysAccess->chkPriv($form,'ClinicManager') ||  SysAccess->chkPriv($form,'Agent')) && !$Locked 
-           ? qq|<A HREF="javascript:ReportWindow('/cgi/bin/authPA.cgi?PrAuthID=${PrAuthID}&mlt=$form->{mlt}','PrintWindow')" TITLE="Click here to manually authorize this PA" ><IMG SRC="/img/tab-lock.png" ALT="" BORDER="0" HEIGHT="20" WIDTH="20" ></A>|
+           ? qq|<A HREF="javascript:ReportWindow('/src/cgi/bin/authPA.cgi?PrAuthID=${PrAuthID}&mlt=$form->{mlt}','PrintWindow')" TITLE="Click here to manually authorize this PA" ><IMG SRC="/img/tab-lock.png" ALT="" BORDER="0" HEIGHT="20" WIDTH="20" ></A>|
            : '';
   my $button = $fail eq ''
              ?  SysAccess->chkPriv($form,'AuthRVUs') && $CDCOK && CDC->required($form,$InsID) && !$Locked && $Status ne 'Closed'
@@ -1463,9 +1463,9 @@ sub listPAgroup
   $sClientPrAuth->finish();
   my ($CodeDescr,$type,$span) = ('','','0');
   my $token = DBUtil->genToken();
-  my $print = qq|<A HREF="javascript:ReportWindow('/cgi/bin/PAPeriods.cgi?IDs=${PrAuthID}&mlt=$form->{mlt}&action=ClientPrAuth','PrintWindow')" TITLE="Click here to print the Inventory for this Prior Authorization" ><IMG SRC="/img/print-ok.png" HEIGHT="21" WIDTH="21" BORDER="0" ></A>|;
-  $print .= $form->{'LOGINPROVID'} == 91 ? qq|</SCRIPT><A HREF="javascript:ReportWindow('/cgi/bin/PrintPALines.cgi?IDs=${PrAuthID}&mlt=$form->{mlt}&action=ClientPrAuth','PrintWindow')" TITLE="Click here to print the Monthly Lines for this Prior Authorization" ><IMG SRC="/img/print-ok.png" HEIGHT="21" WIDTH="21" BORDER="0" ></A>| : '';
-  my $setlines = $form->{'LOGINPROVID'} == 91 ? qq|<BR><A HREF="javascript:ReportWindow('/cgi/bin/setPALines.cgi?PrAuthID=${PrAuthID}&mlt=$form->{mlt}','PrintWindow')" TITLE="Click here to reset the PA Lines for this authorize" ><IMG SRC="/img/tab-lock.png" ALT="" BORDER="0" HEIGHT="20" WIDTH="20" ></A>| : '';
+  my $print = qq|<A HREF="javascript:ReportWindow('/src/cgi/bin/PAPeriods.cgi?IDs=${PrAuthID}&mlt=$form->{mlt}&action=ClientPrAuth','PrintWindow')" TITLE="Click here to print the Inventory for this Prior Authorization" ><IMG SRC="/img/print-ok.png" HEIGHT="21" WIDTH="21" BORDER="0" ></A>|;
+  $print .= $form->{'LOGINPROVID'} == 91 ? qq|</SCRIPT><A HREF="javascript:ReportWindow('/src/cgi/bin/PrintPALines.cgi?IDs=${PrAuthID}&mlt=$form->{mlt}&action=ClientPrAuth','PrintWindow')" TITLE="Click here to print the Monthly Lines for this Prior Authorization" ><IMG SRC="/img/print-ok.png" HEIGHT="21" WIDTH="21" BORDER="0" ></A>| : '';
+  my $setlines = $form->{'LOGINPROVID'} == 91 ? qq|<BR><A HREF="javascript:ReportWindow('/src/cgi/bin/setPALines.cgi?PrAuthID=${PrAuthID}&mlt=$form->{mlt}','PrintWindow')" TITLE="Click here to reset the PA Lines for this authorize" ><IMG SRC="/img/tab-lock.png" ALT="" BORDER="0" HEIGHT="20" WIDTH="20" ></A>| : '';
   my $response = $HHresponse eq '' ? '' : 'Health Home: '.$HHresponse.'<BR>(CoPA ID:'.$CoPA.')';
   if ( $PAgroup ne '' )
   {
@@ -1500,7 +1500,7 @@ sub listDISStatus
   my $fail = qq|<BR>**<BR>${Fail}| if ( ${Fail} ne '' );
   my $reason = qq|<BR>**<BR>${Reason}<BR>**| if ( ${Reason} ne '' );
   my $popup = qq|TransDate/Time: ${TransDate} @ ${TransTime}<BR>${AgencyName}${reason}|;
-  my $print = qq|<A HREF="javascript:ReportWindow('/cgi/bin/PrintCDCLog.cgi?IDs=${DischargeID}&mlt=$form->{mlt}&action=ClientDischarge','PrintWindow')" TITLE="Click here to print the logged activity" ><IMG SRC="/img/print-ok.png" HEIGHT="21" WIDTH="21" BORDER="0" ></A>|;
+  my $print = qq|<A HREF="javascript:ReportWindow('/src/cgi/bin/PrintCDCLog.cgi?IDs=${DischargeID}&mlt=$form->{mlt}&action=ClientDischarge','PrintWindow')" TITLE="Click here to print the logged activity" ><IMG SRC="/img/print-ok.png" HEIGHT="21" WIDTH="21" BORDER="0" ></A>|;
   my $send = qq|MIS_Action=DMHws.pl&Client_ClientID=$form->{'Client_ClientID'}&myID=${DischargeID}&action=ClientDischarge&mlt=$form->{mlt}|;
   my $view = qq|view=DISCDC.cgi&fwdTABLE=ClientDischargeCDC&ClientDischargeCDC_ID=${ID}&ClientDischarge_ID=${DischargeID}&${links}&pushID=$form->{'LINKID'}&UpdateTables=all|;
 #warn qq|listDISStatus: fail=${fail}\n|;

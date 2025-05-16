@@ -21,7 +21,7 @@ function uspsWindow(newName,h,w)
 }
 </SCRIPT>
 
-<FORM NAME="Provider" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="Provider" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

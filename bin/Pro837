@@ -44,7 +44,7 @@ my $html =
 <P>
 <P>
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/novalidate.js"> </SCRIPT>
-<FORM NAME="adminFiles" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="adminFiles" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 | . main->listFiles( $directory, $wildcard ) . qq|
 <INPUT TYPE="hidden" NAME="mlt" VALUE="$form->{mlt}" >
 <INPUT TYPE="hidden" NAME="misLINKS" VALUE="$form->{misLINKS}" >
@@ -90,7 +90,7 @@ sub listFiles {
             ( my $sfx ) =
               $file =~ /\.([^.]*)$/;    # get the suffix/sfx of the filename
             my $href =
-qq|javascript:ReportWindow('/cgi/bin/disHTML.pl?file=${file}&dirname=ADMINDIR&subdir=${dir}&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','DisplayFile')|;
+qq|javascript:ReportWindow('/src/cgi/bin/disHTML.pl?file=${file}&dirname=ADMINDIR&subdir=${dir}&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','DisplayFile')|;
             $html .= qq|
   <TR >
     <TD CLASS="strcol" >${file}</TD>

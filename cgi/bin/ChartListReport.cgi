@@ -309,7 +309,7 @@ qq|$rClient->{FName} $rClient->{LName} ($rClient->{ClientID}) $rClient->{SSN}|;
     $ChartType = 'by Client';
     ( my $ClientName = qq|$rClient->{FName} $rClient->{LName}| ) =~ s/'/\\'/g;
     $ClientInsURL =
-qq|<A HREF="javascript:ReportWindow('/cgi/bin/ListInsPaid.cgi?Client_ClientID=${ClientID}&${addLinks}','ClientInsPaid')" TITLE="Click here for <BR>${ClientName}\'s Manual Insurance Payments." ><IMG SRC="/images/piggybank.gif" BORDER="0" HEIGHT="20" WIDTH="20" ALT="Manual Insurance Payments" ></A>|;
+qq|<A HREF="javascript:ReportWindow('/src/cgi/bin/ListInsPaid.cgi?Client_ClientID=${ClientID}&${addLinks}','ClientInsPaid')" TITLE="Click here for <BR>${ClientName}\'s Manual Insurance Payments." ><IMG SRC="/images/piggybank.gif" BORDER="0" HEIGHT="20" WIDTH="20" ALT="Manual Insurance Payments" ></A>|;
     $sClient->finish();
     $sProvider->execute( $rClient->{ProvID} );
     $rProvider = $sProvider->fetchrow_hashref;

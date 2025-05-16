@@ -17,7 +17,7 @@ function vAdd(NumStr,fld)
 }
 </SCRIPT>
 
-<FORM NAME="ProviderHrs" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="ProviderHrs" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

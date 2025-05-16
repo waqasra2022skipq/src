@@ -481,13 +481,13 @@
   <TR ><TD CLASS="port hdrtxt" COLSPAN="2" >TESTING</TD></TR>
   <TR CLASS="list hdrcol" >
     <TD COLSPAN="2" >
-      <A HREF="javascript:InputWindow('/cgi/bin/mis.cgi?view=IESInp2.cgi&Client_ClientID=<<<Client_ClientID_1>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>&NONAVIGATION=1','IES',900,1200)" CLASS="mybutton" >Impact of Events Scale-Revised (IES-R)</A>
+      <A HREF="javascript:InputWindow('/src/cgi/bin/mis.cgi?view=IESInp2.cgi&Client_ClientID=<<<Client_ClientID_1>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>&NONAVIGATION=1','IES',900,1200)" CLASS="mybutton" >Impact of Events Scale-Revised (IES-R)</A>
     </TD>
   </TR>
   <TR CLASS="list hdrcol" >
     <TD COLSPAN="2" >
-[[DBA->isCHILD(%form+<<<Client_DOB_1>>>)      <A HREF="javascript:InputWindow('/cgi/bin/mis.cgi?view=ListCATS.cgi&Client_ClientID=<<<Client_ClientID_1>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>&NONAVIGATION=1','CATS',900,1200)" CLASS="mybutton" >ENTER Child and Adolescent Trauma Screen (CATS) - Youth Report</A> ]]
-[[DBA->isADULT(%form+<<<Client_DOB_1>>>)      <A HREF="javascript:InputWindow('/cgi/bin/mis.cgi?view=ListPCL5.cgi&Client_ClientID=<<<Client_ClientID_1>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>&NONAVIGATION=1','PCL5',900,1200)" CLASS="mybutton" >ENTER PTSD Checklist for DSM-5 (PCL-5)</A> ]]
+[[DBA->isCHILD(%form+<<<Client_DOB_1>>>)      <A HREF="javascript:InputWindow('/src/cgi/bin/mis.cgi?view=ListCATS.cgi&Client_ClientID=<<<Client_ClientID_1>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>&NONAVIGATION=1','CATS',900,1200)" CLASS="mybutton" >ENTER Child and Adolescent Trauma Screen (CATS) - Youth Report</A> ]]
+[[DBA->isADULT(%form+<<<Client_DOB_1>>>)      <A HREF="javascript:InputWindow('/src/cgi/bin/mis.cgi?view=ListPCL5.cgi&Client_ClientID=<<<Client_ClientID_1>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>&NONAVIGATION=1','PCL5',900,1200)" CLASS="mybutton" >ENTER PTSD Checklist for DSM-5 (PCL-5)</A> ]]
     </TD>
   </TR>
     </TABLE></TD></TR>

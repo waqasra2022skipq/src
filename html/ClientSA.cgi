@@ -28,7 +28,7 @@
   <TR ><TD CLASS="port hdrtxt" COLSPAN="2" >TOBACCO SCREEN<BR>(add multiple screenings from the Client Page Testing menu)</TD></TR>
   <TR CLASS="list hdrcol" >
     <TD COLSPAN="2" >
-<A HREF="javascript:InputWindow('/cgi/bin/mis.cgi?view=ListClientSATobacco.cgi&Client_ClientID=<<<Client_ClientID_1>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>&NONAVIGATION=1','TOBACCO',900,1200)" CLASS="mybutton" >ENTER TOBACCO Screening (add new or edit last screening)</A>
+<A HREF="javascript:InputWindow('/src/cgi/bin/mis.cgi?view=ListClientSATobacco.cgi&Client_ClientID=<<<Client_ClientID_1>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>&NONAVIGATION=1','TOBACCO',900,1200)" CLASS="mybutton" >ENTER TOBACCO Screening (add new or edit last screening)</A>
     </TD>
   </TR>
   <TR ><TD CLASS="hdrtxt" COLSPAN="2" >Alcohol Use</TD></TR>
@@ -116,8 +116,8 @@
   <TR ><TD CLASS="port hdrtxt" COLSPAN="2" >ALCOHOL SCREEN</TD></TR>
   <TR CLASS="list hdrcol" >
     <TD COLSPAN="2" >
-[[DBA->isCHILD(%form+<<<Client_DOB_1>>>)      <A HREF="javascript:InputWindow('/cgi/bin/mis.cgi?view=ListCRAFFT.cgi&Client_ClientID=<<<Client_ClientID_1>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>&NONAVIGATION=1','CRAFFT',900,1200)" CLASS="mybutton" >ENTER Substance-Related Risks and Problems in Adolescents (CRAFFT)</A> ]]
-[[DBA->isADULT(%form+<<<Client_DOB_1>>>)      <A HREF="javascript:InputWindow('/cgi/bin/mis.cgi?view=ListAUDIT.cgi&Client_ClientID=<<<Client_ClientID_1>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>&NONAVIGATION=1','AUDIT',900,1200)" CLASS="mybutton" >ENTER AUDIT (Alcohol Use Disorders Identification Test)</A> ]]
+[[DBA->isCHILD(%form+<<<Client_DOB_1>>>)      <A HREF="javascript:InputWindow('/src/cgi/bin/mis.cgi?view=ListCRAFFT.cgi&Client_ClientID=<<<Client_ClientID_1>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>&NONAVIGATION=1','CRAFFT',900,1200)" CLASS="mybutton" >ENTER Substance-Related Risks and Problems in Adolescents (CRAFFT)</A> ]]
+[[DBA->isADULT(%form+<<<Client_DOB_1>>>)      <A HREF="javascript:InputWindow('/src/cgi/bin/mis.cgi?view=ListAUDIT.cgi&Client_ClientID=<<<Client_ClientID_1>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>&NONAVIGATION=1','AUDIT',900,1200)" CLASS="mybutton" >ENTER AUDIT (Alcohol Use Disorders Identification Test)</A> ]]
     </TD>
   </TR>
     </TABLE></TD></TR>
@@ -132,17 +132,17 @@
   </TR>
   <TR CLASS="list hdrcol" >
     <TD COLSPAN="2" >
-      <A HREF="javascript:InputWindow('/cgi/bin/mis.cgi?view=ListClientASAM.cgi&Client_ClientID=<<<Client_ClientID_1>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>&NONAVIGATION=1','ASAML',900,1200)" CLASS="mybutton" >ASAM Testing</A>
+      <A HREF="javascript:InputWindow('/src/cgi/bin/mis.cgi?view=ListClientASAM.cgi&Client_ClientID=<<<Client_ClientID_1>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>&NONAVIGATION=1','ASAML',900,1200)" CLASS="mybutton" >ASAM Testing</A>
     </TD>
   </TR>
   <TR CLASS="list hdrcol" >
     <TD COLSPAN="2" >
-      <A HREF="javascript:InputWindow('/cgi/bin/mis.cgi?view=ListODAS.cgi&Client_ClientID=<<<Client_ClientID_1>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>&NONAVIGATION=1','ODASL',900,1200)" CLASS="mybutton" >ENTER Oklahoma Determination of ASAM Level</A>
+      <A HREF="javascript:InputWindow('/src/cgi/bin/mis.cgi?view=ListODAS.cgi&Client_ClientID=<<<Client_ClientID_1>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>&NONAVIGATION=1','ODASL',900,1200)" CLASS="mybutton" >ENTER Oklahoma Determination of ASAM Level</A>
     </TD>
   </TR>
   <TR CLASS="list hdrcol" >
     <TD COLSPAN="2" >
-      <A HREF="javascript:InputWindow('/cgi/bin/mis.cgi?view=ListTCUDS.cgi&Client_ClientID=<<<Client_ClientID_1>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>&NONAVIGATION=1','TCUDS',900,1200)" CLASS="mybutton" >ENTER TCUDS (TCU Drug Screen V)</A>
+      <A HREF="javascript:InputWindow('/src/cgi/bin/mis.cgi?view=ListTCUDS.cgi&Client_ClientID=<<<Client_ClientID_1>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>&NONAVIGATION=1','TCUDS',900,1200)" CLASS="mybutton" >ENTER TCUDS (TCU Drug Screen V)</A>
     </TD>
   </TR>
   <TR ><TD CLASS="hdrtxt" COLSPAN="2" >Drug Use</TD></TR>

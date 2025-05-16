@@ -108,7 +108,7 @@ sub listFiles {
     <TD >${file}</TD>
     <TD >
     
-        <A HREF="javascript:ReportWindow('/cgi/bin/adminX12Parser.pl?filepath=$filepath&Type=$dir&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','Logs',800,1200)" ><IMG ALT="edit" src="/img/application-edit.png" BORDER="0" HEIGHT="20" WIDTH="20" >Read File</A>
+        <A HREF="javascript:ReportWindow('/src/cgi/bin/adminX12Parser.pl?filepath=$filepath&Type=$dir&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','Logs',800,1200)" ><IMG ALT="edit" src="/img/application-edit.png" BORDER="0" HEIGHT="20" WIDTH="20" >Read File</A>
     </TD>
 
     <TD >

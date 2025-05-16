@@ -7,7 +7,7 @@
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vNum.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript">
 function TPPG(e)
-{ InputWindow('/cgi/bin/TPPG.cgi?mlt=<<<mlt>>>&id='+e,'ViewPG'); }
+{ InputWindow('/src/cgi/bin/TPPG.cgi?mlt=<<<mlt>>>&id='+e,'ViewPG'); }
 // DeCloak -->
 </SCRIPT>
 

@@ -26,7 +26,7 @@
   <TR ><TD CLASS="port hdrtxt" COLSPAN="2" >TOBACCO SCREEN<BR>(add multiple screenings from the Client Page Testing menu)</TD></TR>
   <TR CLASS="list hdrcol" >
     <TD COLSPAN="2" >
-<A HREF="javascript:InputWindow('/cgi/bin/mis.cgi?view=ListClientSATobacco.cgi&Client_ClientID=<<<Client_ClientID_1>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>&NONAVIGATION=1','TOBACCO',900,1200)" CLASS="mybutton" >ENTER TOBACCO Screening (add new or edit last screening)</A>
+<A HREF="javascript:InputWindow('/src/cgi/bin/mis.cgi?view=ListClientSATobacco.cgi&Client_ClientID=<<<Client_ClientID_1>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>&NONAVIGATION=1','TOBACCO',900,1200)" CLASS="mybutton" >ENTER TOBACCO Screening (add new or edit last screening)</A>
     </TD>
   </TR>
 </TABLE>

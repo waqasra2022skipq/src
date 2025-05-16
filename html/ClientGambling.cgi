@@ -49,7 +49,7 @@
   </TR>
   <TR>
     <TD CLASS="strcol" >Any Yes answer is Positive.
-     <A HREF="javascript:ReportWindow('/cgi/bin/printBSGS.cgi?IDs=<<<Gambling_ID_1>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','PrintBSGS')" ONMOUSEOVER="window.status='Print Brief BioSocial Screen'; return true;" ONMOUSEOUT="window.status=''"><IMG SRC="/images/icon_print.gif" ALT="" BORDER="0" > Brief BioSocial Gambling Screen (save changes first)</A>
+     <A HREF="javascript:ReportWindow('/src/cgi/bin/printBSGS.cgi?IDs=<<<Gambling_ID_1>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','PrintBSGS')" ONMOUSEOVER="window.status='Print Brief BioSocial Screen'; return true;" ONMOUSEOUT="window.status=''"><IMG SRC="/images/icon_print.gif" ALT="" BORDER="0" > Brief BioSocial Gambling Screen (save changes first)</A>
     </TD>
   </TR>
   <TR><TD CLASS="port hdrtxt" > If Positive, complete SOGS</TD></TR>

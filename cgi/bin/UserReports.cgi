@@ -74,7 +74,7 @@ ${Defns}
 my $AutoRun = $xtable eq 'xReports'
   ? qq|
 <U>Automatically run reports*:</U><BR>
-These reports run at a set date/time. They have an (add/remove) link next to them (you can add them only if you have the Human Resources Access). This link (if you have access to the report) can be used to have the report run for you at the set date/time and placed in <A HREF="javascript:LoadInParent('/cgi/bin/ListFiles.cgi?Type=RPT&mlt=$form->{mlt}&misLINKS=$form->{misLINKS}',true)" ONMOUSEOVER="window.status='Your Reports List'; return true;" ONMOUSEOUT="window.status=''" ><U>'your reports list'</U></A>. When they do run, an email is sent to your email address.<BR>
+These reports run at a set date/time. They have an (add/remove) link next to them (you can add them only if you have the Human Resources Access). This link (if you have access to the report) can be used to have the report run for you at the set date/time and placed in <A HREF="javascript:LoadInParent('/src/cgi/bin/ListFiles.cgi?Type=RPT&mlt=$form->{mlt}&misLINKS=$form->{misLINKS}',true)" ONMOUSEOVER="window.status='Your Reports List'; return true;" ONMOUSEOUT="window.status=''" ><U>'your reports list'</U></A>. When they do run, an email is sent to your email address.<BR>
 |
   : '';
 
@@ -123,7 +123,7 @@ qq|<A HREF="javascript:void(0)" ONMOUSEOVER="textMsg.show('help$rxTable->{Name}'
               : '';
             my $flg = $rxTable->{Cron} ? '*' : '';
             $html .=
-qq|<A HREF="javascript:ReportWindow('/cgi/bin/GenReport.cgi?Name=$rxTable->{Name}&mlt=$form->{mlt}&$rxTable->{Args}&xtable=$form->{xtable}','$rxTable->{Name}',900,1000)" >$rxTable->{Descr}</A>${flg} ${Help} ${upd} <BR>\n|;
+qq|<A HREF="javascript:ReportWindow('/src/cgi/bin/GenReport.cgi?Name=$rxTable->{Name}&mlt=$form->{mlt}&$rxTable->{Args}&xtable=$form->{xtable}','$rxTable->{Name}',900,1000)" >$rxTable->{Descr}</A>${flg} ${Help} ${upd} <BR>\n|;
         }
         elsif ( $rxTable->{Priv} eq 'Agent' || $rxTable->{Priv} eq '91' ) {
             null;
@@ -168,7 +168,7 @@ sub setUpdate {
     }
     else { $type = 'add'; }
     $url =
-qq|<A HREF="javascript:InputWindow('/cgi/bin/addProviderRpt.cgi?mlt=$form->{mlt}&Name=$Name','${Name}',300,300)" >(${type})</A>|;
+qq|<A HREF="javascript:InputWindow('/src/cgi/bin/addProviderRpt.cgi?mlt=$form->{mlt}&Name=$Name','${Name}',300,300)" >(${type})</A>|;
     return ($url);
 }
 ############################################################################

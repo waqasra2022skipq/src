@@ -65,7 +65,7 @@ foreach my $f ( sort keys %{$r1} ) {
     $html .= qq|\n  <TR><TD>$f</TD><TD>$r1->{$f}</TD></TR>|;
 }
 $html .= qq|
-  <TR><TD>edit: <A HREF="javascript:ReportWindow('/cgi/bin/te.pl?action=${table}&IDs=$r1->{$RECID}&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','PrintWindow')" ONMOUSEOVER="textMsg.show('edit')" ONMOUSEOUT="textMsg.hide()" ><IMG ALT="edit" SRC="/img/application-edit.png" BORDER="0" HEIGHT="20" WIDTH="20" ></A></TD></TR>
+  <TR><TD>edit: <A HREF="javascript:ReportWindow('/src/cgi/bin/te.pl?action=${table}&IDs=$r1->{$RECID}&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','PrintWindow')" ONMOUSEOVER="textMsg.show('edit')" ONMOUSEOUT="textMsg.hide()" ><IMG ALT="edit" SRC="/img/application-edit.png" BORDER="0" HEIGHT="20" WIDTH="20" ></A></TD></TR>
 </TABLE>
 |;
 if ( $table2 ne '' ) {
@@ -79,7 +79,7 @@ if ( $table2 ne '' ) {
         $html .= qq|\n  <TR><TD>$f</TD><TD>$r2->{$f}</TD></TR>|;
     }
     $html .= qq|
-  <TR><TD>edit: <A HREF="javascript:ReportWindow('/cgi/bin/te.pl?action=${table2}&IDs=$r2->{$RECID}&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','PrintWindow')" ONMOUSEOVER="textMsg.show('edit')" ONMOUSEOUT="textMsg.hide()" ><IMG ALT="edit" SRC="/img/application-edit.png" BORDER="0" HEIGHT="20" WIDTH="20" ></A></TD></TR>
+  <TR><TD>edit: <A HREF="javascript:ReportWindow('/src/cgi/bin/te.pl?action=${table2}&IDs=$r2->{$RECID}&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','PrintWindow')" ONMOUSEOVER="textMsg.show('edit')" ONMOUSEOUT="textMsg.hide()" ><IMG ALT="edit" SRC="/img/application-edit.png" BORDER="0" HEIGHT="20" WIDTH="20" ></A></TD></TR>
 ${url}
 </TABLE>
 |;

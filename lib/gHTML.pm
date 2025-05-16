@@ -639,7 +639,7 @@ sub setNoteTrPlan {
   <TR >
     <TD CLASS="port" >
       Problems Addressed
-      <A HREF="javascript:InputWindow('/cgi/bin/mis.cgi?view=ListClientProblems.cgi&Client_ClientID=${ClientID}&mlt=$form->{mlt}&misLINKS=$form->{misLINKS}&NONAVIGATION=1','linkproblems',900,1200)"; return true; >Add/Update PROBLEMS</A>
+      <A HREF="javascript:InputWindow('/src/cgi?view=ListClientProblems.cgi&Client_ClientID=${ClientID}&mlt=$form->{mlt}&misLINKS=$form->{misLINKS}&NONAVIGATION=1','linkproblems',900,1200)"; return true; >Add/Update PROBLEMS</A>
     </TD>
     <TD CLASS="port numcol" >
       <A HREF="javascript:callAjax('ListClientNoteProblems','','ProblemsList','&id=${id}&Client_ClientID=${ClientID}&Treatment_TrID=${TrID}&Locked=${Locked}&LOGINPROVID=$form->{LOGINPROVID}&LOGINUSERID=$form->{LOGINUSERID}&LOGINUSERDB=$form->{LOGINUSERDB}&mlt=$form->{mlt}&misLINKS=$form->{misLINKS}&LINKID=$form->{LINKID}&d='+document.Treatment.Treatment_ContLogDate_1.value,'popup.pl');" TITLE="refresh problem list">Refresh<IMG SRC="${arrowdown}" HEIGHT="20" WIDTH="20" ></A>
@@ -1958,7 +1958,7 @@ sub setPhysNote {
   <TR >
     <TD CLASS="port" COLSPAN="10" >
       Vital Signs
-      <A HREF="javascript:InputWindow('/cgi/bin/mis.cgi?view=ListClientVitalSigns.cgi&Client_ClientID=${ClientID}&mlt=$form->{mlt}&misLINKS=$form->{misLINKS}&NONAVIGATION=1','linkvitals',900,1100)"; return true; >Add/Update VITAL SIGNS</A>
+      <A HREF="javascript:InputWindow('/src/cgi/bin/mis.cgi?view=ListClientVitalSigns.cgi&Client_ClientID=${ClientID}&mlt=$form->{mlt}&misLINKS=$form->{misLINKS}&NONAVIGATION=1','linkvitals',900,1100)"; return true; >Add/Update VITAL SIGNS</A>
     </TD>
   </TR>
   <TR >
@@ -2050,7 +2050,7 @@ sub setPhysNote {
   <TR >
     <TD CLASS="port" >
       Problems Addressed
-      <A HREF="javascript:InputWindow('/cgi/bin/mis.cgi?view=ListClientProblems.cgi&Client_ClientID=${ClientID}&mlt=$form->{mlt}&misLINKS=$form->{misLINKS}&NONAVIGATION=1','linkproblems',900,1200)"; return true; >Add/Update PROBLEMS</A>
+      <A HREF="javascript:InputWindow('/src/cgi/bin/mis.cgi?view=ListClientProblems.cgi&Client_ClientID=${ClientID}&mlt=$form->{mlt}&misLINKS=$form->{misLINKS}&NONAVIGATION=1','linkproblems',900,1200)"; return true; >Add/Update PROBLEMS</A>
     </TD>
     <TD CLASS="port numcol" >
       <A HREF="javascript:callAjax('ListClientNoteProblems','','ProblemsList','&id=${id}&Client_ClientID=${ClientID}&Treatment_TrID=${TrID}&Locked=${Locked}&LOGINPROVID=$form->{LOGINPROVID}&LOGINUSERID=$form->{LOGINUSERID}&LOGINUSERDB=$form->{LOGINUSERDB}&mlt=$form->{mlt}&misLINKS=$form->{misLINKS}&LINKID=$form->{LINKID}&d='+document.Treatment.Treatment_ContLogDate_1.value,'popup.pl');" TITLE="refresh problem list">Refresh<IMG SRC="${arrowdown}" HEIGHT="20" WIDTH="20" ></A>
@@ -2069,19 +2069,19 @@ sub setPhysNote {
   <TR >
     <TD CLASS="port" COLSPAN="2" >
       Risk Assessment
-      <A HREF="javascript:InputWindow('/cgi/bin/mis.cgi?view=ListClientRiskAssessment.cgi&Client_ClientID=${ClientID}&mlt=$form->{mlt}&misLINKS=$form->{misLINKS}&NONAVIGATION=1','linkassessment',900,1200)"; return true; >Add/Update RISK ASSESSMENTS</A>
+      <A HREF="javascript:InputWindow('/src/cgi/bin/mis.cgi?view=ListClientRiskAssessment.cgi&Client_ClientID=${ClientID}&mlt=$form->{mlt}&misLINKS=$form->{misLINKS}&NONAVIGATION=1','linkassessment',900,1200)"; return true; >Add/Update RISK ASSESSMENTS</A>
     </TD>
   </TR>
   <TR >
     <TD CLASS="port" COLSPAN="2" >
       Interventions Ordered
-      <A HREF="javascript:InputWindow('/cgi/bin/mis.cgi?view=ListClientInterventionsOrdered.cgi&Client_ClientID=${ClientID}&mlt=$form->{mlt}&misLINKS=$form->{misLINKS}&NONAVIGATION=1','linkinterventionso',900,1200)"; return true; >Add/Update INTERVENTIONS ORDERED</A>
+      <A HREF="javascript:InputWindow('/src/cgi/bin/mis.cgi?view=ListClientInterventionsOrdered.cgi&Client_ClientID=${ClientID}&mlt=$form->{mlt}&misLINKS=$form->{misLINKS}&NONAVIGATION=1','linkinterventionso',900,1200)"; return true; >Add/Update INTERVENTIONS ORDERED</A>
     </TD>
   </TR>
   <TR >
     <TD CLASS="port" COLSPAN="2" >
       Interventions Performed
-      <A HREF="javascript:InputWindow('/cgi/bin/mis.cgi?view=ListClientInterventionsPerformed.cgi&Client_ClientID=${ClientID}&mlt=$form->{mlt}&misLINKS=$form->{misLINKS}&NONAVIGATION=1','linkinterventionsp',900,1200)"; return true; >Add/Update INTERVENTIONS PERFORMED</A>
+      <A HREF="javascript:InputWindow('/src/cgi/bin/mis.cgi?view=ListClientInterventionsPerformed.cgi&Client_ClientID=${ClientID}&mlt=$form->{mlt}&misLINKS=$form->{misLINKS}&NONAVIGATION=1','linkinterventionsp',900,1200)"; return true; >Add/Update INTERVENTIONS PERFORMED</A>
     </TD>
   </TR>
   <TR>
@@ -2170,7 +2170,7 @@ sub setPhysNote {
     my $Role = NewCrop->hasRole($form);
     my $LabLink =
       $Role
-      ? qq|<A HREF="javascript:ScreenWindow('/cgi/bin/NewCrop.cgi?ClientID=${ClientID}&requestedPage=lab-orders&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','labs')" >Update Online LABS</A>|
+      ? qq|<A HREF="javascript:ScreenWindow('/src/cgi/bin/NewCrop.cgi?ClientID=${ClientID}&requestedPage=lab-orders&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','labs')" >Update Online LABS</A>|
       : 'Access required (Role) for lab request entry';
     $html .= qq|
 <HR WIDTH="90%" >
@@ -2180,7 +2180,7 @@ sub setPhysNote {
   <TR >
     <TD CLASS="port" >
       Medical Procedures
-      <A HREF="javascript:InputWindow('/cgi/bin/mis.cgi?view=ListClientProcedures.cgi&Client_ClientID=${ClientID}&mlt=$form->{mlt}&misLINKS=$form->{misLINKS}&NONAVIGATION=1','linkprocedure',900,1200)"; return true; >Add/Update MEDICAL PROCEDURES</A>
+      <A HREF="javascript:InputWindow('/src/cgi/bin/mis.cgi?view=ListClientProcedures.cgi&Client_ClientID=${ClientID}&mlt=$form->{mlt}&misLINKS=$form->{misLINKS}&NONAVIGATION=1','linkprocedure',900,1200)"; return true; >Add/Update MEDICAL PROCEDURES</A>
     </TD>
   </TR>
 </TABLE>
@@ -2654,12 +2654,12 @@ sub RestrictedProviderOptions {
             $form->{'Provider_ProvID'} )    # looking at yourself
         {
             $html .= qq|
-  <LI><A HREF="javascript:ReportWindow('/cgi/bin/ListMISEmails.cgi?action=1&mlt=$form->{'mlt'}','MISEmails')" ONMOUSEOVER="window.status='MIS Emails'; return true;" ONMOUSEOUT="window.status=''" >MIS Emails</A></LI>
- <LI><A HREF="/cgi/bin/mis.cgi?view=ListMisEDocs.cgi&Provider_ProvID=90&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}">Millennium Forms</A></LI>
+  <LI><A HREF="javascript:ReportWindow('/src/cgi/bin/ListMISEmails.cgi?action=1&mlt=$form->{'mlt'}','MISEmails')" ONMOUSEOVER="window.status='MIS Emails'; return true;" ONMOUSEOUT="window.status=''" >MIS Emails</A></LI>
+ <LI><A HREF="/src/cgi/bin/mis.cgi?view=ListMisEDocs.cgi&Provider_ProvID=90&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}">Millennium Forms</A></LI>
 |;
         }
         $html .= qq|
-  <LI><A HREF="/cgi/bin/mis.cgi?view=AgencyControl2.cgi&Provider_ProvID=$form->{'Provider_ProvID'}&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}">Agency URL Control</A></LI>
+  <LI><A HREF="/src/cgi/bin/mis.cgi?view=AgencyControl2.cgi&Provider_ProvID=$form->{'Provider_ProvID'}&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}">Agency URL Control</A></LI>
 |;
     }
     if ( SysAccess->chkPriv( $form, 'MUAgent' )
@@ -2668,24 +2668,24 @@ sub RestrictedProviderOptions {
         $html .= qq|
   <LI><A HREF="javascript:void(0)" ONMOUSEOVER="window.status='Meaningful Use Menu'; return true;" ONMOUSEOUT="window.status=''" >Meaningful Use</A>
     <UL CLASS="sub" >
-      <LI><A HREF="/cgi/bin/mis.cgi?view=ListPhiMail.cgi&Provider_ProvID=$form->{'Provider_ProvID'}&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}">PhiMail Received</A></LI>
+      <LI><A HREF="/src/cgi/bin/mis.cgi?view=ListPhiMail.cgi&Provider_ProvID=$form->{'Provider_ProvID'}&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}">PhiMail Received</A></LI>
       <LI><A HREF="javascript:InputWindow('https://www.emrdirect.com/web','sandbox',900,1200)" ONMOUSEOVER="window.status='sandbox'; return true;" ONMOUSEOUT="window.status=''" >EMR Mail Sandbox</A></LI>
-      <LI><A HREF="/cgi/bin/mis.cgi?view=ListCDSrules.cgi&Provider_ProvID=$form->{'Provider_ProvID'}&mlt=$form->{'mlt'}" ONMOUSEOVER="window.status='CDS Rules'; return true;" ONMOUSEOUT="window.status=''" >CDS Rules</A></LI>
-      <LI><A HREF="javascript:InputWindow('/cgi/bin/setPT.cgi?Provider_ProvID=$form->{'Provider_ProvID'}&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}&NONAVIGATION=1','Triggers',500,800)" >Set CDS Triggers for $form->{'LOGINNAME'}</A></LI>
-      <LI><A HREF="/cgi/bin/mis.cgi?view=ListProviderCDAparms.cgi&Provider_ProvID=$form->{'Provider_ProvID'}&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}">CDA Parameters</A></LI> ]]
-      <LI><A HREF="/cgi/bin/mis.cgi?view=ListExportFiles.cgi&Provider_ProvID=$form->{'Provider_ProvID'}&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}">Export Files and Documents</A></LI> ]]
-      <LI><A HREF="/cgi/bin/mis.cgi?view=ListProviderJobs.cgi&Provider_ProvID=$form->{'Provider_ProvID'}&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}">Provider Jobs (crontab)</A></LI> ]]
-      <LI><A HREF="javascript:InputWindow('/cgi/bin/mu.cgi?mlt=$form->{'mlt'}','testrest',900,1200)" ONMOUSEOVER="window.status='testrest'; return true;" ONMOUSEOUT="window.status=''" >Application Access (/index.shtml?ls=mu)</A></LI>
-      <LI><A HREF="javascript:InputWindow('/cgi/bin/pop.cgi?Client_ClientID=53159&mlt=$form->{'mlt'}&NONAVIGATION=1','testpop',400,800)" ONMOUSEOVER="window.status='testpop'; return true;" ONMOUSEOUT="window.status=''" >test pop up</A></LI>
-      <LI><A HREF="javascript:ReportWindow('/cgi/bin/disFILEs.pl?Provider_ProvID=$form->{'Provider_ProvID'}&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','Display FILEs')" >Display FILEs</A></LI> ]]
+      <LI><A HREF="/src/cgi/bin/mis.cgi?view=ListCDSrules.cgi&Provider_ProvID=$form->{'Provider_ProvID'}&mlt=$form->{'mlt'}" ONMOUSEOVER="window.status='CDS Rules'; return true;" ONMOUSEOUT="window.status=''" >CDS Rules</A></LI>
+      <LI><A HREF="javascript:InputWindow('/src/cgi/bin/setPT.cgi?Provider_ProvID=$form->{'Provider_ProvID'}&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}&NONAVIGATION=1','Triggers',500,800)" >Set CDS Triggers for $form->{'LOGINNAME'}</A></LI>
+      <LI><A HREF="/src/cgi/bin/mis.cgi?view=ListProviderCDAparms.cgi&Provider_ProvID=$form->{'Provider_ProvID'}&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}">CDA Parameters</A></LI> ]]
+      <LI><A HREF=/src/cgi/bin/mis.cgi?view=ListExportFiles.cgi&Provider_ProvID=$form->{'Provider_ProvID'}&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}">Export Files and Documents</A></LI> ]]
+      <LI><A HREF="/src/cgi/bin/mis.cgi?view=ListProviderJobs.cgi&Provider_ProvID=$form->{'Provider_ProvID'}&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}">Provider Jobs (crontab)</A></LI> ]]
+      <LI><A HREF="javascript:InputWindow('/src/cgi/bin/mu.cgi?mlt=$form->{'mlt'}','testrest',900,1200)" ONMOUSEOVER="window.status='testrest'; return true;" ONMOUSEOUT="window.status=''" >Application Access (/index.shtml?ls=mu)</A></LI>
+      <LI><A HREF="javascript:InputWindow('/src/cgi/bin/pop.cgi?Client_ClientID=53159&mlt=$form->{'mlt'}&NONAVIGATION=1','testpop',400,800)" ONMOUSEOVER="window.status='testpop'; return true;" ONMOUSEOUT="window.status=''" >test pop up</A></LI>
+      <LI><A HREF="javascript:ReportWindow('/src/cgi/bin/disFILEs.pl?Provider_ProvID=$form->{'Provider_ProvID'}&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','Display FILEs')" >Display FILEs</A></LI> ]]
     </UL>
   </LI>
-  <LI><A HREF="/cgi/bin/mis.cgi?view=QRDA.cgi&Provider_ProvID=$form->{'Provider_ProvID'}&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}">QRDA TEST ONLY</A></LI>
+  <LI><A HREF="/src/cgi/bin/mis.cgi?view=QRDA.cgi&Provider_ProvID=$form->{'Provider_ProvID'}&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}">QRDA TEST ONLY</A></LI>
 |;
     }
     if ( SysAccess->chkPriv( $form, 'root' ) ) {
         $html .= qq|
-  <LI><A HREF="/cgi/bin/mis.cgi?view=ProviderPWD.cgi&Provider_ProvID=$form->{'Provider_ProvID'}&UserLogin_UserID=$form->{'Provider_ProvID'}&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}">Password Control</A></LI>
+  <LI><A HREF="/src/cgi/bin/mis.cgi?view=ProviderPWD.cgi&Provider_ProvID=$form->{'Provider_ProvID'}&UserLogin_UserID=$form->{'Provider_ProvID'}&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}">Password Control</A></LI>
 |;
     }
     return ($html);

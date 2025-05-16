@@ -278,7 +278,7 @@ elsif ($ProviderID) {
     $ChartType = 'by Provider';
     if ( $form->{LOGINPROVID} == 90 || $form->{LOGINPROVID} == 91 ) {
         $Rebill_Button =
-qq|<FONT COLOR="red"><A STYLE="background-color:white; padding:0.2em;"  HREF="javascript:ReportWindow('/cgi/bin/runCMDBash.pl?AgencyID=${ProviderID}&mlt=$form->{mlt}','adjNote')"  TITLE="Click here to change In Process notes to Rebill" >Rebill Notes</A></FONT>|;
+qq|<FONT COLOR="red"><A STYLE="background-color:white; padding:0.2em;"  HREF="javascript:ReportWindow('/src/cgi/bin/runCMDBash.pl?AgencyID=${ProviderID}&mlt=$form->{mlt}','adjNote')"  TITLE="Click here to change In Process notes to Rebill" >Rebill Notes</A></FONT>|;
     }
 
 # per Chris...look at them by date/time, to check for conflicts.
@@ -315,7 +315,7 @@ qq|$rClient->{FName} $rClient->{LName} ($rClient->{ClientID}) $rClient->{SSN}|;
     $ChartType = 'by Client';
     ( my $ClientName = qq|$rClient->{FName} $rClient->{LName}| ) =~ s/'/\\'/g;
     $ClientInsURL =
-qq|<A HREF="javascript:ReportWindow('/cgi/bin/ListInsPaid.cgi?Client_ClientID=${ClientID}&${addLinks}','ClientInsPaid')" TITLE="Click here for <BR>${ClientName}\'s Manual Insurance Payments." ><IMG SRC="/images/piggybank.gif" BORDER="0" HEIGHT="20" WIDTH="20" ALT="Manual Insurance Payments" ></A>|;
+qq|<A HREF="javascript:ReportWindow('/src/cgi/bin/ListInsPaid.cgi?Client_ClientID=${ClientID}&${addLinks}','ClientInsPaid')" TITLE="Click here for <BR>${ClientName}\'s Manual Insurance Payments." ><IMG SRC="/images/piggybank.gif" BORDER="0" HEIGHT="20" WIDTH="20" ALT="Manual Insurance Payments" ></A>|;
     $sClient->finish();
     $sProvider->execute( $rClient->{ProvID} );
     $rProvider = $sProvider->fetchrow_hashref;
@@ -740,7 +740,7 @@ qq|<FONT COLOR="red"><A HREF="javascript:void(0)" TITLE="CAG CODE: ${rTransType}
 
     if ( $BillStatus eq 'Scholarship' ) {
         $BillStatus =
-qq|<FONT COLOR="red"><A  HREF="javascript:ReportWindow('/cgi/bin/unRecNoteForm.pl?submit=1&TrIDs=$r->{TrID}&mlt=$form->{mlt}&noteType=Sch','adjNote')" onclick="return getConsent('Are you SURE you want to UnScholarship $r->{TrID} ')" TITLE="Click here to UnScholarship $r->{TrID}" >${BillStatus}</A></FONT>|;
+qq|<FONT COLOR="red"><A  HREF="javascript:ReportWindow('/src/cgi/bin/unRecNoteForm.pl?submit=1&TrIDs=$r->{TrID}&mlt=$form->{mlt}&noteType=Sch','adjNote')" onclick="return getConsent('Are you SURE you want to UnScholarship $r->{TrID} ')" TITLE="Click here to UnScholarship $r->{TrID}" >${BillStatus}</A></FONT>|;
     }
 
     my $sNoteTransHere =
@@ -751,18 +751,18 @@ qq|<FONT COLOR="red"><A  HREF="javascript:ReportWindow('/cgi/bin/unRecNoteForm.p
 
     if ( $BillStatus eq 'Reconciled' && $nTransCode eq 'AR' ) {
         $BillStatus =
-qq|<FONT COLOR="red"><A  HREF="javascript:ReportWindow('/cgi/bin/unRecNoteForm.pl?submit=1&TrIDs=$r->{TrID}&mlt=$form->{mlt}&noteType=Auto','adjNote')" onclick="return getConsent('Are you SURE you want to UnAutoReconcile $r->{TrID} ')" TITLE="Click here to UnAutoReconcile $r->{TrID}" >${BillStatus}</A></FONT>|;
+qq|<FONT COLOR="red"><A  HREF="javascript:ReportWindow('/src/cgi/bin/unRecNoteForm.pl?submit=1&TrIDs=$r->{TrID}&mlt=$form->{mlt}&noteType=Auto','adjNote')" onclick="return getConsent('Are you SURE you want to UnAutoReconcile $r->{TrID} ')" TITLE="Click here to UnAutoReconcile $r->{TrID}" >${BillStatus}</A></FONT>|;
     }
     elsif ( $BillStatus eq 'Reconciled' && $nTransCode eq 'MR' ) {
         $BillStatus =
-qq|<FONT COLOR="red"><A  HREF="javascript:ReportWindow('/cgi/bin/unRecNoteForm.pl?submit=1&TrIDs=$r->{TrID}&mlt=$form->{mlt}&noteType=','adjNote')" onclick="return getConsent('Are you SURE you want to UnReconcile $r->{TrID} ')" TITLE="Click here to UnReconcile $r->{TrID}" >${BillStatus}</A></FONT>|;
+qq|<FONT COLOR="red"><A  HREF="javascript:ReportWindow('/src/cgi/bin/unRecNoteForm.pl?submit=1&TrIDs=$r->{TrID}&mlt=$form->{mlt}&noteType=','adjNote')" onclick="return getConsent('Are you SURE you want to UnReconcile $r->{TrID} ')" TITLE="Click here to UnReconcile $r->{TrID}" >${BillStatus}</A></FONT>|;
     }
 
     $sNoteTransHere->finish();
 
     if ( $BillStatus eq 'Inprocess' ) {
         $BillStatus =
-qq|<FONT COLOR="red"><A  HREF="javascript:ReportWindow('/cgi/bin/unRecNoteForm.pl?submit=1&TrIDs=$r->{TrID}&mlt=$form->{mlt}&noteType=New','adjNote')" onclick="return getConsent('Are you SURE you want to UnBill $r->{TrID} ')" TITLE="Click here to UnBill $r->{TrID}" >${BillStatus}</A></FONT>|;
+qq|<FONT COLOR="red"><A  HREF="javascript:ReportWindow('/src/cgi/bin/unRecNoteForm.pl?submit=1&TrIDs=$r->{TrID}&mlt=$form->{mlt}&noteType=New','adjNote')" onclick="return getConsent('Are you SURE you want to UnBill $r->{TrID} ')" TITLE="Click here to UnBill $r->{TrID}" >${BillStatus}</A></FONT>|;
     }
 
     my $StatusDate =
@@ -802,7 +802,7 @@ qq|<SPAN CLASS="sublabel" >review:${MgrRevName}${MgrRevDate}${MgrRevStatus}</SPA
       :                      'no';
     my $adjNoteURL =
       $ADDTransACCESS
-      ? qq|<BR><A HREF="javascript:ReportWindow('/cgi/bin/adjNote.pl?TrID=$r->{TrID}&InsID=$rxSC->{InsID}&${addLinks}','adjNote')" TITLE="Click here to <BR>add Transaction<BR>for $r->{TrID}" ><IMG SRC="/src/img/dollarsign.png" HEIGHT="21" WIDTH="21" BORDER="0" ></A>|
+      ? qq|<BR><A HREF="javascript:ReportWindow('/src/cgi/bin/adjNote.pl?TrID=$r->{TrID}&InsID=$rxSC->{InsID}&${addLinks}','adjNote')" TITLE="Click here to <BR>add Transaction<BR>for $r->{TrID}" ><IMG SRC="/src/img/dollarsign.png" HEIGHT="21" WIDTH="21" BORDER="0" ></A>|
       : '';
 
     #warn qq|ChartList: TrID=$r->{TrID}, AmtDue=$r->{AmtDue},$AmtDue\n|;

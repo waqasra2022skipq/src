@@ -378,7 +378,7 @@ sub logintxt {
             $fn = qq|C:/xampp/htdocs/src/html/default.renewlogin|;
         }
     }
-    warn qq|logintxt: renew=$renew, fn=$fn\n|;
+    #warn qq|logintxt: renew=$renew, fn=$fn\n|;
     my $html = DBUtil->ReadFile($fn);
     $html =~ s/{LOGO}/$self->{LOGO}/g;
     $html =~ s/{SITENAME}/$self->{SITENAME}/g;

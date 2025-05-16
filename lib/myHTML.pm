@@ -418,7 +418,7 @@ sub leftpane {
 #  {
 #    $ApptLink = qq|
 #      <BR>
-#      <A HREF="javascript:ReportWindow('/cgi/bin/GenReport.cgi?Name=Appointments&Type=Appointments&daterange=today&submit=1&output=html&mlt=$form->{mlt}&ProvIDs=$form->{LOGINPROVID}','Appointments',300,600)" TITLE="Click here to <BR><STRONG>LIST APPOINTMENTS</STRONG>" ><IMG ALT="your appointments" SRC="/images/appointment.jpg" WIDTH="30" HEIGHT="30" >
+#      <A HREF="javascript:ReportWindow('/src/cgi/bin/GenReport.cgi?Name=Appointments&Type=Appointments&daterange=today&submit=1&output=html&mlt=$form->{mlt}&ProvIDs=$form->{LOGINPROVID}','Appointments',300,600)" TITLE="Click here to <BR><STRONG>LIST APPOINTMENTS</STRONG>" ><IMG ALT="your appointments" SRC="/images/appointment.jpg" WIDTH="30" HEIGHT="30" >
 #      </A>| if ( $form->{LOGINPROVID} == 91 );
 #  }
 ## not used
@@ -431,7 +431,7 @@ sub leftpane {
 #      $RenewMsg = qq|You have ${num} renewals.|;
 #      $RenewLink = qq|
 #      <BR>
-#      <A HREF="javascript:ReportWindow('/cgi/bin/GenReport.cgi?Name=Renewals&Type=renewals&submit=1&output=html&mlt=$form->{mlt}&ProvIDs=$form->{LOGINPROVID}','Renewals',400,1200)" CLASS="tooltip" ><IMG ALT="your renewals" SRC="/img/basic/document_text-import.png" WIDTH="30" HEIGHT="30" >
+#      <A HREF="javascript:ReportWindow('/src/cgi/bin/GenReport.cgi?Name=Renewals&Type=renewals&submit=1&output=html&mlt=$form->{mlt}&ProvIDs=$form->{LOGINPROVID}','Renewals',400,1200)" CLASS="tooltip" ><IMG ALT="your renewals" SRC="/img/basic/document_text-import.png" WIDTH="30" HEIGHT="30" >
 #        <SPAN>
 #          <IMG CLASS="callout" SRC="/img/tooltip_callout.gif" />
 #          Click here to

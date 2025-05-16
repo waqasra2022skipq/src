@@ -19,7 +19,7 @@
     <TD CLASS="port hdrtxt" >
       CURRENT MEDICATIONS
       [[DBA->getClientMedCount(%form+<<<Client_ClientID_1>>>+ClientMeds)]]
-      [[NewCrop->hasRole(%form)<A HREF="javascript:ScreenWindow('/cgi/bin/NewCrop.cgi?ClientID=<<<Client_ClientID>>>&requestedPage=compose&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','UnmappedMeds')" >Update Online Medications / Labs</A> ]]
+      [[NewCrop->hasRole(%form)<A HREF="javascript:ScreenWindow('/src/cgi/bin/NewCrop.cgi?ClientID=<<<Client_ClientID>>>&requestedPage=compose&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','UnmappedMeds')" >Update Online Medications / Labs</A> ]]
     </TD>
   </TR>
   <TR >

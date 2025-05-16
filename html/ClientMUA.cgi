@@ -61,7 +61,7 @@
       <A HREF="javascript:callAjax('ShowClientMeds','','ShowClientMeds','&active=0&Locked=0&Client_ClientID=<<<Client_ClientID>>>&LOGINPROVID=<<<LOGINPROVID>>>&LOGINUSERID=<<<LOGINUSERID>>>&LINKID=<<<LINKID>>>&mlt=<<<mlt>>>&LOGINUSERDB=<<<LOGINUSERDB>>>','popup.pl');" TITLE="Show ALL Medications for Client">Show All</A>
     </TD>
     <TD CLASS="numcol" WIDTH="50%" >
-      <A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ClientMUTI.cgi&Client_ClientID=<<<Client_ClientID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','NewCrop',900,1500);" TITLE="Manually Add NewCrop Medications for testing only">Add NewCrop Medications</A>
+      <A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ClientMUTI.cgi&Client_ClientID=<<<Client_ClientID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','NewCrop',900,1500);" TITLE="Manually Add NewCrop Medications for testing only">Add NewCrop Medications</A>
     </TD>
   </TR>
   <TR >
@@ -191,7 +191,7 @@
   <TR ><TD CLASS="port hdrtxt" COLSPAN="2" >TOBACCO SCREEN<BR>(add multiple screenings from the Client Page Testing menu)</TD></TR>
   <TR CLASS="list hdrcol" >
     <TD COLSPAN="2" >
-<A HREF="javascript:InputWindow('/cgi/bin/mis.cgi?view=ListClientSATobacco.cgi&Client_ClientID=<<<Client_ClientID_1>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>&NONAVIGATION=1','TOBACCO',900,1200)" CLASS="mybutton" >ENTER TOBACCO Screening (add new or edit last screening)</A>
+<A HREF="javascript:InputWindow('/src/cgi/bin/mis.cgi?view=ListClientSATobacco.cgi&Client_ClientID=<<<Client_ClientID_1>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>&NONAVIGATION=1','TOBACCO',900,1200)" CLASS="mybutton" >ENTER TOBACCO Screening (add new or edit last screening)</A>
     </TD>
   </TR>
 </TABLE>

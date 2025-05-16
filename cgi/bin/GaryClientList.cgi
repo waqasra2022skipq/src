@@ -425,7 +425,7 @@ qq|<A HREF="/cgi/bin/mis.cgi?view=ListInvoices.cgi&Client_ClientID=$rClient->{Cl
       if ( SysAccess->verify( $form, 'Privilege=Invoices2Print' ) );
     my $checkEB =
       $rInsurance->{'Descr'} =~ /medicaid/i
-      ? qq|<BR><button STYLE="font-size:0.5em;" CLASS="confirmLINK" MYTEXT="Are you sure you want to check Eligibility?<BR>If so, then click the OK button below. If NOT, click the Cancel button below.<BR><BR>Eligibility information is obtained nightly through extracts from OHCA. Providers should keep in mind the following:<BR>ODMHSAS added this check onto its service as a way to help providers in giving them a quick idea of eligibility for the new Case Management rules.<BR>This is just a marker and is only what ODMHSAS has at the moment, ODMHSAS does not have live access to recipient eligibility.<BR>This is NOT a guarantee of payment and should not replace your checking OHCA for eligibility (MIS checks twice a month).<BR>As with any data extract, things can happen so this should be more of an helpful indicator for providers, not something you rely on." HREF="/cgi/bin/mis.cgi?MIS_Action=DMHcm.pl&Provider_ProvID=${ProviderID}&Client_ClientID=$rClient->{ClientID}&InsNumIDs=$rInsurance->{InsIDNum}&mlt=$form->{mlt}" MYBUSY="Checking..." >Check DMH</button>&nbsp;<A HREF="javascript: ReportWindow('/cgi/bin/EBDMH.cgi?ClientID=$rClient->{ClientID}&InsNumID=$rInsurance->{InsIDNum}&FName=$rClient->{FName}&LName=$rClient->{LName}&mlt=$form->{mlt}','EBDMH',400,1200)" TITLE="Click to view last DMH Eligibility Report"  ><SPAN CLASS="subtitle" >Last DMH Eligibility check</SPAN></A> |
+      ? qq|<BR><button STYLE="font-size:0.5em;" CLASS="confirmLINK" MYTEXT="Are you sure you want to check Eligibility?<BR>If so, then click the OK button below. If NOT, click the Cancel button below.<BR><BR>Eligibility information is obtained nightly through extracts from OHCA. Providers should keep in mind the following:<BR>ODMHSAS added this check onto its service as a way to help providers in giving them a quick idea of eligibility for the new Case Management rules.<BR>This is just a marker and is only what ODMHSAS has at the moment, ODMHSAS does not have live access to recipient eligibility.<BR>This is NOT a guarantee of payment and should not replace your checking OHCA for eligibility (MIS checks twice a month).<BR>As with any data extract, things can happen so this should be more of an helpful indicator for providers, not something you rely on." HREF="/cgi/bin/mis.cgi?MIS_Action=DMHcm.pl&Provider_ProvID=${ProviderID}&Client_ClientID=$rClient->{ClientID}&InsNumIDs=$rInsurance->{InsIDNum}&mlt=$form->{mlt}" MYBUSY="Checking..." >Check DMH</button>&nbsp;<A HREF="javascript: ReportWindow('/src/cgi/bin/EBDMH.cgi?ClientID=$rClient->{ClientID}&InsNumID=$rInsurance->{InsIDNum}&FName=$rClient->{FName}&LName=$rClient->{LName}&mlt=$form->{mlt}','EBDMH',400,1200)" TITLE="Click to view last DMH Eligibility Report"  ><SPAN CLASS="subtitle" >Last DMH Eligibility check</SPAN></A> |
       : '';
 
     #warn qq|checkEB=${checkEB}\n|;
@@ -456,7 +456,7 @@ ${UnitsPopup}
       ${PhysNotesLink}
       ${CashTransLink}
       ${InvPrintLink}
-      <A HREF="javascript: ReportWindow('/cgi/bin/ClientSC.cgi?ClientID=$rClient->{ClientID}&mlt=$form->{mlt}','ClientSC',600,1100)" > <IMG BORDER="0" ALT="Service Codes for Clients Insurance" SRC="/images/paper.gif" > </A>
+      <A HREF="javascript: ReportWindow('/src/cgi/bin/ClientSC.cgi?ClientID=$rClient->{ClientID}&mlt=$form->{mlt}','ClientSC',600,1100)" > <IMG BORDER="0" ALT="Service Codes for Clients Insurance" SRC="/images/paper.gif" > </A>
     </TD>
     <TD CLASS="strcol" WIDTH="${NameWidth}" >
         <A HREF="${ClientHREF}" ONMOUSEOVER="window.status='${ws}'; return true;" ONMOUSEOUT="window.status=''" >${ClientName}</A> / ${ClinicName} <BR> ${ClientActiveStatus}
@@ -471,7 +471,7 @@ ${UnitsPopup}
     <TD CLASS="strcol" WIDTH="${ColWidth}" VALIGN="top" >
       <SPAN CLASS="subtitle" STYLE="color: ${InsColor}" >$rInsurance->{Name} &nbsp; </SPAN> ${HealthHomeImg}<BR>
       $rInsurance->{InsIDNum} &nbsp; <BR>
-      <A HREF="javascript: ReportWindow('/cgi/bin/EBReport.cgi?ClientID=$rClient->{ClientID}&FName=$rClient->{FName}&LName=$rClient->{LName}&mlt=$form->{mlt}','EBReport',400,1200)" ONMOUSEOVER="textMsg.show('eligibility')" ONMOUSEOUT="textMsg.hide()" ><SPAN CLASS="subtitle" COLOR='${EBColor}' >${ActiveStatus}</SPAN></A>
+      <A HREF="javascript: ReportWindow('/src/cgi/bin/EBReport.cgi?ClientID=$rClient->{ClientID}&FName=$rClient->{FName}&LName=$rClient->{LName}&mlt=$form->{mlt}','EBReport',400,1200)" ONMOUSEOVER="textMsg.show('eligibility')" ONMOUSEOUT="textMsg.hide()" ><SPAN CLASS="subtitle" COLOR='${EBColor}' >${ActiveStatus}</SPAN></A>
       ${checkEB}
     </TD>
   </TR>
@@ -707,7 +707,7 @@ qq|select ClientPrAuth.*,ClientPrAuthCDC.Reason,Insurance.Priority,Insurance.Ins
           ? qq|<IMG BORDER="0" HEIGHT="15" WIDTH="15" ALT="HealthHome" SRC="/images/homeicon.gif"><SPAN STYLE="color: green" >Health Home|
           : '';
         my $text =
-qq|<BR>${HealthHomeImg} $inv->{'PAgroup'} <A HREF="javascript: ReportWindow('/cgi/bin/PAPeriods.cgi?IDs=${PrAuthID}&mlt=$form->{mlt}','PAPeriods',600,1100)" ONMOUSEOVER="textMsg.show('pa${ClientID}_${PrAuthID}')" ONMOUSEOUT="textMsg.hide()" ><SPAN STYLE="color: ${PAColor}" >$r->{Priority}-$inv->{InsDescr}: $inv->{fPAEffDate}-$inv->{fPAExpDate}: $inv->{PAnumber}: |;
+qq|<BR>${HealthHomeImg} $inv->{'PAgroup'} <A HREF="javascript: ReportWindow('/src/cgi/bin/PAPeriods.cgi?IDs=${PrAuthID}&mlt=$form->{mlt}','PAPeriods',600,1100)" ONMOUSEOVER="textMsg.show('pa${ClientID}_${PrAuthID}')" ONMOUSEOUT="textMsg.hide()" ><SPAN STYLE="color: ${PAColor}" >$r->{Priority}-$inv->{InsDescr}: $inv->{fPAEffDate}-$inv->{fPAExpDate}: $inv->{PAnumber}: |;
         my $Length1 =
           DBA->getxref( $form, 'xPAgroups', $inv->{'PAgroup'}, 'Length1' );
         $Length1 = 'month' if ( $Length1 eq '' );

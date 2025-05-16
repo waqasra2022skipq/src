@@ -22,7 +22,7 @@
   <TR ><TD CLASS="port hdrtxt" COLSPAN="2" >Mental Health Screening Form-III FY15<BR>(add multiple screenings from the Client Page Testing menu)</TD></TR>
   <TR CLASS="list hdrcol" >
     <TD COLSPAN="2" >
-<A HREF="javascript:InputWindow('/cgi/bin/mis.cgi?view=ListClientMHSF.cgi&Client_ClientID=<<<Client_ClientID_1>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>&NONAVIGATION=1','MHSF',900,1200)" ><BUTTON TYPE="button" >ENTER Mental Health Screening Form-III FY15</BUTTON></A>
+<A HREF="javascript:InputWindow('/src/cgi/bin/mis.cgi?view=ListClientMHSF.cgi&Client_ClientID=<<<Client_ClientID_1>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>&NONAVIGATION=1','MHSF',900,1200)" ><BUTTON TYPE="button" >ENTER Mental Health Screening Form-III FY15</BUTTON></A>
     </TD>
   </TR>
   <TR ><TD CLASS="strcol" >How many times have you been treated for any psychological or emotional problems:</TD></TR>
@@ -46,7 +46,7 @@
       <INPUT TYPE=text NAME="MedHx_AttSuicideDate_1" VALUE="<<MedHx_AttSuicideDate_1>>" ONFOCUS="select()" ONCHANGE="qDate(this)" MAXLENGTH="10" SIZE="10" >
     </TD>
     <TD CLASS="strcol" >  
-	  <A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListCSSRS.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>','C-SSRS',700, 1200)"><B><I>Complete Columbia Suicide Scale (C-SSRS)</I></B></A>
+	  <A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListCSSRS.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>','C-SSRS',700, 1200)"><B><I>Complete Columbia Suicide Scale (C-SSRS)</I></B></A>
     </TD>
   </TR>
   <TR >

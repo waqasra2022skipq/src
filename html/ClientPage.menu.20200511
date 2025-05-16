@@ -46,7 +46,7 @@
       [[SysAccess->verify(%form+Privilege=ClientEDocs)<LI><A HREF="/cgi/bin/mis.cgi?view=ListClientEDocs.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Electronic Docs</A></LI> ]]
       [[SysAccess->verify(%form+Privilege=Discharge)<LI><A HREF="/cgi/bin/mis.cgi?view=ListDischarges.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Discharges</A></LI> ]]
       [[DBUtil->isNOTNULL(<<ClientLegal_JOLTS_1>>)<LI><A HREF="/cgi/bin/mis.cgi?view=ListClientCARSReview.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">CARS Review</A></LI> ]]
-      [[DBUtil->isNOTNULL(<<ClientLegal_JOLTS_1>>)<LI><A HREF="javascript:ReportWindow('/cgi/bin/GenReport.cgi?Name=CARSTrSum&Type=cars&Client_ClientID=<<Client_ClientID>>=1&output=pdf&mlt=<<mlt>>&misLINKS=<<misLINKS>>','CARSReport')" >CARS Report</A></LI> ]]
+      [[DBUtil->isNOTNULL(<<ClientLegal_JOLTS_1>>)<LI><A HREF="javascript:ReportWindow('/src/cgi/bin/GenReport.cgi?Name=CARSTrSum&Type=cars&Client_ClientID=<<Client_ClientID>>=1&output=pdf&mlt=<<mlt>>&misLINKS=<<misLINKS>>','CARSReport')" >CARS Report</A></LI> ]]
       [[SysAccess->verify(%form+Privilege=ClientReview)<LI><A HREF="/cgi/bin/mis.cgi?view=ListClientReview.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Client Reviews</A></LI> ]]
       [[SysAccess->verify(%form+Privilege=Agent)<LI><A HREF="/cgi/bin/mis.cgi?view=ListImportCCDAs.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Import CCDA Documents</A></LI> ]]
     </UL>
@@ -99,7 +99,7 @@
       <LI><A HREF="javascript:void(0)" ONMOUSEOVER="window.status='Labs Menu'; return true;" ONMOUSEOUT="window.status=''" >Labs</A>
         <UL CLASS="sub" >
           <LI><A HREF="/cgi/bin/mis.cgi?view=ListClientLabs.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Lab Results</A></LI>
-          [[NewCrop->hasRole(%form)<LI><A HREF="javascript:ScreenWindow('/cgi/bin/NewCrop.cgi?ClientID=<<Client_ClientID>>&requestedPage=lab-orders&mlt=<<mlt>>&misLINKS=<<misLINKS>>','labs')" >Update Online LABS</A></LI> ]]
+          [[NewCrop->hasRole(%form)<LI><A HREF="javascript:ScreenWindow('/src/cgi/bin/NewCrop.cgi?ClientID=<<Client_ClientID>>&requestedPage=lab-orders&mlt=<<mlt>>&misLINKS=<<misLINKS>>','labs')" >Update Online LABS</A></LI> ]]
         </UL>
       </LI>
     </UL>
@@ -114,7 +114,7 @@
       <LI><A HREF="/cgi/bin/mis.cgi?view=ListClientProcedures.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Medical Procedures</A></LI>
     </UL>
   </LI>
-  <LI><A HREF="javascript:ReportWindow('/cgi/bin/printFaceSheet.pl?IDs=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>','FaceSheet')" ONMOUSEOVER="window.status='Print Client Intake Face Sheet'; return true;" ONMOUSEOUT="window.status=''">Print Face Sheet</A></LI>
+  <LI><A HREF="javascript:ReportWindow('/src/cgi/bin/printFaceSheet.pl?IDs=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>','FaceSheet')" ONMOUSEOVER="window.status='Print Client Intake Face Sheet'; return true;" ONMOUSEOUT="window.status=''">Print Face Sheet</A></LI>
   <LI>[[DBA->setPrintClientIntake(%form+<<Client_ClientID>>++Print  CARF Intake)]]</LI> 
   [[SysAccess->verify(%form+Privilege=ClientAccess)<LI><A HREF="/cgi/bin/ClientAccess.cgi?Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Access Control</A></LI> ]]
   [[DBUtil->isEQ(<<LOGINPROVID>>+91)<LI><A HREF="/cgi/bin/newportal.cgi?Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Add Login for Client Portal</A></LI> ]]

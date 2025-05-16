@@ -7,7 +7,7 @@
 
 [[*SysAccess->verify(%form+Privilege=ProviderACL)]]
 
-<FORM NAME="ProviderACL" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="ProviderACL" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

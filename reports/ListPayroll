@@ -117,7 +117,7 @@ sub disFiles() {
         if ( $EDT eq '' || $Cnt == 5 ) {
             $link =
               $TYPE =~ /MARK/i
-              ? qq|javascript:InputWindow('/cgi/bin/markPaid.cgi?MarkFile=$Files->{$key}&mlt=$form->{mlt}','Mark',400,400)|
+              ? qq|javascript:InputWindow('/src/cgi/bin/markPaid.cgi?MarkFile=$Files->{$key}&mlt=$form->{mlt}','Mark',400,400)|
               : qq|javascript:ReportWindow('/reports2/$Files->{$key}','Payroll')|;
         }
         else {

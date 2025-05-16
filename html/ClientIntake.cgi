@@ -315,7 +315,7 @@ function initAutocomplete() {
     <TD CLASS="strcol">Referring Physician Gender</TD>
     <TD CLASS="strcol">
       <SELECT NAME="ClientReferrals_RefPhysGend_1">
-          [[BDA->selxTable(%form+xGend+<<ClientReferrals_RefPhysGend_1>>+Descr)]]
+          [[DBA->selxTable(%form+xGend+<<ClientReferrals_RefPhysGend_1>>+Descr)]]
       </SELECT>
     </TD>
   </TR>

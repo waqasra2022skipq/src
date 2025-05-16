@@ -6,7 +6,7 @@
 <SCRIPT type="text/javascript" src="/src/cgi/js/ajaxrequest.js"></SCRIPT>
 <SCRIPT LANGUAGE="JavaScript">
 function TPPG(e)
-{ InputWindow('/cgi/bin/TPPG.cgi?mlt=<<<mlt>>>&id='+e.value,'ViewPG'); }
+{ InputWindow('/src/cgi/bin/TPPG.cgi?mlt=<<<mlt>>>&id='+e.value,'ViewPG'); }
 // DeCloak -->
 </SCRIPT>
 

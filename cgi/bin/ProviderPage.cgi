@@ -99,7 +99,7 @@ my $html = myHTML->newHTML(
   . myConfig->cfgfile( 'menuV2.css', 1 )
   . qq|" REL="stylesheet" TYPE="text/css" >
 <script src="/src/cgi/menu/js/menuV2.js" type="text/javascript"></script>
-<SCRIPT LANGUAGE="JavaScript" SRC="/src/src/cgi/js/vEntry.js"> </SCRIPT>
+<SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript">
 <!--
 function validate(form)

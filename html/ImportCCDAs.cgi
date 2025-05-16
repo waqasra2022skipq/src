@@ -51,7 +51,7 @@
   <TR >
     <TD CLASS="strcol" WIDTH="30%" >CCDA and XML files:</TD>
     <TD CLASS="strcol" >
-      <A HREF="javascript:ReportWindow('/cgi/bin/ImportCCDA.cgi?file=<<ClientEDocs_xmlfile_1>>&mlt=<<mlt>>','ImportCCDA',900,1000)" TITLE="Use this link to import this CCDA and create the Client information." >
+      <A HREF="javascript:ReportWindow('/src/cgi/bin/ImportCCDA.cgi?file=<<ClientEDocs_xmlfile_1>>&mlt=<<mlt>>','ImportCCDA',900,1000)" TITLE="Use this link to import this CCDA and create the Client information." >
         The files are available for import: click here to import CCDA
       </A>
     </TD>

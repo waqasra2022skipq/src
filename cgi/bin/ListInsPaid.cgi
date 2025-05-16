@@ -104,7 +104,7 @@ qq|select InsPaid.*, Client.LName, Client.FName from InsPaid left join Client on
     while ( $rList = $sList->fetchrow_hashref ) {
         $count += 1;
         my $printlink =
-qq|  <A HREF="javascript:ReportWindow('/cgi/bin/genReceipt.cgi?InsPaid_ID=$rList->{ID}&mlt=$form->{mlt}','PrintWindow')" ONMOUSEOVER="textMsg.show('print')" ONMOUSEOUT="textMsg.hide()" ><IMG BORDER=0 SRC="/images/icon_print.gif" ></A>|;
+qq|  <A HREF="javascript:ReportWindow('/src/cgi/bin/genReceipt.cgi?InsPaid_ID=$rList->{ID}&mlt=$form->{mlt}','PrintWindow')" ONMOUSEOVER="textMsg.show('print')" ONMOUSEOUT="textMsg.hide()" ><IMG BORDER=0 SRC="/images/icon_print.gif" ></A>|;
         my $even      = int( $count / 2 ) == $count / 2 ? '1' : '0';
         my $class     = $even ? qq|CLASS="alternate"|         : '';
         my $StartDate = DBUtil->Date( $rList->{StartDate}, 'fmt', 'MM/DD/YY' );

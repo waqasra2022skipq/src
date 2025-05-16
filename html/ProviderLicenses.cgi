@@ -101,7 +101,7 @@
 <TABLE CLASS="site fullsize" >
   <TR >
     <TD CLASS="hdrtxt" >
-      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Provider's Electronic Documents</A> ]]
+      [[SysAccess->verify(%form+Privilege=ProviderEDocs)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=ListProviderEDocs.cgi&Provider_ProvID=<<<Provider_ProvID>>>&mlt=<<<mlt>>>&misLINKS=<<<misLINKS>>>','ElecDocs')">View Provider's Electronic Documents</A> ]]
     </TD>
   </TR>
 </TABLE>
