@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!C:/Strawberry/perl/bin/perl.exe
 use lib 'C:/xampp/htdocs/src/lib';
 use DBI;
 use myForm;
@@ -16,9 +16,12 @@ my $dbh    = myDBI->dbconnect( $form->{'DBNAME'} );
 my $addURL = "mlt=$form->{mlt}&misLINKS=$form->{misLINKS}";
 myForm->pushLINK();    # save this link/page to return to.
 
+
+
 #warn "ENTER->ManagerTreeIA::new-> LOGINPROVID=$form->{LOGINPROVID}\n";
-$MyURL  = qq|/cgi/bin/mis.cgi?MIS_Action=MgrTreeIA&mlt=$form->{mlt}|;
+$MyURL  = qq|/src/cgi/bin/mis.cgi?MIS_Action=MgrTreeIA&mlt=$form->{mlt}|;
 $addURL = qq|mlt=$form->{mlt}&misLINKS=$form->{misLINKS}|;
+1 if $MyURL; 
 
 # set the Unreviewed Treatments by Provider
 $Counts      = {};
@@ -41,7 +44,7 @@ my $html = myHTML->new($form) . qq|
 | . myHTML->leftpane( $form, 'clock mail managertree collapseipad' ) . qq|
     <TD WIDTH="84%" ALIGN="center" >
 | . myHTML->hdr($form) . myHTML->menu($form) . qq|
-    <FORM NAME="MgrTree" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+    <FORM NAME="MgrTree" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR ALIGN="left" >
     <TD >
@@ -133,11 +136,11 @@ sub genHTML {
       ? "<FONT COLOR=black >${UnBillCnt}</FONT>"
       : "<FONT COLOR=red >${UnBillCnt}</FONT>";
     my $ClientListURL =
-      qq|/cgi/bin/ClientList.cgi?Provider_ProvID=$r->{ProvID}|;
+      qq|/src/cgi/bin/ClientList.cgi?Provider_ProvID=$r->{ProvID}|;
     my $ClientListIMG =
 qq|<IMG BORDER=0 ALT="Client-List by Provider" SRC="/src/images/icon_folder.gif">|;
     my $ChartListURL =
-qq|/cgi/bin/ChartList.cgi?Provider_ProvID=$r->{ProvID}&SortType=NotBilled|;
+qq|/src/cgi/bin/ChartList.cgi?Provider_ProvID=$r->{ProvID}&SortType=NotBilled|;
     my $ChartListIMG =
 qq|<IMG BORDER=0 ALT="Chart-List by Provider" SRC="/src/images/clipboard.gif">|;
 
@@ -179,7 +182,7 @@ qq|${ClientListIMG} ${ChartListIMG}  <FONT COLOR=black >${ProvName}</FONT> |;
     else {
         my $ws = $dbh->quote("${ProvName} Information ID=$r->{ProvID}");
         $ProvInfo .=
-qq| <A HREF="/cgi/bin/ProviderPage.cgi?Provider_ProvID=$r->{ProvID}&${addURL}" ONMOUSEOVER="window.status=${ws}; return true;" ONMOUSEOUT="window.status=''" >${ProvName}</A> |;
+qq| <A HREF="/src/cgi/bin/ProviderPage.cgi?Provider_ProvID=$r->{ProvID}&${addURL}" ONMOUSEOVER="window.status=${ws}; return true;" ONMOUSEOUT="window.status=''" >${ProvName}</A> |;
     }
     $out .= qq|
       <TD CLASS="title" > ${Spacer} ${ProvInfo} ${Info} ${Email} </TD>

@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!C:/Strawberry/perl/bin/perl.exe
 use lib 'C:/xampp/htdocs/src/lib';
 use DBI;
 use DBForm;
@@ -145,7 +145,7 @@ my $html = myHTML->new($form) . qq|
   </TR>
 </TABLE>
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/novalidate.js"> </SCRIPT>
-<FORM NAME="ListFiles" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="ListFiles" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 |;
 $MainLinks = '';
 foreach my $Section (@Sections) {

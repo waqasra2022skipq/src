@@ -8,7 +8,7 @@
 <SCRIPT TYPE="text/javascript" src="/cgi/lhc/autocomplete-lhc-17.0.3/autocomplete-lhc.min.js"></SCRIPT>
 <SCRIPT TYPE="text/javascript" SRC="/cgi/jquery/jquery-ui-1.12.1/jquery-ui.min.js" ></SCRIPT>
 
-<FORM NAME="ClientEDocs" METHOD=POST ACTION="/cgi/bin/mis.cgi" > 
+<FORM NAME="ClientEDocs" METHOD=POST ACTION="/src/cgi/bin/mis.cgi" > 
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

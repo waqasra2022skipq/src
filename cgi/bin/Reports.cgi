@@ -119,7 +119,7 @@ my $qxReports =
 qq|select * from xReports where Cron=1 and Category=? and ExpDate is null order by Descr |;
 my $html = myHTML->newPage( $form, "Schedule Reports for Provider" ) . qq|
 ${Defns}
-<FORM NAME="ProviderRpts" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="ProviderRpts" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >
@@ -130,7 +130,7 @@ ${Defns}
 </TABLE>
 </FORM>
 <TABLE CLASS="home fullsize" >
-<FORM NAME="Reports" ACTION="/cgi/bin/Reports.cgi" METHOD="POST" >
+<FORM NAME="Reports" ACTION="/src/cgi/bin/Reports.cgi" METHOD="POST" >
 <TABLE CLASS="home fullsize">
   <TR>
     <TD CLASS="port" COLSPAN="2" >

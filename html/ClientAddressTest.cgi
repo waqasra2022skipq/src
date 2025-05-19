@@ -19,7 +19,7 @@ function initAutocomplete() {
 }
 </SCRIPT>
 
-<FORM NAME="Intake" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="Intake" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

@@ -23,7 +23,7 @@ function initAutocomplete() {
 }
 </SCRIPT>
 
-<FORM NAME="ClientLegalPP" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="ClientLegalPP" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

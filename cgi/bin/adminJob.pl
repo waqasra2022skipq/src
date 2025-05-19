@@ -68,7 +68,7 @@ sub submit {
 <P>
 <P>
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/novalidate.js"> </SCRIPT>
-<FORM NAME="submit" ACTION="/cgi/bin/adminJob.pl" METHOD="POST">
+<FORM NAME="submit" ACTION="/src/cgi/bin/adminJob.pl" METHOD="POST">
 <DIV CLASS="strcol" >
 JOB executed ${typename}: ${job}
 Results:
@@ -107,7 +107,7 @@ sub status {
 <P>
 <P>
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/novalidate.js"> </SCRIPT>
-<FORM NAME="submit" ACTION="/cgi/bin/adminJob.pl" METHOD="POST">
+<FORM NAME="submit" ACTION="/src/cgi/bin/adminJob.pl" METHOD="POST">
 <DIV CLASS="strcol" >
 JOB status ${typename}: ${job}
 Results:
@@ -144,7 +144,7 @@ sub verify {
 <P>
 <P>
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/novalidate.js"> </SCRIPT>
-<FORM NAME="submit" ACTION="/cgi/bin/adminJob.pl" METHOD="POST">
+<FORM NAME="submit" ACTION="/src/cgi/bin/adminJob.pl" METHOD="POST">
 <DIV CLASS="strcol" >
   Do you want to execute JOB ${typename}: ${job}
 </DIV>

@@ -79,7 +79,7 @@ function validate(form)
   return true;
 }
 </SCRIPT>
-<FORM NAME="ClientSSN" ACTION="/cgi/bin/chgSSN.cgi" METHOD="POST">
+<FORM NAME="ClientSSN" ACTION="/src/cgi/bin/chgSSN.cgi" METHOD="POST">
   <TABLE CLASS="home fullsize" >
     <TR><TD CLASS="hdrtxt" COLSPAN="2" >ORIGINAL SSN # $rClient->{'SSN'}</TD></TR>
     <TR><TD CLASS="hdrtxt" COLSPAN="2" >Please enter NEW SSN #</TD></TR>

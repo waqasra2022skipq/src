@@ -1,5 +1,4 @@
-#!/usr/bin/perl
-############################################################################
+#!C:/Strawberry/perl/bin/perl.exe
 use lib 'C:/xampp/htdocs/src/lib';
 use DBI;
 use DBUtil;
@@ -78,7 +77,7 @@ my $html =
     <TD CLASS="numcol" >&nbsp;</TD>
   </TR>
 </TABLE>
-<FORM NAME="TimeClock" ACTION="/cgi/bin/TimeClock.cgi" METHOD="POST" >
+<FORM NAME="TimeClock" ACTION="/src/cgi/bin/TimeClock.cgi" METHOD="POST" >
 | . main->genList( ${ForProvID} ) . qq|
 <TABLE CLASS="port fullsize" >
   <TR >
@@ -102,7 +101,7 @@ $html .= qq|
 <INPUT TYPE=hidden NAME="FORMID" VALUE="$form->{FORMID}" >
 <INPUT TYPE=hidden NAME="LINKID" VALUE="$form->{LINKID}" >
 </FORM>
-<FORM NAME="TimeClock" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="TimeClock" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR > <TD CLASS="numcol" > ${Edit} </TD> </TR>
 </TABLE>

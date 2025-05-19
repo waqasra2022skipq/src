@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!C:/Strawberry/perl/bin/perl.exe
 use lib 'C:/xampp/htdocs/src/lib';
 use DBI;
 use DBForm;
@@ -31,7 +31,7 @@ my $html = myHTML->new($form) . qq|
 | . myHTML->leftpane( $form, 'clock mail managertree collapseipad' ) . qq|
     <TD WIDTH="84%" ALIGN="center" >
 | . myHTML->hdr($form) . myHTML->menu($form) . qq|
-<FORM NAME="Surveys" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="Surveys" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR ALIGN="left" >
     <TD CLASS="strcol" >

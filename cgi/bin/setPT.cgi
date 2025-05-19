@@ -46,7 +46,7 @@ sub hPT {
       myHTML->newHTML( $form, 'Set Triggers',
         "checkinputwindow noclock countdown_1" )
       . qq|
-<FORM NAME="submit" ACTION="/cgi/bin/setPT.cgi" METHOD="POST">
+<FORM NAME="submit" ACTION="/src/cgi/bin/setPT.cgi" METHOD="POST">
 <DIV CLASS="blackonwhite" >
   <DIV CLASS="blackonwhite txtleft" >
     <div data-role="header" >

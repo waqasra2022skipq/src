@@ -181,7 +181,7 @@ function validate(form)
   return true;
 }
 </SCRIPT>
-<FORM NAME="submit" ACTION="/cgi/bin/setPP.cgi" METHOD="POST">
+<FORM NAME="submit" ACTION="/src/cgi/bin/setPP.cgi" METHOD="POST">
 |
       . myHTML->setCheckBoxRows( $form, 'xPrivileges', $list, '',
         'Administration' )

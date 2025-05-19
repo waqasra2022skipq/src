@@ -10,7 +10,7 @@
 
 [[*SysAccess->verify(%form+Privilege=Discharge)]]
 
-<FORM NAME="ClientDischarge" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="ClientDischarge" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

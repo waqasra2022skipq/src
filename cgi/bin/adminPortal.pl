@@ -1,5 +1,5 @@
-#!/usr/bin/perl
-#use lib 'C:/xampp/htdocs/src/lib';
+#!C:/Strawberry/perl/bin/perl.exe
+use lib 'C:/xampp/htdocs/src/lib';
 use lib 'E:/src/lib';  
 use DBI;
 use myForm;

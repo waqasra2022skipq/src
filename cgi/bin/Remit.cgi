@@ -68,7 +68,7 @@ function validate(form)
 }
 </SCRIPT>
 
-<FORM NAME="Reconcile" ACTION="/cgi/bin/Remit.cgi" METHOD="POST" >
+<FORM NAME="Reconcile" ACTION="/src/cgi/bin/Remit.cgi" METHOD="POST" >
 <DIV CLASS="main header" >Reconcile or Scholarship Notes</DIV>
 <TABLE CLASS="port" WIDTH="50%" >
   <TR ><TD CLASS="header" >${Title}</TD></TR>

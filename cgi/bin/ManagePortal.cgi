@@ -44,7 +44,7 @@ my $html = myHTML->new( $form, $title, 'noclock' ) . qq|
   . qq|" TYPE="text/javascript" ></SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript" SRC="/src/cgi/js/tabs.js"></SCRIPT>
 <LINK REL="STYLESHEET" TYPE="text/css" HREF="/src/cgi/css/tabs.css" />
-<FORM NAME="ClientPage" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="ClientPage" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >Manage Client Portal Page:<BR>$form->{'LOGINUSERNAME'} </TD>
@@ -55,7 +55,7 @@ my $html = myHTML->new( $form, $title, 'noclock' ) . qq|
   <TR >
     <TD CLASS="strcol" >
       <DIV CLASS="port hdrcol" >Current Clients</DIV>
-      <DIV><A HREF="/cgi/bin/mis.cgi?logout=1&mlt=<<mlt>>" ONMOUSEOVER="window.status='Logout of MIS'; return true;" ONMOUSEOUT="window.status=''" >Logout</A></DIV>
+      <DIV><A HREF="/src/cgi/bin/mis.cgi?logout=1&mlt=<<mlt>>" ONMOUSEOVER="window.status='Logout of MIS'; return true;" ONMOUSEOUT="window.status=''" >Logout</A></DIV>
     </TD>
   </TR>
 </TABLE>

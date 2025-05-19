@@ -85,7 +85,7 @@ ${url}
 |;
 }
 $html .= qq|
-<FORM NAME="submit" ACTION="/cgi/bin/mis.cgi" METHOD="POST">
+<FORM NAME="submit" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST">
 <INPUT TYPE="hidden" NAME="mlt" VALUE="$form->{mlt}" >
 <INPUT TYPE="hidden" NAME="LINKID" VALUE="$form->{LINKID}" >
 <INPUT TYPE="hidden" NAME="misLINKS" VALUE="$form->{misLINKS}" >

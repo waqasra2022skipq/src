@@ -125,7 +125,7 @@ ${Defns}
 | . myHTML->leftpane( $form, 'clock mail managertree collapseipad' ) . qq|
     <TD WIDTH="84%" ALIGN="center" >
 | . myHTML->hdr($form) . myHTML->menu($form) . qq|
-<FORM NAME="ProviderPrivs" ACTION="/cgi/bin/Privileges.cgi" METHOD="POST" >
+<FORM NAME="ProviderPrivs" ACTION="/src/cgi/bin/Privileges.cgi" METHOD="POST" >
 |;
 ############################################################################
 my $BackLinks = gHTML->setLINKS( $form, 'back' );

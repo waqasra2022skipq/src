@@ -66,7 +66,7 @@ sub submit {
 <P>
 <P>
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/novalidate.js"> </SCRIPT>
-<FORM NAME="submit" ACTION="/cgi/bin/adminJobACL.pl" METHOD="POST">
+<FORM NAME="submit" ACTION="/src/cgi/bin/adminJobACL.pl" METHOD="POST">
 <DIV CLASS="strcol" >
 SetACL process executed: ${job}
 Results:
@@ -105,7 +105,7 @@ sub status {
 <P>
 <P>
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/novalidate.js"> </SCRIPT>
-<FORM NAME="submit" ACTION="/cgi/bin/adminJobACL.pl" METHOD="POST">
+<FORM NAME="submit" ACTION="/src/cgi/bin/adminJobACL.pl" METHOD="POST">
 <DIV CLASS="strcol" >
 JOB status: ${job}
 Results:
@@ -142,7 +142,7 @@ sub verify {
 <P>
 <P>
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/novalidate.js"> </SCRIPT>
-<FORM NAME="submit" ACTION="/cgi/bin/adminJobACL.pl" METHOD="POST">
+<FORM NAME="submit" ACTION="/src/cgi/bin/adminJobACL.pl" METHOD="POST">
 <DIV CLASS="strcol" >
   Do you want to execute JOB SetACL: ${job}
 </DIV>

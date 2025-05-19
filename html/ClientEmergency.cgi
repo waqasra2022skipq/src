@@ -15,7 +15,7 @@
 [[[DBA->setAddress(%form+Vision)]]]
 [[[DBA->setAddress(%form+Hearing)]]]
 
-<FORM NAME="ClientEmergency" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="ClientEmergency" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

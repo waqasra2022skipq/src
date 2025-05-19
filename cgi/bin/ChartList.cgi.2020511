@@ -329,18 +329,18 @@ $qNotes .=
 ############################################################################
 my $BackLinks = gHTML->setLINKS( $form, 'back' );
 my $ClientListByProv =
-qq|<A HREF="/cgi/bin/ClientList.cgi?Provider_ProvID=$rProvider->{ProvID}&${addLinks}" TITLE="Click here for <BR>${ProviderName}\'s Client List." ><IMG BORDER=0 SRC="/images/icon_folder.gif" HEIGTH="30" WIDTH="30" ></A>|;
+qq|<A HREF="/src/cgi/bin/ClientList.cgi?Provider_ProvID=$rProvider->{ProvID}&${addLinks}" TITLE="Click here for <BR>${ProviderName}\'s Client List." ><IMG BORDER=0 SRC="/images/icon_folder.gif" HEIGTH="30" WIDTH="30" ></A>|;
 my $AddNote =
   $ClientID
-  ? qq|      <A HREF="/cgi/bin/mis.cgi?MIS_Action=Note&Client_ClientID=${ClientID}&Treatment_TrID=new&${addLinks}" TITLE="Click here to <BR>add a Note for <BR>${ClientName}." ><IMG SRC="/images/edit.gif" CLASS="site" HEIGHT="35" WIDTH="35" ></A>|
+  ? qq|      <A HREF="/src/cgi/bin/mis.cgi?MIS_Action=Note&Client_ClientID=${ClientID}&Treatment_TrID=new&${addLinks}" TITLE="Click here to <BR>add a Note for <BR>${ClientName}." ><IMG SRC="/images/edit.gif" CLASS="site" HEIGHT="35" WIDTH="35" ></A>|
   : '';
 my $PhysNote =
   $ClientID && DBA->isPhysician($form)
-  ? qq|     <A HREF="/cgi/bin/mis.cgi?MIS_Action=Note&NoteType=2&Client_ClientID=${ClientID}&Treatment_TrID=new&${addLinks}" TITLE="Click here to <BR>add a Physician Note for <BR>${ClientName}." > <IMG SRC="/cgi/images/caduceuswhite.png" WIDTH="24" HEIGHT="24" > </A>|
+  ? qq|     <A HREF="/src/cgi/bin/mis.cgi?MIS_Action=Note&NoteType=2&Client_ClientID=${ClientID}&Treatment_TrID=new&${addLinks}" TITLE="Click here to <BR>add a Physician Note for <BR>${ClientName}." > <IMG SRC="/cgi/images/caduceuswhite.png" WIDTH="24" HEIGHT="24" > </A>|
   : '';
 my $TestNote =
   $form->{'LOGINPROVID'} == 91
-  ? qq|     <A HREF="/cgi/bin/mis.cgi?MIS_Action=Note&NoteType=5&Client_ClientID=${ClientID}&Treatment_TrID=new&${addLinks}" TITLE="Click here to <BR>add a Physician Note for <BR>${ClientName}." > <IMG SRC="/cgi/images/caduceuswhite.png" WIDTH="24" HEIGHT="24" > </A>|
+  ? qq|     <A HREF="/src/cgi/bin/mis.cgi?MIS_Action=Note&NoteType=5&Client_ClientID=${ClientID}&Treatment_TrID=new&${addLinks}" TITLE="Click here to <BR>add a Physician Note for <BR>${ClientName}." > <IMG SRC="/cgi/images/caduceuswhite.png" WIDTH="24" HEIGHT="24" > </A>|
   : '';
 $sProgNotes = $dbh->prepare("select * from ProgNotes where NoteID=? ");
 $sPhysNotes = $dbh->prepare("select * from PhysNotes where NoteID=? ");
@@ -368,7 +368,7 @@ my $html = myHTML->new($form) . qq|
 | . myHTML->leftpane( $form, 'clock mail managertree collapseipad' ) . qq|
     <TD WIDTH="84%" ALIGN="center" >
 | . myHTML->hdr($form) . myHTML->menu($form) . qq|
-<FORM NAME="ChartList" ACTION="/cgi/bin/ChartList.cgi" METHOD="POST" >
+<FORM NAME="ChartList" ACTION="/src/cgi/bin/ChartList.cgi" METHOD="POST" >
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vChartList.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vNum.js"> </SCRIPT>
@@ -696,7 +696,7 @@ sub prtNote {
 
         #warn qq|ProviderID=$ProviderID=, LName=$r->{LName}=\n|;
         $ClientPageAcc = qq|
-      <A HREF="/cgi/bin/ClientPage.cgi?Client_ClientID=$r->{ClientID}&${addLinks}" TITLE="Click here for <BR>${Name}\'s Client Page <BR>(${TrIDProvider})" >$r->{LName}</A>
+      <A HREF="/src/cgi/bin/ClientPage.cgi?Client_ClientID=$r->{ClientID}&${addLinks}" TITLE="Click here for <BR>${Name}\'s Client Page <BR>(${TrIDProvider})" >$r->{LName}</A>
 |;
     }
     else {
@@ -777,7 +777,7 @@ qq|<A HREF="javascript:ReportWindow('/src/cgi/bin/disHTML.cgi?${addLinks}&IDs=$r
     }
     my ( $NoteNmbrLink, $NotePrintLink, $NoteCCDALink ) = ( '', '', '' );
     $NoteNmbrLink =
-qq|<A HREF="/cgi/bin/mis.cgi?MIS_Action=Note&Client_ClientID=$r->{ClientID}&Treatment_TrID=$r->{TrID}&${addLinks}&pushID=$form->{LINKID}" TITLE="${TrIDMesg} <BR>Click here to <BR>Edit Note $r->{TrID}" >${NoteIMG}|;
+qq|<A HREF="/src/cgi/bin/mis.cgi?MIS_Action=Note&Client_ClientID=$r->{ClientID}&Treatment_TrID=$r->{TrID}&${addLinks}&pushID=$form->{LINKID}" TITLE="${TrIDMesg} <BR>Click here to <BR>Edit Note $r->{TrID}" >${NoteIMG}|;
     $NotePrintLink .=
 qq|<A HREF="javascript:ReportWindow('/src/cgi/bin/printNotes.pl?TrIDs=$r->{TrID}&${addLinks}','printNote')" TITLE="Click here to <BR>New print Note $r->{TrID} as pdf file." ><IMG SRC="/images/adobelogo_bt.gif" BORDER="0" HEIGHT="18" WIDTH="18" ></A>|;
     $NotePrintLink .=
@@ -1075,7 +1075,7 @@ sub adjTrans {
 sub setInsPaid {
     my ($self) = @_;
     my $html .= qq|
-<FORM NAME="Reconcile" ACTION="/cgi/bin/Reconcile.cgi" METHOD="POST" >
+<FORM NAME="Reconcile" ACTION="/src/cgi/bin/Reconcile.cgi" METHOD="POST" >
 <TABLE CLASS="port fullsize" >
   <TR ><TD COLSPAN="12" >Insurance Payments unreconciled (for notes listed above) ${ClientInsURL}<BR>Wait to apply these to a note until the note is billed/reconciled. If you apply a payment to a note it 'Reconciles' the note and then the note cannot be billed.</TD></TR>
 </TABLE>
@@ -1115,7 +1115,7 @@ sub setInsPaid {
         #warn qq|ClientKey=$ClientKey\n|;
         my ( $LName, $FName, $ClientID ) = split( '_', $ClientKey );
         my $ClientList =
-qq|<A HREF="/cgi/bin/ClientList.cgi?SearchType=ClientID&SearchString=${ClientID}&${addLinks}" ONMOUSEOVER="window.status='Client List this Client only'; return true;" ONMOUSEOUT="window.status='';" ><IMG BORDER=0 ALT="Client-List" SRC="/images/icon_folder.gif" ></A>|;
+qq|<A HREF="/src/cgi/bin/ClientList.cgi?SearchType=ClientID&SearchString=${ClientID}&${addLinks}" ONMOUSEOVER="window.status='Client List this Client only'; return true;" ONMOUSEOUT="window.status='';" ><IMG BORDER=0 ALT="Client-List" SRC="/images/icon_folder.gif" ></A>|;
 
         #warn qq|q=\n$qInsPaid\nClientID=$ClientID\n|;
         $sInsPaid->execute($ClientID);

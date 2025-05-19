@@ -128,7 +128,7 @@ my $html = myHTML->newHTML(
 <DIV CLASS="home title strcol" >
 ${desc}
 </DIV>
-<FORM NAME="adminFiles" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="adminFiles" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 | . main->listJobs($type) . qq|
 <INPUT TYPE="hidden" NAME="mlt" VALUE="$form->{mlt}" >
 <INPUT TYPE="hidden" NAME="misLINKS" VALUE="$form->{misLINKS}" >

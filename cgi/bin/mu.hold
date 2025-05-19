@@ -28,7 +28,7 @@ function validate(form)
 <TABLE CLASS="main" >
   <TR> <TD CLASS="hdrcol title" >Rollup CCDA</TD> </TR>
 </TABLE>
-<FORM NAME="MU" ACTION="/cgi/bin/rest.cgi" METHOD="POST" >
+<FORM NAME="MU" ACTION="/src/cgi/bin/rest.cgi" METHOD="POST" >
 <TABLE CLASS="home fullsize" >
   <TR>
     <TD CLASS="strcol" >

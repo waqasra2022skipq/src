@@ -169,7 +169,7 @@ qq|  <INPUT TYPE="text" NAME="ClientMail_Subject_1" VALUE="" ONFOCUS="select()" 
 qq|  <TEXTAREA NAME="ClientMail_Message_1" COLS="80" ROWS="18" WRAP="virtual" onFocus="select()" ></TEXTAREA>|;
     my $html = myHTML->new( $form, "Client Mail" );
     $html .= qq|
-<FORM NAME="ClientMail" ACTION="/cgi/bin/ClientMail.cgi" METHOD="POST" >
+<FORM NAME="ClientMail" ACTION="/src/cgi/bin/ClientMail.cgi" METHOD="POST" >
 <TABLE CLASS="main halfsize" >
   <TR >
     <TD CLASS="strcol" >

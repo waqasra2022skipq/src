@@ -6,7 +6,7 @@
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/ajaxrequest.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vDate.js"> </SCRIPT>
 
-<FORM NAME="ClientProblems" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="ClientProblems" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <HR WIDTH="90%" >
 <TABLE CLASS="main fullsize" >
   <TR >

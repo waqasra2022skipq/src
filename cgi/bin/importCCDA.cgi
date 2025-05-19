@@ -75,7 +75,7 @@ sub list {
     my ( $FName, $MName, $LName, $Gend, $DOB ) = main->getInfo($fromfile);
     $LName = $MName if ( $LName eq '' );
     $list .= qq|${FName} ${LName} ${Gend} ${DOB}
-             <button CLASS="confirmLINK" MYTEXT="Are you sure you want to LINK this xml to this client?<BR>If so, then click the OK button below. If NOT, click the Cancel button below." HREF="/cgi/bin/mis.cgi?MIS_Action=importCCDA.cgi&Client_ClientID=$r->{'ClientID'}&link=1&IDs=$form->{'IDs'}&mlt=$form->{'mlt'}" MYBUSY="Importing..." >Import</button> $r->{'ClientID'}<BR>|;
+             <button CLASS="confirmLINK" MYTEXT="Are you sure you want to LINK this xml to this client?<BR>If so, then click the OK button below. If NOT, click the Cancel button below." HREF="/src/cgi/bin/mis.cgi?MIS_Action=importCCDA.cgi&Client_ClientID=$r->{'ClientID'}&link=1&IDs=$form->{'IDs'}&mlt=$form->{'mlt'}" MYBUSY="Importing..." >Import</button> $r->{'ClientID'}<BR>|;
     return ($list);
 }
 
@@ -85,7 +85,7 @@ sub html {
       myHTML->newHTML( $form, 'Link CCDA',
         'CheckPopupWindow noclock countdown_10' )
       . qq|
-<FORM ID="form" NAME="importCCDA" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM ID="form" NAME="importCCDA" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
   <TABLE CLASS="main" >
     <TR> <TD CLASS="hdrcol title" >Link CCDA</TD> </TR>
   </TABLE>

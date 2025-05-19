@@ -76,7 +76,7 @@ qq|This screen selects notes for the client's secondary insurance payments for t
 function validate(form) { return(1); }
 </SCRIPT>
 
-<FORM NAME="HCFA" ACTION="/cgi/bin/2ndHCFA.cgi" METHOD="POST" >
+<FORM NAME="HCFA" ACTION="/src/cgi/bin/2ndHCFA.cgi" METHOD="POST" >
 <DIV CLASS="main header" >Generate 2nd HCFA</DIV>
 <DIV CLASS="main heading" >${DateRange}</DIV>
 <HR WIDTH="90%" >

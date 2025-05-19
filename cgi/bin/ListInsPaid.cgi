@@ -26,7 +26,7 @@ my $ClientName = qq|$rClient->{FName} $rClient->{LName} ($rClient->{ClientID})|;
 my $sProvider  = $dbh->prepare("select * from Provider where ProvID=?");
 ############################################################################
 my $html = myHTML->newPage( $form, "Insurance Payments" ) . qq|
-<FORM NAME="List" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="List" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript"> function validate(form) { return(1); } </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vNum.js"> </SCRIPT>

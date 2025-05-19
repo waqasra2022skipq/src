@@ -343,7 +343,7 @@ qq|    <A HREF="javascript:void(0);" ><IMG BORDER="0" SRC="/images/edit.gif" ONM
         $rProvider = $sProvider->fetchrow_hashref;
         $hdr       = "Provider: $rProvider->{FName} $rProvider->{LName}";
         $ChartListByProv =
-qq{<A HREF="/cgi/bin/ChartList.cgi?Provider_ProvID=${ProviderID}&SortType=Not Billed&${addLinks}" ONMOUSEOVER="textMsg.show('chartlist')" ONMOUSEOUT="textMsg.hide()" ><IMG BORDER="0" ALT="Chart-List by Provider" SRC="/images/clipboard.gif"></A>};
+qq{<A HREF="/src/cgi/bin/ChartList.cgi?Provider_ProvID=${ProviderID}&SortType=Not Billed&${addLinks}" ONMOUSEOVER="textMsg.show('chartlist')" ONMOUSEOUT="textMsg.hide()" ><IMG BORDER="0" ALT="Chart-List by Provider" SRC="/images/clipboard.gif"></A>};
         if ( SysAccess->verify( $form, 'Privilege=NewClient' ) ) {
             $AddNewMsg =
 qq|Click here to add New Clients for $rProvider->{FName} $rProvider->{LName}.|;
@@ -405,27 +405,27 @@ qq|select distinct Client.* from Client left join Insurance on Insurance.ClientI
 sub ClientList {
     my ($self) = @_;
     my $ElecNotesLink .=
-qq|<A HREF="/cgi/bin/mis.cgi?MIS_Action=Note&NoteType=3&Client_ClientID=$rClient->{ClientID}&Client_ClinicID=$rClient->{clinicClinicID}&Treatment_TrID=new&${addLinks}" > <IMG BORDER="0" HEIGHT="15" WIDTH="15" ALT="Electronic Note Entry" SRC="/images/lightning.gif"> </A> |
+qq|<A HREF="/src/cgi/bin/mis.cgi?MIS_Action=Note&NoteType=3&Client_ClientID=$rClient->{ClientID}&Client_ClinicID=$rClient->{clinicClinicID}&Treatment_TrID=new&${addLinks}" > <IMG BORDER="0" HEIGHT="15" WIDTH="15" ALT="Electronic Note Entry" SRC="/images/lightning.gif"> </A> |
       if ($ElecNotesFlag);
     my $TFCNotesLink =
-qq|<A HREF="/cgi/bin/mis.cgi?MIS_Action=Note&NoteType=tfc&Client_ClientID=$rClient->{ClientID}&Treatment_TrID=new&${addLinks}" > <IMG BORDER="0" HEIGHT="15" WIDTH="15" ALT="TFC Note Entry" SRC="/images/homeicon.gif"> </A> |
+qq|<A HREF="/src/cgi/bin/mis.cgi?MIS_Action=Note&NoteType=tfc&Client_ClientID=$rClient->{ClientID}&Treatment_TrID=new&${addLinks}" > <IMG BORDER="0" HEIGHT="15" WIDTH="15" ALT="TFC Note Entry" SRC="/images/homeicon.gif"> </A> |
       if ($TFCNotesFlag);
     my $pblink = $rInsurance->{Copay} > 0 ? qq|CLASS="blink-image"| : '';
     my $CashTransLink =
-qq|<A HREF="/cgi/bin/ListInsPaid.cgi?Client_ClientID=$rClient->{ClientID}&${addLinks}" ><IMG ${pblink} BORDER="0" HEIGHT="15" WIDTH="15" ALT="Insurance Payments Entry" SRC="/images/piggybank.gif"></A> |
+qq|<A HREF="/src/cgi/bin/ListInsPaid.cgi?Client_ClientID=$rClient->{ClientID}&${addLinks}" ><IMG ${pblink} BORDER="0" HEIGHT="15" WIDTH="15" ALT="Insurance Payments Entry" SRC="/images/piggybank.gif"></A> |
       if ($CashTransFlag);
     my $PhysNotesLink =
-qq|<A HREF="/cgi/bin/mis.cgi?MIS_Action=Note&NoteType=2&Client_ClientID=$rClient->{ClientID}&Treatment_TrID=new&${addLinks}" > <IMG SRC="/cgi/images/caduceusblack.png" WIDTH="24" HEIGHT="24" > </A> |
+qq|<A HREF="/src/cgi/bin/mis.cgi?MIS_Action=Note&NoteType=2&Client_ClientID=$rClient->{ClientID}&Treatment_TrID=new&${addLinks}" > <IMG SRC="/cgi/images/caduceusblack.png" WIDTH="24" HEIGHT="24" > </A> |
       if ( ${Physician} );
     my $MedicareLink =
-qq|<A HREF="/cgi/bin/mis.cgi?MIS_Action=Note&NoteType=4&Client_ClientID=$rClient->{ClientID}&Treatment_TrID=new&${addLinks}" > <IMG SRC="/img/note_medicare.png" WIDTH="24" HEIGHT="24" > </A> |
+qq|<A HREF="/src/cgi/bin/mis.cgi?MIS_Action=Note&NoteType=4&Client_ClientID=$rClient->{ClientID}&Treatment_TrID=new&${addLinks}" > <IMG SRC="/img/note_medicare.png" WIDTH="24" HEIGHT="24" > </A> |
       if ( $rMedicareInsurance->{'Descr'} ne '' );
     my $InvPrintLink .=
-qq|<A HREF="/cgi/bin/mis.cgi?view=ListInvoices.cgi&Client_ClientID=$rClient->{ClientID}&${addLinks}" > <IMG BORDER="0" ALT="List Client Invoices" SRC="/images/invoice.gif"> </A> |
+qq|<A HREF="/src/cgi/bin/mis.cgi?view=ListInvoices.cgi&Client_ClientID=$rClient->{ClientID}&${addLinks}" > <IMG BORDER="0" ALT="List Client Invoices" SRC="/images/invoice.gif"> </A> |
       if ( SysAccess->verify( $form, 'Privilege=Invoices2Print' ) );
     my $checkEB =
       $rInsurance->{'Descr'} =~ /medicaid/i
-      ? qq|<BR><button STYLE="font-size:0.5em;" CLASS="confirmLINK" MYTEXT="Are you sure you want to check Eligibility?<BR>If so, then click the OK button below. If NOT, click the Cancel button below.<BR><BR>Eligibility information is obtained nightly through extracts from OHCA. Providers should keep in mind the following:<BR>ODMHSAS added this check onto its service as a way to help providers in giving them a quick idea of eligibility for the new Case Management rules.<BR>This is just a marker and is only what ODMHSAS has at the moment, ODMHSAS does not have live access to recipient eligibility.<BR>This is NOT a guarantee of payment and should not replace your checking OHCA for eligibility (MIS checks twice a month).<BR>As with any data extract, things can happen so this should be more of an helpful indicator for providers, not something you rely on." HREF="/cgi/bin/mis.cgi?MIS_Action=DMHcm.pl&Provider_ProvID=${ProviderID}&Client_ClientID=$rClient->{ClientID}&InsNumIDs=$rInsurance->{InsIDNum}&mlt=$form->{mlt}" MYBUSY="Checking..." >Check DMH</button>&nbsp;<A HREF="javascript: ReportWindow('/src/cgi/bin/EBDMH.cgi?ClientID=$rClient->{ClientID}&InsNumID=$rInsurance->{InsIDNum}&FName=$rClient->{FName}&LName=$rClient->{LName}&mlt=$form->{mlt}','EBDMH',400,1200)" TITLE="Click to view last DMH Eligibility Report"  ><SPAN CLASS="subtitle" >Last DMH Eligibility check</SPAN></A> |
+      ? qq|<BR><button STYLE="font-size:0.5em;" CLASS="confirmLINK" MYTEXT="Are you sure you want to check Eligibility?<BR>If so, then click the OK button below. If NOT, click the Cancel button below.<BR><BR>Eligibility information is obtained nightly through extracts from OHCA. Providers should keep in mind the following:<BR>ODMHSAS added this check onto its service as a way to help providers in giving them a quick idea of eligibility for the new Case Management rules.<BR>This is just a marker and is only what ODMHSAS has at the moment, ODMHSAS does not have live access to recipient eligibility.<BR>This is NOT a guarantee of payment and should not replace your checking OHCA for eligibility (MIS checks twice a month).<BR>As with any data extract, things can happen so this should be more of an helpful indicator for providers, not something you rely on." HREF="/src/cgi/bin/mis.cgi?MIS_Action=DMHcm.pl&Provider_ProvID=${ProviderID}&Client_ClientID=$rClient->{ClientID}&InsNumIDs=$rInsurance->{InsIDNum}&mlt=$form->{mlt}" MYBUSY="Checking..." >Check DMH</button>&nbsp;<A HREF="javascript: ReportWindow('/src/cgi/bin/EBDMH.cgi?ClientID=$rClient->{ClientID}&InsNumID=$rInsurance->{InsIDNum}&FName=$rClient->{FName}&LName=$rClient->{LName}&mlt=$form->{mlt}','EBDMH',400,1200)" TITLE="Click to view last DMH Eligibility Report"  ><SPAN CLASS="subtitle" >Last DMH Eligibility check</SPAN></A> |
       : '';
 
     #warn qq|checkEB=${checkEB}\n|;
@@ -447,9 +447,9 @@ qq|$rClient->{FName} $rClient->{MName} $rClient->{LName} ($rClient->{ClientID})|
 ${UnitsPopup}
   <TR >
     <TD STYLE="background-color: ${StatusColor}" WIDTH="${HdrWidth}" ROWSPAN="3" >
-      <A HREF="/cgi/bin/mis.cgi?MIS_Action=Note&Client_ClientID=$rClient->{ClientID}&Treatment_TrID=new&${addLinks}" > <IMG BORDER="0" ALT="General Chart Entry" SRC="/images/facesicon.gif"> </A>
-      <A HREF="/cgi/bin/ChartList.cgi?Client_ClientID=$rClient->{ClientID}&SortType=NotReconciled&${addLinks}" > <IMG BORDER="0" HEIGHT="15" WIDTH="15" ALT="Chart List by Client" SRC="/images/clipboard.gif"> </A>
-      <A HREF="/cgi/bin/mis.cgi?view=ListClientJournals.cgi&Client_ClientID=$rClient->{ClientID}&${addLinks}"> <IMG ${jblink} BORDER="0" HEIGHT="15" WIDTH="15" ALT="Journal List by Client" SRC="/images/journal.gif"> </A>
+      <A HREF="/src/cgi/bin/mis.cgi?MIS_Action=Note&Client_ClientID=$rClient->{ClientID}&Treatment_TrID=new&${addLinks}" > <IMG BORDER="0" ALT="General Chart Entry" SRC="/images/facesicon.gif"> </A>
+      <A HREF="/src/cgi/bin/ChartList.cgi?Client_ClientID=$rClient->{ClientID}&SortType=NotReconciled&${addLinks}" > <IMG BORDER="0" HEIGHT="15" WIDTH="15" ALT="Chart List by Client" SRC="/images/clipboard.gif"> </A>
+      <A HREF="/src/cgi/bin/mis.cgi?view=ListClientJournals.cgi&Client_ClientID=$rClient->{ClientID}&${addLinks}"> <IMG ${jblink} BORDER="0" HEIGHT="15" WIDTH="15" ALT="Journal List by Client" SRC="/images/journal.gif"> </A>
       ${MedicareLink}
       ${ElecNotesLink}
       ${TFCNotesLink}

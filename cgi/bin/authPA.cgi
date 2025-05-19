@@ -129,7 +129,7 @@ function validate(form)
   return true;
 }
 </SCRIPT>
-<FORM NAME="submit" ACTION="/cgi/bin/authPA.cgi" METHOD="POST">
+<FORM NAME="submit" ACTION="/src/cgi/bin/authPA.cgi" METHOD="POST">
   <TABLE CLASS="home fullsize" >
     <TR><TD CLASS="hdrtxt" COLSPAN="2" >Please enter both Reason and Auth#</TD></TR>
     <TR>

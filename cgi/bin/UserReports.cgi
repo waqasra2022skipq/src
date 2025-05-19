@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!C:/Strawberry/perl/bin/perl.exe
 use lib 'C:/xampp/htdocs/src/lib';
 use DBI;
 use myForm;
@@ -68,7 +68,7 @@ my $html = myHTML->newHTML(
 <DIV CLASS="title" >Reports Window</DIV>
 ${Defns}
 <DIV ALIGN="center" > 
-  <FORM NAME="Reports" ACTION="/cgi/bin/GenReports.cgi" METHOD="POST" >
+  <FORM NAME="Reports" ACTION="/src/cgi/bin/GenReports.cgi" METHOD="POST" >
 
 |;
 my $AutoRun = $xtable eq 'xReports'

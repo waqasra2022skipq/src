@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!C:/Strawberry/perl/bin/perl.exe
 use lib 'C:/xampp/htdocs/src/lib';
 use myConfig;
 use Cwd;
@@ -63,8 +63,10 @@ qq|<INPUT TYPE="hidden" NAME="ActivityName" VALUE="$form->{ActivityName}" >|,
     'CronWeek' =>
       qq|<INPUT TYPE="hidden" NAME="CronWeek" VALUE="$form->{CronWeek}" >|,
 );
+
 my $dbh  = myDBI->dbconnect( $form->{'DBNAME'} );
 my $cdbh = myDBI->dbconnect('okmis_config');
+
 chdir("$form->{DOCROOT}/tmp");
 my $result  = '';
 my $xtable  = $form->{'xtable'} eq '' ? 'xReports' : $form->{'xtable'};
@@ -75,12 +77,12 @@ my $rxTable = $sxTable->fetchrow_hashref;
 ##foreach my $f ( sort keys %{$rxTable} ) { warn "GenReport: rxTable-$f=$rxTable->{$f}\n"; }
 if ( $rxTable->{Inputs} eq 'none' ) {
     my $cmd =
-qq|C:/xampp/htdocs/src/reports/$rxTable->{Script} DBNAME=$form->{DBNAME}\\&mlt=$form->{mlt}\\&hdrline=$form->{hdrline}\\&output=$form->{output}|;
+qq| /src/reports/$rxTable->{Script} DBNAME=$form->{DBNAME}\\&mlt=$form->{mlt}\\&hdrline=$form->{hdrline}\\&output=$form->{output}|;
     $result = main->runReport("${cmd}");
 }
 elsif ( $rxTable->{Inputs} eq 'shell' ) {
     my $cmd =
-qq|C:/xampp/htdocs/src/reports/$rxTable->{Script} $form->{$rxTable->{Args}} $form->{mlt}|;
+qq|C:/src/reports/$rxTable->{Script} $form->{$rxTable->{Args}} $form->{mlt}|;
     $result = main->runReport("${cmd}");
 }
 elsif ( $form->{report} || $form->{save} ) { $result = main->submit(); }
@@ -205,12 +207,12 @@ sub check {
       myHTML->newHTML( $form, $form->{'Name'},
         "checkinputwindow noclock countdown_10" )
       . qq|
-  <link rel="stylesheet" type="text/css" href="/cgi/jcal/calendar-forest.css" >
+  <link rel="stylesheet" type="text/css" href="/src/cgi/jcal/calendar-forest.css" >
   <link rel="stylesheet" type="text/css" href="/src/cgi/css/StyleYearMonth.css"> 
   <SCRIPT type="text/javascript" src="/src/cgi/js/ajaxrequest.js"></SCRIPT>
-  <script type="text/javascript" src="/cgi/jcal/calendar.js"></script>
-  <script type="text/javascript" src="/cgi/jcal/calendar-en.js"></script>
-  <script type="text/javascript" src="/cgi/jcal/calendar-setup.js"></script>
+  <script type="text/javascript" src="/src/cgi/jcal/calendar.js"></script>
+  <script type="text/javascript" src="/src/cgi/jcal/calendar-en.js"></script>
+  <script type="text/javascript" src="/src/cgi/jcal/calendar-setup.js"></script>
   <script type="text/javascript" src="/src/cgi/js/vDate.js"></script>
   <script type="text/javascript" src="/src/cgi/js/vTime.js"></script>
   <script type="text/javascript" src="/src/cgi/js/vNum.js"></script>
@@ -224,7 +226,7 @@ ${validation}
 </HEAD>
 <BODY >
 <P >$rxTable->{Descr}</P>
-<FORM NAME="$form->{Name}" ACTION="/cgi/bin/GenReport.cgi" METHOD="POST">
+<FORM NAME="$form->{Name}" ACTION="/src/cgi/bin/GenReport.cgi" METHOD="POST">
 ${askSection}
 <TABLE CLASS="home hdrcol" >
   <TR >
@@ -355,10 +357,10 @@ qq|<HTML lang="en" >\n<HEAD><TITLE>$form->{Name}</TITLE></HEAD>\n<BODY >|
 <HEAD>
   <meta charset="utf-8">
   <TITLE>$form->{Name}</TITLE>
-  <script type="text/javascript" src="/cgi/d3lib/d3.js"></script>
-  <link href="/cgi/d3lib/nv.d3.css" rel="stylesheet">
+  <script type="text/javascript" src="/src/cgi/d3lib/d3.js"></script>
+  <link href="/src/cgi/d3lib/nv.d3.css" rel="stylesheet">
   <script type="text/javascript" src="/cgi/d3lib/nv.d3.js"></script>
-  <link href="/cgi/d3lib/my.d3.css" rel="stylesheet">
+  <link href="/src/cgi/d3lib/my.d3.css" rel="stylesheet">
 </HEAD>
 <BODY > 
 ${out}
@@ -815,8 +817,8 @@ sub setCronTime {
 
 sub setOutput {
     my ($self) = @_;
-    my $html, $OutputTypes, $cnt = 0;
-    my $outhtml, $outss, $outpdf, $outfdf, $outgraph, $outtext;
+    my ($html, $OutputTypes, $cnt) = (undef, undef, 0);
+    my ($outhtml, $outss, $outpdf, $outfdf, $outgraph, $outtext);
     if    ( $form->{output} =~ /html/i )  { $outhtml  = 'CHECKED'; }
     elsif ( $form->{output} =~ /ss/i )    { $outss    = 'CHECKED'; }
     elsif ( $form->{output} =~ /pdf/i )   { $outpdf   = 'CHECKED'; }

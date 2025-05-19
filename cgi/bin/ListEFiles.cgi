@@ -81,7 +81,7 @@ sub gen835 {
     my $dir    = qq|/Provider/EFiles/835|;
     my $path   = $form->{'DOCROOT'} . $dir;
     my $out    = qq|
-<FORM NAME="ListEFiles" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="ListEFiles" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="home" >
   <TR > <TD CLASS="hdrtxt title" COLSPAN="5" >835 available files. ${UploadButton}</TD> </TR>
   <TR >

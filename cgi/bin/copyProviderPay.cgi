@@ -49,7 +49,7 @@ sub check {
 <HEAD> <TITLE>Mark Payroll as Paid</TITLE> </HEAD>
 <BODY >
 <H3>Mark Payroll as Paid</H3>
-<FORM NAME="submit" ACTION="/cgi/bin/markPaid.cgi" METHOD="POST">
+<FORM NAME="submit" ACTION="/src/cgi/bin/markPaid.cgi" METHOD="POST">
 <P>
 from file dated ${SDATE} @ ${STIME}
 <BR>(${Name} ${Type})
@@ -87,7 +87,7 @@ window.opener.location.href = window.opener.location.href;
 </HEAD>
 <BODY >
 <H3>Copy Payroll</H3>
-<FORM NAME="submit" ACTION="/cgi/bin/copyProviderPay.cgi" METHOD="POST">
+<FORM NAME="submit" ACTION="/src/cgi/bin/copyProviderPay.cgi" METHOD="POST">
 <P>${text}</P>
 <INPUT TYPE="button" NAME="cancel" VALUE="close" ONCLICK="javascript: window.close()" >
 </FORM>

@@ -111,7 +111,7 @@ qq|${rows} Client(s) List for: ${FName} ${LName} ${Gender} ${DOB}<BR>|;
             $cnt++;
             $list .=
 qq|$rClient->{'FName'} $rClient->{'LName'} $rClient->{'Gend'} $rClient->{'DOB'}
-             <button CLASS="confirmLINK" MYTEXT="Are you sure you want to LINK this xml to this client?<BR>If so, then click the OK button below. If NOT, click the Cancel button below." HREF="/cgi/bin/mis.cgi?MIS_Action=linkCCDA.cgi&Client_ClientID=$rClient->{'ClientID'}&link=1&IDs=$form->{'IDs'}&mlt=$form->{'mlt'}" MYBUSY="Linking..." >Link</button> $rClient->{'ClientID'}<BR>|;
+             <button CLASS="confirmLINK" MYTEXT="Are you sure you want to LINK this xml to this client?<BR>If so, then click the OK button below. If NOT, click the Cancel button below." HREF="/src/cgi/bin/mis.cgi?MIS_Action=linkCCDA.cgi&Client_ClientID=$rClient->{'ClientID'}&link=1&IDs=$form->{'IDs'}&mlt=$form->{'mlt'}" MYBUSY="Linking..." >Link</button> $rClient->{'ClientID'}<BR>|;
         }
         $sClient->finish();
     }
@@ -131,7 +131,7 @@ sub html {
       myHTML->newHTML( $form, 'Link CCDA',
         'CheckPopupWindow noclock countdown_10' )
       . qq|
-<FORM ID="form" NAME="linkCCDA" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM ID="form" NAME="linkCCDA" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
   <TABLE CLASS="main" >
     <TR> <TD CLASS="hdrcol title" >Link CCDA</TD> </TR>
   </TABLE>

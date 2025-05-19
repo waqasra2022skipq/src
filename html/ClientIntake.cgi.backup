@@ -15,13 +15,13 @@ function uspsWindow(newName,h,w)
   if (h==undefined) { h = '700'; }
   if (w==undefined) { w = '1000'; }
   var ws = "HEIGHT=" + h + ",WIDTH=" + w + ",SCROLLBARS=yes";
-  newURL="/cgi/bin/usps.pl?mlt=<<mlt>>&Tag=Address&Addr1="+document.Intake.Client_Addr1_1.value+"&Addr2="+document.Intake.Client_Addr2_1.value+"&City="+document.Intake.Client_City_1.value+"&State="+document.Intake.Client_ST_1.value+"&Zip="+document.Intake.Client_Zip_1.value;
+  newURL="/src/cgi/bin/usps.pl?mlt=<<mlt>>&Tag=Address&Addr1="+document.Intake.Client_Addr1_1.value+"&Addr2="+document.Intake.Client_Addr2_1.value+"&City="+document.Intake.Client_City_1.value+"&State="+document.Intake.Client_ST_1.value+"&Zip="+document.Intake.Client_Zip_1.value;
   PopupWindowObj = window.open(newURL,newName,ws);
   PopupWindowObj.focus();
 }
 </SCRIPT>
 
-<FORM NAME="Intake" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="Intake" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

@@ -7,7 +7,7 @@
 
 [[*SysAccess->verify(%form+Privilege=Agent)]]
 
-<FORM NAME="AgencyControl" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="AgencyControl" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

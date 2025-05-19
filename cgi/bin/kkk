@@ -56,7 +56,7 @@ my $html =
 <DIV CLASS="home title hdrcol" >
 ${desc}
 </DIV>
-<FORM NAME="adminFiles" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="adminFiles" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 ${UploadButton}
 | . main->listFiles( $type, $wildcard ) . qq|
 <INPUT TYPE="hidden" NAME="mlt" VALUE="$form->{mlt}" >

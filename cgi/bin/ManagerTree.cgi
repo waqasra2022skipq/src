@@ -337,7 +337,7 @@ qq| <A HREF="/src/cgi/bin/ProviderPage.cgi?Provider_ProvID=$r->{ListProvID}&${ad
               qq|/src/cgi/bin/ClientPage.cgi?Client_ClientID=${ClientID}&${addURL}|;
             $ClientTxt .= qq|
       ${BR}
-      <A HREF="/cgi/bin/mis.cgi?MIS_Action=Note&Client_ClientID=${ClientID}&Treatment_TrID=new&${addURL}" >
+      <A HREF="/src/cgi/bin/mis.cgi?MIS_Action=Note&Client_ClientID=${ClientID}&Treatment_TrID=new&${addURL}" >
         <IMG BORDER=0 ALT="General Chart Entry" SRC="/images/facesicon.gif">
       </A>
       <A HREF="${ChartList}?Client_ClientID=${ClientID}&SortType=NotReconciled&${addURL}" >

@@ -139,7 +139,7 @@ sub doHTML() {
     my $BackLinks = gHTML->setLINKS( $form, 'back' );
     print myHTML->newPage( $form, "Client Access" );
     print qq|
-<FORM NAME="ClientAccess" ACTION="/cgi/bin/ClientAccess.cgi" METHOD="POST" >
+<FORM NAME="ClientAccess" ACTION="/src/cgi/bin/ClientAccess.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

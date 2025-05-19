@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!C:/Strawberry/perl/bin/perl.exe
 use lib 'C:/xampp/htdocs/src/lib';
 use CGI qw(:standard escape);
 use DBI;
@@ -12,6 +12,7 @@ use gHTML;
 use cBill;
 use uBill;
 use Time::Local;
+
 
 ############################################################################
 #use Time::HiRes qw(time);
@@ -374,7 +375,7 @@ my $html = myHTML->new($form) . qq|
 | . myHTML->leftpane( $form, 'clock mail managertree collapseipad' ) . qq|
     <TD WIDTH="84%" ALIGN="center" >
 | . myHTML->hdr($form) . myHTML->menu($form) . qq|
-<FORM NAME="ChartList" ACTION="/cgi/bin/ChartList.cgi" METHOD="POST" >
+<FORM NAME="ChartList" ACTION="/src/cgi/bin/ChartList.cgi" METHOD="POST" >
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vChartList.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vNum.js"> </SCRIPT>
@@ -704,7 +705,7 @@ sub prtNote {
 
         #warn qq|ProviderID=$ProviderID=, LName=$r->{LName}=\n|;
         $ClientPageAcc = qq|
-      <A HREF="/cgi/bin/ClientPage.cgi?Client_ClientID=$r->{ClientID}&${addLinks}" TITLE="Click here for <BR>${Name}\'s Client Page <BR>(${TrIDProvider})" >$r->{LName}</A>
+      <A HREF="/src/cgi/bin/ClientPage.cgi?Client_ClientID=$r->{ClientID}&${addLinks}" TITLE="Click here for <BR>${Name}\'s Client Page <BR>(${TrIDProvider})" >$r->{LName}</A>
 |;
     }
     else {
@@ -1126,7 +1127,7 @@ sub adjTrans {
 sub setInsPaid {
     my ($self) = @_;
     my $html .= qq|
-<FORM NAME="Reconcile" ACTION="/cgi/bin/Reconcile.cgi" METHOD="POST" >
+<FORM NAME="Reconcile" ACTION="/src/cgi/bin/Reconcile.cgi" METHOD="POST" >
 <TABLE CLASS="port fullsize" >
   <TR ><TD COLSPAN="12" >Insurance Payments unreconciled (for notes listed above) ${ClientInsURL}<BR>Wait to apply these to a note until the note is billed/reconciled. If you apply a payment to a note it 'Reconciles' the note and then the note cannot be billed.</TD></TR>
 </TABLE>
@@ -1166,7 +1167,7 @@ sub setInsPaid {
         #warn qq|ClientKey=$ClientKey\n|;
         my ( $LName, $FName, $ClientID ) = split( '_', $ClientKey );
         my $ClientList =
-qq|<A HREF="/cgi/bin/ClientList.cgi?SearchType=ClientID&SearchString=${ClientID}&${addLinks}" ONMOUSEOVER="window.status='Client List this Client only'; return true;" ONMOUSEOUT="window.status='';" ><IMG BORDER=0 ALT="Client-List" SRC="/images/icon_folder.gif" ></A>|;
+qq|<A HREF="/src/cgi/bin/ClientList.cgi?SearchType=ClientID&SearchString=${ClientID}&${addLinks}" ONMOUSEOVER="window.status='Client List this Client only'; return true;" ONMOUSEOUT="window.status='';" ><IMG BORDER=0 ALT="Client-List" SRC="/images/icon_folder.gif" ></A>|;
 
         #warn qq|q=\n$qInsPaid\nClientID=$ClientID\n|;
         $sInsPaid->execute($ClientID);

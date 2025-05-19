@@ -37,7 +37,7 @@ qq|Client ${cnt}: [$rClient->{'ClientID'}] $rClient->{'FName'} $rClient->{'LName
       myHTML->newHTML( $form, 'Add Client',
         "CheckPopupWindow noclock countdown_1" )
       . qq|
-<FORM NAME="submit" ACTION="/cgi/bin/ImportCCDA.cgi" METHOD="POST">
+<FORM NAME="submit" ACTION="/src/cgi/bin/ImportCCDA.cgi" METHOD="POST">
   <DIV CLASS="blackonwhite" >
     <DIV CLASS="blackonwhite txtleft" >
       <div data-role="header" >
@@ -91,7 +91,7 @@ qq|Client ${cnt}: $rClient->{'FName'} $rClient->{'LName'}, $rClient->{'Addr1'}, 
         'CheckPopupWindow noclock countdown_1'
       )
       . qq|
-<FORM NAME="submit" ACTION="/cgi/bin/ImportCCDA.cgi" METHOD="POST">
+<FORM NAME="submit" ACTION="/src/cgi/bin/ImportCCDA.cgi" METHOD="POST">
   <DIV CLASS="blackonwhite" >
     <DIV CLASS="blackonwhite txtleft" >
       <div data-role="header" >

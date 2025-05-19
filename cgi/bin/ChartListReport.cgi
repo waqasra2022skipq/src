@@ -777,7 +777,7 @@ qq|<A HREF="javascript:ReportWindow('/src/cgi/bin/disHTML.cgi?${addLinks}&IDs=$r
     }
     my ( $NoteNmbrLink, $NotePrintLink, $NoteCCDALink ) = ( '', '', '' );
     $NoteNmbrLink =
-qq|<A HREF="/cgi/bin/mis.cgi?MIS_Action=Note&Client_ClientID=$r->{ClientID}&Treatment_TrID=$r->{TrID}&${addLinks}&pushID=$form->{LINKID}" TITLE="${TrIDMesg} <BR>Click here to <BR>Edit Note $r->{TrID}" >${NoteIMG}|;
+qq|<A HREF="/src/cgi/bin/mis.cgi?MIS_Action=Note&Client_ClientID=$r->{ClientID}&Treatment_TrID=$r->{TrID}&${addLinks}&pushID=$form->{LINKID}" TITLE="${TrIDMesg} <BR>Click here to <BR>Edit Note $r->{TrID}" >${NoteIMG}|;
     $NotePrintLink .=
 qq|<A HREF="javascript:ReportWindow('/src/cgi/bin/printNotes.pl?TrIDs=$r->{TrID}&${addLinks}','printNote')" TITLE="Click here to <BR>New print Note $r->{TrID} as pdf file." ><IMG SRC="/src/images/adobelogo_bt.gif" BORDER="0" HEIGHT="18" WIDTH="18" ></A>|;
     $NotePrintLink .=
@@ -1075,7 +1075,7 @@ sub adjTrans {
 sub setInsPaid {
     my ($self) = @_;
     my $html .= qq|
-<FORM NAME="Reconcile" ACTION="/cgi/bin/Reconcile.cgi" METHOD="POST" >
+<FORM NAME="Reconcile" ACTION="/src/cgi/bin/Reconcile.cgi" METHOD="POST" >
 <TABLE CLASS="port fullsize" >
   <TR ><TD COLSPAN="12" >Insurance Payments unreconciled (for notes listed above) ${ClientInsURL}<BR>Wait to apply these to a note until the note is billed/reconciled. If you apply a payment to a note it 'Reconciles' the note and then the note cannot be billed.</TD></TR>
 </TABLE>
@@ -1115,7 +1115,7 @@ sub setInsPaid {
         #warn qq|ClientKey=$ClientKey\n|;
         my ( $LName, $FName, $ClientID ) = split( '_', $ClientKey );
         my $ClientList =
-qq|<A HREF="/cgi/bin/ClientList.cgi?SearchType=ClientID&SearchString=${ClientID}&${addLinks}" ONMOUSEOVER="window.status='Client List this Client only'; return true;" ONMOUSEOUT="window.status='';" ><IMG BORDER=0 ALT="Client-List" SRC="/images/icon_folder.gif" ></A>|;
+qq|<A HREF="/src/cgi/bin/ClientList.cgi?SearchType=ClientID&SearchString=${ClientID}&${addLinks}" ONMOUSEOVER="window.status='Client List this Client only'; return true;" ONMOUSEOUT="window.status='';" ><IMG BORDER=0 ALT="Client-List" SRC="/images/icon_folder.gif" ></A>|;
 
         #warn qq|q=\n$qInsPaid\nClientID=$ClientID\n|;
         $sInsPaid->execute($ClientID);

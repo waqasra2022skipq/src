@@ -13,13 +13,13 @@ function uspsWindow(newName,h,w)
   if (h==undefined) { h = '700'; }
   if (w==undefined) { w = '1000'; }
   var ws = "HEIGHT=" + h + ",WIDTH=" + w + ",SCROLLBARS=yes";
-  newURL="/cgi/bin/usps.pl?mlt=<<mlt>>&Tag=Address&Addr1="+document.ClientFamily.GuardianHistory_Addr1_1.value+"&Addr2="+document.ClientFamily.GuardianHistory_Addr2_1.value+"&City="+document.ClientFamily.GuardianHistory_City_1.value+"&State="+document.ClientFamily.GuardianHistory_ST_1.value+"&Zip="+document.ClientFamily.GuardianHistory_Zip_1.value;
+  newURL="/src/cgi/bin/usps.pl?mlt=<<mlt>>&Tag=Address&Addr1="+document.ClientFamily.GuardianHistory_Addr1_1.value+"&Addr2="+document.ClientFamily.GuardianHistory_Addr2_1.value+"&City="+document.ClientFamily.GuardianHistory_City_1.value+"&State="+document.ClientFamily.GuardianHistory_ST_1.value+"&Zip="+document.ClientFamily.GuardianHistory_Zip_1.value;
   PopupWindowObj = window.open(newURL,newName,ws);
   PopupWindowObj.focus();
 }
 </SCRIPT>
 
-<FORM NAME="ClientFamily" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="ClientFamily" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

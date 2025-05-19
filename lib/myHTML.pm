@@ -285,9 +285,9 @@ button, html input[type=button], input[type=reset], input[type=submit] {
     {
 
       ${myAlert}
+      ${myClockONLOAD}
       ${reqLOAD}
       ${accordion}
-      ${myClockONLOAD}
       ${countdownONLOAD}
       ${myMedAlerts}
     }

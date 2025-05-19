@@ -156,7 +156,7 @@ function validate(form)
   return true;
 }
 </SCRIPT>
-<FORM NAME="submit" ACTION="/cgi/bin/adjNote.pl" METHOD="POST">
+<FORM NAME="submit" ACTION="/src/cgi/bin/adjNote.pl" METHOD="POST">
   <TABLE CLASS="home fullsize" >
     <TR><TD CLASS="hdrtxt" COLSPAN="2" >Please enter Amount and RefID</TD></TR>
     <TR>

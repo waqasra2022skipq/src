@@ -64,7 +64,7 @@
                 <b>Provider Reports</b>
                 <div>
       <A HREF="javascript:ReportWindow('/src/cgi/bin/UserReports.cgi?mlt=<<mlt>>&misLINKS=<<misLINKS>>','UserReports',900,1200)" ONMOUSEOVER="window.status='User Reports'; return true;" ONMOUSEOUT="window.status=''" >User Reports</A> <BR />
-      <A HREF="/cgi/bin/ListFiles.cgi?Type=RPT&mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='My Reports Print'; return true;" ONMOUSEOUT="window.status=''" >My Reports List</A> <BR />
+      <A HREF="/src/cgi/bin/ListFiles.cgi?Type=RPT&mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='My Reports Print'; return true;" ONMOUSEOUT="window.status=''" >My Reports List</A> <BR />
       [[SysAccess->verify(%form+Privilege=Graphs) <A HREF="javascript:ReportWindow('/src/cgi/bin/graphs.cgi?mlt=<<mlt>>&misLINKS=<<misLINKS>>','GraphReports',900,1000)" ONMOUSEOVER="window.status='Graph Reports'; return true;" ONMOUSEOUT="window.status=''" >Graph Controller</A> <BR /> ]]
             [[DBUtil->isEQ(<<LOGINPROVID>>+91) <A HREF="javascript:ReportWindow('/src/cgi/bin/stats.cgi?ClientID=53531&mlt=<<mlt>>&misLINKS=<<misLINKS>>','Statistics',900,1000)" ONMOUSEOVER="window.status='Statistics Reports'; return true;" ONMOUSEOUT="window.status=''" >Statistics Client 53531</A> <BR /> ]]
       [[SysAccess->verify(%form+Privilege=MUAgent)<A HREF="javascript:ReportWindow('/src/cgi/bin/UserReports.cgi?mlt=<<mlt>>&misLINKS=<<misLINKS>>&xtable=xAMSReports','AMSReports',900,1200)" ONMOUSEOVER="window.status='Access Monitoring System Reports (AMS)'; return true;" ONMOUSEOUT="window.status=''" >AMS Reports (Access Monitoring System)</A> <BR /> ]]

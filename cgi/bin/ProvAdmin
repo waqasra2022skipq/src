@@ -217,7 +217,7 @@ sub html {
       . qq|
 <LINK REL="STYLESHEET" TYPE="text/css" HREF="/cfg/mis.css" />
 <LINK REL="STYLESHEET" TYPE="text/css" HREF="/cfg/simplegrid.css" />
-<FORM NAME="submit" ACTION="/cgi/bin/setTriggers.cgi" METHOD="POST">
+<FORM NAME="submit" ACTION="/src/cgi/bin/setTriggers.cgi" METHOD="POST">
 <DIV CLASS="blackonwhite" >
 <div CLASS="blackonwhite txtleft" STYLE="overflow-y:scroll; overflow-x:hidden; height:200px;" >
 ${ppp}

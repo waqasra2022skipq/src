@@ -51,7 +51,7 @@ function validate(form)
                );
 }
 </SCRIPT>
-<FORM NAME="MISEmail" ACTION="/cgi/bin/ListMISEmails.cgi" METHOD="POST" >
+<FORM NAME="MISEmail" ACTION="/src/cgi/bin/ListMISEmails.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >
@@ -147,7 +147,7 @@ qq|Emails listed with a SentDate were sent Globally on that date. Those without 
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" >function validate(form) { return(1); }</SCRIPT>
 
-<FORM NAME="MISEmails" ACTION="/cgi/bin/ListMISEmails.cgi" METHOD="POST" >
+<FORM NAME="MISEmails" ACTION="/src/cgi/bin/ListMISEmails.cgi" METHOD="POST" >
 <DIV CLASS="main header" >Millennium Information Services Global Emails</DIV>
 <HR WIDTH="90%" >
 <TABLE CLASS="port fullsize" >

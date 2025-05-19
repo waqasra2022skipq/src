@@ -267,12 +267,12 @@ qq|  <TEXTAREA NAME="ProviderMail_Message_1" COLS=80 ROWS=18 WRAP="virtual" onFo
     <TD CLASS="hdrtxt" >
       <SCRIPT LANGUAGE="JavaScript">newtextMsg('DeleteMsg','Click here to DELETE this Mail Message.');</SCRIPT>
       Delete
-      <A HREF="/cgi/bin/ProviderMail.cgi?MIS_Action=delete&ProviderMail_ID=$MailID&mlt=$form->{mlt}&FORMID=$form->{FORMID}&showd=$form->{showd}" ONMOUSEOVER="textMsg.show('DeleteMsg');" ONMOUSEOUT="textMsg.hide()" ><IMG BORDER=0 ALT="" SRC="/images/redx.gif" ></A>
+      <A HREF="/src/cgi/bin/ProviderMail.cgi?MIS_Action=delete&ProviderMail_ID=$MailID&mlt=$form->{mlt}&FORMID=$form->{FORMID}&showd=$form->{showd}" ONMOUSEOVER="textMsg.show('DeleteMsg');" ONMOUSEOUT="textMsg.hide()" ><IMG BORDER=0 ALT="" SRC="/images/redx.gif" ></A>
     </TD>
     <TD CLASS="hdrtxt" >
       <SCRIPT LANGUAGE="JavaScript">newtextMsg('ForwardMsg','Click here to REPLY or FORWARD this Mail Message.');</SCRIPT>
       Reply
-      <A HREF="/cgi/bin/ProviderMail.cgi?MIS_Action=forward&ProviderMail_ID=$MailID&mlt=$form->{mlt}&FORMID=$form->{FORMID}&showd=$form->{showd}" ONMOUSEOVER="textMsg.show('ForwardMsg');" ONMOUSEOUT="textMsg.hide()" ><IMG BORDER=0 ALT="" SRC="/images/icon_go_right.gif" ></A>
+      <A HREF="/src/cgi/bin/ProviderMail.cgi?MIS_Action=forward&ProviderMail_ID=$MailID&mlt=$form->{mlt}&FORMID=$form->{FORMID}&showd=$form->{showd}" ONMOUSEOVER="textMsg.show('ForwardMsg');" ONMOUSEOUT="textMsg.hide()" ><IMG BORDER=0 ALT="" SRC="/images/icon_go_right.gif" ></A>
     </TD>
   </TR>
 </TABLE>
@@ -292,7 +292,7 @@ qq|  <TEXTAREA NAME="ProviderMail_Message_1" COLS=80 ROWS=18 WRAP="virtual" onFo
     }
 
     print myHTML->newPage( $form, "Send Mail" ) . qq|
-<FORM NAME="ProviderMail" ACTION="/cgi/bin/ProviderMail.cgi" METHOD="POST" >
+<FORM NAME="ProviderMail" ACTION="/src/cgi/bin/ProviderMail.cgi" METHOD="POST" >
 <HR WIDTH=90% >
 <TABLE CLASS="main fullsize" >
   <TR >
@@ -301,7 +301,7 @@ qq|  <TEXTAREA NAME="ProviderMail_Message_1" COLS=80 ROWS=18 WRAP="virtual" onFo
     </TD>
     <TD CLASS="numcol" >
       <SCRIPT LANGUAGE="JavaScript">newtextMsg('Cancel','Click here for your Mail Listing or to Cancel.');</SCRIPT>
-      <A HREF="/cgi/bin/ProviderMail.cgi?mlt=$form->{mlt}&showd=$form->{showd}" ONMOUSEOVER="textMsg.show('Cancel');" ONMOUSEOUT="textMsg.hide()" ><IMG BORDER=0 ALT="" SRC="/images/mailbox.gif" ></A>
+      <A HREF="/src/cgi/bin/ProviderMail.cgi?mlt=$form->{mlt}&showd=$form->{showd}" ONMOUSEOVER="textMsg.show('Cancel');" ONMOUSEOUT="textMsg.hide()" ><IMG BORDER=0 ALT="" SRC="/images/mailbox.gif" ></A>
     </TD>
   </TR>
 </TABLE>
@@ -356,14 +356,14 @@ sub ListMail {
 
     $form->{'FORMID'} = $form->getFORMID;
     print myHTML->newPage( $form, "Secure Mail" ) . qq|
-<FORM NAME="ProviderMail" ACTION="/cgi/bin/ProviderMail.cgi" METHOD="POST" >
+<FORM NAME="ProviderMail" ACTION="/src/cgi/bin/ProviderMail.cgi" METHOD="POST" >
 <HR WIDTH=90% >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >
       Secure Mail to Providers on Network<BR>for ${ProvName}
       <SCRIPT LANGUAGE="JavaScript">newtextMsg('NoMail','$NoMailTxt');</SCRIPT>
-      <A HREF="/cgi/bin/ProviderMail.cgi?MIS_Action=nomail&ProviderMail_ID=$rListMail->{ID}&mlt=$form->{mlt}&FORMID=$form->{FORMID}&showd=$form->{showd}" ONMOUSEOVER="textMsg.show('NoMail');" ONMOUSEOUT="textMsg.hide()" ><IMG BORDER=0 ALT="" SRC="$NoMailIMG" ></A>
+      <A HREF="/src/cgi/bin/ProviderMail.cgi?MIS_Action=nomail&ProviderMail_ID=$rListMail->{ID}&mlt=$form->{mlt}&FORMID=$form->{FORMID}&showd=$form->{showd}" ONMOUSEOVER="textMsg.show('NoMail');" ONMOUSEOUT="textMsg.hide()" ><IMG BORDER=0 ALT="" SRC="$NoMailIMG" ></A>
     </TD>
     <TD CLASS="numcol" >
       <INPUT TYPE="submit" NAME="MIS_Action=send" VALUE="New">
@@ -442,14 +442,14 @@ sub DisplayMail {
         print qq|
     <TD CLASS="port hdrtxt" >
       <SCRIPT LANGUAGE="JavaScript">newtextMsg('DeleteAll${Flag}Msg','Click here to DELETE ALL Mail Messages for the entire [${Flag}] section.\\nThis is a safety which still allows you to see the message in the delete section.');</SCRIPT>
-      <A HREF="/cgi/bin/ProviderMail.cgi?MIS_Action=delall&section=${Flag}&ProviderMail_ID=$rListMail->{ID}&mlt=$form->{mlt}&FORMID=$form->{FORMID}&showd=$form->{showd}" ONMOUSEOVER="textMsg.show('DeleteAll${Flag}Msg');" ONMOUSEOUT="textMsg.hide()" ><IMG BORDER=0 ALT="" SRC="/images/redx.gif" ></A>
+      <A HREF="/src/cgi/bin/ProviderMail.cgi?MIS_Action=delall&section=${Flag}&ProviderMail_ID=$rListMail->{ID}&mlt=$form->{mlt}&FORMID=$form->{FORMID}&showd=$form->{showd}" ONMOUSEOVER="textMsg.show('DeleteAll${Flag}Msg');" ONMOUSEOUT="textMsg.hide()" ><IMG BORDER=0 ALT="" SRC="/images/redx.gif" ></A>
     </TD>
 |;
     }
     print qq|
     <TD CLASS="port hdrtxt" >
       <SCRIPT LANGUAGE="JavaScript">newtextMsg('PurgeAll${Flag}Msg','Click here to PURGE ALL Mail Messages for the entire [${Flag}] section.\\nTHIS CANNOT BE UNDONE!\\nThe message is REMOVED!');</SCRIPT>
-      <A HREF="/cgi/bin/ProviderMail.cgi?MIS_Action=purall&section=${Flag}&ProviderMail_ID=$rListMail->{ID}&mlt=$form->{mlt}&FORMID=$form->{FORMID}&showd=$form->{showd}" ONMOUSEOVER="textMsg.show('PurgeAll${Flag}Msg');" ONMOUSEOUT="textMsg.hide()" ><IMG BORDER=0 ALT="" SRC="/images/redx.gif" ></A>
+      <A HREF="/src/cgi/bin/ProviderMail.cgi?MIS_Action=purall&section=${Flag}&ProviderMail_ID=$rListMail->{ID}&mlt=$form->{mlt}&FORMID=$form->{FORMID}&showd=$form->{showd}" ONMOUSEOVER="textMsg.show('PurgeAll${Flag}Msg');" ONMOUSEOUT="textMsg.hide()" ><IMG BORDER=0 ALT="" SRC="/images/redx.gif" ></A>
     </TD>
   </TR>|;
     my $cnt = 0;
@@ -476,11 +476,11 @@ qq|$Providers{$rListMail->{FromProvID}}{FName} $Providers{$rListMail->{FromProvI
     <TD CLASS="hdrcol" >$rListMail->{DateSent}</TD>
     <TD CLASS="hdrcol" >
       <SCRIPT LANGUAGE="JavaScript">newtextMsg('Read${Flag}Msg','Click here to READ this Mail Message.');</SCRIPT>
-      <A HREF="/cgi/bin/ProviderMail.cgi?MIS_Action=read&ProviderMail_ID=$rListMail->{ID}&mlt=$form->{mlt}&FORMID=$form->{FORMID}&showd=$form->{showd}" ONMOUSEOVER="textMsg.show('Read${Flag}Msg');" ONMOUSEOUT="textMsg.hide()" ><IMG BORDER=0 ALT="" SRC="/images/icon_go_left.gif" ></A>
+      <A HREF="/src/cgi/bin/ProviderMail.cgi?MIS_Action=read&ProviderMail_ID=$rListMail->{ID}&mlt=$form->{mlt}&FORMID=$form->{FORMID}&showd=$form->{showd}" ONMOUSEOVER="textMsg.show('Read${Flag}Msg');" ONMOUSEOUT="textMsg.hide()" ><IMG BORDER=0 ALT="" SRC="/images/icon_go_left.gif" ></A>
     </TD>
     <TD CLASS="hdrcol" >
       <SCRIPT LANGUAGE="JavaScript">newtextMsg('Forward${Flag}Msg','Click here to REPLY or FORWARD this Mail Message.');</SCRIPT>
-      <A HREF="/cgi/bin/ProviderMail.cgi?MIS_Action=forward&ProviderMail_ID=$rListMail->{ID}&mlt=$form->{mlt}&FORMID=$form->{FORMID}&showd=$form->{showd}" ONMOUSEOVER="textMsg.show('Forward${Flag}Msg');" ONMOUSEOUT="textMsg.hide()" ><IMG BORDER=0 ALT="" SRC="/images/icon_go_right.gif" ></A>
+      <A HREF="/src/cgi/bin/ProviderMail.cgi?MIS_Action=forward&ProviderMail_ID=$rListMail->{ID}&mlt=$form->{mlt}&FORMID=$form->{FORMID}&showd=$form->{showd}" ONMOUSEOVER="textMsg.show('Forward${Flag}Msg');" ONMOUSEOUT="textMsg.hide()" ><IMG BORDER=0 ALT="" SRC="/images/icon_go_right.gif" ></A>
     </TD>
 |;
         if ( $Flag eq 'deleted' ) {
@@ -488,7 +488,7 @@ qq|$Providers{$rListMail->{FromProvID}}{FName} $Providers{$rListMail->{FromProvI
     <TD CLASS="hdrcol" >&nbsp;</TD>
     <TD CLASS="hdrcol" >
       <SCRIPT LANGUAGE="JavaScript">newtextMsg('Purge${Flag}Msg','Click here to PURGE this Mail Message.\\nTHIS CANNOT BE UNDONE!\\nThe message is REMOVED!');</SCRIPT>
-      <A HREF="/cgi/bin/ProviderMail.cgi?MIS_Action=purge&ProviderMail_ID=$rListMail->{ID}&mlt=$form->{mlt}&FORMID=$form->{FORMID}&showd=$form->{showd}" ONMOUSEOVER="textMsg.show('Purge${Flag}Msg');" ONMOUSEOUT="textMsg.hide()" ><IMG BORDER=0 ALT="" SRC="/images/redx.gif" ></A>
+      <A HREF="/src/cgi/bin/ProviderMail.cgi?MIS_Action=purge&ProviderMail_ID=$rListMail->{ID}&mlt=$form->{mlt}&FORMID=$form->{FORMID}&showd=$form->{showd}" ONMOUSEOVER="textMsg.show('Purge${Flag}Msg');" ONMOUSEOUT="textMsg.hide()" ><IMG BORDER=0 ALT="" SRC="/images/redx.gif" ></A>
     </TD>
 |;
         }
@@ -496,11 +496,11 @@ qq|$Providers{$rListMail->{FromProvID}}{FName} $Providers{$rListMail->{FromProvI
             print qq|
     <TD CLASS="hdrcol""" >
       <SCRIPT LANGUAGE="JavaScript">newtextMsg('Delete${Flag}Msg','Click here to DELETE this Mail Message.\\nThis is a safety which still allows you to see the message in the delete section.');</SCRIPT>
-      <A HREF="/cgi/bin/ProviderMail.cgi?MIS_Action=delete&ProviderMail_ID=$rListMail->{ID}&mlt=$form->{mlt}&FORMID=$form->{FORMID}&showd=$form->{showd}" ONMOUSEOVER="textMsg.show('Delete${Flag}Msg');" ONMOUSEOUT="textMsg.hide()" ><IMG BORDER=0 ALT="" SRC="/images/redx.gif" ></A>
+      <A HREF="/src/cgi/bin/ProviderMail.cgi?MIS_Action=delete&ProviderMail_ID=$rListMail->{ID}&mlt=$form->{mlt}&FORMID=$form->{FORMID}&showd=$form->{showd}" ONMOUSEOVER="textMsg.show('Delete${Flag}Msg');" ONMOUSEOUT="textMsg.hide()" ><IMG BORDER=0 ALT="" SRC="/images/redx.gif" ></A>
     </TD>
     <TD CLASS="hdrcol" >
       <SCRIPT LANGUAGE="JavaScript">newtextMsg('Purge${Flag}Msg','Click here to PURGE this Mail Message.\\nTHIS CANNOT BE UNDONE!\\nThe message is REMOVED!');</SCRIPT>
-      <A HREF="/cgi/bin/ProviderMail.cgi?MIS_Action=purge&ProviderMail_ID=$rListMail->{ID}&mlt=$form->{mlt}&FORMID=$form->{FORMID}&showd=$form->{showd}" ONMOUSEOVER="textMsg.show('Purge${Flag}Msg');" ONMOUSEOUT="textMsg.hide()" ><IMG BORDER=0 ALT="" SRC="/images/redx.gif" ></A>
+      <A HREF="/src/cgi/bin/ProviderMail.cgi?MIS_Action=purge&ProviderMail_ID=$rListMail->{ID}&mlt=$form->{mlt}&FORMID=$form->{FORMID}&showd=$form->{showd}" ONMOUSEOVER="textMsg.show('Purge${Flag}Msg');" ONMOUSEOUT="textMsg.hide()" ><IMG BORDER=0 ALT="" SRC="/images/redx.gif" ></A>
     </TD>
 |;
         }

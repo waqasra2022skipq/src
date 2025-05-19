@@ -112,7 +112,7 @@ function validate(form)
 <TABLE CLASS="main" >
   <TR> <TD CLASS="hdrcol title" >Send CCDA</TD> </TR>
 </TABLE>
-<FORM NAME="EmailVisit" ACTION="/cgi/bin/sendCCDA.cgi" METHOD="POST" >
+<FORM NAME="EmailVisit" ACTION="/src/cgi/bin/sendCCDA.cgi" METHOD="POST" >
 <TABLE CLASS="home fullsize" >
   <TR>
     <TD CLASS="strcol" >
@@ -143,7 +143,7 @@ function validate(form)
 <INPUT TYPE="hidden" NAME="mlt" VALUE="$form->{mlt}">
 </FORM>
 
-<FORM NAME="EmailReferral" ACTION="/cgi/bin/sendCCDA.cgi" METHOD="POST" >
+<FORM NAME="EmailReferral" ACTION="/src/cgi/bin/sendCCDA.cgi" METHOD="POST" >
 <TABLE CLASS="home fullsize" >
   <TR>
     <TD CLASS="strcol" >

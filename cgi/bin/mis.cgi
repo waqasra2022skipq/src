@@ -43,7 +43,7 @@ my $LOGDIR      = myConfig->cfg('LOGDIR');
 
 ############################################################################
 ##
-# eg: <A HREF="/cgi/bin/mis.cgi?MIS_Action=action&id=${id}&mlt=$form->{mlt}&misLINKS=$form->{misLINKS}" >action<A>
+# eg: <A HREF="/src/cgi/bin/mis.cgi?MIS_Action=action&id=${id}&mlt=$form->{mlt}&misLINKS=$form->{misLINKS}" >action<A>
 # eg: <INPUT TYPE=submit NAME="UpdateTables=all&misPOP=1" VALUE="Add/Update" >
 ##
 

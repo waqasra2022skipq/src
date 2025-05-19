@@ -5,7 +5,7 @@
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vClientJournal.js"> </SCRIPT>
 
 JournalID=<<<ClientJournals_ID>>>
-<FORM NAME="Journal" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="Journal" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

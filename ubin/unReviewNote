@@ -1,16 +1,1 @@
-# used to unreview the note so ie: Chris could change a new note and review it again.
-#   need to fix the case where a note is entered before a TrPlan...no Objs checked
-#                                                               ...because none yet entered.
-select TrID,BillStatus,RevStatus,MgrProvID,MgrRevTime,ProvOKDate,ProvOKTime
- from Treatment
- where TrID=352951 or TrID=352948 or TrID=353262 or TrID=353267
-;
-# RevStatus=2 so Mgr is needed.
-update Treatment
- set RevStatus=2,MgrProvID=NULL,MgrRevDate=NULL,MgrRevTime=NULL
- where TrID=352951 or TrID=352948 or TrID=353262 or TrID=353267
-;
-select TrID,BillStatus,RevStatus,MgrProvID,MgrRevTime,ProvOKDate,ProvOKTime
- from Treatment
- where TrID=352951 or TrID=352948 or TrID=353262 or TrID=353267
-;
+update Treatment set RevStatus=2, MgrProvID=NULL, MgrRevDate=NULL, MgrRevTime=NULL where TrID=;

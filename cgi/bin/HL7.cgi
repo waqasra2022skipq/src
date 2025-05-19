@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!C:/Strawberry/perl/bin/perl.exe
 use lib 'C:/xampp/htdocs/src/lib';
 use DBI;
 use myForm;
@@ -60,7 +60,7 @@ window.opener.location.href = window.opener.location.href;
 </HEAD>
 <BODY >
 <H3>$rxHL7->{Tag}</H3>
-<FORM NAME="submit" ACTION="/cgi/bin/GenReport.cgi" METHOD="POST">
+<FORM NAME="submit" ACTION="/src/cgi/bin/GenReport.cgi" METHOD="POST">
 <P>${text}</P>
 <INPUT TYPE="button" NAME="cancel" VALUE="close" ONCLICK="javascript: window.close()" >
 </FORM>

@@ -49,7 +49,7 @@ function validate(form)
 <TABLE CLASS="main" >
   <TR> <TD CLASS="hdrcol title" >Edit ${table}-${ID}</TD> </TR>
 </TABLE>
-<FORM NAME="TableEdit" ACTION="/cgi/bin/mis.cgi" METHOD="POST">
+<FORM NAME="TableEdit" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST">
 <TABLE CLASS="home fullsize" >
 |;
 foreach my $f ( sort keys %{$r1} ) {

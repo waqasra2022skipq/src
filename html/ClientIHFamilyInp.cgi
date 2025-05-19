@@ -8,7 +8,7 @@
 <SCRIPT TYPE="text/javascript" SRC="/cgi/jquery/jquery-ui-1.11.2/jquery-ui.min.js" ></SCRIPT>
 <LINK HREF="/src/cgi/css/autocomplete.css?v=202008071708" REL="stylesheet">
 
-<FORM NAME="ClientFamily" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="ClientFamily" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

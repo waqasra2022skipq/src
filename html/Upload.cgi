@@ -1,34 +1,34 @@
-[[myHTML->newPage(%form+Provider Upload Electronic Document)]]
+[[myHTML->newHTML(%form+UPLOAD Document)]]
 
-<FORM NAME="Upload" METHOD="POST" ENCTYPE="multipart/form-data" ACTION="/cgi/bin/Upload.cgi" > 
+<FORM NAME="Upload" METHOD=POST ENCTYPE="multipart/form-data" ACTION="/cgi/bin/Upload.cgi?DocType=<<DocType>>" > 
+<TABLE CLASS="main fullsize" >
+  <TR >
+    <TD CLASS="strcol" >
+      <B><<DocType>> Document Upload</B>
+    </TD>
+  </TR>
+</TABLE>
+
+<HR WIDTH="90%" >
 <TABLE CLASS="port fullsize" >
   <TR >
-    <TD CLASS="hdrtxt" COLSPAN="2" ><B>Select Electronic Document to upload</B></TD>
-    <TD CLASS="numcol" >
+    <TD CLASS="port hdrtxt" COLSPAN="2" ><B>Select Electronic Document to upload</B></TD>
+    <TD CLASS="portsublink" >
       <INPUT TYPE="submit" NAME="Action" VALUE="Cancel">
     </TD>
   </TR>
-</TABLE >
+</TABLE>
 <TABLE CLASS="home fullsize" >
   <TR >
     <TD CLASS="strcol" >File: </TD>
     <TD CLASS="strcol" >
-      <INPUT TYPE="file" NAME="TheFile" size="55"> 
+      <INPUT TYPE="file" NAME="TheFile" style="border: solid 1px black" SIZE="55" >
       <INPUT TYPE="submit" NAME="Action" VALUE="Upload File"> 
     </TD>
   </TR>
 </TABLE>
-</DIV>
+<HR WIDTH="90%" >
 
 <INPUT TYPE="hidden" NAME="DocType" VALUE="<<DocType>>" >
-<INPUT TYPE="hidden" NAME="Provider_ProvID" VALUE="<<Provider_ProvID>>" >
-<INPUT TYPE="hidden" NAME="DocID" VALUE="<<ProviderEDocs_ID_1>>" >
-<INPUT TYPE="hidden" NAME="DocTitle" VALUE="<<ProviderEDocs_Title_1>>" >
-<INPUT TYPE="hidden" NAME="DocDescr" VALUE="<<ProviderEDocs_Descr_1>>" >
-<INPUT TYPE="hidden" NAME="DocTag" VALUE="<<ProviderEDocs_Type_1>>" >
-<INPUT TYPE="hidden" NAME="DocPath" VALUE="<<ProviderEDocs_Path_1>>" >
-<INPUT TYPE="hidden" NAME="DocLink" VALUE="<<ProviderEDocs_Link_1>>" >
 </LOADHIDDEN>
 </FORM>
-</BODY>
-</HTML>

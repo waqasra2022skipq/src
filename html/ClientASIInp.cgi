@@ -49,7 +49,7 @@ function setSP(form,id,fld)
 }
 </SCRIPT>
 
-<FORM NAME="ClientASI" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="ClientASI" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

@@ -46,7 +46,7 @@ qq|This report is not setup to run automatically. Do you wish to add it?|;
 <HEAD> <TITLE>$rxReports->{Descr}</TITLE> </HEAD>
 <BODY >
 <H3>$rxReports->{Descr}</H3>
-<FORM NAME="submit" ACTION="/cgi/bin/addProviderRpt.cgi" METHOD="POST">
+<FORM NAME="submit" ACTION="/src/cgi/bin/addProviderRpt.cgi" METHOD="POST">
 <P>${text}</P>
 <INPUT TYPE="submit" NAME="submit" VALUE="yes" >
 <INPUT TYPE="button" NAME="cancel" VALUE="forget it" ONCLICK="javascript: window.close()" >
@@ -87,7 +87,7 @@ window.opener.location.href = window.opener.location.href;
 </HEAD>
 <BODY >
 <H3>$rxReports->{Descr}</H3>
-<FORM NAME="submit" ACTION="/cgi/bin/addProviderRpt.cgi" METHOD="POST">
+<FORM NAME="submit" ACTION="/src/cgi/bin/addProviderRpt.cgi" METHOD="POST">
 <P>${text}</P>
 <INPUT TYPE="button" NAME="cancel" VALUE="close" ONCLICK="javascript: window.close()" >
 </FORM>
