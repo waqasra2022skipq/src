@@ -6,7 +6,7 @@
 
 [[*SysAccess->verify(%form+hasProviderAccess)]]
 
-<FORM NAME="Contracts" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="Contracts" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

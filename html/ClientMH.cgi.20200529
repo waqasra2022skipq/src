@@ -5,7 +5,7 @@
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vNum.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/qDate.js"> </SCRIPT>
 
-<FORM NAME="MH" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="MH" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >
@@ -46,7 +46,7 @@
       <INPUT TYPE=text NAME="MedHx_AttSuicideDate_1" VALUE="<<MedHx_AttSuicideDate_1>>" ONFOCUS="select()" ONCHANGE="qDate(this)" MAXLENGTH="10" SIZE="10" >
     </TD>
     <TD CLASS="strcol" >  
-	  <A HREF="/cgi/bin/mis.cgi?view=ListCSSRS.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>"><B><I>Complete Columbia Suicide Scale (C-SSRS)</I></B></A>
+	  <A HREF="/src/cgi/bin/mis.cgi?view=ListCSSRS.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>"><B><I>Complete Columbia Suicide Scale (C-SSRS)</I></B></A>
     </TD>
   </TR>
   <TR >

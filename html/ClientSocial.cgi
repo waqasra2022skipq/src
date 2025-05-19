@@ -4,7 +4,7 @@
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vClientSocial.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vNum.js"> </SCRIPT>
 
-<FORM NAME="Social" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="Social" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

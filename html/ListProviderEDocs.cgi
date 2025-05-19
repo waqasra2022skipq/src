@@ -3,7 +3,7 @@
 
 <SCRIPT LANGUAGE="JavaScript" src="/src/cgi/js/deleteFile.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/novalidate.js"> </SCRIPT>
-<FORM NAME="ListProviderEDocs" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="ListProviderEDocs" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

@@ -5,7 +5,7 @@
   <TR ><TD><B>Client Opioid Registry Document Upload</B></TD></TR>
 </TABLE>
 
-<FORM NAME="ClientOpioidRegistry" METHOD=POST ENCTYPE="multipart/form-data" ACTION="/cgi/bin/Upload.cgi?DocType=OpioidRegistry&Client_ClientID=<<<Client_ClientID>>>" > 
+<FORM NAME="ClientOpioidRegistry" METHOD=POST ENCTYPE="multipart/form-data" ACTION="/src/cgi/bin/Upload.cgi?DocType=OpioidRegistry&Client_ClientID=<<<Client_ClientID>>>" > 
 <HR >
 <TABLE CLASS="home fullsize" BORDER="0" CELLSPACING="0" CELLPADDING="2" >
   <TR >

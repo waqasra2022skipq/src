@@ -1435,7 +1435,7 @@ sub listPAStatus
            : '';
   my $button = $fail eq ''
              ?  SysAccess->chkPriv($form,'AuthRVUs') && $CDCOK && CDC->required($form,$InsID) && !$Locked && $Status ne 'Closed'
-               ? qq|<BR><button CLASS="confirmLINK" MYTEXT="Are you sure you want to send this Prior Authorization?<BR>If so, then click the OK button below. If NOT, click the Cancel button below." HREF="/cgi/bin/mis.cgi?${send}" MYBUSY="Sending..." >Send</button>|
+               ? qq|<BR><button CLASS="confirmLINK" MYTEXT="Are you sure you want to send this Prior Authorization?<BR>If so, then click the OK button below. If NOT, click the Cancel button below." HREF="/src/src/cgi/bin/mis.cgi?${send}" MYBUSY="Sending..." >Send</button>|
                : ''
              : $CDCOK
                ? qq|<BR><INPUT TYPE="submit" ONCLICK="return validate(this.form)" NAME="${view}" VALUE="Correct" >|
@@ -1511,7 +1511,7 @@ sub listDISStatus
 #warn qq|listDISStatus: AuthRVUs=|.SysAccess->chkPriv($form,'AuthRVUs')."\n";
   my $button = $fail eq ''
              ? SysAccess->chkPriv($form,'AuthRVUs') && $CDCOK && CDC->required($form,$InsID) && !$Locked && $Status ne 'Closed'
-               ? qq|<BR><button CLASS="confirmLINK" MYTEXT="Are you sure you want to send this Discharge?<BR>If so, then click the OK button below. If NOT, click the Cancel button below." HREF="/cgi/bin/mis.cgi?${send}" MYBUSY="Sending..." >Send</button>|
+               ? qq|<BR><button CLASS="confirmLINK" MYTEXT="Are you sure you want to send this Discharge?<BR>If so, then click the OK button below. If NOT, click the Cancel button below." HREF="/src/src/cgi/bin/mis.cgi?${send}" MYBUSY="Sending..." >Send</button>|
                : ''
              : $CDCOK
                ? qq|<BR><INPUT TYPE="submit" ONCLICK="return validate(this.form)" NAME="${view}" VALUE="Correct" >|

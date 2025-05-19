@@ -11,7 +11,7 @@ function validate(form)
 }
 </SCRIPT>
 
-<FORM NAME="vSSN" ONSUBMIT="return validate(this);" ACTION="/cgi/bin/vClient.cgi" METHOD="POST" >
+<FORM NAME="vSSN" ONSUBMIT="return validate(this);" ACTION="/src/cgi/bin/vClient.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

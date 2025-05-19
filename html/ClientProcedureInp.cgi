@@ -5,7 +5,7 @@
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vDate.js"> </SCRIPT>
 <SCRIPT type="text/javascript" src="/src/cgi/js/ajaxrequest.js"></SCRIPT>
 
-<FORM NAME="ClientProcedure" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="ClientProcedure" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

@@ -15,7 +15,7 @@ function uspsWindow(newName,h,w)
   if (h==undefined) { h = '700'; }
   if (w==undefined) { w = '1000'; }
   var ws = "HEIGHT=" + h + ",WIDTH=" + w + ",SCROLLBARS=yes";
-  newURL="/cgi/bin/usps.pl?mlt=<<mlt>>&Tag=Address&Addr1="+document.Provider.Provider_Addr1_1.value+"&Addr2="+Provider.Provider_Addr2_1.value+"&City="+Provider.Provider_City_1.value+"&State="+Provider.Provider_ST_1.value+"&Zip="+Provider.Provider_Zip_1.value;
+  newURL="/src/cgi/bin/usps.pl?mlt=<<mlt>>&Tag=Address&Addr1="+document.Provider.Provider_Addr1_1.value+"&Addr2="+Provider.Provider_Addr2_1.value+"&City="+Provider.Provider_City_1.value+"&State="+Provider.Provider_ST_1.value+"&Zip="+Provider.Provider_Zip_1.value;
   PopupWindowObj = window.open(newURL,newName,ws);
   PopupWindowObj.focus();
 }

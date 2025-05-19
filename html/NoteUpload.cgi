@@ -5,7 +5,7 @@
   <TR ><TD CLASS="main fullsize" ><B>Note Document Upload</B></TD></TR>
 </TABLE>
 
-<FORM NAME="NoteUpload" METHOD=POST ENCTYPE="multipart/form-data" ACTION="/cgi/bin/Upload.cgi?DocType=Note&Client_ClientID=<<<Client_ClientID>>>&Treatment_TrID=<<<Treatment_TrID>>>" > 
+<FORM NAME="NoteUpload" METHOD=POST ENCTYPE="multipart/form-data" ACTION="/src/cgi/bin/Upload.cgi?DocType=Note&Client_ClientID=<<<Client_ClientID>>>&Treatment_TrID=<<<Treatment_TrID>>>" > 
 <HR WIDTH=90% >
 <TABLE WIDTH="90%" BGCOLOR="white" BORDER="0" CELLSPACING="0" CELLPADDING="2" >
   <TR >

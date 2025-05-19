@@ -7,7 +7,7 @@
   <TR ><TD CLASS="main fullsize" ><B>ERA Document Upload</B></TD></TR>
 </TABLE>
 
-<FORM NAME="ERAUpload" METHOD=POST ENCTYPE="multipart/form-data" ACTION="/cgi/bin/Upload.cgi?DocType=ERA" > 
+<FORM NAME="ERAUpload" METHOD=POST ENCTYPE="multipart/form-data" ACTION="/src/cgi/bin/Upload.cgi?DocType=ERA" > 
 <HR WIDTH=90% >
 <TABLE WIDTH="90%" BGCOLOR="white" BORDER="0" CELLSPACING="0" CELLPADDING="2" >
   <TR >

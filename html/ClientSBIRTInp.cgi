@@ -6,7 +6,7 @@
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vDate.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vNum.js"> </SCRIPT>
 
-<FORM NAME="ClientSBIRT" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="ClientSBIRT" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

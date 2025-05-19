@@ -4,7 +4,7 @@
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vProviderEDocs.js"> </SCRIPT>
 
-<FORM NAME="ProviderEDocs" METHOD=POST ACTION="/cgi/bin/mis.cgi" > 
+<FORM NAME="ProviderEDocs" METHOD=POST ACTION="/src/cgi/bin/mis.cgi" > 
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

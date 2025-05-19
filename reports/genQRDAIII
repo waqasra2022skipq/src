@@ -111,7 +111,7 @@ qq|/cgi/bin/mis.cgi?view=ListExportFiles.cgi&Provider_ProvID=${ForProvID}&mlt=$f
 <TABLE CLASS="main" >
   <TR> <TD CLASS="hdrcol title" >Send QRDAIIIs</TD> </TR>
 </TABLE>
-<FORM NAME="QRDA" ACTION="/cgi/bin/sendQRDA.cgi" METHOD="POST" >
+<FORM NAME="QRDA" ACTION="/src/cgi/bin/sendQRDA.cgi" METHOD="POST" >
 <P CLASS="port hdrtxt heading" >Export Documents created as:<BR>Folder ${Folder}</P>
 <P CLASS="port hdrtxt title" >Close this window to navigate to your Export QRDA Documents screen.</P>
 <P CLASS="port hdrcol" >${result}</P>

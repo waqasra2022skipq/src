@@ -9,7 +9,7 @@ function validate(form) { return true; }
 </SCRIPT>
 </HEAD>
 <BODY>
-<FORM NAME="ClientReview" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="ClientReview" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

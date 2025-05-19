@@ -26,7 +26,7 @@ function initAutocomplete() {
 
 [[*SysAccess->verify(%form+Privilege=SiteAdmin)]]
 
-<FORM NAME="xInsurance" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="xInsurance" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

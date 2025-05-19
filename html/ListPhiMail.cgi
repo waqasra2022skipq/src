@@ -1,7 +1,7 @@
 [[myHTML->newPage(%form+PhiMail)]]
 
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/novalidate.js"> </SCRIPT>
-<FORM NAME="ListPhiMail" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="ListPhiMail" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

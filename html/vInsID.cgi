@@ -17,7 +17,7 @@ function setDate(form)
 }
 </SCRIPT>
 
-<FORM NAME="vInsID" ONSUBMIT="return validate(this);" ACTION="/cgi/bin/<<action>>.cgi" METHOD="POST" >
+<FORM NAME="vInsID" ONSUBMIT="return validate(this);" ACTION="/src/cgi/bin/<<action>>.cgi" METHOD="POST" >
 <DIV CLASS="main header" > <<title>> </DIV>
 <DIV CLASS="main header" ><INPUT TYPE="button" ONCLICK="window.close()" VALUE="Cancel / Close" ></DIV>
 <TABLE CLASS="home" >

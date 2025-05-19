@@ -28,7 +28,7 @@ function sPANum(Units,divid)
 } 
 </SCRIPT>
 
-<FORM NAME="PrAuthRVU" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="PrAuthRVU" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

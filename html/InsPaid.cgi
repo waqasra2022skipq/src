@@ -7,7 +7,7 @@
 
 [[*SysAccess->verify(%form+Privilege=CashTrans)]]
 
-<FORM NAME="InsPaid" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="InsPaid" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

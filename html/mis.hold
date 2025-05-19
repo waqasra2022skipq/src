@@ -34,23 +34,23 @@
                 <div>
       <A HREF="javascript:ReportWindow('/src/cgi/bin/TimeClock.cgi?mlt=<<mlt>>&misLINKS=<<misLINKS>>','TimeClock')" ONMOUSEOVER="window.status='Clock In/Out'; return true;" ONMOUSEOUT="window.status=''" >Clock In/Out</A> <BR />
       [[DBUtil->isNOTNULL(<<ShiftExecPath>>)<A TARGET="_shiftexec" HREF="<<ShiftExecPath>>/index.php" ONMOUSEOVER="window.status='ShiftExec'; return true;" ONMOUSEOUT="window.status=''" >Shift Schedule</A> <BR />]]
-      <A HREF="/cgi/bin/mis.cgi?Provider_ProvID=<<LOGINPROVID>>&view=ListReminders.cgi&mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='Reminders'; return true;" ONMOUSEOUT="window.status=''" >Set up Reminder</A> <BR />
+      <A HREF="/src/cgi/bin/mis.cgi?Provider_ProvID=<<LOGINPROVID>>&view=ListReminders.cgi&mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='Reminders'; return true;" ONMOUSEOUT="window.status=''" >Set up Reminder</A> <BR />
       [[DBUtil->isNOTNULL(<<SchedulerPath>>)<A TARGET="_scheduler" HREF="<<SchedulerPath>>/index.php" ONMOUSEOVER="window.status='Scheduler'; return true;" ONMOUSEOUT="window.status=''" >Patient Schedule</A> <BR />]]
-      [[SysAccess->verify(%form+Privilege=Agent)<A HREF="/cgi/bin/ListAppointments.cgi?mlt=<<mlt>>&misLINKS=<<misLINKS>>">Appointments List</A> <BR /> ]]
-      [[SysAccess->verify(%form+Privilege=SatSurveys)<A HREF="/cgi/bin/ListSurveys.cgi?mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='Surveys'; return true;" ONMOUSEOUT="window.status=''" >Satisfaction Surveys</A> <BR /> ]]
+      [[SysAccess->verify(%form+Privilege=Agent)<A HREF="/src/cgi/bin/ListAppointments.cgi?mlt=<<mlt>>&misLINKS=<<misLINKS>>">Appointments List</A> <BR /> ]]
+      [[SysAccess->verify(%form+Privilege=SatSurveys)<A HREF="/src/cgi/bin/ListSurveys.cgi?mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='Surveys'; return true;" ONMOUSEOUT="window.status=''" >Satisfaction Surveys</A> <BR /> ]]
                 </div>
             </div>
             <div class="left">
                 <b>Notes</b>
                 <div>
-      <A HREF="/cgi/bin/ChartList.cgi?Provider_ProvID=<<LOGINPROVID>>&SortType=NotBilled&mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='NotBilled Notes'; return true;" ONMOUSEOUT="window.status=''" >My Notes Not Billed</A> <BR />
-      <A HREF="/cgi/bin/ChartList.cgi?Provider_ProvID=<<LOGINPROVID>>&SortType=inprocess&mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='InProcess Notes'; return true;" ONMOUSEOUT="window.status=''" >My Notes InProcess</A> <BR />
-      <A HREF="/cgi/bin/ChartList.cgi?Provider_ProvID=<<LOGINPROVID>>&SortType=notreconciled&mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='NotReconciled Notes'; return true;" ONMOUSEOUT="window.status=''" >My Notes Not Reconciled</A> <BR />
-      [[SysAccess->verify(%form+Privilege=Notes2Print)<A HREF="/cgi/bin/ListFiles.cgi?Type=Notes&mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='Notes Print'; return true;" ONMOUSEOUT="window.status=''" >Notes Print Files (exp: 5/2017)</A> <BR /> ]]
-      [[SysAccess->verify(%form+Privilege=HCFA2Print)<A HREF="/cgi/bin/ListFiles.cgi?Type=HCFA&mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='HCFA Print'; return true;" ONMOUSEOUT="window.status=''" >HCFA 1500 Print Files</A> <BR /> ]]
-      [[SysAccess->verify(%form+Privilege=Invoices2Print)<A HREF="/cgi/bin/ListFiles.cgi?Type=INV&mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='Invoices Print'; return true;" ONMOUSEOUT="window.status=''" >Invoices Print Files</A> <BR /> ]]
-      [[SysAccess->verify(%form+Privilege=BillingRemit)<A HREF="/cgi/bin/ListFiles.cgi?Type=EBT&mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='Electronic Billing/Remit Files'; return true;" ONMOUSEOUT="window.status=''" >Electronic Billing/Remit Files</A> <BR /> ]]
-      [[SysAccess->verify(%form+Privilege=Elec2Send)<A HREF="/cgi/bin/ListFiles.cgi?Type=HIPPA&mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='Electronic'; return true;" ONMOUSEOUT="window.status=''" >Generated Electronic Billing Files</A> <BR /> ]]
+      <A HREF="/src/cgi/bin/ChartList.cgi?Provider_ProvID=<<LOGINPROVID>>&SortType=NotBilled&mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='NotBilled Notes'; return true;" ONMOUSEOUT="window.status=''" >My Notes Not Billed</A> <BR />
+      <A HREF="/src/cgi/bin/ChartList.cgi?Provider_ProvID=<<LOGINPROVID>>&SortType=inprocess&mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='InProcess Notes'; return true;" ONMOUSEOUT="window.status=''" >My Notes InProcess</A> <BR />
+      <A HREF="/src/cgi/bin/ChartList.cgi?Provider_ProvID=<<LOGINPROVID>>&SortType=notreconciled&mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='NotReconciled Notes'; return true;" ONMOUSEOUT="window.status=''" >My Notes Not Reconciled</A> <BR />
+      [[SysAccess->verify(%form+Privilege=Notes2Print)<A HREF="/src/cgi/bin/ListFiles.cgi?Type=Notes&mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='Notes Print'; return true;" ONMOUSEOUT="window.status=''" >Notes Print Files (exp: 5/2017)</A> <BR /> ]]
+      [[SysAccess->verify(%form+Privilege=HCFA2Print)<A HREF="/src/cgi/bin/ListFiles.cgi?Type=HCFA&mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='HCFA Print'; return true;" ONMOUSEOUT="window.status=''" >HCFA 1500 Print Files</A> <BR /> ]]
+      [[SysAccess->verify(%form+Privilege=Invoices2Print)<A HREF="/src/cgi/bin/ListFiles.cgi?Type=INV&mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='Invoices Print'; return true;" ONMOUSEOUT="window.status=''" >Invoices Print Files</A> <BR /> ]]
+      [[SysAccess->verify(%form+Privilege=BillingRemit)<A HREF="/src/cgi/bin/ListFiles.cgi?Type=EBT&mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='Electronic Billing/Remit Files'; return true;" ONMOUSEOUT="window.status=''" >Electronic Billing/Remit Files</A> <BR /> ]]
+      [[SysAccess->verify(%form+Privilege=Elec2Send)<A HREF="/src/cgi/bin/ListFiles.cgi?Type=HIPPA&mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='Electronic'; return true;" ONMOUSEOUT="window.status=''" >Generated Electronic Billing Files</A> <BR /> ]]
                 </div>
             </div>
             <div style='clear: both;'></div>
@@ -76,7 +76,7 @@
             <div class="left">
                 <b>Monthly Quarterly Reports</b>
                 <div>
-      <A HREF="/cgi/bin/ChartList.cgi?Provider_ProvID=<<LOGINPROVID>>&SortType=all&SortRange=l1m&mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='NotBilled Notes'; return true;" ONMOUSEOUT="window.status=''" >My Notes Last 30 Days</A> <BR />
+      <A HREF="/src/cgi/bin/ChartList.cgi?Provider_ProvID=<<LOGINPROVID>>&SortType=all&SortRange=l1m&mlt=<<mlt>>&misLINKS=<<misLINKS>>" ONMOUSEOVER="window.status='NotBilled Notes'; return true;" ONMOUSEOUT="window.status=''" >My Notes Last 30 Days</A> <BR />
       [[SysAccess->verify(%form+Privilege=BillingReports)<A HREF="javascript:ReportWindow('/src/cgi/bin/mis.cgi?view=Months.html&action=genCARS.cgi&Title=Monthly CARS&mlt=<<mlt>>','CARS')" ONMOUSEOVER="window.status='Monthly CARS'; return true;" ONMOUSEOUT="window.status=''" >Monthly CARS Report</A> <BR /> ]]
       [[SysAccess->verify(%form+Privilege=BillingReports)<A HREF="javascript:ReportWindow('/src/cgi/bin/sm.pl?heading=This report has been retired.&title=If needed please contact MIS Support&mlt=<<mlt>>','SM')" ONMOUSEOVER="window.status='Quarterly BHO'; return true;" ONMOUSEOUT="window.status=''" >Quarterly BHO Report</A> <BR /> ]]
       [[SysAccess->verify(%form+Privilege=BillingReports)<A HREF="javascript:ReportWindow('/src/cgi/bin/sm.pl?heading=This report has been retired.&title=If needed please contact MIS Support&mlt=<<mlt>>','BHO')" ONMOUSEOVER="window.status='Quarterly BHO'; return true;" ONMOUSEOUT="window.status=''" >Quarterly BHO Report (PDF)</A> <BR /> ]]
@@ -211,5 +211,5 @@ Web:    www.myhealthaccess.net<BR />
         </div>
     </li>
     <li class="separator"></li>
-    <li><A HREF="/cgi/bin/mis.cgi?logout=1&mlt=<<mlt>>" ONMOUSEOVER="window.status='Logout of MIS'; return true;" ONMOUSEOUT="window.status=''" >Logout</A></li>
+    <li><A HREF="/src/cgi/bin/mis.cgi?logout=1&mlt=<<mlt>>" ONMOUSEOVER="window.status='Logout of MIS'; return true;" ONMOUSEOUT="window.status=''" >Logout</A></li>
 </ul>

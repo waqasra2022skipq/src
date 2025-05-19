@@ -9,7 +9,7 @@
 <SCRIPT TYPE="text/javascript" src="/cgi/lhc/autocomplete-lhc-17.0.3/autocomplete-lhc.min.js"></SCRIPT>
 <LINK href='/cgi/lhc/autocomplete-lhc-17.0.3/autocomplete-lhc.min.css' REL="stylesheet">
 
-<FORM NAME="ClientProblems" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="ClientProblems" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <HR WIDTH="90%" >
 <TABLE CLASS="main fullsize" >
   <TR >

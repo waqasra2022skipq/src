@@ -2,7 +2,7 @@
 [[[DBForm->pushLINK()]]]
 
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/novalidate.js"> </SCRIPT>
-<FORM NAME="ListClientJournals" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="ListClientJournals" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 
 <TABLE CLASS="main fullsize" >
   <TR >

@@ -5,7 +5,7 @@
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vClientPHQ9.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vDate.js"> </SCRIPT>
 
-<FORM NAME="ClientPHQ9" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="ClientPHQ9" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

@@ -1,10 +1,10 @@
 <UL id="menuV2">
   <LI><A HREF="javascript:void(0)">Select</A>
     <UL CLASS="sub" >
-      <LI><A HREF="/cgi/bin/mis.cgi?view=ClientMU.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">PATIENT DEMOGRAPHICS</A></LI>
-      <LI><A HREF="/cgi/bin/mis.cgi?view=ClientMUA.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Allergies; Medications; Problems; Encounters; etc.</A></LI>
-      <LI><A HREF="/cgi/bin/mis.cgi?view=ClientMUB.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Health History Information</A></LI>
-      <LI><A HREF="/cgi/bin/mis.cgi?view=ClientMUO.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">OBSERVATIONS; Treatment History &amp; Visit Information</A></LI>
+      <LI><A HREF="/src/cgi/bin/mis.cgi?view=ClientMU.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">PATIENT DEMOGRAPHICS</A></LI>
+      <LI><A HREF="/src/cgi/bin/mis.cgi?view=ClientMUA.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Allergies; Medications; Problems; Encounters; etc.</A></LI>
+      <LI><A HREF="/src/cgi/bin/mis.cgi?view=ClientMUB.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Health History Information</A></LI>
+      <LI><A HREF="/src/cgi/bin/mis.cgi?view=ClientMUO.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">OBSERVATIONS; Treatment History &amp; Visit Information</A></LI>
     </UL>
   </LI>
 </UL>

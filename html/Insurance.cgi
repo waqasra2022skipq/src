@@ -35,7 +35,7 @@ function initAutocomplete() {
 <SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript" SRC="/src/cgi/js/tabs.js"></SCRIPT>
 <LINK REL="STYLESHEET" TYPE="text/css" HREF="/src/cgi/css/tabs.css" />
 <DIV ALIGN=center >
-<FORM NAME="Insurance" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="Insurance" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

@@ -2,7 +2,7 @@
 
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/novalidate.js"> </SCRIPT>
 
-<FORM NAME="PCL5" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="PCL5" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

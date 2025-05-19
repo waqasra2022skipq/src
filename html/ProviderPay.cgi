@@ -8,7 +8,7 @@
 
 [[*SysAccess->verify(%form+Privilege=ProviderPay)]]
 
-<FORM NAME="ProviderPay" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="ProviderPay" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

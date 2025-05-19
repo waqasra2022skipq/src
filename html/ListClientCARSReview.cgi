@@ -1,7 +1,7 @@
 [[myHTML->newPage(%form+CARS Review)]]
 
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/novalidate.js"> </SCRIPT>
-<FORM NAME="ClientCARSReview" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="ClientCARSReview" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

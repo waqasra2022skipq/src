@@ -4,7 +4,7 @@
 <SCRIPT TYPE="text/javascript" src="/cgi/lhc/autocomplete-lhc-17.0.3/autocomplete-lhc.min.js"></SCRIPT>
 <SCRIPT TYPE="text/javascript" SRC="/cgi/jquery/jquery-ui-1.12.1/jquery-ui.min.js" ></SCRIPT>
 <LINK HREF="/src/cgi/css/autocomplete.css?v=202008071708" REL="stylesheet">
-<FORM NAME="Intake" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="Intake" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

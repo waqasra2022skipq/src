@@ -14,7 +14,7 @@ function vDelete(form)
 }
 </SCRIPT>
 
-<FORM NAME="Meds" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="Meds" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

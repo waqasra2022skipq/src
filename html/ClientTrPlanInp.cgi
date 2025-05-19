@@ -7,7 +7,7 @@
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/mDate.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vDate.js"> </SCRIPT>
 
-<FORM NAME="ClientTrPlan" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="ClientTrPlan" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

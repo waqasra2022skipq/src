@@ -16,7 +16,7 @@ $locked = 0 if ( $form->{'LOGINPROVID'} == 91);
              : 'Are you sure you want to delete this entire record?';
   my $upd = $locked
      ? qq|    No Updates Allowed
-      <A HREF="/cgi/bin/mis.cgi?misPOP=1&mlt=$form->{mlt}&misLINKS=$form->{misLINKS}" ONMOUSEOVER="textMsg.show('BackUp');" ONMOUSEOUT="textMsg.hide()" ><IMG SRC="|.myConfig->cfgfile('undo_green.png',1).qq|" HEIGHT="30" WIDTH="40" BORDER="0" ></A>\n|
+      <A HREF="/src/cgi/bin/mis.cgi?misPOP=1&mlt=$form->{mlt}&misLINKS=$form->{misLINKS}" ONMOUSEOVER="textMsg.show('BackUp');" ONMOUSEOUT="textMsg.hide()" ><IMG SRC="|.myConfig->cfgfile('undo_green.png',1).qq|" HEIGHT="30" WIDTH="40" BORDER="0" ></A>\n|
      : qq|    <INPUT TYPE="submit" ONCLICK="return validate(this.form);" NAME="UpdateTables=all&misPOP=1" VALUE="Add/Update">|;
   my $add = '';
 # DELETE button??

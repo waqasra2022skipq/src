@@ -1,11 +1,11 @@
 <UL ID="menuV2">
-  [[DBUtil->isEQ(<<LOGINPROVID>>+91)<LI><A HREF="/cgi/bin/ManagePortal.cgi?mlt=<<mlt>>&misLINKS=<<misLINKS>>">Manage Portal</A></LI> ]]
+  [[DBUtil->isEQ(<<LOGINPROVID>>+91)<LI><A HREF="/src/cgi/bin/ManagePortal.cgi?mlt=<<mlt>>&misLINKS=<<misLINKS>>">Manage Portal</A></LI> ]]
   <LI class="separator"></LI>
   <LI><A HREF="javascript:void(0)" ONMOUSEOVER="window.status='Administration Menu'; return true;" ONMOUSEOUT="window.status=''" >Administration</A>
     <UL CLASS="sub" >
-      <LI><A HREF="/cgi/bin/ClientMail.cgi?Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Mail</A></LI>
+      <LI><A HREF="/src/cgi/bin/ClientMail.cgi?Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Mail</A></LI>
     </UL>
   </LI>
   <LI class="separator"></LI>
-  <LI><A HREF="/cgi/bin/mis.cgi?logout=1&mlt=<<mlt>>" ONMOUSEOVER="window.status='Logout of MIS'; return true;" ONMOUSEOUT="window.status=''" >Logout</A></LI>
+  <LI><A HREF="/src/cgi/bin/mis.cgi?logout=1&mlt=<<mlt>>" ONMOUSEOVER="window.status='Logout of MIS'; return true;" ONMOUSEOUT="window.status=''" >Logout</A></LI>
 </UL>

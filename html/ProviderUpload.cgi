@@ -1,6 +1,6 @@
 [[myHTML->newPage(%form+Provider Upload Electronic Document)]]
 
-<FORM NAME="ProviderUpload" METHOD=POST ENCTYPE="multipart/form-data" ACTION="/cgi/bin/Upload.cgi?DocType=Provider&Provider_ProvID=<<<Provider_ProvID>>>" > 
+<FORM NAME="ProviderUpload" METHOD=POST ENCTYPE="multipart/form-data" ACTION="/src/cgi/bin/Upload.cgi?DocType=Provider&Provider_ProvID=<<<Provider_ProvID>>>" > 
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

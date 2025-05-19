@@ -4,7 +4,7 @@
 
 [[*SysAccess->verify(%form+Privilege=OpioidRegistry)]]
 
-<FORM NAME="OpioidRegistry" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="OpioidRegistry" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

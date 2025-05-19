@@ -4,7 +4,7 @@
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vClientVaccines.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vDate.js"> </SCRIPT>
 
-<FORM NAME="ClientVaccines" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="ClientVaccines" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <HR WIDTH="90%" >
 <TABLE CLASS="main fullsize" >
   <TR >

@@ -5,7 +5,7 @@
   <TR ><TD CLASS="main fullsize" ><B>LOGO Upload</B></TD></TR>
 </TABLE>
 
-<FORM NAME="LOGOUpload" METHOD=POST ENCTYPE="multipart/form-data" ACTION="/cgi/bin/Upload.cgi?DocType=LOGO&Provider_ProvID=<<<Provider_ProvID>>>" > 
+<FORM NAME="LOGOUpload" METHOD=POST ENCTYPE="multipart/form-data" ACTION="/src/cgi/bin/Upload.cgi?DocType=LOGO&Provider_ProvID=<<<Provider_ProvID>>>" > 
 <HR WIDTH="90%" >
 <TABLE WIDTH="90%" BGCOLOR="white" BORDER="0" CELLSPACING="0" CELLPADDING="2" >
   <TR >

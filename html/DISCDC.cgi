@@ -10,7 +10,7 @@
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vTime.js" > </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vNum.js" > </SCRIPT>
 
-<FORM NAME="CDC" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="CDC" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

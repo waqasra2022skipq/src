@@ -248,7 +248,7 @@ sub leftpane
   if ( $lpflags =~ /managertree/i || $lpflags =~ /allleft/i )
   {
     $TreeLink = qq|
-      <A HREF="/cgi/bin/mis.cgi?MIS_Action=ManagerTree&mlt=$form->{mlt}" TITLE="Click here to return to the <BR><STRONG>MANAGERIAL TREE</STRONG>" >
+      <A HREF="/src/cgi/bin/mis.cgi?MIS_Action=ManagerTree&mlt=$form->{mlt}" TITLE="Click here to return to the <BR><STRONG>MANAGERIAL TREE</STRONG>" >
         <IMG ALT="tree" SRC="/cgi/images/tree.png" WIDTH="30" HEIGHT="30" >
       </A>|;
   }
@@ -265,7 +265,7 @@ sub leftpane
     if ( $Email eq '' ) { $MailMsg .= qq|<BR><FONT COLOR="red">Missing Email Address</FONT>|; $MailImg = '/img/mail-error.png'; }
     $MailLink = qq|
       <BR>
-      <A HREF="/cgi/bin/ProviderMail.cgi?mlt=$form->{mlt}" TITLE="Click here for you <BR><STRONG>MAIL LISTING</STRONG>" ><IMG ALT="your mail" SRC="${MailImg}" HEIGHT="40" WIDTH="40" >
+      <A HREF="/src/cgi/bin/ProviderMail.cgi?mlt=$form->{mlt}" TITLE="Click here for you <BR><STRONG>MAIL LISTING</STRONG>" ><IMG ALT="your mail" SRC="${MailImg}" HEIGHT="40" WIDTH="40" >
       </A>${MailMsg}|;
     $sProvider->finish();
     $sProviderMail->finish();
@@ -364,7 +364,7 @@ sub rightpane
     $msg .= qq|and Providers| if ( $ok );
     $msg .= qq|.|;
     $SearchLink .= qq|
-      <FORM NAME="Search" ACTION="/cgi/bin/Search.cgi" METHOD="POST">
+      <FORM NAME="Search" ACTION="/src/cgi/bin/Search.cgi" METHOD="POST">
       <DIV CLASS="main subtitle" >${msg}</DIV>
       <DIV CLASS="port subtitle hdrcol" >
         <A HREF="javascript:void(0)" TITLE="Enter search string into the text box.<BR>Then select the type of search needed by clicking on one of the radio buttons.<BR>wildcards such as John... may also be used except in the ID#." >
@@ -429,7 +429,7 @@ sub rightpane
   {
     $SearchLink = qq|
       <DIV CLASS="main hdrcol" >
-           <A HREF="/cgi/bin/mis.cgi?logout=1&mlt=$form->{mlt}" ONMOUSEOVER="ImgShow('logout')" ONMOUSEOUT="ImgHide()" ><IMG ALT="logout" NAME="logout" BORDER=0 SRC="/images/logout_hide.gif"></A>
+           <A HREF="/src/cgi/bin/mis.cgi?logout=1&mlt=$form->{mlt}" ONMOUSEOVER="ImgShow('logout')" ONMOUSEOUT="ImgHide()" ><IMG ALT="logout" NAME="logout" BORDER=0 SRC="/images/logout_hide.gif"></A>
         <BR>${SearchLink}
       </DIV>
       <SCRIPT LANGUAGE="JavaScript" >document.Search.elements[0].focus();</SCRIPT>

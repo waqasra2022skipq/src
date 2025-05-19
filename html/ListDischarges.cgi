@@ -3,7 +3,7 @@
 <SCRIPT LANGUAGE="JavaScript" >
 function validate(form) { return true; }
 </SCRIPT>
-<FORM NAME="ListDischarge" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="ListDischarge" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

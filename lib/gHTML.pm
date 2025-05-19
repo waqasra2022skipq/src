@@ -2629,14 +2629,14 @@ sub RestrictedProviderOptions {
     {
         my $root =
           SysAccess->chkPriv( $form, 'root' )
-          ? qq|      <LI><A HREF="/cgi/bin/mis.cgi?view=ListxTables.cgi&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}" ONMOUSEOVER="window.status='xTables'; return true;" ONMOUSEOUT="window.status=''" >xTables</A> <BR /></LI>|
+          ? qq|      <LI><A HREF="/src/cgi/bin/bin/mis.cgi?view=ListxTables.cgi&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}" ONMOUSEOVER="window.status='xTables'; return true;" ONMOUSEOUT="window.status=''" >xTables</A> <BR /></LI>|
           : '';
         $html .= qq|
   <LI><A HREF="javascript:void(0)">xTables</A>
     <UL CLASS="sub" >
-      <LI><A HREF="/cgi/bin/mis.cgi?view=ListInsurance.cgi&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}" ONMOUSEOVER="window.status='Insurance'; return true;" ONMOUSEOUT="window.status=''" >Insurance</A> <BR /></LI>
+      <LI><A HREF="/src/cgi/bin/bin/mis.cgi?view=ListInsurance.cgi&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}" ONMOUSEOVER="window.status='Insurance'; return true;" ONMOUSEOUT="window.status=''" >Insurance</A> <BR /></LI>
       ${root}
-      <LI><A HREF="/cgi/bin/mis.cgi?view=ListNS.cgi&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}" ONMOUSEOVER="window.status='NeedSkills'; return true;" ONMOUSEOUT="window.status=''" >NeedSkills</A> <BR /></LI>
+      <LI><A HREF="/src/cgi/bin/bin/mis.cgi?view=ListNS.cgi&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}" ONMOUSEOVER="window.status='NeedSkills'; return true;" ONMOUSEOUT="window.status=''" >NeedSkills</A> <BR /></LI>
     </Ul>
   </LI>
 |;
@@ -2647,7 +2647,7 @@ sub RestrictedProviderOptions {
             2 )    # looking at Agency type Provider record.
         {
             $html .= qq|
-  <LI><A HREF="/cgi/bin/mis.cgi?view=AgencyControl.cgi&Provider_ProvID=$form->{'Provider_ProvID'}&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}">Agency Control</A></LI>
+  <LI><A HREF="/src/cgi/bin/bin/mis.cgi?view=AgencyControl.cgi&Provider_ProvID=$form->{'Provider_ProvID'}&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}">Agency Control</A></LI>
 |;
         }
         if ( $form->{'LOGINPROVID'} ==

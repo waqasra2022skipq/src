@@ -1,122 +1,122 @@
 <ul id="menuV2">
-  [[SysAccess->verify(%form+Privilege=Agent)<LI><A HREF="/cgi/bin/mis.cgi?view=ClientMU.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Client Admit (MU)</A></LI> ]]
+  [[SysAccess->verify(%form+Privilege=Agent)<LI><A HREF="/src/cgi/bin/mis.cgi?view=ClientMU.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Client Admit (MU)</A></LI> ]]
   <LI><A HREF="javascript:void(0)">CARF Intake <BR> Client Information</A>
     <UL CLASS="sub" >
-      <LI><A HREF="/cgi/bin/mis.cgi?view=ClientIntake.cgi&Client_ClientID=<<Client_ClientID>>&Insurance_InsNumID=<<Insurance_InsNumID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">REFERRAL SOURCE/REASON &amp; IDENTIFING INFORMATION</A></LI>
-      <LI><A HREF="/cgi/bin/mis.cgi?view=ClientEmergency.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">EMERGENCY &amp; Health Care Information/Resources</A></LI>
-      <LI><A HREF="/cgi/bin/mis.cgi?view=ClientMHProblems.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">PRESENTING PROBLEM &amp; HISTORY OF PRESENTING PROBLEM</A></LI>
+      <LI><A HREF="/src/cgi/bin/mis.cgi?view=ClientIntake.cgi&Client_ClientID=<<Client_ClientID>>&Insurance_InsNumID=<<Insurance_InsNumID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">REFERRAL SOURCE/REASON &amp; IDENTIFING INFORMATION</A></LI>
+      <LI><A HREF="/src/cgi/bin/mis.cgi?view=ClientEmergency.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">EMERGENCY &amp; Health Care Information/Resources</A></LI>
+      <LI><A HREF="/src/cgi/bin/mis.cgi?view=ClientMHProblems.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">PRESENTING PROBLEM &amp; HISTORY OF PRESENTING PROBLEM</A></LI>
       <LI><A HREF="javascript:void(0)" ONMOUSEOVER="window.status='Health History Menu'; return true;" ONMOUSEOUT="window.status=''" >HEALTH HISTORY</A>
         <UL CLASS="sub" >
-          <LI><A HREF="/cgi/bin/mis.cgi?view=ClientHealthHistory.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Medical/physical history &amp; Current biomedical conditions/complications &amp; AT RISK BEHAVIORS including Sexual History,HIV/AIDS & STD &amp; Medication/Food Allergies &amp; Immunizations</A>
-          [[DBUtil->isEQ(<<LOGINPROVID>>+91)<LI><A HREF="/cgi/bin/mis.cgi?view=ListClientCDCHA.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Entered screen above (HealthAppraisal-ClientCDCHA)</A></LI> ]]
-          <LI><A HREF="/cgi/bin/mis.cgi?view=ListClientMeds.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">MEDICATIONS</A></LI>
-          <LI><A HREF="/cgi/bin/mis.cgi?view=ClientDevl.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">DEVELOPMENTAL HISTORY</A></LI>
+          <LI><A HREF="/src/cgi/bin/mis.cgi?view=ClientHealthHistory.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Medical/physical history &amp; Current biomedical conditions/complications &amp; AT RISK BEHAVIORS including Sexual History,HIV/AIDS & STD &amp; Medication/Food Allergies &amp; Immunizations</A>
+          [[DBUtil->isEQ(<<LOGINPROVID>>+91)<LI><A HREF="/src/cgi/bin/mis.cgi?view=ListClientCDCHA.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Entered screen above (HealthAppraisal-ClientCDCHA)</A></LI> ]]
+          <LI><A HREF="/src/cgi/bin/mis.cgi?view=ListClientMeds.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">MEDICATIONS</A></LI>
+          <LI><A HREF="/src/cgi/bin/mis.cgi?view=ClientDevl.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">DEVELOPMENTAL HISTORY</A></LI>
         </UL>
       </LI>
       <LI><A HREF="javascript:void(0)" ONMOUSEOVER="window.status='Health History Menu'; return true;" ONMOUSEOUT="window.status=''" >MENTAL HEALTH HISTORY</A>
         <UL CLASS="sub" >
-          <LI><A HREF="/cgi/bin/mis.cgi?view=ClientMH.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">MENTAL HEALTH HISTORY &amp; TREATMENTS</A></LI>
-          <LI><A HREF="/cgi/bin/mis.cgi?view=ClientSA.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">SUBSTANCE ABUSE &amp; TREATMENTS</A></LI>
-          [[SysAccess->verify(%form+Privilege=Agent)<LI><A HREF="/cgi/bin/mis.cgi?view=ClientGambling.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">GAMBLING</A></LI> ]]
-          <LI><A HREF="/cgi/bin/mis.cgi?view=ClientDV.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">TRAUMA &amp; Violence &amp; Domestic Violence &amp; Sexual</A></LI>
+          <LI><A HREF="/src/cgi/bin/mis.cgi?view=ClientMH.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">MENTAL HEALTH HISTORY &amp; TREATMENTS</A></LI>
+          <LI><A HREF="/src/cgi/bin/mis.cgi?view=ClientSA.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">SUBSTANCE ABUSE &amp; TREATMENTS</A></LI>
+          [[SysAccess->verify(%form+Privilege=Agent)<LI><A HREF="/src/cgi/bin/mis.cgi?view=ClientGambling.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">GAMBLING</A></LI> ]]
+          <LI><A HREF="/src/cgi/bin/mis.cgi?view=ClientDV.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">TRAUMA &amp; Violence &amp; Domestic Violence &amp; Sexual</A></LI>
         </UL>
       </LI>
       <LI><A HREF="javascript:void(0)" ONMOUSEOVER="window.status='Relationships Menu'; return true;" ONMOUSEOUT="window.status=''" >FAMILY HISTORY</A>
         <UL CLASS="sub" >
-          <LI><A HREF="/cgi/bin/mis.cgi?view=ClientFamilyRel.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Marital/Significant Other Relationship History &amp; Family Relationships &amp; Current Living Situation &amp; Other Persons Living In Home &amp; Usual Living Arrangement</A></LI>
+          <LI><A HREF="/src/cgi/bin/mis.cgi?view=ClientFamilyRel.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Marital/Significant Other Relationship History &amp; Family Relationships &amp; Current Living Situation &amp; Other Persons Living In Home &amp; Usual Living Arrangement</A></LI>
         </UL>
       </LI>
       <LI><A HREF="javascript:void(0)" ONMOUSEOVER="window.status='Relationships Menu'; return true;" ONMOUSEOUT="window.status=''" >SOCIAL</A>
         <UL CLASS="sub" >
-          <LI><A HREF="/cgi/bin/mis.cgi?view=ClientResources.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Income &amp; Caregiver/Client Resources, Issues, or Concerns About Meeting Basic Needs &amp; Current Support System</A></LI>
-          <LI><A HREF="/cgi/bin/mis.cgi?view=ClientLegal.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Legal &amp; Custody/Referral Type &amp; Legal History</A></LI>
-          <LI><A HREF="/cgi/bin/mis.cgi?view=ClientSocial.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Cultural/Religious Orientations &amp; Recreational/Leisure &amp; Present stressors &amp; Level of Social Functioning</A></LI>
+          <LI><A HREF="/src/cgi/bin/mis.cgi?view=ClientResources.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Income &amp; Caregiver/Client Resources, Issues, or Concerns About Meeting Basic Needs &amp; Current Support System</A></LI>
+          <LI><A HREF="/src/cgi/bin/mis.cgi?view=ClientLegal.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Legal &amp; Custody/Referral Type &amp; Legal History</A></LI>
+          <LI><A HREF="/src/cgi/bin/mis.cgi?view=ClientSocial.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Cultural/Religious Orientations &amp; Recreational/Leisure &amp; Present stressors &amp; Level of Social Functioning</A></LI>
         </UL>
       </LI>
-      <LI><A HREF="/cgi/bin/mis.cgi?view=ClientHistory.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">EDUCATIONAL HISTORY &amp; VOCATIONAL HISTORY &amp; CLIENT ISSUES</A></LI>
-      <LI><A HREF="/cgi/bin/mis.cgi?view=ClientMentalStatus.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">MENTAL STATUS</A></LI>
-      <LI><A HREF="/cgi/bin/mis.cgi?view=ClientIntSum.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">INTERPRETIVE SUMMARY &amp; LEVEL OF CARE &amp; SERVICE FOCUS &amp; SERVICES &amp; COLLABORATIVE REFERRALS</A></LI>
+      <LI><A HREF="/src/cgi/bin/mis.cgi?view=ClientHistory.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">EDUCATIONAL HISTORY &amp; VOCATIONAL HISTORY &amp; CLIENT ISSUES</A></LI>
+      <LI><A HREF="/src/cgi/bin/mis.cgi?view=ClientMentalStatus.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">MENTAL STATUS</A></LI>
+      <LI><A HREF="/src/cgi/bin/mis.cgi?view=ClientIntSum.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">INTERPRETIVE SUMMARY &amp; LEVEL OF CARE &amp; SERVICE FOCUS &amp; SERVICES &amp; COLLABORATIVE REFERRALS</A></LI>
     </UL>
   </LI>
   <LI><A HREF="javascript:void(0)" ONMOUSEOVER="window.status='Administration Menu'; return true;" ONMOUSEOUT="window.status=''" >Administration</A>
     <UL CLASS="sub" >
-      [[SysAccess->verify(%form+Privilege=NewClient)<LI><A HREF="/cgi/bin/mis.cgi?view=ListClientAdmits.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Admissions / Intakes</A></LI> ]]
-      [[SysAccess->verify(%form+Privilege=CashTrans)<LI><A HREF="/cgi/bin/ListInsPaid.cgi?Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Payments</A></LI> ]]
-      [[SysAccess->verify(%form+Privilege=Invoices2Print)<LI><A HREF="/cgi/bin/mis.cgi?view=ListInvoices.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Invoices</A></LI> ]]
-      [[SysAccess->verify(%form+Privilege=ClientEDocs)<LI><A HREF="/cgi/bin/mis.cgi?view=ListClientEDocs.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Electronic Docs</A></LI> ]]
-      [[SysAccess->verify(%form+Privilege=Discharge)<LI><A HREF="/cgi/bin/mis.cgi?view=ListDischarges.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Discharges</A></LI> ]]
-      [[DBUtil->isNOTNULL(<<ClientLegal_JOLTS_1>>)<LI><A HREF="/cgi/bin/mis.cgi?view=ListClientCARSReview.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">CARS Review</A></LI> ]]
+      [[SysAccess->verify(%form+Privilege=NewClient)<LI><A HREF="/src/cgi/bin/mis.cgi?view=ListClientAdmits.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Admissions / Intakes</A></LI> ]]
+      [[SysAccess->verify(%form+Privilege=CashTrans)<LI><A HREF="/src/cgi/bin/ListInsPaid.cgi?Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Payments</A></LI> ]]
+      [[SysAccess->verify(%form+Privilege=Invoices2Print)<LI><A HREF="/src/cgi/bin/mis.cgi?view=ListInvoices.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Invoices</A></LI> ]]
+      [[SysAccess->verify(%form+Privilege=ClientEDocs)<LI><A HREF="/src/cgi/bin/mis.cgi?view=ListClientEDocs.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Electronic Docs</A></LI> ]]
+      [[SysAccess->verify(%form+Privilege=Discharge)<LI><A HREF="/src/cgi/bin/mis.cgi?view=ListDischarges.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Discharges</A></LI> ]]
+      [[DBUtil->isNOTNULL(<<ClientLegal_JOLTS_1>>)<LI><A HREF="/src/cgi/bin/mis.cgi?view=ListClientCARSReview.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">CARS Review</A></LI> ]]
       [[DBUtil->isNOTNULL(<<ClientLegal_JOLTS_1>>)<LI><A HREF="javascript:ReportWindow('/src/cgi/bin/GenReport.cgi?Name=CARSTrSum&Type=cars&Client_ClientID=<<Client_ClientID>>=1&output=pdf&mlt=<<mlt>>&misLINKS=<<misLINKS>>','CARSReport')" >CARS Report</A></LI> ]]
-      [[SysAccess->verify(%form+Privilege=ClientReview)<LI><A HREF="/cgi/bin/mis.cgi?view=ListClientReview.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Client Reviews</A></LI> ]]
-      [[SysAccess->verify(%form+Privilege=Agent)<LI><A HREF="/cgi/bin/mis.cgi?view=ListImportCCDAs.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Import CCDA Documents</A></LI> ]]
+      [[SysAccess->verify(%form+Privilege=ClientReview)<LI><A HREF="/src/cgi/bin/mis.cgi?view=ListClientReview.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Client Reviews</A></LI> ]]
+      [[SysAccess->verify(%form+Privilege=Agent)<LI><A HREF="/src/cgi/bin/mis.cgi?view=ListImportCCDAs.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Import CCDA Documents</A></LI> ]]
     </UL>
   </LI>
-  [[NewCrop->hasRole(%form)<LI><A HREF="/cgi/bin/mis.cgi?view=ListClientMeds2.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">ONLINE MEDICATIONS/LABS</A></LI> ]]
-  <LI><A HREF="/cgi/bin/mis.cgi?view=ListClientFamily.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Family Members</A></LI>
-  <LI><A HREF="/cgi/bin/mis.cgi?view=ClientLegal.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Legal Status</A></LI>
+  [[NewCrop->hasRole(%form)<LI><A HREF="/src/cgi/bin/mis.cgi?view=ListClientMeds2.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">ONLINE MEDICATIONS/LABS</A></LI> ]]
+  <LI><A HREF="/src/cgi/bin/mis.cgi?view=ListClientFamily.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Family Members</A></LI>
+  <LI><A HREF="/src/cgi/bin/mis.cgi?view=ClientLegal.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Legal Status</A></LI>
   <LI><A HREF="javascript:void(0)" ONMOUSEOVER="window.status='Testing Menu'; return true;" ONMOUSEOUT="window.status=''" >Testing</A>
     <UL CLASS="sub" >
       <LI><A HREF="javascript:void(0)" ONMOUSEOVER="window.status='SA Menu'; return true;" ONMOUSEOUT="window.status=''" >Gambling</A>
         <UL CLASS="sub" >
-          <LI><A HREF="/cgi/bin/mis.cgi?view=ListDCGD.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">DSM5 Diagnostic Criteria: Gambling Disorder</A></LI>
-          <LI><A HREF="/cgi/bin/mis.cgi?view=ListSOGS.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>"><U>S</U>outh <U>O</U>aks <U>G</U>ambling <U>S</U>creening</A></LI>
-          <LI><A HREF="/cgi/bin/mis.cgi?view=ListSOGSGSI.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>"><U>S</U>outh <U>O</U>aks <U>G</U>ambling <U>S</U>creening GSI (old)</A></LI>
+          <LI><A HREF="/src/cgi/bin/mis.cgi?view=ListDCGD.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">DSM5 Diagnostic Criteria: Gambling Disorder</A></LI>
+          <LI><A HREF="/src/cgi/bin/mis.cgi?view=ListSOGS.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>"><U>S</U>outh <U>O</U>aks <U>G</U>ambling <U>S</U>creening</A></LI>
+          <LI><A HREF="/src/cgi/bin/mis.cgi?view=ListSOGSGSI.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>"><U>S</U>outh <U>O</U>aks <U>G</U>ambling <U>S</U>creening GSI (old)</A></LI>
         </UL>
       </LI>
       <LI><A HREF="javascript:void(0)" ONMOUSEOVER="window.status='SA Menu'; return true;" ONMOUSEOUT="window.status=''" >Mental Health</A>
         <UL CLASS="sub" >
-          <LI><A HREF="/cgi/bin/mis.cgi?view=ListClientBasis32.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Behavior & Symptom ID Scale (BASIS 32)</A></LI>
-          <LI><A HREF="/cgi/bin/mis.cgi?view=ListClientMHSF.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Mental Health Screening Form-III FY15</A></LI>
+          <LI><A HREF="/src/cgi/bin/mis.cgi?view=ListClientBasis32.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Behavior & Symptom ID Scale (BASIS 32)</A></LI>
+          <LI><A HREF="/src/cgi/bin/mis.cgi?view=ListClientMHSF.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Mental Health Screening Form-III FY15</A></LI>
           <LI><A HREF="javascript:void(0)" ONMOUSEOVER="window.status='SA Menu'; return true;" ONMOUSEOUT="window.status=''" >Depression</A>
             <UL CLASS="sub" >
-              [[DBUtil->isGTE(<<Client_Age>>+60)<LI><A HREF="/cgi/bin/mis.cgi?view=ListClientGDS.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Geriatric Depression Scale</A></LI> ]]
-              <LI><A HREF="/cgi/bin/mis.cgi?view=ListSADS.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Somatic Anxiety and Depressive Symptoms</A></LI>
-              <LI><A HREF="/cgi/bin/mis.cgi?view=ListClientSMFQ.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Short Mood and Feeling Questionnaire</A></LI>
+              [[DBUtil->isGTE(<<Client_Age>>+60)<LI><A HREF="/src/cgi/bin/mis.cgi?view=ListClientGDS.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Geriatric Depression Scale</A></LI> ]]
+              <LI><A HREF="/src/cgi/bin/mis.cgi?view=ListSADS.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Somatic Anxiety and Depressive Symptoms</A></LI>
+              <LI><A HREF="/src/cgi/bin/mis.cgi?view=ListClientSMFQ.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Short Mood and Feeling Questionnaire</A></LI>
             </UL>
           <LI>
           <LI><A HREF="javascript:void(0)" ONMOUSEOVER="window.status='SA Menu'; return true;" ONMOUSEOUT="window.status=''" >Anxiety</A>
             <UL CLASS="sub" >
-              <LI><A HREF="/cgi/bin/mis.cgi?view=ListGAD7.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Generalized Anxiety Disorder - 7</A></LI>
-              <LI><A HREF="/cgi/bin/mis.cgi?view=ListSADS.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Somatic Anxiety and Depressive Symptoms</A></LI>
+              <LI><A HREF="/src/cgi/bin/mis.cgi?view=ListGAD7.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Generalized Anxiety Disorder - 7</A></LI>
+              <LI><A HREF="/src/cgi/bin/mis.cgi?view=ListSADS.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Somatic Anxiety and Depressive Symptoms</A></LI>
             </UL>
           <LI>
           <LI><A HREF="javascript:void(0)" ONMOUSEOVER="window.status='SA Menu'; return true;" ONMOUSEOUT="window.status=''" >PTSD</A>
             <UL CLASS="sub" ></UL>
           <LI>
-          <LI><A HREF="/cgi/bin/mis.cgi?view=ListCANS.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">CANS-MH</A></LI>
+          <LI><A HREF="/src/cgi/bin/mis.cgi?view=ListCANS.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">CANS-MH</A></LI>
         </UL>
       </LI>
       <LI><A HREF="javascript:void(0)" ONMOUSEOVER="window.status='SA Menu'; return true;" ONMOUSEOUT="window.status=''" >Suicide</A>
         <UL CLASS="sub" >
-          <LI><A HREF="/cgi/bin/mis.cgi?view=ListCSSRS.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">C-SSRS</A></LI>
+          <LI><A HREF="/src/cgi/bin/mis.cgi?view=ListCSSRS.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">C-SSRS</A></LI>
         </UL>
       <LI>
-      <LI><A HREF="/cgi/bin/mis.cgi?view=ListClientPHQ.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Patient Health Questionnaires</A></LI>
+      <LI><A HREF="/src/cgi/bin/mis.cgi?view=ListClientPHQ.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Patient Health Questionnaires</A></LI>
       <LI><A HREF="javascript:void(0)" ONMOUSEOVER="window.status='SA Menu'; return true;" ONMOUSEOUT="window.status=''" >Substance Abuse</A>
         <UL CLASS="sub" >
-          <LI><A HREF="/cgi/bin/mis.cgi?view=ListClientASI.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>"><U>A</U>ddiction <U>S</U>everity <U>I</U>ndex</A></LI>
-          <LI><A HREF="/cgi/bin/mis.cgi?view=ListClientTASI.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>"><U>T</U>een <U>A</U>ddiction <U>S</U>everity <U>I</U>ndex</A></LI>
-          <LI><A HREF="/cgi/bin/mis.cgi?view=ListClientSATobacco.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>"><U>S</U>ubstance <U>A</U>buse <U>T</U>obacco</A></LI>
-          <LI><A HREF="/cgi/bin/mis.cgi?view=ListClientASAM.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">American Society of Addiction Medicine (ASAM)</A></LI>
-          <LI><A HREF="/cgi/bin/mis.cgi?view=ListODAS.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Oklahoma Determination of ASAM Service Level</A></LI>
-          <LI><A HREF="/cgi/bin/mis.cgi?view=ListTCUDS.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">TCU Drug Screen V</A></LI>
-          <LI><A HREF="/cgi/bin/mis.cgi?view=ListSBIRT.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">SBIRT</A></LI>
-          <LI><A HREF="/cgi/bin/mis.cgi?view=ListCRAFFT.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">CRAFFT Substance-Related Risks and Problems in Adolescents</A></LI>
-          <LI><A HREF="/cgi/bin/mis.cgi?view=ListAUDIT.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">AUDIT (Alcohol Use Disorders Identification Test)</A></LI>
-          [[DBUtil->isEQSTR(<<DBNAME>>+okmis_cti)<LI><A HREF="/cgi/bin/mis.cgi?view=ListClientOOWS.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Objective Opioid Withdrawal Scale (OOWS)</A></LI> ]]
+          <LI><A HREF="/src/cgi/bin/mis.cgi?view=ListClientASI.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>"><U>A</U>ddiction <U>S</U>everity <U>I</U>ndex</A></LI>
+          <LI><A HREF="/src/cgi/bin/mis.cgi?view=ListClientTASI.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>"><U>T</U>een <U>A</U>ddiction <U>S</U>everity <U>I</U>ndex</A></LI>
+          <LI><A HREF="/src/cgi/bin/mis.cgi?view=ListClientSATobacco.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>"><U>S</U>ubstance <U>A</U>buse <U>T</U>obacco</A></LI>
+          <LI><A HREF="/src/cgi/bin/mis.cgi?view=ListClientASAM.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">American Society of Addiction Medicine (ASAM)</A></LI>
+          <LI><A HREF="/src/cgi/bin/mis.cgi?view=ListODAS.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Oklahoma Determination of ASAM Service Level</A></LI>
+          <LI><A HREF="/src/cgi/bin/mis.cgi?view=ListTCUDS.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">TCU Drug Screen V</A></LI>
+          <LI><A HREF="/src/cgi/bin/mis.cgi?view=ListSBIRT.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">SBIRT</A></LI>
+          <LI><A HREF="/src/cgi/bin/mis.cgi?view=ListCRAFFT.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">CRAFFT Substance-Related Risks and Problems in Adolescents</A></LI>
+          <LI><A HREF="/src/cgi/bin/mis.cgi?view=ListAUDIT.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">AUDIT (Alcohol Use Disorders Identification Test)</A></LI>
+          [[DBUtil->isEQSTR(<<DBNAME>>+okmis_cti)<LI><A HREF="/src/cgi/bin/mis.cgi?view=ListClientOOWS.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Objective Opioid Withdrawal Scale (OOWS)</A></LI> ]]
         </UL>
       </LI>
       <LI><A HREF="javascript:void(0)" ONMOUSEOVER="window.status='SA Menu'; return true;" ONMOUSEOUT="window.status=''" >Trauma</A>
         <UL CLASS="sub" >
-          <LI><A HREF="/cgi/bin/mis.cgi?view=ListPCL5.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">PTSD Checklist for DSM-5</A></LI>
-          <LI><A HREF="/cgi/bin/mis.cgi?view=ListCATS.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Child and Adolescent Trauma Screen (CATS)</A></LI>
-          <LI><A HREF="/cgi/bin/mis.cgi?view=ListPCLC.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Abbreviated PCL-C</A></LI>
-          <LI><A HREF="/cgi/bin/mis.cgi?view=ListClientACE.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Adverse Childhood Experience (ACE)</A></LI>
+          <LI><A HREF="/src/cgi/bin/mis.cgi?view=ListPCL5.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">PTSD Checklist for DSM-5</A></LI>
+          <LI><A HREF="/src/cgi/bin/mis.cgi?view=ListCATS.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Child and Adolescent Trauma Screen (CATS)</A></LI>
+          <LI><A HREF="/src/cgi/bin/mis.cgi?view=ListPCLC.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Abbreviated PCL-C</A></LI>
+          <LI><A HREF="/src/cgi/bin/mis.cgi?view=ListClientACE.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Adverse Childhood Experience (ACE)</A></LI>
         </UL>
       </LI>
       <LI><A HREF="javascript:void(0)" ONMOUSEOVER="window.status='Labs Menu'; return true;" ONMOUSEOUT="window.status=''" >Labs</A>
         <UL CLASS="sub" >
-          <LI><A HREF="/cgi/bin/mis.cgi?view=ListClientLabs.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Lab Results</A></LI>
+          <LI><A HREF="/src/cgi/bin/mis.cgi?view=ListClientLabs.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Lab Results</A></LI>
           [[NewCrop->hasRole(%form)<LI><A HREF="javascript:ScreenWindow('/src/cgi/bin/NewCrop.cgi?ClientID=<<Client_ClientID>>&requestedPage=lab-orders&mlt=<<mlt>>&misLINKS=<<misLINKS>>','labs')" >Update Online LABS</A></LI> ]]
         </UL>
       </LI>
@@ -124,17 +124,17 @@
   </LI>
   <LI><A HREF="javascript:void(0)" ONMOUSEOVER="window.status='Procedures Menu'; return true;" ONMOUSEOUT="window.status=''" >Measures and<BR>Procedures</A>
     <UL CLASS="sub" >
-      <LI><A HREF="/cgi/bin/mis.cgi?view=ListClientVitalSigns.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Vital Signs</A></LI>
-      <LI><A HREF="/cgi/bin/mis.cgi?view=ListClientVaccines.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Immunizations / Vaccines</A></LI>
-      <LI><A HREF="/cgi/bin/mis.cgi?view=ListClientRiskAssessment.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Risk Assessment</A></LI>
-      <LI><A HREF="/cgi/bin/mis.cgi?view=ListClientInterventionsOrdered.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Interventions Ordered</A></LI>
-      <LI><A HREF="/cgi/bin/mis.cgi?view=ListClientInterventionsPerformed.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Interventions Performed</A></LI>
-      <LI><A HREF="/cgi/bin/mis.cgi?view=ListClientProcedures.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Medical Procedures</A></LI>
+      <LI><A HREF="/src/cgi/bin/mis.cgi?view=ListClientVitalSigns.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Vital Signs</A></LI>
+      <LI><A HREF="/src/cgi/bin/mis.cgi?view=ListClientVaccines.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Immunizations / Vaccines</A></LI>
+      <LI><A HREF="/src/cgi/bin/mis.cgi?view=ListClientRiskAssessment.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Risk Assessment</A></LI>
+      <LI><A HREF="/src/cgi/bin/mis.cgi?view=ListClientInterventionsOrdered.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Interventions Ordered</A></LI>
+      <LI><A HREF="/src/cgi/bin/mis.cgi?view=ListClientInterventionsPerformed.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Interventions Performed</A></LI>
+      <LI><A HREF="/src/cgi/bin/mis.cgi?view=ListClientProcedures.cgi&Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Medical Procedures</A></LI>
     </UL>
   </LI>
   <LI><A HREF="javascript:ReportWindow('/src/cgi/bin/printFaceSheet.pl?IDs=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>','FaceSheet')" ONMOUSEOVER="window.status='Print Client Intake Face Sheet'; return true;" ONMOUSEOUT="window.status=''">Print Face Sheet</A></LI>
   <LI>[[DBA->setPrintClientIntake(%form+<<Client_ClientID>>++Print  CARF Intake)]]</LI> 
-  [[SysAccess->verify(%form+Privilege=ClientAccess)<LI><A HREF="/cgi/bin/ClientAccess.cgi?Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Access Control</A></LI> ]]
-  [[DBUtil->isEQ(<<LOGINPROVID>>+91)<LI><A HREF="/cgi/bin/newportal.cgi?Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Add Login for Client Portal</A></LI> ]]
-  [[DBUtil->isEQ(<<LOGINPROVID>>+90)<LI><A HREF="/cgi/bin/newportal.cgi?Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Add Login for Client Portal</A></LI> ]]
+  [[SysAccess->verify(%form+Privilege=ClientAccess)<LI><A HREF="/src/cgi/bin/ClientAccess.cgi?Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Access Control</A></LI> ]]
+  [[DBUtil->isEQ(<<LOGINPROVID>>+91)<LI><A HREF="/src/cgi/bin/newportal.cgi?Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Add Login for Client Portal</A></LI> ]]
+  [[DBUtil->isEQ(<<LOGINPROVID>>+90)<LI><A HREF="/src/cgi/bin/newportal.cgi?Client_ClientID=<<Client_ClientID>>&mlt=<<mlt>>&misLINKS=<<misLINKS>>">Add Login for Client Portal</A></LI> ]]
 </UL>

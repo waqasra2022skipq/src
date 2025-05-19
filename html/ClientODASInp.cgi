@@ -5,7 +5,7 @@
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vClientODAS.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vDate.js"> </SCRIPT>
 
-<FORM NAME="ClientODAS" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="ClientODAS" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

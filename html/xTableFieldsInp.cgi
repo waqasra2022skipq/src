@@ -5,7 +5,7 @@
 
 [[*SysAccess->verify(%form+Privilege=AdminTables)]]
 
-<FORM NAME="xTableFields" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="xTableFields" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

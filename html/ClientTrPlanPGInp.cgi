@@ -10,7 +10,7 @@ function TPPG(e)
 // DeCloak -->
 </SCRIPT>
 
-<FORM NAME="ClientTrPlanPG" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="ClientTrPlanPG" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

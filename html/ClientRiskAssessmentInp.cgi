@@ -6,7 +6,7 @@
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vNum.js"> </SCRIPT>
 <SCRIPT type="text/javascript" src="/src/cgi/js/ajaxrequest.js"></SCRIPT>
 
-<FORM NAME="RiskAssessment" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="RiskAssessment" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

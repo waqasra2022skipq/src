@@ -212,5 +212,5 @@ Web:    www.myhealthaccess.net<BR />
         </div>
     </li>
     <li class="separator"></li>
-    <li><A HREF="/cgi/bin/mis.cgi?logout=1&mlt=<<mlt>>" ONMOUSEOVER="window.status='Logout of MIS'; return true;" ONMOUSEOUT="window.status=''" >Logout</A></li>
+    <li><A HREF="/src/cgi/bin/mis.cgi?logout=1&mlt=<<mlt>>" ONMOUSEOVER="window.status='Logout of MIS'; return true;" ONMOUSEOUT="window.status=''" >Logout</A></li>
 </ul>

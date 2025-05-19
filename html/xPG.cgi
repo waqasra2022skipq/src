@@ -6,7 +6,7 @@
 
 [[*SysAccess->verify(%form+Privilege=AdminTables)]]
 
-<FORM NAME="xPG" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="xPG" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

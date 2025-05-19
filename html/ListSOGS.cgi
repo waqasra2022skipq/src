@@ -2,7 +2,7 @@
 
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/novalidate.js"> </SCRIPT>
 
-<FORM NAME="SOGS" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="SOGS" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" COLSPAN=2 >

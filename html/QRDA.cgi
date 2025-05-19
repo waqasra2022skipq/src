@@ -4,7 +4,7 @@
 
 [[*SysAccess->verify(%form+Privilege=Agent)]]
 
-<FORM NAME="QRDA" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="QRDA" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

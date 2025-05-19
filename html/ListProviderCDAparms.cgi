@@ -4,7 +4,7 @@
 
 <SCRIPT type="text/javascript" SRC="/src/cgi/js/ajaxrequest.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/novalidate.js"> </SCRIPT>
-<FORM NAME="ListProviderCDAparms" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="ListProviderCDAparms" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 
 <TABLE CLASS="main fullsize" >
   <TR >

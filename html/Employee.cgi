@@ -10,7 +10,7 @@
 <SCRIPT type="text/javascript" src="/src/cgi/js/ajaxrequest.js"></SCRIPT>
 <LINK HREF="/src/cgi/css/autocomplete.css?v=202008071708" REL="stylesheet">
 
-<FORM NAME="Employee" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="Employee" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

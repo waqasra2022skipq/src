@@ -2,7 +2,7 @@
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vEntry.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vIES.js"> </SCRIPT>
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vNum.js"> </SCRIPT>
-<FORM NAME="submit" ACTION="/cgi/bin/mis.cgi" METHOD="POST">
+<FORM NAME="submit" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST">
   <TABLE CLASS="home fullsize" >
     <TR ><TD CLASS="port hdrtxt" COLSPAN="2" >Impact of Events Scale-Revised (IES-R)</TD></TR>
     <TR ><TD CLASS="strcol" COLSPAN="2" >Answer the following questions about the most distressing psychological trauma event and your distress level over the past 7 days.</TD></TR>

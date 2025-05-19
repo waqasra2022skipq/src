@@ -4,7 +4,7 @@
 <LINK HREF="/cfg/menuV2.css" REL="stylesheet" TYPE="text/css" >
 <SCRIPT type="text/javascript" src="/cgi/menu/js/menuV2.js" ></SCRIPT>
 
-<FORM NAME="Intake" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="Intake" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >[[myHTML->getHTML(%form+MU.menu+1)]]</TD>

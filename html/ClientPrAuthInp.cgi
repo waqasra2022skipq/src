@@ -10,7 +10,7 @@
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vNum.js"> </SCRIPT>
 <script type="text/javascript" src="/src/cgi/js/ajaxrequest.js"></script>
 
-<FORM NAME="ClientPrAuth" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="ClientPrAuth" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

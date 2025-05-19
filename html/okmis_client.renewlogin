@@ -29,7 +29,7 @@ function vLogin(form)
     <IMG ALT="logo" BORDER=0 SRC="{LOGO}" >
     <H2 >{SITENAME}</H2>
 <P>
-<FORM NAME="login" METHOD="post" ACTION="/cgi/bin/mis.cgi" >
+<FORM NAME="login" METHOD="post" ACTION="/src/cgi/bin/mis.cgi" >
       <TABLE WIDTH="100%" >
 	<TR>
 	  <TD ALIGN="center" >

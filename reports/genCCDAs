@@ -89,7 +89,7 @@ qq|/cgi/bin/mis.cgi?view=ListExportFiles.cgi&Provider_ProvID=${ForProvID}&mlt=$f
 <TABLE CLASS="main" >
   <TR> <TD CLASS="hdrcol title" >Send CCDAs</TD> </TR>
 </TABLE>
-<FORM NAME="CCDA" ACTION="/cgi/bin/sendCCDA.cgi" METHOD="POST" >
+<FORM NAME="CCDA" ACTION="/src/cgi/bin/sendCCDA.cgi" METHOD="POST" >
 <P CLASS="port hdrtxt heading" >Export Documents created as:<BR>Folder ${Folder}</P>
 <P CLASS="port hdrtxt title" >Close this window to navigate to your Export CCDA Documents screen.</P>
 <TABLE CLASS="main fullsize" >

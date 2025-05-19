@@ -5,7 +5,7 @@
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/vMisEDocs.js"> </SCRIPT>
 <SCRIPT type="text/javascript" src="/src/cgi/js/ajaxrequest.js"></SCRIPT>
 
-<FORM NAME="MisEDocs" ACTION="/cgi/bin/mis.cgi" METHOD="POST" > 
+<FORM NAME="MisEDocs" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" > 
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

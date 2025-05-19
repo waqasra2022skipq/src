@@ -1,6 +1,6 @@
 [[myHTML->newHTML(%form+UPLOAD Document)]]
 
-<FORM NAME="Upload" METHOD=POST ENCTYPE="multipart/form-data" ACTION="/cgi/bin/Upload.cgi?DocType=<<DocType>>" > 
+<FORM NAME="Upload" METHOD=POST ENCTYPE="multipart/form-data" ACTION="/src/cgi/bin/Upload.cgi?DocType=<<DocType>>" > 
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >

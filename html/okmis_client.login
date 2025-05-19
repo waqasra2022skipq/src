@@ -29,7 +29,7 @@ function vLogin(form)
     <IMG ALT="logo" BORDER=0 SRC="{LOGO}" >
     <H2 >{SITENAME}</H2>
 <P>
-<FORM NAME="login" METHOD="post" ACTION="/cgi/bin/mis.cgi" >
+<FORM NAME="login" METHOD="post" ACTION="/src/cgi/bin/mis.cgi" >
       <TABLE WIDTH="100%" >
 	<TR>
 	  <TD ALIGN="center" >
@@ -51,7 +51,7 @@ function vLogin(form)
 	<TR><TD >&nbsp;</TD></TR>
 	<TR>
 	  <TD ALIGN="center" >
-            <A HREF="/cgi/bin/mis.cgi?RenewLogin=yes">Forgot password</A>
+            <A HREF="/src/cgi/bin/mis.cgi?RenewLogin=yes">Forgot password</A>
 	  </TD>
 	</TR>
       </TABLE>

@@ -1,7 +1,7 @@
 [[myHTML->newPage(%form+Client Admissions)]]
 
 <SCRIPT LANGUAGE="JavaScript" SRC="/src/cgi/js/novalidate.js"> </SCRIPT>
-<FORM NAME="ListAdmit" ACTION="/cgi/bin/mis.cgi" METHOD="POST" >
+<FORM NAME="ListAdmit" ACTION="/src/cgi/bin/mis.cgi" METHOD="POST" >
 <TABLE CLASS="main fullsize" >
   <TR >
     <TD CLASS="strcol" >
