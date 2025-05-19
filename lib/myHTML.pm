@@ -51,13 +51,13 @@ sub newPage {
 #warn qq|myHTML-newPage: flags=$flags\n|;
 #warn qq|myHTML-newPage: addHEAD=${addHEAD}, argBODY=${argBODY}, addBODY=${addBODY}\n|;
     my $html = $self->new( $form, $title, $flags ) . qq|
-<TABLE CLASS="main" >
-  <TR ALIGN="center" >
-| . $self->leftpane( $form, 'clock mail managertree collapseipad' ) . qq|
-    <TD WIDTH="84%" >
-| . $self->hdr($form) . $self->menu($form);
-    return ($html);
-}
+      <TABLE CLASS="main" >
+        <TR ALIGN="center" >
+      | . $self->leftpane( $form, 'clock mail managertree collapseipad' ) . qq|
+          <TD WIDTH="84%" >
+      | . $self->hdr($form) . $self->menu($form);
+          return ($html);
+      }
 
 sub newHTML {
     my ( $self, $form, $title, $flags, $BODYARGS ) = @_;
@@ -125,7 +125,7 @@ sub new {
     my $myMedAlerts = $flags =~ /medalerts/i ? qq|myMedAlerts(500,600);| : '';
     my $lhcautocomplete = $flags =~ /lhcautocomplete/i
       ? qq|
-<LINK href='/cgi/lhc/autocomplete-lhc-17.0.3/autocomplete-lhc.min.css' REL="stylesheet">
+<LINK href='/src/cgi/lhc/autocomplete-lhc-17.0.3/autocomplete-lhc.min.css' REL="stylesheet">
 <STYLE>
 .form_auto_complete {
   text-align: left;
@@ -169,7 +169,7 @@ button, html input[type=button], input[type=reset], input[type=submit] {
     }
     my $countdown = $flags =~ /countdown/i
       ? qq|
-  <SCRIPT TYPE="text/javascript" SRC="src/src/cgi/js/countdown.js?v=20161101"></SCRIPT>
+  <SCRIPT TYPE="text/javascript" SRC="/src/cgi/js/countdown.js?v=20161101"></SCRIPT>
 |
       : '';
 
@@ -209,7 +209,7 @@ button, html input[type=button], input[type=reset], input[type=submit] {
       . qq|" REL="stylesheet" TYPE="text/css" >
   <SCRIPT TYPE="text/javascript" SRC="|
       . myConfig->cfgfile( 'tabcontent/tabcontent.js', 1 ) . qq|" ></SCRIPT>
-  <SCRIPT TYPE="text/javascript" SRC="/src/src/cgi/js/tabs.js"></SCRIPT>
+  <SCRIPT TYPE="text/javascript" SRC="/src/cgi/js/tabs.js"></SCRIPT>
 |
       : '';
 
@@ -283,6 +283,7 @@ button, html input[type=button], input[type=reset], input[type=submit] {
   <SCRIPT TYPE="text/javascript" >
     function loadup()
     {
+
       ${myAlert}
       ${reqLOAD}
       ${accordion}
