@@ -307,6 +307,23 @@ sub setPADiag {
         elsif ( $cnt == 5 ) { $rPA->{'Diag2Sec'}  = $ICD10; }
     }
 
+    $sClientProblems = $dbh->prepare(
+"select ClientProblems.UUID,ClientProblems.Priority,umlsICD10.mapTarget as ICD10 from ClientProblems left join okmis_config.umlsICD10 on umlsICD10.ID=ClientProblems.UUID where ClientID=? and umlsICD10.mapTarget LIKE 'F%' order by ClientProblems.Priority"
+    );
+    $sClientProblems->execute($ClientID)
+      || myDBI->dberror("setPADiag: select ClientProblems ${ClientID}");
+    while ( $rClientProblems = $sClientProblems->fetchrow_hashref ) {
+        my $ICD10 = $rClientProblems->{'ICD10'};
+        $ICD10 =~ s/\.//g;                 # trim period .
+        next unless ( $ICD10 =~ /^F/ );    # skip non-MH Diagnosis
+        $cnt++;
+        if    ( $cnt == 1 ) { $rPA->{'Diag1Prim'} = $ICD10; }
+        elsif ( $cnt == 2 ) { $rPA->{'Diag1Sec'}  = $ICD10; }
+        elsif ( $cnt == 3 ) { $rPA->{'Diag1Tert'} = $ICD10; }
+        elsif ( $cnt == 4 ) { $rPA->{'Diag2Prim'} = $ICD10; }
+        elsif ( $cnt == 5 ) { $rPA->{'Diag2Sec'}  = $ICD10; }
+    }
+
 #foreach my $f ( sort keys %{$rPA} ) { warn "setPADiag: AFTER: rPA-$f=$rPA->{$f}\n"; }
     return ($rPA);
 }
