@@ -1485,15 +1485,63 @@ sub setClientNoteProblems {
   </TR>|;
     }
 
+    # Get the saved ones from UMLS
+    my $umlsICD10Saved = $dbh->prepare(
+"select umlsICD10.mapTarget as ICD10,umlsICD10.icdName,umlsICD10.sctName,ClientNoteProblems.UUID,ClientNoteProblems.Priority,ClientNoteProblems.InitiatedDate,ClientNoteProblems.ResolvedDate from ClientNoteProblems inner join okmis_config.umlsICD10 on umlsICD10.ID=ClientNoteProblems.UUID where ClientNoteProblems.ClientID=? and ClientNoteProblems.TrID=? order by ClientNoteProblems.Priority"
+    );
+    $umlsICD10Saved->execute( $ClientID, $TrID )
+      || myDBI->dberror("Physician Note: select ClientNoteProblems");
+    while ( my $r = $umlsICD10Saved->fetchrow_hashref ) {
+        $row++;
+        my $class  = int( $row / 2 ) == $row / 2 ? 'rpteven' : 'rptodd';
+        my $Status = $r->{'ResolvedDate'} eq ''  ? 'active'  : 'complete';
+        $out .= qq|
+  <TR CLASS="${class}" >
+    <TD ALIGN="center" >
+      <INPUT TYPE="checkbox" NAME="NoteProblems" VALUE="$r->{UUID}" CHECKED ${blur} >
+    </TD>
+    <TD ALIGN="left" >$r->{'ICD10'}</TD>
+    <TD ALIGN="left" >$r->{'icdName'}</TD>
+    <TD ALIGN="left" >$r->{'sctName'}</TD>
+    <TD ALIGN="left" >$r->{'InitiatedDate'}</TD>
+    <TD ALIGN="left" >$r->{'ResolvedDate'}</TD>
+    <TD ALIGN="left" >${Status}</TD>
+  </TR>|;
+    }
+
     #warn qq| setClientNoteProblems: CHECK TrID=$TrID\n|;
     # add those NOT CHECKED...
     warn qq|setClientNoteProblems: with=$with\n| if ($debug);
-    my $s = $dbh->prepare(
+    $s = $dbh->prepare(
 "select misICD10.ICD10,misICD10.icdName,misICD10.sctName,ClientProblems.UUID,ClientProblems.Priority,ClientProblems.InitiatedDate,ClientProblems.ResolvedDate from ClientProblems inner join okmis_config.misICD10 on misICD10.ID=ClientProblems.UUID left join ClientNoteProblems on ClientNoteProblems.UUID=ClientProblems.UUID and ClientNoteProblems.TrID='${TrID}' where ClientProblems.ClientID=? and ClientNoteProblems.UUID is null ${with} order by ClientProblems.Priority"
     );
     $s->execute($ClientID)
       || myDBI->dberror("Physician Note: select ClientProblems");
     while ( my $r = $s->fetchrow_hashref ) {
+        $row++;
+        my $class  = int( $row / 2 ) == $row / 2 ? 'rpteven' : 'rptodd';
+        my $Status = $r->{'ResolvedDate'} eq ''  ? 'active'  : 'complete';
+        $out .= qq|
+  <TR CLASS="${class}" >
+    <TD ALIGN="center" >
+      <INPUT TYPE="checkbox" NAME="NoteProblems" VALUE="$r->{UUID}" ${blur} >
+    </TD>
+    <TD ALIGN="left" >$r->{ICD10}</TD>
+    <TD ALIGN="left" >$r->{icdName}</TD>
+    <TD ALIGN="left" >$r->{sctName}</TD>
+    <TD ALIGN="left" >$r->{InitiatedDate}</TD>
+    <TD ALIGN="left" >$r->{ResolvedDate}</TD>
+    <TD ALIGN="left" >${Status}</TD>
+  </TR>|;
+    }
+
+    # fetch the ones from umlsICD10
+    my $umlsICD10 = $dbh->prepare(
+"select umlsICD10.mapTarget as ICD10,umlsICD10.icdName,umlsICD10.sctName,ClientProblems.UUID,ClientProblems.Priority,ClientProblems.InitiatedDate,ClientProblems.ResolvedDate from ClientProblems inner join okmis_config.umlsICD10 on umlsICD10.ID=ClientProblems.UUID left join ClientNoteProblems on ClientNoteProblems.UUID=ClientProblems.UUID and ClientNoteProblems.TrID='${TrID}' where ClientProblems.ClientID=? and ClientNoteProblems.UUID is null ${with} order by ClientProblems.Priority"
+    );
+    $umlsICD10->execute($ClientID)
+      || myDBI->dberror("Physician Note: select ClientProblems");
+    while ( my $r = $umlsICD10->fetchrow_hashref ) {
         $row++;
         my $class  = int( $row / 2 ) == $row / 2 ? 'rpteven' : 'rptodd';
         my $Status = $r->{'ResolvedDate'} eq ''  ? 'active'  : 'complete';
