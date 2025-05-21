@@ -633,12 +633,13 @@ sub CheckProblems {
     my ( $code, $msg ) = ( 0, '' );
     my $dbh     = myDBI->dbconnect( $form->{'DBNAME'} );
     my $sCheckF = $dbh->prepare( "
-select Treatment.TrID
- from ClientNoteProblems 
-  left join Treatment on Treatment.TrID = ClientNoteProblems.TrID
-  left join okmis_config.misICD10 on misICD10.ID = ClientNoteProblems.UUID
- where Treatment.TrID = ? and misICD10.ICD10 LIKE 'F%'
-" );
+    select Treatment.TrID
+    from ClientNoteProblems 
+    left join Treatment on Treatment.TrID = ClientNoteProblems.TrID
+    left join okmis_config.misICD10 on misICD10.ID = ClientNoteProblems.UUID
+    left join okmis_config.umlsICD10 on umlsICD10.ID = ClientNoteProblems.UUID
+    where Treatment.TrID = ? and (misICD10.ICD10 LIKE 'F%' OR umlsICD10.mapTarget LIKE 'F%')
+    " );
     my $sClientNoteProblems = $dbh->prepare( "
 select ClientNoteProblems.ID,ClientNoteProblems.TrID,xSC.SCNum,xSC.InsID,xInsurance.InsType
  from ClientNoteProblems
