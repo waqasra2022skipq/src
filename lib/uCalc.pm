@@ -1,4 +1,5 @@
 package uCalc;
+use myDBI;
 ############################################################################
 # sub calc... returns count.
 # sub flag... adds text to returned count for display: ie.
@@ -101,22 +102,53 @@ sub flagBIMSandMMSE {
 }
 
 sub q9_descriptor {
-     my ($self, $form, $record, $val) = @_;
+      my ($self, $form, $record, $val) = @_;
 
-    my %map = (
-        '0'     => ['no',            'background-color: lightgray'],
-        ''      => ['no',            'background-color: lightgray'],
-        undef   => ['no',            'background-color: lightgray'],
-        '1'     => ['yes',           'background-color: lightgreen'],
-        '2'     => ['on some words', 'background-color: orange'],
-        '3'     => ['always',        'background-color: red'],
+    # If $val is the literal 'q9', replace with actual value from $record hashref
+    $val = $record->{q9} if defined $val && $val eq 'q9';
+
+    # Connect to DB (replace credentials with actual values)
+    my $dbh = myDBI->dbconnect('okmis_config');
+    my $table_id = 55;       # adjust dynamically if needed
+    my $field = 'q9';
+
+    # Prepare SQL to fetch theValues and descriptors
+    my $sql = "SELECT theValues, descriptors FROM xtablefields WHERE TableID=? AND theField=?";
+    my $sth = $dbh->prepare($sql);
+    $sth->execute($table_id, $field);
+
+    my ($theValues, $descriptors) = $sth->fetchrow_array();
+    $sth->finish;
+    $dbh->disconnect;
+
+    # Fail-safe: if no mapping, return original value
+    return $val unless defined $theValues && defined $descriptors;
+
+    # Parse theValues and descriptors into arrays
+    my @values = split /\|/, $theValues;
+    my @texts  = split /\|/, $descriptors;
+
+    # Build mapping hash
+    my %map;
+    for my $i (0 .. $#values) {
+        $map{ $values[$i] } = $texts[$i];
+    }
+
+    # Map your value to text (or fallback to original value)
+    my $text = exists $map{$val} ? $map{$val} : $val;
+
+    # Optional: add color styles by value
+    my %colors = (
+        '0' => 'background-color: lightgray',
+        '1' => 'background-color: lightgreen',
+        '2' => 'background-color: orange',
+        '3' => 'background-color: red',
     );
 
-    my ($text, $style) = exists $map{$val} ? @{$map{$val}} : ($val, '');
+    my $style = exists $colors{$val} ? qq|style="$colors{$val}"| : '';
 
-    my $html = $style ne '' ? "$text" . chr(253) . qq|STYLE="$style"| : $text;
-
-    return $html;
+    # Return HTML with color style (you can tweak this formatting)
+    return qq|<span $style>$text</span>|;
 }
 
 
