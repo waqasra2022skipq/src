@@ -598,6 +598,8 @@ sub ListSel {
         $addWHERE )
       = @_;
 
+    my $dbh = myDBI->dbconnect( $form->{'DBNAME'} );
+
 #warn qq|\nENTER ListSel: screen_name=${screen_name}, id=${id}\n|;
 #warn qq|\nENTER ListSel: pushID=${pushID}, islocked=${islocked}, tabnum=${tabnum}\n|;
 #warn qq|\nENTER ListSel: addWHERE=${addWHERE}\n|;
@@ -687,6 +689,15 @@ qq|          <TH CLASS="${sortclass}" STYLE="text-align: ${jst}" >${hdrlabel}</T
         my $class   = int( $row / 2 ) == $row / 2 ? 'rpteven' : 'rptodd';
         my $thistab = qq|        <TR CLASS="${class}" >\n|;
         my $fldcnt  = 0;
+
+        my $misProblem;
+        if ( "ListClientProblems" eq $screen_name ) {
+            my $q =
+              $dbh->prepare("SELECT * FROM okmis_config.misICD10 WHERE ID=?");
+            $q->execute( $r->{UUID} );
+            $misProblem = $q->fetchrow_hashref;
+        }
+
         foreach
           my $tablehdrdefs ( @{ myConfig->scr( $screen_name, 'SHEADER' ) } )
         {
@@ -697,6 +708,10 @@ qq|          <TH CLASS="${sortclass}" STYLE="text-align: ${jst}" >${hdrlabel}</T
 
       #warn qq|ListSel: fld=$fld, jst=$jst, fldDef=$fldDef, display=$display\n|;
             my $fldval = $r->{$fld};    # original field value
+            if ( $fldval eq '' && "ListClientProblems" eq $screen_name ) {
+                $fldval = $misProblem->{$fld};
+            }
+
             if ( $jst =~ /total/ ) { $TOTALCOLS[$fldcnt] += $fldval; }
             if ( $jst =~ /flag/i )      # change original field value
             { $fldval = $fldval eq 1 ? 'yes' : 'no'; }
