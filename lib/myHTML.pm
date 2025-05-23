@@ -732,6 +732,7 @@ qq|<A HREF="javascript:void(0)" TITLE="${text}" >${fldval}</A>|;
                 elsif (
                     $typeFunc eq 'S' ) # STYLE-some functions return value^style
                 { ( $display, $style ) = split( chr(253), $text ); }
+                
                 elsif ( $typeFunc eq 'E' ) # EDIT or VIEW (calculated View/Edit)
                 {
                     my $editbutton = $r->{'Locked'} ? 'View' : qq|View/Edit|;

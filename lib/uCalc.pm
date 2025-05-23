@@ -100,6 +100,29 @@ sub flagBIMSandMMSE {
     return ($html);
 }
 
+sub q9_descriptor {
+     my ($self, $form, $record, $val) = @_;
+
+    my %map = (
+        '0'     => ['no',            'background-color: lightgray'],
+        ''      => ['no',            'background-color: lightgray'],
+        undef   => ['no',            'background-color: lightgray'],
+        '1'     => ['yes',           'background-color: lightgreen'],
+        '2'     => ['on some words', 'background-color: orange'],
+        '3'     => ['always',        'background-color: red'],
+    );
+
+    my ($text, $style) = exists $map{$val} ? @{$map{$val}} : ($val, '');
+
+    my $html = $style ne '' ? "$text" . chr(253) . qq|STYLE="$style"| : $text;
+
+    return $html;
+}
+
+
+
+
+
 sub flagTotalLabel {
     my ( $self, $form, $rPHQ, $pfx, $beg, $end, $min, $med, $max, $severe ) =
       @_;
