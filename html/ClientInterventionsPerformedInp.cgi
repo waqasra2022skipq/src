@@ -35,7 +35,17 @@
       </SELECT>
     </TD>
   </TR>
+
   <BR><BR>
+  <TR>
+  <TD CLASS="strcol">Assessment</TD>
+  <TD CLASS="strcol" COLSPAN="3">
+    <SELECT NAME="ClientInterventionsPerformed_Assessment_1">
+    [[DBA->selxTable(%form+xRiskAssessment+<<ClientInterventionsPerformed_Assessment_1>>+ConceptName ConceptCode)]]
+    </SELECT>
+  </TD>
+</TR>
+  
   <TR ID="Reason_TR" STYLE= "display:none;">
     <TD CLASS="strcol" >Reason</TD>
     <TD CLASS="strcol" COLSPAN="3" >
