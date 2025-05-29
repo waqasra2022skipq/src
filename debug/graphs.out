@@ -6,7 +6,7 @@ graphs.cgi: form-DOCROOT=C:/xampp/htdocs
 graphs.cgi: form-FromDate=2025-04-01
 graphs.cgi: form-FromDateD=04/01/2025
 graphs.cgi: form-HTTPSERVER=https://localhost
-graphs.cgi: form-LINKID=81906
+graphs.cgi: form-LINKID=81969
 graphs.cgi: form-LOGINACLID=
 graphs.cgi: form-LOGINAGENCY=91
 graphs.cgi: form-LOGINEMAIL=support@okmis.com
@@ -19,19 +19,19 @@ graphs.cgi: form-LOGINUSERDB=okmis_dev
 graphs.cgi: form-LOGINUSERID=91
 graphs.cgi: form-LOGINUSERNAME=Root User 
 graphs.cgi: form-LOGINUSERTYPE=1
-graphs.cgi: form-NOW=12:07:59
-graphs.cgi: form-TODAY=2025-05-16
-graphs.cgi: form-TheDate=2025-05-16
+graphs.cgi: form-NOW=09:20:34
+graphs.cgi: form-TODAY=2025-05-28
+graphs.cgi: form-TheDate=2025-05-28
 graphs.cgi: form-ToDate=2025-04-30
 graphs.cgi: form-ToDateD=04/30/2025
 graphs.cgi: form-USERLOGINID=okmis_dev:91
 graphs.cgi: form-browser=Mozilla/5.0
 graphs.cgi: form-daterange=lastmonth
 graphs.cgi: form-method=BilledvsIncome
-graphs.cgi: form-misLINKS=81861
-graphs.cgi: form-mlt=tMugt2gAPoHS
-graphs.cgi: form-query=mlt=tMugt2gAPoHS&misLINKS=81861
-graphs.cgi: form-sesid=20250516120759_RHytny
+graphs.cgi: form-misLINKS=81968
+graphs.cgi: form-mlt=Vo6oxVNHkBTb
+graphs.cgi: form-query=mlt=Vo6oxVNHkBTb&misLINKS=81968
+graphs.cgi: form-sesid=20250528092034_VpwWJf
 graphs.cgi: form-updLINKIDnew=
 graphs.cgi: s=
 
@@ -68,7 +68,7 @@ data=
     {
       key: "Amt",
       values: [
-        { x:'2025-04 BillAmt', y:324.00 },
+        { x:'2025-04 BillAmt', y:162.00 },
         { x:'2025-04 IncAmt', y:0 },
       ]
     },

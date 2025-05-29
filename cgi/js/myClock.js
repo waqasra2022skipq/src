@@ -12,6 +12,7 @@
 //  document.clock.time.value = h + ":" + m + ":" + s + " " + c;
 //  window.setTimeout("clock()", 900);
 //}
+alert("in myClock");
 function myClock()
 {
 //alert("in myClock");

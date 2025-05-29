@@ -155,10 +155,13 @@ sub getLogin {
     $self->{mlt} = $form->{mlt};
 
     #warn qq|getLogin: self mlt=$self->{mlt}\n|;
-    my $sLogin = $dbh->prepare(
-"select * from Login left join UserLogin on UserLogin.UserID=Login.UserID where Login.Token='$self->{mlt}'"
-    );
-    $sLogin->execute() || $self->error("sql error: getLogin select");
+  my $sLogin = $dbh->prepare(
+    "SELECT * FROM Login 
+     LEFT JOIN UserLogin ON UserLogin.UserID = Login.UserID 
+     WHERE Login.Token = CONVERT(? USING latin1) COLLATE latin1_swedish_ci"
+);
+$sLogin->execute($self->{mlt}) || $self->error("sql error: getLogin select");
+
     if ( my $rLogin = $sLogin->fetchrow_hashref ) {
 
 #warn qq|getLogin: passed LOGINID=$rLogin->{Name}\n|;

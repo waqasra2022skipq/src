@@ -15,13 +15,14 @@ my $cdbh      = myDBI->dbconnect('okmis_config');
 my $AccessHR  = SysAccess->ChkPriv( $form, 'HRReports' );
 my $ALLACCESS = $form->{LOGINPROVID} == 91 ? 1 : 0;
 
+
 ############################################################################
 # get Provider record for summary output.
 $qProvider = qq|select * from Provider where ProvID=?|;
 $sProvider = $dbh->prepare($qProvider);
 $sProvider->execute( $form->{Provider_ProvID} )
   || myDBI->dberror("Provider in UserReports");
-$rProvider = $sProvider->fetchrow_hashref;
+my $rProvider = $sProvider->fetchrow_hashref;
 
 my $Defns;
 my $xtable = $form->{'xtable'} eq '' ? 'xReports' : $form->{'xtable'};
@@ -51,12 +52,12 @@ while ( my $rxTable = $sxTable->fetchrow_hashref ) {
 
 ############################################################################
 # UNUSED???
-#<link rel="STYLESHEET" type="text/css" href="/src/cgi/css/tabs.css" />
-#<LINK REL="stylesheet" TYPE="text/css" HREF="/cgi/jcal/calendar-forest.css" >
-#<script language="JavaScript" type="text/javascript" src="/src/cgi/js/tabs.js"></script>
-#<SCRIPT TYPE="text/javascript" SRC="/cgi/jcal/calendar.js"></SCRIPT>
-#<SCRIPT TYPE="text/javascript" SRC="/cgi/jcal/calendar-en.js"></SCRIPT>
-#<SCRIPT TYPE="text/javascript" SRC="/cgi/jcal/calendar-setup.js"></SCRIPT>
+# <link rel="STYLESHEET" type="text/css" href="/src/cgi/css/tabs.css" />
+# <LINK REL="stylesheet" TYPE="text/css" HREF="/cgi/jcal/calendar-forest.css" >
+# <script language="JavaScript" type="text/javascript" src="/src/cgi/js/tabs.js"></script>
+# <SCRIPT TYPE="text/javascript" SRC="/cgi/jcal/calendar.js"></SCRIPT>
+# <SCRIPT TYPE="text/javascript" SRC="/cgi/jcal/calendar-en.js"></SCRIPT>
+# <SCRIPT TYPE="text/javascript" SRC="/cgi/jcal/calendar-setup.js"></SCRIPT>
 ############################################################################
 # Start out the display.
 my $html = myHTML->newHTML(

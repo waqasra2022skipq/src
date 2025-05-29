@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!C:/Strawberry/perl/bin/perl.exe
 use lib 'C:/xampp/htdocs/src/lib';
 use DBI;
 use DBForm;
@@ -72,7 +72,7 @@ qq|select * from xReports where Cron=1 and ExpDate is null order by Descr |;
     $cdbh->disconnect();
     $form->complete();
     print
-qq|Location: /cgi/bin/ProviderPage.cgi?Provider_ProvID=$form->{Provider_ProvID}&mlt=$form->{mlt}\n\n|;
+qq|Location: /src/cgi/bin/ProviderPage.cgi?Provider_ProvID=$form->{Provider_ProvID}&mlt=$form->{mlt}\n\n|;
 }
 ##
 # CONTINUE if not update
@@ -115,7 +115,7 @@ while ( my $rxReports = $sxReports->fetchrow_hashref ) {
 }
 ############################################################################
 my $BackLinks = gHTML->setLINKS( $form, 'back' );
-my $qxReports =
+$qxReports =
 qq|select * from xReports where Cron=1 and Category=? and ExpDate is null order by Descr |;
 my $html = myHTML->newPage( $form, "Schedule Reports for Provider" ) . qq|
 ${Defns}

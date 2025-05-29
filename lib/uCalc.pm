@@ -106,24 +106,59 @@ sub q9_descriptor {
 
     # If $val is the literal 'q9', replace with actual value from $record hashref
     $val = $record->{q9} if defined $val && $val eq 'q9';
+     return '<span style="color: red;">No value provided</span>' unless defined $val;
 
     # Connect to DB (replace credentials with actual values)
     my $dbh = myDBI->dbconnect('okmis_config');
-    my $table_id = 55;       # adjust dynamically if needed
+    my $tableName = 'ClientBIMS';  # or dynamic table name if available
+
+    # Step 1: Get TableID from xtables
+    my $table_sql = "SELECT ID FROM xtables WHERE theTable = ?";
+    my $table_sth = eval { $dbh->prepare($table_sql) };
+    unless ($table_sth) {
+        $dbh->disconnect;
+        return '<span style="color: red;">Failed to prepare table lookup</span>';
+    }
+
+    eval { $table_sth->execute($tableName) };
+    if ($@) {
+        $dbh->disconnect;
+        return '<span style="color: red;">Failed to execute table lookup</span>';
+    }
+
+    my ($table_id) = $table_sth->fetchrow_array;
+    unless (defined $table_id) {
+        $dbh->disconnect;
+        return "<span style=\"color: red;\">No TableID found for '$tableName'</span>";
+    }
+
+
+           # adjust dynamically if needed
     my $field = 'q9';
+
+
 
     # Prepare SQL to fetch theValues and descriptors
     my $sql = "SELECT theValues, descriptors FROM xtablefields WHERE TableID=? AND theField=?";
-    my $sth = $dbh->prepare($sql);
-    $sth->execute($table_id, $field);
+     my $sth = eval { $dbh->prepare($sql) };
+    unless ($sth) {
+        $dbh->disconnect;
+        return '<span style="color: red;">Failed to prepare field lookup</span>';
+    }
 
-    my ($theValues, $descriptors) = $sth->fetchrow_array();
-    $sth->finish;
-    $dbh->disconnect;
+    eval { $sth->execute($table_id, $field) };
+    if ($@) {
+        $dbh->disconnect;
+        return '<span style="color: red;">Failed to execute field lookup</span>';
+    }
 
-    # Fail-safe: if no mapping, return original value
-    return $val unless defined $theValues && defined $descriptors;
+    my ($theValues, $descriptors) = $sth->fetchrow_array;
+    $sth->finish();  
+    $dbh->disconnect();
 
+    unless (defined $theValues && defined $descriptors) {
+        return "<span style=\"color: red;\">No descriptors found for field '$field'</span>";
+    }
     # Parse theValues and descriptors into arrays
     my @values = split /\|/, $theValues;
     my @texts  = split /\|/, $descriptors;

@@ -75,9 +75,11 @@ $sxTable->execute( $form->{Name} )
   || myDBI->dberror("execute error: $form->{Name}/check");
 my $rxTable = $sxTable->fetchrow_hashref;
 ##foreach my $f ( sort keys %{$rxTable} ) { warn "GenReport: rxTable-$f=$rxTable->{$f}\n"; }
+
 if ( $rxTable->{Inputs} eq 'none' ) {
     my $cmd =
 qq| /src/reports/$rxTable->{Script} DBNAME=$form->{DBNAME}\\&mlt=$form->{mlt}\\&hdrline=$form->{hdrline}\\&output=$form->{output}|;
+
     $result = main->runReport("${cmd}");
 }
 elsif ( $rxTable->{Inputs} eq 'shell' ) {
@@ -261,30 +263,49 @@ document.$form->{Name}.elements[0].focus();
 }
 
 sub submit {
-    warn "START DEBUGGUNG!!!!!";
-    warn qq|GenReport: submit: $form->{Name}, Inputs=$rxTable->{Inputs}\n|
-      if ($debug);
-    my $hdrline = $form->{hdrline} ? $form->{hdrline} : 3;
-    my $cmd =
-qq|C:/xampp/htdocs/src/reports/$rxTable->{Script} 'DBNAME=$form->{DBNAME}&mlt=$form->{mlt}&Type=$form->{Type}&hdrline=$form->{hdrline}&output=$form->{output}&Descr=$rxTable->{Descr}|;
-##  foreach my $inp ( split(':',$rxTable->{Inputs}) )
-    foreach my $inp ( sort keys %{Args} ) {
-        $cmd .= qq|&${inp}=$form->{$inp}|;
+      warn "START DEBUGGUNG!!!!!";
+   warn qq|GenReport: submit: $form->{Name}, Inputs=$rxTable->{Inputs}\n| if ($debug);
+
+my $hdrline = $form->{hdrline} ? $form->{hdrline} : 3;
+
+# Start with the Perl interpreter and script path
+my $script_path = "C:/xampp/htdocs/src/reports/$rxTable->{Script}";
+
+# Start building the parameter string
+my %all_params = %{$form};
+
+# Include extra dynamic Args
+foreach my $inp (sort keys %{Args}) {
+    $all_params{$inp} = $form->{$inp};
+}
+
+# Add optional extras
+$all_params{ForProvID}         = $form->{ForProvID}         if $form->{ForProvID};
+$all_params{Client_ClientID}   = $form->{Client_ClientID}   if $form->{Client_ClientID};
+$all_params{ClientCARSReview_ID} = $form->{ClientCARSReview_ID} if $form->{ClientCARSReview_ID};
+
+# Clean ReportDescr
+(my $ReportDescr = $rxTable->{Descr}) =~ s/'//g;
+$all_params{ReportDescr} = $ReportDescr;
+$all_params{xtable}       = $form->{xtable};
+$all_params{submit}       = 1;
+
+    # Build the command parts array
+    my @cmd_parts = ("perl", qq|"$script_path"|);
+
+    foreach my $key (sort keys %all_params) {
+        my $val = $all_params{$key} // '';
+        $val =~ s/"/\\"/g;     # Escape any double quotes inside the value
+        push @cmd_parts, qq|"$key=$val"|;  # Add each key=value pair as its own argument
     }
-    $cmd .= qq|&ForProvID=$form->{'ForProvID'}| if ( $form->{'ForProvID'} );
-    $cmd .= qq|&Client_ClientID=$form->{'Client_ClientID'}|
-      if ( $form->{'Client_ClientID'} );
-    $cmd .= qq|&ClientCARSReview_ID=$form->{'ClientCARSReview_ID'}|
-      if ( $form->{'ClientCARSReview_ID'} );
-    ( my $ReportDescr = $rxTable->{Descr} ) =~ s/\'//g;
 
-# ($ReportDescr = $ReportDescr) =~ s/\"//g;
-# ($ReportDescr = $ReportDescr) =~ s/\(/&#40;/g;      # don't think this alwarys works
-# ($ReportDescr = $ReportDescr) =~ s/\)/&#41;/g;      # don't think this alwarys works
-    $cmd .= qq|&ReportDescr=${ReportDescr}&xtable=$form->{'xtable'}|;
-    $cmd .= qq|&submit=1'|;
+    # Join the command parts into a single command string
+    my $cmd = join(' ', @cmd_parts);
 
-    my $out  = main->runReport("${cmd}");
+    # warn "FINAL CMD: $cmd";  # For debugging
+
+    my $out = main->runReport($cmd);
+
     my $html = '';
     my ( $header, $body ) = ( '', '' );
     my $sfx = '.txt';
@@ -326,7 +347,7 @@ qq|C:/xampp/htdocs/src/reports/$rxTable->{Script} 'DBNAME=$form->{DBNAME}&mlt=$f
 
         # Close the workbook
         $workbook->close();
-
+  
         my $q = new CGI;
         print $q->header(
             -type =>
@@ -359,7 +380,7 @@ qq|<HTML lang="en" >\n<HEAD><TITLE>$form->{Name}</TITLE></HEAD>\n<BODY >|
   <TITLE>$form->{Name}</TITLE>
   <script type="text/javascript" src="/src/cgi/d3lib/d3.js"></script>
   <link href="/src/cgi/d3lib/nv.d3.css" rel="stylesheet">
-  <script type="text/javascript" src="/cgi/d3lib/nv.d3.js"></script>
+  <script type="text/javascript" src="/src/cgi/d3lib/nv.d3.js"></script>
   <link href="/src/cgi/d3lib/my.d3.css" rel="stylesheet">
 </HEAD>
 <BODY > 
@@ -885,11 +906,11 @@ sub runReport {
     my $RptName = $rxTable->{'Name'};
     warn
 qq|GenReport: runReport: $form->{Name}: output=$form->{output}, cmd:${cmd}\n|
-      if (true);
+      if '1';
     warn
 qq|GenReport: runReport: ProvID=$ProvID, RptID=$RptID, xtable=$xtable, RptName=$RptName\n|
       if ($debug);
-
+      
     # first log the Report...
     my $DT = main->getDATETIME();
     my $s  = $dbh->prepare(

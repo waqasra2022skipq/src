@@ -7,7 +7,6 @@
 //var isOp=window.opera?1:0;
 //var isWin=navigator.platform.indexOf('Win')!=-1?1:0;
 //var isDyn=isDOM||isIE||isNS4;
-
 function getRef(id, par)
 {
  par=!par?document:(par.navigator?par.document:par);
@@ -291,9 +290,9 @@ textMsg.doFades = false;
 function newtextMsg(msgName,MsgInfo)
 {
   textMsg.message[msgName] = new Array(-75, 15, 300, MsgInfo);
-//alert("Name=" + msgName + ", Info=" + MsgInfo);
-//alert("message.info=" + textMsg.message.info);
-//showProps(textMsg,"textMsg");
+alert("Name=" + msgName + ", Info=" + MsgInfo);
+alert("message.info=" + textMsg.message.info);
+showProps(textMsg,"textMsg");
   return 1
 }
 

@@ -70,7 +70,7 @@
                 </div>
             </div>
             <div class="left" style="border-left: 44px solid #F7F7F7; text-align:right; width:100px;">
-                <img src="/cgi/images/reports.jpeg" style="width:128px; height:128px;" />
+                <img src="/src/cgi/images/reports.jpeg" style="width:128px; height:128px;" />
             </div>
             <div style='clear: both;'></div>
             <div class="left">

@@ -5,7 +5,7 @@ vitals.cgi: form-DOCBIN=C:/xampp/htdocs/cgi/bin
 vitals.cgi: form-DOCPARENT=C:/xampp/
 vitals.cgi: form-DOCROOT=C:/xampp/htdocs
 vitals.cgi: form-HTTPSERVER=https://localhost
-vitals.cgi: form-LINKID=81883
+vitals.cgi: form-LINKID=81970
 vitals.cgi: form-LOGINACLID=
 vitals.cgi: form-LOGINAGENCY=91
 vitals.cgi: form-LOGINEMAIL=support@okmis.com
@@ -18,11 +18,11 @@ vitals.cgi: form-LOGINUSERDB=okmis_dev
 vitals.cgi: form-LOGINUSERID=91
 vitals.cgi: form-LOGINUSERNAME=Root User 
 vitals.cgi: form-LOGINUSERTYPE=1
-vitals.cgi: form-NOW=11:45:57
-vitals.cgi: form-TODAY=2025-05-16
+vitals.cgi: form-NOW=09:20:42
+vitals.cgi: form-TODAY=2025-05-28
 vitals.cgi: form-USERLOGINID=okmis_dev:91
 vitals.cgi: form-browser=Mozilla/5.0
-vitals.cgi: form-misLINKS=81861
-vitals.cgi: form-mlt=tMugt2gAPoHS
-vitals.cgi: form-query=ClientID=53531&mlt=tMugt2gAPoHS&misLINKS=81861
+vitals.cgi: form-misLINKS=81968
+vitals.cgi: form-mlt=Vo6oxVNHkBTb
+vitals.cgi: form-query=ClientID=53531&mlt=Vo6oxVNHkBTb&misLINKS=81968
 vitals.cgi: form-updLINKIDnew=

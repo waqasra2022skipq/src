@@ -1,4 +1,5 @@
-<!-- Cloak
+// <!-- Cloak
+
 var ScreenWindowObj="";
 function ScreenWindow(newURL,newName)
 {

@@ -135,7 +135,7 @@ sub new {
       : '';
     my $lhcform = $flags =~ /lhcform/i
       ? qq|
-<link href="/cgi/lhc/lforms-24.1.4/styles/lforms.min.css" media="screen" rel="stylesheet" />
+<link href="/src/cgi/lhc/lforms-24.1.4/styles/lforms.min.css" media="screen" rel="stylesheet" />
 <STYLE>
 body {
   display: block;
@@ -260,7 +260,7 @@ button, html input[type=button], input[type=reset], input[type=submit] {
   <SCRIPT TYPE="text/javascript" >setCookie('MillenniumIS','$form->{mlt}','60');</SCRIPT>
   <SCRIPT TYPE="text/javascript" >javascript:window.history.forward(1);</SCRIPT>
   <SCRIPT TYPE="text/javascript" SRC="/src/cgi/menu/js/centerAlign.js?v=20200911"> </SCRIPT>
-  <SCRIPT TYPE="text/javascript" SRC="/src/cgi/js/utils.js?v=20170828" ></SCRIPT>
+  <SCRIPT TYPE="text/javascript" SRC="/src/cgi/js/Utils.js?v=20170828" ></SCRIPT>
   <SCRIPT TYPE="text/javascript" SRC="/src/cgi/js/NoEnter.js" ></SCRIPT>
   <SCRIPT TYPE="text/javascript" SRC="/src/cgi/js/accordion.js" ></SCRIPT>
   ${addHEAD}

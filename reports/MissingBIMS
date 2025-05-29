@@ -1,0 +1,48 @@
+#!/usr/bin/perl
+use lib 'C:/xampp/htdocs/src/lib';
+
+use DBI;
+use DBForm;
+use DBA;
+use DBUtil;
+
+my $form = DBForm->new();
+my $dbh  = $form->dbconnect();
+
+my $ForProvID = $form->{ForProvID} || $form->{LOGINPROVID};
+
+# Clinic filtering similar to VitalsExpire
+my $ClinicSelection = DBA->withSelection($form, 'and', 'Client.clinicClinicID', 'Client.ProvID', '', '');
+$ClinicSelection .= qq| and Client.Active=1| if ($form->{Active});
+
+# Query: get clients who do NOT have a record in clientbims
+my $sql = qq|
+SELECT 
+    Client.ClientID, Client.LName, Client.FName, Client.DOB,
+    Clinic.Name AS ClinicName,
+    Provider.ProvID,
+    CONCAT(Provider.LName, ', ', Provider.FName) AS ProviderName
+FROM Client
+LEFT JOIN clientbims ON Client.ClientID = clientbims.ClientID
+LEFT JOIN Provider ON Provider.ProvID = Client.ProvID
+LEFT JOIN Provider AS Clinic ON Clinic.ProvID = Client.clinicClinicID
+WHERE clientbims.ClientID IS NULL
+  $ClinicSelection
+ORDER BY Client.LName, Client.FName
+|;
+
+my $sth = $dbh->prepare($sql);
+$sth->execute();
+
+print "Missing BIMS Report\n";
+print "Clients who do not have a BIMS record in the clientbims table\n\n";
+print "ClientID\tClient Name\tDOB\tClinic\tProvider\n";
+
+while (my $r = $sth->fetchrow_hashref) {
+    my $ClientName = "$r->{LName}, $r->{FName}";
+    print "$r->{ClientID}\t$ClientName\t$r->{DOB}\t$r->{ClinicName}\t$r->{ProviderName}\n";
+}
+
+$sth->finish();
+$form->complete();
+exit;
