@@ -1,214 +1,30 @@
 #!/usr/bin/perl
-use lib 'C:/xampp/htdocs/src/lib';
-use DBI;
-use DBForm;
-use DBA;
-use DBUtil;
-use Inv;
+use lib '/var/www/okmis/src/lib';
+use Accounts;
+use myConfig;
 ############################################################################
-# usage: genHHPA DBNAME=db
-#   creates Health Home ClientPrAuth from Approved ClientPrAuthCDC
+# usage: Gen db db
+#   creates the
 ############################################################################
-my $form  = DBForm->new();
-my $dbh   = $form->dbconnect();
-my $debug = $form->{'debug'};
-############################################################################
-my $sClientPrAuth = $dbh->prepare("select * from ClientPrAuth where ID=?");
-my $sClientPrAuthCDC =
-  $dbh->prepare("select * from ClientPrAuthCDC where ClientPrAuthID=?");
-my $sPDDom = $dbh->prepare("select * from PDDom where PrAuthID=?");
-my $supdClientPrAuth =
-  $dbh->prepare("update ClientPrAuth set CoPA=? where ID=?");
-############################################################################
-my $qSelPrAuth = qq|
-select ClientPrAuth.ID,ClientPrAuth.ClientID,ClientPrAuth.InsuranceID
-      ,ClientPrAuth.EffDate,ClientPrAuth.ExpDate,ClientPrAuth.PAnumber
-      ,ClientPrAuthCDC.TransType,ClientPrAuthCDC.Status,ClientPrAuthCDC.StatusDate,ClientPrAuthCDC.CDCOK
-      ,Insurance.InsID
- from ClientPrAuth
-  left join Insurance on Insurance.InsNumID=ClientPrAuth.InsuranceID
-  left join ClientPrAuthCDC on ClientPrAuthCDC.ClientPrAuthID=ClientPrAuth.ID
- where ClientPrAuth.HHresponse is not null and ClientPrAuth.CoPA is null 
-   and ClientPrAuthCDC.Status = 'Approved'
- order by ClientPrAuth.ClientID,ClientPrAuth.EffDate
-|;
-my $HHInsID = 356;
-my $sInsurance =
-  $dbh->prepare("select * from Insurance where ClientID=? and InsID=?");
-my $sPrAuthInsurance =
-  $dbh->prepare("select * from Insurance where InsNumID=?");
+# get the command name...
+my ( $pw, $cmd ) = $0 =~ m/(.*\/)(.*)$/;
 
-my $cnt = 0;
-warn qq|q=\n$qSelPrAuth\n| if ($debug);
-print
-qq|\ngenHHPA: $form->{'DBNAME'}: select from ClientPrAuth HHresponse is not null and CoPA is null...\n|;
-my $sSelPrAuth = $dbh->prepare($qSelPrAuth);
-$sSelPrAuth->execute() || $form->dberror($qSelPrAuth);
-while ( my $r = $sSelPrAuth->fetchrow_hashref ) {
-    my $ClientID = $r->{'ClientID'};
-    print
-qq|  check Client: ${ClientID} PA: $r->{'ID'} Insurance: $r->{'InsuranceID'}  (HealthHome ${HHInsID})\n|;
-    $sInsurance->execute( $ClientID, $HHInsID )
-      || $form->dberror("genHHPA: CheckHH: $ClientID");
-    my $rHealthHomeInsurance = $sInsurance->fetchrow_hashref;
-    unless ( $rHealthHomeInsurance->{'InsNumID'} )   # No Health Home Insurance.
-    {    # from this PA/Insurance Create HH Ins...
-        print qq|    read: ${ClientID} Insurance: $r->{InsuranceID}\n|;
-        $sPrAuthInsurance->execute( $r->{InsuranceID} )
-          || $form->dberror(
-            "genHHPA: ClientPrAuthInsurance: $r->{InsuranceID}");
-        if ( my $rMedicaidInsurance = $sPrAuthInsurance->fetchrow_hashref ) {
-            $rHealthHomeInsurance = $rMedicaidInsurance;
+# the databases to work with
+my @DBS =
+    $ARGV[0] eq 'test' ? Accounts->dbs('test')
+  : scalar(@ARGV)      ? @ARGV
+  :                      Accounts->dbs('active');
+my $BIN = myConfig->cfg('BIN');
 
-#foreach my $f ( sort keys %{$rMedicaidInsurance} ) { warn ": rMedicaidInsurance-$f=$rMedicaidInsurance->{$f}\n"; }
-#foreach my $f ( sort keys %{$rHealthHomeInsurance} ) { warn ": rHealthHomeInsurance-$f=$rHealthHomeInsurance->{$f}\n"; }
-            $rHealthHomeInsurance->{'InsID'}         = $HHInsID;
-            $rHealthHomeInsurance->{'Priority'}      = 2;
-            $rHealthHomeInsurance->{'InsNumEffDate'} = $r->{'EffDate'};
-            delete $rHealthHomeInsurance->{'InsNumExpDate'};
-            $rHealthHomeInsurance->{'InsNumActive'} = 1;
-            delete $rHealthHomeInsurance->{'InsNumComments'};
-            $rHealthHomeInsurance->{'CreateProvID'} = 91;
-            $rHealthHomeInsurance->{'CreateDate'}   = $form->{'TODAY'};
-            $rHealthHomeInsurance->{'ChangeProvID'} = 91;
-            delete $rHealthHomeInsurance->{'RecDOLC'};
-            delete $rHealthHomeInsurance->{'DesigProvID'};    # MAYBE NOT...
-            my $UID =
-              DBA->doUpdate( $form, 'Insurance', $rHealthHomeInsurance );
-            print qq|      create Health Home Insurance...ID=${UID}\n|;
-            $rHealthHomeInsurance->{InsNumID} = $UID;
-        }
-        else {
-            print
-qq|<<<ERROR>>> FAILED: Create Health Home Insurance...NO Insurance $r->{'InsuranceID'}\n|;
-        }
-    }
-    warn qq|  check: InsNumID=$rHealthHomeInsurance->{'InsNumID'}\n|
-      if ($debug);
-    next
-      unless ( $rHealthHomeInsurance->{'InsNumID'} )
-      ;    # No Health Home Insurance.
-    warn
-qq|  copy: ID=$r->{'ID'}, InsuranceID=$rHealthHomeInsurance->{'InsNumID'}\n|
-      if ($debug);
-    my $PrAuthID =
-      main->copyPA( $form, $r->{'ID'}, $rHealthHomeInsurance->{'InsNumID'} );
-
-    # set the PALines for Approved PAs...
-    Inv->setPALines( $form, $PrAuthID );
+############################################################################
+print qq|${cmd} Started: | . localtime() . qq|\n\n|;
+print qq|======================================\n\n|;
+foreach my $dbname (@DBS) {
+    print qq|\n--------------------------------------\n|;
+    print qq|database: ${dbname}\n|;
+    system("${BIN}/genHHPA DBNAME=${dbname}");
 }
-$sSelPrAuth->finish();
-$sInsurance->finish();
-$sPrAuthInsurance->finish();
-$sClientPrAuth->finish();
-$sClientPrAuthCDC->finish();
-$sPDDom->finish();
-$supdClientPrAuth->finish();
-$form->complete();
-print qq|${cnt} records processed.\n\n|;
+print qq|\n\n======================================\n|;
+print qq|${cmd} Completed: | . localtime() . qq|\n|;
 exit;
-############################################################################
-sub copyPA {
-    my ( $self, $form, $PrAuthID, $InsuranceID ) = @_;
-    my $NewPrAuthID = '';
-    warn qq|  copyPA: PrAuthID=${PrAuthID}, InsuranceID=${InsuranceID}\n|
-      if ($debug);
-    $sClientPrAuth->execute($PrAuthID) || $form->dberror("copyPA: $PrAuthID");
-    if ( my $rClientPrAuth = $sClientPrAuth->fetchrow_hashref ) {
-        warn
-qq|#$rClientPrAuth->{ClientID}\t$rClientPrAuth->{ID}\t$rClientPrAuth->{PAnumber}\n|
-          if ($debug);
-        $rClientPrAuth->{'InsuranceID'} = $InsuranceID;
-
-        my ( $txt, $sid, $mod ) =
-          split( '\|', $rClientPrAuth->{'HHresponse'}, 3 );
-        ( my $id = $sid . ' ' . $mod ) =~
-          s/^\s*(.*?)\s*$/$1/g;    # trim both leading/trailing
-        if ( $id eq '' ) {
-            print qq|<<<ERROR>>> No PAgroup ID in HHresponse!\n|;
-            return;
-        }
-
-        warn qq|HHresponse/PAgroup: =${id}= (${txt} ${sid} ${mod})\n|
-          if ($debug);
-        $rClientPrAuth->{'PAgroup'} = $id;
-## CHANGED TO KEEP the PrAuth EffDate/ExpData from the Medicaid PrAuth.
-##    my ($year, $month, $day) = $rClientPrAuth->{'EffDate'} =~ /(\d*)-(\d*)-(\d*)/;
-##    $rClientPrAuth->{'EffDate'} = $year.'-'.$month.'-01';
-##    my $Length2 = DBA->getxref($form,'xPAgroups',$id,'Length2');
-##    $rClientPrAuth->{'ExpDate'} = DBUtil->Date($rClientPrAuth->{'EffDate'},$Length2,-1);
-        my $which   = $id =~ /G9009|G9010/ ? 'ChildAmt' : 'AdultAmt';
-        my $AuthAmt = DBA->getxref( $form, 'xPAgroups', $id, $which );
-        if ( $AuthAmt eq '' ) {
-            print qq|<<<ERROR>>> No AuthAmt for ID=${id}!\n|;
-            return;
-        }
-
-        my $UnitsAuth = DBA->getxref( $form, 'xPAgroups', $id, 'Units' );
-        my $LinesAuth = DBA->getxref( $form, 'xPAgroups', $id, 'PAlines' );
-        warn
-qq|x: AuthAmt=${AuthAmt}: UnitsAuth=${UnitsAuth}: LinesAuth=${LinesAuth}\n|
-          if ($debug);
-        $rClientPrAuth->{'AuthAmt'}   = $AuthAmt * $LinesAuth;
-        $rClientPrAuth->{'UnitsAuth'} = $UnitsAuth;
-        $rClientPrAuth->{'LinesAuth'} = $LinesAuth;
-
-        $rClientPrAuth->{'CreateProvID'} = 91;
-        $rClientPrAuth->{'CreateDate'}   = $form->{'TODAY'};
-        $rClientPrAuth->{'ChangeProvID'} = 91;
-        delete $rClientPrAuth->{'NotificationType'};  # so PALines will be built
-        delete $rClientPrAuth->{'RecDOLC'};
-        $NewPrAuthID = DBA->doUpdate( $form, 'ClientPrAuth', $rClientPrAuth );
-        warn qq|Create ClientPrAuth: NewPrAuthID=${NewPrAuthID};\n| if ($debug);
-
-        warn qq|#ClientPrAuthCDC-->\tTransType\tStatus\tStatusDate\t\n|
-          if ($debug);
-        $cnt = 0;
-        $sClientPrAuthCDC->execute($PrAuthID)
-          || $form->dberror("copyPA: ClientPrAuthCDC");
-        while ( my $rClientPrAuthCDC = $sClientPrAuthCDC->fetchrow_hashref ) {
-            $cnt++;
-            warn
-qq|#\t$rClientPrAuthCDC->{TransType}\t$rClientPrAuthCDC->{Status}\t$rClientPrAuthCDC->{StatusDate}\t$rClientPrAuthCDC->{me}\n|
-              if ($debug);
-            $rClientPrAuthCDC->{'ClientPrAuthID'} = $NewPrAuthID;
-            $rClientPrAuthCDC->{'CreateProvID'}   = 91;
-            $rClientPrAuthCDC->{'CreateDate'}     = $form->{'TODAY'};
-            $rClientPrAuthCDC->{'ChangeProvID'}   = 91;
-            $rClientPrAuthCDC->{'CDCOK'} =
-              1;    # CDCOK, will process in ExpPrevAuth
-            delete $rClientPrAuthCDC->{'RecDOLC'};
-            my $UID =
-              DBA->doUpdate( $form, 'ClientPrAuthCDC', $rClientPrAuthCDC );
-        }
-        warn qq|     No ClientPrAuthCDC\n| if ( $cnt == 0 );
-
-        warn qq|#Dom-->\tDom1\tDom2\tDom3\tDom4\tDom5\tDom6\tDom7\n|
-          if ($debug);
-        $cnt = 0;
-        $sPDDom->execute($PrAuthID) || $form->dberror("copyPA: PDDom");
-        while ( my $rPDDom = $sPDDom->fetchrow_hashref ) {
-            $cnt++;
-            warn
-qq|#\t$rPDDom->{Dom1Score}\t$rPDDom->{Dom2Score}\t$rPDDom->{Dom3Score}\t$rPDDom->{Dom4Score}\t$rPDDom->{Dom5Score}\t$rPDDom->{Dom6Score}\t$rPDDom->{Dom7Score}\n|
-              if ($debug);
-            $rPDDom->{'PrAuthID'}     = $NewPrAuthID;
-            $rPDDom->{'CreateProvID'} = 91;
-            $rPDDom->{'CreateDate'}   = $form->{'TODAY'};
-            $rPDDom->{'ChangeProvID'} = 91;
-            delete $rPDDom->{'RecDOLC'};
-            my $UID = DBA->doUpdate( $form, 'PDDom', $rPDDom );
-        }
-        print qq|    No CARS!\n| if ( $cnt == 0 );
-
-        #   finally mark it copied...
-        $supdClientPrAuth->execute( $NewPrAuthID, $PrAuthID )
-          || $form->dberror("copyPA: mark: from: $PrAuthID to: $NewPrAuthID");
-        $supdClientPrAuth->execute( $PrAuthID, $NewPrAuthID )
-          || $form->dberror("copyPA: mark: to: $NewPrAuthID from: $PrAuthID");
-        print qq|    Copy PrAuth ${PrAuthID} to ${NewPrAuthID}!\n|;
-    }
-    else { print qq|<<<ERROR>>> SELECT PrAuthID=${PrAuthID}!! \n|; }
-    return ($NewPrAuthID);
-}
 ############################################################################

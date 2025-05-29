@@ -1,541 +1,90 @@
-#!C:/Strawberry/perl/bin/perl.exe
-use lib 'C:/xampp/htdocs/src/lib';
-use Cwd;
-use DBI;
+#!/usr/bin/perl
+use lib '/var/www/okmis/src/lib';
+use Accounts;
+use myConfig;
 use myForm;
-use SysAccess;
-use DBA;
-use DBUtil;
-use cBill;
-use uBill;
-use Time::Local;
-my $DT = localtime();
-my ( $sec, $min, $hrs, $day, $month, $year, $wday, $julian ) = localtime();
+use myDBI;
+use Cwd;
+############################################################################
+# usage: command                    for all accounts
+#    or: command mark               mark billing for weekly run
+#    or: command acct1 acct2...     to run for 'acct1' 'acct2' ...
+#    or: command mark acct1 acct2...to mark for 'acct1' 'acct2' ...
+############################################################################
+my $form;
+
+# get the command name...
+my ( $pw, $cmd ) = $0 =~ m/(.*\/)(.*)$/;
+
+# Mark?
+my $Mark = 0;
+if ( $ARGV[0] eq 'mark' ) { $Mark = 1; shift; }
+
+# the databases to work with
+my @DBS =
+    $ARGV[0] eq 'test' ? Accounts->dbs('test')
+  : scalar(@ARGV)      ? @ARGV
+  :                      Accounts->dbs('active');
+my $BILLDIR = myConfig->cfg('BILLDIR');
+my $BIN     = myConfig->cfg('BIN');
+
+# $form->{'debug'} = 1;
 
 ############################################################################
-# usage: genBilling DBNAME={dbname}&Mark=1&MarkDate=2012-06-22&ClinicIDs=1 2 3&ProvIDs=1 2 3&TrIDs=1 2 3&DEBUG=1
-############################################################################
-# Initilization section
-##
-my $form = myForm->new();
+print qq|${cmd} Started: | . localtime() . qq|\n\n|;
+print qq|======================================\n\n|;
+print qq|Mark=${Mark}\n|;
+print qq|DBS=@DBS\n|;
 
-#unless ( SysAccess->getRule($form,'EnableBill') )
-#{ print "\nConfiguration not set to Bill!\n\n"; exit; }
-my $dbh = myDBI->dbconnect( $form->{'DBNAME'} );
+# remove the billing files from last week...
+chdir($BILLDIR);
+my @delfiles = glob("*.837 *.837.out *.837.txt");
+print qq|\nRemove OLD Billing files: | . @delfiles . qq|...\n|;
+unlink(@delfiles);
 
-#######################################################
-# Initialize table lookups
-##
-$s = $dbh->prepare("select * from Provider where Type=3");
-$s->execute();
-while ( my $r = $s->fetchrow_hashref ) { $ClinicList{ $r->{ProvID} } = $r; }
-$s = $dbh->prepare("select * from xInsurance");
-$s->execute();
-while ( my $r = $s->fetchrow_hashref ) { $xInsurance{ $r->{ID} } = $r; }
-$xInsurance{0}{ID}    = 0;
-$xInsurance{0}{Name}  = 'No Insurance';
-$xInsurance{0}{Descr} = 'none';
-$s->finish();
+foreach my $dbname (@DBS) {
+    my $pwd = cwd();
+    print qq|\n--------------------------------------\n|;
+    print qq|database: ${dbname} pwd=${pwd}\n|;
 
-my ( $MarkDate, $NEXTBILLDATE ) = cBill->getBillDate();
-$MarkDate = $form->{MarkDate} if ( $form->{MarkDate} );
+    system("${BIN}/genBilling DBNAME=${dbname}\\&Mark=${Mark}");
+    next unless ($Mark);
 
-##
-# other selects
-##
-$sProvider  = $dbh->prepare("select * from Provider where ProvID=?");
-$qContracts = qq|
-select Contracts.PIN, Contracts.InsID, Contracts.BillFlag, Contracts.BillType
-      ,Contracts.AutoReconcile
-      ,xInsurance.Descr, Provider.ProvID, Provider.Name, Provider.Email
-      ,Provider.Addr1, Provider.Addr2, Provider.City, Provider.ST, Provider.Zip
-from Contracts
-  left join xInsurance on xInsurance.ID=Contracts.InsID
-  left join Provider on Provider.ProvID=Contracts.ProvID
-where Provider.ProvID=? and xInsurance.ID=?
-order by xInsurance.Descr, Provider.Name
-|;
+    print qq|\n    Set Addons ...\n|;
+    system("${BIN}/setAddon DBNAME=${dbname}");
 
-#warn qq|$qContracts\n|;
-$sContracts = $dbh->prepare($qContracts);
-##
-# database updates
-##
-my $sBillDate = $dbh->prepare(
-    "update Treatment set BillDate=? where TrID=? and BillDate is null");
-my $sCIPDate = $dbh->prepare(
-"update Treatment set BillStatus=3, StatusDate=?, CIPDate=?, Units=? where TrID=?"
-);
-my $sInsMet =
-  $dbh->prepare("update Insurance set DeductionMet=? where InsNumID=?");
-my $sNotePR = $dbh->prepare("update Treatment set BillCode='PR' where TrID=?");
+    print qq|\n    Set Billing ...\n|;
+    system("${BIN}/setBilling DBNAME=${dbname}");
 
-#############################################################################
-# Begin
-my $GrandText;
-if ( $form->{Mark} ) {
-    $GrandText = qq|\n${DT}\nBilling Report (MarkDate=${MarkDate})\n\n|;
-}
-else { $GrandText = qq|\n${DT}\nBilling Report (Check)\n\n|; }
-
-##
-# START THE SHOW. Process the Providers/Clinics
-##
-
-my $ForProvID = $form->{Provider} ? $form->{Provider} : $form->{LOGINPROVID};
-my $ClinicSelection =
-  DBA->getClinicSelection( $form, $ForProvID, 'Treatment.ClinicID' );
-my ( $ClinicIDs, $conj ) = ( '', '' );
-foreach my $ClinicID ( split( ' ', $form->{ClinicIDs} ) ) {
-    $ClinicIDs .= qq|${conj} Treatment.ClinicID=${ClinicID} |;
-    $conj = 'or';
-}
-$ClinicSelection .= qq|  and (${ClinicIDs})| if ( $ClinicIDs ne '' );
-my ( $ProvIDs, $conj ) = ( '', '' );
-foreach my $ProvID ( split( ' ', $form->{ProvIDs} ) ) {
-    $ProvIDs .= qq|${conj} Treatment.ProvID=${ProvID} |;
-    $conj = 'or';
-}
-$ClinicSelection .= qq|  and (${ProvIDs})| if ( $ProvIDs ne '' );
-my ( $TrIDs, $conj ) = ( '', '' );
-foreach my $TrID ( split( ' ', $form->{TrIDs} ) ) {
-    $TrIDs .= qq|${conj} Treatment.TrID=${TrID} |;
-    $conj = 'or';
-}
-$ClinicSelection .= qq|  and (${TrIDs})| if ( $TrIDs ne '' );
-##
-# select Treatments Reviewed but not InProcess and not yet Scholarshipped or Reconciled...
-##
-my $qNotes = qq|
-  select *, Treatment.ProvID as ProvID, Client.ProvID as PrimaryProvID
-  from Treatment
-    left join Client on Client.ClientID=Treatment.ClientID
-    left join xSC on xSC.SCID=Treatment.SCID
-  where Treatment.BillStatus<3 and Treatment.MgrRevDate is not null
-    ${ClinicSelection}
-  order by Treatment.ClinicID, Treatment.ProvID, Treatment.ClientID, Treatment.ContLogDate
-|;
-warn "qNotes=$qNotes\n" if ( $form->{DEBUG} );
-$sNotes = $dbh->prepare($qNotes);
-
-#######################################################
-##
-# set our counters & stuff
-##
-my $SubTotalServices   = ();    # Number of Notes
-my $TotalServiceAmount = ();    # $$ amount of services provided
-my $TotalPay           = ();    # $$ amount of payment to provider
-my $ClientTotal        = 0;     # Line total per Client
-my $PrevClientID       = '';    # lets us know when to reset ClientTotal
-my $Emails             = ();    # Email results by Clinic
-##
-# reports go in the reports directory.
-print qq|DOCROOT=$form->{DOCROOT}\n|;
-chdir("$form->{DOCROOT}/reports4");
-
-# clear the billingerrors reports
-my @TmpFiles = glob("$form->{DOCROOT}/reports4/billingerrors*");
-
-#  foreach $file ( @TmpFiles ) { print "Expire: $file\n"; }
-unlink(@TmpFiles);
-
-# reset the notes Status Messages in Treatment table
-my $qResetNew =
-qq|update Treatment set BillStatus=0, StatusMsg=NULL where BillStatus=2 and BillDate is null|;
-my $sResetNew = $dbh->prepare($qResetNew);
-$sResetNew->execute() || $form->dberror($qResetNew);
-$sResetNew->finish();
-my $qResetBilled =
-qq|update Treatment set BillStatus=1, StatusMsg=NULL where BillStatus=2 and BillDate is not null|;
-my $sResetBilled = $dbh->prepare($qResetBilled);
-$sResetBilled->execute() || $form->dberror($qResetBilled);
-$sResetBilled->finish();
-#####################################################################
-##
-# run the report
-##
-$sNotes->execute() || $form->dberror($qNotes);
-while ( $rNotes = $sNotes->fetchrow_hashref ) {
-    my $TrID = $rNotes->{'TrID'};
-    warn "TrID=$rNotes->{TrID}:${TrID}, ClientID=$rNotes->{ClientID}\n"
-      if ( $form->{DEBUG} );
-
-   #foreach my $f ( sort keys %{$rNotes} ) { warn "rNotes-$f=$rNotes->{$f}\n"; }
-    my $ClinicID = $rNotes->{ClinicID};
-    my $InsID =
-      $rNotes->{InsID} ? $rNotes->{InsID} : '0';    # 0 = No Insurance, none.
-    $form->{FileID} = $ClinicID . '_' . $InsID;
-    $form->{FileIDs}->{ $form->{FileID} } =
-      1;    # set to output totals, even if no fatals/warnings.
-    $form->{InsDescr}  = $xInsurance{$InsID}{Descr};
-    $form->{InsName}   = $xInsurance{$InsID}{Name};
-    $form->{ErrHeader} = qq|$DT\n$xInsurance{$InsID}{Name} Billing Errors\n|;
-    $SubTotalServices{ $form->{FileID} } += 0;    # just to make a zero.
-    ##
-    # Validate billing.
-    ##
-    warn "TrID=${TrID}, ClinicID=$ClinicID, InsID=$InsID\n"
-      if ( $form->{DEBUG} );
-    next unless ( main->validNote( $form, $rNotes ) );
-
-    my ( $BilledAmt, $IncAmt, $SchAmt, $AmtDue ) =
-      uBill->setBilledAmt( $form, $TrID );
-    my $rxSC = cBill->getServiceCode(
-        $form, $rNotes->{SCID},
-        $rNotes->{ContLogDate},
-        $rNotes->{ContLogBegTime},
-        $rNotes->{ContLogEndTime},
-        $TrID, $rNotes->{BillDate}
+    $form = myForm->new("DBNAME=$dbname");
+    my $dbh           = myDBI->dbconnect( $form->{'DBNAME'} );
+    my $sInsContracts = $dbh->prepare(
+"select xInsurance.Descr from Contracts left join xInsurance on xInsurance.ID=Contracts.InsID where Contracts.BillFlag=1 and Contracts.BillType='EL' group by xInsurance.Descr"
     );
-    warn "TrID=${TrID}, FileID=$form->{FileID}, UnitLbl=$rxSC->{UnitLbl}\n"
-      if ( $form->{DEBUG} );
-    next
-      if (
-        main->Scholarshipped(
-            $form, $rxSC->{UnitLbl}, $form->{Mark},
-            $TrID, $rxSC->{SCNum},   $MarkDate,
-            $AmtDue
-        )
-      );
-
-    $sContracts->execute( $ClinicID, $InsID ) || $form->dberror($qContracts);
-    my $rContracts = $sContracts->fetchrow_hashref;
-    my $rInsurance = cBill->getInsurance( $form, $rNotes->{ClientID}, $InsID,
-        $rNotes->{ContLogDate} );
-    my $rClientPrAuth = cBill->getAuth( $form, $rNotes->{ClientID}, $InsID,
-        $rNotes->{ContLogDate} );
-
-    $rNotes->{Units}    = $rxSC->{Units};                # for error printing.
-    $rNotes->{InsIDNum} = $rInsurance->{InsIDNum};       # for error printing.
-    $rNotes->{PAnumber} = $rClientPrAuth->{PAnumber};    # for error printing.
-    warn
-"TrID=${TrID}, InsIDNum=$rInsurance->{InsIDNum}, PAnumber=$rClientPrAuth->{PAnumber}\n"
-      if ( $form->{DEBUG} );
-
-    warn "GOOD: TrID=${TrID}, BillFlag=$rContracts->{BillFlag}\n"
-      if ( $form->{DEBUG} );
-
-    $SubTotalServices{ $form->{FileID} }++;
-    $TotalServiceAmount{ $form->{FileID} } += $rxSC->{BillAmt};
-    $ClientTotal = 0 if ( $PrevClientID ne $rNotes->{ClientID} );
-    $ClientTotal += $rxSC->{BillAmt};
-
-    ##
-    # FATAL error if not set to be Billed.
-    ##
-    unless ( $rContracts->{BillFlag} ) {
-        main->FatalError( $form, $rNotes, "Contract NOT SET to be billed." );
-        $form->{ $form->{FileID} }->{Fatals}++;
+    $sInsContracts->execute();
+    while ( my $rInsContracts = $sInsContracts->fetchrow_hashref ) {
+        print qq|\n    generate $rInsContracts->{Descr} '837'...\n|;
+        system(
+            "${BIN}/gen837 DBNAME=${dbname}\\&InsDescr=$rInsContracts->{Descr}"
+        );
     }
-    ##
-    # Mark these TrIDs to be Billed.
-    ##
-    if ( $form->{Mark} && $rContracts->{BillFlag} ) {
-        warn "Bill: TrID=${TrID}\n" if ( $form->{DEBUG} );
-        $sBillDate->execute( $MarkDate, $TrID )
-          || $form->dberror("update Treatment BillDate: ${TrID}");
-        $sCIPDate->execute( $MarkDate, $MarkDate, $rxSC->{Units}, $TrID )
-          || $form->dberror("update Treatment CIPDate: ${TrID}");
-        ##
-        # Mark these TrIDs as Patient's Responsibility.
-        ##
-        my $InsCode = $xInsurance{$InsID}{InsCode};
-        if ( $rInsurance->{Deductible} > $rInsurance->{DeductionMet} ) {
-            my $Met = $rInsurance->{DeductionMet} + $AmtDue;
-            $sInsMet->execute( $Met, $rInsurance->{InsNumID} )
-              || $form->dberror($qInsMet);
-            $sNotePR->execute($TrID)
-              || $form->dberror("update Treatment BillCode PR ${TrID}");
-            $InsCode = '09';    # Self-pay.
-        }
-        if ( $rContracts->{AutoReconcile} ) {
-            main->AutoReconcile( $form, $TrID, $rxSC->{SCNum}, $MarkDate,
-                $AmtDue );
-        }
-        else {
-            my $rNoteTrans = ();
-            $rNoteTrans->{TrID}     = $TrID;
-            $rNoteTrans->{ClientID} = $rNotes->{ClientID};
-            $rNoteTrans->{ProvID}   = $rNotes->{ProvID};
-            $rNoteTrans->{BillDate} = ${MarkDate};
-            $rNoteTrans->{ContDate} = $rNotes->{ContLogDate};
-            $rNoteTrans->{SCID}     = $rNotes->{SCID};
-            $rNoteTrans->{SCNum} =
-                $rNotes->{Mod4} eq ''
-              ? $rxSC->{SCNum}
-              : $rxSC->{SCNum} . ' ' . $rNotes->{Mod4};
-            $rNoteTrans->{Units}    = $rxSC->{Units};
-            $rNoteTrans->{Duration} = $rxSC->{Duration};
-            $rNoteTrans->{BillAmt}  = $rxSC->{BillAmt};
-            $rNoteTrans->{InsCode}  = ${InsCode};
-            $rNoteTrans->{RefID}    = '';
-            $rNoteTrans->{RecDate}  = '';
-            $rNoteTrans->{PaidAmt}  = '';
-            $rNoteTrans->{DenCode}  = '';
-            $rNoteTrans->{Code}     = 'BI';
-            $rNoteTrans->{SRC}      = 'BI';
-            $rNoteTrans->{PaidDate} = '';
-            ##
-            # in case it's run several times in 1 week.
-            # (but it won't get picked up because of CIPDate?)
-            ##
-            DBA->replace( $form, 'TrID:BillDate', 'NoteTrans', $rNoteTrans );
-        }
-    }
-    $PrevClientID = $rNotes->{ClientID};
+    $sInsContracts->finish();
+    myDBI->cleanup();
+
+    print qq|\n    generate JOLTS '837'\n|;
+    system("${BIN}/genJOLTS DBNAME=${dbname}");
+
+    # not done anymore...
+    #  print qq|\n    generate Notes...\n|;
+    #  system("${BIN}/ClinicNotes DBNAME=${dbname}\\&Type=progress");
+    print qq|\n    generate HCFAs...\n|;
+    system("${BIN}/ClinicHCFA DBNAME=${dbname}");
 }
-$sNotes->finish();
-$sNotePR->finish();
-$sInsMet->finish();
-$sCIPDate->finish();
-$sBillDate->finish();
-##
-# send email with totals.
-##
-$cnt                     = 0;
-$GrandTotalServices      = 0;
-$GrandTotalServiceAmount = 0;
-foreach my $ID ( sort keys %{ $form->{FileIDs} } ) {
-    $cnt++;
-    my ( $ClinicID, $InsID ) = split( '_', $ID );
 
-    #warn qq|ID=$ID, ClinicID=$ClinicID, InsID=$InsID\n|;
-    my $SubSubject = qq|ERRORs in Billing for $ClinicList{$ClinicID}{Name}|;
-
-    $sContracts->execute( $ClinicID, $InsID ) || $form->dberror($qContracts);
-    my $rContracts = $sContracts->fetchrow_hashref;
-    my $SubText =
-qq|INSURANCE: $xInsurance{$InsID}{Name} ($InsID) PIN: $rContracts->{PIN}\n|;
-
-#warn qq|EMAIL: ClinicID=$ClinicID, InsID=$InsID, Bill=$rContracts->{BillFlag}\n|;
-    if ( $rContracts->{BillFlag} ) {
-        $SubText .=
-          qq|$xInsurance{$InsID}{Name} CONTRACT set up to BILL on MONDAYs.\n|;
-    }
-    else {
-        $SubText .=
-qq|$xInsurance{$InsID}{Name} CONTRACT is NOT SET UP TO BILL.<<<<----\n|;
-    }
-
-    my $TS = &AddComma( $SubTotalServices{$ID} );
-    $SubTotalServices = DBUtil->FmtStr( $TS, 11, 'R' );
-    my $TA = sprintf( "%.2f", $TotalServiceAmount{$ID} );
-    $TotalServiceAmount = DBUtil->FmtStr( $TA, 11, 'R' );
-    my $W = &AddComma( $form->{$ID}->{Warnings} );
-    my $F = &AddComma( $form->{$ID}->{Fatals} );
-    $SubText .=
-qq|Total Fatals:\t${F}\tTotal Warnings:\t${W}\nTotal Services Passed:\t${SubTotalServices}\tTotal Amount:\t${TotalServiceAmount}\n|;
-    $SubText .=
-qq|Report has been run and available on the menu option: Reports->User Reports (Reports Window)\nUnder the 'Billing' heading section 'Billing Errors'.\n-------\n\n|
-      if ( $form->{OpenFileID}->{$ID} );
-
-    my $Addresses = ''
-      ; # got rid of ClinicIDs in ProviderPrivs - SysAccess->getPrivEmail($form,$ClinicID);
-    $GrandTotalServices      += $SubTotalServices{$ID};
-    $GrandTotalServiceAmount += $TotalServiceAmount{$ID};
-    $GrandTotalWarnings      += $form->{$ID}->{Warnings};
-    $GrandTotalFatals        += $form->{$ID}->{Fatal};
-    close($ID);
-
-    #warn qq|email: ClinicID=$ClinicID, InsID=$InsID, ERRFLAG=$ERRFLAG\n|;
-    #warn qq|email: SubAddress=$SubAddress, SubSubject=$SubSubject\n|;
-    $Emails->{$ClinicID}->{Addresses} = $Addresses;
-    $Emails->{$ClinicID}->{Subject}   = $SubSubject;
-    $Emails->{$ClinicID}->{Text} .= $SubText;
-}
-foreach my $ClinicID ( sort keys %{$Emails} ) {
-    print qq|ClinicID: $ClinicID=$Emails->{$ClinicID}->{Addresses}\n|;
-    print qq|$Emails->{$ClinicID}->{Subject}\n$Emails->{$ClinicID}->{Text}\n\n|;
-    $GrandText .= qq|Billing for $ClinicList{$ClinicID}{Name}\n|;
-    $GrandText .= qq|$Emails->{$ClinicID}->{Addresses}\n|;
-    $GrandText .= $Emails->{$ClinicID}->{Text};
-}
-$GrandTotalServices      = &AddComma($GrandTotalServices);
-$GrandTotalServices      = DBUtil->FmtStr( $GrandTotalServices,      11, 'R' );
-$GrandTotalServiceAmount = DBUtil->FmtStr( $GrandTotalServiceAmount, 11, 'R' );
-$GrandText .=
-qq|\nGRAND TOTAL:\t${GrandTotalServices}\t${GrandTotalServiceAmount}\t                               \t                               \t${GrandTotalFatals}\t${GrandTotalWarnings}\n|;
-print
-qq|\n            \tTotalServices\tTotalServiceAmount\tTotalFatals\tTotalWarnings\n|;
-print
-qq|\nGRAND TOTAL:\t${GrandTotalServices}\t${GrandTotalServiceAmount}\t${GrandTotalFatals}\t${GrandTotalWarnings}\n|;
-$GrandSubject = qq|Billing Reports for $form->{TODAY} ($form->{DBNAME})|;
-DBUtil->email( $form, 'billing@okmis.com', $GrandSubject, $GrandText );
-##
-# Finish up.
-##
-$sContracts->finish();
+system("${BIN}/SendBilling");
 myDBI->cleanup();
+
+print qq|\n\n======================================\n|;
+print qq|${cmd} Completed: | . localtime() . qq|\n|;
 exit;
-##############################################################################
-sub validNote {
-    my ( $self, $form, $r ) = @_;
-
-    my ( $valid, $fatalCnt, $warnCnt ) = ( 1, 0, 0 );
-    my ( $code, $msg ) = cBill->CheckNote( $form, $r->{TrID} );
-    if ( $code && $msg )    # FATAL
-    { main->FatalError( $form, $r, $msg ); $fatalCnt++; }
-    elsif ($msg)            # Warning
-    { main->WarnError( $form, $r, $msg ); $warnCnt++; }
-
-    if ($fatalCnt) {
-        my $qStatusUnBill =
-qq|update Treatment set BillStatus=2, StatusDate=?, StatusMsg=? where TrID=?|;
-        my $sStatusUnBill = $dbh->prepare($qStatusUnBill);
-        $sStatusUnBill->execute( $form->{TODAY}, $msg, $r->{TrID} )
-          || $form->dberror($qStatusUnBill);
-        $sStatusUnBill->finish();
-        $valid = 0;
-    }
-    $form->{ $form->{FileID} }->{Fatals}   += $fatalCnt;
-    $form->{ $form->{FileID} }->{Warnings} += $warnCnt++;
-    return ($valid);
-}
-
-sub Scholarshipped {
-    my ( $self, $form, $UnitLbl, $Mark, $TrID, $SCNum, $SchDate, $AmtDue ) = @_;
-
-#warn qq|UnitLbl=$UnitLbl, Mark=$Mark, TrID=$TrID, SchDate=$SchDate, AmtDue=$AmtDue\n|;
-    return (0) if ( $UnitLbl ne 'NonBill' );
-    return (1) unless ($Mark);
-    my ( $SRC, $Code ) = ( 'BI', 'SR' );
-    my $r835 = ();
-    $r835->{'TrID'}     = $TrID;
-    $r835->{'SCNum'}    = $SCNum;
-    $r835->{'BillDate'} = $SchDate;
-    $r835->{'RecDate'}  = $SchDate;
-    $r835->{'PaidAmt'}  = $AmtDue;
-    $r835->{'PaidDate'} = $SchDate;    # mark for Payroll exclusion.
-    my $TheDate = DBUtil->Date( $SchDate, 'fmt', 'MM/DD/YYYY' );
-    $r835->{'RefID'} = 'SR:' . $TheDate;
-    my ( $trid, $scid, $code, $type ) =
-      uBill->postClaim( $form, $r835, $SRC, $Code, $StatusMsg );
-
-    # did we reconcile this note before it was even billed?
-    uBill->fixBillDate( $form, $TrID, $SchDate );
-
-    # don't leave it unreviewed.
-    uBill->fixRevDates( $form, $TrID, 3 );
-    return (1);
-}
-
-sub AutoReconcile {
-    my ( $self, $form, $TrID, $SCNum, $RecDate, $AmtDue ) = @_;
-
-    #warn qq|TrID=$TrID, RecDate=$RecDate, AmtDue=$AmtDue\n|;
-    my ( $SRC, $Code ) = ( 'BI', 'AR' );
-    my $r835 = ();
-    $r835->{'TrID'}     = $TrID;
-    $r835->{'SCNum'}    = $SCNum;
-    $r835->{'BillDate'} = $RecDate;
-    $r835->{'RecDate'}  = $RecDate;
-    $r835->{'PaidAmt'}  = $AmtDue;
-    my $TheDate = DBUtil->Date( $RecDate, 'fmt', 'MM/DD/YYYY' );
-    $r835->{'RefID'} = 'AR:' . $TheDate;
-    my ( $trid, $scid, $code, $type ) =
-      uBill->postClaim( $form, $r835, $SRC, $Code, $StatusMsg );
-
-    # did we reconcile this note before it was even billed?
-    uBill->fixBillDate( $form, $TrID, $RecDate );
-
-    # don't leave it unreviewed.
-    uBill->fixRevDates( $form, $TrID, 3 );
-    return (1);
-}
-
-sub FatalError {
-    my ( $self, $form, $rNotes, $errormsg ) = @_;
-    my $ID = $form->{FileID};
-
-    #warn qq|FatalError=ID=$ID, $errormsg\n|;
-    main->OpenFile($form) unless ( $form->{OpenFileID}->{$ID} );
-    print $ID "FATAL!\t${errormsg}";
-    print $ID "\t$rNotes->{LName}, $rNotes->{FName} ($rNotes->{ClientID})";
-    print $ID "\t$rNotes->{SSN}";
-    print $ID "\t$rNotes->{DOB}";
-    print $ID "\t$rNotes->{TrID}";
-    print $ID "\t$rNotes->{ContLogDate}";
-    print $ID "\t$rNotes->{InsIDNum}";
-    print $ID "\t$rNotes->{PAnumber}";
-    print $ID "\t$rNotes->{SCNum} $rNotes->{Mod4}";
-    print $ID "\t$rNotes->{SCID}";
-    print $ID "\t$rNotes->{Units}";
-    print $ID "\t$rNotes->{Axis1ACode}";
-    print $ID "\n";
-    return (1);
-}
-
-sub WarnError {
-    my ( $self, $form, $rNotes, $errormsg ) = @_;
-    my $ID = $form->{FileID};
-
-    #warn qq|WarnError=ID=$ID, $errormsg\n|;
-    main->OpenFile($form) unless ( $form->{OpenFileID}->{$ID} );
-    print $ID "Warning\t${errormsg}";
-    print $ID "\t$rNotes->{LName}, $rNotes->{FName} ($rNotes->{ClientID})";
-    print $ID "\t$rNotes->{SSN}";
-    print $ID "\t$rNotes->{DOB}";
-    print $ID "\t$rNotes->{TrID}";
-    print $ID "\t$rNotes->{ContLogDate}";
-    print $ID "\t$rNotes->{InsIDNum}";
-    print $ID "\t$rNotes->{PAnumber}";
-    print $ID "\t$rNotes->{SCNum} $rNotes->{Mod4}";
-    print $ID "\t$rNotes->{SCID}";
-    print $ID "\t$rNotes->{Units}";
-    print $ID "\t$rNotes->{Axis1ACode}";
-    print $ID "\n";
-    return (1);
-}
-
-sub OpenFile {
-    my ( $self, $form ) = @_;
-    my $ID = $form->{FileID};
-
-    #warn qq|ID=$ID, opened=$form->{$ID}\n|;
-    return (0) if ( $form->{OpenFileID}->{$ID} );    # already opened.
-
-    my $OutFile =
-        'billingerrors_'
-      . ${ID} . '_'
-      . DBUtil->Date() . '_'
-      . DBUtil->Date( '', 'stamp' ) . '_'
-      . DBUtil->genToken() . '.xls';
-
-    #warn qq|OutFile=$OutFile\n|;
-    open $ID, ">${OutFile}" || die "Couldn't open '${OutFile}' file: $!";
-    $form->{OpenFileID}->{$ID} = 1;                  # set to opened.
-
-    print $ID "$HDR";
-    print $ID "Type";
-    print $ID "\tDescription";
-    print $ID "\tClientName";
-    print $ID "\tSSN";
-    print $ID "\tDOB";
-    print $ID "\tTrID";
-    print $ID "\tContDate";
-    print $ID "\tInsGrpNum";
-    print $ID "\tPAnumber";
-    print $ID "\tSCNum";
-    print $ID "\tSCID";
-    print $ID "\tUnits";
-    print $ID "\tAxis1ACode";
-    print $ID "\n";
-    return (1);
-}
-###############################################################################
-sub AddComma($) {
-    my ($Num) = @_;
-    my ( $r, $l ) = split( /\./, $Num );
-    my @r      = split( //, $r );
-    my $NewNum = '';
-    my $i      = 0;
-    my $comma  = '';
-    foreach $c ( reverse @r ) {
-        if   ( $i % 3 == 0 ) { $NewNum = $c . $comma . $NewNum; }
-        else                 { $NewNum = $c . $NewNum; }
-        $i++;
-        $comma = ',';
-    }
-    return $l eq '' ? $NewNum : $NewNum . '.' . $l;
-}
-##############################################################################
+############################################################################

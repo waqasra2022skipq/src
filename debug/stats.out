@@ -1,28 +1,121 @@
-vitals.cgi: form-Browser=Mozilla/5.0
-vitals.cgi: form-ClientID=53531
-vitals.cgi: form-DBNAME=okmis_dev
-vitals.cgi: form-DOCBIN=C:/xampp/htdocs/cgi/bin
-vitals.cgi: form-DOCPARENT=C:/xampp/
-vitals.cgi: form-DOCROOT=C:/xampp/htdocs
-vitals.cgi: form-HTTPSERVER=https://localhost
-vitals.cgi: form-LINKID=81970
-vitals.cgi: form-LOGINACLID=
-vitals.cgi: form-LOGINAGENCY=91
-vitals.cgi: form-LOGINEMAIL=support@okmis.com
-vitals.cgi: form-LOGINID=root
-vitals.cgi: form-LOGINNAME=Millennium Group
-vitals.cgi: form-LOGINPROVID=91
-vitals.cgi: form-LOGINSCREEN=ManagerTree.cgi
-vitals.cgi: form-LOGINTYPE=0
-vitals.cgi: form-LOGINUSERDB=okmis_dev
-vitals.cgi: form-LOGINUSERID=91
-vitals.cgi: form-LOGINUSERNAME=Root User 
-vitals.cgi: form-LOGINUSERTYPE=1
-vitals.cgi: form-NOW=09:20:42
-vitals.cgi: form-TODAY=2025-05-28
-vitals.cgi: form-USERLOGINID=okmis_dev:91
-vitals.cgi: form-browser=Mozilla/5.0
-vitals.cgi: form-misLINKS=81968
-vitals.cgi: form-mlt=Vo6oxVNHkBTb
-vitals.cgi: form-query=ClientID=53531&mlt=Vo6oxVNHkBTb&misLINKS=81968
-vitals.cgi: form-updLINKIDnew=
+%FDF-1.2
+
+1 0 obj
+<< 
+/FDF << /Fields 
+[
+<< /V (Norman)/T (AGENCY_CITY)>>
+<< /V (Therapeutic Services Group Inc.)/T (AGENCY_NAME)>>
+<< /V ()/T (AMSType)>>
+<< /V (1.17)/T (AVGPROGRESS)>>
+<< /V ()/T (Active)>>
+<< /V ()/T (ActivityName)>>
+<< /V (Mozilla/5.0)/T (Browser)>>
+<< /V ()/T (CQM)>>
+<< /V ()/T (ClientIDs)>>
+<< /V ()/T (ClinicIDs)>>
+<< /V ()/T (CustAgency)>>
+<< /V (09/01/18-11/30/18)/T (DATERANGE)>>
+<< /V (okmis_tsi)/T (DBNAME)>>
+<< /V (/home/okmis/public_html/tsi/cgi/bin)/T (DOCBIN)>>
+<< /V (02/08/2019)/T (DOCDATE)>>
+<< /V (/home/okmis/public_html)/T (DOCPARENT)>>
+<< /V (Fiscal Year 07/01/2018-11/30/2018)/T (DOCRANGE)>>
+<< /V (/home/okmis/public_html/tsi)/T (DOCROOT)>>
+<< /V ()/T (Days)>>
+<< /V ()/T (Folder)>>
+<< /V ()/T (Format)>>
+<< /V (2018-09-01)/T (FromDate)>>
+<< /V (09/01/2018)/T (FromDateD)>>
+<< /V (0)/T (GAFCOUNT)>>
+<< /V (0)/T (GAFLESS)>>
+<< /V (0)/T (GAFLESSPCT)>>
+<< /V (0)/T (GAFMORE)>>
+<< /V (0)/T (GAFMOREPCT)>>
+<< /V (1729.45)/T (HRSQTR)>>
+<< /V (2621.10)/T (HRSYTD)>>
+<< /V (https://tsi.okmis.com)/T (HTTPSERVER)>>
+<< /V (0.00)/T (INDQTR)>>
+<< /V (0.00)/T (INDYTD)>>
+<< /V (all)/T (INSURANCE)>>
+<< /V ()/T (InsCode)>>
+<< /V ()/T (InsID)>>
+<< /V (2370)/T (LINKID)>>
+<< /V ()/T (LOGINACLID)>>
+<< /V (91)/T (LOGINAGENCY)>>
+<< /V (wade@okmis.com)/T (LOGINEMAIL)>>
+<< /V (root)/T (LOGINID)>>
+<< /V (Therapeutic Services Group Inc.)/T (LOGINNAME)>>
+<< /V (91)/T (LOGINPROVID)>>
+<< /V (ManagerTree)/T (LOGINSCREEN)>>
+<< /V (0)/T (LOGINTYPE)>>
+<< /V (okmis_tsi)/T (LOGINUSERDB)>>
+<< /V (91)/T (LOGINUSERID)>>
+<< /V (  TSI )/T (LOGINUSERNAME)>>
+<< /V (1)/T (LOGINUSERTYPE)>>
+<< /V (0)/T (NOSHOWS)>>
+<< /V (0.00)/T (NOSHOWSPCT)>>
+<< /V (0.00)/T (NOSHOWSPCTQTR)>>
+<< /V (0)/T (NOSHOWSQTR)>>
+<< /V (2940)/T (NOTECOUNT)>>
+<< /V (1930)/T (NOTECOUNTQTR)>>
+<< /V (10:03:17)/T (NOW)>>
+<< /V (0)/T (PROG0)>>
+<< /V (0.00)/T (PROG0PCT)>>
+<< /V (61)/T (PROG1)>>
+<< /V (56.48)/T (PROG1PCT)>>
+<< /V (42)/T (PROG2)>>
+<< /V (38.89)/T (PROG2PCT)>>
+<< /V (1)/T (PROG3)>>
+<< /V (0.93)/T (PROG3PCT)>>
+<< /V (108)/T (PROGCOUNT)>>
+<< /V (3)/T (PROGM1)>>
+<< /V (2.78)/T (PROGM1PCT)>>
+<< /V (1)/T (PROGM2)>>
+<< /V (0.93)/T (PROGM2PCT)>>
+<< /V (0)/T (PROGM3)>>
+<< /V (0.00)/T (PROGM3PCT)>>
+<< /V (197)/T (PROGRESSCOUNT)>>
+<< /V (  TSI )/T (PROVIDER_NAME)>>
+<< /V ()/T (ProvIDs)>>
+<< /V (all)/T (REFBY)>>
+<< /V (35)/T (REFLESS)>>
+<< /V (94.59)/T (REFLESSPCT)>>
+<< /V (2)/T (REFMORE)>>
+<< /V (5.41)/T (REFMOREPCT)>>
+<< /V (37)/T (REFSQTR)>>
+<< /V (59)/T (REFSYTD)>>
+<< /V (Quarerly Statistics by Note for Clients)/T (ReportDescr)>>
+<< /V (07/01/18)/T (STARTYTD)>>
+<< /V (0)/T (SurveyHelped)>>
+<< /V (0)/T (SurveyRecommend)>>
+<< /V (0)/T (SurveyRespected)>>
+<< /V (0)/T (SurveySessionsOK)>>
+<< /V (0)/T (SurveyTrPlan)>>
+<< /V (2019-02-08)/T (TODAY)>>
+<< /V (2019-02-08)/T (TheDate)>>
+<< /V (2018-11-30)/T (ToDate)>>
+<< /V (11/30/2018)/T (ToDateD)>>
+<< /V ()/T (Type)>>
+<< /V (okmis_tsi:91)/T (USERLOGINID)>>
+<< /V (Mozilla/5.0)/T (browser)>>
+<< /V (lastquarter)/T (daterange)>>
+<< /V (3)/T (hdrline)>>
+<< /V (4yAY9TkGFUab)/T (mlt)>>
+<< /V (fdf)/T (output)>>
+<< /V (DBNAME=okmis_tsi&mlt=4yAY9TkGFUab&Type=&hdrline=3&output=fdf&AMSType=&Active=&ActivityName=&CQM=&ClientIDs=&ClinicIDs=&CustAgency=&Days=&Folder=&Format=&FromDate=&InsCode=&InsID=&ProvIDs=&ToDate=&daterange=lastquarter&sYearMonth=&ReportDescr=Quarerly Statistics by Note for Clients&xtable=&submit=1)/T (query)>>
+<< /V ()/T (sYearMonth)>>
+<< /V (1)/T (submit)>>
+<< /V ()/T (updLINKIDnew)>>
+<< /V ()/T (xtable)>>
+
+] 
+/F (https://tsi.okmis.com/pdf/QA_20080801.pdf)>>
+>> 
+endobj
+trailer
+<<
+/Root 1 0 R 
+
+>>
+%%EOF

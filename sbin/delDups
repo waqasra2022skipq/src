@@ -1,18 +1,21 @@
 #!/usr/bin/perl
-use lib 'C:/xampp/htdocs/src/lib';
+use lib '/var/www/okmis/src/lib';
+use myConfig;
 use DBI;
 use DBForm;
 ############################################################################
 # prints delete's for multiple sub-records.
-#        ProgNotes, TrPlan, and ClientReferrals
-# usage: delDups oays mms ...
+# usage: delDUPS oays mms ...
 ############################################################################
-my $form = DBForm->new();
-my $dbh  = $form->dbconnect();
-main->delbydID( $dbh, 'ProgNotes',       'NoteID',   'ID',       'Methods' );
-main->delbydID( $dbh, 'TrPlan',          'PrAuthID', 'TrPlanID', 'TrPlanType' );
-main->delbydID( $dbh, 'PDDiag',          'PrAuthID', 'PDDiagID', 'Axis1ACode' );
-main->delbydID( $dbh, 'PDDom',           'PrAuthID', 'PDDomID',  'Dom1Score' );
+my $form    = DBForm->new();
+my $dbh     = $form->dbconnect();
+my $SRCSBIN = myConfig->cfg('SRCSBIN');
+my $catout  = `echo > ddc`;
+print qq|## database=$form->{DBNAME}\n|;
+main->delbydID( $dbh, 'ProgNotes', 'NoteID', 'ID', 'Methods' );
+#####main->delbydID($dbh,'TrPlan','PrAuthID','TrPlanID','TrPlanType');
+#####main->delbydID($dbh,'PDDiag','PrAuthID','PDDiagID','Axis1ACode');
+main->delbydID( $dbh, 'PDDom',           'PrAuthID', 'PDDomID', 'Dom1Score' );
 main->delbydID( $dbh, 'ClientReferrals', 'ClientID', 'ID', 'ReferredBy1NPI' );
 main->delbydID( $dbh, 'MedHx',           'ClientID', 'ID', 'DevlDesc' );
 main->delbydID( $dbh, 'MentalStat',      'ClientID', 'ID', 'Dress' );
@@ -31,9 +34,7 @@ sub delbydID {
     my ( $self, $dbh, $table, $dID, $kID, $dfld ) = @_;
 
     #warn qq|$table,$dID,$kID,$dfld\n|;
-    my $PrevID  = '';
-    my $PrevkID = '';
-    my $Prevr   = '';
+    my ( $PrevID, $PrevkID, $Prevr ) = ( '', '', '' );
     my $s = $dbh->prepare("select * from ${table} order by ${dID}, ${kID}");
 
     #warn "select * from ${table} order by ${dID}, ${kID}\n";
@@ -44,54 +45,21 @@ sub delbydID {
         #warn "PrevID=$PrevID, r-dID=$r->{$dID}, PrevkID=$PrevkID\n";
         if ( $PrevID ne '' && $PrevID == $r->{$dID} ) {
             print qq|\n|;
-            if ( $table eq 'TrPlan' ) {
-                print
-qq|#Prev: $kID=$Prevr->{$kID}: $Prevr->{RecDOLC},$Prevr->{ChangeProvID}\n|;
-                my $ip2 = $dbh->prepare(
-                    "select * from TrPlanIP where TrPlanID=$PrevkID");
-
-            #        print "# select * from TrPlanIP where TrPlanID=$PrevkID\n";
-                $ip2->execute() || die "select * from Prev TrPlanIP";
-                while ( $r2 = $ip2->fetchrow_hashref ) {
-                    ( my $Prob = $r2->{Prob} ) =~ s/\r\n//g;
-                    print
-qq|#Prev: ProbNum=$r2->{ProbNum}: NeedSkill=$r2->{NeedSkill}, $dfld=$Prevr->{$dfld}, Problem=$Prob\n|;
-                }
-                $ip2->finish();
-                print
-qq|#This: $kID=$r->{$kID}: c=$r->{RecDOLC},$r->{ChangeProvID}\n|;
-                my $ip1 = $dbh->prepare(
-                    "select * from TrPlanIP where TrPlanID=$r->{$kID}");
-
-          #        print "# select * from TrPlanIP where TrPlanID=$r->{$kID}\n";
-                $ip1->execute() || die "select * from TrPlanIP";
-                while ( $r1 = $ip1->fetchrow_hashref ) {
-                    ( my $Prob = $r1->{Prob} ) =~ s/\r\n//g;
-                    print
-qq|#This: ProbNum=$r1->{ProbNum}: NeedSkill=$r1->{NeedSkill}, $dfld=$r->{$dfld}, Problem=$r1->{Prob}\n|;
-                }
-                $ip1->finish();
-                print
-qq|delete from TrPlan where $kID=$r->{$kID};     #$PrevkID: delete dup ${dID}=$r->{$dID}, ClientID=$r->{ClientID}\n|;
-                print qq|delete from TrPlanIP where $kID=$r->{$kID};\n|;
-            }
-            else {
-                # SWITCHED these to delete 1st ID, not 2nd ID.
-                # SWITCHED back, 2/20/2018
-                my $prevDate =
-                    $Prevr->{'RecDOLC'} eq ''
-                  ? $Prevr->{'ChangeDate'}
-                  : $Prevr->{'RecDOLC'};
-                my $cDate =
-                  $r->{'RecDOLC'} eq '' ? $r->{'ChangeDate'} : $r->{'RecDOLC'};
-                print
-qq|# $r->{$kID}: delete dup ${dID}=$r->{$dID}, ClientID=$r->{ClientID}\n|;
-                ##print qq|delete from ${table} where $kID=$PrevkID;     # c=$Prevr->{$kID}=${prevDate}/$r->{$kID}=${cDate}\n|;
-                print
+            my $prevDate =
+                $Prevr->{'RecDOLC'} eq ''
+              ? $Prevr->{'ChangeDate'}
+              : $Prevr->{'RecDOLC'};
+            my $cDate =
+              $r->{'RecDOLC'} eq '' ? $r->{'ChangeDate'} : $r->{'RecDOLC'};
+            print
+qq|# $r->{$kID}: DUPLICATE ${dID}=$r->{$dID}/ClientID=$r->{ClientID}, ${PrevkID} vs $r->{$kID}\n|;
+            print
 qq|delete from ${table} where $kID=$r->{$kID};     # c=$Prevr->{$kID}=${prevDate}/$r->{$kID}=${cDate}\n|;
-                print
-qq|#sqlcompare $form->{'DBNAME'} ${table} $PrevkID $r->{$kID} ${kID}\n|;
-            }
+##        print qq|#sqlcmp $form->{'DBNAME'} ${table} ${PrevkID} $r->{$kID} ${kID}\n|;
+            my $results =
+`sh ${SRCSBIN}/sqlcmp $form->{'DBNAME'} ${table} ${PrevkID} $r->{$kID} ${kID} >> ddc`;
+
+            #print qq|# results\n${results}\n|;
         }
         $PrevID  = $r->{$dID};
         $PrevkID = $r->{$kID};
