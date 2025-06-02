@@ -59,7 +59,11 @@ sub setLogin {
     $self->{newpass} = $form->{newpass};
     $self->{verpass} = $form->{verpass};
     $self->{xx}      = $form->{xx};
-    $self->{LOGINID} = $ENV{HTTP_USER_AGENT} ? $self->{user} : getpwuid($>);
+    if ($ENV{HTTP_USER_AGENT}) {
+    $self->{LOGINID} = $self->{user};
+} else {
+    $self->{LOGINID} = ($^O eq 'MSWin32') ? $ENV{'USERNAME'} || 'unknown' : getpwuid($>);
+}
 
     #warn qq|setLogin: LOGINID=$self->{LOGINID}\n|;
     if ( $self->{LOGINID} eq '' ) {

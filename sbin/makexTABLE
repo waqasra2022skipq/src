@@ -11,12 +11,12 @@ use DBA;
 my $debug    = 0;
 my $table    = shift;
 my $Category = shift;
-if ( $table eq '' || $Category eq '' ) {
+if ( !$table || !$Category ) {
     print
 qq|\n\nusage: makexTABLE table Category\nERROR>> Missing table or Category!!\n\n|;
     exit;
 }
-my $form = DBForm->new("DBNAME=okmis_dev");
+my $form = DBForm->new("DBNAME=okmis_dev&mlt=BNpCTLI9e3tB");
 if ($debug) {
     foreach my $f ( sort keys %{$form} ) { print ": form-$f=$form->{$f}\n"; }
 }
@@ -25,7 +25,7 @@ my $cdbh = $form->connectdb('okmis_config');
 warn qq|table=${table}\n|;
 warn qq|Category=${Category}\n|;
 
-main->reCreate( $cdbh, $table );
+reCreate( $cdbh, $table );
 
 my $sVALUESET = $cdbh->prepare(
     "select * from xVALUESET where Category=? group by Concept order by Concept"
@@ -33,13 +33,13 @@ my $sVALUESET = $cdbh->prepare(
 $sVALUESET->execute($Category);
 my $rows = $sVALUESET->rows;
 print qq|## selected ${rows} for xVALUESET Category=${Category}=\n|;
-while ( $rVALUESET = $sVALUESET->fetchrow_hashref ) {
+while ( my $rVALUESET = $sVALUESET->fetchrow_hashref ) {
     if ($debug) {
         foreach my $f ( sort keys %{$rVALUESET} ) {
             print ": rVALUESET-$f=$rVALUESET->{$f}\n";
         }
     }
-    my $r = ();
+    my $r = {};
     $r->{'ID'} = $rVALUESET->{'CodeSystem'} . '_' . $rVALUESET->{'Concept'};
     $r->{'Category'}          = $rVALUESET->{'Category'};
     $r->{'SubCategory'}       = $rVALUESET->{'QualityDataElement'};
@@ -51,7 +51,7 @@ while ( $rVALUESET = $sVALUESET->fetchrow_hashref ) {
     $r->{'ValueSetName'}      = $rVALUESET->{'ValueSetName'};
     $r->{'ValueSetOID'}       = $rVALUESET->{'ValueSetOID'};
     $r->{'ValueSetVersion'}   = $rVALUESET->{'ValueSetVersion'};
-    $r->{'Active'}            = 1;
+    $r->{'Active'}            = '1';   # as string, matching char(1)
     my $qInsert = DBA->genInsert( $form, $table, $r );
     print qq|insRecord: qInsert=${qInsert}\n| if ($debug);
     my $sInsert = $cdbh->prepare($qInsert);
@@ -67,8 +67,7 @@ $form->complete();
 exit;
 ############################################################################
 sub reCreate {
-    my ( $self, $dbh, $table ) = @_;
-##
+    my ( $dbh, $table ) = @_;
     # recreate table...
     my $sDrop = $dbh->prepare("DROP TABLE IF EXISTS ${table}");
     $sDrop->execute();

@@ -144,7 +144,11 @@ warn qq|DBForm: parse: WARN-DBFORM\n| if ( $DEBUG );
   my $min = length($min) == 2 ? $min : '0'.$min;
   my $sec = length($sec) == 2 ? $sec : '0'.$sec;
   $self->{'NOW'} = "${hrs}:${min}:${sec}";        # save time.
-  $self->{LOGINID} = $ENV{HTTP_USER_AGENT} ? $self->{user} : getpwuid($>);
+  if ($ENV{HTTP_USER_AGENT}) {
+    $self->{LOGINID} = $self->{user};
+  } else {
+    $self->{LOGINID} = ($^O eq 'MSWin32') ? $ENV{'USERNAME'} || 'unknown' : getpwuid($>);
+  }
   $self->getRoot();                       # set the root directory.
 #warn qq|DBForm.pm-parse: return\n|;
   return($self);
