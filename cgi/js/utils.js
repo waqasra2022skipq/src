@@ -1,3 +1,7 @@
+function ReportWindow(url, windowName, height, width) {
+    window.open(url, windowName, `height=${height},width=${width},resizable=yes,scrollbars=yes`);
+}
+
 function togglediv(divid)
 { 
   if(document.getElementById(divid).style.display == 'none')

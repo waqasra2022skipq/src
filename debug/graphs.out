@@ -3,10 +3,10 @@ graphs.cgi: form-DBNAME=okmis_dev
 graphs.cgi: form-DOCBIN=C:/xampp/htdocs/cgi/bin
 graphs.cgi: form-DOCPARENT=C:/xampp/
 graphs.cgi: form-DOCROOT=C:/xampp/htdocs
-graphs.cgi: form-FromDate=2025-04-01
-graphs.cgi: form-FromDateD=04/01/2025
+graphs.cgi: form-FromDate=2025-05-01
+graphs.cgi: form-FromDateD=05/01/2025
 graphs.cgi: form-HTTPSERVER=https://localhost
-graphs.cgi: form-LINKID=81969
+graphs.cgi: form-LINKID=82265
 graphs.cgi: form-LOGINACLID=
 graphs.cgi: form-LOGINAGENCY=91
 graphs.cgi: form-LOGINEMAIL=support@okmis.com
@@ -19,19 +19,19 @@ graphs.cgi: form-LOGINUSERDB=okmis_dev
 graphs.cgi: form-LOGINUSERID=91
 graphs.cgi: form-LOGINUSERNAME=Root User 
 graphs.cgi: form-LOGINUSERTYPE=1
-graphs.cgi: form-NOW=09:20:34
-graphs.cgi: form-TODAY=2025-05-28
-graphs.cgi: form-TheDate=2025-05-28
-graphs.cgi: form-ToDate=2025-04-30
-graphs.cgi: form-ToDateD=04/30/2025
+graphs.cgi: form-NOW=11:32:10
+graphs.cgi: form-TODAY=2025-06-04
+graphs.cgi: form-TheDate=2025-06-04
+graphs.cgi: form-ToDate=2025-05-31
+graphs.cgi: form-ToDateD=05/31/2025
 graphs.cgi: form-USERLOGINID=okmis_dev:91
 graphs.cgi: form-browser=Mozilla/5.0
 graphs.cgi: form-daterange=lastmonth
 graphs.cgi: form-method=BilledvsIncome
-graphs.cgi: form-misLINKS=81968
-graphs.cgi: form-mlt=Vo6oxVNHkBTb
-graphs.cgi: form-query=mlt=Vo6oxVNHkBTb&misLINKS=81968
-graphs.cgi: form-sesid=20250528092034_VpwWJf
+graphs.cgi: form-misLINKS=82255
+graphs.cgi: form-mlt=ypZ92T9ooJwV
+graphs.cgi: form-query=mlt=ypZ92T9ooJwV&misLINKS=82255
+graphs.cgi: form-sesid=20250604113210_X5eojh
 graphs.cgi: form-updLINKIDnew=
 graphs.cgi: s=
 
@@ -43,7 +43,7 @@ select 'Amt' as MyKey, DATE_FORMAT(Treatment.ContLogDate,'%Y-%m') as MyX, SUM(Tr
   left join Provider as Clinic on Clinic.ProvID=Client.clinicClinicID
   left join xSC on xSC.SCID=Treatment.SCID
   left join xInsurance on xInsurance.ID=xSC.InsID
- where Treatment.ContLogDate>="2025-04-01" and Treatment.ContLogDate<="2025-04-30"
+ where Treatment.ContLogDate>="2025-05-01" and Treatment.ContLogDate<="2025-05-31"
    and  ClientACL.ProvID='91' 
  group by MyKey, MyX 
 sel=
@@ -56,7 +56,7 @@ select 'Amt' as MyKey, DATE_FORMAT(Treatment.ContLogDate,'%Y-%m') as MyX, SUM(Tr
   left join Provider as Clinic on Clinic.ProvID=Client.clinicClinicID
   left join xSC on xSC.SCID=Treatment.SCID
   left join xInsurance on xInsurance.ID=xSC.InsID
- where Treatment.ContLogDate>="2025-04-01" and Treatment.ContLogDate<="2025-04-30"
+ where Treatment.ContLogDate>="2025-05-01" and Treatment.ContLogDate<="2025-05-31"
    and  ClientACL.ProvID='91' 
  group by MyKey, MyX 
 y_values=MyY1|BillAmt:MyY2|IncAmt
@@ -64,14 +64,6 @@ data=
 
   data = 
   [
-
-    {
-      key: "Amt",
-      values: [
-        { x:'2025-04 BillAmt', y:162.00 },
-        { x:'2025-04 IncAmt', y:0 },
-      ]
-    },
 
   ];
 

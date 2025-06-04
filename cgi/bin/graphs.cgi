@@ -63,7 +63,7 @@ my $html = myHTML->new(
 <SCRIPT TYPE="text/javascript" SRC="/src/cgi/js/ajaxrequest.js"></SCRIPT>
   <LINK REL="stylesheet" TYPE="text/css" HREF="/cgi/jcal/calendar-forest.css" >
   <LINK REL="stylesheet" TYPE="text/css" HREF="/src/cgi/css/StyleYearMonth.css"> 
-  <SCRIPT TYPE="text/javascript" SRC="/src/cgi/js/utils.js"></SCRIPT>
+  <SCRIPT TYPE="text/javascript" SRC="/src/cgi/js/Utils.js"></SCRIPT>
   <SCRIPT TYPE="text/javascript" SRC="/cgi/jcal/calendar.js"></SCRIPT>
   <SCRIPT TYPE="text/javascript" SRC="/cgi/jcal/calendar-en.js"></SCRIPT>
   <SCRIPT TYPE="text/javascript" SRC="/cgi/jcal/calendar-setup.js"></SCRIPT>
