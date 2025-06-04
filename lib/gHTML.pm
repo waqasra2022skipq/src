@@ -946,7 +946,7 @@ qq|SELECT * FROM `ClientInterventionsPerformed` WHERE TrID = $form->{Treatment_T
             my $IntExcl      = $r->{ReasonForExclusion};
             my $IntRejected  = $r->{Rejected};
             my $IntException = $r->{ReasonForException};
-
+            my $IntAssessment = $r->{Assessment};
             $out .= qq|
             <div class="intervention-entry">
                         <TABLE CLASS="home fullsize" >
@@ -968,7 +968,17 @@ qq|SELECT * FROM `ClientInterventionsPerformed` WHERE TrID = $form->{Treatment_T
                             </TD>
                         </TR>
                         <BR><BR>
-                        <TR  CLASS="Reason_TR">
+
+                        <TR >
+                            <TD CLASS="strcol" >Assessment</TD>
+                            <TD CLASS="strcol" COLSPAN="3" >
+                              <SELECT NAME="ClientRiskAssessment_Assessment_1">
+                                [[DBA->selxTable(%form+xRiskAssessment+${IntAssessment}+ConceptName ConceptCode)]]
+                              </SELECT>
+                            </TD>
+                        </TR>
+
+                        <TR  >
                             <TD CLASS="strcol" >Reason</TD>
                             <TD CLASS="strcol" COLSPAN="3" >
                             <SELECT NAME="ClientInterventionsPerformed_Reason_1[]">
@@ -1077,7 +1087,15 @@ qq|SELECT * FROM `ClientInterventionsPerformed` WHERE TrID = $form->{Treatment_T
                             </TD>
                         </TR>
                         <BR><BR>
-                        <TR  CLASS="Reason_TR" STYLE= "display:none;">
+                        <TR >
+                              <TD CLASS="strcol" >Assessment</TD>
+                              <TD CLASS="strcol" COLSPAN="3" >
+                                <SELECT NAME="ClientRiskAssessment_Assessment_1">
+                                  [[DBA->selxTable(%form+xRiskAssessment+<<ClientInterventionsPerformed_Assessment_1>>+ConceptName ConceptCode)]]
+                                </SELECT>
+                              </TD>
+                          </TR>
+                        <TR  >
                             <TD CLASS="strcol" >Reason</TD>
                             <TD CLASS="strcol" COLSPAN="3" >
                             <SELECT NAME="ClientInterventionsPerformed_Reason_1[]">
