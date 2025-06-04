@@ -1,3 +1,0 @@
-update Treatment set BillStatus=1,StatusDate='2017-12-19',DenCode=NULL,DenDate=NULL,RecDate=NULL,CIPDate=NULL,COPLDate=NULL,PaidDate=NULL,AmtDue=00.00 where TrID=651826;
-delete from NoteTrans where ID=681863;
-
