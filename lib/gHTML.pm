@@ -940,13 +940,13 @@ qq|SELECT * FROM `ClientInterventionsPerformed` WHERE TrID = $form->{Treatment_T
             my $IntPerformed = $r->{Intervention};
             my $IntDate      = $r->{VisitDate};
             my $IntReason    = $r->{Reason};
-            my $IntFinding   = $r->{Finding};
+            my $IntFinding   = $r->{finding};
             my $IntFollowUp  = $r->{FollowUpPlan};
             my $IntNotPerf   = $r->{NotPerformed};
             my $IntExcl      = $r->{ReasonForExclusion};
-            my $IntRejected  = $r->{RejectedReason};
+            my $IntRejected  = $r->{Rejected};
             my $IntException = $r->{ReasonForException};
-
+            my $IntAssessment = $r->{Assessment};
             $out .= qq|
             <div class="intervention-entry">
                         <TABLE CLASS="home fullsize" >
@@ -962,12 +962,22 @@ qq|SELECT * FROM `ClientInterventionsPerformed` WHERE TrID = $form->{Treatment_T
                         <TR STYLE= "margin-botton:5px;">
                             <TD CLASS="strcol" >Performed</TD>
                             <TD CLASS="strcol" COLSPAN="3" >
-            <SELECT NAME="ClientInterventionsPerformed_Intervention_1[]" ID="performedSelect">
+            <SELECT NAME="ClientInterventionsPerformed_Intervention_1[]" CLASS="performedSelect">
                                 [[DBA->selxTable(%form+xInterventionPerformed+${IntPerformed}+ConceptName ConceptCode)]]
                             </SELECT>
                             </TD>
                         </TR>
                         <BR><BR>
+
+                        <TR >
+                            <TD CLASS="strcol" >Assessment</TD>
+                            <TD CLASS="strcol" COLSPAN="3" >
+                              <SELECT NAME="ClientRiskAssessment_Assessment_1">
+                                [[DBA->selxTable(%form+xRiskAssessment+${IntAssessment}+ConceptName ConceptCode)]]
+                              </SELECT>
+                            </TD>
+                        </TR>
+
                         <TR  >
                             <TD CLASS="strcol" >Reason</TD>
                             <TD CLASS="strcol" COLSPAN="3" >
@@ -978,29 +988,30 @@ qq|SELECT * FROM `ClientInterventionsPerformed` WHERE TrID = $form->{Treatment_T
                             
                         </TR>
                         
-                        <TR  >
+                        <TR  CLASS="Finding_TR">
                             <TD CLASS="strcol" >
                             Finding
                             </TD>
                             <TD CLASS="strcol" >
-                                <select NAME="ClientInterventionsPerformed_finding_1[]" ID="finding" data-value="<<ClientInterventionsPerformed_finding_1>>">
+                                <select NAME="ClientInterventionsPerformed_finding_1[]" CLASS="findingSelect" data-value="${IntFinding}">
                                     <OPTION>unselected</OPTION>
-                                    <OPTION VALUE="428171000124102" >Depression screening negative (finding)  428171000124102  G8510</OPTION>
-                                    <OPTION VALUE="428181000124104">Depression screening positive (finding) AND Follow-Up Plan Documented  428181000124104  G8431</OPTION>
-                                    <OPTION VALUE="G8511">Depression screening positive (finding) BUT Follow-Up Plan not Documented, Reason not Given  G8511</OPTION>
+                                    <OPTION VALUE="428171000124102" [[DBUtil->isEQ(${IntFinding}+428171000124102) SELECTED]]>Depression screening negative (finding)  428171000124102  G8510</OPTION>
+                                    <OPTION VALUE="428181000124104" [[DBUtil->isEQ(${IntFinding}+428181000124104) SELECTED]]>Depression screening positive (finding) AND Follow-Up Plan Documented  428181000124104  G8431</OPTION>
+                                    <OPTION VALUE="G8511" [[DBUtil->isEQ(${IntFinding}+G8511) SELECTED]]>Depression screening positive (finding) BUT Follow-Up Plan not Documented, Reason not Given  G8511</OPTION>
                                 </select>
                             </TD>
                         </TR>
 
-                        <TR  >
+                        <TR  CLASS="FollowUpPlan_TR">
                             <TD CLASS="strcol" >
                             Follow-Up Plan
                             </TD>
                             <TD CLASS="strcol" >
-                                <select NAME="ClientInterventionsPerformed_FollowUpPlan_1[]" ID="FollowUpPlan" data-value="<<ClientInterventionsPerformed_FollowUpPlan_1>>">
-                                    <OPTION VALUE="306226009">Referral to a provider for additional evaluation and assessment to formulate a follow-up plan for a positive depression screen  306226009</OPTION>
-                                    <OPTION VALUE="698456001">Pharmacological interventions  698456001</OPTION>
-                                    <OPTION VALUE="306227000">Other interventions or follow-up for the diagnosis or treatment of depression  306227000</OPTION>
+                                <select NAME="ClientInterventionsPerformed_FollowUpPlan_1[]" ID="FollowUpPlan" data-value="${IntFollowUp}">
+                                    <OPTION>unselected ${IntFollowUp}</OPTION>
+                                    <OPTION VALUE="306226009" [[DBUtil->isEQ(${IntFollowUp}+306226009) SELECTED]]>Referral to a provider for additional evaluation and assessment to formulate a follow-up plan for a positive depression screen  306226009</OPTION>
+                                    <OPTION VALUE="698456001" [[DBUtil->isEQ(${IntFollowUp}+698456001) SELECTED]]>Pharmacological interventions  698456001</OPTION>
+                                    <OPTION VALUE="306227000" [[DBUtil->isEQ(${IntFollowUp}+306227000) SELECTED]]>Other interventions or follow-up for the diagnosis or treatment of depression  306227000</OPTION>
                                 </select>
                             </TD>
                         </TR>
@@ -1010,41 +1021,41 @@ qq|SELECT * FROM `ClientInterventionsPerformed` WHERE TrID = $form->{Treatment_T
                             Not Performed
                             </TD>
                             <TD CLASS="strcol" >
-                                <select NAME="ClientInterventionsPerformed_NotPerformed_1[]" ID="NotPerformed" data-value="<<ClientInterventionsPerformed_NotPerformed_1>>">
+                                <select NAME="ClientInterventionsPerformed_NotPerformed_1[]" CLASS="NotPerformed" data-value="${IntNotPerf}">
                                     <OPTION value="">unselected</OPTION>
-                                    <OPTION VALUE="454841000124105">Depression screening not done  454841000124105  G0444</OPTION>
+                                    <OPTION VALUE="454841000124105" [[DBUtil->isEQ(${IntNotPerf}+454841000124105) SELECTED]]>Depression screening not done  454841000124105  G0444</OPTION>
                                 </select>
                             </TD>
                         </TR>
 
-                        <TR  >
+                        <TR  CLASS="ReasonForExclusion_TR">
                             <TD CLASS="strcol" >
                             Reason for Exclusion
                             </TD>
                             <TD CLASS="strcol" >
-                                <select NAME="ClientInterventionsPerformed_ReasonForExclusion_1[]" ID="ReasonForExclusion" data-value="<<ClientInterventionsPerformed_ReasonForExclusion_1>>">
+                                <select NAME="ClientInterventionsPerformed_ReasonForExclusion_1[]" CLASS="ReasonForExclusion" data-value="<<ClientInterventionsPerformed_ReasonForExclusion_1>>">
                                     <OPTION value="">unselected</OPTION>
-                                    <OPTION VALUE="400998002">Documentation stating the patient has had a diagnosis of bipolar disorder  400998002  G9717</OPTION>
+                                    <OPTION VALUE="400998002" [[DBUtil->isEQ(${IntExcl}+400998002) SELECTED]]>Documentation stating the patient has had a diagnosis of bipolar disorder  400998002  G9717</OPTION>
                                 </select>
                             </TD>
                         </TR>
-                        <TR  >
+                        <TR  CLASS="ReasonForRejected_TR" STYLE= "display:none;">
                             <TD CLASS="strcol" >Rejected Reason</TD>
                             <TD CLASS="strcol" COLSPAN="3" >
                             <SELECT NAME="ClientInterventionsPerformed_Rejected_1[]">
-                                [[DBA->selxTable(%form+xInterventionPerformedRejected+<<ClientInterventionsPerformed_Rejected_1>>+ConceptName ConceptCode)]]
+                                [[DBA->selxTable(%form+xInterventionPerformedRejected+${IntRejected}+ConceptName ConceptCode)]]
                             </SELECT>
                             </TD>
                         </TR>
-                        <TR  >
+                        <TR  CLASS="ReasonForException_TR">
                             <TD CLASS="strcol" >
                             Reason for Exception
                             </TD>
                             <TD CLASS="strcol" >
-                                <select STYLE="width: 100px;text-overflow: ellipsis;" NAME="ClientInterventionsPerformed_ReasonForException_1[]" ID="ReasonForException" data-value="<<ClientInterventionsPerformed_ReasonForException_1>>">
+                                <select STYLE="width: 100px;text-overflow: ellipsis;" NAME="ClientInterventionsPerformed_ReasonForException_1[]" CLASS="ReasonForException" data-value="<<ClientInterventionsPerformed_ReasonForException_1>>">
                                     <OPTION value="">unselected</OPTION>
-                                    <OPTION VALUE="183944003">Patient refuses to participate in or complete the depression screening  183944003  G8433</OPTION>
-                                    <OPTION VALUE="G8433">Documentation of medical reason for not screening patient for depression 
+                                    <OPTION VALUE="183944003" [[DBUtil->isEQ(${IntException}+183944003) SELECTED]]>Patient refuses to participate in or complete the depression screening  183944003  G8433</OPTION>
+                                    <OPTION VALUE="G8433" [[DBUtil->isEQ(${IntException}+G8433) SELECTED]]>Documentation of medical reason for not screening patient for depression 
                                     (e.g., cognitive, functional, or motivational limitations that may impact accuracy of results; patient is in an urgent or emergent situation where time is of the essence and to delay treatment would jeopardize the patient’s health status)   G8433</OPTION>
                                 </select>
                             </TD>
@@ -1070,12 +1081,20 @@ qq|SELECT * FROM `ClientInterventionsPerformed` WHERE TrID = $form->{Treatment_T
                         <TR STYLE= "margin-botton:5px;">
                             <TD CLASS="strcol" >Performed</TD>
                             <TD CLASS="strcol" COLSPAN="3" >
-            <SELECT NAME="ClientInterventionsPerformed_Intervention_1[]" ID="performedSelect">
+            <SELECT NAME="ClientInterventionsPerformed_Intervention_1[]" CLASS="performedSelect">
                                 [[DBA->selxTable(%form+xInterventionPerformed+<<ClientInterventionsPerformed_Intervention_1>>+ConceptName ConceptCode)]]
                             </SELECT>
                             </TD>
                         </TR>
                         <BR><BR>
+                        <TR >
+                              <TD CLASS="strcol" >Assessment</TD>
+                              <TD CLASS="strcol" COLSPAN="3" >
+                                <SELECT NAME="ClientRiskAssessment_Assessment_1">
+                                  [[DBA->selxTable(%form+xRiskAssessment+<<ClientInterventionsPerformed_Assessment_1>>+ConceptName ConceptCode)]]
+                                </SELECT>
+                              </TD>
+                          </TR>
                         <TR  >
                             <TD CLASS="strcol" >Reason</TD>
                             <TD CLASS="strcol" COLSPAN="3" >
@@ -1086,12 +1105,12 @@ qq|SELECT * FROM `ClientInterventionsPerformed` WHERE TrID = $form->{Treatment_T
                             
                         </TR>
                         
-                        <TR  >
+                        <TR  CLASS="Finding_TR" STYLE= "display:none;">
                             <TD CLASS="strcol" >
                             Finding
                             </TD>
                             <TD CLASS="strcol" >
-                                <select NAME="ClientInterventionsPerformed_finding_1[]" ID="finding" data-value="<<ClientInterventionsPerformed_finding_1>>">
+                                <select NAME="ClientInterventionsPerformed_finding_1[]" CLASS="findingSelect" data-value="<<ClientInterventionsPerformed_finding_1>>">
                                     <OPTION>unselected</OPTION>
                                     <OPTION VALUE="428171000124102" >Depression screening negative (finding)  428171000124102  G8510</OPTION>
                                     <OPTION VALUE="428181000124104">Depression screening positive (finding) AND Follow-Up Plan Documented  428181000124104  G8431</OPTION>
@@ -1100,12 +1119,12 @@ qq|SELECT * FROM `ClientInterventionsPerformed` WHERE TrID = $form->{Treatment_T
                             </TD>
                         </TR>
 
-                        <TR  >
+                        <TR  CLASS="FollowUpPlan_TR" STYLE= "display:none;">
                             <TD CLASS="strcol" >
                             Follow-Up Plan
                             </TD>
                             <TD CLASS="strcol" >
-                                <select NAME="ClientInterventionsPerformed_FollowUpPlan_1[]" ID="FollowUpPlan" data-value="<<ClientInterventionsPerformed_FollowUpPlan_1>>">
+                                <select NAME="ClientInterventionsPerformed_FollowUpPlan_1[]" CLASS="FollowUpPlan" data-value="<<ClientInterventionsPerformed_FollowUpPlan_1>>">
                                     <OPTION VALUE="306226009">Referral to a provider for additional evaluation and assessment to formulate a follow-up plan for a positive depression screen  306226009</OPTION>
                                     <OPTION VALUE="698456001">Pharmacological interventions  698456001</OPTION>
                                     <OPTION VALUE="306227000">Other interventions or follow-up for the diagnosis or treatment of depression  306227000</OPTION>
@@ -1118,25 +1137,25 @@ qq|SELECT * FROM `ClientInterventionsPerformed` WHERE TrID = $form->{Treatment_T
                             Not Performed
                             </TD>
                             <TD CLASS="strcol" >
-                                <select NAME="ClientInterventionsPerformed_NotPerformed_1[]" ID="NotPerformed" data-value="<<ClientInterventionsPerformed_NotPerformed_1>>">
+                                <select NAME="ClientInterventionsPerformed_NotPerformed_1[]" CLASS="NotPerformed" data-value="<<ClientInterventionsPerformed_NotPerformed_1>>">
                                     <OPTION value="">unselected</OPTION>
                                     <OPTION VALUE="454841000124105">Depression screening not done  454841000124105  G0444</OPTION>
                                 </select>
                             </TD>
                         </TR>
 
-                        <TR  >
+                        <TR  CLASS="ReasonForExclusion_TR" STYLE= "display:none;">
                             <TD CLASS="strcol" >
                             Reason for Exclusion
                             </TD>
                             <TD CLASS="strcol" >
-                                <select NAME="ClientInterventionsPerformed_ReasonForExclusion_1[]" ID="ReasonForExclusion" data-value="<<ClientInterventionsPerformed_ReasonForExclusion_1>>">
+                                <select NAME="ClientInterventionsPerformed_ReasonForExclusion_1[]" CLASS="ReasonForExclusion" data-value="<<ClientInterventionsPerformed_ReasonForExclusion_1>>">
                                     <OPTION value="">unselected</OPTION>
                                     <OPTION VALUE="400998002">Documentation stating the patient has had a diagnosis of bipolar disorder  400998002  G9717</OPTION>
                                 </select>
                             </TD>
                         </TR>
-                        <TR  >
+                        <TR  CLASS="ReasonForRejected_TR" STYLE= "display:none;">
                             <TD CLASS="strcol" >Rejected Reason</TD>
                             <TD CLASS="strcol" COLSPAN="3" >
                             <SELECT NAME="ClientInterventionsPerformed_Rejected_1[]">
@@ -1144,7 +1163,7 @@ qq|SELECT * FROM `ClientInterventionsPerformed` WHERE TrID = $form->{Treatment_T
                             </SELECT>
                             </TD>
                         </TR>
-                        <TR  >
+                        <TR  CLASS="ReasonForException_TR" STYLE= "display:none;">
                             <TD CLASS="strcol" >
                             Reason for Exception
                             </TD>
@@ -1484,15 +1503,63 @@ sub setClientNoteProblems {
   </TR>|;
     }
 
+    # Get the saved ones from UMLS
+    my $umlsICD10Saved = $dbh->prepare(
+"select umlsICD10.mapTarget as ICD10,umlsICD10.icdName,umlsICD10.sctName,ClientNoteProblems.UUID,ClientNoteProblems.Priority,ClientNoteProblems.InitiatedDate,ClientNoteProblems.ResolvedDate from ClientNoteProblems inner join okmis_config.umlsICD10 on umlsICD10.ID=ClientNoteProblems.UUID where ClientNoteProblems.ClientID=? and ClientNoteProblems.TrID=? order by ClientNoteProblems.Priority"
+    );
+    $umlsICD10Saved->execute( $ClientID, $TrID )
+      || myDBI->dberror("Physician Note: select ClientNoteProblems");
+    while ( my $r = $umlsICD10Saved->fetchrow_hashref ) {
+        $row++;
+        my $class  = int( $row / 2 ) == $row / 2 ? 'rpteven' : 'rptodd';
+        my $Status = $r->{'ResolvedDate'} eq ''  ? 'active'  : 'complete';
+        $out .= qq|
+  <TR CLASS="${class}" >
+    <TD ALIGN="center" >
+      <INPUT TYPE="checkbox" NAME="NoteProblems" VALUE="$r->{UUID}" CHECKED ${blur} >
+    </TD>
+    <TD ALIGN="left" >$r->{'ICD10'}</TD>
+    <TD ALIGN="left" >$r->{'icdName'}</TD>
+    <TD ALIGN="left" >$r->{'sctName'}</TD>
+    <TD ALIGN="left" >$r->{'InitiatedDate'}</TD>
+    <TD ALIGN="left" >$r->{'ResolvedDate'}</TD>
+    <TD ALIGN="left" >${Status}</TD>
+  </TR>|;
+    }
+
     #warn qq| setClientNoteProblems: CHECK TrID=$TrID\n|;
     # add those NOT CHECKED...
     warn qq|setClientNoteProblems: with=$with\n| if ($debug);
-    my $s = $dbh->prepare(
+    $s = $dbh->prepare(
 "select misICD10.ICD10,misICD10.icdName,misICD10.sctName,ClientProblems.UUID,ClientProblems.Priority,ClientProblems.InitiatedDate,ClientProblems.ResolvedDate from ClientProblems inner join okmis_config.misICD10 on misICD10.ID=ClientProblems.UUID left join ClientNoteProblems on ClientNoteProblems.UUID=ClientProblems.UUID and ClientNoteProblems.TrID='${TrID}' where ClientProblems.ClientID=? and ClientNoteProblems.UUID is null ${with} order by ClientProblems.Priority"
     );
     $s->execute($ClientID)
       || myDBI->dberror("Physician Note: select ClientProblems");
     while ( my $r = $s->fetchrow_hashref ) {
+        $row++;
+        my $class  = int( $row / 2 ) == $row / 2 ? 'rpteven' : 'rptodd';
+        my $Status = $r->{'ResolvedDate'} eq ''  ? 'active'  : 'complete';
+        $out .= qq|
+  <TR CLASS="${class}" >
+    <TD ALIGN="center" >
+      <INPUT TYPE="checkbox" NAME="NoteProblems" VALUE="$r->{UUID}" ${blur} >
+    </TD>
+    <TD ALIGN="left" >$r->{ICD10}</TD>
+    <TD ALIGN="left" >$r->{icdName}</TD>
+    <TD ALIGN="left" >$r->{sctName}</TD>
+    <TD ALIGN="left" >$r->{InitiatedDate}</TD>
+    <TD ALIGN="left" >$r->{ResolvedDate}</TD>
+    <TD ALIGN="left" >${Status}</TD>
+  </TR>|;
+    }
+
+    # fetch the ones from umlsICD10
+    my $umlsICD10 = $dbh->prepare(
+"select umlsICD10.mapTarget as ICD10,umlsICD10.icdName,umlsICD10.sctName,ClientProblems.UUID,ClientProblems.Priority,ClientProblems.InitiatedDate,ClientProblems.ResolvedDate from ClientProblems inner join okmis_config.umlsICD10 on umlsICD10.ID=ClientProblems.UUID left join ClientNoteProblems on ClientNoteProblems.UUID=ClientProblems.UUID and ClientNoteProblems.TrID='${TrID}' where ClientProblems.ClientID=? and ClientNoteProblems.UUID is null ${with} order by ClientProblems.Priority"
+    );
+    $umlsICD10->execute($ClientID)
+      || myDBI->dberror("Physician Note: select ClientProblems");
+    while ( my $r = $umlsICD10->fetchrow_hashref ) {
         $row++;
         my $class  = int( $row / 2 ) == $row / 2 ? 'rpteven' : 'rptodd';
         my $Status = $r->{'ResolvedDate'} eq ''  ? 'active'  : 'complete';

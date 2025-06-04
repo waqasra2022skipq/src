@@ -31,7 +31,11 @@ $sInsert = $dbh->prepare(
 $sProviderControl =
   $dbh->prepare("select * from ProviderControl where ProvID=?");
 $sClientNoteProblems = $dbh->prepare(
-"select ClientNoteProblems.UUID,ClientNoteProblems.Priority,misICD10.ICD10 from ClientNoteProblems left join okmis_config.misICD10 on misICD10.ID=ClientNoteProblems.UUID where ClientID=? and TrID=? order by ClientNoteProblems.Priority"
+"select ClientNoteProblems.UUID,ClientNoteProblems.Priority,misICD10.ICD10 from ClientNoteProblems inner join okmis_config.misICD10 on misICD10.ID=ClientNoteProblems.UUID where ClientID=? and TrID=? order by ClientNoteProblems.Priority"
+);
+
+$sClientNoteProblemsUMLS = $dbh->prepare(
+"select ClientNoteProblems.UUID,ClientNoteProblems.Priority,umlsICD10.mapTarget as ICD10 from ClientNoteProblems inner join okmis_config.umlsICD10 on umlsICD10.ID=ClientNoteProblems.UUID where ClientID=? and TrID=? order by ClientNoteProblems.Priority"
 );
 
 ############################################################################
@@ -79,6 +83,22 @@ qq|$rNotes->{ID},$rNotes->{TrID},$rNotes->{ClinicID},$rNotes->{ProvID},$rNotes->
         "select ClientNoteProblems $rNotes->{'ClientID'},$rNotes->{'TrID'}");
 
     while ( $rClientNoteProblems = $sClientNoteProblems->fetchrow_hashref ) {
+        my $ICD10 = $rClientNoteProblems->{'ICD10'};
+        warn qq|BEFORE: ICD10=${ICD10}, ContLogDate=$rNotes->{ContLogDate}\n|
+          if ($debug);
+        $ICD10 =~ s/\.//g;                 # trim period .
+        next unless ( $ICD10 =~ /^F/ );    # skip non-MH Diagnosis
+
+        push( @Problems, $ICD10 );
+    }
+
+    $sClientNoteProblemsUMLS->execute( $rNotes->{'ClientID'},
+        $rNotes->{'TrID'} )
+      || $form->dberror(
+        "select ClientNoteProblems $rNotes->{'ClientID'},$rNotes->{'TrID'}");
+
+    while ( $rClientNoteProblems = $sClientNoteProblemsUMLS->fetchrow_hashref )
+    {
         my $ICD10 = $rClientNoteProblems->{'ICD10'};
         warn qq|BEFORE: ICD10=${ICD10}, ContLogDate=$rNotes->{ContLogDate}\n|
           if ($debug);

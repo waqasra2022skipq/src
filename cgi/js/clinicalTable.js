@@ -8,8 +8,8 @@ const referralFields = [
 	["SearchHosp", "ClientEmergency_DesigHospNPI_1", "NPI-2"],
 	["SearchPharmacy", "ClientEmergency_PharmacyNPI_1", "NPI-2"],
 	["SearchDentist", "ClientEmergency_DentistNPI_1"],
-	["SearchVision", "ClientEmergency_VisionNPI_1", "NPI-2"],
-	["SearchHearing", "ClientEmergency_HearingNPI_1", "NPI-2"],
+	["SearchVision", "ClientEmergency_VisionNPI_1"],
+	["SearchHearing", "ClientEmergency_HearingNPI_1"],
 ];
 
 // These two are dynamic based on select field
@@ -112,6 +112,17 @@ function initAutocompleteNPI(inputId, hiddenId, type, selectedBoxValue) {
 	) {
 		condition = "q=addr_practice.state:OK";
 	}
+
+	if ("SearchPharmacy" === inputId) {
+		condition =
+			"q=addr_practice.state:OK AND licenses.taxonomy.classification:Pharmacy";
+	}
+
+	if ("SearchHosp" === inputId) {
+		condition =
+			"q=addr_practice.state:OK AND licenses.taxonomy.classification:Hospital";
+	}
+
 	apiUrl =
 		type === "NPI-2"
 			? `https://clinicaltables.nlm.nih.gov/api/npi_org/v3/search?df=name.full,NPI,provider_type,addr_practice.full,licenses.taxonomy.classification&${condition}`

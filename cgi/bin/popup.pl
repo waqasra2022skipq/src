@@ -441,7 +441,7 @@ elsif ( $form->{method} eq 'pProblem' ) {
     my ( $err, $cnt ) = ( '', 0 );
     my $dbh = $form->connectdb('okmis_config');
     my $s   = $dbh->prepare(
-"select sctName,referencedComponentId,icdName,mapTarget from umlsICD10 where referencedComponentId=? OR mapTarget=?"
+"select sctName,referencedComponentId,icdName,mapTarget from umlsICD10 where Active=1 AND (referencedComponentId=? OR mapTarget=?)"
     );
     $s->execute( $value, $value )
       || $form->dberror("pProblem: select umlsICD10 ${value}");
