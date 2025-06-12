@@ -41,7 +41,7 @@ sub report {
     $pwd = cwd();
     warn qq|genQRDAs: pwd=${pwd}\n| if ($debug);
     my $cmd =
-qq|/home/okmis/mis/src/cgi/bin/GenReport.cgi Name=GenerateQRDAs\&daterange=2yago\&InsID=100\&ClinicIDs=2501\&ProvIDs=2502\&DBNAME=$form->{DBNAME}\&mlt=$form->{mlt}|;
+qq|/var/www/okmis/mis/src/cgi/bin/GenReport.cgi Name=GenerateQRDAs\&daterange=2yago\&InsID=100\&ClinicIDs=2501\&ProvIDs=2502\&DBNAME=$form->{DBNAME}\&mlt=$form->{mlt}|;
     warn qq|genQRDAs: cmd=${cmd}\n| if ($debug);
     my $html = `${cmd}`;
     my $html = myHTML->close(1);

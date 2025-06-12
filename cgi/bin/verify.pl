@@ -107,7 +107,7 @@ elsif ( $form->{type} eq 'EFT' ) {
     my $rxInsurance = $sxInsurance->fetchrow_hashref;
 ############################################################################
     my $files =
-      qq|/home/okmis/www/forms/hesk_docs/Insurance_$rxInsurance->{Descr}_*|;
+      qq|/var/www/okmis/www/forms/hesk_docs/Insurance_$rxInsurance->{Descr}_*|;
     my @Files = glob($files);
     foreach $path (@Files) {
         my ( $dir,      $fn )   = $path =~ /(.*\/)?(.+)/s;

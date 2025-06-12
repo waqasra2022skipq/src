@@ -1,9 +1,9 @@
-./NoteRpt DBNAME=okmis_cti\&hdrline=\&output=ss\&Type=billedrpt\&InsID=\&ProvIDs=\&Format=extended\&daterange=last3m\&FromDate=\&ToDate= > /home/okmis/mis/bc1.xls
-./NoteRpt DBNAME=okmis_cti\&hdrline=\&output=ss\&Type=unreconciled\&InsID=100\&ProvIDs=\&Format=quick\&daterange=\&FromDate=2010-12-01\&ToDate=2015-03-31 > /home/okmis/mis/uc1.xls
-./NoteRpt DBNAME=okmis_cti\&hdrline=\&output=ss\&Type=denied\&InsID=100\&ProvIDs=\&Format=quick\&daterange=\&FromDate=2013-12-01\&ToDate=2013-12-30 > /home/okmis/mis/dc1
-./NoteRpt DBNAME=okmis_cti\&hdrline=\&output=ss\&Type=reconciled\&InsID=100\&ProvIDs=\&Format=quick\&daterange=\&FromDate=2013-12-01\&ToDate=2013-12-30 > /home/okmis/mis/rc1
+./NoteRpt DBNAME=okmis_cti\&hdrline=\&output=ss\&Type=billedrpt\&InsID=\&ProvIDs=\&Format=extended\&daterange=last3m\&FromDate=\&ToDate= > /var/www/okmis/mis/bc1.xls
+./NoteRpt DBNAME=okmis_cti\&hdrline=\&output=ss\&Type=unreconciled\&InsID=100\&ProvIDs=\&Format=quick\&daterange=\&FromDate=2010-12-01\&ToDate=2015-03-31 > /var/www/okmis/mis/uc1.xls
+./NoteRpt DBNAME=okmis_cti\&hdrline=\&output=ss\&Type=denied\&InsID=100\&ProvIDs=\&Format=quick\&daterange=\&FromDate=2013-12-01\&ToDate=2013-12-30 > /var/www/okmis/mis/dc1
+./NoteRpt DBNAME=okmis_cti\&hdrline=\&output=ss\&Type=reconciled\&InsID=100\&ProvIDs=\&Format=quick\&daterange=\&FromDate=2013-12-01\&ToDate=2013-12-30 > /var/www/okmis/mis/rc1
 
-./NoteRpt DBNAME=okmis_gpr\&hdrline=\&output=ss\&Type=billedrpt\&InsID=\&ProvIDs=\&Format=extended\&daterange=last3m\&FromDate=\&ToDate= > /home/okmis/mis/bg1.xls
-./NoteRpt DBNAME=okmis_gpr\&hdrline=\&output=ss\&Type=unreconciled\&InsID=100\&ProvIDs=\&Format=quick\&daterange=\&FromDate=2010-12-01\&ToDate=2015-03-31 > /home/okmis/mis/ug1.xls
-./NoteRpt DBNAME=okmis_gpr\&hdrline=\&output=ss\&Type=denied\&InsID=100\&ProvIDs=\&Format=quick\&daterange=\&FromDate=2013-12-01\&ToDate=2013-12-30 > /home/okmis/mis/dg1
-./NoteRpt DBNAME=okmis_gpr\&hdrline=\&output=ss\&Type=reconciled\&InsID=100\&ProvIDs=\&Format=quick\&daterange=\&FromDate=2013-12-01\&ToDate=2013-12-30 > /home/okmis/mis/rg1
+./NoteRpt DBNAME=okmis_gpr\&hdrline=\&output=ss\&Type=billedrpt\&InsID=\&ProvIDs=\&Format=extended\&daterange=last3m\&FromDate=\&ToDate= > /var/www/okmis/mis/bg1.xls
+./NoteRpt DBNAME=okmis_gpr\&hdrline=\&output=ss\&Type=unreconciled\&InsID=100\&ProvIDs=\&Format=quick\&daterange=\&FromDate=2010-12-01\&ToDate=2015-03-31 > /var/www/okmis/mis/ug1.xls
+./NoteRpt DBNAME=okmis_gpr\&hdrline=\&output=ss\&Type=denied\&InsID=100\&ProvIDs=\&Format=quick\&daterange=\&FromDate=2013-12-01\&ToDate=2013-12-30 > /var/www/okmis/mis/dg1
+./NoteRpt DBNAME=okmis_gpr\&hdrline=\&output=ss\&Type=reconciled\&InsID=100\&ProvIDs=\&Format=quick\&daterange=\&FromDate=2013-12-01\&ToDate=2013-12-30 > /var/www/okmis/mis/rg1

@@ -1,8 +1,8 @@
 form-Browser=Telnet
 form-DBNAME=okmis_mms
-form-DOCBIN=/home/okmis/www/mms/cgi/bin
-form-DOCPARENT=/home/okmis/www/
-form-DOCROOT=/home/okmis/www/mms
+form-DOCBIN=/var/www/okmis/www/mms/cgi/bin
+form-DOCPARENT=/var/www/okmis/www/
+form-DOCROOT=/var/www/okmis/www/mms
 form-HTTPSERVER=https://mms.okmis.com
 form-LOGINACLID=
 form-LOGINAGENCY=91
@@ -68,7 +68,7 @@ select Treatment.TrID,Treatment.ContLogDate,Treatment.ClinicID,xSC.SCNum
   left join Client on Client.ClientID=Treatment.ClientID
   left join Provider as Clinic on Clinic.ProvID=Client.clinicClinicID
   left join Provider as Counselor on Counselor.ProvID=Client.ProvID
-  left join okmis_config.xRaces on xRaces.ID=SUBSTRING_INDEX(Client.Race,'ý',1)
+  left join okmis_config.xRaces on xRaces.ID=SUBSTRING_INDEX(Client.Race,'ï¿½',1)
   left join xSC on xSC.SCID=Treatment.SCID
   left join xInsurance on xInsurance.ID=xSC.InsID
   left join ClientNoteProblems on ClientNoteProblems.TrID=Treatment.TrID

@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use lib '/home/okmis/mis/src/lib';
+use lib '/var/www/okmis/mis/src/lib';
 use DBI;
 use DBA;
 use myForm;
@@ -15,125 +15,162 @@ use strict;
 
 ############################################################################
 my $form = myForm->new();
-my $dbh = myDBI->dbconnect($form->{'DBNAME'});
-my $IDs = $form->{'IDs'};
+my $dbh  = myDBI->dbconnect( $form->{'DBNAME'} );
+my $IDs  = $form->{'IDs'};
+
 # Level: 1 or 2.1 or .05 etc...
-(my $Level = $form->{'Level'}) =~ s/\.//g; $Level = length($Level) == 2 ? $Level : $Level.'0';
-my $AdultChild = $form->{'AdultChild'};      # ie: ADULT|CHILD
-my $Type = $form->{'Type'};                  # ie: DIS|ADM
+( my $Level = $form->{'Level'} ) =~ s/\.//g;
+$Level = length($Level) == 2 ? $Level : $Level . '0';
+my $AdultChild = $form->{'AdultChild'};    # ie: ADULT|CHILD
+my $Type       = $form->{'Type'};          # ie: DIS|ADM
 
 my $sClientASAM = $dbh->prepare("select * from ClientASAM where ID=?");
-my $sClient = $dbh->prepare("select * from Client where ClientID=?");
-my $sProvider = $dbh->prepare("select * from Provider where ProvID=?");
-my $sInsurance = $dbh->prepare("select * from Insurance where Insurance.ClientID=? and Insurance.Priority=? and Insurance.InsNumEffDate<=? and (?<=Insurance.InsNumExpDate or Insurance.InsNumExpDate is NULL) order by Insurance.InsNumEffDate desc");
-my$sCredentials = $dbh->prepare("select * from Credentials left join okmis_config.xCredentials on xCredentials.ID=Credentials.CredID where ProvID=? and InsID=? order by Credentials.Rank");
-
+my $sClient     = $dbh->prepare("select * from Client where ClientID=?");
+my $sProvider   = $dbh->prepare("select * from Provider where ProvID=?");
+my $sInsurance  = $dbh->prepare(
+"select * from Insurance where Insurance.ClientID=? and Insurance.Priority=? and Insurance.InsNumEffDate<=? and (?<=Insurance.InsNumExpDate or Insurance.InsNumExpDate is NULL) order by Insurance.InsNumEffDate desc"
+);
+my $sCredentials = $dbh->prepare(
+"select * from Credentials left join okmis_config.xCredentials on xCredentials.ID=Credentials.CredID where ProvID=? and InsID=? order by Credentials.Rank"
+);
 
 ############################################################################
 my $searchpath = "../data";
 
-my $pagewidth = 612;
-my $pageheight = 792;
-my $fontname= "Arial";
-my $boldfontname= "Arial-BoldMT";
-my $fontsizesmall = 8;
-my $fontsize = 9;
-my $fontsizemid = 10;
-my $fontsizelarge = 11;
-my $fontsizemidlarge = 12;
-my $fontsizexlarge = 13;
+my $pagewidth         = 612;
+my $pageheight        = 792;
+my $fontname          = "Arial";
+my $boldfontname      = "Arial-BoldMT";
+my $fontsizesmall     = 8;
+my $fontsize          = 9;
+my $fontsizemid       = 10;
+my $fontsizelarge     = 11;
+my $fontsizemidlarge  = 12;
+my $fontsizexlarge    = 13;
 my $fontsizemidxlarge = 14;
-my $fontsizexxlarge = 15;
-my $basefontoptions = "fontname=" . $fontname . " fontsize=" . $fontsize . " embedding encoding=unicode charref";
+my $fontsizexxlarge   = 15;
+my $basefontoptions =
+    "fontname="
+  . $fontname
+  . " fontsize="
+  . $fontsize
+  . " embedding encoding=unicode charref";
 my $basefontoptions_i = $basefontoptions . " fontstyle=italic";
-my $basefontoptions_u = $basefontoptions . " underline=true underlineposition=-15% underlinewidth=0.3";
-my $baseboldfontoptions = "fontname=" . $boldfontname . " fontsize=" . $fontsize . " embedding encoding=unicode";
-my $baseboldfontoptions_u = $baseboldfontoptions . " underline=true underlineposition=-15% underlinewidth=0.3";
-my $basemidfontoptions = $basefontoptions . " fontsize=" . $fontsizemid;
+my $basefontoptions_u = $basefontoptions
+  . " underline=true underlineposition=-15% underlinewidth=0.3";
+my $baseboldfontoptions =
+    "fontname="
+  . $boldfontname
+  . " fontsize="
+  . $fontsize
+  . " embedding encoding=unicode";
+my $baseboldfontoptions_u = $baseboldfontoptions
+  . " underline=true underlineposition=-15% underlinewidth=0.3";
+my $basemidfontoptions   = $basefontoptions . " fontsize=" . $fontsizemid;
 my $basemidfontoptions_i = $basemidfontoptions . " fontstyle=italic";
-my $basemidfontoptions_u = $basemidfontoptions . " underline=true underlineposition=-15% underlinewidth=0.3";
+my $basemidfontoptions_u = $basemidfontoptions
+  . " underline=true underlineposition=-15% underlinewidth=0.3";
 my $baseboldmidfontoptions = $baseboldfontoptions . " fontsize=" . $fontsizemid;
-my $baseboldmidfontoptions_u = $baseboldmidfontoptions . " underline=true underlineposition=-15% underlinewidth=0.3";
+my $baseboldmidfontoptions_u = $baseboldmidfontoptions
+  . " underline=true underlineposition=-15% underlinewidth=0.3";
 my $baseboldmidfontoptions_i = $baseboldmidfontoptions . " fontstyle=italic";
-my $baselargefontoptions = $basefontoptions . " fontsize=" . $fontsizelarge;
-my $baseboldlargefontoptions = $baseboldfontoptions . " fontsize=" . $fontsizelarge;
-my $baseboldlargefontoptions_u = $baseboldlargefontoptions . " underline=true underlineposition=-15% underlinewidth=0.3";
-my $baseboldlargefontoptions_ui = $baseboldlargefontoptions_u . " fontstyle=italic";
-my $baseboldlargefontoptions_i = $baseboldlargefontoptions . " fontstyle=italic";
-my $basesmallfontoptions = $basefontoptions . " fontsize=" . $fontsizesmall;
+my $baselargefontoptions     = $basefontoptions . " fontsize=" . $fontsizelarge;
+my $baseboldlargefontoptions =
+  $baseboldfontoptions . " fontsize=" . $fontsizelarge;
+my $baseboldlargefontoptions_u = $baseboldlargefontoptions
+  . " underline=true underlineposition=-15% underlinewidth=0.3";
+my $baseboldlargefontoptions_ui =
+  $baseboldlargefontoptions_u . " fontstyle=italic";
+my $baseboldlargefontoptions_i =
+  $baseboldlargefontoptions . " fontstyle=italic";
+my $basesmallfontoptions   = $basefontoptions . " fontsize=" . $fontsizesmall;
 my $basesmallfontoptions_i = $basesmallfontoptions . " fontstyle=italic";
-my $baseboldsmallfontoptions = $baseboldfontoptions . " fontsize=" . $fontsizesmall;
-my $basemidlargefontoptions = $basefontoptions . " fontsize=" . $fontsizemidlarge;
+my $baseboldsmallfontoptions =
+  $baseboldfontoptions . " fontsize=" . $fontsizesmall;
+my $basemidlargefontoptions =
+  $basefontoptions . " fontsize=" . $fontsizemidlarge;
 my $basemidlargefontoptions_i = $basemidlargefontoptions . " fontstyle=italic";
-my $basemidxlargefontoptions = $basefontoptions . " fontsize=" . $fontsizemidxlarge;
-my $baseboldmidxlargefontoptions = $baseboldfontoptions . " fontsize=" . $fontsizemidxlarge;
-my $basemidxlargefontoptions_i = $basemidxlargefontoptions . " fontstyle=italic";
-my $baseboldmidlargefontoptions = $baseboldfontoptions . " fontsize=" . $fontsizemidlarge;
-my $baseboldmidlargefontoptions_u = $baseboldmidlargefontoptions . " underline=true underlineposition=-15% underlinewidth=0.3";
-my $baseboldxlargefontoptions = $baseboldfontoptions . " fontsize=" . $fontsizexlarge;
-my $baseboldxlargefontoptions_i = $baseboldxlargefontoptions . " fontstyle=italic";
-my $basecheckfontoptions = "fontname={DejaVuSans} encoding=unicode fontsize=10 charref";
+my $basemidxlargefontoptions =
+  $basefontoptions . " fontsize=" . $fontsizemidxlarge;
+my $baseboldmidxlargefontoptions =
+  $baseboldfontoptions . " fontsize=" . $fontsizemidxlarge;
+my $basemidxlargefontoptions_i =
+  $basemidxlargefontoptions . " fontstyle=italic";
+my $baseboldmidlargefontoptions =
+  $baseboldfontoptions . " fontsize=" . $fontsizemidlarge;
+my $baseboldmidlargefontoptions_u = $baseboldmidlargefontoptions
+  . " underline=true underlineposition=-15% underlinewidth=0.3";
+my $baseboldxlargefontoptions =
+  $baseboldfontoptions . " fontsize=" . $fontsizexlarge;
+my $baseboldxlargefontoptions_i =
+  $baseboldxlargefontoptions . " fontstyle=italic";
+my $basecheckfontoptions =
+  "fontname={DejaVuSans} encoding=unicode fontsize=10 charref";
 
-my $marginleft = 30;
-my $margintop = 35;
+my $marginleft   = 30;
+my $margintop    = 35;
 my $marginbottom = 30;
 my $contentwidth = $pagewidth - 2 * $marginleft;
-my $y_top = $pageheight - $margintop;
-my $y_bottom = $marginbottom;
+my $y_top        = $pageheight - $margintop;
+my $y_bottom     = $marginbottom;
 
 my $indoc;
 my $no_of_input_pages;
 my @pagehandles = ();
-my $pagecount = 0;
+my $pagecount   = 0;
 
-my $pdfname = qq|Print$form->{'AdultChild'}_$form->{'Type'}_L${Level}.pdf|;
-my $pdfpath = qq|$form->{'DOCROOT'}/forms/${pdfname}|;
-my $filename = '/tmp/'.$form->{'LOGINID'}.'_'.DBUtil->genToken().'_'.DBUtil->Date('','stamp').'.pdf';
-my $outfile = $form->{'file'} eq ''                # create and print pdf else just create.
-        ? $form->{'DOCROOT'}.$filename
-        : $form->{'file'};
+my $pdfname  = qq|Print$form->{'AdultChild'}_$form->{'Type'}_L${Level}.pdf|;
+my $pdfpath  = qq|$form->{'DOCROOT'}/forms/${pdfname}|;
+my $filename = '/tmp/'
+  . $form->{'LOGINID'} . '_'
+  . DBUtil->genToken() . '_'
+  . DBUtil->Date( '', 'stamp' ) . '.pdf';
+my $outfile = $form->{'file'} eq ''    # create and print pdf else just create.
+  ? $form->{'DOCROOT'} . $filename
+  : $form->{'file'};
+
 #my $outfile = "kls.pdf";
 
 ############################################################################
 eval {
 
-  # create a new PDFlib object 
-  my $p = new PDFlib::PDFlib;
+    # create a new PDFlib object
+    my $p = new PDFlib::PDFlib;
 
-  $p->set_option("SearchPath={{" . $searchpath . "}}");
+    $p->set_option( "SearchPath={{" . $searchpath . "}}" );
 
-  # This mean we don't have to check error return values, but will
-  # get an exception in case of runtime problems.
-  
-  $p->set_option("errorpolicy=exception");
+    # This mean we don't have to check error return values, but will
+    # get an exception in case of runtime problems.
 
-  # all strings are expected as utf8
-  $p->set_option("stringformat=utf8");
+    $p->set_option("errorpolicy=exception");
 
-  $p->begin_document($outfile, "");
+    # all strings are expected as utf8
+    $p->set_option("stringformat=utf8");
 
-  $p->set_info("Creator", "Millennium Information Services");
-  $p->set_info("Author", "Keith Stephenson");
-  $p->set_info("Title", "ASAM");
+    $p->begin_document( $outfile, "" );
 
-  # Open the Block template which contains PDFlib Blocks 
-  $indoc = $p->open_pdi_document($pdfpath, "");
-  if ($indoc == -1) { die("Error: " . $p->get_errmsg()); }
+    $p->set_info( "Creator", "Millennium Information Services" );
+    $p->set_info( "Author",  "Keith Stephenson" );
+    $p->set_info( "Title",   "ASAM" );
 
-  $no_of_input_pages = $p->pcos_get_number($indoc, "length:pages");
+    # Open the Block template which contains PDFlib Blocks
+    $indoc = $p->open_pdi_document( $pdfpath, "" );
+    if ( $indoc == -1 ) { die( "Error: " . $p->get_errmsg() ); }
 
-  main->openPdiPages($p);
+    $no_of_input_pages = $p->pcos_get_number( $indoc, "length:pages" );
 
-  main->printClientASAM($p);
+    main->openPdiPages($p);
 
-  main->closePdiPages($p);
+    main->printClientASAM($p);
 
-  $p->end_document("");
+    main->closePdiPages($p);
+
+    $p->end_document("");
 
 };
 
 if ($@) {
-  die("$0: PDFlib Exception occurred:\n$@");
+    die("$0: PDFlib Exception occurred:\n$@");
 }
 
 $sClientASAM->finish();
@@ -144,165 +181,188 @@ $sCredentials->finish();
 
 myDBI->cleanup();
 
-if ( $form->{'file'} eq '' )                # create and print pdf.
+if ( $form->{'file'} eq '' )    # create and print pdf.
 { print qq|Location: ${filename}\n\n|; }
 exit;
 
 ##########################################################################################################
-sub printClientASAM
-{
-  my ($self, $p) = @_;
+sub printClientASAM {
+    my ( $self, $p ) = @_;
 
-  foreach my $ID ( split(' ',$IDs) )
-  { 
-  #warn "PrintClientASI: ID=${ID}\n";
-    $sClientASAM->execute($ID) || myDBI->dberror("select ClientASAM ${ID}");
-    while ( my $rClientASAM = $sClientASAM->fetchrow_hashref )
-    {
-      $sClient->execute($rClientASAM->{'ClientID'}) || myDBI->dberror("select Client: $rClientASAM->{'ClientID'}");
-      my $rClient = $sClient->fetchrow_hashref;
-      $sInsurance->execute($rClient->{'ClientID'},1,$form->{'TODAY'},$form->{'TODAY'});
-      my $rInsurance = $sInsurance->fetchrow_hashref;
-      $sProvider->execute($rClientASAM->{'Interviewer'});
-      my $rProvider = $sProvider->fetchrow_hashref;
-      $sCredentials->execute($rClientASAM->{'Interviewer'},$rInsurance->{'InsID'});
-      my $rCredentials = $sCredentials->fetchrow_hashref;
-      my $ProvCred = $rCredentials->{'Abbr'};
-      $rClientASAM->{'Client_Name'} = qq|$rClient->{'FName'} $rClient->{'MName'} $rClient->{'LName'}|;
-      $rClientASAM->{'Client_ClientID'} = $rClient->{'ClientID'};
-      $rClientASAM->{'Client_Date'} = DBUtil->Date($form->{TODAY},'fmt','MM/DD/YY');
-      $rClientASAM->{'Provider_Name'} = qq|$rProvider->{'FName'} $rProvider->{'MName'} $rProvider->{'LName'}|;
-      $rClientASAM->{'Provider_Cred'} = $ProvCred;
-      $rClientASAM->{'Provider_Date'} = DBUtil->Date($rClientASAM->{'TestDate'},'fmt','MM/DD/YY');
-      main->createPages($p, $rClientASAM, $rClient);
+    foreach my $ID ( split( ' ', $IDs ) ) {
+
+        #warn "PrintClientASI: ID=${ID}\n";
+        $sClientASAM->execute($ID) || myDBI->dberror("select ClientASAM ${ID}");
+        while ( my $rClientASAM = $sClientASAM->fetchrow_hashref ) {
+            $sClient->execute( $rClientASAM->{'ClientID'} )
+              || myDBI->dberror("select Client: $rClientASAM->{'ClientID'}");
+            my $rClient = $sClient->fetchrow_hashref;
+            $sInsurance->execute( $rClient->{'ClientID'},
+                1, $form->{'TODAY'}, $form->{'TODAY'} );
+            my $rInsurance = $sInsurance->fetchrow_hashref;
+            $sProvider->execute( $rClientASAM->{'Interviewer'} );
+            my $rProvider = $sProvider->fetchrow_hashref;
+            $sCredentials->execute( $rClientASAM->{'Interviewer'},
+                $rInsurance->{'InsID'} );
+            my $rCredentials = $sCredentials->fetchrow_hashref;
+            my $ProvCred     = $rCredentials->{'Abbr'};
+            $rClientASAM->{'Client_Name'} =
+              qq|$rClient->{'FName'} $rClient->{'MName'} $rClient->{'LName'}|;
+            $rClientASAM->{'Client_ClientID'} = $rClient->{'ClientID'};
+            $rClientASAM->{'Client_Date'} =
+              DBUtil->Date( $form->{TODAY}, 'fmt', 'MM/DD/YY' );
+            $rClientASAM->{'Provider_Name'} =
+qq|$rProvider->{'FName'} $rProvider->{'MName'} $rProvider->{'LName'}|;
+            $rClientASAM->{'Provider_Cred'} = $ProvCred;
+            $rClientASAM->{'Provider_Date'} =
+              DBUtil->Date( $rClientASAM->{'TestDate'}, 'fmt', 'MM/DD/YY' );
+            main->createPages( $p, $rClientASAM, $rClient );
+        }
     }
-  }
-  ##print($pagecount);
-  if ($pagecount eq 0) {
-    main->createEmptyPage($p);
-  }
+    ##print($pagecount);
+    if ( $pagecount eq 0 ) {
+        main->createEmptyPage($p);
+    }
 }
 
 sub createEmptyPage {
-  my ($self, $p) = @_;
+    my ( $self, $p ) = @_;
 
-  $p->begin_page_ext($pagewidth, $pageheight, "topdown");
-  $p->fit_textline("NOT FOUND", $marginleft, 50, $basefontoptions);
-  $p->end_page_ext("");
+    $p->begin_page_ext( $pagewidth, $pageheight, "topdown" );
+    $p->fit_textline( "NOT FOUND", $marginleft, 50, $basefontoptions );
+    $p->end_page_ext("");
 }
 
 sub createPages {
-  my ($self, $p, $rClientASAM, $rClient) = @_;
+    my ( $self, $p, $rClientASAM, $rClient ) = @_;
 
-  # Header info...
-  my $AgencyID = MgrTree->getAgency($form,$rClient->{'clinicClinicID'});
-  $sProvider->execute($AgencyID) || myDBI->dberror("printClientASAM: select Provider $AgencyID");
-  my $rAgency = $sProvider->fetchrow_hashref;
-  my $AgencyName = $rAgency->{Name};
-  my $AgencyAddr = $rAgency->{Addr1} . ', ';
-  $AgencyAddr .= $rAgency->{Addr2} . ', ' if ( $rAgency->{Addr2} );
-  my $AgencyCSZ = $rAgency->{City} . ', ' . $rAgency->{ST} . ' ' . $rAgency->{Zip};
-  my $AgencyPh = 'Office: ' . $rAgency->{WkPh} . ' Fax: ' . $rAgency->{Fax};
+    # Header info...
+    my $AgencyID = MgrTree->getAgency( $form, $rClient->{'clinicClinicID'} );
+    $sProvider->execute($AgencyID)
+      || myDBI->dberror("printClientASAM: select Provider $AgencyID");
+    my $rAgency    = $sProvider->fetchrow_hashref;
+    my $AgencyName = $rAgency->{Name};
+    my $AgencyAddr = $rAgency->{Addr1} . ', ';
+    $AgencyAddr .= $rAgency->{Addr2} . ', ' if ( $rAgency->{Addr2} );
+    my $AgencyCSZ =
+      $rAgency->{City} . ', ' . $rAgency->{ST} . ' ' . $rAgency->{Zip};
+    my $AgencyPh = 'Office: ' . $rAgency->{WkPh} . ' Fax: ' . $rAgency->{Fax};
 
-  # set variables for pages...
+    # set variables for pages...
   ie: $rClientASAM->{Addr1} = "$rClientASAM->{Addr1} $rClientASAM->{Addr2}";
 ##
-  my @PageData = (
-    { "descr" => "page 1", "data" => [
-    ] },
-    { "descr" => "page 2", "data" => [
-    ] },
-    { "descr" => "page 3", "data" => [
-    ] },
-# etc...
-  );
+    my @PageData = (
+        {
+            "descr" => "page 1",
+            "data"  => []
+        },
+        {
+            "descr" => "page 2",
+            "data"  => []
+        },
+        {
+            "descr" => "page 3",
+            "data"  => []
+        },
+
+        # etc...
+    );
 
 #####################
-  for (my $pageno = 1; $pageno <= $no_of_input_pages; $pageno++) {
-    $p->begin_page_ext($pagewidth, $pageheight, "");
-    $p->fit_pdi_page($pagehandles[$pageno], 0, 0, "cloneboxes");
-    foreach (@{$PageData[$pageno-1]->{"data"}}) {
-      main->renderObject($p, $_);
+    for ( my $pageno = 1 ; $pageno <= $no_of_input_pages ; $pageno++ ) {
+        $p->begin_page_ext( $pagewidth, $pageheight, "" );
+        $p->fit_pdi_page( $pagehandles[$pageno], 0, 0, "cloneboxes" );
+        foreach ( @{ $PageData[ $pageno - 1 ]->{"data"} } ) {
+            main->renderObject( $p, $_ );
+        }
+        $p->end_page_ext("");
+        $pagecount++;
     }
-    $p->end_page_ext("");
-    $pagecount++;
-  }
 }
 
 ############################################################################
 sub renderObject {
-  my ($self, $p, $obj) = @_;
+    my ( $self, $p, $obj ) = @_;
 
-  if ($obj->{"type"} eq "textline") {
-    main->renderTextline($p,
-      $obj->{"text"}, $obj->{"xpos"}, $obj->{"ypos"}, $obj->{"optlist"});
-  }
+    if ( $obj->{"type"} eq "textline" ) {
+        main->renderTextline( $p,
+            $obj->{"text"}, $obj->{"xpos"}, $obj->{"ypos"}, $obj->{"optlist"} );
+    }
 
-  if ($obj->{"type"} eq "textflow") {
-    main->renderTextflow($p,
-      $obj->{"text"}, $obj->{"xpos_start"}, $obj->{"xpos_end"}, $obj->{"ypos"},
-      $obj->{"optlist"}, $obj->{"optlist2"});
-  }
+    if ( $obj->{"type"} eq "textflow" ) {
+        main->renderTextflow( $p,
+            $obj->{"text"}, $obj->{"xpos_start"}, $obj->{"xpos_end"},
+            $obj->{"ypos"}, $obj->{"optlist"},    $obj->{"optlist2"} );
+    }
 
-  if ($obj->{"type"} eq "table") {
-    main->renderTable($p,
-      $obj->{"fields"}, $obj->{"ypos"}, $obj->{"h_row"}, $obj->{"data"});
-  }
+    if ( $obj->{"type"} eq "table" ) {
+        main->renderTable( $p,
+            $obj->{"fields"}, $obj->{"ypos"}, $obj->{"h_row"}, $obj->{"data"} );
+    }
 
 }
 
 sub openPdiPages {
-  my ($self, $p) = @_;
+    my ( $self, $p ) = @_;
 
-#warn qq|no_of_input_pages: ${no_of_input_pages}\n|;
-  # Prepare all pages of the input document. We assume a small
-  # number of input pages and a large number of generated output
-  # pages. Therefore it makes sense to keep the input pages
-  # open instead of opening the pages again for each encounter.
-    
-  for (my $pageno = 1; $pageno <= $no_of_input_pages; $pageno++)
-  {
-    # Open the first page and clone the page size 
-    $pagehandles[$pageno] = $p->open_pdi_page($indoc, $pageno, "cloneboxes");
-    if ($pagehandles[$pageno] == -1) { die("Error: " . $p->get_errmsg()); }
-  }
+    #warn qq|no_of_input_pages: ${no_of_input_pages}\n|;
+    # Prepare all pages of the input document. We assume a small
+    # number of input pages and a large number of generated output
+    # pages. Therefore it makes sense to keep the input pages
+    # open instead of opening the pages again for each encounter.
+
+    for ( my $pageno = 1 ; $pageno <= $no_of_input_pages ; $pageno++ ) {
+
+        # Open the first page and clone the page size
+        $pagehandles[$pageno] =
+          $p->open_pdi_page( $indoc, $pageno, "cloneboxes" );
+        if ( $pagehandles[$pageno] == -1 ) {
+            die( "Error: " . $p->get_errmsg() );
+        }
+    }
 }
 
 sub closePdiPages {
-  my ($self, $p) = @_;
+    my ( $self, $p ) = @_;
 
-  # Close all input pages 
-  for (my $pageno = 1; $pageno <= $no_of_input_pages; $pageno++)
-  { $p->close_pdi_page($pagehandles[$pageno]); }
-  $p->close_pdi_document($indoc);
+    # Close all input pages
+    for ( my $pageno = 1 ; $pageno <= $no_of_input_pages ; $pageno++ ) {
+        $p->close_pdi_page( $pagehandles[$pageno] );
+    }
+    $p->close_pdi_document($indoc);
 }
 
 sub renderTextline {
-  my ($self, $p, $text, $xpos, $ypos, $optlist) = @_;
+    my ( $self, $p, $text, $xpos, $ypos, $optlist ) = @_;
 
-  $p->fit_textline($text, $xpos, $ypos, ($optlist ? $optlist : $basesmallfontoptions));
+    $p->fit_textline( $text, $xpos, $ypos,
+        ( $optlist ? $optlist : $basesmallfontoptions ) );
 }
 
 sub renderTextflow {
-  my ($self, $p, $text, $xpos_start, $xpos_end, $ypos, $optlist, $optlist2) = @_;
-  
-  my $tf;
-  my $result;
+    my ( $self, $p, $text, $xpos_start, $xpos_end, $ypos, $optlist, $optlist2 )
+      = @_;
 
-  $tf = $p->create_textflow($text, $basefontoptions . " leading=120% " . ($optlist ? $optlist : ""));
-  $p->fit_textflow($tf, $xpos_start, $y_bottom, $xpos_end, $ypos, ($optlist2 ? $optlist2 : ""));
+    my $tf;
+    my $result;
+
+    $tf = $p->create_textflow( $text,
+        $basefontoptions . " leading=120% " . ( $optlist ? $optlist : "" ) );
+    $p->fit_textflow( $tf, $xpos_start, $y_bottom, $xpos_end, $ypos,
+        ( $optlist2 ? $optlist2 : "" ) );
 }
 
 sub renderTable {
-  my ($self, $p, $fields, $ypos, $h_row, $data) = @_;
+    my ( $self, $p, $fields, $ypos, $h_row, $data ) = @_;
 
-  my $i = 0;
+    my $i = 0;
 
-  foreach (@{$data}) {
-    foreach my $field (@{$fields}) {
-      main->renderTextline($p, $_->{$field->{"key"}}, $field->{"xpos"}, $ypos - $h_row * $i);
+    foreach ( @{$data} ) {
+        foreach my $field ( @{$fields} ) {
+            main->renderTextline( $p, $_->{ $field->{"key"} },
+                $field->{"xpos"}, $ypos - $h_row * $i );
+        }
+        $i++;
     }
-    $i++;
-  }
 
 }

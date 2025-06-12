@@ -11,4 +11,4 @@ fi
 # do daily save.
 okmis_mms_backup_file=/home2/okmis/backups/backups/daily/Thu/okmis_mms.sqldump.gz
 
-scp ${okmis_mms_backup_file} root@server4.okmis.com:/home/okmis/backups/
+scp ${okmis_mms_backup_file} root@server4.okmis.com:/var/www/okmis/backups/

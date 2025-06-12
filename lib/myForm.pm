@@ -217,7 +217,7 @@ sub unescape {
 # VERY IMPORTANT - decides which database to update
 #   based upon the HTML DOCUMENT_ROOT variable
 #   for instance,
-#   for home directory /home/okmis/www/dev
+#   for home directory /var/www/okmis/www/dev
 #    then the SQL database named 'okmis_dev' is updated
 ############################################################################
 sub getRoot {

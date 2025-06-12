@@ -28,7 +28,7 @@ fi
   print "Save tar of okmis: pwd=$(pwd)"
   tar -vcf ${dDir}/okmis.tar --exclude src --exclude tmp --exclude mail --exclude Client --exclude Provider --exclude reports* --exclude upload --exclude unload --exclude reload --exclude backups --exclude files --exclude logs okmis
 
-  cd /home/okmis/mis
+  cd /var/www/okmis/mis
   print "Save tar of src: pwd=$(pwd)"
   tar -vcf ${dDir}/src.tar src
 

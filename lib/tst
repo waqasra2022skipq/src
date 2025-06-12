@@ -46,7 +46,7 @@ myDBI->dberror("HTLP TEST");
 myDBI->cleanup();
 exit;
 
-my $rptfile = '/home/okmis/kls.rsp';
+my $rptfile = '/var/www/okmis/kls.rsp';
 my ( $directory, $filename ) = $rptfile =~ m/(.*\/)(.*)$/;
 warn qq|directory=${directory}\n|;
 warn qq|filename=${filename}\n|;

@@ -5,7 +5,7 @@ echo "Define variables"
 DB_USER="root"
 DB_PASSWORD="}zI2ZH.TENcyMRwY"
 DB_NAME="okmis_lkt"
-DEV_BACKUP_DIR="/home/okmis/backups"
+DEV_BACKUP_DIR="/var/www/okmis/backups"
 DUMP_FILE=$(ls -t $DEV_BACKUP_DIR/okmis_mms.sqldump.gz | head -1)
 
 # Extract the dump file

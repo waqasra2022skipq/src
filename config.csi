@@ -11,29 +11,29 @@ WEBMASTER="support@okmis.com"
 # Site
 export HOSTNAME=`/bin/hostname`
 export HOSTSYS=linux
-export CSI=/home/okmis/mis/csi
+export CSI=/var/www/okmis/mis/csi
 export SAVEDIR=/home/backups
-export WWW=/home/okmis/www
+export WWW=/var/www/okmis/www
 export MOODLE=/home/moodle
-export MAINDIR=/home/okmis/mis
-export BACKDIR=/home/okmis/backups
+export MAINDIR=/var/www/okmis/mis
+export BACKDIR=/var/www/okmis/backups
 # Database
 export DBSYS=SQL
 export DBDIR=/var/lib/mysql
 export DBBIN=/usr/bin
 export DBCMD=/usr/bin/mysql
 
-export KEEPDIR=/home/okmis/mis/upd/keep
-export WORKDIR=/home/okmis/mis/upd/work
+export KEEPDIR=/var/www/okmis/mis/upd/keep
+export WORKDIR=/var/www/okmis/mis/upd/work
 
-export TAPEDIR=/home/okmis/mis/backups
-export DBADIR=/home/okmis/mis/
+export TAPEDIR=/var/www/okmis/mis/backups
+export DBADIR=/var/www/okmis/mis/
 export MISBIN=/var/www/okmis/src/bin
 export MISSBIN=/var/www/okmis/src/sbin
 export MISLIB=/var/www/okmis/src/lib
-export BILLDIR=/home/okmis/mis/billing
+export BILLDIR=/var/www/okmis/mis/billing
 
-export ADMINDIR=/home/okmis/www/mms/admin
+export ADMINDIR=/var/www/okmis/www/mms/admin
 export FTPDIR="${ADMINDIR}/downloads"
 export LOGDIR="${ADMINDIR}/logs"
 export REMITDIR="${ADMINDIR}/835"

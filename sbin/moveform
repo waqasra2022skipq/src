@@ -15,7 +15,7 @@ for ACCT in $ACCTS; do
     cd ${WWW}/${ACCT}/Provider/EFiles/835
     echo "check ${ACCT}/Provider/EFiles/835..."
     for fn in $(/bin/ls -1 *.pdf 2>/dev/null); do
-      mv -v ${fn} /home/okmis/www/forms/printing/${fn}
+      mv -v ${fn} /var/www/okmis/www/forms/printing/${fn}
     done
   fi
 done
