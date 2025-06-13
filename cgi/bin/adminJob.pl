@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!C:/xampp/perl/bin/perl.exe
 ############################################################################
 use lib 'C:/xampp/htdocs/src/lib';
 use DBI;

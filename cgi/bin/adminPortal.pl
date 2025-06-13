@@ -71,11 +71,11 @@ sub list837 {
 
       <DIV CLASS="subtitle tophdr" >Billing</DIV>
       <DIV CLASS="subtitle strcol" >
-        <A HREF="javascript:ReportWindow('/src/cgi/bin/adminGenerate.pl?type=837&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','Generate',800,1200)" ><IMG ALT="edit" SRC="/img/application-edit.png" BORDER="0" HEIGHT="20" WIDTH="20" >Generate 837</A>
+        <A HREF="javascript:ReportWindow('/src/cgi/bin/adminGenerate.pl?type=837&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','Generate',800,1200)" ><IMG ALT="edit" SRC="/src/img/application-edit.png" BORDER="0" HEIGHT="20" WIDTH="20" >Generate 837</A>
         <BR>
-        <A HREF="javascript:ReportWindow('/src/cgi/bin/adminFiles.pl?type=837&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','Transfer',800,1200)" ><IMG ALT="edit" SRC="/img/application-edit.png" BORDER="0" HEIGHT="20" WIDTH="20" >Transfer files</A>
+        <A HREF="javascript:ReportWindow('/src/cgi/bin/adminFiles.pl?type=837&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','Transfer',800,1200)" ><IMG ALT="edit" SRC="/src/img/application-edit.png" BORDER="0" HEIGHT="20" WIDTH="20" >Transfer files</A>
         <BR>
-        <A HREF="javascript:ReportWindow('/src/cgi/bin/adminLogs.pl?type=837&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','Logs',800,1200)" ><IMG ALT="edit" SRC="/img/application-edit.png" BORDER="0" HEIGHT="20" WIDTH="20" >Response & Log files</A>
+        <A HREF="javascript:ReportWindow('/src/cgi/bin/adminLogs.pl?type=837&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','Logs',800,1200)" ><IMG ALT="edit" SRC="/src/img/application-edit.png" BORDER="0" HEIGHT="20" WIDTH="20" >Response & Log files</A>
       </DIV>
 
     </TD>
@@ -91,13 +91,13 @@ sub list835 {
 
       <DIV CLASS="subtitle tophdr" >Remittances</DIV>
       <DIV CLASS="subtitle strcol" >
-        <A HREF="javascript:ReportWindow('/src/cgi/bin/adminGenerate.pl?type=835&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','Generate',800,1200)" ><IMG ALT="edit" SRC="/img/application-edit.png" BORDER="0" HEIGHT="20" WIDTH="20" >Instructions 835</A>
+        <A HREF="javascript:ReportWindow('/src/cgi/bin/adminGenerate.pl?type=835&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','Generate',800,1200)" ><IMG ALT="edit" SRC="/src/img/application-edit.png" BORDER="0" HEIGHT="20" WIDTH="20" >Instructions 835</A>
         <BR>
-        <A HREF="javascript:ReportWindow('/src/cgi/bin/adminFiles.pl?type=835&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','Transfer',800,1200)" ><IMG ALT="edit" SRC="/img/application-edit.png" BORDER="0" HEIGHT="20" WIDTH="20" >Transfer files</A>
+        <A HREF="javascript:ReportWindow('/src/cgi/bin/adminFiles.pl?type=835&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','Transfer',800,1200)" ><IMG ALT="edit" SRC="/src/img/application-edit.png" BORDER="0" HEIGHT="20" WIDTH="20" >Transfer files</A>
         <BR>
-        <A HREF="javascript:ReportWindow('/src/cgi/bin/adminLogs.pl?type=835&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','Logs',800,1200)" ><IMG ALT="edit" SRC="/img/application-edit.png" BORDER="0" HEIGHT="20" WIDTH="20" >Log files</A>
+        <A HREF="javascript:ReportWindow('/src/cgi/bin/adminLogs.pl?type=835&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','Logs',800,1200)" ><IMG ALT="edit" SRC="/src/img/application-edit.png" BORDER="0" HEIGHT="20" WIDTH="20" >Log files</A>
         <BR>
-        <A HREF="javascript:ReportWindow('/src/cgi/bin/adminJob.pl?type=835&job=process&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','Process',800,1200)" ><IMG ALT="edit" SRC="/img/application-edit.png" BORDER="0" HEIGHT="20" WIDTH="20" >Process 835 Remittance Files</A>
+        <A HREF="javascript:ReportWindow('/src/cgi/bin/adminJob.pl?type=835&job=process&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','Process',800,1200)" ><IMG ALT="edit" SRC="/src/img/application-edit.png" BORDER="0" HEIGHT="20" WIDTH="20" >Process 835 Remittance Files</A>
       </DIV>
 
     </TD>
@@ -113,13 +113,13 @@ sub list271 {
 
       <DIV CLASS="subtitle tophdr" >Eligibility</DIV>
       <DIV CLASS="subtitle strcol" >
-        <A HREF="javascript:ReportWindow('/src/cgi/bin/adminGenerate.pl?type=271&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','Generate',800,1200)" ><IMG ALT="edit" SRC="/img/application-edit.png" BORDER="0" HEIGHT="20" WIDTH="20" >Generate 270</A>
+        <A HREF="javascript:ReportWindow('/src/cgi/bin/adminGenerate.pl?type=271&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','Generate',800,1200)" ><IMG ALT="edit" SRC="/src/img/application-edit.png" BORDER="0" HEIGHT="20" WIDTH="20" >Generate 270</A>
         <BR>
-        <A HREF="javascript:ReportWindow('/src/cgi/bin/adminFiles.pl?type=271&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','Transfer',800,1200)" ><IMG ALT="edit" SRC="/img/application-edit.png" BORDER="0" HEIGHT="20" WIDTH="20" >Transfer files</A>
+        <A HREF="javascript:ReportWindow('/src/cgi/bin/adminFiles.pl?type=271&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','Transfer',800,1200)" ><IMG ALT="edit" SRC="/src/img/application-edit.png" BORDER="0" HEIGHT="20" WIDTH="20" >Transfer files</A>
         <BR>
-        <A HREF="javascript:ReportWindow('/src/cgi/bin/adminLogs.pl?type=271&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','Logs',800,1200)" ><IMG ALT="edit" SRC="/img/application-edit.png" BORDER="0" HEIGHT="20" WIDTH="20" >Response & Log files</A>
+        <A HREF="javascript:ReportWindow('/src/cgi/bin/adminLogs.pl?type=271&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','Logs',800,1200)" ><IMG ALT="edit" SRC="/src/img/application-edit.png" BORDER="0" HEIGHT="20" WIDTH="20" >Response & Log files</A>
         <BR>
-        <A HREF="javascript:ReportWindow('/src/cgi/bin/adminJob.pl?type=271&job=process&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','Process',800,1200)" ><IMG ALT="edit" SRC="/img/application-edit.png" BORDER="0" HEIGHT="20" WIDTH="20" >Process 271 Eligibility Files</A>
+        <A HREF="javascript:ReportWindow('/src/cgi/bin/adminJob.pl?type=271&job=process&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','Process',800,1200)" ><IMG ALT="edit" SRC="/src/img/application-edit.png" BORDER="0" HEIGHT="20" WIDTH="20" >Process 271 Eligibility Files</A>
       </DIV>
 
     </TD>
@@ -135,11 +135,11 @@ sub listJobs {
 
       <DIV CLASS="subtitle tophdr" >Automatic Backgroups Job Logs</DIV>
       <DIV CLASS="subtitle strcol" >
-        <A HREF="javascript:ReportWindow('/src/cgi/bin/adminLogs.pl?type=logs&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','Logs',800,1200)" ><IMG ALT="edit" SRC="/img/application-edit.png" BORDER="0" HEIGHT="20" WIDTH="20" >Log files</A>
+        <A HREF="javascript:ReportWindow('/src/cgi/bin/adminLogs.pl?type=logs&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','Logs',800,1200)" ><IMG ALT="edit" SRC="/src/img/application-edit.png" BORDER="0" HEIGHT="20" WIDTH="20" >Log files</A>
 <BR>
-        <A HREF="javascript:ReportWindow('/src/cgi/bin/adminJobACL.pl?type=271&job=process&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','Process',800,1200)" ><IMG ALT="edit" SRC="/img/application-edit.png" BORDER="0" HEIGHT="20" WIDTH="20" >Run setACL (Update Manager Tree) </A>
+        <A HREF="javascript:ReportWindow('/src/cgi/bin/adminJobACL.pl?type=271&job=process&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','Process',800,1200)" ><IMG ALT="edit" SRC="/src/img/application-edit.png" BORDER="0" HEIGHT="20" WIDTH="20" >Run setACL (Update Manager Tree) </A>
 <BR>
-        <A HREF="javascript:ReportWindow('/src/cgi/bin/adminX12ParseList.pl?type=271_835_837&job=x12_parsing&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','Logs',800,1200)" ><IMG ALT="edit" src="/img/application-edit.png" BORDER="0" HEIGHT="20" WIDTH="20" >Read 835/837/271 Response Files</A>
+        <A HREF="javascript:ReportWindow('/src/cgi/bin/adminX12ParseList.pl?type=271_835_837&job=x12_parsing&mlt=$form->{'mlt'}&misLINKS=$form->{'misLINKS'}','Logs',800,1200)" ><IMG ALT="edit" src="/src/img/application-edit.png" BORDER="0" HEIGHT="20" WIDTH="20" >Read 835/837/271 Response Files</A>
       
       </DIV>
 

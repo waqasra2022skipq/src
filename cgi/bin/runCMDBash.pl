@@ -1,4 +1,5 @@
-#!/usr/bin/perl
+#!C:/Strawberry/perl/bin/perl.exe
+
 use lib 'C:/xampp/htdocs/src/lib';
 
 use CGI::Carp qw(fatalsToBrowser);

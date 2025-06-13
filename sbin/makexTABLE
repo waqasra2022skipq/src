@@ -16,7 +16,7 @@ if ( !$table || !$Category ) {
 qq|\n\nusage: makexTABLE table Category\nERROR>> Missing table or Category!!\n\n|;
     exit;
 }
-my $form = DBForm->new("DBNAME=okmis_dev&mlt=BNpCTLI9e3tB");
+my $form = DBForm->new("DBNAME=okmis_dev&mlt=EdeGD84LBnmo");
 if ($debug) {
     foreach my $f ( sort keys %{$form} ) { print ": form-$f=$form->{$f}\n"; }
 }
