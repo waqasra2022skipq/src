@@ -134,7 +134,6 @@ sub prepareMeasures {
     my $ipop_three_measures;
     my $denom_three_measures;
     my $numerator_three_measures;
-    my $numerator_three_measures;
     my $PFRATES;
 
     if ( $TOP_MEASUREID eq '138' ) {
