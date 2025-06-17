@@ -753,14 +753,21 @@ sub genMeasures2 {
       group by Client.ClientID
   |;
 
-    my $sExclude = $dbh->prepare(
-        "select Treatment.TrID
-    from Treatment left join xSC on xSC.SCID=Treatment.SCID 
-    where Treatment.ClientID=? 
-    AND Treatment.ContLogDate < ?
-    and xSC.SCNum = 'G9717'"
-    );
-
+  my $qClProbs = $dbh->prepare(qq|
+    SELECT cp.InitiatedDate, i.ICD10, i.sctName 
+    FROM ClientProblems cp
+    LEFT JOIN okmis_config.misICD10 i ON cp.UUID = i.ID 
+    WHERE cp.ClientID = ? 
+      AND cp.Active = 1 
+      AND i.ICD10 IN (
+        'F30.2', 'F30.3', 'F30.4', 'F30.8', 'F30.9', 'F30.10', 'F30.11', 'F30.12', 'F30.13',
+        'F31.0', 'F31.10', 'F31.11', 'F31.12', 'F31.13', 'F31.2', 'F31.30', 'F31.31', 'F31.32',
+        'F31.4', 'F31.5', 'F31.60', 'F31.61', 'F31.62', 'F31.63', 'F31.64', 'F31.70', 'F31.71',
+        'F31.72', 'F31.73', 'F31.74', 'F31.75', 'F31.76', 'F31.77', 'F31.78', 'F31.81', 'F31.89', 'F31.9'
+    )
+|);
+ 
+   
     my $sNumertor = $dbh->prepare(
         "select Treatment.TrID, xSC.SCNum
      from Treatment 
@@ -793,9 +800,10 @@ sub genMeasures2 {
         $measures{'IPOP'}{'Race'}{$Race}           += 1;
         $measures{'IPOP'}{'Payer'}{$Payer}         += 1;
 
-        $sExclude->execute( $ClientID, $rrecord->{'ContLogDate'} );
-        $cnt = $sExclude->rows;
-        next if ( $cnt > 0 );
+
+         $qClProbs ->execute( $ClientID );
+        $cnt = $qClProbs->rows;
+
 
         $measures{'DENOM'}{'count'}                 += 1;
         $measures{'DENOM'}{$gender}                 += 1;
@@ -823,7 +831,6 @@ sub genMeasures2 {
         }
 
     }
-
     return %measures;
 }
 
