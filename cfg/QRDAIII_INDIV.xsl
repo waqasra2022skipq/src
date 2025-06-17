@@ -25,11 +25,11 @@
     <!-- QRDA Header -->
     <realmCode code="US"/>
     <typeId root="2.16.840.1.113883.1.3" extension="POCD_HD000040"/>
-    <templateId root="2.16.840.1.113883.10.20.27.1.1" extension="2017-06-01"/>
-    <templateId root="2.16.840.1.113883.10.20.27.1.2" extension="2022-12-01"/>
+    <templateId root="2.16.840.1.113883.10.20.27.1.1" extension="2016-06-01"/>
+    <templateId root="2.16.840.1.113883.10.20.27.1.2" extension="2024-12-01"/>
     <id root="26a42253-99f5-48e7-9274-b467c6c7f623"/>
     <code code="55184-6" codeSystem="2.16.840.1.113883.6.1" codeSystemName="LOINC" displayName="Quality Reporting Document Architecture Calculated Summary Report"/>
-    <title>QRDA III MIPS Individual Report</title>
+    <title>eCQMs</title>
     <confidentialityCode codeSystem="2.16.840.1.113883.5.25" code="N"/>
     <languageCode code="en" />
     <setId root="ae23711d-783d-4f5e-b942-4084b467848b"/>
@@ -2996,6 +2996,9 @@
               <xsl:value-of select="familyName"/>          
             </family>
           </name>
+          <providerid>
+            <xsl:value-of select="providerid"/>
+          </providerid>
         </assignedPerson>
       </assignedAuthor>
 

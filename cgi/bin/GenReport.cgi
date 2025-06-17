@@ -3,6 +3,8 @@ use lib 'C:/xampp/htdocs/src/lib';
 use myConfig;
 use Cwd;
 use DBI;
+use CGI::Carp qw(warningsToBrowser);
+use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
 use myForm;
 use myDBI;
 use DBUtil;
@@ -12,6 +14,10 @@ use Excel::Writer::XLSX;
 
 ############################################################################
 my $form = myForm->new();
+
+foreach my $k (sort keys %$form) {
+    warn "GenReport.cgi: form-$k=$form->{$k}\n";
+}
 
 my $debug = $form->{'LOGINPROVID'} == 91 ? 0 : 0;
 
@@ -191,6 +197,7 @@ sub check {
     # ALWAYS set the type of output...
     $askSection .= main->setOutput();
 
+
 # to limit reports hanging the system we tried this...ALWAYS narrow to selecting an Insurance
 # but users did not like...
     my $validation = $askIns && $form->{'DBNAME'} eq 'okmis_dev'
@@ -262,205 +269,281 @@ document.$form->{Name}.elements[0].focus();
     return ($html);
 }
 
-sub submit {
-      warn "START DEBUGGUNG!!!!!";
-   warn qq|GenReport: submit: $form->{Name}, Inputs=$rxTable->{Inputs}\n| if ($debug);
+sub submit
 
-my $hdrline = $form->{hdrline} ? $form->{hdrline} : 3;
+{
+ 
+warn "START DEBUGGUNG!!!!!";
 
-# Start with the Perl interpreter and script path
-my $script_path = "C:/xampp/htdocs/src/reports/$rxTable->{Script}";
+warn qq|GenReport: submit: $form->{Name}, Inputs=$rxTable->{Inputs}\n| if ( $debug );
 
-# Start building the parameter string
-my %all_params = %{$form};
+  my $hdrline = $form->{hdrline} ? $form->{hdrline} : 3;
 
-# Include extra dynamic Args
-foreach my $inp (sort keys %{Args}) {
-    $all_params{$inp} = $form->{$inp};
-}
+  my $cmd1 = qq|C:/xampp/htdocs/src/reports/$rxTable->{Script}|;
+ 
+  my $cmd = qq|C:/xampp/htdocs/src/reports/$rxTable->{Script} "DBNAME=$form->{DBNAME}&mlt=$form->{mlt}&Type=$form->{Type}&hdrline=$form->{hdrline}&output=$form->{output}|;
 
-# Add optional extras
-$all_params{ForProvID}         = $form->{ForProvID}         if $form->{ForProvID};
-$all_params{Client_ClientID}   = $form->{Client_ClientID}   if $form->{Client_ClientID};
-$all_params{ClientCARSReview_ID} = $form->{ClientCARSReview_ID} if $form->{ClientCARSReview_ID};
+##  foreach my $inp ( split(':',$rxTable->{Inputs}) )
 
-# Clean ReportDescr
-(my $ReportDescr = $rxTable->{Descr}) =~ s/'//g;
-$all_params{ReportDescr} = $ReportDescr;
-$all_params{xtable}       = $form->{xtable};
-$all_params{submit}       = 1;
+  foreach my $inp ( sort keys %{Args} )
 
-    # Build the command parts array
-    my @cmd_parts = ("perl", qq|"$script_path"|);
+  {
 
-    foreach my $key (sort keys %all_params) {
-        my $val = $all_params{$key} // '';
-        $val =~ s/"/\\"/g;     # Escape any double quotes inside the value
-        push @cmd_parts, qq|"$key=$val"|;  # Add each key=value pair as its own argument
+    $cmd .= qq|&${inp}=$form->{$inp}|;
+
+  }
+
+  $cmd .= qq|&ForProvID=$form->{'ForProvID'}| if ( $form->{'ForProvID'} );
+
+  $cmd .= qq|&Client_ClientID=$form->{'Client_ClientID'}| if ( $form->{'Client_ClientID'} );
+
+  $cmd .= qq|&ClientCARSReview_ID=$form->{'ClientCARSReview_ID'}| if ( $form->{'ClientCARSReview_ID'} );
+
+  (my $ReportDescr = $rxTable->{Descr}) =~ s/\'//g;
+
+  ($ReportDescr = $ReportDescr) =~ s/\"//g;
+
+  ($ReportDescr = $ReportDescr) =~ s/\(/&#40;/g;      # don't think this alwarys works
+
+  ($ReportDescr = $ReportDescr) =~ s/\)/&#41;/g;      # don't think this alwarys works
+
+  $cmd .= qq|&ReportDescr=${ReportDescr}\\&xtable=$form->{'xtable'}|;
+
+  $cmd .= qq|&submit=1"|;                            # for genCCDAs to submit and close window
+
+  my $out = main->runReport("${cmd}");
+  my $html = '';
+
+  my ($header,$body) = ('','');
+
+  my $sfx = '.txt';
+
+  if ( $form->{output} eq 'ss' )
+
+  {
+
+    (my $Descr = $rxTable->{Descr}) =~ s;\/;\:;g;
+
+    my $newfile = 'RPT_'.$form->{PROVLOGINID}.'_'.${Descr}.'_'.$form->{TODAY}.'.xlsx';
+ 
+    
+
+    # Your data generation logic here
+
+    my @data = [];
+
+    my @cmd_resp = split('\n',$out); #Split the Responce from CMD file into lines
+ 
+    foreach my $line (@cmd_resp) {
+
+      my @tabs = split('\t', $line); #Split the Line by Tabs
+
+      @line_here = [];
+
+      foreach my $fld (@tabs) {
+
+        push(@line_here, [$fld]);
+
+      }
+
+      shift @line_here;
+
+      push(@data, [@line_here]);
+
     }
+ 
+    my $workbook = Excel::Writer::XLSX->new($newfile);
 
-    # Join the command parts into a single command string
-    my $cmd = join(' ', @cmd_parts);
+    my $worksheet = $workbook->add_worksheet();
+ 
+    # Write data to the worksheet
 
-    # warn "FINAL CMD: $cmd";  # For debugging
+    my $row = 0;
 
-    my $out = main->runReport($cmd);
+    foreach my $row_data (@data) {
 
-    my $html = '';
-    my ( $header, $body ) = ( '', '' );
-    my $sfx = '.txt';
-    if ( $form->{output} eq 'ss' ) {
-        ( my $Descr = $rxTable->{Descr} ) =~ s;\/;\:;g;
-        my $newfile = 'RPT_'
-          . $form->{PROVLOGINID} . '_'
-          . ${Descr} . '_'
-          . $form->{TODAY} . '.xlsx';
+        my $col = 0;
 
-        # Your data generation logic here
-        my @data = [];
-        my @cmd_resp =
-          split( '\n', $out );    #Split the Responce from CMD file into lines
+        foreach my $cell_data (@$row_data) {
 
-        foreach my $line (@cmd_resp) {
-            my @tabs = split( '\t', $line );    #Split the Line by Tabs
-            @line_here = [];
-            foreach my $fld (@tabs) {
-                push( @line_here, [$fld] );
-            }
-            shift @line_here;
-            push( @data, [@line_here] );
+            $worksheet->write($row, $col, $cell_data);
+
+            $col++;
+
         }
 
-        my $workbook  = Excel::Writer::XLSX->new($newfile);
-        my $worksheet = $workbook->add_worksheet();
+        $row++;
 
-        # Write data to the worksheet
-        my $row = 0;
-        foreach my $row_data (@data) {
-            my $col = 0;
-            foreach my $cell_data (@$row_data) {
-                $worksheet->write( $row, $col, $cell_data );
-                $col++;
-            }
-            $row++;
-        }
-
-        # Close the workbook
-        $workbook->close();
-  
-        my $q = new CGI;
-        print $q->header(
-            -type =>
-'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            -attachment => $newfile
-        );
-
-        # Read and print the XLSX file
-        open my $xlsx_file, '<', $newfile or die "Unable to open XLSX file: $!";
-        binmode $xlsx_file;
-        while ( my $chunk = <$xlsx_file> ) {
-            print $chunk;
-        }
-        close $xlsx_file;
     }
-    elsif ( $form->{output} eq 'html' ) {
-        $header = qq|Content-type: text/html\n\n|;
-        $body =
-qq|<HTML lang="en" >\n<HEAD><TITLE>$form->{Name}</TITLE></HEAD>\n<BODY >|
-          . gHTML->htmlReport( $out, $hdrline )
-          . qq|\n</BODY>\n</HTML>\n|;
-        $sfx = '.html';
+ 
+    # Close the workbook
+
+    $workbook->close();
+
+    my $q = new CGI;
+
+    print $q->header(
+
+        -type => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+
+        -attachment => $newfile
+
+    );
+ 
+    # Read and print the XLSX file
+
+    open my $xlsx_file, '<', $newfile or die "Unable to open XLSX file: $!";
+
+    binmode $xlsx_file;
+
+    while (my $chunk = <$xlsx_file>) {
+
+        print $chunk;
+
     }
-    elsif ( $form->{output} eq 'plain' ) { $body = $out; }
-    elsif ( $form->{output} eq 'graph' ) {
-        $header = qq|Content-type: text/html\n\n|;
-        $body   = qq|<HTML lang="en" >
+
+    close $xlsx_file;
+ 
+  }
+
+  elsif ( $form->{output} eq 'plain' ) { $body = $out; }
+  elsif ( $form->{output} eq 'graph' )
+
+  {
+ 
+    $header = qq|Content-type: text/html\n\n|; 
+
+    $body = qq|<HTML lang="en" >
 <HEAD>
-  <meta charset="utf-8">
-  <TITLE>$form->{Name}</TITLE>
-  <script type="text/javascript" src="/src/cgi/d3lib/d3.js"></script>
-  <link href="/src/cgi/d3lib/nv.d3.css" rel="stylesheet">
-  <script type="text/javascript" src="/src/cgi/d3lib/nv.d3.js"></script>
-  <link href="/src/cgi/d3lib/my.d3.css" rel="stylesheet">
+<meta charset="utf-8">
+<TITLE>$form->{Name}</TITLE>
+<script type="text/javascript" src="/src/cgi/d3lib/d3.js"></script>
+<link href="/src/cgi/d3lib/nv.d3.css" rel="stylesheet">
+<script type="text/javascript" src="/src/cgi/d3lib/nv.d3.js"></script>
+<link href="/src/cgi/d3lib/my.d3.css" rel="stylesheet">
 </HEAD>
 <BODY > 
-${out}
+
+        ${out}
 </BODY>
 </HTML>
+
 |;
-        $sfx = '.html';
-    }
-    elsif ( $form->{output} eq 'pdf' ) {
-        $header = qq|Content-Type: application/pdf\n\n|;
-        $body   = $out;
-        $sfx    = '.pdf';
-    }
-    elsif ( $form->{output} eq 'fdf' ) {
-        $header = qq|Content-Type: application/vnd.fdf\n\n|;
-        $body   = $out;
-        $sfx    = '.fdf';
-    }
-    elsif ( $form->{output} eq 'text' ) {
-        $header = qq|Content-type: text/html\n\n|;
-        $body =
-qq|<HTML lang="en" >\n<HEAD><TITLE>$form->{Name}</TITLE></HEAD>\n<BODY>\n<PRE>\n|
-          . $out
-          . qq|\n</PRE>\n</BODY>\n</HTML>\n|;
-    }
-    else {
-        $header = qq|Content-type: text/html\n\n|;
-        $body   = qq|<HTML lang="en" >
-<HEAD>
-  <TITLE>$form->{Name}</TITLE>
-</HEAD>
-<BODY>
-  <P CLASS="heading">ERROR! output=$form->{output}</P>
-</BODY>
-</HTML>
-|;
-        $sfx = '.html';
-    }
+
+    $sfx = '.html';
+
+  }
+
+  elsif ( $form->{output} eq 'pdf' )
+
+  {
+
+    $header = qq|Content-Type: application/pdf\n\n|;
+
+    $body = $out; 
+
+    $sfx = '.pdf';
+
+  }
+
+  elsif ( $form->{output} eq 'fdf' )
+
+  {
+
+    $header = qq|Content-Type: application/vnd.fdf\n\n|;
+
+    $body = $out; 
+
+    $sfx = '.fdf';
+
+  }
+
+  elsif ( $form->{output} eq 'text' )
+
+  {
+
+    $header = qq|Content-type: text/html\n\n|;
+
+    $body = qq|<HTML lang="en" >\n<HEAD><TITLE>$form->{Name}</TITLE></HEAD>\n<BODY>\n<PRE>\n|
+
+          . $out . qq|\n</PRE>\n</BODY>\n</HTML>\n|;
+
+  }
+
+  else
+
+  { 
+
+    $header = qq|Content-type: text/html\n\n|; 
+
+    $body = qq|<HTML lang="en" >\n<HEAD><TITLE>$form->{Name}</TITLE></HEAD>\n<BODY >|
+
+          . gHTML->htmlReport($out,$hdrline) . qq|\n</BODY>\n</HTML>\n|;
+
+    $sfx = '.html';
+
+  }
+
 ## KLS
-    if ( $form->{save} ) {
-        my $linecnt = 0;
-        if ( $sfx eq '.pdf' ) { $linecnt = 'x'; }
-        else {
-            $linecnt = DBUtil->CountFile($diskfile) - 4;
-            $linecnt = 0 if ( $linecnt < 0 );
-        }
-        ( my $Descr = $rxTable->{Descr} ) =~ s;\/;\:;g;
-        my $rptDir = $rxReports->{Dir} eq '' ? 'reports2' : $rxReports->{Dir};
-        chdir("$form->{DOCROOT}/${rptDir}");
-        my $pwd = cwd();
-        my $newfile =
-            'RPT_scheduled_'
-          . $form->{PROVLOGINID} . '_'
-          . ${Descr} . '_'
-          . $form->{TODAY} . '_'
-          . $linecnt . '_'
-          . DBUtil->Date( '', 'stamp' ) . '_'
-          . DBUtil->genToken() . '.'
-          . $sfx;
-        open FILE, ">${newfile}" or die "Couldn't open file: $!";
-        print FILE $body;
-        close(FILE);
-        $html =
-          myHTML->newHTML( $form, $form->{Name},
-            'CheckPopupWindow noclock countdown_1' )
-          . qq|
-  <P CLASS="heading" >Your report has been saved to your Report List.</P>
-  <P CLASS="title" >Report List can be accessed from the main menu Report->My Reports List.</P>
+
+  if ( $form->{save} )
+
+  {
+
+    my $linecnt = 0;
+
+    if ( $sfx eq '.pdf' ) { $linecnt = 'x'; }
+
+    else
+
+    {
+
+      $linecnt = DBUtil->CountFile($diskfile)-4;
+
+      $linecnt = 0 if ( $linecnt < 0 );
+
+    }
+
+    (my $Descr = $rxTable->{Descr}) =~ s;\/;\:;g;
+
+    my $rptDir = $rxReports->{Dir} eq '' ? 'reports2' : $rxReports->{Dir};
+
+    chdir("$form->{DOCROOT}/${rptDir}");
+
+    my $pwd=cwd();
+
+    my $newfile = 'RPT_scheduled_'.$form->{PROVLOGINID}.'_'.${Descr}.'_'.$form->{TODAY}.'_'.$linecnt.'_'.DBUtil->Date('','stamp').'_'.DBUtil->genToken().'.'.$sfx;
+
+    open FILE, ">${newfile}" or die "Couldn't open file: $!";
+
+    print FILE $body;
+
+    close(FILE);
+
+    $html = myHTML->newHTML($form,$form->{Name},'CheckPopupWindow noclock countdown_1') . qq|
+<P CLASS="heading" >Your report has been saved to your Report List.</P>
+<P CLASS="title" >Report List can be accessed from the main menu Report->My Reports List.</P>
 </BODY>
 <INPUT TYPE="hidden" NAME="CLOSEWINDOW" VALUE="CLOSE">
 </HTML>
+
 |;
-        ##DBA->setAlert($form,"You report has been saved.\n");
-        warn qq|GenReport: save: COMPLETE\n${html}| if ($debug);
-    }
-    else { $html = $header . $body; }
-    warn qq|GenReport: submit: COMPLETE\n| if ($debug);
-    return ($html);
+
+    ##DBA->setAlert($form,"You report has been saved.\n");
+
+warn qq|GenReport: save: COMPLETE\n${html}| if ( $debug );
+
+  }
+
+  else
+
+  { $html = $header.$body; }
+
+warn qq|GenReport: submit: COMPLETE\n| if ( $debug );
+  return($html);
+
 }
+ 
 
 sub setProvClients {
     my ($self) = @_;
@@ -923,7 +1006,8 @@ qq|GenReport: runReport: ProvID=$ProvID, RptID=$RptID, xtable=$xtable, RptName=$
     # run the Report...
     my $diskfile = DBUtil->ExecCmd( $cmd, '.warn' );
     my $out      = DBUtil->ReadFile($diskfile);
-
+  
+  
     # end time the Report...
     $DT = main->getDATETIME();
     $s =

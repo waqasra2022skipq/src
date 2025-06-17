@@ -1,4 +1,6 @@
 package DBUtil;
+use CGI::Carp qw(warningsToBrowser);
+use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
 use Time::Local;
 use DateTime;
 use Cwd;
@@ -733,7 +735,8 @@ sub ExecCmd
 #my $pwd=cwd();
 #warn "ExecCmd: pwd=$pwd, cmd=$cmd\n";
 #warn "ExecCmd: outfile=$outfile\n";
-  system("${cmd} > ${outfile} ${warnfile}");
+  $ENV{USERPROFILE} ||= "C:/Users/Lenovo"; # Set this to your actual user folder if not already set
+  system("perl ${cmd} > ${outfile} ${warnfile}");
   return($outfile);
 }
 # Read a file

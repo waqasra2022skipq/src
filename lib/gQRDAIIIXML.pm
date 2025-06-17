@@ -23,19 +23,29 @@ our $TOP_MEASUREID;
 sub styleQRDA
 {
   my ($self,$form,$xmlfile) = @_;
-  # first read and parse the file
   my $xmlpath = $form->{'DOCROOT'}.$xmlfile;
+  warn "styleQRDA: Loading XML from $xmlpath\n";
   my $docfile = '';
-  # load_xml: initializes the parser and parse_file()
   eval { $docfile = XML::LibXML->load_xml(location => $xmlpath); };
-  return('parse_error') if ( $@ );
-
-  # initialize XSLT processor and read stylesheet
+  if ($@) {
+      warn "styleQRDA: XML parse error: $@";
+      return('parse_error');
+  }
   my $xslt = XML::LibXSLT->new( );
   my $QRDAxsl = $form->{'DOCROOT'}.myConfig->cfgfile("QRDAIII_INDIV.xsl",1);
-  my $stylesheet_qrda = $xslt->parse_stylesheet_file( $QRDAxsl );
-  # next the generate/transform the QRDA file...
-  my $qrdatrans = $stylesheet_qrda->transform( $docfile );
+  warn "styleQRDA: Using XSLT $QRDAxsl\n";
+  my $stylesheet_qrda;
+  eval { $stylesheet_qrda = $xslt->parse_stylesheet_file( $QRDAxsl ); };
+  if ($@) {
+      warn "styleQRDA: XSLT parse error: $@";
+      return('parse_error');
+  }
+  my $qrdatrans;
+  eval { $qrdatrans = $stylesheet_qrda->transform( $docfile ); };
+  if ($@) {
+      warn "styleQRDA: XSLT transform error: $@";
+      return('parse_error');
+  }
   my $qrdaout = $stylesheet_qrda->output_string( $qrdatrans );
   return($qrdaout);
 }

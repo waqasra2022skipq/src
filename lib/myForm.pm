@@ -232,8 +232,8 @@ sub getRoot {
         my ( $p1, $p2 ) = split( '_', $FORM->{'DBNAME'} );
 
         #warn qq|2: 1=${p1}, 2=${p2}, 3=${p3}, 4=${p4}, 5=${p5}, 6=${p6}\n|;
-        $FORM->{DOCROOT}   = qq|/home/${p1}/www/${p2}|;
-        $FORM->{DOCPARENT} = qq|/home/${p1}/www/|;
+        $FORM->{DOCROOT}   = 'C:/xampp/htdocs/';
+        $FORM->{DOCPARENT} = 'C:/xampp/htdocs/';
     }
     elsif ( defined( $ENV{DOCUMENT_ROOT} ) ) {
         $FORM->{DOCROOT} = $ENV{DOCUMENT_ROOT};

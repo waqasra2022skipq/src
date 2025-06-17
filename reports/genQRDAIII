@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!C:/Strawberry/perl/bin/perl.exe
 use lib 'C:/xampp/htdocs/src/lib';
 use CGI::Carp qw(warningsToBrowser);
 use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
@@ -13,6 +13,7 @@ use SysAccess;
 use gQRDAIIIXML;
 use XML::LibXSLT;
 use XML::LibXML;
+
 binmode STDOUT, ":utf8";
 my $debug = 1;
 
@@ -39,11 +40,10 @@ sub report {
     my ( $self, $form ) = @_;
     $pwd = cwd();
     warn qq|genQRDAs: pwd=${pwd}\n| if ($debug);
-    my $cmd =
-qq|/home/okmis/mis/src/cgi/bin/GenReport.cgi Name=GenerateQRDAIII&daterange=lastyear&ProvIDs=$form->{'ProvIDs'}&DBNAME=$form->{DBNAME}&mlt=$form->{mlt}|;
+    my $cmd = qq|C:/xampp/htdocs/src/cgi/bin/GenReport.cgi Name=GenerateQRDAIII daterange=lastyear ProvIDs=$form->{'ProvIDs'} DBNAME=$form->{DBNAME} mlt=$form->{mlt}|;
     warn qq|genQRDAIII: cmd=${cmd}\n| if ($debug);
     my $html = `${cmd}`;
-    my $html = myHTML->close(1);
+   $html = myHTML->close(1);
     return ($html);
 }
 
@@ -62,8 +62,9 @@ sub submit {
         my $xml = qq|<?xml version="1.0" encoding="utf-8"?>\n|
           . gQRDAIIIXML->setXML( $form, $ProvID, '', $form->{FromDate},
             $form->{ToDate}, $form->{'MEASUREID'} );
-        my $xmlfile = qq|/tmp/XML_${Token}_${ProvID}.xml|;
-        my $xmlpath = qq|$form->{DOCROOT}${xmlfile}|;
+        # Ensure $form->{DOCROOT} ends with a slash (/) or backslash (\)
+        my $xmlfile = qq|tmp/XML_${Token}_${ProvID}.xml|;
+        my $xmlpath = qq|$form->{DOCROOT}$xmlfile|;
         open( XML, ">", $xmlpath ) || die "Couldn't open '${xmlpath}' file: $!";
         print XML $xml;
         close(XML);
@@ -71,7 +72,7 @@ sub submit {
         # next the generate QRDA file...
         # IF you want to VIEw the QRDA change the suffix to '.htm'!!
         my $visitout  = gQRDAIIIXML->styleQRDA( $form, $xmlfile );
-        my $visitfile = qq|/tmp/QRDAIII_${Token}_${ProvID}.xml|;
+        my $visitfile = qq|tmp/QRDAIII_${Token}_${ProvID}.xml|;
         my $visitpath = qq|$form->{DOCROOT}${visitfile}|;
         open( OUT, ">:encoding(UTF-8)", $visitpath )
           || die "Couldn't open '${visitpath}' file: $!";
