@@ -63,7 +63,8 @@ sub submit {
           . gQRDAIIIXML->setXML( $form, $ProvID, '', $form->{FromDate},
             $form->{ToDate}, $form->{'MEASUREID'} );
         my $xmlfile = qq|/tmp/XML_${Token}_${ProvID}.xml|;
-        $form->{DOCROOT} = my $xmlpath = qq|$form->{DOCROOT}${xmlfile}|;
+        $form->{DOCROOT} = myConfig->cfg('DOCROOT');
+        my $xmlpath = qq|$form->{DOCROOT}${xmlfile}|;
         open( XML, ">", $xmlpath ) || die "Couldn't open '${xmlpath}' file: $!";
         print XML $xml;
         close(XML);
