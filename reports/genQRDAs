@@ -67,6 +67,7 @@ sub submit {
               . gXML->setXML( $form, $ProvID, $ClientID, '', $form->{FromDate},
                 $form->{ToDate}, 'QRDA nonulls' );
             my $xmlfile = qq|/tmp/XML_${Token}_${ProvID}_${ClientID}.xml|;
+            $form->{DOCROOT} = myConfig->cfg('DOCROOT');
             my $xmlpath = qq|$form->{DOCROOT}${xmlfile}|;
             open( XML, ">", $xmlpath )
               || die "Couldn't open '${xmlpath}' file: $!";
